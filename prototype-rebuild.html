@@ -741,6 +741,28 @@
   }
   .opt-file-tag .file-remove { font-size: 12px; }
 
+  /* Built-in filter tag variant */
+  .opt-file-tag.builtin-filter {
+    color: var(--text-secondary);
+    border-style: dashed;
+  }
+  .opt-file-tag.builtin-filter.enabled {
+    color: var(--accent);
+    border-style: solid;
+  }
+  .opt-file-tag .builtin-checkbox {
+    width: 12px;
+    height: 12px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    margin: 0;
+  }
+  .opt-file-tag .builtin-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-left: 2px;
+  }
+
   /* Key/value row for metadata and variables */
   .opt-kv-row {
     display: flex;
@@ -1482,7 +1504,7 @@
       </div>
     </div>
     <div id="luaFiltersList" style="margin-top:4px;"></div>
-    <div style="margin-top:4px; font-size:10px; color:var(--text-muted);">Drag to reorder execution sequence.</div>
+    <div style="margin-top:4px; font-size:10px; color:var(--text-muted);">Drag to reorder execution sequence. Built-in filters can be enabled/disabled with the checkbox.</div>
   </div>
 
   <!-- Wrapping -->
@@ -2205,6 +2227,71 @@ const resourceFiles = {
   luaFilters: [],
 };
 
+// ─── BUILT-IN LUA FILTERS ───
+// Filters embedded directly in the app. Each entry has:
+//   id: unique identifier
+//   name: display name
+//   filename: virtual filename for pandoc
+//   description: tooltip text
+//   defaultEnabled: whether on by default
+//   content: the Lua source as a string
+const BUILT_IN_FILTERS = [
+  {
+    id: 'missing-image-placeholder',
+    name: 'Missing Image Placeholder',
+    filename: 'missing-image-placeholder.lua',
+    description: 'Replaces missing images with a visible placeholder box showing the filename',
+    defaultEnabled: true,
+    content: `-- missing-image-placeholder.lua
+-- Replaces Image elements with visible placeholder text when the
+-- referenced image file is not available in the virtual filesystem.
+-- Useful for browser-based pandoc conversions where images may not
+-- be uploaded alongside the source document.
+
+function Image(el)
+  -- Try to read the image file; if it fails, it's missing
+  local f = io.open(el.src, "r")
+  if f then
+    f:close()
+    return nil  -- image exists, leave it alone
+  end
+
+  -- Build placeholder content
+  local warning = pandoc.Str("⚠ Missing image: " .. el.src)
+  local caption_text = pandoc.utils.stringify(el.caption)
+
+  local blocks = {}
+  table.insert(blocks, pandoc.Para({
+    pandoc.Strong({ pandoc.Str("["), warning, pandoc.Str("]") })
+  }))
+
+  if caption_text ~= "" then
+    table.insert(blocks, pandoc.Para({
+      pandoc.Emph({ pandoc.Str("Caption: " .. caption_text) })
+    }))
+  end
+
+  -- Wrap in a Div with a border style (works in HTML; in docx the
+  -- text itself is the main indicator)
+  local div = pandoc.Div(blocks, pandoc.Attr("", {"missing-image-placeholder"}, {
+    {"style", "border: 2px dashed #c0392b; padding: 12px; margin: 12px 0; background: #fdf2f2; color: #c0392b; text-align: center;"}
+  }))
+
+  return div
+end
+`
+  }
+];
+
+// State: tracks enabled/disabled and position for each built-in filter
+// filterOrder is the unified ordering: mix of {type:'builtin', id} and {type:'user', idx}
+// We rebuild this on every render from the DOM order after drag operations.
+const builtInState = {};
+BUILT_IN_FILTERS.forEach(f => { builtInState[f.id] = f.defaultEnabled; });
+
+// Unified filter ordering — initialized with built-ins first, users appended as added
+let filterOrder = BUILT_IN_FILTERS.map(f => ({ type: 'builtin', id: f.id }));
+
 // --- Citations tab ---
 // Helper for single-file upload fields
 function setupSingleFileUpload(btnId, inputId, nameId, removeId, resourceKey, onChangeExtra) {
@@ -2430,23 +2517,86 @@ document.getElementById('btnAddMetadata')?.addEventListener('click', () => addMe
 addMetadataRow('', '');
 
 // --- Filters tab ---
+// Ensure filterOrder includes all user filters (called after user adds/removes)
+function syncFilterOrder() {
+  // Collect existing user indices in filterOrder
+  const existingUserIdxs = new Set(
+    filterOrder.filter(e => e.type === 'user').map(e => e.idx)
+  );
+  // Add any new user filters not yet in the order
+  resourceFiles.luaFilters.forEach((_, i) => {
+    if (!existingUserIdxs.has(i)) {
+      filterOrder.push({ type: 'user', idx: i });
+    }
+  });
+  // Remove user entries whose idx is out of range (deleted filters)
+  filterOrder = filterOrder.filter(e => {
+    if (e.type === 'builtin') return true;
+    return e.idx >= 0 && e.idx < resourceFiles.luaFilters.length;
+  });
+  // Ensure all built-ins are present
+  const existingBuiltinIds = new Set(
+    filterOrder.filter(e => e.type === 'builtin').map(e => e.id)
+  );
+  BUILT_IN_FILTERS.forEach(f => {
+    if (!existingBuiltinIds.has(f.id)) {
+      filterOrder.unshift({ type: 'builtin', id: f.id });
+    }
+  });
+}
+
 function renderLuaFiltersList() {
   const list = document.getElementById('luaFiltersList');
   if (!list) return;
-  const files = resourceFiles.luaFilters;
-  if (files.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = '';
-  files.forEach((f, i) => {
-    const tag = document.createElement('span');
-    tag.className = 'opt-file-tag';
-    tag.draggable = true;
-    tag.dataset.idx = i;
-    tag.style.cursor = 'grab';
-    tag.innerHTML = `<span style="color:var(--text-muted);font-size:10px;margin-right:2px;">☰</span>${f.name}<button class="file-remove" data-luaidx="${i}">×</button>`;
+  syncFilterOrder();
 
-    // Drag events for reordering
+  // If nothing to show, clear
+  if (filterOrder.length === 0) { list.innerHTML = ''; return; }
+
+  list.innerHTML = '';
+  filterOrder.forEach((entry, orderIdx) => {
+    const tag = document.createElement('span');
+    tag.draggable = true;
+    tag.dataset.orderIdx = orderIdx;
+    tag.style.cursor = 'grab';
+
+    if (entry.type === 'builtin') {
+      const def = BUILT_IN_FILTERS.find(f => f.id === entry.id);
+      if (!def) return;
+      const enabled = builtInState[entry.id];
+      tag.className = 'opt-file-tag builtin-filter' + (enabled ? ' enabled' : '');
+      tag.title = def.description;
+      tag.innerHTML = `<span style="color:var(--text-muted);font-size:10px;margin-right:2px;">☰</span>` +
+        `<input type="checkbox" class="builtin-checkbox" data-builtin-id="${entry.id}" ${enabled ? 'checked' : ''}>` +
+        `${def.name}<span class="builtin-label">(built-in)</span>`;
+      // Checkbox toggle
+      tag.querySelector('.builtin-checkbox').addEventListener('change', (ev) => {
+        ev.stopPropagation();
+        builtInState[entry.id] = ev.target.checked;
+        renderLuaFiltersList();
+      });
+    } else {
+      const f = resourceFiles.luaFilters[entry.idx];
+      if (!f) return;
+      tag.className = 'opt-file-tag';
+      tag.innerHTML = `<span style="color:var(--text-muted);font-size:10px;margin-right:2px;">☰</span>${f.name}<button class="file-remove" data-useridx="${entry.idx}">×</button>`;
+      // Remove button
+      tag.querySelector('.file-remove').addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const removedIdx = entry.idx;
+        resourceFiles.luaFilters.splice(removedIdx, 1);
+        // Remove from filterOrder and adjust indices
+        filterOrder = filterOrder.filter(e => !(e.type === 'user' && e.idx === removedIdx));
+        filterOrder.forEach(e => {
+          if (e.type === 'user' && e.idx > removedIdx) e.idx--;
+        });
+        renderLuaFiltersList();
+      });
+    }
+
+    // Drag events for reordering (unified)
     tag.addEventListener('dragstart', (e) => {
-      e.dataTransfer.setData('text/plain', i);
+      e.dataTransfer.setData('text/plain', orderIdx);
       tag.style.opacity = '0.4';
     });
     tag.addEventListener('dragend', () => { tag.style.opacity = '1'; });
@@ -2459,23 +2609,20 @@ function renderLuaFiltersList() {
       e.preventDefault();
       tag.style.borderColor = '';
       const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
-      const toIdx = parseInt(tag.dataset.idx);
+      const toIdx = parseInt(tag.dataset.orderIdx);
       if (fromIdx !== toIdx) {
-        const [moved] = resourceFiles.luaFilters.splice(fromIdx, 1);
-        resourceFiles.luaFilters.splice(toIdx, 0, moved);
+        const [moved] = filterOrder.splice(fromIdx, 1);
+        filterOrder.splice(toIdx, 0, moved);
         renderLuaFiltersList();
       }
-    });
-
-    tag.querySelector('.file-remove').addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      resourceFiles.luaFilters.splice(i, 1);
-      renderLuaFiltersList();
     });
 
     list.appendChild(tag);
   });
 }
+
+// Initialize the list on load (shows built-in filters even before user uploads)
+renderLuaFiltersList();
 
 document.getElementById('btnLuaFilters')?.addEventListener('click', () => {
   document.getElementById('luaFiltersInput').click();
@@ -2865,8 +3012,23 @@ function buildOptions() {
     if (Object.keys(variables).length > 0) opts.variables = variables;
   }
 
-  // Lua filters
-  if (resourceFiles.luaFilters.length > 0) opts.filters = resourceFiles.luaFilters.map(f => f.name);
+  // Lua filters — unified ordering of built-in + user filters
+  {
+    const filterNames = [];
+    syncFilterOrder();
+    for (const entry of filterOrder) {
+      if (entry.type === 'builtin') {
+        if (builtInState[entry.id]) {
+          const def = BUILT_IN_FILTERS.find(f => f.id === entry.id);
+          if (def) filterNames.push(def.filename);
+        }
+      } else {
+        const f = resourceFiles.luaFilters[entry.idx];
+        if (f) filterNames.push(f.name);
+      }
+    }
+    if (filterNames.length > 0) opts.filters = filterNames;
+  }
 
   // Output file — always set so pandoc writes to virtual filesystem
   const baseToFmt = toFmt.split(/[+-]/)[0]; // strip extensions
@@ -2903,6 +3065,12 @@ function buildFiles() {
   resourceFiles.beforeBodyFiles.forEach(f => { raw[f.name] = f; });
   resourceFiles.afterBodyFiles.forEach(f => { raw[f.name] = f; });
   resourceFiles.luaFilters.forEach(f => { raw[f.name] = f; });
+  // Include enabled built-in filter content as virtual files
+  BUILT_IN_FILTERS.forEach(f => {
+    if (builtInState[f.id]) {
+      raw[f.filename] = new Blob([f.content], { type: 'text/plain' });
+    }
+  });
   // Binary input file
   if (inputBinaryFile) raw[inputBinaryFile.name] = inputBinaryFile.blob;
   // pandoc.js expects Blob objects (calls blob.arrayBuffer())
