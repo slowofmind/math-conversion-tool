@@ -6,34 +6,32 @@
 <title>Pandoc WASM — Prototype</title>
 
 <!-- Ace Editor from CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-latex.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-html.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/theme-chrome.js"></script>
+<script src="ace/ace.js"></script>
+<script src="ace/mode-latex.js"></script>
+<script src="ace/mode-html.js"></script>
+<script src="ace/mode-markdown.js"></script>
+<script src="ace/theme-one_dark.js"></script>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
   :root {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f5f5f8;
-    --bg-tertiary: #ecedf2;
-    --bg-elevated: #e4e5ec;
-    --bg-surface: #dcdde6;
-    --border: #c8c9d4;
-    --border-subtle: #dfe0e8;
-    --text-primary: #1e1e2e;
-    --text-secondary: #4a4b66;
-    --text-muted: #8b8da6;
-    --accent: #a51c30;
-    --accent-dim: #c75065;
-    --accent-glow: rgba(165, 28, 48, 0.08);
-    --accent-blue: #6578b4;
-    --accent-blue-light: #aac8eb;
-    --accent-blue-glow: rgba(101, 120, 180, 0.10);
-    --success: #2e7d32;
-    --warning: #c67a0e;
-    --error: #c62828;
+    --bg-primary: #1a1b26;
+    --bg-secondary: #1e1f2e;
+    --bg-tertiary: #24253a;
+    --bg-elevated: #2a2b3d;
+    --bg-surface: #30314a;
+    --border: #3b3d57;
+    --border-subtle: #2e3047;
+    --text-primary: #c8cad8;
+    --text-secondary: #8f91a8;
+    --text-muted: #5d5f78;
+    --accent: #7aa2f7;
+    --accent-dim: #3d5a9e;
+    --accent-glow: rgba(122, 162, 247, 0.12);
+    --success: #9ece6a;
+    --warning: #e0af68;
+    --error: #f7768e;
     --toolbar-height: 42px;
     --statusbar-height: 26px;
     --sidebar-width: 300px;
@@ -86,9 +84,9 @@
     gap: 5px;
   }
   .toolbar-btn:hover { background: var(--bg-elevated); border-color: var(--text-muted); }
-  .toolbar-btn.active { background: var(--accent-blue-glow); border-color: var(--accent-blue); color: var(--accent-blue); }
-  .toolbar-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .toolbar-btn.primary:hover { background: var(--accent-dim); }
+  .toolbar-btn.active { background: var(--accent-glow); border-color: var(--accent-dim); color: var(--accent); }
+  .toolbar-btn.primary { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+  .toolbar-btn.primary:hover { background: var(--accent); }
   .toolbar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .toolbar-select {
@@ -288,7 +286,7 @@
     border-radius: 2px;
     outline: none;
   }
-  .pf-input:focus { border-color: var(--accent-blue); }
+  .pf-input:focus { border-color: var(--accent); }
   .pf-input::placeholder { color: var(--text-muted); opacity: 0.5; font-family: 'IBM Plex Sans', sans-serif; }
 
   .pf-input-anchor { width: 50px; flex-shrink: 0; }
@@ -365,7 +363,7 @@
     margin-top: 10px;
     transition: background 0.15s;
   }
-  .cleanup-run-btn:hover { background: var(--accent-dim); }
+  .cleanup-run-btn:hover { background: var(--accent); }
 
   /* ─── EDITOR AREA ─── */
   .editor-area {
@@ -400,7 +398,7 @@
     white-space: nowrap;
   }
   .editor-tab:hover { color: var(--text-secondary); }
-  .editor-tab.active { color: var(--text-primary); border-bottom-color: var(--accent-blue); background: var(--bg-primary); }
+  .editor-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); background: var(--bg-primary); }
 
   .editor-content { flex: 1; position: relative; overflow: hidden; }
 
@@ -429,12 +427,12 @@
   }
 
   /* Pandoc warning/error/info markers */
-  .pandoc-warning-line { position: absolute; background: rgba(198, 122, 14, 0.08); border-left: 3px solid var(--warning); }
-  .pandoc-error-line { position: absolute; background: rgba(198, 40, 40, 0.08); border-left: 3px solid var(--error); }
-  .pandoc-info-line { position: absolute; background: rgba(101, 120, 180, 0.06); border-left: 3px solid var(--accent-blue); }
-  .pandoc-warning-text { position: absolute; background: rgba(198, 122, 14, 0.15); border-bottom: 2px solid var(--warning); }
-  .pandoc-error-text { position: absolute; background: rgba(198, 40, 40, 0.15); border-bottom: 2px solid var(--error); }
-  .pandoc-info-text { position: absolute; background: rgba(101, 120, 180, 0.12); border-bottom: 2px solid var(--accent-blue); }
+  .pandoc-warning-line { position: absolute; background: rgba(224, 175, 104, 0.08); border-left: 3px solid var(--warning); }
+  .pandoc-error-line { position: absolute; background: rgba(247, 118, 142, 0.08); border-left: 3px solid var(--error); }
+  .pandoc-info-line { position: absolute; background: rgba(122, 162, 247, 0.05); border-left: 3px solid var(--accent); }
+  .pandoc-warning-text { position: absolute; background: rgba(224, 175, 104, 0.18); border-bottom: 2px solid var(--warning); }
+  .pandoc-error-text { position: absolute; background: rgba(247, 118, 142, 0.18); border-bottom: 2px solid var(--error); }
+  .pandoc-info-text { position: absolute; background: rgba(122, 162, 247, 0.12); border-bottom: 2px solid var(--accent); }
 
   /* ─── RESIZE GUTTER ─── */
   .resize-gutter {
@@ -445,7 +443,7 @@
     z-index: 10;
     transition: background 0.1s;
   }
-  .resize-gutter:hover, .resize-gutter.dragging { background: var(--accent-blue); }
+  .resize-gutter:hover, .resize-gutter.dragging { background: var(--accent-dim); }
   .resize-gutter.horizontal { height: 5px; width: 100%; cursor: row-resize; }
 
   /* ─── OUTPUT PANEL ─── */
@@ -504,6 +502,8 @@
     margin-right: 4px;
   }
   .output-tab-action:hover { color: var(--text-primary); border-color: var(--text-muted); }
+  #btnDownloadOutput { color: var(--accent); border-color: var(--accent-dim); }
+  #btnDownloadOutput:hover { background: var(--accent-dim); color: #fff; }
 
   .output-body { flex: 1; overflow: auto; background: var(--bg-primary); }
 
@@ -536,7 +536,7 @@
     margin: 1px 0;
   }
   .log-entry:hover { background: var(--bg-tertiary); }
-  .log-entry.active { background: var(--accent-blue-glow); }
+  .log-entry.active { background: var(--accent-glow); }
 
   .log-level {
     flex-shrink: 0;
@@ -548,9 +548,9 @@
     min-width: 38px;
     text-align: center;
   }
-  .log-level.info { color: var(--accent-blue); background: rgba(101, 120, 180, 0.10); }
-  .log-level.warn { color: var(--warning); background: rgba(198, 122, 14, 0.08); }
-  .log-level.error { color: var(--error); background: rgba(198, 40, 40, 0.08); }
+  .log-level.info { color: var(--accent); background: rgba(122, 162, 247, 0.1); }
+  .log-level.warn { color: var(--warning); background: rgba(224, 175, 104, 0.1); }
+  .log-level.error { color: var(--error); background: rgba(247, 118, 142, 0.1); }
 
   .log-location { flex-shrink: 0; color: var(--text-muted); min-width: 60px; }
   .log-msg { color: var(--text-secondary); word-break: break-word; }
@@ -566,9 +566,9 @@
     border-radius: 8px;
     margin-left: 4px;
   }
-  .log-badge.warn { background: rgba(198, 122, 14, 0.12); color: var(--warning); }
-  .log-badge.error { background: rgba(198, 40, 40, 0.12); color: var(--error); }
-  .log-badge.info { background: rgba(101, 120, 180, 0.12); color: var(--accent-blue); }
+  .log-badge.warn { background: rgba(224, 175, 104, 0.2); color: var(--warning); }
+  .log-badge.error { background: rgba(247, 118, 142, 0.2); color: var(--error); }
+  .log-badge.info { background: rgba(122, 162, 247, 0.15); color: var(--accent); }
 
   /* ─── STATUS BAR ─── */
   .statusbar {
@@ -604,7 +604,7 @@
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
   /* ─── OPTIONS PANEL ─── */
   .options-panel {
@@ -771,6 +771,41 @@
   }
   .opt-kv-row:hover .kv-remove { visibility: visible; }
 
+  /* Collapsible format-specific sections */
+  details.fmt-section {
+    margin-top: 6px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  details.fmt-section > summary {
+    text-transform: uppercase;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 5px 8px;
+    cursor: pointer;
+    background: var(--bg-tertiary);
+    user-select: none;
+    list-style: none;
+  }
+  details.fmt-section > summary::-webkit-details-marker { display: none; }
+  details.fmt-section > summary::before {
+    content: '▸ ';
+    font-size: 10px;
+  }
+  details.fmt-section[open] > summary::before {
+    content: '▾ ';
+  }
+  details.fmt-section[open] > summary {
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  details.fmt-section > .fmt-section-body {
+    padding: 6px 8px;
+  }
+
   /* Extension checkbox items */
   .ext-item {
     display: flex;
@@ -783,213 +818,18 @@
     border-radius: 2px;
   }
   .ext-item:hover { background: var(--bg-tertiary); }
-  .ext-item input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--accent-blue); cursor: pointer; }
+  .ext-item input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--accent); cursor: pointer; }
   .ext-item label { cursor: pointer; white-space: nowrap; }
   .ext-item.default-on label { font-weight: 500; }
-  .ext-item.toggled label { color: var(--accent-blue); }
+  .ext-item.toggled label { color: var(--accent); }
 
   /* Toggle button in toolbar for options panel */
   .toolbar-btn.options-toggle.panel-open { color: var(--accent); }
-
-  /* ─── BUILT-IN ASSETS OVERLAY ─── */
-  .builtin-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-  }
-  .builtin-overlay.active { display: flex; }
-
-  .builtin-panel {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    width: min(680px, 90vw);
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-  }
-
-  .builtin-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .builtin-header h2 {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-  }
-  .builtin-close {
-    background: none; border: none; color: var(--text-muted);
-    font-size: 18px; cursor: pointer; padding: 2px 6px;
-  }
-  .builtin-close:hover { color: var(--text-primary); }
-
-  .builtin-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    padding: 0 18px;
-    flex-shrink: 0;
-  }
-  .builtin-tab {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12px;
-    padding: 8px 16px;
-    background: none; border: none;
-    color: var(--text-muted);
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-  }
-  .builtin-tab:hover { color: var(--text-secondary); }
-  .builtin-tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
-
-  .builtin-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 14px 18px;
-  }
-
-  .builtin-category-empty {
-    color: var(--text-muted);
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12px;
-    font-style: italic;
-    padding: 12px 0;
-  }
-
-  .builtin-asset {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px 12px;
-    border: 1px solid var(--border-subtle);
-    border-radius: 6px;
-    margin-bottom: 8px;
-    background: var(--bg-primary);
-    transition: border-color 0.15s;
-  }
-  .builtin-asset:hover { border-color: var(--border); }
-  .builtin-asset.disabled { opacity: 0.5; }
-
-  .builtin-toggle {
-    position: relative;
-    width: 36px; height: 20px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .builtin-toggle input { opacity: 0; width: 0; height: 0; }
-  .builtin-toggle .slider {
-    position: absolute; inset: 0;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .builtin-toggle .slider::before {
-    content: '';
-    position: absolute;
-    width: 14px; height: 14px;
-    left: 2px; bottom: 2px;
-    background: var(--text-muted);
-    border-radius: 50%;
-    transition: transform 0.2s, background 0.2s;
-  }
-  .builtin-toggle input:checked + .slider {
-    background: var(--accent-dim);
-    border-color: var(--accent);
-  }
-  .builtin-toggle input:checked + .slider::before {
-    transform: translateX(16px);
-    background: var(--accent);
-  }
-
-  .builtin-info { flex: 1; min-width: 0; }
-  .builtin-name {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .builtin-badge {
-    font-size: 9px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 1px 5px;
-    border-radius: 3px;
-    background: var(--accent-dim);
-    color: var(--accent);
-  }
-  .builtin-desc {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 2px;
-    line-height: 1.4;
-  }
-  .builtin-filename {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-top: 4px;
-    opacity: 0.7;
-  }
-  .builtin-view-btn {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 10px;
-    padding: 2px 8px;
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    color: var(--text-muted);
-    cursor: pointer;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .builtin-view-btn:hover {
-    color: var(--text-primary);
-    border-color: var(--text-muted);
-  }
-
-  /* Source viewer for inspecting asset content */
-  .builtin-source-viewer {
-    margin-top: 8px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-subtle);
-    border-radius: 4px;
-    padding: 10px;
-    max-height: 200px;
-    overflow: auto;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    line-height: 1.5;
-    color: var(--text-secondary);
-    white-space: pre-wrap;
-    word-break: break-all;
-  }
-
 </style>
 </head>
 <body>
 
-<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.epub,.typ">
+<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ">
 
 <!-- ═══ TOOLBAR ═══ -->
 <div class="toolbar" role="toolbar" aria-label="Main toolbar">
@@ -1026,7 +866,6 @@
   <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
-    <button class="toolbar-btn" id="btnBuiltIns" title="Manage built-in filters, templates & CSS">📦 Built-ins</button>
     <button class="toolbar-btn primary" id="btnConvert" disabled>▶ Convert</button>
   </div>
 
@@ -1046,6 +885,9 @@
     <button class="toolbar-btn" id="btnLayoutHide" title="Hide preview">▣</button>
   </div>
 </div>
+
+<!-- Binary input info bar -->
+<div id="binaryInputInfo" style="display:none; padding:4px 12px; background:var(--bg-tertiary); border-bottom:1px solid var(--border-subtle); font-size:11px; color:var(--text-secondary); align-items:center; gap:8px;"></div>
 
 <!-- ═══ OPTIONS PANEL ═══ -->
 <div class="options-panel" id="optionsPanel">
@@ -1262,38 +1104,44 @@
 
   <!-- Format-specific -->
   <div class="options-tab-panel" id="panel-format">
-    <div class="options-grid">
-      <!-- Reader options -->
-      <div class="opt-group">
-        <input type="checkbox" id="opt-strip-comments">
-        <label for="opt-strip-comments">Strip HTML comments (input)</label>
+    <!-- Reader options -->
+    <details class="fmt-section">
+      <summary>Reader / Input</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <input type="checkbox" id="opt-strip-comments">
+          <label for="opt-strip-comments">Strip HTML comments (input)</label>
+        </div>
+        <div class="opt-group">
+          <label for="opt-default-image-extension">Default image ext:</label>
+          <input type="text" id="opt-default-image-extension" placeholder=".png" style="width:60px;">
+        </div>
+        <div class="opt-file-upload">
+          <label>Abbreviations file:</label>
+          <button class="upload-btn" id="btnAbbrevsFile">Upload</button>
+          <input type="file" id="abbrevsFileInput" style="display:none;">
+          <span class="file-name" id="abbrevsFileName"></span>
+          <button class="file-remove" id="abbrevsFileRemove" style="display:none;">×</button>
+        </div>
+        <!-- Track changes (docx input) -->
+        <div class="opt-group">
+          <label for="opt-track-changes">Track changes:</label>
+          <select id="opt-track-changes" style="width:110px;">
+            <option value="">Default (accept)</option>
+            <option value="accept">Accept all</option>
+            <option value="reject">Reject all</option>
+            <option value="all">Include all</option>
+          </select>
+        </div>
       </div>
-      <div class="opt-group">
-        <label for="opt-default-image-extension">Default image ext:</label>
-        <input type="text" id="opt-default-image-extension" placeholder=".png" style="width:60px;">
       </div>
-      <div class="opt-file-upload">
-        <label>Abbreviations file:</label>
-        <button class="upload-btn" id="btnAbbrevsFile">Upload</button>
-        <input type="file" id="abbrevsFileInput" style="display:none;">
-        <span class="file-name" id="abbrevsFileName"></span>
-        <button class="file-remove" id="abbrevsFileRemove" style="display:none;">×</button>
-      </div>
-      <!-- Track changes (docx input) -->
-      <div class="opt-group">
-        <label for="opt-track-changes">Track changes:</label>
-        <select id="opt-track-changes" style="width:110px;">
-          <option value="">Default (accept)</option>
-          <option value="accept">Accept all</option>
-          <option value="reject">Reject all</option>
-          <option value="all">Include all</option>
-        </select>
-      </div>
-    </div>
+    </details>
     <!-- HTML output options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">HTML Output</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section" open>
+      <summary>HTML Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <input type="checkbox" id="opt-self-contained">
           <label for="opt-self-contained">Embed resources</label>
@@ -1333,11 +1181,13 @@
         </div>
       </div>
       <div class="opt-file-list" id="cssFileList"></div>
-    </div>
+      </div>
+    </details>
     <!-- Markdown output options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Markdown Output</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Markdown Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <input type="checkbox" id="opt-reference-links">
           <label for="opt-reference-links">Reference-style links</label>
@@ -1360,11 +1210,13 @@
           </select>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- RST output options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">RST Output</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>RST Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <input type="checkbox" id="opt-reference-links-rst">
           <label for="opt-reference-links-rst">Reference-style links</label>
@@ -1374,11 +1226,13 @@
           <label for="opt-list-tables">List tables</label>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- LaTeX output options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">LaTeX Output</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>LaTeX Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <input type="checkbox" id="opt-lof">
           <label for="opt-lof">List of figures</label>
@@ -1397,11 +1251,13 @@
           </select>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- Caption / ASCII / ODT options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Other</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Other</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <label for="opt-figure-caption-position">Figure caption:</label>
           <select id="opt-figure-caption-position" style="width:80px;">
@@ -1427,11 +1283,13 @@
           <label for="opt-link-images">Link images (ODT)</label>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- EPUB options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">EPUB</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>EPUB</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-file-upload">
           <label>Cover image:</label>
           <button class="upload-btn" id="btnEpubCover">Upload image</button>
@@ -1461,11 +1319,13 @@
         </div>
       </div>
       <div class="opt-file-list" id="epubFontsList"></div>
-    </div>
+      </div>
+    </details>
     <!-- Chunked HTML -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Chunked HTML</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Chunked HTML</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <label for="opt-split-level">Split level:</label>
           <select id="opt-split-level" style="width:55px;">
@@ -1481,11 +1341,13 @@
           <input type="text" id="opt-chunk-template" placeholder="%s-%i.html" style="width:130px;">
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- Notebook -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Jupyter Notebook</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Jupyter Notebook</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <label for="opt-ipynb-output">Output cell handling:</label>
           <select id="opt-ipynb-output" style="width:100px;">
@@ -1496,11 +1358,13 @@
           </select>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- Slides -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Slides</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Slides</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <label for="opt-slide-level">Slide level:</label>
           <select id="opt-slide-level" style="width:55px;">
@@ -1515,7 +1379,8 @@
           <label for="opt-incremental">Incremental lists</label>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
   </div>
 
   <!-- Template -->
@@ -1746,12 +1611,13 @@
         <button class="output-tab active" data-tab="preview">Preview</button>
         <button class="output-tab" data-tab="log">Log <span id="logBadge"></span></button>
         <button class="output-tab" data-tab="source">Source</button>
+        <button class="output-tab-action" id="btnDownloadOutput" title="Download output" style="display:none;">📥 Download</button>
         <span class="output-tab-spacer"></span>
         <button class="output-tab-action" id="btnOutputClose" title="Hide panel">×</button>
       </div>
       <div class="output-body">
         <div class="tab-content active" id="tabPreview">
-          <iframe id="previewFrame" sandbox="allow-same-origin" title="HTML preview"></iframe>
+          <iframe id="previewFrame" sandbox="allow-scripts" title="HTML preview"></iframe>
         </div>
         <div class="tab-content" id="tabLog" role="log" aria-label="Conversion log" aria-live="polite">
           <div class="log-container" id="logContainer">
@@ -1782,31 +1648,13 @@
   <div class="statusbar-item" id="statusWarnings" style="display:none;"></div>
 </div>
 
-
-<div class="builtin-overlay" id="builtinOverlay">
-  <div class="builtin-panel">
-    <div class="builtin-header">
-      <h2>📦 Built-in Assets</h2>
-      <button class="builtin-close" id="builtinClose">×</button>
-    </div>
-    <div class="builtin-tabs" id="builtinTabs">
-      <button class="builtin-tab active" data-category="lua-filter">Lua Filters</button>
-      <button class="builtin-tab" data-category="template">Templates</button>
-      <button class="builtin-tab" data-category="css">CSS Stylesheets</button>
-    </div>
-    <div class="builtin-body" id="builtinBody">
-      <!-- Dynamically populated -->
-    </div>
-  </div>
-</div>
-
 <script type="module">
 // ════════════════════════════════════════════════════════════════════
 // SECTION 1: ACE EDITOR SETUP
 // ════════════════════════════════════════════════════════════════════
 
 const editor = ace.edit('aceEditor');
-editor.setTheme('ace/theme/chrome');
+editor.setTheme('ace/theme/one_dark');
 editor.session.setMode('ace/mode/latex');
 editor.setOptions({
   fontSize: '13px',
@@ -1870,7 +1718,7 @@ editor.session.selection.on('changeCursor', () => {
 
 // Output source viewer (read-only Ace)
 const sourceEditor = ace.edit('outputSource');
-sourceEditor.setTheme('ace/theme/chrome');
+sourceEditor.setTheme('ace/theme/one_dark');
 sourceEditor.session.setMode('ace/mode/html');
 sourceEditor.setReadOnly(true);
 sourceEditor.setOptions({
@@ -1879,306 +1727,6 @@ sourceEditor.setOptions({
   showPrintMargin: false,
   wrap: true,
 });
-
-// ════════════════════════════════════════════════════════════════════
-// SECTION 1.5: BUILT-IN ASSETS REGISTRY
-// ════════════════════════════════════════════════════════════════════
-//
-// ┌──────────────────────────────────────────────────────────────────┐
-// │  HOW TO ADD A NEW BUILT-IN ASSET                                │
-// │                                                                  │
-// │  1. Add a new object to the BUILT_IN_ASSETS array below         │
-// │  2. Set `category` to: 'lua-filter', 'template', or 'css'      │
-// │  3. Put file content in `content` as a template literal         │
-// │  4. Set `defaultEnabled: true` if it should be ON by default    │
-// │  5. Reload the page — it will appear in the Built-ins panel     │
-// │                                                                  │
-// │  Categories map to pandoc options:                               │
-// │    'lua-filter'  → --lua-filter=<path>   (multiple allowed)     │
-// │    'template'    → --template=<path>     (only one active)      │
-// │    'css'         → --css=<path>          (multiple allowed)     │
-// │                                                                  │
-// │  The `id` must be unique. The `filename` is what pandoc sees    │
-// │  in its virtual filesystem. Keep filenames descriptive.          │
-// └──────────────────────────────────────────────────────────────────┘
-
-const BUILT_IN_ASSETS = [
-
-  // ── Lua Filters ─────────────────────────────────────────────────
-
-  {
-    id: 'missing-image-placeholder',
-    name: 'Missing Image Placeholder',
-    description: 'Replaces missing images with styled warning boxes showing the filename and caption. Useful when source images are not uploaded alongside the document.',
-    category: 'lua-filter',
-    filename: 'missing-image-placeholder.lua',
-    defaultEnabled: true,
-    content: `-- missing-image-placeholder.lua
--- Replaces Image elements with visible placeholder text when the
--- referenced image file is not available in the virtual filesystem.
--- Useful for browser-based pandoc conversions where images may not
--- be uploaded alongside the source document.
-
-function Image(el)
-  -- Try to read the image file; if it fails, it's missing
-  local f = io.open(el.src, "r")
-  if f then
-    f:close()
-    return nil  -- image exists, leave it alone
-  end
-
-  -- Build placeholder content
-  local warning = pandoc.Str("⚠ Missing image: " .. el.src)
-  local caption_text = pandoc.utils.stringify(el.caption)
-
-  local blocks = {}
-  table.insert(blocks, pandoc.Para({
-    pandoc.Strong({ pandoc.Str("["), warning, pandoc.Str("]") })
-  }))
-
-  if caption_text ~= "" then
-    table.insert(blocks, pandoc.Para({
-      pandoc.Emph({ pandoc.Str("Caption: " .. caption_text) })
-    }))
-  end
-
-  -- Wrap in a Div with a border style (works in HTML; in docx the
-  -- text itself is the main indicator)
-  local div = pandoc.Div(blocks, pandoc.Attr("", {"missing-image-placeholder"}, {
-    {"style", "border: 2px dashed #c0392b; padding: 12px; margin: 12px 0; background: #fdf2f2; color: #c0392b; text-align: center;"}
-  }))
-
-  return div
-end
-`
-  },
-
-  // ── EXAMPLE: Add more Lua filters here ──
-  // {
-  //   id: 'my-custom-filter',
-  //   name: 'My Custom Filter',
-  //   description: 'Description of what this filter does.',
-  //   category: 'lua-filter',
-  //   filename: 'my-custom-filter.lua',
-  //   defaultEnabled: false,
-  //   content: `
-  //     function Pandoc(doc)
-  //       -- your filter logic here
-  //       return doc
-  //     end
-  //   `
-  // },
-
-  // ── Templates ───────────────────────────────────────────────────
-
-  // ── EXAMPLE: Add pandoc templates here ──
-  // {
-  //   id: 'clean-html-template',
-  //   name: 'Clean HTML Template',
-  //   description: 'A minimal, clean HTML5 template with sensible defaults.',
-  //   category: 'template',
-  //   filename: 'clean-html.html',
-  //   defaultEnabled: false,
-  //   content: `<!DOCTYPE html>
-  //     <html lang="en">
-  //     <head><meta charset="utf-8"><title>$title$</title></head>
-  //     <body>$body$</body>
-  //     </html>`
-  // },
-
-  // ── CSS Stylesheets ─────────────────────────────────────────────
-
-  // ── EXAMPLE: Add CSS stylesheets here ──
-  // {
-  //   id: 'academic-style',
-  //   name: 'Academic Paper Style',
-  //   description: 'Clean serif typography for academic papers.',
-  //   category: 'css',
-  //   filename: 'academic-style.css',
-  //   defaultEnabled: false,
-  //   content: `body { font-family: Georgia, serif; max-width: 42em; margin: auto; }`
-  // },
-
-];
-
-// ── State: track which built-ins are enabled ──
-// Initialized from each asset's defaultEnabled flag.
-// Persists only for the lifetime of the page (no localStorage needed yet).
-const builtInState = {};
-for (const asset of BUILT_IN_ASSETS) {
-  builtInState[asset.id] = asset.defaultEnabled;
-}
-
-// ── Helper: get enabled assets for a given category ──
-function getEnabledBuiltIns(category) {
-  return BUILT_IN_ASSETS.filter(a => a.category === category && builtInState[a.id]);
-}
-
-// ── Helper: get ALL enabled assets across categories ──
-function getAllEnabledBuiltIns() {
-  return BUILT_IN_ASSETS.filter(a => builtInState[a.id]);
-}
-
-// ── Pipeline integration: inject built-in assets into conversion ──
-// Call this in runConversion() to merge built-in assets into the
-// options and files objects before passing them to pandoc.convert().
-function applyBuiltInAssets(options, files) {
-  const encoder = new TextEncoder();
-
-  // Lua filters — append to lua-filter array
-  const enabledFilters = getEnabledBuiltIns('lua-filter');
-  if (enabledFilters.length > 0) {
-    if (!options['lua-filter']) options['lua-filter'] = [];
-    for (const f of enabledFilters) {
-      const path = `built-in/${f.filename}`;
-      files[path] = encoder.encode(f.content);
-      options['lua-filter'].push(path);
-    }
-  }
-
-  // Templates — only one can be active; first enabled wins
-  const enabledTemplates = getEnabledBuiltIns('template');
-  if (enabledTemplates.length > 0) {
-    const tmpl = enabledTemplates[0];
-    const path = `built-in/${tmpl.filename}`;
-    files[path] = encoder.encode(tmpl.content);
-    options['template'] = path;
-  }
-
-  // CSS stylesheets — append to css array
-  const enabledCSS = getEnabledBuiltIns('css');
-  if (enabledCSS.length > 0) {
-    if (!options['css']) options['css'] = [];
-    for (const c of enabledCSS) {
-      const path = `built-in/${c.filename}`;
-      files[path] = encoder.encode(c.content);
-      options['css'].push(path);
-    }
-  }
-
-  return { options, files };
-}
-
-// ── UI: render the built-in assets panel ──
-let currentBuiltInCategory = 'lua-filter';
-let expandedSourceViewer = null; // track which asset has source expanded
-
-function renderBuiltInPanel() {
-  const body = document.getElementById('builtinBody');
-  const assets = BUILT_IN_ASSETS.filter(a => a.category === currentBuiltInCategory);
-
-  if (assets.length === 0) {
-    body.innerHTML = `<div class="builtin-category-empty">
-      No built-in ${currentBuiltInCategory === 'lua-filter' ? 'Lua filters' :
-        currentBuiltInCategory === 'template' ? 'templates' : 'CSS stylesheets'} registered yet.
-      <br><br>Add entries to the <code>BUILT_IN_ASSETS</code> array in the source code.
-    </div>`;
-    return;
-  }
-
-  body.innerHTML = '';
-  for (const asset of assets) {
-    const enabled = builtInState[asset.id];
-    const row = document.createElement('div');
-    row.className = 'builtin-asset' + (enabled ? '' : ' disabled');
-
-    // Toggle switch
-    const toggle = document.createElement('label');
-    toggle.className = 'builtin-toggle';
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = enabled;
-    checkbox.addEventListener('change', () => {
-      builtInState[asset.id] = checkbox.checked;
-      updateBuiltInBadge();
-      renderBuiltInPanel();
-    });
-    const slider = document.createElement('span');
-    slider.className = 'slider';
-    toggle.appendChild(checkbox);
-    toggle.appendChild(slider);
-    row.appendChild(toggle);
-
-    // Info
-    const info = document.createElement('div');
-    info.className = 'builtin-info';
-
-    const nameRow = document.createElement('div');
-    nameRow.className = 'builtin-name';
-    nameRow.textContent = asset.name;
-    const badge = document.createElement('span');
-    badge.className = 'builtin-badge';
-    badge.textContent = 'built-in';
-    nameRow.appendChild(badge);
-    info.appendChild(nameRow);
-
-    const desc = document.createElement('div');
-    desc.className = 'builtin-desc';
-    desc.textContent = asset.description;
-    info.appendChild(desc);
-
-    const fname = document.createElement('div');
-    fname.className = 'builtin-filename';
-    fname.textContent = asset.filename;
-    info.appendChild(fname);
-
-    // Source viewer (collapsible)
-    if (expandedSourceViewer === asset.id) {
-      const viewer = document.createElement('div');
-      viewer.className = 'builtin-source-viewer';
-      viewer.textContent = asset.content;
-      info.appendChild(viewer);
-    }
-
-    row.appendChild(info);
-
-    // View source button
-    const viewBtn = document.createElement('button');
-    viewBtn.className = 'builtin-view-btn';
-    viewBtn.textContent = expandedSourceViewer === asset.id ? 'Hide' : 'View';
-    viewBtn.addEventListener('click', () => {
-      expandedSourceViewer = expandedSourceViewer === asset.id ? null : asset.id;
-      renderBuiltInPanel();
-    });
-    row.appendChild(viewBtn);
-
-    body.appendChild(row);
-  }
-}
-
-// ── UI: wire up overlay open/close and tabs ──
-function updateBuiltInBadge() {
-  const count = BUILT_IN_ASSETS.filter(a => builtInState[a.id]).length;
-  const btn = document.getElementById('btnBuiltIns');
-  btn.textContent = count > 0 ? `📦 Built-ins (${count})` : '📦 Built-ins';
-}
-updateBuiltInBadge(); // set initial badge
-
-document.getElementById('btnBuiltIns').addEventListener('click', () => {
-  document.getElementById('builtinOverlay').classList.add('active');
-  renderBuiltInPanel();
-});
-
-document.getElementById('builtinClose').addEventListener('click', () => {
-  document.getElementById('builtinOverlay').classList.remove('active');
-});
-
-document.getElementById('builtinOverlay').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) {
-    e.currentTarget.classList.remove('active');
-  }
-});
-
-document.querySelectorAll('#builtinTabs .builtin-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('#builtinTabs .builtin-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentBuiltInCategory = tab.dataset.category;
-    expandedSourceViewer = null;
-    renderBuiltInPanel();
-  });
-});
-
 
 // ════════════════════════════════════════════════════════════════════
 // SECTION 2: PANDOC WASM INITIALIZATION
@@ -2246,26 +1794,60 @@ fileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  const text = await file.text();
-  editor.setValue(text, -1);
-
-  // Update tab name
+  // Update tab name and track filename
   document.getElementById('tabFilename').textContent = file.name;
+  inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
 
   // Auto-detect format from extension
   const ext = file.name.split('.').pop().toLowerCase();
   const formatMap = {
     'tex': 'latex', 'latex': 'latex', 'md': 'markdown', 'markdown': 'markdown',
     'html': 'html', 'htm': 'html', 'rst': 'rst', 'org': 'org', 'typ': 'typst',
-    'txt': 'markdown',
+    'txt': 'markdown', 'docx': 'docx', 'odt': 'odt', 'pptx': 'pptx',
+    'epub': 'epub', 'fb2': 'fb2', 'ipynb': 'ipynb',
   };
   const fmt = formatMap[ext];
-  if (fmt) {
-    document.getElementById('selFrom').value = fmt;
-    // Set Ace mode
-    const modeMap = { 'latex': 'latex', 'markdown': 'markdown', 'html': 'html' };
-    editor.session.setMode('ace/mode/' + (modeMap[fmt] || 'text'));
-    document.getElementById('statusFormat').textContent = fmt;
+
+  if (fmt && BINARY_INPUT_FORMATS.includes(fmt)) {
+    // Binary input — store as blob, show placeholder in editor
+    inputBinaryFile = { name: file.name, blob: file };
+    editor.setValue(`[Binary file loaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\n\nThis file will be passed directly to Pandoc for conversion.\nClick "▶ Convert" to process.`, -1);
+    editor.setReadOnly(true);
+
+    if (fmt) {
+      document.getElementById('selFrom').value = fmt;
+      document.getElementById('statusFormat').textContent = fmt;
+      updateExtensions();
+    }
+
+    // Show clear button
+    document.getElementById('binaryInputInfo').style.display = 'flex';
+    document.getElementById('binaryInputInfo').innerHTML =
+      `<span>📎 ${file.name}</span><button class="toolbar-btn" id="btnClearBinary" title="Remove file and return to text editor" style="font-size:11px;padding:2px 6px;">✕ Clear</button>`;
+    document.getElementById('btnClearBinary').addEventListener('click', () => {
+      inputBinaryFile = null;
+      editor.setValue('', -1);
+      editor.setReadOnly(false);
+      inputFileName = 'untitled';
+      document.getElementById('binaryInputInfo').style.display = 'none';
+      document.getElementById('tabFilename').textContent = 'untitled';
+    });
+  } else {
+    // Text input — read into editor as before
+    inputBinaryFile = null;
+    editor.setReadOnly(false);
+    document.getElementById('binaryInputInfo').style.display = 'none';
+
+    const text = await file.text();
+    editor.setValue(text, -1);
+
+    if (fmt) {
+      document.getElementById('selFrom').value = fmt;
+      const modeMap = { 'latex': 'latex', 'markdown': 'markdown', 'html': 'html' };
+      editor.session.setMode('ace/mode/' + (modeMap[fmt] || 'text'));
+      document.getElementById('statusFormat').textContent = fmt;
+      updateExtensions();
+    }
   }
 
   fileInput.value = '';
@@ -2988,6 +2570,90 @@ function buildFormatWithExtensions(baseFormat, extState) {
 document.getElementById('selFrom').addEventListener('change', () => { updateExtensions(); });
 document.getElementById('selTo').addEventListener('change', () => { updateExtensions(); });
 
+// --- Format metadata ---
+const BINARY_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'epub2', 'epub3', 'pdf', 'chunkedhtml'];
+const EXTENSION_BY_FORMAT = {
+  'html': 'html', 'html5': 'html', 'html4': 'html', 'chunkedhtml': 'zip',
+  'markdown': 'md', 'markdown_strict': 'md', 'markdown_mmd': 'md', 'markdown_phpextra': 'md',
+  'gfm': 'md', 'commonmark': 'md', 'commonmark_x': 'md',
+  'latex': 'tex', 'beamer': 'tex', 'context': 'tex',
+  'pdf': 'pdf', 'docx': 'docx', 'odt': 'odt',
+  'epub': 'epub', 'epub2': 'epub', 'epub3': 'epub',
+  'rst': 'rst', 'org': 'org', 'plain': 'txt',
+  'json': 'json', 'native': 'native',
+  'docbook': 'xml', 'docbook4': 'xml', 'docbook5': 'xml',
+  'jats': 'xml', 'tei': 'xml', 'man': '1', 'rtf': 'rtf',
+  'textile': 'textile', 'mediawiki': 'wiki',
+  'asciidoc': 'adoc', 'asciidoctor': 'adoc', 'asciidoc_legacy': 'adoc',
+  'revealjs': 'html', 'slidy': 'html', 'slideous': 'html', 'dzslides': 'html', 's5': 'html',
+  'ipynb': 'ipynb', 'typst': 'typ', 'texinfo': 'texi', 'ms': 'ms', 'icml': 'icml',
+  'opml': 'opml', 'bibtex': 'bib', 'biblatex': 'bib', 'csljson': 'json',
+  'pptx': 'pptx', 'djot': 'dj', 'fb2': 'fb2', 'opendocument': 'xml', 'vimdoc': 'txt'
+};
+const BINARY_INPUT_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'fb2', 'ipynb'];
+
+// Track binary input file
+let inputBinaryFile = null;  // { name, blob }
+let inputFileName = 'untitled';  // tracks current input file name (without extension)
+let lastOutput = null;  // { blob, filename } — stores last conversion output for download
+
+// Download button handler
+document.getElementById('btnDownloadOutput').addEventListener('click', () => {
+  if (!lastOutput) return;
+  // Clean up previous URL if any
+  if (lastOutput.objectUrl) URL.revokeObjectURL(lastOutput.objectUrl);
+  const url = URL.createObjectURL(lastOutput.blob);
+  lastOutput.objectUrl = url;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = lastOutput.filename;
+  a.click();
+});
+
+// 1x1 transparent PNG placeholder for missing images
+const PLACEHOLDER_PNG = new Uint8Array([
+  137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,1,0,0,0,1,8,6,0,0,0,
+  31,21,196,137,0,0,0,10,73,68,65,84,120,156,98,0,0,0,2,0,1,226,33,188,51,
+  0,0,0,0,73,69,78,68,174,66,96,130
+]);
+
+// Generate a visible placeholder PNG with warning text for a missing image
+function generatePlaceholderImage(filename) {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 120;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#fff3cd';
+    ctx.fillRect(0, 0, 400, 120);
+    ctx.strokeStyle = '#ffc107';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, 398, 118);
+
+    // Warning icon and text
+    ctx.fillStyle = '#856404';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText('⚠ Missing Image', 16, 36);
+    ctx.font = '13px sans-serif';
+    ctx.fillText(filename, 16, 62);
+    ctx.fillStyle = '#a07000';
+    ctx.font = '11px sans-serif';
+    ctx.fillText('Upload the actual image via the Media tab', 16, 88);
+    ctx.fillText('to replace this placeholder.', 16, 104);
+
+    canvas.toBlob((blob) => resolve(blob), 'image/png');
+  });
+}
+
+// Extract missing filename from pandoc error messages
+function extractMissingFile(errMsg) {
+  // Match patterns like: "File domain.png not found in resource path"
+  const m = errMsg.match(/File\s+(\S+)\s+not found in resource path/i);
+  return m ? m[1] : null;
+}
+
 // --- Build pandoc options object from all tabs ---
 function buildOptions() {
   const fromFmt = document.getElementById('selFrom').value;
@@ -3202,29 +2868,48 @@ function buildOptions() {
   // Lua filters
   if (resourceFiles.luaFilters.length > 0) opts.filters = resourceFiles.luaFilters.map(f => f.name);
 
+  // Output file — always set so pandoc writes to virtual filesystem
+  const baseToFmt = toFmt.split(/[+-]/)[0]; // strip extensions
+  const outExt = EXTENSION_BY_FORMAT[baseToFmt] || baseToFmt;
+  opts['output-file'] = `${inputFileName}.${outExt}`;
+
+  // Binary input — use input-files instead of stdin
+  if (inputBinaryFile) {
+    opts['input-files'] = [inputBinaryFile.name];
+  }
+
   return opts;
 }
 
 // --- Build files object for pandoc.convert() ---
 function buildFiles() {
-  const files = { ...resourceFiles.auxFiles };
-  if (resourceFiles.bibFile) files[resourceFiles.bibFile.name] = resourceFiles.bibFile;
-  if (resourceFiles.cslFile) files[resourceFiles.cslFile.name] = resourceFiles.cslFile;
-  if (resourceFiles.abbrevFile) files[resourceFiles.abbrevFile.name] = resourceFiles.abbrevFile;
-  if (resourceFiles.abbreviationsFile) files[resourceFiles.abbreviationsFile.name] = resourceFiles.abbreviationsFile;
-  resourceFiles.cssFiles.forEach(f => { files[f.name] = f; });
-  if (resourceFiles.highlightThemeFile) files[resourceFiles.highlightThemeFile.name] = resourceFiles.highlightThemeFile;
-  resourceFiles.syntaxDefinitions.forEach(f => { files[f.name] = f; });
-  if (resourceFiles.templateFile) files[resourceFiles.templateFile.name] = resourceFiles.templateFile;
-  if (resourceFiles.referenceDoc) files[resourceFiles.referenceDoc.name] = resourceFiles.referenceDoc;
-  if (resourceFiles.metadataFile) files[resourceFiles.metadataFile.name] = resourceFiles.metadataFile;
-  if (resourceFiles.epubCoverImage) files[resourceFiles.epubCoverImage.name] = resourceFiles.epubCoverImage;
-  if (resourceFiles.epubMetadataFile) files[resourceFiles.epubMetadataFile.name] = resourceFiles.epubMetadataFile;
-  resourceFiles.epubFonts.forEach(f => { files[f.name] = f; });
-  resourceFiles.headerFiles.forEach(f => { files[f.name] = f; });
-  resourceFiles.beforeBodyFiles.forEach(f => { files[f.name] = f; });
-  resourceFiles.afterBodyFiles.forEach(f => { files[f.name] = f; });
-  resourceFiles.luaFilters.forEach(f => { files[f.name] = f; });
+  const raw = {};
+  // Collect all resource files
+  Object.entries(resourceFiles.auxFiles).forEach(([name, data]) => { raw[name] = data; });
+  if (resourceFiles.bibFile) raw[resourceFiles.bibFile.name] = resourceFiles.bibFile;
+  if (resourceFiles.cslFile) raw[resourceFiles.cslFile.name] = resourceFiles.cslFile;
+  if (resourceFiles.abbrevFile) raw[resourceFiles.abbrevFile.name] = resourceFiles.abbrevFile;
+  if (resourceFiles.abbreviationsFile) raw[resourceFiles.abbreviationsFile.name] = resourceFiles.abbreviationsFile;
+  resourceFiles.cssFiles.forEach(f => { raw[f.name] = f; });
+  if (resourceFiles.highlightThemeFile) raw[resourceFiles.highlightThemeFile.name] = resourceFiles.highlightThemeFile;
+  resourceFiles.syntaxDefinitions.forEach(f => { raw[f.name] = f; });
+  if (resourceFiles.templateFile) raw[resourceFiles.templateFile.name] = resourceFiles.templateFile;
+  if (resourceFiles.referenceDoc) raw[resourceFiles.referenceDoc.name] = resourceFiles.referenceDoc;
+  if (resourceFiles.metadataFile) raw[resourceFiles.metadataFile.name] = resourceFiles.metadataFile;
+  if (resourceFiles.epubCoverImage) raw[resourceFiles.epubCoverImage.name] = resourceFiles.epubCoverImage;
+  if (resourceFiles.epubMetadataFile) raw[resourceFiles.epubMetadataFile.name] = resourceFiles.epubMetadataFile;
+  resourceFiles.epubFonts.forEach(f => { raw[f.name] = f; });
+  resourceFiles.headerFiles.forEach(f => { raw[f.name] = f; });
+  resourceFiles.beforeBodyFiles.forEach(f => { raw[f.name] = f; });
+  resourceFiles.afterBodyFiles.forEach(f => { raw[f.name] = f; });
+  resourceFiles.luaFilters.forEach(f => { raw[f.name] = f; });
+  // Binary input file
+  if (inputBinaryFile) raw[inputBinaryFile.name] = inputBinaryFile.blob;
+  // pandoc.js expects Blob objects (calls blob.arrayBuffer())
+  const files = {};
+  for (const [name, data] of Object.entries(raw)) {
+    files[name] = (data instanceof Blob) ? data : new Blob([data]);
+  }
   return files;
 }
 
@@ -3243,44 +2928,111 @@ async function runConversion() {
   updateStatus('loading', 'Converting…');
   clearDecorations();
 
-  const sourceText = editor.getValue();
+  const sourceText = inputBinaryFile ? null : editor.getValue();
 
   try {
     const options = buildOptions();
     const files = buildFiles();
-
-    // Apply built-in assets (filters, templates, CSS)
-    applyBuiltInAssets(options, files);
-
-    // Log which built-ins are active
-    const activeBuiltIns = getAllEnabledBuiltIns();
-    if (activeBuiltIns.length > 0) {
-      console.log('[built-in] Active assets:', activeBuiltIns.map(a => a.category + ':' + a.filename).join(', '));
-    }
+    const outFileName = options['output-file'];
+    const baseToFmt = document.getElementById('selTo').value.split(/[+-]/)[0];
+    const isBinaryOutput = BINARY_FORMATS.includes(baseToFmt);
 
     console.log('Pandoc options:', JSON.stringify(options, null, 2));
 
-    const result = await pandocModule.convert(options, sourceText, files);
+    // Retry loop for missing resources (up to 20 retries)
+    let result;
+    const placeholderFiles = [];
+    const MAX_RETRIES = 20;
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        result = await pandocModule.convert(options, sourceText, files);
+        if (attempt > 0) console.log(`Conversion succeeded after ${attempt} placeholder(s)`);
+        break; // success
+      } catch (convErr) {
+        console.warn(`Conversion attempt ${attempt} failed:`, convErr.message);
+        const missingFile = extractMissingFile(convErr.message);
+        if (missingFile && attempt < MAX_RETRIES) {
+          // Add visible placeholder image and retry
+          console.warn(`Missing resource "${missingFile}" — substituting placeholder`);
+          files[missingFile] = await generatePlaceholderImage(missingFile);
+          placeholderFiles.push(missingFile);
+          continue;
+        }
+        throw convErr; // re-throw if not a missing file error or max retries
+      }
+    }
+
+    // Check stderr for missing resource warnings (even if conversion succeeded)
+    if (result.stderr) {
+      const missingMatches = [...result.stderr.matchAll(/File\s+(\S+)\s+not found in resource path/gi)];
+      for (const m of missingMatches) {
+        if (!placeholderFiles.includes(m[1])) {
+          placeholderFiles.push(m[1]);
+        }
+      }
+    }
 
     // Parse warnings
-    const warnings = parseWarnings(result.warnings, result.stderr, sourceText);
+    const warnings = parseWarnings(result.warnings, result.stderr, sourceText || '');
 
-    // Apply editor decorations
-    applyDecorations(warnings);
+    // Add placeholder warnings
+    for (const pf of placeholderFiles) {
+      warnings.push({
+        line: null, column: null, level: 'warn',
+        message: `Missing image "${pf}" — replaced with 1×1 transparent placeholder. Upload the actual image via the Media tab to include it.`,
+        matchedText: null, type: 'placeholder'
+      });
+    }
+
+    // Apply editor decorations (only for text input)
+    if (!inputBinaryFile) applyDecorations(warnings);
 
     // Update log panel
     updateLog(warnings, result.stderr);
 
-    // Update output panels
-    const outputHtml = result.stdout || '';
-    sourceEditor.setValue(outputHtml, -1);
+    // Handle output
+    const downloadBtn = document.getElementById('btnDownloadOutput');
 
-    // Preview
-    const previewFrame = document.getElementById('previewFrame');
-    const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-    previewDoc.open();
-    previewDoc.write(outputHtml);
-    previewDoc.close();
+    if (isBinaryOutput && files[outFileName]) {
+      // Binary output — show info in editor/preview, enable download
+      const blob = files[outFileName];
+      const sizeKB = (blob.size / 1024).toFixed(1);
+
+      lastOutput = { blob, filename: outFileName };
+      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
+      downloadBtn.style.display = '';
+
+      sourceEditor.setValue(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`, -1);
+
+      const previewFrame = document.getElementById('previewFrame');
+      previewFrame.srcdoc = `<body style="background:#1e1e2e;color:#cdd6f4;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
+        <div style="font-size:48px;margin-bottom:16px;">📄</div>
+        <div style="font-size:16px;">${outFileName} (${sizeKB} KB)</div>
+        <div style="font-size:12px;color:#6c7086;margin-top:8px;">Binary file — use the download button above</div>
+        ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#fab387;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
+      </body>`;
+
+    } else {
+      // Text output — display in editor/preview, enable download
+      let outputText = '';
+      if (files[outFileName]) {
+        outputText = await files[outFileName].text();
+      } else if (result.stdout) {
+        outputText = result.stdout;
+      }
+
+      sourceEditor.setValue(outputText, -1);
+
+      const previewFrame = document.getElementById('previewFrame');
+      previewFrame.srcdoc = outputText;
+
+      const blob = new Blob([outputText], { type: 'text/plain' });
+      const sizeKB = (blob.size / 1024).toFixed(1);
+      lastOutput = { blob, filename: outFileName };
+      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
+      downloadBtn.style.display = '';
+    }
 
     // Auto-populate cleanup patterns from warnings
     populateCleanupFromWarnings(warnings);
@@ -3297,18 +3049,26 @@ async function runConversion() {
     const warningsEl = document.getElementById('statusWarnings');
     if (statusParts.length > 0) {
       warningsEl.style.display = '';
-      warningsEl.style.color = errCount ? 'var(--error)' : warnCount ? 'var(--warning)' : 'var(--accent-blue)';
+      warningsEl.style.color = errCount ? 'var(--error)' : warnCount ? 'var(--warning)' : 'var(--accent)';
       warningsEl.textContent = statusParts.join(', ');
     } else {
       warningsEl.style.display = 'none';
     }
 
-    updateStatus('ready', `Converted ${options.from} → ${options.to} (${pandocVersion})`);
+    const statusMsg = placeholderFiles.length > 0
+      ? `Converted ${options.from} → ${options.to} (${placeholderFiles.length} placeholder${placeholderFiles.length > 1 ? 's' : ''}) (${pandocVersion})`
+      : `Converted ${options.from} → ${options.to} (${pandocVersion})`;
+    updateStatus('ready', statusMsg);
 
   } catch (err) {
     console.error('Conversion error:', err);
+    const missingFile = extractMissingFile(err.message);
+    let userMessage = err.message;
+    if (missingFile) {
+      userMessage += `\n\nTip: Upload "${missingFile}" via the Media tab's "Upload Files" button, or remove the reference from your source.`;
+    }
     updateStatus('error', `Error: ${err.message}`);
-    updateLog([{ line: null, column: null, level: 'error', message: err.message, matchedText: null, type: 'exception' }], '');
+    updateLog([{ line: null, column: null, level: 'error', message: userMessage, matchedText: null, type: 'exception' }], '');
   } finally {
     btn.disabled = false;
     btn.textContent = '▶ Convert';
@@ -4367,14 +4127,6 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     if (!document.getElementById('btnConvert').disabled) {
       runConversion();
-    }
-  }
-  // Escape = close built-in assets overlay
-  if (e.key === 'Escape') {
-    const overlay = document.getElementById('builtinOverlay');
-    if (overlay.classList.contains('active')) {
-      overlay.classList.remove('active');
-      e.preventDefault();
     }
   }
 });
