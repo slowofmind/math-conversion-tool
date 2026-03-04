@@ -6,32 +6,31 @@
 <title>Pandoc WASM — Prototype</title>
 
 <!-- Ace Editor from CDN -->
-<script src="ace/ace.js"></script>
-<script src="ace/mode-latex.js"></script>
-<script src="ace/mode-html.js"></script>
-<script src="ace/mode-markdown.js"></script>
-<script src="ace/theme-one_dark.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-latex.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-html.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/theme-chrome.js"></script>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
   :root {
-    --bg-primary: #1a1b26;
-    --bg-secondary: #1e1f2e;
-    --bg-tertiary: #24253a;
-    --bg-elevated: #2a2b3d;
-    --bg-surface: #30314a;
-    --border: #3b3d57;
-    --border-subtle: #2e3047;
-    --text-primary: #c8cad8;
-    --text-secondary: #8f91a8;
-    --text-muted: #5d5f78;
-    --accent: #7aa2f7;
-    --accent-dim: #3d5a9e;
-    --accent-glow: rgba(122, 162, 247, 0.12);
-    --success: #9ece6a;
-    --warning: #e0af68;
-    --error: #f7768e;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f8;
+    --bg-tertiary: #ecedf2;
+    --bg-elevated: #e4e5ec;
+    --bg-surface: #dcdde6;
+    --border: #c8c9d4;
+    --border-subtle: #dfe0e8;
+    --text-primary: #1e1e2e;
+    --text-secondary: #4a4b66;
+    --text-muted: #8b8da6;
+    --accent: #a51c30;
+    --accent-dim: #c75065;
+    --accent-glow: rgba(165, 28, 48, 0.08);
+    --success: #2e7d32;
+    --warning: #c67a0e;
+    --error: #c62828;
     --toolbar-height: 42px;
     --statusbar-height: 26px;
     --sidebar-width: 300px;
@@ -85,8 +84,8 @@
   }
   .toolbar-btn:hover { background: var(--bg-elevated); border-color: var(--text-muted); }
   .toolbar-btn.active { background: var(--accent-glow); border-color: var(--accent-dim); color: var(--accent); }
-  .toolbar-btn.primary { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
-  .toolbar-btn.primary:hover { background: var(--accent); }
+  .toolbar-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .toolbar-btn.primary:hover { background: var(--accent-dim); }
   .toolbar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .toolbar-select {
@@ -355,7 +354,7 @@
     font-family: 'IBM Plex Sans', sans-serif;
     font-size: 12px;
     font-weight: 600;
-    background: var(--accent-dim);
+    background: var(--accent);
     color: #fff;
     border: 1px solid var(--accent);
     border-radius: 4px;
@@ -363,7 +362,7 @@
     margin-top: 10px;
     transition: background 0.15s;
   }
-  .cleanup-run-btn:hover { background: var(--accent); }
+  .cleanup-run-btn:hover { background: var(--accent-dim); }
 
   /* ─── EDITOR AREA ─── */
   .editor-area {
@@ -427,12 +426,12 @@
   }
 
   /* Pandoc warning/error/info markers */
-  .pandoc-warning-line { position: absolute; background: rgba(224, 175, 104, 0.08); border-left: 3px solid var(--warning); }
-  .pandoc-error-line { position: absolute; background: rgba(247, 118, 142, 0.08); border-left: 3px solid var(--error); }
-  .pandoc-info-line { position: absolute; background: rgba(122, 162, 247, 0.05); border-left: 3px solid var(--accent); }
-  .pandoc-warning-text { position: absolute; background: rgba(224, 175, 104, 0.18); border-bottom: 2px solid var(--warning); }
-  .pandoc-error-text { position: absolute; background: rgba(247, 118, 142, 0.18); border-bottom: 2px solid var(--error); }
-  .pandoc-info-text { position: absolute; background: rgba(122, 162, 247, 0.12); border-bottom: 2px solid var(--accent); }
+  .pandoc-warning-line { position: absolute; background: rgba(198, 122, 14, 0.08); border-left: 3px solid var(--warning); }
+  .pandoc-error-line { position: absolute; background: rgba(198, 40, 40, 0.08); border-left: 3px solid var(--error); }
+  .pandoc-info-line { position: absolute; background: rgba(165, 28, 48, 0.05); border-left: 3px solid var(--accent); }
+  .pandoc-warning-text { position: absolute; background: rgba(198, 122, 14, 0.15); border-bottom: 2px solid var(--warning); }
+  .pandoc-error-text { position: absolute; background: rgba(198, 40, 40, 0.15); border-bottom: 2px solid var(--error); }
+  .pandoc-info-text { position: absolute; background: rgba(165, 28, 48, 0.10); border-bottom: 2px solid var(--accent); }
 
   /* ─── RESIZE GUTTER ─── */
   .resize-gutter {
@@ -502,8 +501,6 @@
     margin-right: 4px;
   }
   .output-tab-action:hover { color: var(--text-primary); border-color: var(--text-muted); }
-  #btnDownloadOutput { color: var(--accent); border-color: var(--accent-dim); }
-  #btnDownloadOutput:hover { background: var(--accent-dim); color: #fff; }
 
   .output-body { flex: 1; overflow: auto; background: var(--bg-primary); }
 
@@ -548,9 +545,9 @@
     min-width: 38px;
     text-align: center;
   }
-  .log-level.info { color: var(--accent); background: rgba(122, 162, 247, 0.1); }
-  .log-level.warn { color: var(--warning); background: rgba(224, 175, 104, 0.1); }
-  .log-level.error { color: var(--error); background: rgba(247, 118, 142, 0.1); }
+  .log-level.info { color: var(--accent); background: rgba(165, 28, 48, 0.08); }
+  .log-level.warn { color: var(--warning); background: rgba(198, 122, 14, 0.08); }
+  .log-level.error { color: var(--error); background: rgba(198, 40, 40, 0.08); }
 
   .log-location { flex-shrink: 0; color: var(--text-muted); min-width: 60px; }
   .log-msg { color: var(--text-secondary); word-break: break-word; }
@@ -566,9 +563,9 @@
     border-radius: 8px;
     margin-left: 4px;
   }
-  .log-badge.warn { background: rgba(224, 175, 104, 0.2); color: var(--warning); }
-  .log-badge.error { background: rgba(247, 118, 142, 0.2); color: var(--error); }
-  .log-badge.info { background: rgba(122, 162, 247, 0.15); color: var(--accent); }
+  .log-badge.warn { background: rgba(198, 122, 14, 0.12); color: var(--warning); }
+  .log-badge.error { background: rgba(198, 40, 40, 0.12); color: var(--error); }
+  .log-badge.info { background: rgba(165, 28, 48, 0.10); color: var(--accent); }
 
   /* ─── STATUS BAR ─── */
   .statusbar {
@@ -605,231 +602,11 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-  /* ─── OPTIONS PANEL ─── */
-  .options-panel {
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
-    transition: max-height 0.25s ease;
-  }
-  .options-panel.collapsed { max-height: 0 !important; border-bottom: none; }
-
-  .options-tabs {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    padding: 0 8px;
-    overflow-x: auto;
-    flex-shrink: 0;
-  }
-  .options-tab {
-    padding: 5px 10px;
-    font-size: 11px;
-    font-family: var(--font-ui);
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: color 0.15s, border-color 0.15s;
-  }
-  .options-tab:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
-  .options-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
-
-  .options-tab-panel {
-    display: none;
-    padding: 8px 12px;
-    gap: 8px;
-  }
-  .options-tab-panel.active { display: flex; flex-wrap: wrap; align-items: flex-start; }
-
-  .options-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 18px;
-    align-items: center;
-  }
-
-  .opt-group {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    font-family: var(--font-ui);
-    color: var(--text-secondary);
-  }
-  .opt-group label { white-space: nowrap; cursor: pointer; }
-  .opt-group input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
-  .opt-group select, .opt-group input[type="text"], .opt-group input[type="number"] {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 2px 5px;
-    font-size: 11px;
-    font-family: var(--font-mono);
-  }
-  .opt-group select { padding-right: 18px; }
-  .opt-group select:focus, .opt-group input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
-
-  .opt-section-label {
-    font-size: 10px;
-    font-family: var(--font-ui);
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-right: 4px;
-  }
-
-  /* File upload areas within options */
-  .opt-file-upload {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-family: var(--font-ui);
-    color: var(--text-secondary);
-  }
-  .opt-file-upload .upload-btn {
-    padding: 2px 8px;
-    font-size: 11px;
-    background: var(--bg-primary);
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    cursor: pointer;
-    font-family: var(--font-ui);
-  }
-  .opt-file-upload .upload-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-  .opt-file-upload .file-name {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--accent);
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .opt-file-upload .file-remove {
-    background: none;
-    border: none;
-    color: var(--error);
-    cursor: pointer;
-    font-size: 13px;
-    padding: 0 2px;
-    line-height: 1;
-  }
-  .opt-file-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 3px;
-  }
-  .opt-file-tag {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 1px 6px;
-    font-size: 11px;
-    font-family: var(--font-mono);
-    color: var(--accent);
-  }
-  .opt-file-tag .file-remove { font-size: 12px; }
-
-  /* Key/value row for metadata and variables */
-  .opt-kv-row {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    margin-bottom: 3px;
-  }
-  .opt-kv-row input[type="text"] {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 2px 5px;
-    font-size: 11px;
-    font-family: var(--font-mono);
-    width: 140px;
-  }
-  .opt-kv-row input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
-  .opt-kv-row .kv-remove {
-    background: none;
-    border: none;
-    color: var(--error);
-    cursor: pointer;
-    font-size: 13px;
-    padding: 0 2px;
-    line-height: 1;
-    visibility: hidden;
-  }
-  .opt-kv-row:hover .kv-remove { visibility: visible; }
-
-  /* Collapsible format-specific sections */
-  details.fmt-section {
-    margin-top: 6px;
-    border: 1px solid var(--border-subtle);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  details.fmt-section > summary {
-    text-transform: uppercase;
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    padding: 5px 8px;
-    cursor: pointer;
-    background: var(--bg-tertiary);
-    user-select: none;
-    list-style: none;
-  }
-  details.fmt-section > summary::-webkit-details-marker { display: none; }
-  details.fmt-section > summary::before {
-    content: '▸ ';
-    font-size: 10px;
-  }
-  details.fmt-section[open] > summary::before {
-    content: '▾ ';
-  }
-  details.fmt-section[open] > summary {
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-subtle);
-  }
-  details.fmt-section > .fmt-section-body {
-    padding: 6px 8px;
-  }
-
-  /* Extension checkbox items */
-  .ext-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 1px 4px;
-    font-size: 11px;
-    font-family: var(--font-mono);
-    color: var(--text-secondary);
-    border-radius: 2px;
-  }
-  .ext-item:hover { background: var(--bg-tertiary); }
-  .ext-item input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--accent); cursor: pointer; }
-  .ext-item label { cursor: pointer; white-space: nowrap; }
-  .ext-item.default-on label { font-weight: 500; }
-  .ext-item.toggled label { color: var(--accent); }
-
-  /* Toggle button in toolbar for options panel */
-  .toolbar-btn.options-toggle.panel-open { color: var(--accent); }
 </style>
 </head>
 <body>
 
-<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ">
+<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.epub,.typ">
 
 <!-- ═══ TOOLBAR ═══ -->
 <div class="toolbar" role="toolbar" aria-label="Main toolbar">
@@ -869,12 +646,6 @@
     <button class="toolbar-btn primary" id="btnConvert" disabled>▶ Convert</button>
   </div>
 
-  <div class="toolbar-divider"></div>
-
-  <div class="toolbar-group">
-    <button class="toolbar-btn options-toggle panel-open" id="btnOptions" title="Toggle conversion options panel">⚙ Options</button>
-  </div>
-
   <span class="toolbar-spacer"></span>
 
   <div class="toolbar-group">
@@ -883,638 +654,6 @@
     <button class="toolbar-btn active" id="btnLayoutSide" title="Preview: right side">◫</button>
     <button class="toolbar-btn" id="btnLayoutBottom" title="Preview: bottom">⬓</button>
     <button class="toolbar-btn" id="btnLayoutHide" title="Hide preview">▣</button>
-  </div>
-</div>
-
-<!-- Binary input info bar -->
-<div id="binaryInputInfo" style="display:none; padding:4px 12px; background:var(--bg-tertiary); border-bottom:1px solid var(--border-subtle); font-size:11px; color:var(--text-secondary); align-items:center; gap:8px;"></div>
-
-<!-- ═══ OPTIONS PANEL ═══ -->
-<div class="options-panel" id="optionsPanel">
-  <div class="options-tabs" id="optionsTabs">
-    <button class="options-tab active" data-tab="general">General</button>
-    <button class="options-tab" data-tab="headings">Headings</button>
-    <button class="options-tab" data-tab="media">Media</button>
-    <button class="options-tab" data-tab="citations">Citations</button>
-    <button class="options-tab" data-tab="math">Math</button>
-    <button class="options-tab" data-tab="code">Code</button>
-    <button class="options-tab" data-tab="format">Format-Specific</button>
-    <button class="options-tab" data-tab="template">Template</button>
-    <button class="options-tab" data-tab="metadata">Metadata</button>
-    <button class="options-tab" data-tab="filters">Filters</button>
-    <button class="options-tab" data-tab="wrapping">Wrapping</button>
-    <button class="options-tab" data-tab="extensions">Extensions</button>
-  </div>
-
-  <!-- General -->
-  <div class="options-tab-panel active" id="panel-general">
-    <div class="options-grid">
-      <div class="opt-group">
-        <input type="checkbox" id="opt-standalone" checked>
-        <label for="opt-standalone">Standalone document</label>
-      </div>
-      <div class="opt-group">
-        <input type="checkbox" id="opt-file-scope">
-        <label for="opt-file-scope">File scope</label>
-      </div>
-      <div class="opt-group">
-        <label for="opt-tab-stop">Tab stop:</label>
-        <select id="opt-tab-stop" style="width:55px;">
-          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-          <option value="4" selected>4</option><option value="5">5</option><option value="6">6</option>
-          <option value="7">7</option><option value="8">8</option>
-        </select>
-      </div>
-      <div class="opt-group">
-        <input type="checkbox" id="opt-preserve-tabs">
-        <label for="opt-preserve-tabs">Preserve tabs</label>
-      </div>
-      <div class="opt-group">
-        <label for="opt-eol">Line endings:</label>
-        <select id="opt-eol" style="width:100px;">
-          <option value="">Native</option>
-          <option value="lf">LF (Unix)</option>
-          <option value="crlf">CRLF (Windows)</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Headings -->
-  <div class="options-tab-panel" id="panel-headings">
-    <div class="options-grid">
-      <div class="opt-group">
-        <label for="opt-shift-heading">Shift heading level by:</label>
-        <select id="opt-shift-heading" style="width:55px;">
-          <option value="-2">-2</option>
-          <option value="-1">-1</option>
-          <option value="0" selected>0</option>
-          <option value="1">+1</option>
-          <option value="2">+2</option>
-        </select>
-      </div>
-      <div class="opt-group">
-        <input type="checkbox" id="opt-number-sections">
-        <label for="opt-number-sections">Number sections</label>
-      </div>
-      <div class="opt-group">
-        <label for="opt-number-offset">Number offset:</label>
-        <input type="text" id="opt-number-offset" placeholder="0,0,0" style="width:80px;">
-      </div>
-      <div class="opt-group">
-        <input type="checkbox" id="opt-toc">
-        <label for="opt-toc">Table of contents</label>
-      </div>
-      <div class="opt-group">
-        <label for="opt-toc-depth">TOC depth:</label>
-        <select id="opt-toc-depth" style="width:50px;">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3" selected>3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Media -->
-  <div class="options-tab-panel" id="panel-media">
-    <div class="options-grid">
-      <div class="opt-group">
-        <input type="checkbox" id="opt-extract-media">
-        <label for="opt-extract-media">Extract media</label>
-      </div>
-      <div class="opt-group">
-        <label for="opt-dpi">DPI (images):</label>
-        <input type="number" id="opt-dpi" placeholder="96" min="1" style="width:65px;">
-      </div>
-      <div class="opt-group">
-        <label for="opt-resource-path">Resource path:</label>
-        <input type="text" id="opt-resource-path" placeholder=".:images" style="width:180px;">
-      </div>
-      <div class="opt-file-upload">
-        <label>Auxiliary files:</label>
-        <button class="upload-btn" id="btnAuxFiles">Upload Files</button>
-        <input type="file" id="auxFileInput" multiple style="display:none;">
-      </div>
-      <div class="opt-file-upload">
-        <button class="upload-btn" id="btnAuxDir">Upload Directory</button>
-        <input type="file" id="auxDirInput" webkitdirectory style="display:none;">
-      </div>
-    </div>
-    <div class="opt-file-list" id="auxFileList"></div>
-  </div>
-
-  <!-- Citations -->
-  <div class="options-tab-panel" id="panel-citations">
-    <div class="options-grid">
-      <div class="opt-group">
-        <label for="opt-citation-method">Citation processing:</label>
-        <select id="opt-citation-method" style="width:110px;">
-          <option value="">None</option>
-          <option value="citeproc">Citeproc</option>
-          <option value="natbib">Natbib</option>
-          <option value="biblatex">BibLaTeX</option>
-        </select>
-      </div>
-      <div class="opt-file-upload">
-        <label>Bibliography:</label>
-        <button class="upload-btn" id="btnBibFile">Upload .bib/.json/.yaml</button>
-        <input type="file" id="bibFileInput" accept=".bib,.bibtex,.json,.yaml,.yml" style="display:none;">
-        <span class="file-name" id="bibFileName"></span>
-        <button class="file-remove" id="bibFileRemove" style="display:none;">×</button>
-      </div>
-    </div>
-    <div class="options-grid" style="margin-top:6px;" id="citeprocOptions">
-      <div class="opt-file-upload">
-        <label>CSL style:</label>
-        <button class="upload-btn" id="btnCslFile">Upload .csl</button>
-        <input type="file" id="cslFileInput" accept=".csl" style="display:none;">
-        <span class="file-name" id="cslFileName"></span>
-        <button class="file-remove" id="cslFileRemove" style="display:none;">×</button>
-      </div>
-      <div class="opt-file-upload">
-        <label>Citation abbreviations:</label>
-        <button class="upload-btn" id="btnAbbrevFile">Upload .json</button>
-        <input type="file" id="abbrevFileInput" accept=".json" style="display:none;">
-        <span class="file-name" id="abbrevFileName"></span>
-        <button class="file-remove" id="abbrevFileRemove" style="display:none;">×</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Math -->
-  <div class="options-tab-panel" id="panel-math">
-    <div class="options-grid">
-      <div class="opt-group">
-        <label for="opt-math">Math rendering method:</label>
-        <select id="opt-math" style="width:130px;">
-          <option value="">Default (plain)</option>
-          <option value="mathjax">MathJax</option>
-          <option value="katex">KaTeX</option>
-          <option value="mathml">MathML</option>
-          <option value="webtex">WebTeX (images)</option>
-          <option value="gladtex">GladTeX</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Code -->
-  <div class="options-tab-panel" id="panel-code">
-    <div class="options-grid">
-      <div class="opt-group">
-        <label for="opt-highlight-style">Highlight style:</label>
-        <select id="opt-highlight-style" style="width:120px;">
-          <option value="">Default</option>
-          <option value="idiomatic">Idiomatic</option>
-          <option value="none">None</option>
-          <option value="pygments">Pygments</option>
-          <option value="kate">Kate</option>
-          <option value="monochrome">Monochrome</option>
-          <option value="breezedark">Breeze Dark</option>
-          <option value="espresso">Espresso</option>
-          <option value="zenburn">Zenburn</option>
-          <option value="haddock">Haddock</option>
-          <option value="tango">Tango</option>
-          <option value="custom">Custom…</option>
-        </select>
-      </div>
-      <div class="opt-group">
-        <label for="opt-indented-code-classes">Indented code classes:</label>
-        <input type="text" id="opt-indented-code-classes" placeholder="e.g. haskell, python" style="width:160px;">
-      </div>
-      <div class="opt-file-upload" id="customThemeUpload" style="display:none;">
-        <label>Custom theme:</label>
-        <button class="upload-btn" id="btnHighlightTheme">Upload .theme</button>
-        <input type="file" id="highlightThemeInput" accept=".theme" style="display:none;">
-        <span class="file-name" id="highlightThemeName"></span>
-        <button class="file-remove" id="highlightThemeRemove" style="display:none;">×</button>
-      </div>
-      <div class="opt-file-upload">
-        <label>Syntax definitions:</label>
-        <button class="upload-btn" id="btnSyntaxDefs">Add .xml files</button>
-        <input type="file" id="syntaxDefsInput" accept=".xml" multiple style="display:none;">
-      </div>
-    </div>
-    <div class="opt-file-list" id="syntaxDefsList"></div>
-  </div>
-
-  <!-- Format-specific -->
-  <div class="options-tab-panel" id="panel-format">
-    <!-- Reader options -->
-    <details class="fmt-section">
-      <summary>Reader / Input</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-group">
-          <input type="checkbox" id="opt-strip-comments">
-          <label for="opt-strip-comments">Strip HTML comments (input)</label>
-        </div>
-        <div class="opt-group">
-          <label for="opt-default-image-extension">Default image ext:</label>
-          <input type="text" id="opt-default-image-extension" placeholder=".png" style="width:60px;">
-        </div>
-        <div class="opt-file-upload">
-          <label>Abbreviations file:</label>
-          <button class="upload-btn" id="btnAbbrevsFile">Upload</button>
-          <input type="file" id="abbrevsFileInput" style="display:none;">
-          <span class="file-name" id="abbrevsFileName"></span>
-          <button class="file-remove" id="abbrevsFileRemove" style="display:none;">×</button>
-        </div>
-        <!-- Track changes (docx input) -->
-        <div class="opt-group">
-          <label for="opt-track-changes">Track changes:</label>
-          <select id="opt-track-changes" style="width:110px;">
-            <option value="">Default (accept)</option>
-            <option value="accept">Accept all</option>
-            <option value="reject">Reject all</option>
-            <option value="all">Include all</option>
-          </select>
-        </div>
-      </div>
-      </div>
-    </details>
-    <!-- HTML output options -->
-    <details class="fmt-section" open>
-      <summary>HTML Output</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-group">
-          <input type="checkbox" id="opt-self-contained">
-          <label for="opt-self-contained">Embed resources</label>
-        </div>
-        <div class="opt-group">
-          <input type="checkbox" id="opt-html-q-tags">
-          <label for="opt-html-q-tags">Use &lt;q&gt; tags</label>
-        </div>
-        <div class="opt-group">
-          <input type="checkbox" id="opt-section-divs">
-          <label for="opt-section-divs">Wrap in &lt;section&gt;</label>
-        </div>
-        <div class="opt-group">
-          <input type="checkbox" id="opt-ascii-html">
-          <label for="opt-ascii-html">ASCII only</label>
-        </div>
-        <div class="opt-group">
-          <label for="opt-title-prefix">Title prefix:</label>
-          <input type="text" id="opt-title-prefix" placeholder="Prefix" style="width:80px;">
-        </div>
-        <div class="opt-group">
-          <label for="opt-id-prefix">ID prefix:</label>
-          <input type="text" id="opt-id-prefix" placeholder="Prefix" style="width:80px;">
-        </div>
-        <div class="opt-group">
-          <label for="opt-email-obfuscation">Email obfuscation:</label>
-          <select id="opt-email-obfuscation" style="width:120px;">
-            <option value="">None</option>
-            <option value="javascript">JavaScript</option>
-            <option value="references">Char references</option>
-          </select>
-        </div>
-        <div class="opt-file-upload">
-          <label>CSS files:</label>
-          <button class="upload-btn" id="btnCssFiles">Add .css</button>
-          <input type="file" id="cssFilesInput" accept=".css" multiple style="display:none;">
-        </div>
-      </div>
-      <div class="opt-file-list" id="cssFileList"></div>
-      </div>
-    </details>
-    <!-- Markdown output options -->
-    <details class="fmt-section">
-      <summary>Markdown Output</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-group">
-          <input type="checkbox" id="opt-reference-links">
-          <label for="opt-reference-links">Reference-style links</label>
-        </div>
-        <div class="opt-group">
-          <label for="opt-reference-location">Reference location:</label>
-          <select id="opt-reference-location" style="width:100px;">
-            <option value="">Default</option>
-            <option value="block">Block</option>
-            <option value="section">Section</option>
-            <option value="document">Document</option>
-          </select>
-        </div>
-        <div class="opt-group">
-          <label for="opt-markdown-headings">Heading style:</label>
-          <select id="opt-markdown-headings" style="width:100px;">
-            <option value="">Default (ATX)</option>
-            <option value="atx">ATX (#)</option>
-            <option value="setext">Setext</option>
-          </select>
-        </div>
-      </div>
-      </div>
-    </details>
-    <!-- RST output options -->
-    <details class="fmt-section">
-      <summary>RST Output</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-group">
-          <input type="checkbox" id="opt-reference-links-rst">
-          <label for="opt-reference-links-rst">Reference-style links</label>
-        </div>
-        <div class="opt-group">
-          <input type="checkbox" id="opt-list-tables">
-          <label for="opt-list-tables">List tables</label>
-        </div>
-      </div>
-      </div>
-    </details>
-    <!-- LaTeX output options -->
-    <details class="fmt-section">
-      <summary>LaTeX Output</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-group">
-          <input type="checkbox" id="opt-lof">
-          <label for="opt-lof">List of figures</label>
-        </div>
-        <div class="opt-group">
-          <input type="checkbox" id="opt-lot">
-          <label for="opt-lot">List of tables</label>
-        </div>
-        <div class="opt-group">
-          <label for="opt-top-level-division">Top-level division:</label>
-          <select id="opt-top-level-division" style="width:90px;">
-            <option value="">Default</option>
-            <option value="section">Section</option>
-            <option value="chapter">Chapter</option>
-            <option value="part">Part</option>
-          </select>
-        </div>
-      </div>
-      </div>
-    </details>
-    <!-- Caption / ASCII / ODT options -->
-    <details class="fmt-section">
-      <summary>Other</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-group">
-          <label for="opt-figure-caption-position">Figure caption:</label>
-          <select id="opt-figure-caption-position" style="width:80px;">
-            <option value="">Default</option>
-            <option value="above">Above</option>
-            <option value="below">Below</option>
-          </select>
-        </div>
-        <div class="opt-group">
-          <label for="opt-table-caption-position">Table caption:</label>
-          <select id="opt-table-caption-position" style="width:80px;">
-            <option value="">Default</option>
-            <option value="above">Above</option>
-            <option value="below">Below</option>
-          </select>
-        </div>
-        <div class="opt-group">
-          <input type="checkbox" id="opt-ascii">
-          <label for="opt-ascii">ASCII output only</label>
-        </div>
-        <div class="opt-group">
-          <input type="checkbox" id="opt-link-images">
-          <label for="opt-link-images">Link images (ODT)</label>
-        </div>
-      </div>
-      </div>
-    </details>
-    <!-- EPUB options -->
-    <details class="fmt-section">
-      <summary>EPUB</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-file-upload">
-          <label>Cover image:</label>
-          <button class="upload-btn" id="btnEpubCover">Upload image</button>
-          <input type="file" id="epubCoverInput" accept="image/*" style="display:none;">
-          <span class="file-name" id="epubCoverName"></span>
-          <button class="file-remove" id="epubCoverRemove" style="display:none;">×</button>
-        </div>
-        <div class="opt-file-upload">
-          <label>EPUB metadata:</label>
-          <button class="upload-btn" id="btnEpubMeta">Upload .xml</button>
-          <input type="file" id="epubMetaInput" accept=".xml" style="display:none;">
-          <span class="file-name" id="epubMetaName"></span>
-          <button class="file-remove" id="epubMetaRemove" style="display:none;">×</button>
-        </div>
-        <div class="opt-file-upload">
-          <label>Fonts:</label>
-          <button class="upload-btn" id="btnEpubFonts">Add fonts</button>
-          <input type="file" id="epubFontsInput" accept=".ttf,.otf,.woff,.woff2" multiple style="display:none;">
-        </div>
-        <div class="opt-group">
-          <input type="checkbox" id="opt-epub-title-page" checked>
-          <label for="opt-epub-title-page">Title page</label>
-        </div>
-        <div class="opt-group">
-          <label for="opt-epub-subdirectory">Subdirectory:</label>
-          <input type="text" id="opt-epub-subdirectory" placeholder="EPUB" style="width:80px;">
-        </div>
-      </div>
-      <div class="opt-file-list" id="epubFontsList"></div>
-      </div>
-    </details>
-    <!-- Chunked HTML -->
-    <details class="fmt-section">
-      <summary>Chunked HTML</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-group">
-          <label for="opt-split-level">Split level:</label>
-          <select id="opt-split-level" style="width:55px;">
-            <option value="">Default</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-          </select>
-        </div>
-        <div class="opt-group">
-          <label for="opt-chunk-template">Chunk template:</label>
-          <input type="text" id="opt-chunk-template" placeholder="%s-%i.html" style="width:130px;">
-        </div>
-      </div>
-      </div>
-    </details>
-    <!-- Notebook -->
-    <details class="fmt-section">
-      <summary>Jupyter Notebook</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-group">
-          <label for="opt-ipynb-output">Output cell handling:</label>
-          <select id="opt-ipynb-output" style="width:100px;">
-            <option value="">Default (best)</option>
-            <option value="all">All</option>
-            <option value="none">None</option>
-            <option value="best">Best only</option>
-          </select>
-        </div>
-      </div>
-      </div>
-    </details>
-    <!-- Slides -->
-    <details class="fmt-section">
-      <summary>Slides</summary>
-      <div class="fmt-section-body">
-      <div class="options-grid">
-        <div class="opt-group">
-          <label for="opt-slide-level">Slide level:</label>
-          <select id="opt-slide-level" style="width:55px;">
-            <option value="">Auto</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
-        </div>
-        <div class="opt-group">
-          <input type="checkbox" id="opt-incremental">
-          <label for="opt-incremental">Incremental lists</label>
-        </div>
-      </div>
-      </div>
-    </details>
-  </div>
-
-  <!-- Template -->
-  <div class="options-tab-panel" id="panel-template">
-    <div class="options-grid">
-      <div class="opt-file-upload">
-        <label>Custom template:</label>
-        <button class="upload-btn" id="btnTemplateFile">Upload template</button>
-        <input type="file" id="templateFileInput" style="display:none;">
-        <span class="file-name" id="templateFileName"></span>
-        <button class="file-remove" id="templateFileRemove" style="display:none;">×</button>
-      </div>
-      <div class="opt-file-upload">
-        <label>Reference doc (docx/odt/pptx):</label>
-        <button class="upload-btn" id="btnRefDoc">Upload</button>
-        <input type="file" id="refDocInput" accept=".docx,.odt,.pptx" style="display:none;">
-        <span class="file-name" id="refDocName"></span>
-        <button class="file-remove" id="refDocRemove" style="display:none;">×</button>
-      </div>
-    </div>
-    <!-- Include files -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Include Files</span>
-      <div class="options-grid" style="margin-top:3px;">
-        <div class="opt-file-upload">
-          <label>In header:</label>
-          <button class="upload-btn" id="btnHeaderFiles">Add files</button>
-          <input type="file" id="headerFilesInput" multiple style="display:none;">
-        </div>
-        <div class="opt-file-upload">
-          <label>Before body:</label>
-          <button class="upload-btn" id="btnBeforeFiles">Add files</button>
-          <input type="file" id="beforeFilesInput" multiple style="display:none;">
-        </div>
-        <div class="opt-file-upload">
-          <label>After body:</label>
-          <button class="upload-btn" id="btnAfterFiles">Add files</button>
-          <input type="file" id="afterFilesInput" multiple style="display:none;">
-        </div>
-      </div>
-      <div class="opt-file-list" id="headerFilesList"></div>
-      <div class="opt-file-list" id="beforeFilesList"></div>
-      <div class="opt-file-list" id="afterFilesList"></div>
-    </div>
-    <!-- Variables -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Template Variables</span>
-      <div id="templateVarRows" style="margin-top:3px;"></div>
-      <button class="upload-btn" id="btnAddTemplateVar" style="margin-top:4px;">+ Add variable</button>
-      <datalist id="variable-suggestions">
-        <option value="abstract"></option><option value="abstract-title"></option>
-        <option value="author"></option><option value="backgroundcolor"></option>
-        <option value="date"></option><option value="description"></option>
-        <option value="dir"></option><option value="document-css"></option>
-        <option value="fontcolor"></option><option value="fontsize"></option>
-        <option value="keywords"></option><option value="lang"></option>
-        <option value="linestretch"></option><option value="linkcolor"></option>
-        <option value="mainfont"></option><option value="margin-bottom"></option>
-        <option value="margin-left"></option><option value="margin-right"></option>
-        <option value="margin-top"></option><option value="maxwidth"></option>
-        <option value="monofont"></option><option value="subject"></option>
-        <option value="subtitle"></option><option value="title"></option>
-        <option value="toc-title"></option>
-      </datalist>
-    </div>
-  </div>
-
-  <!-- Metadata -->
-  <div class="options-tab-panel" id="panel-metadata">
-    <div class="options-grid">
-      <div class="opt-file-upload">
-        <label>Metadata file (.yaml/.json):</label>
-        <button class="upload-btn" id="btnMetadataFile">Upload</button>
-        <input type="file" id="metadataFileInput" accept=".yaml,.yml,.json" style="display:none;">
-        <span class="file-name" id="metadataFileName"></span>
-        <button class="file-remove" id="metadataFileRemove" style="display:none;">×</button>
-      </div>
-    </div>
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Metadata Fields</span>
-      <datalist id="metadata-suggestions">
-        <option value="title"></option><option value="author"></option>
-        <option value="date"></option><option value="lang"></option>
-        <option value="subject"></option><option value="description"></option>
-        <option value="category"></option><option value="keywords"></option>
-      </datalist>
-      <div id="metadataKvRows" style="margin-top:3px;"></div>
-      <button class="upload-btn" id="btnAddMetadata" style="margin-top:4px;">+ Add field</button>
-    </div>
-  </div>
-
-  <!-- Filters -->
-  <div class="options-tab-panel" id="panel-filters">
-    <div class="options-grid">
-      <div class="opt-file-upload">
-        <label>Lua filters (.lua):</label>
-        <button class="upload-btn" id="btnLuaFilters">Add Lua filters</button>
-        <input type="file" id="luaFiltersInput" accept=".lua" multiple style="display:none;">
-      </div>
-    </div>
-    <div id="luaFiltersList" style="margin-top:4px;"></div>
-    <div style="margin-top:4px; font-size:10px; color:var(--text-muted);">Drag to reorder execution sequence.</div>
-  </div>
-
-  <!-- Wrapping -->
-  <div class="options-tab-panel" id="panel-wrapping">
-    <div class="options-grid">
-      <div class="opt-group">
-        <label for="opt-wrap">Wrap mode:</label>
-        <select id="opt-wrap" style="width:90px;">
-          <option value="auto">Auto</option>
-          <option value="none">None</option>
-          <option value="preserve">Preserve</option>
-        </select>
-      </div>
-      <div class="opt-group">
-        <label for="opt-columns">Line width (columns):</label>
-        <input type="number" id="opt-columns" placeholder="72" min="1" style="width:60px;">
-      </div>
-    </div>
-  </div>
-
-  <!-- Extensions -->
-  <div class="options-tab-panel" id="panel-extensions">
-    <div style="display:flex; gap:24px; flex-wrap:wrap; width:100%;">
-      <div style="flex:1; min-width:200px;">
-        <span class="opt-section-label" id="extInputHeader">Input Extensions</span>
-        <div id="extInputList" style="margin-top:4px; max-height:260px; overflow-y:auto;"></div>
-      </div>
-      <div style="flex:1; min-width:200px;">
-        <span class="opt-section-label" id="extOutputHeader">Output Extensions</span>
-        <div id="extOutputList" style="margin-top:4px; max-height:260px; overflow-y:auto;"></div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -1611,13 +750,12 @@
         <button class="output-tab active" data-tab="preview">Preview</button>
         <button class="output-tab" data-tab="log">Log <span id="logBadge"></span></button>
         <button class="output-tab" data-tab="source">Source</button>
-        <button class="output-tab-action" id="btnDownloadOutput" title="Download output" style="display:none;">📥 Download</button>
         <span class="output-tab-spacer"></span>
         <button class="output-tab-action" id="btnOutputClose" title="Hide panel">×</button>
       </div>
       <div class="output-body">
         <div class="tab-content active" id="tabPreview">
-          <iframe id="previewFrame" sandbox="allow-scripts" title="HTML preview"></iframe>
+          <iframe id="previewFrame" sandbox="allow-same-origin" title="HTML preview"></iframe>
         </div>
         <div class="tab-content" id="tabLog" role="log" aria-label="Conversion log" aria-live="polite">
           <div class="log-container" id="logContainer">
@@ -1654,7 +792,7 @@
 // ════════════════════════════════════════════════════════════════════
 
 const editor = ace.edit('aceEditor');
-editor.setTheme('ace/theme/one_dark');
+editor.setTheme('ace/theme/chrome');
 editor.session.setMode('ace/mode/latex');
 editor.setOptions({
   fontSize: '13px',
@@ -1718,7 +856,7 @@ editor.session.selection.on('changeCursor', () => {
 
 // Output source viewer (read-only Ace)
 const sourceEditor = ace.edit('outputSource');
-sourceEditor.setTheme('ace/theme/one_dark');
+sourceEditor.setTheme('ace/theme/chrome');
 sourceEditor.session.setMode('ace/mode/html');
 sourceEditor.setReadOnly(true);
 sourceEditor.setOptions({
@@ -1751,9 +889,6 @@ async function initPandoc() {
     const outputFormats = await mod.query({ query: 'output-formats' });
     populateFormats('selFrom', inputFormats, 'latex');
     populateFormats('selTo', outputFormats, 'html');
-
-    // Load extensions for default formats
-    updateExtensions();
 
   } catch (err) {
     console.error('Failed to load pandoc.wasm:', err);
@@ -1794,60 +929,26 @@ fileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Update tab name and track filename
+  const text = await file.text();
+  editor.setValue(text, -1);
+
+  // Update tab name
   document.getElementById('tabFilename').textContent = file.name;
-  inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
 
   // Auto-detect format from extension
   const ext = file.name.split('.').pop().toLowerCase();
   const formatMap = {
     'tex': 'latex', 'latex': 'latex', 'md': 'markdown', 'markdown': 'markdown',
     'html': 'html', 'htm': 'html', 'rst': 'rst', 'org': 'org', 'typ': 'typst',
-    'txt': 'markdown', 'docx': 'docx', 'odt': 'odt', 'pptx': 'pptx',
-    'epub': 'epub', 'fb2': 'fb2', 'ipynb': 'ipynb',
+    'txt': 'markdown',
   };
   const fmt = formatMap[ext];
-
-  if (fmt && BINARY_INPUT_FORMATS.includes(fmt)) {
-    // Binary input — store as blob, show placeholder in editor
-    inputBinaryFile = { name: file.name, blob: file };
-    editor.setValue(`[Binary file loaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\n\nThis file will be passed directly to Pandoc for conversion.\nClick "▶ Convert" to process.`, -1);
-    editor.setReadOnly(true);
-
-    if (fmt) {
-      document.getElementById('selFrom').value = fmt;
-      document.getElementById('statusFormat').textContent = fmt;
-      updateExtensions();
-    }
-
-    // Show clear button
-    document.getElementById('binaryInputInfo').style.display = 'flex';
-    document.getElementById('binaryInputInfo').innerHTML =
-      `<span>📎 ${file.name}</span><button class="toolbar-btn" id="btnClearBinary" title="Remove file and return to text editor" style="font-size:11px;padding:2px 6px;">✕ Clear</button>`;
-    document.getElementById('btnClearBinary').addEventListener('click', () => {
-      inputBinaryFile = null;
-      editor.setValue('', -1);
-      editor.setReadOnly(false);
-      inputFileName = 'untitled';
-      document.getElementById('binaryInputInfo').style.display = 'none';
-      document.getElementById('tabFilename').textContent = 'untitled';
-    });
-  } else {
-    // Text input — read into editor as before
-    inputBinaryFile = null;
-    editor.setReadOnly(false);
-    document.getElementById('binaryInputInfo').style.display = 'none';
-
-    const text = await file.text();
-    editor.setValue(text, -1);
-
-    if (fmt) {
-      document.getElementById('selFrom').value = fmt;
-      const modeMap = { 'latex': 'latex', 'markdown': 'markdown', 'html': 'html' };
-      editor.session.setMode('ace/mode/' + (modeMap[fmt] || 'text'));
-      document.getElementById('statusFormat').textContent = fmt;
-      updateExtensions();
-    }
+  if (fmt) {
+    document.getElementById('selFrom').value = fmt;
+    // Set Ace mode
+    const modeMap = { 'latex': 'latex', 'markdown': 'markdown', 'html': 'html' };
+    editor.session.setMode('ace/mode/' + (modeMap[fmt] || 'text'));
+    document.getElementById('statusFormat').textContent = fmt;
   }
 
   fileInput.value = '';
@@ -2112,808 +1213,6 @@ function clearDecorations() {
 }
 
 // ════════════════════════════════════════════════════════════════════
-// SECTION 5B: OPTIONS PANEL
-// ════════════════════════════════════════════════════════════════════
-
-// --- Options panel toggle ---
-const optionsPanel = document.getElementById('optionsPanel');
-const btnOptions = document.getElementById('btnOptions');
-btnOptions.addEventListener('click', () => {
-  optionsPanel.classList.toggle('collapsed');
-  btnOptions.classList.toggle('panel-open');
-});
-
-// --- Tab switching ---
-const optionsTabs = document.getElementById('optionsTabs');
-optionsTabs.addEventListener('click', (e) => {
-  const tab = e.target.closest('.options-tab');
-  if (!tab) return;
-  const tabName = tab.dataset.tab;
-
-  // Deactivate all tabs and panels
-  optionsTabs.querySelectorAll('.options-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.options-tab-panel').forEach(p => p.classList.remove('active'));
-
-  // Activate clicked tab and panel
-  tab.classList.add('active');
-  const panel = document.getElementById('panel-' + tabName);
-  if (panel) panel.classList.add('active');
-});
-
-// --- Collected resource files (populated by future tabs) ---
-
-// --- Auxiliary file uploads (Media tab) ---
-function renderAuxFileList() {
-  const list = document.getElementById('auxFileList');
-  if (!list) return;
-  const names = Object.keys(resourceFiles.auxFiles);
-  if (names.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = names.map(name =>
-    `<span class="opt-file-tag">${name}<button class="file-remove" data-aux="${name}">×</button></span>`
-  ).join('');
-  list.querySelectorAll('.file-remove').forEach(btn => {
-    btn.addEventListener('click', () => {
-      delete resourceFiles.auxFiles[btn.dataset.aux];
-      renderAuxFileList();
-    });
-  });
-}
-
-document.getElementById('btnAuxFiles')?.addEventListener('click', () => {
-  document.getElementById('auxFileInput').click();
-});
-document.getElementById('auxFileInput')?.addEventListener('change', async (e) => {
-  for (const file of e.target.files) {
-    const content = new Uint8Array(await file.arrayBuffer());
-    resourceFiles.auxFiles[file.name] = content;
-  }
-  renderAuxFileList();
-  e.target.value = '';
-});
-
-document.getElementById('btnAuxDir')?.addEventListener('click', () => {
-  document.getElementById('auxDirInput').click();
-});
-document.getElementById('auxDirInput')?.addEventListener('change', async (e) => {
-  for (const file of e.target.files) {
-    const path = file.webkitRelativePath || file.name;
-    const content = new Uint8Array(await file.arrayBuffer());
-    resourceFiles.auxFiles[path] = content;
-  }
-  renderAuxFileList();
-  e.target.value = '';
-});
-
-const resourceFiles = {
-  auxFiles: {},       // additional files (images, includes)
-  bibFile: null,
-  cslFile: null,
-  abbrevFile: null,
-  abbreviationsFile: null,
-  cssFiles: [],
-  highlightThemeFile: null,
-  syntaxDefinitions: [],
-  templateFile: null,
-  referenceDoc: null,
-  metadataFile: null,
-  epubCoverImage: null,
-  epubMetadataFile: null,
-  epubFonts: [],
-  headerFiles: [],
-  beforeBodyFiles: [],
-  afterBodyFiles: [],
-  luaFilters: [],
-};
-
-// --- Citations tab ---
-// Helper for single-file upload fields
-function setupSingleFileUpload(btnId, inputId, nameId, removeId, resourceKey, onChangeExtra) {
-  const btn = document.getElementById(btnId);
-  const input = document.getElementById(inputId);
-  const nameEl = document.getElementById(nameId);
-  const removeBtn = document.getElementById(removeId);
-  if (!btn || !input) return;
-
-  btn.addEventListener('click', () => input.click());
-  input.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const content = new Uint8Array(await file.arrayBuffer());
-    content.name = file.name;
-    resourceFiles[resourceKey] = content;
-    if (nameEl) nameEl.textContent = file.name;
-    if (removeBtn) removeBtn.style.display = '';
-    if (onChangeExtra) onChangeExtra();
-    e.target.value = '';
-  });
-  if (removeBtn) {
-    removeBtn.addEventListener('click', () => {
-      resourceFiles[resourceKey] = null;
-      if (nameEl) nameEl.textContent = '';
-      removeBtn.style.display = 'none';
-    });
-  }
-}
-
-setupSingleFileUpload('btnBibFile', 'bibFileInput', 'bibFileName', 'bibFileRemove', 'bibFile');
-setupSingleFileUpload('btnCslFile', 'cslFileInput', 'cslFileName', 'cslFileRemove', 'cslFile');
-setupSingleFileUpload('btnAbbrevFile', 'abbrevFileInput', 'abbrevFileName', 'abbrevFileRemove', 'abbrevFile');
-
-// Show/hide citeproc-specific options based on citation method
-document.getElementById('opt-citation-method')?.addEventListener('change', (e) => {
-  const citeprocOpts = document.getElementById('citeprocOptions');
-  if (citeprocOpts) citeprocOpts.style.display = e.target.value === 'citeproc' ? '' : 'none';
-});
-// Initial state: hide citeproc options since default is "None"
-document.getElementById('citeprocOptions').style.display = 'none';
-
-// --- Code tab ---
-// Show/hide custom theme upload based on highlight style selection
-document.getElementById('opt-highlight-style')?.addEventListener('change', (e) => {
-  const customUpload = document.getElementById('customThemeUpload');
-  if (customUpload) customUpload.style.display = e.target.value === 'custom' ? '' : 'none';
-});
-
-setupSingleFileUpload('btnHighlightTheme', 'highlightThemeInput', 'highlightThemeName', 'highlightThemeRemove', 'highlightThemeFile');
-
-// Syntax definitions (multi-file)
-function renderSyntaxDefsList() {
-  const list = document.getElementById('syntaxDefsList');
-  if (!list) return;
-  const files = resourceFiles.syntaxDefinitions;
-  if (files.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = files.map((f, i) =>
-    `<span class="opt-file-tag">${f.name}<button class="file-remove" data-synidx="${i}">×</button></span>`
-  ).join('');
-  list.querySelectorAll('.file-remove').forEach(btn => {
-    btn.addEventListener('click', () => {
-      resourceFiles.syntaxDefinitions.splice(parseInt(btn.dataset.synidx), 1);
-      renderSyntaxDefsList();
-    });
-  });
-}
-
-document.getElementById('btnSyntaxDefs')?.addEventListener('click', () => {
-  document.getElementById('syntaxDefsInput').click();
-});
-document.getElementById('syntaxDefsInput')?.addEventListener('change', async (e) => {
-  for (const file of e.target.files) {
-    const content = new Uint8Array(await file.arrayBuffer());
-    content.name = file.name;
-    resourceFiles.syntaxDefinitions.push(content);
-  }
-  renderSyntaxDefsList();
-  e.target.value = '';
-});
-
-// --- Format-specific tab ---
-// Abbreviations file
-setupSingleFileUpload('btnAbbrevsFile', 'abbrevsFileInput', 'abbrevsFileName', 'abbrevsFileRemove', 'abbreviationsFile');
-
-// CSS files (multi-file)
-function renderCssFileList() {
-  const list = document.getElementById('cssFileList');
-  if (!list) return;
-  const files = resourceFiles.cssFiles;
-  if (files.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = files.map((f, i) =>
-    `<span class="opt-file-tag">${f.name}<button class="file-remove" data-cssidx="${i}">×</button></span>`
-  ).join('');
-  list.querySelectorAll('.file-remove').forEach(btn => {
-    btn.addEventListener('click', () => {
-      resourceFiles.cssFiles.splice(parseInt(btn.dataset.cssidx), 1);
-      renderCssFileList();
-    });
-  });
-}
-
-document.getElementById('btnCssFiles')?.addEventListener('click', () => {
-  document.getElementById('cssFilesInput').click();
-});
-document.getElementById('cssFilesInput')?.addEventListener('change', async (e) => {
-  for (const file of e.target.files) {
-    const content = new Uint8Array(await file.arrayBuffer());
-    content.name = file.name;
-    resourceFiles.cssFiles.push(content);
-  }
-  renderCssFileList();
-  e.target.value = '';
-});
-
-// EPUB cover, metadata, fonts
-setupSingleFileUpload('btnEpubCover', 'epubCoverInput', 'epubCoverName', 'epubCoverRemove', 'epubCoverImage');
-setupSingleFileUpload('btnEpubMeta', 'epubMetaInput', 'epubMetaName', 'epubMetaRemove', 'epubMetadataFile');
-
-function renderEpubFontsList() {
-  const list = document.getElementById('epubFontsList');
-  if (!list) return;
-  const files = resourceFiles.epubFonts;
-  if (files.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = files.map((f, i) =>
-    `<span class="opt-file-tag">${f.name}<button class="file-remove" data-fontidx="${i}">×</button></span>`
-  ).join('');
-  list.querySelectorAll('.file-remove').forEach(btn => {
-    btn.addEventListener('click', () => {
-      resourceFiles.epubFonts.splice(parseInt(btn.dataset.fontidx), 1);
-      renderEpubFontsList();
-    });
-  });
-}
-
-document.getElementById('btnEpubFonts')?.addEventListener('click', () => {
-  document.getElementById('epubFontsInput').click();
-});
-document.getElementById('epubFontsInput')?.addEventListener('change', async (e) => {
-  for (const file of e.target.files) {
-    const content = new Uint8Array(await file.arrayBuffer());
-    content.name = file.name;
-    resourceFiles.epubFonts.push(content);
-  }
-  renderEpubFontsList();
-  e.target.value = '';
-});
-
-// --- Template tab ---
-setupSingleFileUpload('btnTemplateFile', 'templateFileInput', 'templateFileName', 'templateFileRemove', 'templateFile');
-setupSingleFileUpload('btnRefDoc', 'refDocInput', 'refDocName', 'refDocRemove', 'referenceDoc');
-
-// Include files (header, before body, after body) — multi-file lists
-function setupMultiFileUpload(btnId, inputId, listId, resourceKey) {
-  const btn = document.getElementById(btnId);
-  const input = document.getElementById(inputId);
-  if (!btn || !input) return;
-
-  function renderList() {
-    const list = document.getElementById(listId);
-    if (!list) return;
-    const files = resourceFiles[resourceKey];
-    if (files.length === 0) { list.innerHTML = ''; return; }
-    list.innerHTML = files.map((f, i) =>
-      `<span class="opt-file-tag">${f.name}<button class="file-remove" data-idx="${i}" data-key="${resourceKey}">×</button></span>`
-    ).join('');
-    list.querySelectorAll('.file-remove').forEach(b => {
-      b.addEventListener('click', () => {
-        resourceFiles[b.dataset.key].splice(parseInt(b.dataset.idx), 1);
-        renderList();
-      });
-    });
-  }
-
-  btn.addEventListener('click', () => input.click());
-  input.addEventListener('change', async (e) => {
-    for (const file of e.target.files) {
-      const content = new Uint8Array(await file.arrayBuffer());
-      content.name = file.name;
-      resourceFiles[resourceKey].push(content);
-    }
-    renderList();
-    e.target.value = '';
-  });
-}
-
-setupMultiFileUpload('btnHeaderFiles', 'headerFilesInput', 'headerFilesList', 'headerFiles');
-setupMultiFileUpload('btnBeforeFiles', 'beforeFilesInput', 'beforeFilesList', 'beforeBodyFiles');
-setupMultiFileUpload('btnAfterFiles', 'afterFilesInput', 'afterFilesList', 'afterBodyFiles');
-
-// Template variables — dynamic key/value rows
-function addTemplateVarRow(key, val) {
-  const container = document.getElementById('templateVarRows');
-  const row = document.createElement('div');
-  row.className = 'opt-kv-row';
-  row.innerHTML = `<input type="text" placeholder="variable name" list="variable-suggestions" value="${key || ''}">` +
-    `<input type="text" placeholder="value" value="${val || ''}">` +
-    `<button class="kv-remove">×</button>`;
-  row.querySelector('.kv-remove').addEventListener('click', () => row.remove());
-  container.appendChild(row);
-}
-
-document.getElementById('btnAddTemplateVar')?.addEventListener('click', () => addTemplateVarRow('', ''));
-// Start with one empty row
-addTemplateVarRow('', '');
-
-// --- Metadata tab ---
-setupSingleFileUpload('btnMetadataFile', 'metadataFileInput', 'metadataFileName', 'metadataFileRemove', 'metadataFile');
-
-function addMetadataRow(key, val) {
-  const container = document.getElementById('metadataKvRows');
-  const row = document.createElement('div');
-  row.className = 'opt-kv-row';
-  row.innerHTML = `<input type="text" placeholder="field name" list="metadata-suggestions" value="${key || ''}">` +
-    `<input type="text" placeholder="value" value="${val || ''}">` +
-    `<button class="kv-remove">×</button>`;
-  row.querySelector('.kv-remove').addEventListener('click', () => row.remove());
-  container.appendChild(row);
-}
-
-document.getElementById('btnAddMetadata')?.addEventListener('click', () => addMetadataRow('', ''));
-// Start with one empty row
-addMetadataRow('', '');
-
-// --- Filters tab ---
-function renderLuaFiltersList() {
-  const list = document.getElementById('luaFiltersList');
-  if (!list) return;
-  const files = resourceFiles.luaFilters;
-  if (files.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = '';
-  files.forEach((f, i) => {
-    const tag = document.createElement('span');
-    tag.className = 'opt-file-tag';
-    tag.draggable = true;
-    tag.dataset.idx = i;
-    tag.style.cursor = 'grab';
-    tag.innerHTML = `<span style="color:var(--text-muted);font-size:10px;margin-right:2px;">☰</span>${f.name}<button class="file-remove" data-luaidx="${i}">×</button>`;
-
-    // Drag events for reordering
-    tag.addEventListener('dragstart', (e) => {
-      e.dataTransfer.setData('text/plain', i);
-      tag.style.opacity = '0.4';
-    });
-    tag.addEventListener('dragend', () => { tag.style.opacity = '1'; });
-    tag.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      tag.style.borderColor = 'var(--accent)';
-    });
-    tag.addEventListener('dragleave', () => { tag.style.borderColor = ''; });
-    tag.addEventListener('drop', (e) => {
-      e.preventDefault();
-      tag.style.borderColor = '';
-      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
-      const toIdx = parseInt(tag.dataset.idx);
-      if (fromIdx !== toIdx) {
-        const [moved] = resourceFiles.luaFilters.splice(fromIdx, 1);
-        resourceFiles.luaFilters.splice(toIdx, 0, moved);
-        renderLuaFiltersList();
-      }
-    });
-
-    tag.querySelector('.file-remove').addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      resourceFiles.luaFilters.splice(i, 1);
-      renderLuaFiltersList();
-    });
-
-    list.appendChild(tag);
-  });
-}
-
-document.getElementById('btnLuaFilters')?.addEventListener('click', () => {
-  document.getElementById('luaFiltersInput').click();
-});
-document.getElementById('luaFiltersInput')?.addEventListener('change', async (e) => {
-  for (const file of e.target.files) {
-    const content = new Uint8Array(await file.arrayBuffer());
-    content.name = file.name;
-    resourceFiles.luaFilters.push(content);
-  }
-  renderLuaFiltersList();
-  e.target.value = '';
-});
-
-// --- Extensions tab ---
-let inputExtensionsList = [];   // [{ name, defaultOn }, ...]
-let outputExtensionsList = [];
-const inputExtensions = {};     // { extName: true/false } — only toggled ones
-const outputExtensions = {};
-
-async function updateExtensions() {
-  if (!pandocModule) return;
-  const inputFmt = document.getElementById('selFrom').value;
-  const outputFmt = document.getElementById('selTo').value;
-
-  // Query input extensions
-  inputExtensionsList = [];
-  try {
-    const extData = await pandocModule.query({ query: 'extensions-for-format', format: inputFmt });
-    inputExtensionsList = Object.entries(extData)
-      .map(([name, defaultOn]) => ({ name, defaultOn }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  } catch (e) { console.warn('Could not get input extensions:', e); }
-
-  // Query output extensions
-  outputExtensionsList = [];
-  const effOut = outputFmt === 'pdf' ? 'typst' : outputFmt;
-  try {
-    const extData = await pandocModule.query({ query: 'extensions-for-format', format: effOut });
-    outputExtensionsList = Object.entries(extData)
-      .map(([name, defaultOn]) => ({ name, defaultOn }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  } catch (e) { console.warn('Could not get output extensions:', e); }
-
-  renderExtensionsList('extInputList', inputExtensionsList, inputExtensions, 'input');
-  renderExtensionsList('extOutputList', outputExtensionsList, outputExtensions, 'output');
-
-  document.getElementById('extInputHeader').textContent = `Input (${inputFmt}) — ${inputExtensionsList.length}`;
-  document.getElementById('extOutputHeader').textContent = `Output (${outputFmt}) — ${outputExtensionsList.length}`;
-}
-
-function renderExtensionsList(containerId, extList, extState, direction) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  if (extList.length === 0) {
-    container.innerHTML = '<span style="color:var(--text-muted);font-size:11px;">No extensions available</span>';
-    return;
-  }
-  container.innerHTML = '';
-  for (const ext of extList) {
-    const isChecked = extState[ext.name] !== undefined ? extState[ext.name] : ext.defaultOn;
-    const isToggled = extState[ext.name] !== undefined;
-    const item = document.createElement('div');
-    item.className = 'ext-item' + (ext.defaultOn ? ' default-on' : '') + (isToggled ? ' toggled' : '');
-    const id = `ext-${direction}-${ext.name}`;
-    item.innerHTML = `<input type="checkbox" id="${id}" ${isChecked ? 'checked' : ''}>` +
-      `<label for="${id}">${ext.name}</label>`;
-    item.querySelector('input').addEventListener('change', (e) => {
-      if (e.target.checked !== ext.defaultOn) {
-        extState[ext.name] = e.target.checked;
-      } else {
-        delete extState[ext.name];
-      }
-      // Re-render to update toggled styling
-      renderExtensionsList(containerId, extList, extState, direction);
-    });
-    container.appendChild(item);
-  }
-}
-
-function buildFormatWithExtensions(baseFormat, extState) {
-  if (!baseFormat) return baseFormat;
-  let formatStr = baseFormat;
-  for (const [ext, enabled] of Object.entries(extState)) {
-    if (enabled === true) formatStr += `+${ext}`;
-    else if (enabled === false) formatStr += `-${ext}`;
-  }
-  return formatStr;
-}
-
-// Update extensions when format dropdowns change
-document.getElementById('selFrom').addEventListener('change', () => { updateExtensions(); });
-document.getElementById('selTo').addEventListener('change', () => { updateExtensions(); });
-
-// --- Format metadata ---
-const BINARY_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'epub2', 'epub3', 'pdf', 'chunkedhtml'];
-const EXTENSION_BY_FORMAT = {
-  'html': 'html', 'html5': 'html', 'html4': 'html', 'chunkedhtml': 'zip',
-  'markdown': 'md', 'markdown_strict': 'md', 'markdown_mmd': 'md', 'markdown_phpextra': 'md',
-  'gfm': 'md', 'commonmark': 'md', 'commonmark_x': 'md',
-  'latex': 'tex', 'beamer': 'tex', 'context': 'tex',
-  'pdf': 'pdf', 'docx': 'docx', 'odt': 'odt',
-  'epub': 'epub', 'epub2': 'epub', 'epub3': 'epub',
-  'rst': 'rst', 'org': 'org', 'plain': 'txt',
-  'json': 'json', 'native': 'native',
-  'docbook': 'xml', 'docbook4': 'xml', 'docbook5': 'xml',
-  'jats': 'xml', 'tei': 'xml', 'man': '1', 'rtf': 'rtf',
-  'textile': 'textile', 'mediawiki': 'wiki',
-  'asciidoc': 'adoc', 'asciidoctor': 'adoc', 'asciidoc_legacy': 'adoc',
-  'revealjs': 'html', 'slidy': 'html', 'slideous': 'html', 'dzslides': 'html', 's5': 'html',
-  'ipynb': 'ipynb', 'typst': 'typ', 'texinfo': 'texi', 'ms': 'ms', 'icml': 'icml',
-  'opml': 'opml', 'bibtex': 'bib', 'biblatex': 'bib', 'csljson': 'json',
-  'pptx': 'pptx', 'djot': 'dj', 'fb2': 'fb2', 'opendocument': 'xml', 'vimdoc': 'txt'
-};
-const BINARY_INPUT_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'fb2', 'ipynb'];
-
-// Track binary input file
-let inputBinaryFile = null;  // { name, blob }
-let inputFileName = 'untitled';  // tracks current input file name (without extension)
-let lastOutput = null;  // { blob, filename } — stores last conversion output for download
-
-// Download button handler
-document.getElementById('btnDownloadOutput').addEventListener('click', () => {
-  if (!lastOutput) return;
-  // Clean up previous URL if any
-  if (lastOutput.objectUrl) URL.revokeObjectURL(lastOutput.objectUrl);
-  const url = URL.createObjectURL(lastOutput.blob);
-  lastOutput.objectUrl = url;
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = lastOutput.filename;
-  a.click();
-});
-
-// 1x1 transparent PNG placeholder for missing images
-const PLACEHOLDER_PNG = new Uint8Array([
-  137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,1,0,0,0,1,8,6,0,0,0,
-  31,21,196,137,0,0,0,10,73,68,65,84,120,156,98,0,0,0,2,0,1,226,33,188,51,
-  0,0,0,0,73,69,78,68,174,66,96,130
-]);
-
-// Generate a visible placeholder PNG with warning text for a missing image
-function generatePlaceholderImage(filename) {
-  return new Promise((resolve) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 400;
-    canvas.height = 120;
-    const ctx = canvas.getContext('2d');
-
-    // Background
-    ctx.fillStyle = '#fff3cd';
-    ctx.fillRect(0, 0, 400, 120);
-    ctx.strokeStyle = '#ffc107';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(1, 1, 398, 118);
-
-    // Warning icon and text
-    ctx.fillStyle = '#856404';
-    ctx.font = 'bold 16px sans-serif';
-    ctx.fillText('⚠ Missing Image', 16, 36);
-    ctx.font = '13px sans-serif';
-    ctx.fillText(filename, 16, 62);
-    ctx.fillStyle = '#a07000';
-    ctx.font = '11px sans-serif';
-    ctx.fillText('Upload the actual image via the Media tab', 16, 88);
-    ctx.fillText('to replace this placeholder.', 16, 104);
-
-    canvas.toBlob((blob) => resolve(blob), 'image/png');
-  });
-}
-
-// Extract missing filename from pandoc error messages
-function extractMissingFile(errMsg) {
-  // Match patterns like: "File domain.png not found in resource path"
-  const m = errMsg.match(/File\s+(\S+)\s+not found in resource path/i);
-  return m ? m[1] : null;
-}
-
-// --- Build pandoc options object from all tabs ---
-function buildOptions() {
-  const fromFmt = document.getElementById('selFrom').value;
-  const toFmt = document.getElementById('selTo').value;
-  const opts = {
-    from: buildFormatWithExtensions(fromFmt, inputExtensions),
-    to: buildFormatWithExtensions(toFmt, outputExtensions),
-  };
-
-  // General
-  if (document.getElementById('opt-standalone').checked) opts.standalone = true;
-  if (document.getElementById('opt-file-scope').checked) opts['file-scope'] = true;
-  const tabStop = parseInt(document.getElementById('opt-tab-stop').value);
-  if (tabStop !== 4) opts['tab-stop'] = tabStop;
-  if (document.getElementById('opt-preserve-tabs').checked) opts['preserve-tabs'] = true;
-  const eol = document.getElementById('opt-eol').value;
-  if (eol) opts.eol = eol;
-
-  // Headings (wired later)
-  const shiftEl = document.getElementById('opt-shift-heading');
-  if (shiftEl) {
-    const shift = parseInt(shiftEl.value);
-    if (shift !== 0) opts['shift-heading-level-by'] = shift;
-  }
-  const numSec = document.getElementById('opt-number-sections');
-  if (numSec && numSec.checked) opts['number-sections'] = true;
-  const numOff = document.getElementById('opt-number-offset');
-  if (numOff && numOff.value.trim()) {
-    opts['number-offset'] = numOff.value.trim().split(',').map(n => parseInt(n.trim()) || 0);
-  }
-  const tocEl = document.getElementById('opt-toc');
-  if (tocEl && tocEl.checked) {
-    opts['table-of-contents'] = true;
-    const tocDepth = document.getElementById('opt-toc-depth');
-    if (tocDepth) opts['toc-depth'] = parseInt(tocDepth.value);
-  }
-
-  // Media (wired later)
-  const extractMedia = document.getElementById('opt-extract-media');
-  if (extractMedia && extractMedia.checked) opts['extract-media'] = 'media.zip';
-  const dpi = document.getElementById('opt-dpi');
-  if (dpi && dpi.value) opts.dpi = parseInt(dpi.value);
-  const resPath = document.getElementById('opt-resource-path');
-  if (resPath && resPath.value.trim()) opts['resource-path'] = resPath.value.trim();
-
-  // Citations (wired later)
-  const citMethod = document.getElementById('opt-citation-method');
-  if (citMethod) {
-    const method = citMethod.value;
-    if (method === 'citeproc') opts.citeproc = true;
-    else if (method === 'natbib') opts.natbib = true;
-    else if (method === 'biblatex') opts.biblatex = true;
-    if (resourceFiles.bibFile) opts.bibliography = resourceFiles.bibFile.name;
-    if (method === 'citeproc') {
-      if (resourceFiles.cslFile) opts.csl = resourceFiles.cslFile.name;
-      if (resourceFiles.abbrevFile) opts['citation-abbreviations'] = resourceFiles.abbrevFile.name;
-    }
-  }
-
-  // Math (wired later)
-  const mathEl = document.getElementById('opt-math');
-  if (mathEl && mathEl.value) opts['html-math-method'] = mathEl.value;
-
-  // Code highlighting (wired later)
-  const hlStyle = document.getElementById('opt-highlight-style');
-  if (hlStyle) {
-    if (hlStyle.value === 'custom' && resourceFiles.highlightThemeFile) {
-      opts['highlight-style'] = resourceFiles.highlightThemeFile.name;
-    } else if (hlStyle.value && hlStyle.value !== 'custom') {
-      opts['highlight-style'] = hlStyle.value;
-    }
-  }
-  if (resourceFiles.syntaxDefinitions.length > 0) {
-    opts['syntax-definition'] = resourceFiles.syntaxDefinitions.map(f => f.name);
-  }
-  const indentCode = document.getElementById('opt-indented-code-classes');
-  if (indentCode && indentCode.value.trim()) opts['indented-code-classes'] = indentCode.value.trim();
-
-  // Format-specific (wired later — read whatever elements exist)
-  const stripComments = document.getElementById('opt-strip-comments');
-  if (stripComments && stripComments.checked) opts['strip-comments'] = true;
-  const defImgExt = document.getElementById('opt-default-image-extension');
-  if (defImgExt && defImgExt.value.trim()) opts['default-image-extension'] = defImgExt.value.trim();
-  if (resourceFiles.abbreviationsFile) opts.abbreviations = resourceFiles.abbreviationsFile.name;
-
-  // HTML-specific
-  const selfContained = document.getElementById('opt-self-contained');
-  if (selfContained && selfContained.checked) opts['embed-resources'] = true;
-  const htmlQTags = document.getElementById('opt-html-q-tags');
-  if (htmlQTags && htmlQTags.checked) opts['html-q-tags'] = true;
-  const sectionDivs = document.getElementById('opt-section-divs');
-  if (sectionDivs && sectionDivs.checked) opts['section-divs'] = true;
-  const titlePrefix = document.getElementById('opt-title-prefix');
-  if (titlePrefix && titlePrefix.value.trim()) opts['title-prefix'] = titlePrefix.value.trim();
-  const idPrefix = document.getElementById('opt-id-prefix');
-  if (idPrefix && idPrefix.value.trim()) opts['id-prefix'] = idPrefix.value.trim();
-  const emailObfusc = document.getElementById('opt-email-obfuscation');
-  if (emailObfusc && emailObfusc.value) opts['email-obfuscation'] = emailObfusc.value;
-  if (resourceFiles.cssFiles.length > 0) opts.css = resourceFiles.cssFiles.map(f => f.name);
-
-  // Markdown-specific
-  const refLinks = document.getElementById('opt-reference-links');
-  if (refLinks && refLinks.checked) opts['reference-links'] = true;
-  const refLoc = document.getElementById('opt-reference-location');
-  if (refLoc && refLoc.value) opts['reference-location'] = refLoc.value;
-  const mdHeadings = document.getElementById('opt-markdown-headings');
-  if (mdHeadings && mdHeadings.value) opts['markdown-headings'] = mdHeadings.value;
-
-  // RST-specific
-  const refLinksRst = document.getElementById('opt-reference-links-rst');
-  if (refLinksRst && refLinksRst.checked) opts['reference-links'] = true;
-  const listTables = document.getElementById('opt-list-tables');
-  if (listTables && listTables.checked) opts['list-tables'] = true;
-
-  // LaTeX-specific
-  const lof = document.getElementById('opt-lof');
-  if (lof && lof.checked) opts['list-of-figures'] = true;
-  const lot = document.getElementById('opt-lot');
-  if (lot && lot.checked) opts['list-of-tables'] = true;
-  const topLevel = document.getElementById('opt-top-level-division');
-  if (topLevel && topLevel.value) opts['top-level-division'] = topLevel.value;
-
-  // Caption position
-  const figCaption = document.getElementById('opt-figure-caption-position');
-  if (figCaption && figCaption.value) opts['figure-caption-position'] = figCaption.value;
-  const tblCaption = document.getElementById('opt-table-caption-position');
-  if (tblCaption && tblCaption.value) opts['table-caption-position'] = tblCaption.value;
-
-  // ASCII
-  const ascii = document.getElementById('opt-ascii');
-  if (ascii && ascii.checked) opts.ascii = true;
-  const asciiHtml = document.getElementById('opt-ascii-html');
-  if (asciiHtml && asciiHtml.checked) opts.ascii = true;
-
-  // ODT
-  const linkImages = document.getElementById('opt-link-images');
-  if (linkImages && linkImages.checked) opts['link-images'] = true;
-
-  // EPUB
-  if (resourceFiles.epubCoverImage) opts['epub-cover-image'] = resourceFiles.epubCoverImage.name;
-  if (resourceFiles.epubMetadataFile) opts['epub-metadata'] = resourceFiles.epubMetadataFile.name;
-  if (resourceFiles.epubFonts.length > 0) opts['epub-fonts'] = resourceFiles.epubFonts.map(f => f.name);
-  const epubTitle = document.getElementById('opt-epub-title-page');
-  if (epubTitle && !epubTitle.checked) opts['epub-title-page'] = false;
-  const epubSubdir = document.getElementById('opt-epub-subdirectory');
-  if (epubSubdir && epubSubdir.value.trim()) opts['epub-subdirectory'] = epubSubdir.value.trim();
-
-  // Chunked HTML
-  const splitLevel = document.getElementById('opt-split-level');
-  if (splitLevel && splitLevel.value) opts['split-level'] = parseInt(splitLevel.value);
-  const chunkTemplate = document.getElementById('opt-chunk-template');
-  if (chunkTemplate && chunkTemplate.value.trim()) opts['chunk-template'] = chunkTemplate.value.trim();
-
-  // Notebook
-  const ipynb = document.getElementById('opt-ipynb-output');
-  if (ipynb && ipynb.value) opts['ipynb-output'] = ipynb.value;
-
-  // Slides
-  const slideLevel = document.getElementById('opt-slide-level');
-  if (slideLevel && slideLevel.value) opts['slide-level'] = parseInt(slideLevel.value);
-  const incremental = document.getElementById('opt-incremental');
-  if (incremental && incremental.checked) opts.incremental = true;
-
-  // Track changes
-  const trackChanges = document.getElementById('opt-track-changes');
-  if (trackChanges && trackChanges.value) opts['track-changes'] = trackChanges.value;
-
-  // Template
-  if (resourceFiles.templateFile) opts.template = resourceFiles.templateFile.name;
-  if (resourceFiles.referenceDoc) opts['reference-doc'] = resourceFiles.referenceDoc.name;
-
-  // Include files
-  if (resourceFiles.headerFiles.length > 0) opts['include-in-header'] = resourceFiles.headerFiles.map(f => f.name);
-  if (resourceFiles.beforeBodyFiles.length > 0) opts['include-before-body'] = resourceFiles.beforeBodyFiles.map(f => f.name);
-  if (resourceFiles.afterBodyFiles.length > 0) opts['include-after-body'] = resourceFiles.afterBodyFiles.map(f => f.name);
-
-  // Wrapping (wired later)
-  const wrapEl = document.getElementById('opt-wrap');
-  if (wrapEl && wrapEl.value !== 'auto') opts.wrap = wrapEl.value;
-  const colsEl = document.getElementById('opt-columns');
-  if (colsEl && colsEl.value.trim()) opts.columns = parseInt(colsEl.value);
-
-  // Metadata key/value pairs
-  const metaRows = document.querySelectorAll('#panel-metadata .opt-kv-row');
-  if (metaRows.length > 0) {
-    const metadata = {};
-    metaRows.forEach(row => {
-      const inputs = row.querySelectorAll('input[type="text"]');
-      const key = inputs[0]?.value.trim();
-      const val = inputs[1]?.value.trim();
-      if (key && val) {
-        metadata[key] = key === 'author' ? [val] : val;
-      }
-    });
-    if (Object.keys(metadata).length > 0) opts.metadata = metadata;
-  }
-  if (resourceFiles.metadataFile) opts['metadata-file'] = resourceFiles.metadataFile.name;
-
-  // Template variables key/value pairs
-  const varRows = document.querySelectorAll('#panel-template .opt-kv-row');
-  if (varRows.length > 0) {
-    const variables = {};
-    varRows.forEach(row => {
-      const inputs = row.querySelectorAll('input[type="text"]');
-      const key = inputs[0]?.value.trim();
-      const val = inputs[1]?.value.trim();
-      if (key && val) variables[key] = val;
-    });
-    if (Object.keys(variables).length > 0) opts.variables = variables;
-  }
-
-  // Lua filters
-  if (resourceFiles.luaFilters.length > 0) opts.filters = resourceFiles.luaFilters.map(f => f.name);
-
-  // Output file — always set so pandoc writes to virtual filesystem
-  const baseToFmt = toFmt.split(/[+-]/)[0]; // strip extensions
-  const outExt = EXTENSION_BY_FORMAT[baseToFmt] || baseToFmt;
-  opts['output-file'] = `${inputFileName}.${outExt}`;
-
-  // Binary input — use input-files instead of stdin
-  if (inputBinaryFile) {
-    opts['input-files'] = [inputBinaryFile.name];
-  }
-
-  return opts;
-}
-
-// --- Build files object for pandoc.convert() ---
-function buildFiles() {
-  const raw = {};
-  // Collect all resource files
-  Object.entries(resourceFiles.auxFiles).forEach(([name, data]) => { raw[name] = data; });
-  if (resourceFiles.bibFile) raw[resourceFiles.bibFile.name] = resourceFiles.bibFile;
-  if (resourceFiles.cslFile) raw[resourceFiles.cslFile.name] = resourceFiles.cslFile;
-  if (resourceFiles.abbrevFile) raw[resourceFiles.abbrevFile.name] = resourceFiles.abbrevFile;
-  if (resourceFiles.abbreviationsFile) raw[resourceFiles.abbreviationsFile.name] = resourceFiles.abbreviationsFile;
-  resourceFiles.cssFiles.forEach(f => { raw[f.name] = f; });
-  if (resourceFiles.highlightThemeFile) raw[resourceFiles.highlightThemeFile.name] = resourceFiles.highlightThemeFile;
-  resourceFiles.syntaxDefinitions.forEach(f => { raw[f.name] = f; });
-  if (resourceFiles.templateFile) raw[resourceFiles.templateFile.name] = resourceFiles.templateFile;
-  if (resourceFiles.referenceDoc) raw[resourceFiles.referenceDoc.name] = resourceFiles.referenceDoc;
-  if (resourceFiles.metadataFile) raw[resourceFiles.metadataFile.name] = resourceFiles.metadataFile;
-  if (resourceFiles.epubCoverImage) raw[resourceFiles.epubCoverImage.name] = resourceFiles.epubCoverImage;
-  if (resourceFiles.epubMetadataFile) raw[resourceFiles.epubMetadataFile.name] = resourceFiles.epubMetadataFile;
-  resourceFiles.epubFonts.forEach(f => { raw[f.name] = f; });
-  resourceFiles.headerFiles.forEach(f => { raw[f.name] = f; });
-  resourceFiles.beforeBodyFiles.forEach(f => { raw[f.name] = f; });
-  resourceFiles.afterBodyFiles.forEach(f => { raw[f.name] = f; });
-  resourceFiles.luaFilters.forEach(f => { raw[f.name] = f; });
-  // Binary input file
-  if (inputBinaryFile) raw[inputBinaryFile.name] = inputBinaryFile.blob;
-  // pandoc.js expects Blob objects (calls blob.arrayBuffer())
-  const files = {};
-  for (const [name, data] of Object.entries(raw)) {
-    files[name] = (data instanceof Blob) ? data : new Blob([data]);
-  }
-  return files;
-}
-
-// ════════════════════════════════════════════════════════════════════
 // SECTION 6: CONVERSION FLOW
 // ════════════════════════════════════════════════════════════════════
 
@@ -2928,111 +1227,38 @@ async function runConversion() {
   updateStatus('loading', 'Converting…');
   clearDecorations();
 
-  const sourceText = inputBinaryFile ? null : editor.getValue();
+  const fromFmt = document.getElementById('selFrom').value;
+  const toFmt = document.getElementById('selTo').value;
+  const sourceText = editor.getValue();
 
   try {
-    const options = buildOptions();
-    const files = buildFiles();
-    const outFileName = options['output-file'];
-    const baseToFmt = document.getElementById('selTo').value.split(/[+-]/)[0];
-    const isBinaryOutput = BINARY_FORMATS.includes(baseToFmt);
+    const options = {
+      from: fromFmt,
+      to: toFmt,
+      standalone: true,
+    };
 
-    console.log('Pandoc options:', JSON.stringify(options, null, 2));
-
-    // Retry loop for missing resources (up to 20 retries)
-    let result;
-    const placeholderFiles = [];
-    const MAX_RETRIES = 20;
-
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        result = await pandocModule.convert(options, sourceText, files);
-        if (attempt > 0) console.log(`Conversion succeeded after ${attempt} placeholder(s)`);
-        break; // success
-      } catch (convErr) {
-        console.warn(`Conversion attempt ${attempt} failed:`, convErr.message);
-        const missingFile = extractMissingFile(convErr.message);
-        if (missingFile && attempt < MAX_RETRIES) {
-          // Add visible placeholder image and retry
-          console.warn(`Missing resource "${missingFile}" — substituting placeholder`);
-          files[missingFile] = await generatePlaceholderImage(missingFile);
-          placeholderFiles.push(missingFile);
-          continue;
-        }
-        throw convErr; // re-throw if not a missing file error or max retries
-      }
-    }
-
-    // Check stderr for missing resource warnings (even if conversion succeeded)
-    if (result.stderr) {
-      const missingMatches = [...result.stderr.matchAll(/File\s+(\S+)\s+not found in resource path/gi)];
-      for (const m of missingMatches) {
-        if (!placeholderFiles.includes(m[1])) {
-          placeholderFiles.push(m[1]);
-        }
-      }
-    }
+    const result = await pandocModule.convert(options, sourceText, {});
 
     // Parse warnings
-    const warnings = parseWarnings(result.warnings, result.stderr, sourceText || '');
+    const warnings = parseWarnings(result.warnings, result.stderr, sourceText);
 
-    // Add placeholder warnings
-    for (const pf of placeholderFiles) {
-      warnings.push({
-        line: null, column: null, level: 'warn',
-        message: `Missing image "${pf}" — replaced with 1×1 transparent placeholder. Upload the actual image via the Media tab to include it.`,
-        matchedText: null, type: 'placeholder'
-      });
-    }
-
-    // Apply editor decorations (only for text input)
-    if (!inputBinaryFile) applyDecorations(warnings);
+    // Apply editor decorations
+    applyDecorations(warnings);
 
     // Update log panel
     updateLog(warnings, result.stderr);
 
-    // Handle output
-    const downloadBtn = document.getElementById('btnDownloadOutput');
+    // Update output panels
+    const outputHtml = result.stdout || '';
+    sourceEditor.setValue(outputHtml, -1);
 
-    if (isBinaryOutput && files[outFileName]) {
-      // Binary output — show info in editor/preview, enable download
-      const blob = files[outFileName];
-      const sizeKB = (blob.size / 1024).toFixed(1);
-
-      lastOutput = { blob, filename: outFileName };
-      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
-      downloadBtn.style.display = '';
-
-      sourceEditor.setValue(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`, -1);
-
-      const previewFrame = document.getElementById('previewFrame');
-      previewFrame.srcdoc = `<body style="background:#1e1e2e;color:#cdd6f4;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
-        <div style="font-size:48px;margin-bottom:16px;">📄</div>
-        <div style="font-size:16px;">${outFileName} (${sizeKB} KB)</div>
-        <div style="font-size:12px;color:#6c7086;margin-top:8px;">Binary file — use the download button above</div>
-        ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#fab387;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
-      </body>`;
-
-    } else {
-      // Text output — display in editor/preview, enable download
-      let outputText = '';
-      if (files[outFileName]) {
-        outputText = await files[outFileName].text();
-      } else if (result.stdout) {
-        outputText = result.stdout;
-      }
-
-      sourceEditor.setValue(outputText, -1);
-
-      const previewFrame = document.getElementById('previewFrame');
-      previewFrame.srcdoc = outputText;
-
-      const blob = new Blob([outputText], { type: 'text/plain' });
-      const sizeKB = (blob.size / 1024).toFixed(1);
-      lastOutput = { blob, filename: outFileName };
-      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
-      downloadBtn.style.display = '';
-    }
+    // Preview
+    const previewFrame = document.getElementById('previewFrame');
+    const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+    previewDoc.open();
+    previewDoc.write(outputHtml);
+    previewDoc.close();
 
     // Auto-populate cleanup patterns from warnings
     populateCleanupFromWarnings(warnings);
@@ -3055,20 +1281,12 @@ async function runConversion() {
       warningsEl.style.display = 'none';
     }
 
-    const statusMsg = placeholderFiles.length > 0
-      ? `Converted ${options.from} → ${options.to} (${placeholderFiles.length} placeholder${placeholderFiles.length > 1 ? 's' : ''}) (${pandocVersion})`
-      : `Converted ${options.from} → ${options.to} (${pandocVersion})`;
-    updateStatus('ready', statusMsg);
+    updateStatus('ready', `Converted ${fromFmt} → ${toFmt} (${pandocVersion})`);
 
   } catch (err) {
     console.error('Conversion error:', err);
-    const missingFile = extractMissingFile(err.message);
-    let userMessage = err.message;
-    if (missingFile) {
-      userMessage += `\n\nTip: Upload "${missingFile}" via the Media tab's "Upload Files" button, or remove the reference from your source.`;
-    }
     updateStatus('error', `Error: ${err.message}`);
-    updateLog([{ line: null, column: null, level: 'error', message: userMessage, matchedText: null, type: 'exception' }], '');
+    updateLog([{ line: null, column: null, level: 'error', message: err.message, matchedText: null, type: 'exception' }], '');
   } finally {
     btn.disabled = false;
     btn.textContent = '▶ Convert';
