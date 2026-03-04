@@ -1749,8 +1749,9 @@ fileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Update tab name
+  // Update tab name and track filename
   document.getElementById('tabFilename').textContent = file.name;
+  inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
 
   // Auto-detect format from extension
   const ext = file.name.split('.').pop().toLowerCase();
@@ -1782,6 +1783,7 @@ fileInput.addEventListener('change', async (e) => {
       inputBinaryFile = null;
       editor.setValue('', -1);
       editor.setReadOnly(false);
+      inputFileName = 'untitled';
       document.getElementById('binaryInputInfo').style.display = 'none';
       document.getElementById('tabFilename').textContent = 'untitled';
     });
@@ -2547,6 +2549,7 @@ const BINARY_INPUT_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'fb2', 'ipynb'];
 
 // Track binary input file
 let inputBinaryFile = null;  // { name, blob }
+let inputFileName = 'untitled';  // tracks current input file name (without extension)
 
 // 1x1 transparent PNG placeholder for missing images
 const PLACEHOLDER_PNG = new Uint8Array([
@@ -2554,6 +2557,36 @@ const PLACEHOLDER_PNG = new Uint8Array([
   31,21,196,137,0,0,0,10,73,68,65,84,120,156,98,0,0,0,2,0,1,226,33,188,51,
   0,0,0,0,73,69,78,68,174,66,96,130
 ]);
+
+// Generate a visible placeholder PNG with warning text for a missing image
+function generatePlaceholderImage(filename) {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 120;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#fff3cd';
+    ctx.fillRect(0, 0, 400, 120);
+    ctx.strokeStyle = '#ffc107';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, 398, 118);
+
+    // Warning icon and text
+    ctx.fillStyle = '#856404';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText('⚠ Missing Image', 16, 36);
+    ctx.font = '13px sans-serif';
+    ctx.fillText(filename, 16, 62);
+    ctx.fillStyle = '#a07000';
+    ctx.font = '11px sans-serif';
+    ctx.fillText('Upload the actual image via the Media tab', 16, 88);
+    ctx.fillText('to replace this placeholder.', 16, 104);
+
+    canvas.toBlob((blob) => resolve(blob), 'image/png');
+  });
+}
 
 // Extract missing filename from pandoc error messages
 function extractMissingFile(errMsg) {
@@ -2779,7 +2812,7 @@ function buildOptions() {
   // Output file — always set so pandoc writes to virtual filesystem
   const baseToFmt = toFmt.split(/[+-]/)[0]; // strip extensions
   const outExt = EXTENSION_BY_FORMAT[baseToFmt] || baseToFmt;
-  opts['output-file'] = `output.${outExt}`;
+  opts['output-file'] = `${inputFileName}.${outExt}`;
 
   // Binary input — use input-files instead of stdin
   if (inputBinaryFile) {
@@ -2859,9 +2892,9 @@ async function runConversion() {
       } catch (convErr) {
         const missingFile = extractMissingFile(convErr.message);
         if (missingFile && attempt < MAX_RETRIES) {
-          // Add placeholder image and retry
+          // Add visible placeholder image and retry
           console.warn(`Missing resource "${missingFile}" — substituting placeholder`);
-          files[missingFile] = new Blob([PLACEHOLDER_PNG], { type: 'image/png' });
+          files[missingFile] = await generatePlaceholderImage(missingFile);
           placeholderFiles.push(missingFile);
           continue;
         }
