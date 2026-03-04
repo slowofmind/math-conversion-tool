@@ -28,6 +28,9 @@
     --accent: #a51c30;
     --accent-dim: #c75065;
     --accent-glow: rgba(165, 28, 48, 0.08);
+    --accent-blue: #6578b4;
+    --accent-blue-light: #aac8eb;
+    --accent-blue-glow: rgba(101, 120, 180, 0.10);
     --success: #2e7d32;
     --warning: #c67a0e;
     --error: #c62828;
@@ -83,7 +86,7 @@
     gap: 5px;
   }
   .toolbar-btn:hover { background: var(--bg-elevated); border-color: var(--text-muted); }
-  .toolbar-btn.active { background: var(--accent-glow); border-color: var(--accent-dim); color: var(--accent); }
+  .toolbar-btn.active { background: var(--accent-blue-glow); border-color: var(--accent-blue); color: var(--accent-blue); }
   .toolbar-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .toolbar-btn.primary:hover { background: var(--accent-dim); }
   .toolbar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -285,7 +288,7 @@
     border-radius: 2px;
     outline: none;
   }
-  .pf-input:focus { border-color: var(--accent); }
+  .pf-input:focus { border-color: var(--accent-blue); }
   .pf-input::placeholder { color: var(--text-muted); opacity: 0.5; font-family: 'IBM Plex Sans', sans-serif; }
 
   .pf-input-anchor { width: 50px; flex-shrink: 0; }
@@ -397,7 +400,7 @@
     white-space: nowrap;
   }
   .editor-tab:hover { color: var(--text-secondary); }
-  .editor-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); background: var(--bg-primary); }
+  .editor-tab.active { color: var(--text-primary); border-bottom-color: var(--accent-blue); background: var(--bg-primary); }
 
   .editor-content { flex: 1; position: relative; overflow: hidden; }
 
@@ -428,10 +431,10 @@
   /* Pandoc warning/error/info markers */
   .pandoc-warning-line { position: absolute; background: rgba(198, 122, 14, 0.08); border-left: 3px solid var(--warning); }
   .pandoc-error-line { position: absolute; background: rgba(198, 40, 40, 0.08); border-left: 3px solid var(--error); }
-  .pandoc-info-line { position: absolute; background: rgba(165, 28, 48, 0.05); border-left: 3px solid var(--accent); }
+  .pandoc-info-line { position: absolute; background: rgba(101, 120, 180, 0.06); border-left: 3px solid var(--accent-blue); }
   .pandoc-warning-text { position: absolute; background: rgba(198, 122, 14, 0.15); border-bottom: 2px solid var(--warning); }
   .pandoc-error-text { position: absolute; background: rgba(198, 40, 40, 0.15); border-bottom: 2px solid var(--error); }
-  .pandoc-info-text { position: absolute; background: rgba(165, 28, 48, 0.10); border-bottom: 2px solid var(--accent); }
+  .pandoc-info-text { position: absolute; background: rgba(101, 120, 180, 0.12); border-bottom: 2px solid var(--accent-blue); }
 
   /* ─── RESIZE GUTTER ─── */
   .resize-gutter {
@@ -442,7 +445,7 @@
     z-index: 10;
     transition: background 0.1s;
   }
-  .resize-gutter:hover, .resize-gutter.dragging { background: var(--accent-dim); }
+  .resize-gutter:hover, .resize-gutter.dragging { background: var(--accent-blue); }
   .resize-gutter.horizontal { height: 5px; width: 100%; cursor: row-resize; }
 
   /* ─── OUTPUT PANEL ─── */
@@ -533,7 +536,7 @@
     margin: 1px 0;
   }
   .log-entry:hover { background: var(--bg-tertiary); }
-  .log-entry.active { background: var(--accent-glow); }
+  .log-entry.active { background: var(--accent-blue-glow); }
 
   .log-level {
     flex-shrink: 0;
@@ -545,7 +548,7 @@
     min-width: 38px;
     text-align: center;
   }
-  .log-level.info { color: var(--accent); background: rgba(165, 28, 48, 0.08); }
+  .log-level.info { color: var(--accent-blue); background: rgba(101, 120, 180, 0.10); }
   .log-level.warn { color: var(--warning); background: rgba(198, 122, 14, 0.08); }
   .log-level.error { color: var(--error); background: rgba(198, 40, 40, 0.08); }
 
@@ -565,7 +568,7 @@
   }
   .log-badge.warn { background: rgba(198, 122, 14, 0.12); color: var(--warning); }
   .log-badge.error { background: rgba(198, 40, 40, 0.12); color: var(--error); }
-  .log-badge.info { background: rgba(165, 28, 48, 0.10); color: var(--accent); }
+  .log-badge.info { background: rgba(101, 120, 180, 0.12); color: var(--accent-blue); }
 
   /* ─── STATUS BAR ─── */
   .statusbar {
@@ -601,7 +604,7 @@
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
 </style>
 </head>
 <body>
@@ -1275,7 +1278,7 @@ async function runConversion() {
     const warningsEl = document.getElementById('statusWarnings');
     if (statusParts.length > 0) {
       warningsEl.style.display = '';
-      warningsEl.style.color = errCount ? 'var(--error)' : warnCount ? 'var(--warning)' : 'var(--accent)';
+      warningsEl.style.color = errCount ? 'var(--error)' : warnCount ? 'var(--warning)' : 'var(--accent-blue)';
       warningsEl.textContent = statusParts.join(', ');
     } else {
       warningsEl.style.display = 'none';
