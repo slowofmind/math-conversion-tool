@@ -3006,15 +3006,12 @@ async function runConversion() {
       sourceEditor.setValue(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`, -1);
 
       const previewFrame = document.getElementById('previewFrame');
-      const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-      previewDoc.open();
-      previewDoc.write(`<body style="background:#1e1e2e;color:#cdd6f4;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
+      previewFrame.srcdoc = `<body style="background:#1e1e2e;color:#cdd6f4;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
         <div style="font-size:48px;margin-bottom:16px;">📄</div>
         <div style="font-size:16px;">${outFileName} (${sizeKB} KB)</div>
         <div style="font-size:12px;color:#6c7086;margin-top:8px;">Binary file — use the download button above</div>
         ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#fab387;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
-      </body>`);
-      previewDoc.close();
+      </body>`;
 
     } else {
       // Text output — display in editor/preview, enable download
@@ -3028,10 +3025,7 @@ async function runConversion() {
       sourceEditor.setValue(outputText, -1);
 
       const previewFrame = document.getElementById('previewFrame');
-      const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-      previewDoc.open();
-      previewDoc.write(outputText);
-      previewDoc.close();
+      previewFrame.srcdoc = outputText;
 
       const blob = new Blob([outputText], { type: 'text/plain' });
       const sizeKB = (blob.size / 1024).toFixed(1);
