@@ -2548,6 +2548,20 @@ const BINARY_INPUT_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'fb2', 'ipynb'];
 // Track binary input file
 let inputBinaryFile = null;  // { name, blob }
 
+// 1x1 transparent PNG placeholder for missing images
+const PLACEHOLDER_PNG = new Uint8Array([
+  137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,1,0,0,0,1,8,6,0,0,0,
+  31,21,196,137,0,0,0,10,73,68,65,84,120,156,98,0,0,0,2,0,1,226,33,188,51,
+  0,0,0,0,73,69,78,68,174,66,96,130
+]);
+
+// Extract missing filename from pandoc error messages
+function extractMissingFile(errMsg) {
+  // Match patterns like: "File domain.png not found in resource path"
+  const m = errMsg.match(/File\s+(\S+)\s+not found in resource path/i);
+  return m ? m[1] : null;
+}
+
 // --- Build pandoc options object from all tabs ---
 function buildOptions() {
   const fromFmt = document.getElementById('selFrom').value;
@@ -2833,10 +2847,39 @@ async function runConversion() {
 
     console.log('Pandoc options:', JSON.stringify(options, null, 2));
 
-    const result = await pandocModule.convert(options, sourceText, files);
+    // Retry loop for missing resources (up to 20 retries)
+    let result;
+    const placeholderFiles = [];
+    const MAX_RETRIES = 20;
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        result = await pandocModule.convert(options, sourceText, files);
+        break; // success
+      } catch (convErr) {
+        const missingFile = extractMissingFile(convErr.message);
+        if (missingFile && attempt < MAX_RETRIES) {
+          // Add placeholder image and retry
+          console.warn(`Missing resource "${missingFile}" — substituting placeholder`);
+          files[missingFile] = new Blob([PLACEHOLDER_PNG], { type: 'image/png' });
+          placeholderFiles.push(missingFile);
+          continue;
+        }
+        throw convErr; // re-throw if not a missing file error or max retries
+      }
+    }
 
     // Parse warnings
     const warnings = parseWarnings(result.warnings, result.stderr, sourceText || '');
+
+    // Add placeholder warnings
+    for (const pf of placeholderFiles) {
+      warnings.push({
+        line: null, column: null, level: 'warn',
+        message: `Missing image "${pf}" — replaced with 1×1 transparent placeholder. Upload the actual image via the Media tab to include it.`,
+        matchedText: null, type: 'placeholder'
+      });
+    }
 
     // Apply editor decorations (only for text input)
     if (!inputBinaryFile) applyDecorations(warnings);
@@ -2861,6 +2904,7 @@ async function runConversion() {
         <div style="font-size:48px;margin-bottom:16px;">📄</div>
         <div style="font-size:16px;">${outFileName} (${sizeKB} KB)</div>
         <div style="font-size:12px;color:#6c7086;margin-top:8px;">Binary file — use the download button above</div>
+        ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#fab387;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
       </body>`);
       previewDoc.close();
 
@@ -2916,12 +2960,20 @@ async function runConversion() {
       warningsEl.style.display = 'none';
     }
 
-    updateStatus('ready', `Converted ${options.from} → ${options.to} (${pandocVersion})`);
+    const statusMsg = placeholderFiles.length > 0
+      ? `Converted ${options.from} → ${options.to} (${placeholderFiles.length} placeholder${placeholderFiles.length > 1 ? 's' : ''}) (${pandocVersion})`
+      : `Converted ${options.from} → ${options.to} (${pandocVersion})`;
+    updateStatus('ready', statusMsg);
 
   } catch (err) {
     console.error('Conversion error:', err);
+    const missingFile = extractMissingFile(err.message);
+    let userMessage = err.message;
+    if (missingFile) {
+      userMessage += `\n\nTip: Upload "${missingFile}" via the Media tab's "Upload Files" button, or remove the reference from your source.`;
+    }
     updateStatus('error', `Error: ${err.message}`);
-    updateLog([{ line: null, column: null, level: 'error', message: err.message, matchedText: null, type: 'exception' }], '');
+    updateLog([{ line: null, column: null, level: 'error', message: userMessage, matchedText: null, type: 'exception' }], '');
   } finally {
     btn.disabled = false;
     btn.textContent = '▶ Convert';
