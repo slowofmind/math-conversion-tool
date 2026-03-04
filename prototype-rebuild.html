@@ -2888,8 +2888,10 @@ async function runConversion() {
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
         result = await pandocModule.convert(options, sourceText, files);
+        if (attempt > 0) console.log(`Conversion succeeded after ${attempt} placeholder(s)`);
         break; // success
       } catch (convErr) {
+        console.warn(`Conversion attempt ${attempt} failed:`, convErr.message);
         const missingFile = extractMissingFile(convErr.message);
         if (missingFile && attempt < MAX_RETRIES) {
           // Add visible placeholder image and retry
@@ -2899,6 +2901,16 @@ async function runConversion() {
           continue;
         }
         throw convErr; // re-throw if not a missing file error or max retries
+      }
+    }
+
+    // Check stderr for missing resource warnings (even if conversion succeeded)
+    if (result.stderr) {
+      const missingMatches = [...result.stderr.matchAll(/File\s+(\S+)\s+not found in resource path/gi)];
+      for (const m of missingMatches) {
+        if (!placeholderFiles.includes(m[1])) {
+          placeholderFiles.push(m[1]);
+        }
       }
     }
 
