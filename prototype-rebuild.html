@@ -788,11 +788,26 @@
 
   /* Toggle button in toolbar for options panel */
   .toolbar-btn.options-toggle.panel-open { color: var(--accent); }
+
+  /* Download link for binary output */
+  .download-link {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-sans);
+  }
+  .download-link:hover { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
 
-<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.epub,.typ">
+<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ">
 
 <!-- ═══ TOOLBAR ═══ -->
 <div class="toolbar" role="toolbar" aria-label="Main toolbar">
@@ -848,6 +863,9 @@
     <button class="toolbar-btn" id="btnLayoutHide" title="Hide preview">▣</button>
   </div>
 </div>
+
+<!-- Binary input info bar -->
+<div id="binaryInputInfo" style="display:none; padding:4px 12px; background:var(--bg-tertiary); border-bottom:1px solid var(--border-subtle); font-size:11px; color:var(--text-secondary); align-items:center; gap:8px;"></div>
 
 <!-- ═══ OPTIONS PANEL ═══ -->
 <div class="options-panel" id="optionsPanel">
@@ -1552,6 +1570,7 @@
         <button class="output-tab-action" id="btnOutputClose" title="Hide panel">×</button>
       </div>
       <div class="output-body">
+        <div id="downloadArea" style="display:none; padding:8px 12px; background:var(--bg-tertiary); border-bottom:1px solid var(--border-subtle);"></div>
         <div class="tab-content active" id="tabPreview">
           <iframe id="previewFrame" sandbox="allow-same-origin" title="HTML preview"></iframe>
         </div>
@@ -1730,9 +1749,6 @@ fileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  const text = await file.text();
-  editor.setValue(text, -1);
-
   // Update tab name
   document.getElementById('tabFilename').textContent = file.name;
 
@@ -1741,15 +1757,50 @@ fileInput.addEventListener('change', async (e) => {
   const formatMap = {
     'tex': 'latex', 'latex': 'latex', 'md': 'markdown', 'markdown': 'markdown',
     'html': 'html', 'htm': 'html', 'rst': 'rst', 'org': 'org', 'typ': 'typst',
-    'txt': 'markdown',
+    'txt': 'markdown', 'docx': 'docx', 'odt': 'odt', 'pptx': 'pptx',
+    'epub': 'epub', 'fb2': 'fb2', 'ipynb': 'ipynb',
   };
   const fmt = formatMap[ext];
-  if (fmt) {
-    document.getElementById('selFrom').value = fmt;
-    // Set Ace mode
-    const modeMap = { 'latex': 'latex', 'markdown': 'markdown', 'html': 'html' };
-    editor.session.setMode('ace/mode/' + (modeMap[fmt] || 'text'));
-    document.getElementById('statusFormat').textContent = fmt;
+
+  if (fmt && BINARY_INPUT_FORMATS.includes(fmt)) {
+    // Binary input — store as blob, show placeholder in editor
+    inputBinaryFile = { name: file.name, blob: file };
+    editor.setValue(`[Binary file loaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\n\nThis file will be passed directly to Pandoc for conversion.\nClick "▶ Convert" to process.`, -1);
+    editor.setReadOnly(true);
+
+    if (fmt) {
+      document.getElementById('selFrom').value = fmt;
+      document.getElementById('statusFormat').textContent = fmt;
+      updateExtensions();
+    }
+
+    // Show clear button
+    document.getElementById('binaryInputInfo').style.display = 'flex';
+    document.getElementById('binaryInputInfo').innerHTML =
+      `<span>📎 ${file.name}</span><button class="toolbar-btn" id="btnClearBinary" title="Remove file and return to text editor" style="font-size:11px;padding:2px 6px;">✕ Clear</button>`;
+    document.getElementById('btnClearBinary').addEventListener('click', () => {
+      inputBinaryFile = null;
+      editor.setValue('', -1);
+      editor.setReadOnly(false);
+      document.getElementById('binaryInputInfo').style.display = 'none';
+      document.getElementById('tabFilename').textContent = 'untitled';
+    });
+  } else {
+    // Text input — read into editor as before
+    inputBinaryFile = null;
+    editor.setReadOnly(false);
+    document.getElementById('binaryInputInfo').style.display = 'none';
+
+    const text = await file.text();
+    editor.setValue(text, -1);
+
+    if (fmt) {
+      document.getElementById('selFrom').value = fmt;
+      const modeMap = { 'latex': 'latex', 'markdown': 'markdown', 'html': 'html' };
+      editor.session.setMode('ace/mode/' + (modeMap[fmt] || 'text'));
+      document.getElementById('statusFormat').textContent = fmt;
+      updateExtensions();
+    }
   }
 
   fileInput.value = '';
@@ -2472,6 +2523,31 @@ function buildFormatWithExtensions(baseFormat, extState) {
 document.getElementById('selFrom').addEventListener('change', () => { updateExtensions(); });
 document.getElementById('selTo').addEventListener('change', () => { updateExtensions(); });
 
+// --- Format metadata ---
+const BINARY_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'epub2', 'epub3', 'pdf', 'chunkedhtml'];
+const EXTENSION_BY_FORMAT = {
+  'html': 'html', 'html5': 'html', 'html4': 'html', 'chunkedhtml': 'zip',
+  'markdown': 'md', 'markdown_strict': 'md', 'markdown_mmd': 'md', 'markdown_phpextra': 'md',
+  'gfm': 'md', 'commonmark': 'md', 'commonmark_x': 'md',
+  'latex': 'tex', 'beamer': 'tex', 'context': 'tex',
+  'pdf': 'pdf', 'docx': 'docx', 'odt': 'odt',
+  'epub': 'epub', 'epub2': 'epub', 'epub3': 'epub',
+  'rst': 'rst', 'org': 'org', 'plain': 'txt',
+  'json': 'json', 'native': 'native',
+  'docbook': 'xml', 'docbook4': 'xml', 'docbook5': 'xml',
+  'jats': 'xml', 'tei': 'xml', 'man': '1', 'rtf': 'rtf',
+  'textile': 'textile', 'mediawiki': 'wiki',
+  'asciidoc': 'adoc', 'asciidoctor': 'adoc', 'asciidoc_legacy': 'adoc',
+  'revealjs': 'html', 'slidy': 'html', 'slideous': 'html', 'dzslides': 'html', 's5': 'html',
+  'ipynb': 'ipynb', 'typst': 'typ', 'texinfo': 'texi', 'ms': 'ms', 'icml': 'icml',
+  'opml': 'opml', 'bibtex': 'bib', 'biblatex': 'bib', 'csljson': 'json',
+  'pptx': 'pptx', 'djot': 'dj', 'fb2': 'fb2', 'opendocument': 'xml', 'vimdoc': 'txt'
+};
+const BINARY_INPUT_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'fb2', 'ipynb'];
+
+// Track binary input file
+let inputBinaryFile = null;  // { name, blob }
+
 // --- Build pandoc options object from all tabs ---
 function buildOptions() {
   const fromFmt = document.getElementById('selFrom').value;
@@ -2686,6 +2762,16 @@ function buildOptions() {
   // Lua filters
   if (resourceFiles.luaFilters.length > 0) opts.filters = resourceFiles.luaFilters.map(f => f.name);
 
+  // Output file — always set so pandoc writes to virtual filesystem
+  const baseToFmt = toFmt.split(/[+-]/)[0]; // strip extensions
+  const outExt = EXTENSION_BY_FORMAT[baseToFmt] || baseToFmt;
+  opts['output-file'] = `output.${outExt}`;
+
+  // Binary input — use input-files instead of stdin
+  if (inputBinaryFile) {
+    opts['input-files'] = [inputBinaryFile.name];
+  }
+
   return opts;
 }
 
@@ -2711,6 +2797,8 @@ function buildFiles() {
   resourceFiles.beforeBodyFiles.forEach(f => { raw[f.name] = f; });
   resourceFiles.afterBodyFiles.forEach(f => { raw[f.name] = f; });
   resourceFiles.luaFilters.forEach(f => { raw[f.name] = f; });
+  // Binary input file
+  if (inputBinaryFile) raw[inputBinaryFile.name] = inputBinaryFile.blob;
   // pandoc.js expects Blob objects (calls blob.arrayBuffer())
   const files = {};
   for (const [name, data] of Object.entries(raw)) {
@@ -2734,35 +2822,78 @@ async function runConversion() {
   updateStatus('loading', 'Converting…');
   clearDecorations();
 
-  const sourceText = editor.getValue();
+  const sourceText = inputBinaryFile ? null : editor.getValue();
 
   try {
     const options = buildOptions();
     const files = buildFiles();
+    const outFileName = options['output-file'];
+    const baseToFmt = document.getElementById('selTo').value.split(/[+-]/)[0];
+    const isBinaryOutput = BINARY_FORMATS.includes(baseToFmt);
 
     console.log('Pandoc options:', JSON.stringify(options, null, 2));
 
     const result = await pandocModule.convert(options, sourceText, files);
 
     // Parse warnings
-    const warnings = parseWarnings(result.warnings, result.stderr, sourceText);
+    const warnings = parseWarnings(result.warnings, result.stderr, sourceText || '');
 
-    // Apply editor decorations
-    applyDecorations(warnings);
+    // Apply editor decorations (only for text input)
+    if (!inputBinaryFile) applyDecorations(warnings);
 
     // Update log panel
     updateLog(warnings, result.stderr);
 
-    // Update output panels
-    const outputHtml = result.stdout || '';
-    sourceEditor.setValue(outputHtml, -1);
+    // Handle output
+    const downloadArea = document.getElementById('downloadArea');
 
-    // Preview
-    const previewFrame = document.getElementById('previewFrame');
-    const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-    previewDoc.open();
-    previewDoc.write(outputHtml);
-    previewDoc.close();
+    if (isBinaryOutput && files[outFileName]) {
+      // Binary output — show download link
+      const blob = files[outFileName];
+      const sizeKB = (blob.size / 1024).toFixed(1);
+
+      sourceEditor.setValue(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`, -1);
+
+      const previewFrame = document.getElementById('previewFrame');
+      const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+      previewDoc.open();
+      previewDoc.write(`<body style="background:#1e1e2e;color:#cdd6f4;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
+        <div style="font-size:48px;margin-bottom:16px;">📄</div>
+        <div style="font-size:16px;">${outFileName} (${sizeKB} KB)</div>
+        <div style="font-size:12px;color:#6c7086;margin-top:8px;">Binary file — use the download button above</div>
+      </body>`);
+      previewDoc.close();
+
+      // Show download area
+      if (downloadArea) {
+        // Clean up any previous object URL
+        if (downloadArea.dataset.objectUrl) URL.revokeObjectURL(downloadArea.dataset.objectUrl);
+        const url = URL.createObjectURL(blob);
+        downloadArea.dataset.objectUrl = url;
+        downloadArea.innerHTML = `<a href="${url}" download="${outFileName}" class="download-link">📥 Download ${outFileName} (${sizeKB} KB)</a>`;
+        downloadArea.style.display = '';
+      }
+    } else {
+      // Text output — read from output file or stdout
+      let outputText = '';
+      if (files[outFileName]) {
+        outputText = await files[outFileName].text();
+      } else if (result.stdout) {
+        outputText = result.stdout;
+      }
+
+      sourceEditor.setValue(outputText, -1);
+
+      // Preview
+      const previewFrame = document.getElementById('previewFrame');
+      const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+      previewDoc.open();
+      previewDoc.write(outputText);
+      previewDoc.close();
+
+      // Hide download area
+      if (downloadArea) downloadArea.style.display = 'none';
+    }
 
     // Auto-populate cleanup patterns from warnings
     populateCleanupFromWarnings(warnings);
