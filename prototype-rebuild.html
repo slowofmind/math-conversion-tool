@@ -771,6 +771,41 @@
   }
   .opt-kv-row:hover .kv-remove { visibility: visible; }
 
+  /* Collapsible format-specific sections */
+  details.fmt-section {
+    margin-top: 6px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  details.fmt-section > summary {
+    text-transform: uppercase;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 5px 8px;
+    cursor: pointer;
+    background: var(--bg-tertiary);
+    user-select: none;
+    list-style: none;
+  }
+  details.fmt-section > summary::-webkit-details-marker { display: none; }
+  details.fmt-section > summary::before {
+    content: '▸ ';
+    font-size: 10px;
+  }
+  details.fmt-section[open] > summary::before {
+    content: '▾ ';
+  }
+  details.fmt-section[open] > summary {
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  details.fmt-section > .fmt-section-body {
+    padding: 6px 8px;
+  }
+
   /* Extension checkbox items */
   .ext-item {
     display: flex;
@@ -1069,38 +1104,44 @@
 
   <!-- Format-specific -->
   <div class="options-tab-panel" id="panel-format">
-    <div class="options-grid">
-      <!-- Reader options -->
-      <div class="opt-group">
-        <input type="checkbox" id="opt-strip-comments">
-        <label for="opt-strip-comments">Strip HTML comments (input)</label>
+    <!-- Reader options -->
+    <details class="fmt-section">
+      <summary>Reader / Input</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <input type="checkbox" id="opt-strip-comments">
+          <label for="opt-strip-comments">Strip HTML comments (input)</label>
+        </div>
+        <div class="opt-group">
+          <label for="opt-default-image-extension">Default image ext:</label>
+          <input type="text" id="opt-default-image-extension" placeholder=".png" style="width:60px;">
+        </div>
+        <div class="opt-file-upload">
+          <label>Abbreviations file:</label>
+          <button class="upload-btn" id="btnAbbrevsFile">Upload</button>
+          <input type="file" id="abbrevsFileInput" style="display:none;">
+          <span class="file-name" id="abbrevsFileName"></span>
+          <button class="file-remove" id="abbrevsFileRemove" style="display:none;">×</button>
+        </div>
+        <!-- Track changes (docx input) -->
+        <div class="opt-group">
+          <label for="opt-track-changes">Track changes:</label>
+          <select id="opt-track-changes" style="width:110px;">
+            <option value="">Default (accept)</option>
+            <option value="accept">Accept all</option>
+            <option value="reject">Reject all</option>
+            <option value="all">Include all</option>
+          </select>
+        </div>
       </div>
-      <div class="opt-group">
-        <label for="opt-default-image-extension">Default image ext:</label>
-        <input type="text" id="opt-default-image-extension" placeholder=".png" style="width:60px;">
       </div>
-      <div class="opt-file-upload">
-        <label>Abbreviations file:</label>
-        <button class="upload-btn" id="btnAbbrevsFile">Upload</button>
-        <input type="file" id="abbrevsFileInput" style="display:none;">
-        <span class="file-name" id="abbrevsFileName"></span>
-        <button class="file-remove" id="abbrevsFileRemove" style="display:none;">×</button>
-      </div>
-      <!-- Track changes (docx input) -->
-      <div class="opt-group">
-        <label for="opt-track-changes">Track changes:</label>
-        <select id="opt-track-changes" style="width:110px;">
-          <option value="">Default (accept)</option>
-          <option value="accept">Accept all</option>
-          <option value="reject">Reject all</option>
-          <option value="all">Include all</option>
-        </select>
-      </div>
-    </div>
+    </details>
     <!-- HTML output options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">HTML Output</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section" open>
+      <summary>HTML Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <input type="checkbox" id="opt-self-contained">
           <label for="opt-self-contained">Embed resources</label>
@@ -1140,11 +1181,13 @@
         </div>
       </div>
       <div class="opt-file-list" id="cssFileList"></div>
-    </div>
+      </div>
+    </details>
     <!-- Markdown output options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Markdown Output</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Markdown Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <input type="checkbox" id="opt-reference-links">
           <label for="opt-reference-links">Reference-style links</label>
@@ -1167,11 +1210,13 @@
           </select>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- RST output options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">RST Output</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>RST Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <input type="checkbox" id="opt-reference-links-rst">
           <label for="opt-reference-links-rst">Reference-style links</label>
@@ -1181,11 +1226,13 @@
           <label for="opt-list-tables">List tables</label>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- LaTeX output options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">LaTeX Output</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>LaTeX Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <input type="checkbox" id="opt-lof">
           <label for="opt-lof">List of figures</label>
@@ -1204,11 +1251,13 @@
           </select>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- Caption / ASCII / ODT options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Other</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Other</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <label for="opt-figure-caption-position">Figure caption:</label>
           <select id="opt-figure-caption-position" style="width:80px;">
@@ -1234,11 +1283,13 @@
           <label for="opt-link-images">Link images (ODT)</label>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- EPUB options -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">EPUB</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>EPUB</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-file-upload">
           <label>Cover image:</label>
           <button class="upload-btn" id="btnEpubCover">Upload image</button>
@@ -1268,11 +1319,13 @@
         </div>
       </div>
       <div class="opt-file-list" id="epubFontsList"></div>
-    </div>
+      </div>
+    </details>
     <!-- Chunked HTML -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Chunked HTML</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Chunked HTML</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <label for="opt-split-level">Split level:</label>
           <select id="opt-split-level" style="width:55px;">
@@ -1288,11 +1341,13 @@
           <input type="text" id="opt-chunk-template" placeholder="%s-%i.html" style="width:130px;">
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- Notebook -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Jupyter Notebook</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Jupyter Notebook</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <label for="opt-ipynb-output">Output cell handling:</label>
           <select id="opt-ipynb-output" style="width:100px;">
@@ -1303,11 +1358,13 @@
           </select>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
     <!-- Slides -->
-    <div style="margin-top:6px;">
-      <span class="opt-section-label">Slides</span>
-      <div class="options-grid" style="margin-top:3px;">
+    <details class="fmt-section">
+      <summary>Slides</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
         <div class="opt-group">
           <label for="opt-slide-level">Slide level:</label>
           <select id="opt-slide-level" style="width:55px;">
@@ -1322,7 +1379,8 @@
           <label for="opt-incremental">Incremental lists</label>
         </div>
       </div>
-    </div>
+      </div>
+    </details>
   </div>
 
   <!-- Template -->
@@ -1559,7 +1617,7 @@
       </div>
       <div class="output-body">
         <div class="tab-content active" id="tabPreview">
-          <iframe id="previewFrame" sandbox="allow-same-origin" title="HTML preview"></iframe>
+          <iframe id="previewFrame" sandbox="allow-scripts" title="HTML preview"></iframe>
         </div>
         <div class="tab-content" id="tabLog" role="log" aria-label="Conversion log" aria-live="polite">
           <div class="log-container" id="logContainer">
