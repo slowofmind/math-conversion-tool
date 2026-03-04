@@ -1,0 +1,4143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandoc WASM — Prototype</title>
+
+<!-- Ace Editor from CDN -->
+<script src="ace/ace.js"></script>
+<script src="ace/mode-latex.js"></script>
+<script src="ace/mode-html.js"></script>
+<script src="ace/mode-markdown.js"></script>
+<script src="ace/theme-one_dark.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg-primary: #1a1b26;
+    --bg-secondary: #1e1f2e;
+    --bg-tertiary: #24253a;
+    --bg-elevated: #2a2b3d;
+    --bg-surface: #30314a;
+    --border: #3b3d57;
+    --border-subtle: #2e3047;
+    --text-primary: #c8cad8;
+    --text-secondary: #8f91a8;
+    --text-muted: #5d5f78;
+    --accent: #7aa2f7;
+    --accent-dim: #3d5a9e;
+    --accent-glow: rgba(122, 162, 247, 0.12);
+    --success: #9ece6a;
+    --warning: #e0af68;
+    --error: #f7768e;
+    --toolbar-height: 42px;
+    --statusbar-height: 26px;
+    --sidebar-width: 300px;
+    --gutter: 5px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── TOOLBAR ─── */
+  .toolbar {
+    height: var(--toolbar-height);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+
+  .toolbar-group { display: flex; align-items: center; gap: 6px; }
+  .toolbar-divider { width: 1px; height: 20px; background: var(--border); margin: 0 6px; }
+  .toolbar-spacer { flex: 1; }
+
+  .toolbar-btn {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .toolbar-btn:hover { background: var(--bg-elevated); border-color: var(--text-muted); }
+  .toolbar-btn.active { background: var(--accent-glow); border-color: var(--accent-dim); color: var(--accent); }
+  .toolbar-btn.primary { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+  .toolbar-btn.primary:hover { background: var(--accent); }
+  .toolbar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .toolbar-select {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    cursor: pointer;
+    min-width: 100px;
+  }
+
+  .toolbar-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.03em; }
+
+  .toolbar-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  .main-area {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ─── SIDEBAR (Cleanup Tool) ─── */
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: width 0.2s ease, min-width 0.2s ease, max-width 0.2s ease, visibility 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .sidebar.collapsed {
+    width: 0;
+    min-width: 0;
+    max-width: 0;
+    border-right: none;
+    padding: 0;
+    visibility: hidden;
+  }
+
+  .sidebar-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .sidebar-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+  }
+
+  .sidebar-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px;
+    line-height: 1;
+    border-radius: 3px;
+  }
+  .sidebar-close:hover { color: var(--text-primary); background: var(--bg-elevated); }
+
+  .sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 12px;
+  }
+
+  .cleanup-section { margin-bottom: 14px; }
+
+  .cleanup-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .cleanup-select {
+    width: 100%;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+
+  /* ─── Pattern list ─── */
+  .pattern-item {
+    border: 1px solid var(--border-subtle);
+    border-radius: 3px;
+    margin-bottom: 4px;
+    background: var(--bg-primary);
+    overflow: hidden;
+  }
+  .pattern-item.from-warning { border-left: 3px solid var(--warning); }
+
+  .pattern-item-header {
+    display: flex;
+    align-items: center;
+    padding: 5px 8px;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .pattern-item-header:hover { background: var(--bg-tertiary); }
+
+  .pattern-toggle {
+    width: 14px;
+    font-size: 14px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    text-align: center;
+    user-select: none;
+  }
+
+  .pattern-summary {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pattern-delete {
+    opacity: 0;
+    background: none;
+    border: none;
+    color: var(--error);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0 2px;
+    flex-shrink: 0;
+  }
+  .pattern-item-header:hover .pattern-delete { opacity: 1; }
+  .pattern-delete:hover { color: #fff; background: var(--error); border-radius: 2px; }
+
+  /* ─── Pattern expanded fields ─── */
+  .pattern-fields {
+    padding: 8px 10px;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pf-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .pf-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    width: 16px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .pf-input {
+    padding: 3px 5px;
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    border-radius: 2px;
+    outline: none;
+  }
+  .pf-input:focus { border-color: var(--accent); }
+  .pf-input::placeholder { color: var(--text-muted); opacity: 0.5; font-family: 'IBM Plex Sans', sans-serif; }
+
+  .pf-input-anchor { width: 50px; flex-shrink: 0; }
+  .pf-input-flex { flex: 1; min-width: 40px; }
+
+  .pf-select {
+    padding: 3px 5px;
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    border-radius: 2px;
+  }
+
+  .pf-arrow { color: var(--text-muted); font-size: 11px; padding: 0 2px; flex-shrink: 0; }
+
+  .pf-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-left: 6px;
+    flex-shrink: 0;
+  }
+
+  .pf-note {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+    padding-left: 20px;
+  }
+
+  /* ─── Scope section ─── */
+  .scope-section {
+    border: 1px solid var(--border-subtle);
+    border-radius: 3px;
+    background: var(--bg-primary);
+    margin-top: 6px;
+  }
+
+  .scope-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .scope-header:hover { background: var(--bg-tertiary); }
+
+  .scope-fields {
+    padding: 8px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .cleanup-run-btn {
+    width: 100%;
+    padding: 7px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--accent-dim);
+    color: #fff;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.15s;
+  }
+  .cleanup-run-btn:hover { background: var(--accent); }
+
+  /* ─── EDITOR AREA ─── */
+  .editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    overflow: hidden;
+  }
+
+  .editor-tabs {
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    height: 32px;
+    flex-shrink: 0;
+    padding: 0 4px;
+    gap: 2px;
+  }
+
+  .editor-tab {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    padding: 5px 14px;
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.1s;
+    white-space: nowrap;
+  }
+  .editor-tab:hover { color: var(--text-secondary); }
+  .editor-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); background: var(--bg-primary); }
+
+  .editor-content { flex: 1; position: relative; overflow: hidden; }
+
+  /* Ace editor custom theme overrides */
+  #aceEditor {
+    position: absolute;
+    inset: 0;
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-size: 13px;
+  }
+
+  /* Override Ace gutter background */
+  .ace_gutter { background: var(--bg-secondary) !important; border-right: 1px solid var(--border-subtle) !important; }
+  .ace_gutter-cell { color: var(--text-muted) !important; }
+  .ace_gutter-cell.ace_info {
+    background-image: none !important;
+    border-left: 3px solid var(--accent);
+  }
+  .ace_gutter-cell.ace_warning {
+    background-image: none !important;
+    border-left: 3px solid var(--warning);
+  }
+  .ace_gutter-cell.ace_error {
+    background-image: none !important;
+    border-left: 3px solid var(--error);
+  }
+
+  /* Pandoc warning/error/info markers */
+  .pandoc-warning-line { position: absolute; background: rgba(224, 175, 104, 0.08); border-left: 3px solid var(--warning); }
+  .pandoc-error-line { position: absolute; background: rgba(247, 118, 142, 0.08); border-left: 3px solid var(--error); }
+  .pandoc-info-line { position: absolute; background: rgba(122, 162, 247, 0.05); border-left: 3px solid var(--accent); }
+  .pandoc-warning-text { position: absolute; background: rgba(224, 175, 104, 0.18); border-bottom: 2px solid var(--warning); }
+  .pandoc-error-text { position: absolute; background: rgba(247, 118, 142, 0.18); border-bottom: 2px solid var(--error); }
+  .pandoc-info-text { position: absolute; background: rgba(122, 162, 247, 0.12); border-bottom: 2px solid var(--accent); }
+
+  /* ─── RESIZE GUTTER ─── */
+  .resize-gutter {
+    width: 5px;
+    background: var(--bg-secondary);
+    cursor: col-resize;
+    flex-shrink: 0;
+    z-index: 10;
+    transition: background 0.1s;
+  }
+  .resize-gutter:hover, .resize-gutter.dragging { background: var(--accent-dim); }
+  .resize-gutter.horizontal { height: 5px; width: 100%; cursor: row-resize; }
+
+  /* ─── OUTPUT PANEL ─── */
+  .output-panel {
+    width: 45%;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-left: 1px solid var(--border);
+  }
+  .output-panel.bottom-mode {
+    width: 100%;
+    min-width: 0;
+    height: 40%;
+    min-height: 120px;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+  .output-panel.hidden-mode { display: none; }
+
+  .output-tabs {
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    height: 32px;
+    flex-shrink: 0;
+    padding: 0 4px;
+  }
+
+  .output-tab {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    padding: 5px 14px;
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .output-tab:hover { color: var(--text-secondary); }
+  .output-tab.active { color: var(--text-primary); border-bottom-color: var(--success); }
+
+  .output-tab-spacer { flex: 1; }
+
+  .output-tab-action {
+    font-size: 11px;
+    padding: 3px 8px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-muted);
+    cursor: pointer;
+    margin-right: 4px;
+  }
+  .output-tab-action:hover { color: var(--text-primary); border-color: var(--text-muted); }
+  #btnDownloadOutput { color: var(--accent); border-color: var(--accent-dim); }
+  #btnDownloadOutput:hover { background: var(--accent-dim); color: #fff; }
+
+  .output-body { flex: 1; overflow: auto; background: var(--bg-primary); }
+
+  .tab-content { display: none; height: 100%; }
+  .tab-content.active { display: flex; flex-direction: column; }
+
+  /* Preview iframe */
+  #previewFrame { flex: 1; border: none; background: #fff; }
+
+  /* Source tab Ace editor */
+  #outputSource { flex: 1; }
+
+  /* Log tab */
+  .log-container {
+    flex: 1;
+    overflow: auto;
+    padding: 8px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .log-entry {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 2px 6px;
+    margin: 1px 0;
+  }
+  .log-entry:hover { background: var(--bg-tertiary); }
+  .log-entry.active { background: var(--accent-glow); }
+
+  .log-level {
+    flex-shrink: 0;
+    font-weight: 600;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    min-width: 38px;
+    text-align: center;
+  }
+  .log-level.info { color: var(--accent); background: rgba(122, 162, 247, 0.1); }
+  .log-level.warn { color: var(--warning); background: rgba(224, 175, 104, 0.1); }
+  .log-level.error { color: var(--error); background: rgba(247, 118, 142, 0.1); }
+
+  .log-location { flex-shrink: 0; color: var(--text-muted); min-width: 60px; }
+  .log-msg { color: var(--text-secondary); word-break: break-word; }
+
+  /* Log badge */
+  .log-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 4px;
+  }
+  .log-badge.warn { background: rgba(224, 175, 104, 0.2); color: var(--warning); }
+  .log-badge.error { background: rgba(247, 118, 142, 0.2); color: var(--error); }
+  .log-badge.info { background: rgba(122, 162, 247, 0.15); color: var(--accent); }
+
+  /* ─── STATUS BAR ─── */
+  .statusbar {
+    height: var(--statusbar-height);
+    background: var(--bg-tertiary);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .statusbar-item { display: flex; align-items: center; gap: 4px; }
+
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); }
+  .status-dot.ready { background: var(--success); }
+  .status-dot.loading { background: var(--warning); animation: pulse 1.2s infinite; }
+  .status-dot.error { background: var(--error); }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ─── CENTER WRAP ─── */
+  .center-wrap { flex: 1; display: flex; overflow: hidden; }
+  .center-wrap.vertical { flex-direction: column; }
+
+  /* ─── HIDDEN FILE INPUT ─── */
+  #fileInput { display: none; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+  /* ─── OPTIONS PANEL ─── */
+  .options-panel {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .options-panel.collapsed { max-height: 0 !important; border-bottom: none; }
+
+  .options-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 0 8px;
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .options-tab {
+    padding: 5px 10px;
+    font-size: 11px;
+    font-family: var(--font-ui);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .options-tab:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
+  .options-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+  .options-tab-panel {
+    display: none;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .options-tab-panel.active { display: flex; flex-wrap: wrap; align-items: flex-start; }
+
+  .options-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    align-items: center;
+  }
+
+  .opt-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-family: var(--font-ui);
+    color: var(--text-secondary);
+  }
+  .opt-group label { white-space: nowrap; cursor: pointer; }
+  .opt-group input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
+  .opt-group select, .opt-group input[type="text"], .opt-group input[type="number"] {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+  .opt-group select { padding-right: 18px; }
+  .opt-group select:focus, .opt-group input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+
+  .opt-section-label {
+    font-size: 10px;
+    font-family: var(--font-ui);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 4px;
+  }
+
+  /* File upload areas within options */
+  .opt-file-upload {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-family: var(--font-ui);
+    color: var(--text-secondary);
+  }
+  .opt-file-upload .upload-btn {
+    padding: 2px 8px;
+    font-size: 11px;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: var(--font-ui);
+  }
+  .opt-file-upload .upload-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .opt-file-upload .file-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .opt-file-upload .file-remove {
+    background: none;
+    border: none;
+    color: var(--error);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0 2px;
+    line-height: 1;
+  }
+  .opt-file-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 3px;
+  }
+  .opt-file-tag {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--accent);
+  }
+  .opt-file-tag .file-remove { font-size: 12px; }
+
+  /* Key/value row for metadata and variables */
+  .opt-kv-row {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-bottom: 3px;
+  }
+  .opt-kv-row input[type="text"] {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    width: 140px;
+  }
+  .opt-kv-row input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+  .opt-kv-row .kv-remove {
+    background: none;
+    border: none;
+    color: var(--error);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0 2px;
+    line-height: 1;
+    visibility: hidden;
+  }
+  .opt-kv-row:hover .kv-remove { visibility: visible; }
+
+  /* Collapsible format-specific sections */
+  details.fmt-section {
+    margin-top: 6px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  details.fmt-section > summary {
+    text-transform: uppercase;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 5px 8px;
+    cursor: pointer;
+    background: var(--bg-tertiary);
+    user-select: none;
+    list-style: none;
+  }
+  details.fmt-section > summary::-webkit-details-marker { display: none; }
+  details.fmt-section > summary::before {
+    content: '▸ ';
+    font-size: 10px;
+  }
+  details.fmt-section[open] > summary::before {
+    content: '▾ ';
+  }
+  details.fmt-section[open] > summary {
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  details.fmt-section > .fmt-section-body {
+    padding: 6px 8px;
+  }
+
+  /* Extension checkbox items */
+  .ext-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 4px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    border-radius: 2px;
+  }
+  .ext-item:hover { background: var(--bg-tertiary); }
+  .ext-item input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--accent); cursor: pointer; }
+  .ext-item label { cursor: pointer; white-space: nowrap; }
+  .ext-item.default-on label { font-weight: 500; }
+  .ext-item.toggled label { color: var(--accent); }
+
+  /* Toggle button in toolbar for options panel */
+  .toolbar-btn.options-toggle.panel-open { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ">
+
+<!-- ═══ TOOLBAR ═══ -->
+<div class="toolbar" role="toolbar" aria-label="Main toolbar">
+  <span class="toolbar-title">PANDOC WASM</span>
+  <div class="toolbar-divider"></div>
+
+  <div class="toolbar-group">
+    <button class="toolbar-btn" id="btnUpload" title="Upload file">📄 Upload</button>
+  </div>
+
+  <div class="toolbar-divider"></div>
+
+  <div class="toolbar-group">
+    <span class="toolbar-label">From:</span>
+    <select class="toolbar-select" id="selFrom">
+      <option value="latex">latex</option>
+      <option value="markdown">markdown</option>
+      <option value="html">html</option>
+      <option value="rst">rst</option>
+      <option value="org">org</option>
+      <option value="typst">typst</option>
+    </select>
+    <span class="toolbar-label" style="margin-left:4px;">To:</span>
+    <select class="toolbar-select" id="selTo">
+      <option value="html">html</option>
+      <option value="markdown">markdown</option>
+      <option value="latex">latex</option>
+      <option value="docx">docx</option>
+      <option value="epub">epub</option>
+      <option value="typst">typst</option>
+    </select>
+  </div>
+
+  <div class="toolbar-divider"></div>
+
+  <div class="toolbar-group">
+    <button class="toolbar-btn primary" id="btnConvert" disabled>▶ Convert</button>
+  </div>
+
+  <div class="toolbar-divider"></div>
+
+  <div class="toolbar-group">
+    <button class="toolbar-btn options-toggle panel-open" id="btnOptions" title="Toggle conversion options panel">⚙ Options</button>
+  </div>
+
+  <span class="toolbar-spacer"></span>
+
+  <div class="toolbar-group">
+    <button class="toolbar-btn active" id="btnCleanup" title="Toggle cleanup sidebar">🧹 Cleanup</button>
+    <div class="toolbar-divider"></div>
+    <button class="toolbar-btn active" id="btnLayoutSide" title="Preview: right side">◫</button>
+    <button class="toolbar-btn" id="btnLayoutBottom" title="Preview: bottom">⬓</button>
+    <button class="toolbar-btn" id="btnLayoutHide" title="Hide preview">▣</button>
+  </div>
+</div>
+
+<!-- Binary input info bar -->
+<div id="binaryInputInfo" style="display:none; padding:4px 12px; background:var(--bg-tertiary); border-bottom:1px solid var(--border-subtle); font-size:11px; color:var(--text-secondary); align-items:center; gap:8px;"></div>
+
+<!-- ═══ OPTIONS PANEL ═══ -->
+<div class="options-panel" id="optionsPanel">
+  <div class="options-tabs" id="optionsTabs">
+    <button class="options-tab active" data-tab="general">General</button>
+    <button class="options-tab" data-tab="headings">Headings</button>
+    <button class="options-tab" data-tab="media">Media</button>
+    <button class="options-tab" data-tab="citations">Citations</button>
+    <button class="options-tab" data-tab="math">Math</button>
+    <button class="options-tab" data-tab="code">Code</button>
+    <button class="options-tab" data-tab="format">Format-Specific</button>
+    <button class="options-tab" data-tab="template">Template</button>
+    <button class="options-tab" data-tab="metadata">Metadata</button>
+    <button class="options-tab" data-tab="filters">Filters</button>
+    <button class="options-tab" data-tab="wrapping">Wrapping</button>
+    <button class="options-tab" data-tab="extensions">Extensions</button>
+  </div>
+
+  <!-- General -->
+  <div class="options-tab-panel active" id="panel-general">
+    <div class="options-grid">
+      <div class="opt-group">
+        <input type="checkbox" id="opt-standalone" checked>
+        <label for="opt-standalone">Standalone document</label>
+      </div>
+      <div class="opt-group">
+        <input type="checkbox" id="opt-file-scope">
+        <label for="opt-file-scope">File scope</label>
+      </div>
+      <div class="opt-group">
+        <label for="opt-tab-stop">Tab stop:</label>
+        <select id="opt-tab-stop" style="width:55px;">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4" selected>4</option><option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <input type="checkbox" id="opt-preserve-tabs">
+        <label for="opt-preserve-tabs">Preserve tabs</label>
+      </div>
+      <div class="opt-group">
+        <label for="opt-eol">Line endings:</label>
+        <select id="opt-eol" style="width:100px;">
+          <option value="">Native</option>
+          <option value="lf">LF (Unix)</option>
+          <option value="crlf">CRLF (Windows)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Headings -->
+  <div class="options-tab-panel" id="panel-headings">
+    <div class="options-grid">
+      <div class="opt-group">
+        <label for="opt-shift-heading">Shift heading level by:</label>
+        <select id="opt-shift-heading" style="width:55px;">
+          <option value="-2">-2</option>
+          <option value="-1">-1</option>
+          <option value="0" selected>0</option>
+          <option value="1">+1</option>
+          <option value="2">+2</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <input type="checkbox" id="opt-number-sections">
+        <label for="opt-number-sections">Number sections</label>
+      </div>
+      <div class="opt-group">
+        <label for="opt-number-offset">Number offset:</label>
+        <input type="text" id="opt-number-offset" placeholder="0,0,0" style="width:80px;">
+      </div>
+      <div class="opt-group">
+        <input type="checkbox" id="opt-toc">
+        <label for="opt-toc">Table of contents</label>
+      </div>
+      <div class="opt-group">
+        <label for="opt-toc-depth">TOC depth:</label>
+        <select id="opt-toc-depth" style="width:50px;">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Media -->
+  <div class="options-tab-panel" id="panel-media">
+    <div class="options-grid">
+      <div class="opt-group">
+        <input type="checkbox" id="opt-extract-media">
+        <label for="opt-extract-media">Extract media</label>
+      </div>
+      <div class="opt-group">
+        <label for="opt-dpi">DPI (images):</label>
+        <input type="number" id="opt-dpi" placeholder="96" min="1" style="width:65px;">
+      </div>
+      <div class="opt-group">
+        <label for="opt-resource-path">Resource path:</label>
+        <input type="text" id="opt-resource-path" placeholder=".:images" style="width:180px;">
+      </div>
+      <div class="opt-file-upload">
+        <label>Auxiliary files:</label>
+        <button class="upload-btn" id="btnAuxFiles">Upload Files</button>
+        <input type="file" id="auxFileInput" multiple style="display:none;">
+      </div>
+      <div class="opt-file-upload">
+        <button class="upload-btn" id="btnAuxDir">Upload Directory</button>
+        <input type="file" id="auxDirInput" webkitdirectory style="display:none;">
+      </div>
+    </div>
+    <div class="opt-file-list" id="auxFileList"></div>
+  </div>
+
+  <!-- Citations -->
+  <div class="options-tab-panel" id="panel-citations">
+    <div class="options-grid">
+      <div class="opt-group">
+        <label for="opt-citation-method">Citation processing:</label>
+        <select id="opt-citation-method" style="width:110px;">
+          <option value="">None</option>
+          <option value="citeproc">Citeproc</option>
+          <option value="natbib">Natbib</option>
+          <option value="biblatex">BibLaTeX</option>
+        </select>
+      </div>
+      <div class="opt-file-upload">
+        <label>Bibliography:</label>
+        <button class="upload-btn" id="btnBibFile">Upload .bib/.json/.yaml</button>
+        <input type="file" id="bibFileInput" accept=".bib,.bibtex,.json,.yaml,.yml" style="display:none;">
+        <span class="file-name" id="bibFileName"></span>
+        <button class="file-remove" id="bibFileRemove" style="display:none;">×</button>
+      </div>
+    </div>
+    <div class="options-grid" style="margin-top:6px;" id="citeprocOptions">
+      <div class="opt-file-upload">
+        <label>CSL style:</label>
+        <button class="upload-btn" id="btnCslFile">Upload .csl</button>
+        <input type="file" id="cslFileInput" accept=".csl" style="display:none;">
+        <span class="file-name" id="cslFileName"></span>
+        <button class="file-remove" id="cslFileRemove" style="display:none;">×</button>
+      </div>
+      <div class="opt-file-upload">
+        <label>Citation abbreviations:</label>
+        <button class="upload-btn" id="btnAbbrevFile">Upload .json</button>
+        <input type="file" id="abbrevFileInput" accept=".json" style="display:none;">
+        <span class="file-name" id="abbrevFileName"></span>
+        <button class="file-remove" id="abbrevFileRemove" style="display:none;">×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Math -->
+  <div class="options-tab-panel" id="panel-math">
+    <div class="options-grid">
+      <div class="opt-group">
+        <label for="opt-math">Math rendering method:</label>
+        <select id="opt-math" style="width:130px;">
+          <option value="">Default (plain)</option>
+          <option value="mathjax">MathJax</option>
+          <option value="katex">KaTeX</option>
+          <option value="mathml">MathML</option>
+          <option value="webtex">WebTeX (images)</option>
+          <option value="gladtex">GladTeX</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Code -->
+  <div class="options-tab-panel" id="panel-code">
+    <div class="options-grid">
+      <div class="opt-group">
+        <label for="opt-highlight-style">Highlight style:</label>
+        <select id="opt-highlight-style" style="width:120px;">
+          <option value="">Default</option>
+          <option value="idiomatic">Idiomatic</option>
+          <option value="none">None</option>
+          <option value="pygments">Pygments</option>
+          <option value="kate">Kate</option>
+          <option value="monochrome">Monochrome</option>
+          <option value="breezedark">Breeze Dark</option>
+          <option value="espresso">Espresso</option>
+          <option value="zenburn">Zenburn</option>
+          <option value="haddock">Haddock</option>
+          <option value="tango">Tango</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <label for="opt-indented-code-classes">Indented code classes:</label>
+        <input type="text" id="opt-indented-code-classes" placeholder="e.g. haskell, python" style="width:160px;">
+      </div>
+      <div class="opt-file-upload" id="customThemeUpload" style="display:none;">
+        <label>Custom theme:</label>
+        <button class="upload-btn" id="btnHighlightTheme">Upload .theme</button>
+        <input type="file" id="highlightThemeInput" accept=".theme" style="display:none;">
+        <span class="file-name" id="highlightThemeName"></span>
+        <button class="file-remove" id="highlightThemeRemove" style="display:none;">×</button>
+      </div>
+      <div class="opt-file-upload">
+        <label>Syntax definitions:</label>
+        <button class="upload-btn" id="btnSyntaxDefs">Add .xml files</button>
+        <input type="file" id="syntaxDefsInput" accept=".xml" multiple style="display:none;">
+      </div>
+    </div>
+    <div class="opt-file-list" id="syntaxDefsList"></div>
+  </div>
+
+  <!-- Format-specific -->
+  <div class="options-tab-panel" id="panel-format">
+    <!-- Reader options -->
+    <details class="fmt-section">
+      <summary>Reader / Input</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <input type="checkbox" id="opt-strip-comments">
+          <label for="opt-strip-comments">Strip HTML comments (input)</label>
+        </div>
+        <div class="opt-group">
+          <label for="opt-default-image-extension">Default image ext:</label>
+          <input type="text" id="opt-default-image-extension" placeholder=".png" style="width:60px;">
+        </div>
+        <div class="opt-file-upload">
+          <label>Abbreviations file:</label>
+          <button class="upload-btn" id="btnAbbrevsFile">Upload</button>
+          <input type="file" id="abbrevsFileInput" style="display:none;">
+          <span class="file-name" id="abbrevsFileName"></span>
+          <button class="file-remove" id="abbrevsFileRemove" style="display:none;">×</button>
+        </div>
+        <!-- Track changes (docx input) -->
+        <div class="opt-group">
+          <label for="opt-track-changes">Track changes:</label>
+          <select id="opt-track-changes" style="width:110px;">
+            <option value="">Default (accept)</option>
+            <option value="accept">Accept all</option>
+            <option value="reject">Reject all</option>
+            <option value="all">Include all</option>
+          </select>
+        </div>
+      </div>
+      </div>
+    </details>
+    <!-- HTML output options -->
+    <details class="fmt-section" open>
+      <summary>HTML Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <input type="checkbox" id="opt-self-contained">
+          <label for="opt-self-contained">Embed resources</label>
+        </div>
+        <div class="opt-group">
+          <input type="checkbox" id="opt-html-q-tags">
+          <label for="opt-html-q-tags">Use &lt;q&gt; tags</label>
+        </div>
+        <div class="opt-group">
+          <input type="checkbox" id="opt-section-divs">
+          <label for="opt-section-divs">Wrap in &lt;section&gt;</label>
+        </div>
+        <div class="opt-group">
+          <input type="checkbox" id="opt-ascii-html">
+          <label for="opt-ascii-html">ASCII only</label>
+        </div>
+        <div class="opt-group">
+          <label for="opt-title-prefix">Title prefix:</label>
+          <input type="text" id="opt-title-prefix" placeholder="Prefix" style="width:80px;">
+        </div>
+        <div class="opt-group">
+          <label for="opt-id-prefix">ID prefix:</label>
+          <input type="text" id="opt-id-prefix" placeholder="Prefix" style="width:80px;">
+        </div>
+        <div class="opt-group">
+          <label for="opt-email-obfuscation">Email obfuscation:</label>
+          <select id="opt-email-obfuscation" style="width:120px;">
+            <option value="">None</option>
+            <option value="javascript">JavaScript</option>
+            <option value="references">Char references</option>
+          </select>
+        </div>
+        <div class="opt-file-upload">
+          <label>CSS files:</label>
+          <button class="upload-btn" id="btnCssFiles">Add .css</button>
+          <input type="file" id="cssFilesInput" accept=".css" multiple style="display:none;">
+        </div>
+      </div>
+      <div class="opt-file-list" id="cssFileList"></div>
+      </div>
+    </details>
+    <!-- Markdown output options -->
+    <details class="fmt-section">
+      <summary>Markdown Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <input type="checkbox" id="opt-reference-links">
+          <label for="opt-reference-links">Reference-style links</label>
+        </div>
+        <div class="opt-group">
+          <label for="opt-reference-location">Reference location:</label>
+          <select id="opt-reference-location" style="width:100px;">
+            <option value="">Default</option>
+            <option value="block">Block</option>
+            <option value="section">Section</option>
+            <option value="document">Document</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label for="opt-markdown-headings">Heading style:</label>
+          <select id="opt-markdown-headings" style="width:100px;">
+            <option value="">Default (ATX)</option>
+            <option value="atx">ATX (#)</option>
+            <option value="setext">Setext</option>
+          </select>
+        </div>
+      </div>
+      </div>
+    </details>
+    <!-- RST output options -->
+    <details class="fmt-section">
+      <summary>RST Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <input type="checkbox" id="opt-reference-links-rst">
+          <label for="opt-reference-links-rst">Reference-style links</label>
+        </div>
+        <div class="opt-group">
+          <input type="checkbox" id="opt-list-tables">
+          <label for="opt-list-tables">List tables</label>
+        </div>
+      </div>
+      </div>
+    </details>
+    <!-- LaTeX output options -->
+    <details class="fmt-section">
+      <summary>LaTeX Output</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <input type="checkbox" id="opt-lof">
+          <label for="opt-lof">List of figures</label>
+        </div>
+        <div class="opt-group">
+          <input type="checkbox" id="opt-lot">
+          <label for="opt-lot">List of tables</label>
+        </div>
+        <div class="opt-group">
+          <label for="opt-top-level-division">Top-level division:</label>
+          <select id="opt-top-level-division" style="width:90px;">
+            <option value="">Default</option>
+            <option value="section">Section</option>
+            <option value="chapter">Chapter</option>
+            <option value="part">Part</option>
+          </select>
+        </div>
+      </div>
+      </div>
+    </details>
+    <!-- Caption / ASCII / ODT options -->
+    <details class="fmt-section">
+      <summary>Other</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <label for="opt-figure-caption-position">Figure caption:</label>
+          <select id="opt-figure-caption-position" style="width:80px;">
+            <option value="">Default</option>
+            <option value="above">Above</option>
+            <option value="below">Below</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label for="opt-table-caption-position">Table caption:</label>
+          <select id="opt-table-caption-position" style="width:80px;">
+            <option value="">Default</option>
+            <option value="above">Above</option>
+            <option value="below">Below</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <input type="checkbox" id="opt-ascii">
+          <label for="opt-ascii">ASCII output only</label>
+        </div>
+        <div class="opt-group">
+          <input type="checkbox" id="opt-link-images">
+          <label for="opt-link-images">Link images (ODT)</label>
+        </div>
+      </div>
+      </div>
+    </details>
+    <!-- EPUB options -->
+    <details class="fmt-section">
+      <summary>EPUB</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-file-upload">
+          <label>Cover image:</label>
+          <button class="upload-btn" id="btnEpubCover">Upload image</button>
+          <input type="file" id="epubCoverInput" accept="image/*" style="display:none;">
+          <span class="file-name" id="epubCoverName"></span>
+          <button class="file-remove" id="epubCoverRemove" style="display:none;">×</button>
+        </div>
+        <div class="opt-file-upload">
+          <label>EPUB metadata:</label>
+          <button class="upload-btn" id="btnEpubMeta">Upload .xml</button>
+          <input type="file" id="epubMetaInput" accept=".xml" style="display:none;">
+          <span class="file-name" id="epubMetaName"></span>
+          <button class="file-remove" id="epubMetaRemove" style="display:none;">×</button>
+        </div>
+        <div class="opt-file-upload">
+          <label>Fonts:</label>
+          <button class="upload-btn" id="btnEpubFonts">Add fonts</button>
+          <input type="file" id="epubFontsInput" accept=".ttf,.otf,.woff,.woff2" multiple style="display:none;">
+        </div>
+        <div class="opt-group">
+          <input type="checkbox" id="opt-epub-title-page" checked>
+          <label for="opt-epub-title-page">Title page</label>
+        </div>
+        <div class="opt-group">
+          <label for="opt-epub-subdirectory">Subdirectory:</label>
+          <input type="text" id="opt-epub-subdirectory" placeholder="EPUB" style="width:80px;">
+        </div>
+      </div>
+      <div class="opt-file-list" id="epubFontsList"></div>
+      </div>
+    </details>
+    <!-- Chunked HTML -->
+    <details class="fmt-section">
+      <summary>Chunked HTML</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <label for="opt-split-level">Split level:</label>
+          <select id="opt-split-level" style="width:55px;">
+            <option value="">Default</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label for="opt-chunk-template">Chunk template:</label>
+          <input type="text" id="opt-chunk-template" placeholder="%s-%i.html" style="width:130px;">
+        </div>
+      </div>
+      </div>
+    </details>
+    <!-- Notebook -->
+    <details class="fmt-section">
+      <summary>Jupyter Notebook</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <label for="opt-ipynb-output">Output cell handling:</label>
+          <select id="opt-ipynb-output" style="width:100px;">
+            <option value="">Default (best)</option>
+            <option value="all">All</option>
+            <option value="none">None</option>
+            <option value="best">Best only</option>
+          </select>
+        </div>
+      </div>
+      </div>
+    </details>
+    <!-- Slides -->
+    <details class="fmt-section">
+      <summary>Slides</summary>
+      <div class="fmt-section-body">
+      <div class="options-grid">
+        <div class="opt-group">
+          <label for="opt-slide-level">Slide level:</label>
+          <select id="opt-slide-level" style="width:55px;">
+            <option value="">Auto</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <input type="checkbox" id="opt-incremental">
+          <label for="opt-incremental">Incremental lists</label>
+        </div>
+      </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Template -->
+  <div class="options-tab-panel" id="panel-template">
+    <div class="options-grid">
+      <div class="opt-file-upload">
+        <label>Custom template:</label>
+        <button class="upload-btn" id="btnTemplateFile">Upload template</button>
+        <input type="file" id="templateFileInput" style="display:none;">
+        <span class="file-name" id="templateFileName"></span>
+        <button class="file-remove" id="templateFileRemove" style="display:none;">×</button>
+      </div>
+      <div class="opt-file-upload">
+        <label>Reference doc (docx/odt/pptx):</label>
+        <button class="upload-btn" id="btnRefDoc">Upload</button>
+        <input type="file" id="refDocInput" accept=".docx,.odt,.pptx" style="display:none;">
+        <span class="file-name" id="refDocName"></span>
+        <button class="file-remove" id="refDocRemove" style="display:none;">×</button>
+      </div>
+    </div>
+    <!-- Include files -->
+    <div style="margin-top:6px;">
+      <span class="opt-section-label">Include Files</span>
+      <div class="options-grid" style="margin-top:3px;">
+        <div class="opt-file-upload">
+          <label>In header:</label>
+          <button class="upload-btn" id="btnHeaderFiles">Add files</button>
+          <input type="file" id="headerFilesInput" multiple style="display:none;">
+        </div>
+        <div class="opt-file-upload">
+          <label>Before body:</label>
+          <button class="upload-btn" id="btnBeforeFiles">Add files</button>
+          <input type="file" id="beforeFilesInput" multiple style="display:none;">
+        </div>
+        <div class="opt-file-upload">
+          <label>After body:</label>
+          <button class="upload-btn" id="btnAfterFiles">Add files</button>
+          <input type="file" id="afterFilesInput" multiple style="display:none;">
+        </div>
+      </div>
+      <div class="opt-file-list" id="headerFilesList"></div>
+      <div class="opt-file-list" id="beforeFilesList"></div>
+      <div class="opt-file-list" id="afterFilesList"></div>
+    </div>
+    <!-- Variables -->
+    <div style="margin-top:6px;">
+      <span class="opt-section-label">Template Variables</span>
+      <div id="templateVarRows" style="margin-top:3px;"></div>
+      <button class="upload-btn" id="btnAddTemplateVar" style="margin-top:4px;">+ Add variable</button>
+      <datalist id="variable-suggestions">
+        <option value="abstract"></option><option value="abstract-title"></option>
+        <option value="author"></option><option value="backgroundcolor"></option>
+        <option value="date"></option><option value="description"></option>
+        <option value="dir"></option><option value="document-css"></option>
+        <option value="fontcolor"></option><option value="fontsize"></option>
+        <option value="keywords"></option><option value="lang"></option>
+        <option value="linestretch"></option><option value="linkcolor"></option>
+        <option value="mainfont"></option><option value="margin-bottom"></option>
+        <option value="margin-left"></option><option value="margin-right"></option>
+        <option value="margin-top"></option><option value="maxwidth"></option>
+        <option value="monofont"></option><option value="subject"></option>
+        <option value="subtitle"></option><option value="title"></option>
+        <option value="toc-title"></option>
+      </datalist>
+    </div>
+  </div>
+
+  <!-- Metadata -->
+  <div class="options-tab-panel" id="panel-metadata">
+    <div class="options-grid">
+      <div class="opt-file-upload">
+        <label>Metadata file (.yaml/.json):</label>
+        <button class="upload-btn" id="btnMetadataFile">Upload</button>
+        <input type="file" id="metadataFileInput" accept=".yaml,.yml,.json" style="display:none;">
+        <span class="file-name" id="metadataFileName"></span>
+        <button class="file-remove" id="metadataFileRemove" style="display:none;">×</button>
+      </div>
+    </div>
+    <div style="margin-top:6px;">
+      <span class="opt-section-label">Metadata Fields</span>
+      <datalist id="metadata-suggestions">
+        <option value="title"></option><option value="author"></option>
+        <option value="date"></option><option value="lang"></option>
+        <option value="subject"></option><option value="description"></option>
+        <option value="category"></option><option value="keywords"></option>
+      </datalist>
+      <div id="metadataKvRows" style="margin-top:3px;"></div>
+      <button class="upload-btn" id="btnAddMetadata" style="margin-top:4px;">+ Add field</button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="options-tab-panel" id="panel-filters">
+    <div class="options-grid">
+      <div class="opt-file-upload">
+        <label>Lua filters (.lua):</label>
+        <button class="upload-btn" id="btnLuaFilters">Add Lua filters</button>
+        <input type="file" id="luaFiltersInput" accept=".lua" multiple style="display:none;">
+      </div>
+    </div>
+    <div id="luaFiltersList" style="margin-top:4px;"></div>
+    <div style="margin-top:4px; font-size:10px; color:var(--text-muted);">Drag to reorder execution sequence.</div>
+  </div>
+
+  <!-- Wrapping -->
+  <div class="options-tab-panel" id="panel-wrapping">
+    <div class="options-grid">
+      <div class="opt-group">
+        <label for="opt-wrap">Wrap mode:</label>
+        <select id="opt-wrap" style="width:90px;">
+          <option value="auto">Auto</option>
+          <option value="none">None</option>
+          <option value="preserve">Preserve</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <label for="opt-columns">Line width (columns):</label>
+        <input type="number" id="opt-columns" placeholder="72" min="1" style="width:60px;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Extensions -->
+  <div class="options-tab-panel" id="panel-extensions">
+    <div style="display:flex; gap:24px; flex-wrap:wrap; width:100%;">
+      <div style="flex:1; min-width:200px;">
+        <span class="opt-section-label" id="extInputHeader">Input Extensions</span>
+        <div id="extInputList" style="margin-top:4px; max-height:260px; overflow-y:auto;"></div>
+      </div>
+      <div style="flex:1; min-width:200px;">
+        <span class="opt-section-label" id="extOutputHeader">Output Extensions</span>
+        <div id="extOutputList" style="margin-top:4px; max-height:260px; overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN AREA ═══ -->
+<div class="main-area" id="mainArea">
+
+  <!-- SIDEBAR: Cleanup Tool -->
+  <aside class="sidebar" id="sidebar" role="complementary" aria-label="LaTeX Cleanup">
+    <div class="sidebar-header">
+      <span class="sidebar-title">LaTeX Cleanup</span>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close cleanup sidebar">×</button>
+    </div>
+    <div class="sidebar-body">
+      <!-- Profile selector -->
+      <div class="cleanup-section">
+        <div class="cleanup-section-label">Profile</div>
+        <div style="display:flex; gap:4px;">
+          <select class="cleanup-select" id="cleanupProfile" style="flex:1;"></select>
+          <button class="toolbar-btn" id="btnDuplicateProfile" style="font-size:10px; padding:3px 6px;" title="Duplicate profile">⧉</button>
+          <button class="toolbar-btn" id="btnDeleteProfile" style="font-size:10px; padding:3px 6px; color:var(--error);" title="Delete profile">✕</button>
+        </div>
+      </div>
+
+      <!-- Profile scope -->
+      <div class="cleanup-section">
+        <div class="scope-section" id="profileScopeSection">
+          <div class="scope-header" id="profileScopeHeader">
+            <span>Scope (entire file)</span>
+            <span id="profileScopeToggle">›</span>
+          </div>
+          <div class="scope-fields" id="profileScopeFields" style="display:none;">
+            <div class="pf-row">
+              <span class="pf-label">O:</span>
+              <input class="pf-input pf-input-flex" id="scopeOpenPrefix" placeholder="Prefix">
+              <input class="pf-input pf-input-anchor" id="scopeOpenAnchor" placeholder="Anchor">
+              <input class="pf-input pf-input-flex" id="scopeOpenSuffix" placeholder="Suffix">
+            </div>
+            <div class="pf-row">
+              <span class="pf-label">C:</span>
+              <input class="pf-input pf-input-flex" id="scopeClosePrefix" placeholder="Prefix">
+              <input class="pf-input pf-input-anchor" id="scopeCloseAnchor" placeholder="Anchor">
+              <input class="pf-input pf-input-flex" id="scopeCloseSuffix" placeholder="Suffix">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pattern list -->
+      <div class="cleanup-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <div class="cleanup-section-label" style="margin-bottom:0;">Patterns <span id="patternCount">(0)</span></div>
+          <div style="display:flex; gap:4px;">
+            <button class="toolbar-btn" id="btnExpandAll" style="font-size:10px; padding:2px 6px;">⊞</button>
+            <button class="toolbar-btn" id="btnCollapseAll" style="font-size:10px; padding:2px 6px;">⊟</button>
+          </div>
+        </div>
+        <div id="patternList" style="max-height: calc(100vh - 480px); overflow-y: auto;"></div>
+      </div>
+
+      <!-- Add pattern -->
+      <div class="cleanup-section">
+        <div style="display:flex; gap:4px;">
+          <select class="cleanup-select" id="addPatternType" style="flex:1;">
+            <option value="matched_pair">Matched Pair</option>
+            <option value="single_string">Single String</option>
+          </select>
+          <button class="toolbar-btn" id="btnAddPattern" style="font-size:11px; padding:4px 10px;">+ Add</button>
+        </div>
+      </div>
+
+      <button class="cleanup-run-btn" id="btnRunCleanup">▶ Run Cleanup</button>
+    </div>
+  </aside>
+
+  <!-- CENTER WRAP -->
+  <div class="center-wrap" id="centerWrap">
+
+    <!-- EDITOR -->
+    <div class="editor-area" id="editorArea">
+      <div class="editor-tabs">
+        <button class="editor-tab active" id="tabFilename">untitled.tex</button>
+      </div>
+      <div class="editor-content">
+        <div id="aceEditor"></div>
+      </div>
+    </div>
+
+    <!-- RESIZE GUTTER -->
+    <div class="resize-gutter" id="resizeGutter"></div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="output-panel" id="outputPanel">
+      <div class="output-tabs">
+        <button class="output-tab active" data-tab="preview">Preview</button>
+        <button class="output-tab" data-tab="log">Log <span id="logBadge"></span></button>
+        <button class="output-tab" data-tab="source">Source</button>
+        <button class="output-tab-action" id="btnDownloadOutput" title="Download output" style="display:none;">📥 Download</button>
+        <span class="output-tab-spacer"></span>
+        <button class="output-tab-action" id="btnOutputClose" title="Hide panel">×</button>
+      </div>
+      <div class="output-body">
+        <div class="tab-content active" id="tabPreview">
+          <iframe id="previewFrame" sandbox="allow-scripts" title="HTML preview"></iframe>
+        </div>
+        <div class="tab-content" id="tabLog" role="log" aria-label="Conversion log" aria-live="polite">
+          <div class="log-container" id="logContainer">
+            <div style="color: var(--text-muted); padding: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;">
+              Run a conversion to see log output.
+            </div>
+          </div>
+        </div>
+        <div class="tab-content" id="tabSource">
+          <div id="outputSource"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /center-wrap -->
+</div><!-- /main-area -->
+
+<!-- ═══ STATUS BAR ═══ -->
+<div class="statusbar" role="status">
+  <div class="statusbar-item">
+    <span class="status-dot loading" id="statusDot"></span>
+    <span id="statusText">Loading Pandoc WASM…</span>
+  </div>
+  <div class="statusbar-item" id="statusFormat">LaTeX</div>
+  <div class="statusbar-item" id="statusEncoding">UTF-8</div>
+  <div class="statusbar-item" id="statusCursor">Ln 1, Col 1</div>
+  <span class="toolbar-spacer"></span>
+  <div class="statusbar-item" id="statusWarnings" style="display:none;"></div>
+</div>
+
+<script type="module">
+// ════════════════════════════════════════════════════════════════════
+// SECTION 1: ACE EDITOR SETUP
+// ════════════════════════════════════════════════════════════════════
+
+const editor = ace.edit('aceEditor');
+editor.setTheme('ace/theme/one_dark');
+editor.session.setMode('ace/mode/latex');
+editor.setOptions({
+  fontSize: '13px',
+  fontFamily: "'IBM Plex Mono', monospace",
+  showPrintMargin: false,
+  wrap: true,
+  tabSize: 2,
+  useSoftTabs: true,
+  enableBasicAutocompletion: false,
+  scrollPastEnd: 0.3,
+});
+
+// Default sample content
+editor.setValue(`\\documentclass{article}
+\\usepackage{amsmath}
+\\usepackage{graphicx}
+\\usepackage[utf8]{inputenc}
+
+\\title{Introduction to PDEs}
+\\author{N. Miller}
+\\date{\\today}
+
+\\begin{document}
+\\maketitle
+
+\\section{Introduction}
+
+This document explores the fundamental properties of
+differential equations in bounded domains, with emphasis
+on regularity results near the boundary.
+
+The governing equation takes the form:
+\\begin{equation}
+  \\frac{\\partial u}{\\partial t} - \\Delta u = f(x,t)
+\\end{equation}
+
+% TODO: Fix undefined citation key
+We refer the reader to \\cite{smith2024}
+for a comprehensive treatment.
+
+\\section{Preliminaries}
+
+Let \\( \\Omega \\subset \\mathbb{R}^n \\) be a bounded open set
+with Lipschitz boundary \\( \\partial\\Omega \\).
+
+\\begin{figure}[htbp]
+  \\centering
+  \\includegraphics[width=0.8\\textwidth]{domain.png}
+  \\caption{Bounded domain with Lipschitz boundary}
+\\end{figure}
+
+\\end{document}
+`, -1);
+
+// Track cursor position in status bar
+editor.session.selection.on('changeCursor', () => {
+  const pos = editor.getCursorPosition();
+  document.getElementById('statusCursor').textContent =
+    `Ln ${pos.row + 1}, Col ${pos.column + 1}`;
+});
+
+// Output source viewer (read-only Ace)
+const sourceEditor = ace.edit('outputSource');
+sourceEditor.setTheme('ace/theme/one_dark');
+sourceEditor.session.setMode('ace/mode/html');
+sourceEditor.setReadOnly(true);
+sourceEditor.setOptions({
+  fontSize: '12px',
+  fontFamily: "'IBM Plex Mono', monospace",
+  showPrintMargin: false,
+  wrap: true,
+});
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 2: PANDOC WASM INITIALIZATION
+// ════════════════════════════════════════════════════════════════════
+
+let pandocModule = null;
+let pandocVersion = '';
+
+async function initPandoc() {
+  try {
+    updateStatus('loading', 'Loading Pandoc WASM…');
+    const mod = await import('./pandoc.js');
+    pandocModule = mod;
+
+    // Query version
+    pandocVersion = await mod.query({ query: 'version' });
+    updateStatus('ready', `Pandoc WASM ${pandocVersion} ready`);
+    document.getElementById('btnConvert').disabled = false;
+
+    // Populate format dropdowns
+    const inputFormats = await mod.query({ query: 'input-formats' });
+    const outputFormats = await mod.query({ query: 'output-formats' });
+    populateFormats('selFrom', inputFormats, 'latex');
+    populateFormats('selTo', outputFormats, 'html');
+
+    // Load extensions for default formats
+    updateExtensions();
+
+  } catch (err) {
+    console.error('Failed to load pandoc.wasm:', err);
+    updateStatus('error', `Failed to load: ${err.message}`);
+  }
+}
+
+function populateFormats(selectId, formats, defaultVal) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '';
+  for (const fmt of formats) {
+    const opt = document.createElement('option');
+    opt.value = fmt;
+    opt.textContent = fmt;
+    if (fmt === defaultVal) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+function updateStatus(state, text) {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  dot.className = 'status-dot ' + state;
+  txt.textContent = text;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 3: FILE UPLOAD
+// ════════════════════════════════════════════════════════════════════
+
+const fileInput = document.getElementById('fileInput');
+
+document.getElementById('btnUpload').addEventListener('click', () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Update tab name and track filename
+  document.getElementById('tabFilename').textContent = file.name;
+  inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
+
+  // Auto-detect format from extension
+  const ext = file.name.split('.').pop().toLowerCase();
+  const formatMap = {
+    'tex': 'latex', 'latex': 'latex', 'md': 'markdown', 'markdown': 'markdown',
+    'html': 'html', 'htm': 'html', 'rst': 'rst', 'org': 'org', 'typ': 'typst',
+    'txt': 'markdown', 'docx': 'docx', 'odt': 'odt', 'pptx': 'pptx',
+    'epub': 'epub', 'fb2': 'fb2', 'ipynb': 'ipynb',
+  };
+  const fmt = formatMap[ext];
+
+  if (fmt && BINARY_INPUT_FORMATS.includes(fmt)) {
+    // Binary input — store as blob, show placeholder in editor
+    inputBinaryFile = { name: file.name, blob: file };
+    editor.setValue(`[Binary file loaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\n\nThis file will be passed directly to Pandoc for conversion.\nClick "▶ Convert" to process.`, -1);
+    editor.setReadOnly(true);
+
+    if (fmt) {
+      document.getElementById('selFrom').value = fmt;
+      document.getElementById('statusFormat').textContent = fmt;
+      updateExtensions();
+    }
+
+    // Show clear button
+    document.getElementById('binaryInputInfo').style.display = 'flex';
+    document.getElementById('binaryInputInfo').innerHTML =
+      `<span>📎 ${file.name}</span><button class="toolbar-btn" id="btnClearBinary" title="Remove file and return to text editor" style="font-size:11px;padding:2px 6px;">✕ Clear</button>`;
+    document.getElementById('btnClearBinary').addEventListener('click', () => {
+      inputBinaryFile = null;
+      editor.setValue('', -1);
+      editor.setReadOnly(false);
+      inputFileName = 'untitled';
+      document.getElementById('binaryInputInfo').style.display = 'none';
+      document.getElementById('tabFilename').textContent = 'untitled';
+    });
+  } else {
+    // Text input — read into editor as before
+    inputBinaryFile = null;
+    editor.setReadOnly(false);
+    document.getElementById('binaryInputInfo').style.display = 'none';
+
+    const text = await file.text();
+    editor.setValue(text, -1);
+
+    if (fmt) {
+      document.getElementById('selFrom').value = fmt;
+      const modeMap = { 'latex': 'latex', 'markdown': 'markdown', 'html': 'html' };
+      editor.session.setMode('ace/mode/' + (modeMap[fmt] || 'text'));
+      document.getElementById('statusFormat').textContent = fmt;
+      updateExtensions();
+    }
+  }
+
+  fileInput.value = '';
+});
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 4: WARNING PARSER
+// ════════════════════════════════════════════════════════════════════
+
+// Parsed warning objects: { line, column, level, message, matchedText, type }
+let parsedWarnings = [];
+
+function parseWarnings(warnings, stderr, sourceText) {
+  parsedWarnings = [];
+
+  // DEBUG: dump raw warning structure to console for inspection
+  if (warnings && warnings.length > 0) {
+    console.log('[pandoc] Raw warnings:', JSON.stringify(warnings[0], null, 2));
+  }
+
+  // Parse structured warnings from pandoc
+  if (warnings && warnings.length > 0) {
+    for (const w of warnings) {
+      try {
+        const parsed = parseOneWarning(w, sourceText);
+        if (parsed) parsedWarnings.push(parsed);
+      } catch (err) {
+        console.error('[pandoc] Failed to parse warning:', err, w);
+        parsedWarnings.push({
+          line: null, column: null, level: 'warn',
+          message: String(w.pretty || JSON.stringify(w)),
+          matchedText: null, type: 'parse-error',
+        });
+      }
+    }
+  }
+
+  // Also parse stderr for errors
+  if (stderr && stderr.trim()) {
+    const lines = stderr.trim().split('\n');
+    for (const line of lines) {
+      const locMatch = line.match(/at\s+\S+\s+line\s+(\d+)\s+column\s+(\d+)/i);
+      parsedWarnings.push({
+        line: locMatch ? parseInt(locMatch[1]) : null,
+        column: locMatch ? parseInt(locMatch[2]) : null,
+        level: 'error',
+        message: line.trim(),
+        matchedText: null,
+        type: 'stderr',
+      });
+    }
+  }
+
+  return parsedWarnings;
+}
+
+/**
+ * Safely convert a pandoc field to a plain string.
+ * The `contents` / `message` fields may be:
+ *   - a plain string
+ *   - an array of pandoc AST inlines
+ *   - an object with nested structure
+ *   - null/undefined
+ */
+function toStr(val) {
+  if (val == null) return '';
+  if (typeof val === 'string') return val;
+  if (Array.isArray(val)) {
+    // Pandoc inline array: try to extract text recursively
+    return val.map(item => {
+      if (typeof item === 'string') return item;
+      if (item && item.t === 'Str') return item.c || '';
+      if (item && item.t === 'Space') return ' ';
+      if (item && item.c) return toStr(item.c);
+      return JSON.stringify(item);
+    }).join('');
+  }
+  if (typeof val === 'object') return JSON.stringify(val);
+  return String(val);
+}
+
+function parseOneWarning(w, sourceText) {
+  // Extract structured fields directly from pandoc warning object
+  const line = w.line || null;
+  const column = w.column || null;
+  const contents = toStr(w.contents);
+  const path = toStr(w.path);
+  const wType = toStr(w.type) || null;
+  const verbosity = toStr(w.verbosity) || 'INFO';
+
+  // Determine severity level
+  let level = verbosity === 'INFO' ? 'info' : 'warn';
+
+  // Build clean message based on warning type
+  let message = '';
+  let matchedText = null;
+
+  switch (wType) {
+    case 'SkippedContent':
+      message = `Skipped '${contents}'`;
+      matchedText = contents;
+      break;
+
+    case 'CouldNotLoadIncludeFile':
+      message = `Could not load include file: ${contents}`;
+      matchedText = contents;
+      break;
+
+    case 'CouldNotConvertTeXMath':
+      message = `Could not convert TeX math: ${contents}`;
+      matchedText = contents;
+      level = 'warn';
+      break;
+
+    case 'InlineNotRendered':
+      message = `Inline not rendered: ${contents}`;
+      matchedText = contents;
+      break;
+
+    case 'NoLangSpecified':
+      message = 'No language specified';
+      level = 'info';
+      break;
+
+    default:
+      // Fallback: use the pretty-printed message
+      message = toStr(w.pretty) || toStr(w.message) || JSON.stringify(w);
+      // Try to extract location from pretty string if structured fields missing
+      if (!line && typeof message === 'string') {
+        const locMatch = message.match(/line\s+(\d+)/i);
+        if (locMatch) {
+          return {
+            line: parseInt(locMatch[1]),
+            column: null,
+            level,
+            message: message.replace(/\s+at\s+\/stdin.*$/, ''),
+            matchedText: null,
+            type: wType || 'unknown',
+          };
+        }
+      }
+      break;
+  }
+
+  // If we still don't have a line number, try to find the text in the source
+  let resolvedLine = line;
+  if (!resolvedLine && matchedText && sourceText) {
+    resolvedLine = findInSource(matchedText, sourceText);
+  }
+
+  return {
+    line: resolvedLine,
+    column,
+    level,
+    message: (typeof message === 'string') ? message.replace(/\s+at\s+\/stdin.*$/, '').trim() : String(message),
+    matchedText: matchedText || null,
+    type: wType || 'unknown',
+  };
+}
+
+function findInSource(text, source) {
+  if (!text || typeof text !== 'string' || !source) return null;
+  const lines = source.split('\n');
+  // Try exact match first
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes(text)) return i + 1; // 1-based
+  }
+  // Try with backslash escaping collapsed
+  const alt = text.replace(/\\\\/g, '\\');
+  if (alt !== text) {
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes(alt)) return i + 1;
+    }
+  }
+  return null;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 5: ACE DECORATIONS
+// ════════════════════════════════════════════════════════════════════
+
+let activeMarkers = [];
+const Range = ace.require('ace/range').Range;
+
+function applyDecorations(warnings) {
+  clearDecorations();
+  const session = editor.session;
+  const annotations = [];
+
+  for (const warn of warnings) {
+    if (!warn.line) continue;
+
+    const aceRow = warn.line - 1; // 0-based
+    if (aceRow < 0 || aceRow >= session.getLength()) continue;
+
+    const aceType = warn.level === 'error' ? 'error'
+                  : warn.level === 'warn' ? 'warning'
+                  : 'info';
+
+    const cssPrefix = warn.level === 'error' ? 'pandoc-error'
+                    : warn.level === 'warn' ? 'pandoc-warning'
+                    : 'pandoc-info';
+
+    // 1. Gutter annotation
+    annotations.push({
+      row: aceRow,
+      column: warn.column ? warn.column - 1 : 0,
+      text: warn.message,
+      type: aceType,
+    });
+
+    // 2. Full-line background marker
+    const lineRange = new Range(aceRow, 0, aceRow, Infinity);
+    activeMarkers.push(
+      session.addMarker(lineRange, `${cssPrefix}-line`, 'fullLine', false)
+    );
+
+    // 3. Text-range marker for the specific offending token
+    const lineText = session.getLine(aceRow);
+    let textMarked = false;
+
+    if (warn.matchedText) {
+      let idx = lineText.indexOf(warn.matchedText);
+      if (idx < 0) {
+        const alt = warn.matchedText.replace(/\\\\/g, '\\');
+        if (alt !== warn.matchedText) idx = lineText.indexOf(alt);
+      }
+      if (idx >= 0) {
+        const len = (idx === lineText.indexOf(warn.matchedText))
+          ? warn.matchedText.length
+          : warn.matchedText.replace(/\\\\/g, '\\').length;
+        const textRange = new Range(aceRow, idx, aceRow, idx + len);
+        activeMarkers.push(
+          session.addMarker(textRange, `${cssPrefix}-text`, 'text', false)
+        );
+        textMarked = true;
+      }
+    }
+
+    // Fallback: highlight token at column position
+    if (!textMarked && warn.column) {
+      const col = Math.min(warn.column - 1, lineText.length);
+      const rest = lineText.substring(col);
+      const tok = rest.match(/^\\?[a-zA-Z@*]+(?:\{[^}]*\})?|^\{[^}]*\}|^\S+/);
+      if (tok) {
+        const textRange = new Range(aceRow, col, aceRow, col + tok[0].length);
+        activeMarkers.push(
+          session.addMarker(textRange, `${cssPrefix}-text`, 'text', false)
+        );
+      }
+    }
+  }
+
+  session.setAnnotations(annotations);
+}
+
+function clearDecorations() {
+  const session = editor.session;
+  for (const id of activeMarkers) session.removeMarker(id);
+  activeMarkers = [];
+  session.clearAnnotations();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 5B: OPTIONS PANEL
+// ════════════════════════════════════════════════════════════════════
+
+// --- Options panel toggle ---
+const optionsPanel = document.getElementById('optionsPanel');
+const btnOptions = document.getElementById('btnOptions');
+btnOptions.addEventListener('click', () => {
+  optionsPanel.classList.toggle('collapsed');
+  btnOptions.classList.toggle('panel-open');
+});
+
+// --- Tab switching ---
+const optionsTabs = document.getElementById('optionsTabs');
+optionsTabs.addEventListener('click', (e) => {
+  const tab = e.target.closest('.options-tab');
+  if (!tab) return;
+  const tabName = tab.dataset.tab;
+
+  // Deactivate all tabs and panels
+  optionsTabs.querySelectorAll('.options-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.options-tab-panel').forEach(p => p.classList.remove('active'));
+
+  // Activate clicked tab and panel
+  tab.classList.add('active');
+  const panel = document.getElementById('panel-' + tabName);
+  if (panel) panel.classList.add('active');
+});
+
+// --- Collected resource files (populated by future tabs) ---
+
+// --- Auxiliary file uploads (Media tab) ---
+function renderAuxFileList() {
+  const list = document.getElementById('auxFileList');
+  if (!list) return;
+  const names = Object.keys(resourceFiles.auxFiles);
+  if (names.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = names.map(name =>
+    `<span class="opt-file-tag">${name}<button class="file-remove" data-aux="${name}">×</button></span>`
+  ).join('');
+  list.querySelectorAll('.file-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      delete resourceFiles.auxFiles[btn.dataset.aux];
+      renderAuxFileList();
+    });
+  });
+}
+
+document.getElementById('btnAuxFiles')?.addEventListener('click', () => {
+  document.getElementById('auxFileInput').click();
+});
+document.getElementById('auxFileInput')?.addEventListener('change', async (e) => {
+  for (const file of e.target.files) {
+    const content = new Uint8Array(await file.arrayBuffer());
+    resourceFiles.auxFiles[file.name] = content;
+  }
+  renderAuxFileList();
+  e.target.value = '';
+});
+
+document.getElementById('btnAuxDir')?.addEventListener('click', () => {
+  document.getElementById('auxDirInput').click();
+});
+document.getElementById('auxDirInput')?.addEventListener('change', async (e) => {
+  for (const file of e.target.files) {
+    const path = file.webkitRelativePath || file.name;
+    const content = new Uint8Array(await file.arrayBuffer());
+    resourceFiles.auxFiles[path] = content;
+  }
+  renderAuxFileList();
+  e.target.value = '';
+});
+
+const resourceFiles = {
+  auxFiles: {},       // additional files (images, includes)
+  bibFile: null,
+  cslFile: null,
+  abbrevFile: null,
+  abbreviationsFile: null,
+  cssFiles: [],
+  highlightThemeFile: null,
+  syntaxDefinitions: [],
+  templateFile: null,
+  referenceDoc: null,
+  metadataFile: null,
+  epubCoverImage: null,
+  epubMetadataFile: null,
+  epubFonts: [],
+  headerFiles: [],
+  beforeBodyFiles: [],
+  afterBodyFiles: [],
+  luaFilters: [],
+};
+
+// --- Citations tab ---
+// Helper for single-file upload fields
+function setupSingleFileUpload(btnId, inputId, nameId, removeId, resourceKey, onChangeExtra) {
+  const btn = document.getElementById(btnId);
+  const input = document.getElementById(inputId);
+  const nameEl = document.getElementById(nameId);
+  const removeBtn = document.getElementById(removeId);
+  if (!btn || !input) return;
+
+  btn.addEventListener('click', () => input.click());
+  input.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const content = new Uint8Array(await file.arrayBuffer());
+    content.name = file.name;
+    resourceFiles[resourceKey] = content;
+    if (nameEl) nameEl.textContent = file.name;
+    if (removeBtn) removeBtn.style.display = '';
+    if (onChangeExtra) onChangeExtra();
+    e.target.value = '';
+  });
+  if (removeBtn) {
+    removeBtn.addEventListener('click', () => {
+      resourceFiles[resourceKey] = null;
+      if (nameEl) nameEl.textContent = '';
+      removeBtn.style.display = 'none';
+    });
+  }
+}
+
+setupSingleFileUpload('btnBibFile', 'bibFileInput', 'bibFileName', 'bibFileRemove', 'bibFile');
+setupSingleFileUpload('btnCslFile', 'cslFileInput', 'cslFileName', 'cslFileRemove', 'cslFile');
+setupSingleFileUpload('btnAbbrevFile', 'abbrevFileInput', 'abbrevFileName', 'abbrevFileRemove', 'abbrevFile');
+
+// Show/hide citeproc-specific options based on citation method
+document.getElementById('opt-citation-method')?.addEventListener('change', (e) => {
+  const citeprocOpts = document.getElementById('citeprocOptions');
+  if (citeprocOpts) citeprocOpts.style.display = e.target.value === 'citeproc' ? '' : 'none';
+});
+// Initial state: hide citeproc options since default is "None"
+document.getElementById('citeprocOptions').style.display = 'none';
+
+// --- Code tab ---
+// Show/hide custom theme upload based on highlight style selection
+document.getElementById('opt-highlight-style')?.addEventListener('change', (e) => {
+  const customUpload = document.getElementById('customThemeUpload');
+  if (customUpload) customUpload.style.display = e.target.value === 'custom' ? '' : 'none';
+});
+
+setupSingleFileUpload('btnHighlightTheme', 'highlightThemeInput', 'highlightThemeName', 'highlightThemeRemove', 'highlightThemeFile');
+
+// Syntax definitions (multi-file)
+function renderSyntaxDefsList() {
+  const list = document.getElementById('syntaxDefsList');
+  if (!list) return;
+  const files = resourceFiles.syntaxDefinitions;
+  if (files.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = files.map((f, i) =>
+    `<span class="opt-file-tag">${f.name}<button class="file-remove" data-synidx="${i}">×</button></span>`
+  ).join('');
+  list.querySelectorAll('.file-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      resourceFiles.syntaxDefinitions.splice(parseInt(btn.dataset.synidx), 1);
+      renderSyntaxDefsList();
+    });
+  });
+}
+
+document.getElementById('btnSyntaxDefs')?.addEventListener('click', () => {
+  document.getElementById('syntaxDefsInput').click();
+});
+document.getElementById('syntaxDefsInput')?.addEventListener('change', async (e) => {
+  for (const file of e.target.files) {
+    const content = new Uint8Array(await file.arrayBuffer());
+    content.name = file.name;
+    resourceFiles.syntaxDefinitions.push(content);
+  }
+  renderSyntaxDefsList();
+  e.target.value = '';
+});
+
+// --- Format-specific tab ---
+// Abbreviations file
+setupSingleFileUpload('btnAbbrevsFile', 'abbrevsFileInput', 'abbrevsFileName', 'abbrevsFileRemove', 'abbreviationsFile');
+
+// CSS files (multi-file)
+function renderCssFileList() {
+  const list = document.getElementById('cssFileList');
+  if (!list) return;
+  const files = resourceFiles.cssFiles;
+  if (files.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = files.map((f, i) =>
+    `<span class="opt-file-tag">${f.name}<button class="file-remove" data-cssidx="${i}">×</button></span>`
+  ).join('');
+  list.querySelectorAll('.file-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      resourceFiles.cssFiles.splice(parseInt(btn.dataset.cssidx), 1);
+      renderCssFileList();
+    });
+  });
+}
+
+document.getElementById('btnCssFiles')?.addEventListener('click', () => {
+  document.getElementById('cssFilesInput').click();
+});
+document.getElementById('cssFilesInput')?.addEventListener('change', async (e) => {
+  for (const file of e.target.files) {
+    const content = new Uint8Array(await file.arrayBuffer());
+    content.name = file.name;
+    resourceFiles.cssFiles.push(content);
+  }
+  renderCssFileList();
+  e.target.value = '';
+});
+
+// EPUB cover, metadata, fonts
+setupSingleFileUpload('btnEpubCover', 'epubCoverInput', 'epubCoverName', 'epubCoverRemove', 'epubCoverImage');
+setupSingleFileUpload('btnEpubMeta', 'epubMetaInput', 'epubMetaName', 'epubMetaRemove', 'epubMetadataFile');
+
+function renderEpubFontsList() {
+  const list = document.getElementById('epubFontsList');
+  if (!list) return;
+  const files = resourceFiles.epubFonts;
+  if (files.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = files.map((f, i) =>
+    `<span class="opt-file-tag">${f.name}<button class="file-remove" data-fontidx="${i}">×</button></span>`
+  ).join('');
+  list.querySelectorAll('.file-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      resourceFiles.epubFonts.splice(parseInt(btn.dataset.fontidx), 1);
+      renderEpubFontsList();
+    });
+  });
+}
+
+document.getElementById('btnEpubFonts')?.addEventListener('click', () => {
+  document.getElementById('epubFontsInput').click();
+});
+document.getElementById('epubFontsInput')?.addEventListener('change', async (e) => {
+  for (const file of e.target.files) {
+    const content = new Uint8Array(await file.arrayBuffer());
+    content.name = file.name;
+    resourceFiles.epubFonts.push(content);
+  }
+  renderEpubFontsList();
+  e.target.value = '';
+});
+
+// --- Template tab ---
+setupSingleFileUpload('btnTemplateFile', 'templateFileInput', 'templateFileName', 'templateFileRemove', 'templateFile');
+setupSingleFileUpload('btnRefDoc', 'refDocInput', 'refDocName', 'refDocRemove', 'referenceDoc');
+
+// Include files (header, before body, after body) — multi-file lists
+function setupMultiFileUpload(btnId, inputId, listId, resourceKey) {
+  const btn = document.getElementById(btnId);
+  const input = document.getElementById(inputId);
+  if (!btn || !input) return;
+
+  function renderList() {
+    const list = document.getElementById(listId);
+    if (!list) return;
+    const files = resourceFiles[resourceKey];
+    if (files.length === 0) { list.innerHTML = ''; return; }
+    list.innerHTML = files.map((f, i) =>
+      `<span class="opt-file-tag">${f.name}<button class="file-remove" data-idx="${i}" data-key="${resourceKey}">×</button></span>`
+    ).join('');
+    list.querySelectorAll('.file-remove').forEach(b => {
+      b.addEventListener('click', () => {
+        resourceFiles[b.dataset.key].splice(parseInt(b.dataset.idx), 1);
+        renderList();
+      });
+    });
+  }
+
+  btn.addEventListener('click', () => input.click());
+  input.addEventListener('change', async (e) => {
+    for (const file of e.target.files) {
+      const content = new Uint8Array(await file.arrayBuffer());
+      content.name = file.name;
+      resourceFiles[resourceKey].push(content);
+    }
+    renderList();
+    e.target.value = '';
+  });
+}
+
+setupMultiFileUpload('btnHeaderFiles', 'headerFilesInput', 'headerFilesList', 'headerFiles');
+setupMultiFileUpload('btnBeforeFiles', 'beforeFilesInput', 'beforeFilesList', 'beforeBodyFiles');
+setupMultiFileUpload('btnAfterFiles', 'afterFilesInput', 'afterFilesList', 'afterBodyFiles');
+
+// Template variables — dynamic key/value rows
+function addTemplateVarRow(key, val) {
+  const container = document.getElementById('templateVarRows');
+  const row = document.createElement('div');
+  row.className = 'opt-kv-row';
+  row.innerHTML = `<input type="text" placeholder="variable name" list="variable-suggestions" value="${key || ''}">` +
+    `<input type="text" placeholder="value" value="${val || ''}">` +
+    `<button class="kv-remove">×</button>`;
+  row.querySelector('.kv-remove').addEventListener('click', () => row.remove());
+  container.appendChild(row);
+}
+
+document.getElementById('btnAddTemplateVar')?.addEventListener('click', () => addTemplateVarRow('', ''));
+// Start with one empty row
+addTemplateVarRow('', '');
+
+// --- Metadata tab ---
+setupSingleFileUpload('btnMetadataFile', 'metadataFileInput', 'metadataFileName', 'metadataFileRemove', 'metadataFile');
+
+function addMetadataRow(key, val) {
+  const container = document.getElementById('metadataKvRows');
+  const row = document.createElement('div');
+  row.className = 'opt-kv-row';
+  row.innerHTML = `<input type="text" placeholder="field name" list="metadata-suggestions" value="${key || ''}">` +
+    `<input type="text" placeholder="value" value="${val || ''}">` +
+    `<button class="kv-remove">×</button>`;
+  row.querySelector('.kv-remove').addEventListener('click', () => row.remove());
+  container.appendChild(row);
+}
+
+document.getElementById('btnAddMetadata')?.addEventListener('click', () => addMetadataRow('', ''));
+// Start with one empty row
+addMetadataRow('', '');
+
+// --- Filters tab ---
+function renderLuaFiltersList() {
+  const list = document.getElementById('luaFiltersList');
+  if (!list) return;
+  const files = resourceFiles.luaFilters;
+  if (files.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = '';
+  files.forEach((f, i) => {
+    const tag = document.createElement('span');
+    tag.className = 'opt-file-tag';
+    tag.draggable = true;
+    tag.dataset.idx = i;
+    tag.style.cursor = 'grab';
+    tag.innerHTML = `<span style="color:var(--text-muted);font-size:10px;margin-right:2px;">☰</span>${f.name}<button class="file-remove" data-luaidx="${i}">×</button>`;
+
+    // Drag events for reordering
+    tag.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', i);
+      tag.style.opacity = '0.4';
+    });
+    tag.addEventListener('dragend', () => { tag.style.opacity = '1'; });
+    tag.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      tag.style.borderColor = 'var(--accent)';
+    });
+    tag.addEventListener('dragleave', () => { tag.style.borderColor = ''; });
+    tag.addEventListener('drop', (e) => {
+      e.preventDefault();
+      tag.style.borderColor = '';
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+      const toIdx = parseInt(tag.dataset.idx);
+      if (fromIdx !== toIdx) {
+        const [moved] = resourceFiles.luaFilters.splice(fromIdx, 1);
+        resourceFiles.luaFilters.splice(toIdx, 0, moved);
+        renderLuaFiltersList();
+      }
+    });
+
+    tag.querySelector('.file-remove').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      resourceFiles.luaFilters.splice(i, 1);
+      renderLuaFiltersList();
+    });
+
+    list.appendChild(tag);
+  });
+}
+
+document.getElementById('btnLuaFilters')?.addEventListener('click', () => {
+  document.getElementById('luaFiltersInput').click();
+});
+document.getElementById('luaFiltersInput')?.addEventListener('change', async (e) => {
+  for (const file of e.target.files) {
+    const content = new Uint8Array(await file.arrayBuffer());
+    content.name = file.name;
+    resourceFiles.luaFilters.push(content);
+  }
+  renderLuaFiltersList();
+  e.target.value = '';
+});
+
+// --- Extensions tab ---
+let inputExtensionsList = [];   // [{ name, defaultOn }, ...]
+let outputExtensionsList = [];
+const inputExtensions = {};     // { extName: true/false } — only toggled ones
+const outputExtensions = {};
+
+async function updateExtensions() {
+  if (!pandocModule) return;
+  const inputFmt = document.getElementById('selFrom').value;
+  const outputFmt = document.getElementById('selTo').value;
+
+  // Query input extensions
+  inputExtensionsList = [];
+  try {
+    const extData = await pandocModule.query({ query: 'extensions-for-format', format: inputFmt });
+    inputExtensionsList = Object.entries(extData)
+      .map(([name, defaultOn]) => ({ name, defaultOn }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  } catch (e) { console.warn('Could not get input extensions:', e); }
+
+  // Query output extensions
+  outputExtensionsList = [];
+  const effOut = outputFmt === 'pdf' ? 'typst' : outputFmt;
+  try {
+    const extData = await pandocModule.query({ query: 'extensions-for-format', format: effOut });
+    outputExtensionsList = Object.entries(extData)
+      .map(([name, defaultOn]) => ({ name, defaultOn }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  } catch (e) { console.warn('Could not get output extensions:', e); }
+
+  renderExtensionsList('extInputList', inputExtensionsList, inputExtensions, 'input');
+  renderExtensionsList('extOutputList', outputExtensionsList, outputExtensions, 'output');
+
+  document.getElementById('extInputHeader').textContent = `Input (${inputFmt}) — ${inputExtensionsList.length}`;
+  document.getElementById('extOutputHeader').textContent = `Output (${outputFmt}) — ${outputExtensionsList.length}`;
+}
+
+function renderExtensionsList(containerId, extList, extState, direction) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (extList.length === 0) {
+    container.innerHTML = '<span style="color:var(--text-muted);font-size:11px;">No extensions available</span>';
+    return;
+  }
+  container.innerHTML = '';
+  for (const ext of extList) {
+    const isChecked = extState[ext.name] !== undefined ? extState[ext.name] : ext.defaultOn;
+    const isToggled = extState[ext.name] !== undefined;
+    const item = document.createElement('div');
+    item.className = 'ext-item' + (ext.defaultOn ? ' default-on' : '') + (isToggled ? ' toggled' : '');
+    const id = `ext-${direction}-${ext.name}`;
+    item.innerHTML = `<input type="checkbox" id="${id}" ${isChecked ? 'checked' : ''}>` +
+      `<label for="${id}">${ext.name}</label>`;
+    item.querySelector('input').addEventListener('change', (e) => {
+      if (e.target.checked !== ext.defaultOn) {
+        extState[ext.name] = e.target.checked;
+      } else {
+        delete extState[ext.name];
+      }
+      // Re-render to update toggled styling
+      renderExtensionsList(containerId, extList, extState, direction);
+    });
+    container.appendChild(item);
+  }
+}
+
+function buildFormatWithExtensions(baseFormat, extState) {
+  if (!baseFormat) return baseFormat;
+  let formatStr = baseFormat;
+  for (const [ext, enabled] of Object.entries(extState)) {
+    if (enabled === true) formatStr += `+${ext}`;
+    else if (enabled === false) formatStr += `-${ext}`;
+  }
+  return formatStr;
+}
+
+// Update extensions when format dropdowns change
+document.getElementById('selFrom').addEventListener('change', () => { updateExtensions(); });
+document.getElementById('selTo').addEventListener('change', () => { updateExtensions(); });
+
+// --- Format metadata ---
+const BINARY_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'epub2', 'epub3', 'pdf', 'chunkedhtml'];
+const EXTENSION_BY_FORMAT = {
+  'html': 'html', 'html5': 'html', 'html4': 'html', 'chunkedhtml': 'zip',
+  'markdown': 'md', 'markdown_strict': 'md', 'markdown_mmd': 'md', 'markdown_phpextra': 'md',
+  'gfm': 'md', 'commonmark': 'md', 'commonmark_x': 'md',
+  'latex': 'tex', 'beamer': 'tex', 'context': 'tex',
+  'pdf': 'pdf', 'docx': 'docx', 'odt': 'odt',
+  'epub': 'epub', 'epub2': 'epub', 'epub3': 'epub',
+  'rst': 'rst', 'org': 'org', 'plain': 'txt',
+  'json': 'json', 'native': 'native',
+  'docbook': 'xml', 'docbook4': 'xml', 'docbook5': 'xml',
+  'jats': 'xml', 'tei': 'xml', 'man': '1', 'rtf': 'rtf',
+  'textile': 'textile', 'mediawiki': 'wiki',
+  'asciidoc': 'adoc', 'asciidoctor': 'adoc', 'asciidoc_legacy': 'adoc',
+  'revealjs': 'html', 'slidy': 'html', 'slideous': 'html', 'dzslides': 'html', 's5': 'html',
+  'ipynb': 'ipynb', 'typst': 'typ', 'texinfo': 'texi', 'ms': 'ms', 'icml': 'icml',
+  'opml': 'opml', 'bibtex': 'bib', 'biblatex': 'bib', 'csljson': 'json',
+  'pptx': 'pptx', 'djot': 'dj', 'fb2': 'fb2', 'opendocument': 'xml', 'vimdoc': 'txt'
+};
+const BINARY_INPUT_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'fb2', 'ipynb'];
+
+// Track binary input file
+let inputBinaryFile = null;  // { name, blob }
+let inputFileName = 'untitled';  // tracks current input file name (without extension)
+let lastOutput = null;  // { blob, filename } — stores last conversion output for download
+
+// Download button handler
+document.getElementById('btnDownloadOutput').addEventListener('click', () => {
+  if (!lastOutput) return;
+  // Clean up previous URL if any
+  if (lastOutput.objectUrl) URL.revokeObjectURL(lastOutput.objectUrl);
+  const url = URL.createObjectURL(lastOutput.blob);
+  lastOutput.objectUrl = url;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = lastOutput.filename;
+  a.click();
+});
+
+// 1x1 transparent PNG placeholder for missing images
+const PLACEHOLDER_PNG = new Uint8Array([
+  137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,1,0,0,0,1,8,6,0,0,0,
+  31,21,196,137,0,0,0,10,73,68,65,84,120,156,98,0,0,0,2,0,1,226,33,188,51,
+  0,0,0,0,73,69,78,68,174,66,96,130
+]);
+
+// Generate a visible placeholder PNG with warning text for a missing image
+function generatePlaceholderImage(filename) {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 120;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#fff3cd';
+    ctx.fillRect(0, 0, 400, 120);
+    ctx.strokeStyle = '#ffc107';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, 398, 118);
+
+    // Warning icon and text
+    ctx.fillStyle = '#856404';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText('⚠ Missing Image', 16, 36);
+    ctx.font = '13px sans-serif';
+    ctx.fillText(filename, 16, 62);
+    ctx.fillStyle = '#a07000';
+    ctx.font = '11px sans-serif';
+    ctx.fillText('Upload the actual image via the Media tab', 16, 88);
+    ctx.fillText('to replace this placeholder.', 16, 104);
+
+    canvas.toBlob((blob) => resolve(blob), 'image/png');
+  });
+}
+
+// Extract missing filename from pandoc error messages
+function extractMissingFile(errMsg) {
+  // Match patterns like: "File domain.png not found in resource path"
+  const m = errMsg.match(/File\s+(\S+)\s+not found in resource path/i);
+  return m ? m[1] : null;
+}
+
+// --- Build pandoc options object from all tabs ---
+function buildOptions() {
+  const fromFmt = document.getElementById('selFrom').value;
+  const toFmt = document.getElementById('selTo').value;
+  const opts = {
+    from: buildFormatWithExtensions(fromFmt, inputExtensions),
+    to: buildFormatWithExtensions(toFmt, outputExtensions),
+  };
+
+  // General
+  if (document.getElementById('opt-standalone').checked) opts.standalone = true;
+  if (document.getElementById('opt-file-scope').checked) opts['file-scope'] = true;
+  const tabStop = parseInt(document.getElementById('opt-tab-stop').value);
+  if (tabStop !== 4) opts['tab-stop'] = tabStop;
+  if (document.getElementById('opt-preserve-tabs').checked) opts['preserve-tabs'] = true;
+  const eol = document.getElementById('opt-eol').value;
+  if (eol) opts.eol = eol;
+
+  // Headings (wired later)
+  const shiftEl = document.getElementById('opt-shift-heading');
+  if (shiftEl) {
+    const shift = parseInt(shiftEl.value);
+    if (shift !== 0) opts['shift-heading-level-by'] = shift;
+  }
+  const numSec = document.getElementById('opt-number-sections');
+  if (numSec && numSec.checked) opts['number-sections'] = true;
+  const numOff = document.getElementById('opt-number-offset');
+  if (numOff && numOff.value.trim()) {
+    opts['number-offset'] = numOff.value.trim().split(',').map(n => parseInt(n.trim()) || 0);
+  }
+  const tocEl = document.getElementById('opt-toc');
+  if (tocEl && tocEl.checked) {
+    opts['table-of-contents'] = true;
+    const tocDepth = document.getElementById('opt-toc-depth');
+    if (tocDepth) opts['toc-depth'] = parseInt(tocDepth.value);
+  }
+
+  // Media (wired later)
+  const extractMedia = document.getElementById('opt-extract-media');
+  if (extractMedia && extractMedia.checked) opts['extract-media'] = 'media.zip';
+  const dpi = document.getElementById('opt-dpi');
+  if (dpi && dpi.value) opts.dpi = parseInt(dpi.value);
+  const resPath = document.getElementById('opt-resource-path');
+  if (resPath && resPath.value.trim()) opts['resource-path'] = resPath.value.trim();
+
+  // Citations (wired later)
+  const citMethod = document.getElementById('opt-citation-method');
+  if (citMethod) {
+    const method = citMethod.value;
+    if (method === 'citeproc') opts.citeproc = true;
+    else if (method === 'natbib') opts.natbib = true;
+    else if (method === 'biblatex') opts.biblatex = true;
+    if (resourceFiles.bibFile) opts.bibliography = resourceFiles.bibFile.name;
+    if (method === 'citeproc') {
+      if (resourceFiles.cslFile) opts.csl = resourceFiles.cslFile.name;
+      if (resourceFiles.abbrevFile) opts['citation-abbreviations'] = resourceFiles.abbrevFile.name;
+    }
+  }
+
+  // Math (wired later)
+  const mathEl = document.getElementById('opt-math');
+  if (mathEl && mathEl.value) opts['html-math-method'] = mathEl.value;
+
+  // Code highlighting (wired later)
+  const hlStyle = document.getElementById('opt-highlight-style');
+  if (hlStyle) {
+    if (hlStyle.value === 'custom' && resourceFiles.highlightThemeFile) {
+      opts['highlight-style'] = resourceFiles.highlightThemeFile.name;
+    } else if (hlStyle.value && hlStyle.value !== 'custom') {
+      opts['highlight-style'] = hlStyle.value;
+    }
+  }
+  if (resourceFiles.syntaxDefinitions.length > 0) {
+    opts['syntax-definition'] = resourceFiles.syntaxDefinitions.map(f => f.name);
+  }
+  const indentCode = document.getElementById('opt-indented-code-classes');
+  if (indentCode && indentCode.value.trim()) opts['indented-code-classes'] = indentCode.value.trim();
+
+  // Format-specific (wired later — read whatever elements exist)
+  const stripComments = document.getElementById('opt-strip-comments');
+  if (stripComments && stripComments.checked) opts['strip-comments'] = true;
+  const defImgExt = document.getElementById('opt-default-image-extension');
+  if (defImgExt && defImgExt.value.trim()) opts['default-image-extension'] = defImgExt.value.trim();
+  if (resourceFiles.abbreviationsFile) opts.abbreviations = resourceFiles.abbreviationsFile.name;
+
+  // HTML-specific
+  const selfContained = document.getElementById('opt-self-contained');
+  if (selfContained && selfContained.checked) opts['embed-resources'] = true;
+  const htmlQTags = document.getElementById('opt-html-q-tags');
+  if (htmlQTags && htmlQTags.checked) opts['html-q-tags'] = true;
+  const sectionDivs = document.getElementById('opt-section-divs');
+  if (sectionDivs && sectionDivs.checked) opts['section-divs'] = true;
+  const titlePrefix = document.getElementById('opt-title-prefix');
+  if (titlePrefix && titlePrefix.value.trim()) opts['title-prefix'] = titlePrefix.value.trim();
+  const idPrefix = document.getElementById('opt-id-prefix');
+  if (idPrefix && idPrefix.value.trim()) opts['id-prefix'] = idPrefix.value.trim();
+  const emailObfusc = document.getElementById('opt-email-obfuscation');
+  if (emailObfusc && emailObfusc.value) opts['email-obfuscation'] = emailObfusc.value;
+  if (resourceFiles.cssFiles.length > 0) opts.css = resourceFiles.cssFiles.map(f => f.name);
+
+  // Markdown-specific
+  const refLinks = document.getElementById('opt-reference-links');
+  if (refLinks && refLinks.checked) opts['reference-links'] = true;
+  const refLoc = document.getElementById('opt-reference-location');
+  if (refLoc && refLoc.value) opts['reference-location'] = refLoc.value;
+  const mdHeadings = document.getElementById('opt-markdown-headings');
+  if (mdHeadings && mdHeadings.value) opts['markdown-headings'] = mdHeadings.value;
+
+  // RST-specific
+  const refLinksRst = document.getElementById('opt-reference-links-rst');
+  if (refLinksRst && refLinksRst.checked) opts['reference-links'] = true;
+  const listTables = document.getElementById('opt-list-tables');
+  if (listTables && listTables.checked) opts['list-tables'] = true;
+
+  // LaTeX-specific
+  const lof = document.getElementById('opt-lof');
+  if (lof && lof.checked) opts['list-of-figures'] = true;
+  const lot = document.getElementById('opt-lot');
+  if (lot && lot.checked) opts['list-of-tables'] = true;
+  const topLevel = document.getElementById('opt-top-level-division');
+  if (topLevel && topLevel.value) opts['top-level-division'] = topLevel.value;
+
+  // Caption position
+  const figCaption = document.getElementById('opt-figure-caption-position');
+  if (figCaption && figCaption.value) opts['figure-caption-position'] = figCaption.value;
+  const tblCaption = document.getElementById('opt-table-caption-position');
+  if (tblCaption && tblCaption.value) opts['table-caption-position'] = tblCaption.value;
+
+  // ASCII
+  const ascii = document.getElementById('opt-ascii');
+  if (ascii && ascii.checked) opts.ascii = true;
+  const asciiHtml = document.getElementById('opt-ascii-html');
+  if (asciiHtml && asciiHtml.checked) opts.ascii = true;
+
+  // ODT
+  const linkImages = document.getElementById('opt-link-images');
+  if (linkImages && linkImages.checked) opts['link-images'] = true;
+
+  // EPUB
+  if (resourceFiles.epubCoverImage) opts['epub-cover-image'] = resourceFiles.epubCoverImage.name;
+  if (resourceFiles.epubMetadataFile) opts['epub-metadata'] = resourceFiles.epubMetadataFile.name;
+  if (resourceFiles.epubFonts.length > 0) opts['epub-fonts'] = resourceFiles.epubFonts.map(f => f.name);
+  const epubTitle = document.getElementById('opt-epub-title-page');
+  if (epubTitle && !epubTitle.checked) opts['epub-title-page'] = false;
+  const epubSubdir = document.getElementById('opt-epub-subdirectory');
+  if (epubSubdir && epubSubdir.value.trim()) opts['epub-subdirectory'] = epubSubdir.value.trim();
+
+  // Chunked HTML
+  const splitLevel = document.getElementById('opt-split-level');
+  if (splitLevel && splitLevel.value) opts['split-level'] = parseInt(splitLevel.value);
+  const chunkTemplate = document.getElementById('opt-chunk-template');
+  if (chunkTemplate && chunkTemplate.value.trim()) opts['chunk-template'] = chunkTemplate.value.trim();
+
+  // Notebook
+  const ipynb = document.getElementById('opt-ipynb-output');
+  if (ipynb && ipynb.value) opts['ipynb-output'] = ipynb.value;
+
+  // Slides
+  const slideLevel = document.getElementById('opt-slide-level');
+  if (slideLevel && slideLevel.value) opts['slide-level'] = parseInt(slideLevel.value);
+  const incremental = document.getElementById('opt-incremental');
+  if (incremental && incremental.checked) opts.incremental = true;
+
+  // Track changes
+  const trackChanges = document.getElementById('opt-track-changes');
+  if (trackChanges && trackChanges.value) opts['track-changes'] = trackChanges.value;
+
+  // Template
+  if (resourceFiles.templateFile) opts.template = resourceFiles.templateFile.name;
+  if (resourceFiles.referenceDoc) opts['reference-doc'] = resourceFiles.referenceDoc.name;
+
+  // Include files
+  if (resourceFiles.headerFiles.length > 0) opts['include-in-header'] = resourceFiles.headerFiles.map(f => f.name);
+  if (resourceFiles.beforeBodyFiles.length > 0) opts['include-before-body'] = resourceFiles.beforeBodyFiles.map(f => f.name);
+  if (resourceFiles.afterBodyFiles.length > 0) opts['include-after-body'] = resourceFiles.afterBodyFiles.map(f => f.name);
+
+  // Wrapping (wired later)
+  const wrapEl = document.getElementById('opt-wrap');
+  if (wrapEl && wrapEl.value !== 'auto') opts.wrap = wrapEl.value;
+  const colsEl = document.getElementById('opt-columns');
+  if (colsEl && colsEl.value.trim()) opts.columns = parseInt(colsEl.value);
+
+  // Metadata key/value pairs
+  const metaRows = document.querySelectorAll('#panel-metadata .opt-kv-row');
+  if (metaRows.length > 0) {
+    const metadata = {};
+    metaRows.forEach(row => {
+      const inputs = row.querySelectorAll('input[type="text"]');
+      const key = inputs[0]?.value.trim();
+      const val = inputs[1]?.value.trim();
+      if (key && val) {
+        metadata[key] = key === 'author' ? [val] : val;
+      }
+    });
+    if (Object.keys(metadata).length > 0) opts.metadata = metadata;
+  }
+  if (resourceFiles.metadataFile) opts['metadata-file'] = resourceFiles.metadataFile.name;
+
+  // Template variables key/value pairs
+  const varRows = document.querySelectorAll('#panel-template .opt-kv-row');
+  if (varRows.length > 0) {
+    const variables = {};
+    varRows.forEach(row => {
+      const inputs = row.querySelectorAll('input[type="text"]');
+      const key = inputs[0]?.value.trim();
+      const val = inputs[1]?.value.trim();
+      if (key && val) variables[key] = val;
+    });
+    if (Object.keys(variables).length > 0) opts.variables = variables;
+  }
+
+  // Lua filters
+  if (resourceFiles.luaFilters.length > 0) opts.filters = resourceFiles.luaFilters.map(f => f.name);
+
+  // Output file — always set so pandoc writes to virtual filesystem
+  const baseToFmt = toFmt.split(/[+-]/)[0]; // strip extensions
+  const outExt = EXTENSION_BY_FORMAT[baseToFmt] || baseToFmt;
+  opts['output-file'] = `${inputFileName}.${outExt}`;
+
+  // Binary input — use input-files instead of stdin
+  if (inputBinaryFile) {
+    opts['input-files'] = [inputBinaryFile.name];
+  }
+
+  return opts;
+}
+
+// --- Build files object for pandoc.convert() ---
+function buildFiles() {
+  const raw = {};
+  // Collect all resource files
+  Object.entries(resourceFiles.auxFiles).forEach(([name, data]) => { raw[name] = data; });
+  if (resourceFiles.bibFile) raw[resourceFiles.bibFile.name] = resourceFiles.bibFile;
+  if (resourceFiles.cslFile) raw[resourceFiles.cslFile.name] = resourceFiles.cslFile;
+  if (resourceFiles.abbrevFile) raw[resourceFiles.abbrevFile.name] = resourceFiles.abbrevFile;
+  if (resourceFiles.abbreviationsFile) raw[resourceFiles.abbreviationsFile.name] = resourceFiles.abbreviationsFile;
+  resourceFiles.cssFiles.forEach(f => { raw[f.name] = f; });
+  if (resourceFiles.highlightThemeFile) raw[resourceFiles.highlightThemeFile.name] = resourceFiles.highlightThemeFile;
+  resourceFiles.syntaxDefinitions.forEach(f => { raw[f.name] = f; });
+  if (resourceFiles.templateFile) raw[resourceFiles.templateFile.name] = resourceFiles.templateFile;
+  if (resourceFiles.referenceDoc) raw[resourceFiles.referenceDoc.name] = resourceFiles.referenceDoc;
+  if (resourceFiles.metadataFile) raw[resourceFiles.metadataFile.name] = resourceFiles.metadataFile;
+  if (resourceFiles.epubCoverImage) raw[resourceFiles.epubCoverImage.name] = resourceFiles.epubCoverImage;
+  if (resourceFiles.epubMetadataFile) raw[resourceFiles.epubMetadataFile.name] = resourceFiles.epubMetadataFile;
+  resourceFiles.epubFonts.forEach(f => { raw[f.name] = f; });
+  resourceFiles.headerFiles.forEach(f => { raw[f.name] = f; });
+  resourceFiles.beforeBodyFiles.forEach(f => { raw[f.name] = f; });
+  resourceFiles.afterBodyFiles.forEach(f => { raw[f.name] = f; });
+  resourceFiles.luaFilters.forEach(f => { raw[f.name] = f; });
+  // Binary input file
+  if (inputBinaryFile) raw[inputBinaryFile.name] = inputBinaryFile.blob;
+  // pandoc.js expects Blob objects (calls blob.arrayBuffer())
+  const files = {};
+  for (const [name, data] of Object.entries(raw)) {
+    files[name] = (data instanceof Blob) ? data : new Blob([data]);
+  }
+  return files;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 6: CONVERSION FLOW
+// ════════════════════════════════════════════════════════════════════
+
+document.getElementById('btnConvert').addEventListener('click', runConversion);
+
+async function runConversion() {
+  if (!pandocModule) return;
+
+  const btn = document.getElementById('btnConvert');
+  btn.disabled = true;
+  btn.textContent = '⏳ Converting…';
+  updateStatus('loading', 'Converting…');
+  clearDecorations();
+
+  const sourceText = inputBinaryFile ? null : editor.getValue();
+
+  try {
+    const options = buildOptions();
+    const files = buildFiles();
+    const outFileName = options['output-file'];
+    const baseToFmt = document.getElementById('selTo').value.split(/[+-]/)[0];
+    const isBinaryOutput = BINARY_FORMATS.includes(baseToFmt);
+
+    console.log('Pandoc options:', JSON.stringify(options, null, 2));
+
+    // Retry loop for missing resources (up to 20 retries)
+    let result;
+    const placeholderFiles = [];
+    const MAX_RETRIES = 20;
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        result = await pandocModule.convert(options, sourceText, files);
+        if (attempt > 0) console.log(`Conversion succeeded after ${attempt} placeholder(s)`);
+        break; // success
+      } catch (convErr) {
+        console.warn(`Conversion attempt ${attempt} failed:`, convErr.message);
+        const missingFile = extractMissingFile(convErr.message);
+        if (missingFile && attempt < MAX_RETRIES) {
+          // Add visible placeholder image and retry
+          console.warn(`Missing resource "${missingFile}" — substituting placeholder`);
+          files[missingFile] = await generatePlaceholderImage(missingFile);
+          placeholderFiles.push(missingFile);
+          continue;
+        }
+        throw convErr; // re-throw if not a missing file error or max retries
+      }
+    }
+
+    // Check stderr for missing resource warnings (even if conversion succeeded)
+    if (result.stderr) {
+      const missingMatches = [...result.stderr.matchAll(/File\s+(\S+)\s+not found in resource path/gi)];
+      for (const m of missingMatches) {
+        if (!placeholderFiles.includes(m[1])) {
+          placeholderFiles.push(m[1]);
+        }
+      }
+    }
+
+    // Parse warnings
+    const warnings = parseWarnings(result.warnings, result.stderr, sourceText || '');
+
+    // Add placeholder warnings
+    for (const pf of placeholderFiles) {
+      warnings.push({
+        line: null, column: null, level: 'warn',
+        message: `Missing image "${pf}" — replaced with 1×1 transparent placeholder. Upload the actual image via the Media tab to include it.`,
+        matchedText: null, type: 'placeholder'
+      });
+    }
+
+    // Apply editor decorations (only for text input)
+    if (!inputBinaryFile) applyDecorations(warnings);
+
+    // Update log panel
+    updateLog(warnings, result.stderr);
+
+    // Handle output
+    const downloadBtn = document.getElementById('btnDownloadOutput');
+
+    if (isBinaryOutput && files[outFileName]) {
+      // Binary output — show info in editor/preview, enable download
+      const blob = files[outFileName];
+      const sizeKB = (blob.size / 1024).toFixed(1);
+
+      lastOutput = { blob, filename: outFileName };
+      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
+      downloadBtn.style.display = '';
+
+      sourceEditor.setValue(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`, -1);
+
+      const previewFrame = document.getElementById('previewFrame');
+      previewFrame.srcdoc = `<body style="background:#1e1e2e;color:#cdd6f4;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
+        <div style="font-size:48px;margin-bottom:16px;">📄</div>
+        <div style="font-size:16px;">${outFileName} (${sizeKB} KB)</div>
+        <div style="font-size:12px;color:#6c7086;margin-top:8px;">Binary file — use the download button above</div>
+        ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#fab387;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
+      </body>`;
+
+    } else {
+      // Text output — display in editor/preview, enable download
+      let outputText = '';
+      if (files[outFileName]) {
+        outputText = await files[outFileName].text();
+      } else if (result.stdout) {
+        outputText = result.stdout;
+      }
+
+      sourceEditor.setValue(outputText, -1);
+
+      const previewFrame = document.getElementById('previewFrame');
+      previewFrame.srcdoc = outputText;
+
+      const blob = new Blob([outputText], { type: 'text/plain' });
+      const sizeKB = (blob.size / 1024).toFixed(1);
+      lastOutput = { blob, filename: outFileName };
+      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
+      downloadBtn.style.display = '';
+    }
+
+    // Auto-populate cleanup patterns from warnings
+    populateCleanupFromWarnings(warnings);
+
+    // Status
+    const warnCount = warnings.filter(w => w.level === 'warn').length;
+    const errCount = warnings.filter(w => w.level === 'error').length;
+    const infoCount = warnings.filter(w => w.level === 'info').length;
+    let statusParts = [];
+    if (errCount) statusParts.push(`${errCount} error${errCount > 1 ? 's' : ''}`);
+    if (warnCount) statusParts.push(`${warnCount} warning${warnCount > 1 ? 's' : ''}`);
+    if (infoCount) statusParts.push(`${infoCount} info`);
+
+    const warningsEl = document.getElementById('statusWarnings');
+    if (statusParts.length > 0) {
+      warningsEl.style.display = '';
+      warningsEl.style.color = errCount ? 'var(--error)' : warnCount ? 'var(--warning)' : 'var(--accent)';
+      warningsEl.textContent = statusParts.join(', ');
+    } else {
+      warningsEl.style.display = 'none';
+    }
+
+    const statusMsg = placeholderFiles.length > 0
+      ? `Converted ${options.from} → ${options.to} (${placeholderFiles.length} placeholder${placeholderFiles.length > 1 ? 's' : ''}) (${pandocVersion})`
+      : `Converted ${options.from} → ${options.to} (${pandocVersion})`;
+    updateStatus('ready', statusMsg);
+
+  } catch (err) {
+    console.error('Conversion error:', err);
+    const missingFile = extractMissingFile(err.message);
+    let userMessage = err.message;
+    if (missingFile) {
+      userMessage += `\n\nTip: Upload "${missingFile}" via the Media tab's "Upload Files" button, or remove the reference from your source.`;
+    }
+    updateStatus('error', `Error: ${err.message}`);
+    updateLog([{ line: null, column: null, level: 'error', message: userMessage, matchedText: null, type: 'exception' }], '');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '▶ Convert';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 7: LOG DISPLAY
+// ════════════════════════════════════════════════════════════════════
+
+function updateLog(warnings) {
+  const container = document.getElementById('logContainer');
+  container.innerHTML = '';
+
+  if (warnings.length === 0) {
+    container.innerHTML = '<div style="color: var(--text-muted); padding: 16px; font-family: \'IBM Plex Sans\', sans-serif; font-size: 12px;">No warnings or errors.</div>';
+  }
+
+  for (const warn of warnings) {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+
+    // Click to jump to line
+    if (warn.line) {
+      entry.addEventListener('click', () => {
+        editor.gotoLine(warn.line, warn.column ? warn.column - 1 : 0, true);
+        editor.focus();
+        // Highlight active log entry
+        container.querySelectorAll('.log-entry').forEach(e => e.classList.remove('active'));
+        entry.classList.add('active');
+      });
+    }
+
+    const levelEl = document.createElement('span');
+    levelEl.className = 'log-level ' + warn.level;
+    levelEl.textContent = warn.level.toUpperCase();
+
+    const locEl = document.createElement('span');
+    locEl.className = 'log-location';
+    locEl.textContent = warn.line ? `Ln ${warn.line}${warn.column ? ':' + warn.column : ''}` : '';
+
+    const msgEl = document.createElement('span');
+    msgEl.className = 'log-msg';
+    msgEl.textContent = warn.message;
+
+    entry.appendChild(levelEl);
+    entry.appendChild(locEl);
+    entry.appendChild(msgEl);
+    container.appendChild(entry);
+  }
+
+  // Update badge
+  const badge = document.getElementById('logBadge');
+  const total = warnings.length;
+  const hasError = warnings.some(w => w.level === 'error');
+  const hasWarn = warnings.some(w => w.level === 'warn');
+  if (total > 0) {
+    badge.className = 'log-badge ' + (hasError ? 'error' : hasWarn ? 'warn' : 'info');
+    badge.textContent = total;
+  } else {
+    badge.className = '';
+    badge.textContent = '';
+  }
+}
+
+
+
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 8: CLEANUP ENGINE
+//   Data model, stack-based parser, pattern card UI
+//   (ported from atc-latex-cleanup-tool/src/core/)
+// ════════════════════════════════════════════════════════════════════
+
+// ─── 8.1 DATA MODEL ─────────────────────────────────────────────────
+
+const PatternType = Object.freeze({
+  MATCHED_PAIR:  'matched_pair',
+  SINGLE_STRING: 'single_string',
+});
+
+const ReplacementMode = Object.freeze({
+  EDIT_TAGS:   'edit_tags',
+  REMOVE_TAGS: 'remove_tags',
+  REMOVE_ALL:  'remove_all',
+});
+
+function createTagPattern(prefix, anchor, suffix) {
+  return {
+    prefix: prefix || '',
+    anchor: anchor || '',
+    suffix: suffix || '',
+  };
+}
+
+function createSearchParameter(overrides) {
+  const base = {
+    name: '',
+    patternType: PatternType.MATCHED_PAIR,
+    useRegex: false,
+    scope: null,
+    opening: createTagPattern(),
+    closing: createTagPattern(),
+    replacementMode: ReplacementMode.EDIT_TAGS,
+    modifications: { newOpeningTag: '', newClosingTag: '' },
+    findString: '',
+    replaceString: '',
+  };
+  return Object.assign(base, overrides || {});
+}
+
+function createProfile(name, searchParameters) {
+  return {
+    name: name || 'Default',
+    createNewFile: false,
+    scope: null,
+    searchParameters: searchParameters || [],
+  };
+}
+
+function createInlineScope(overrides) {
+  return Object.assign({
+    openingAtStartOfFile: false,
+    opening: null,
+    closingAtEndOfFile: false,
+    closing: null,
+  }, overrides || {});
+}
+
+// ─── Escape sequence processing (extension's regex-chain approach) ───
+function processEscapeSequences(text) {
+  if (!text) return '';
+  return text
+    .replace(/\\\\/g, '\uE000')
+    .replace(/\\n(?!\w)/g, '\n')
+    .replace(/\\r(?!\w)/g, '\r')
+    .replace(/\\t(?!\w)/g, '\t')
+    .replace(/\\"/g, '"')
+    .replace(/\uE000/g, '\\');
+}
+
+function escapeRegexSpecialChars(str) {
+  if (!str) return '';
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function buildTagString(tag) {
+  if (!tag) return '';
+  return (tag.prefix || '') + (tag.anchor || '') + (tag.suffix || '');
+}
+
+function getPatternSummaryText(pattern) {
+  if (pattern.patternType === PatternType.SINGLE_STRING) {
+    return pattern.findString || '(empty)';
+  }
+  const o = pattern.opening ? buildTagString(pattern.opening) : '';
+  const c = pattern.closing ? buildTagString(pattern.closing) : '';
+  return o + '    ' + c;
+}
+
+
+// ─── 8.2 CORE MATCHING FUNCTIONS ────────────────────────────────────
+
+function findOpeningPattern(content, param, startPosition) {
+  if (startPosition === undefined) startPosition = 0;
+  if (!param.opening) return null;
+
+  const prefix = param.opening.prefix || '';
+  const anchor = param.opening.anchor || '';
+  const suffix = param.opening.suffix || '';
+  const useRegex = param.useRegex || false;
+  const searchContent = content.substring(startPosition);
+
+  try {
+    let fullPattern;
+    if (useRegex) {
+      const anchorPattern = escapeRegexSpecialChars(anchor);
+      fullPattern = (prefix || '') + anchorPattern + (suffix || '');
+    } else {
+      fullPattern = escapeRegexSpecialChars(prefix) +
+                    escapeRegexSpecialChars(anchor) +
+                    escapeRegexSpecialChars(suffix);
+    }
+
+    const regex = new RegExp(fullPattern);
+    const match = regex.exec(searchContent);
+    if (!match) return null;
+
+    const fullMatch = match[0];
+    const startIndex = startPosition + match.index;
+    const endIndex = startIndex + fullMatch.length;
+
+    let anchorIndex;
+    if (useRegex) {
+      const anchorPos = fullMatch.search(new RegExp(escapeRegexSpecialChars(anchor)));
+      anchorIndex = startIndex + anchorPos;
+    } else {
+      anchorIndex = startIndex + (prefix ? prefix.length : 0);
+    }
+
+    return { fullMatch, startIndex, endIndex, anchorIndex };
+  } catch (error) {
+    console.error('Error in findOpeningPattern:', error);
+    return null;
+  }
+}
+
+function findMatchingClosing(content, param, opening) {
+  if (!param.opening || !param.closing) return null;
+
+  const openAnchor  = param.opening.anchor || '';
+  const closeAnchor = param.closing.anchor || '';
+
+  let position = opening.endIndex;
+  let stack = 1;
+
+  try {
+    while (position < content.length && stack > 0) {
+      const nextOpen  = content.indexOf(openAnchor, position);
+      const nextClose = content.indexOf(closeAnchor, position);
+
+      if (nextClose === -1) return null;
+
+      if (nextOpen !== -1 && nextOpen < nextClose) {
+        stack++;
+        position = nextOpen + openAnchor.length;
+      } else {
+        stack--;
+        if (stack === 0) {
+          const closingMatch = verifyClosingPattern(content, param.closing, nextClose, param);
+          if (closingMatch) return closingMatch;
+          stack = 1;
+        }
+        position = nextClose + closeAnchor.length;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Error in findMatchingClosing:', error);
+    return null;
+  }
+}
+
+function verifyClosingPattern(content, closingSpec, anchorPos, param) {
+  if (!closingSpec) return null;
+
+  const prefix  = closingSpec.prefix || '';
+  const anchor  = closingSpec.anchor || '';
+  const suffix  = closingSpec.suffix || '';
+  const useRegex = param.useRegex || false;
+
+  try {
+    if (prefix) {
+      if (useRegex) {
+        const prefixRegex = new RegExp('(' + prefix + ')$');
+        const textBefore = content.substring(Math.max(0, anchorPos - 50), anchorPos);
+        if (!prefixRegex.exec(textBefore)) return null;
+      } else {
+        const prefixStart = anchorPos - prefix.length;
+        if (prefixStart < 0) return null;
+        if (content.substring(prefixStart, anchorPos) !== prefix) return null;
+      }
+    }
+
+    const anchorEnd = anchorPos + anchor.length;
+    if (suffix) {
+      if (useRegex) {
+        const suffixRegex = new RegExp('^(' + suffix + ')');
+        const textAfter = content.substring(anchorEnd, Math.min(content.length, anchorEnd + 50));
+        if (!suffixRegex.exec(textAfter)) return null;
+      } else {
+        const suffixEnd = anchorEnd + suffix.length;
+        if (suffixEnd > content.length) return null;
+        if (content.substring(anchorEnd, suffixEnd) !== suffix) return null;
+      }
+    }
+
+    const patternStart = prefix ? anchorPos - prefix.length : anchorPos;
+    const patternEnd = suffix ? anchorEnd + suffix.length : anchorEnd;
+    return {
+      fullMatch: content.substring(patternStart, patternEnd),
+      startIndex: patternStart,
+      endIndex: patternEnd,
+      anchorIndex: anchorPos,
+    };
+  } catch (error) {
+    console.error('Error verifying closing pattern:', error);
+    return null;
+  }
+}
+
+function findAllMatchedPairs(content, param) {
+  const matches = [];
+  let searchStart = 0;
+
+  while (searchStart < content.length) {
+    const opening = findOpeningPattern(content, param, searchStart);
+    if (!opening) break;
+
+    const closing = findMatchingClosing(content, param, opening);
+    if (!closing) {
+      searchStart = opening.endIndex;
+      continue;
+    }
+
+    matches.push({ opening, closing });
+    searchStart = closing.endIndex;
+  }
+
+  return matches;
+}
+
+
+// ─── 8.3 REPLACEMENT + ORCHESTRATION ────────────────────────────────
+
+function applyMatchedPairReplacement(content, opening, closing, param) {
+  const beforeOpening = content.substring(0, opening.startIndex);
+  const innerContent  = content.substring(opening.endIndex, closing.startIndex);
+  const afterClosing  = content.substring(closing.endIndex);
+  const mode = param.replacementMode || ReplacementMode.EDIT_TAGS;
+
+  switch (mode) {
+    case ReplacementMode.EDIT_TAGS: {
+      let newOpen = (param.modifications && param.modifications.newOpeningTag) || '';
+      let newClose = (param.modifications && param.modifications.newClosingTag) || '';
+      newOpen = processEscapeSequences(newOpen);
+      newClose = processEscapeSequences(newClose);
+      return beforeOpening + newOpen + innerContent + newClose + afterClosing;
+    }
+    case ReplacementMode.REMOVE_TAGS:
+      return beforeOpening + innerContent + afterClosing;
+    case ReplacementMode.REMOVE_ALL:
+      return beforeOpening + afterClosing;
+    default:
+      return content;
+  }
+}
+
+function processMatchedPairParameter(text, param) {
+  if (!param.opening || !param.closing) return { result: text, matchCount: 0 };
+
+  const allMatches = findAllMatchedPairs(text, param);
+  if (allMatches.length === 0) return { result: text, matchCount: 0 };
+
+  allMatches.sort((a, b) => b.opening.startIndex - a.opening.startIndex);
+
+  let result = text;
+  for (const match of allMatches) {
+    result = applyMatchedPairReplacement(result, match.opening, match.closing, param);
+  }
+  return { result, matchCount: allMatches.length };
+}
+
+function processSingleStringParameter(text, param) {
+  const findStr    = param.findString || '';
+  const replaceStr = processEscapeSequences(param.replaceString || '');
+  const useRegex   = param.useRegex || false;
+
+  if (!findStr) return { result: text, matchCount: 0 };
+
+  if (useRegex) {
+    try {
+      const re = new RegExp(findStr, 'g');
+      let matchCount = 0;
+      const result = text.replace(re, (...args) => { matchCount++; return replaceStr; });
+      return { result, matchCount };
+    } catch (e) {
+      console.warn('Regex error:', e);
+      return { result: text, matchCount: 0 };
+    }
+  }
+
+  const positions = [];
+  let pos = 0;
+  while (pos < text.length) {
+    const idx = text.indexOf(findStr, pos);
+    if (idx === -1) break;
+    positions.push(idx);
+    pos = idx + findStr.length;
+  }
+  if (positions.length === 0) return { result: text, matchCount: 0 };
+
+  let result = text;
+  for (let i = positions.length - 1; i >= 0; i--) {
+    const idx = positions[i];
+    result = result.substring(0, idx) + replaceStr + result.substring(idx + findStr.length);
+  }
+  return { result, matchCount: positions.length };
+}
+
+function extractScopeRegion(text, scope) {
+  if (!scope) return { scopedText: text, startOffset: 0 };
+
+  let startPos = 0, endPos = text.length;
+
+  if (scope.openingAtStartOfFile) {
+    startPos = 0;
+  } else if (scope.opening) {
+    const tag = buildTagString(scope.opening);
+    if (tag) {
+      const idx = text.indexOf(tag);
+      if (idx === -1) return { scopedText: '', startOffset: 0 };
+      startPos = idx + tag.length;
+    }
+  }
+
+  if (scope.closingAtEndOfFile) {
+    endPos = text.length;
+  } else if (scope.closing) {
+    const tag = buildTagString(scope.closing);
+    if (tag) {
+      const idx = text.indexOf(tag, startPos);
+      if (idx === -1) endPos = text.length;
+      else endPos = idx;
+    }
+  }
+
+  return { scopedText: text.substring(startPos, endPos), startOffset: startPos };
+}
+
+function processSearchParameter(text, param) {
+  const scope = param.scope || null;
+  const { scopedText, startOffset } = extractScopeRegion(text, scope);
+
+  let processed;
+  if (param.patternType === PatternType.MATCHED_PAIR) {
+    processed = processMatchedPairParameter(scopedText, param);
+  } else if (param.patternType === PatternType.SINGLE_STRING) {
+    processed = processSingleStringParameter(scopedText, param);
+  } else {
+    return { result: text, matchCount: 0 };
+  }
+
+  if (scope && (startOffset > 0 || startOffset + scopedText.length < text.length)) {
+    const before = text.substring(0, startOffset);
+    const after  = text.substring(startOffset + scopedText.length);
+    return { result: before + processed.result + after, matchCount: processed.matchCount };
+  }
+  return processed;
+}
+
+function runProfile(text, profile) {
+  const profileScope = profile.scope || null;
+  const { scopedText, startOffset } = extractScopeRegion(text, profileScope);
+
+  let current = scopedText;
+  let totalMatches = 0;
+  const perPattern = [];
+
+  for (const param of profile.searchParameters) {
+    const { result, matchCount } = processSearchParameter(current, param);
+    current = result;
+    totalMatches += matchCount;
+    perPattern.push({ name: param.name || getPatternSummaryText(param), matchCount });
+  }
+
+  let finalResult;
+  if (profileScope && (startOffset > 0 || startOffset + scopedText.length < text.length)) {
+    const before = text.substring(0, startOffset);
+    const after  = text.substring(startOffset + scopedText.length);
+    finalResult = before + current + after;
+  } else {
+    finalResult = current;
+  }
+
+  return { result: finalResult, totalMatches, perPattern };
+}
+
+
+// ─── 8.4 PATTERN CARD UI ───────────────────────────────────────────
+
+// State
+const expandedPatterns = new Set();
+let profiles = [
+  createProfile('Default', [
+    createSearchParameter({
+      name: 'Strip \\textbf',
+      patternType: PatternType.MATCHED_PAIR,
+      opening: createTagPattern('\\textbf', '{', ''),
+      closing: createTagPattern('', '}', ''),
+      replacementMode: ReplacementMode.REMOVE_TAGS,
+    }),
+    createSearchParameter({
+      name: 'Strip \\textit',
+      patternType: PatternType.MATCHED_PAIR,
+      opening: createTagPattern('\\textit', '{', ''),
+      closing: createTagPattern('', '}', ''),
+      replacementMode: ReplacementMode.REMOVE_TAGS,
+    }),
+  ]),
+];
+let activeProfileIndex = 0;
+
+function getActiveProfile() {
+  return profiles[activeProfileIndex] || profiles[0];
+}
+
+// ─── Profile selector ───
+function renderProfileSelect() {
+  const sel = document.getElementById('cleanupProfile');
+  sel.innerHTML = '';
+  profiles.forEach((p, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = p.name;
+    if (i === activeProfileIndex) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  // Add "New Profile" option
+  const newOpt = document.createElement('option');
+  newOpt.value = '__new__';
+  newOpt.textContent = '+ New Profile…';
+  sel.appendChild(newOpt);
+}
+
+document.getElementById('cleanupProfile').addEventListener('change', (e) => {
+  if (e.target.value === '__new__') {
+    const name = prompt('New profile name:');
+    if (name && name.trim()) {
+      profiles.push(createProfile(name.trim()));
+      activeProfileIndex = profiles.length - 1;
+    }
+    renderProfileSelect();
+    renderCleanupUI();
+    return;
+  }
+  activeProfileIndex = parseInt(e.target.value);
+  expandedPatterns.clear();
+  renderCleanupUI();
+});
+
+document.getElementById('btnDuplicateProfile').addEventListener('click', () => {
+  const src = getActiveProfile();
+  const name = prompt('Duplicate profile name:', src.name + ' (copy)');
+  if (name && name.trim()) {
+    const dup = JSON.parse(JSON.stringify(src));
+    dup.name = name.trim();
+    profiles.push(dup);
+    activeProfileIndex = profiles.length - 1;
+    renderProfileSelect();
+    renderCleanupUI();
+  }
+});
+
+document.getElementById('btnDeleteProfile').addEventListener('click', () => {
+  if (profiles.length <= 1) return;
+  if (!confirm('Delete profile "' + getActiveProfile().name + '"?')) return;
+  profiles.splice(activeProfileIndex, 1);
+  activeProfileIndex = Math.min(activeProfileIndex, profiles.length - 1);
+  expandedPatterns.clear();
+  renderProfileSelect();
+  renderCleanupUI();
+});
+
+// ─── Profile scope toggle ───
+document.getElementById('profileScopeHeader').addEventListener('click', () => {
+  const fields = document.getElementById('profileScopeFields');
+  const toggle = document.getElementById('profileScopeToggle');
+  if (fields.style.display === 'none') {
+    fields.style.display = '';
+    toggle.textContent = '⌄';
+  } else {
+    fields.style.display = 'none';
+    toggle.textContent = '›';
+  }
+});
+
+// Save scope on blur
+['scopeOpenPrefix','scopeOpenAnchor','scopeOpenSuffix',
+ 'scopeClosePrefix','scopeCloseAnchor','scopeCloseSuffix'].forEach(id => {
+  document.getElementById(id).addEventListener('blur', () => {
+    const profile = getActiveProfile();
+    const oA = document.getElementById('scopeOpenAnchor').value.trim();
+    const cA = document.getElementById('scopeCloseAnchor').value.trim();
+    if (oA || cA) {
+      profile.scope = {};
+      if (oA) profile.scope.opening = {
+        prefix: document.getElementById('scopeOpenPrefix').value,
+        anchor: oA,
+        suffix: document.getElementById('scopeOpenSuffix').value,
+      };
+      if (cA) profile.scope.closing = {
+        prefix: document.getElementById('scopeClosePrefix').value,
+        anchor: cA,
+        suffix: document.getElementById('scopeCloseSuffix').value,
+      };
+    } else {
+      profile.scope = null;
+    }
+  });
+});
+
+// ─── Pattern list rendering ───
+function renderPatternList() {
+  const profile = getActiveProfile();
+  const patterns = profile.searchParameters;
+  const listEl = document.getElementById('patternList');
+  const countEl = document.getElementById('patternCount');
+  countEl.textContent = '(' + patterns.length + ')';
+
+  if (patterns.length === 0) {
+    listEl.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:11px;">No patterns</div>';
+    return;
+  }
+
+  listEl.innerHTML = '';
+  patterns.forEach((pat, i) => {
+    listEl.appendChild(createPatternItem(pat, i));
+  });
+}
+
+function createPatternItem(pattern, index) {
+  const item = document.createElement('div');
+  item.className = 'pattern-item';
+  const isExpanded = expandedPatterns.has(index);
+
+  // Header (always shows toggle + summary + delete)
+  const header = document.createElement('div');
+  header.className = 'pattern-item-header';
+
+  const toggle = document.createElement('div');
+  toggle.className = 'pattern-toggle';
+  toggle.textContent = isExpanded ? '⌄' : '›';
+  toggle.onclick = () => { togglePattern(index); };
+
+  const summary = document.createElement('div');
+  summary.className = 'pattern-summary';
+  summary.textContent = getPatternSummaryText(pattern);
+  summary.onclick = () => { togglePattern(index); };
+
+  const del = document.createElement('button');
+  del.className = 'pattern-delete';
+  del.textContent = '×';
+  del.onclick = (e) => { e.stopPropagation(); deletePattern(index); };
+
+  header.appendChild(toggle);
+  header.appendChild(summary);
+  header.appendChild(del);
+  item.appendChild(header);
+
+  // Expanded fields panel (below header)
+  if (isExpanded) {
+    const fields = document.createElement('div');
+    fields.className = 'pattern-fields';
+    fields.appendChild(createPatternFields(pattern, index));
+    item.appendChild(fields);
+  }
+
+  return item;
+}
+
+// Helper: create an input with prototype's CSS classes
+function mkInput(cls, placeholder, value, onBlur) {
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'pf-input ' + cls;
+  inp.placeholder = placeholder;
+  inp.value = value;
+  inp.onblur = () => onBlur(inp.value);
+  return inp;
+}
+
+function createPatternFields(pattern, index) {
+  const container = document.createElement('div');
+  container.style.cssText = 'display:flex; flex-direction:column; gap:6px;';
+
+  if (pattern.patternType === PatternType.SINGLE_STRING) {
+    // ── Single String: [find] → [replace] + regex ──
+    const row = document.createElement('div');
+    row.className = 'pf-row';
+
+    row.appendChild(mkInput('pf-input-flex', 'Find', pattern.findString || '', v => { pattern.findString = v; }));
+
+    const arrow = document.createElement('span');
+    arrow.className = 'pf-arrow';
+    arrow.textContent = '→';
+    row.appendChild(arrow);
+
+    row.appendChild(mkInput('pf-input-flex', 'Replace', pattern.replaceString || '', v => { pattern.replaceString = v; }));
+
+    const lbl = document.createElement('label');
+    lbl.className = 'pf-checkbox';
+    const chk = document.createElement('input');
+    chk.type = 'checkbox';
+    chk.checked = pattern.useRegex || false;
+    chk.onchange = () => { pattern.useRegex = chk.checked; };
+    lbl.appendChild(chk);
+    lbl.appendChild(document.createTextNode(' Regex'));
+    row.appendChild(lbl);
+
+    container.appendChild(row);
+
+  } else {
+    // ── Matched Pair ──
+    // Opening row
+    const openRow = document.createElement('div');
+    openRow.className = 'pf-row';
+    const openLbl = document.createElement('span');
+    openLbl.className = 'pf-label';
+    openLbl.textContent = 'O:';
+    openRow.appendChild(openLbl);
+    openRow.appendChild(mkInput('pf-input-flex', 'Prefix',
+      (pattern.opening && pattern.opening.prefix) || '',
+      v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.prefix = v; }));
+    openRow.appendChild(mkInput('pf-input-anchor', 'Anchor',
+      (pattern.opening && pattern.opening.anchor) || '',
+      v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.anchor = v; }));
+    openRow.appendChild(mkInput('pf-input-flex', 'Suffix',
+      (pattern.opening && pattern.opening.suffix) || '',
+      v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.suffix = v; }));
+    container.appendChild(openRow);
+
+    // Closing row
+    const closeRow = document.createElement('div');
+    closeRow.className = 'pf-row';
+    const closeLbl = document.createElement('span');
+    closeLbl.className = 'pf-label';
+    closeLbl.textContent = 'C:';
+    closeRow.appendChild(closeLbl);
+    closeRow.appendChild(mkInput('pf-input-flex', 'Prefix',
+      (pattern.closing && pattern.closing.prefix) || '',
+      v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.prefix = v; }));
+    closeRow.appendChild(mkInput('pf-input-anchor', 'Anchor',
+      (pattern.closing && pattern.closing.anchor) || '',
+      v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.anchor = v; }));
+    closeRow.appendChild(mkInput('pf-input-flex', 'Suffix',
+      (pattern.closing && pattern.closing.suffix) || '',
+      v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.suffix = v; }));
+    container.appendChild(closeRow);
+
+    // Mode row
+    const modeRow = document.createElement('div');
+    modeRow.className = 'pf-row';
+    modeRow.style.marginTop = '4px';
+
+    const modeLbl = document.createElement('span');
+    modeLbl.style.cssText = 'font-size:10px; color:var(--text-muted); margin-right:4px;';
+    modeLbl.textContent = 'Mode:';
+    modeRow.appendChild(modeLbl);
+
+    const rm = pattern.replacementMode || ReplacementMode.EDIT_TAGS;
+    const modeSel = document.createElement('select');
+    modeSel.className = 'pf-select';
+    modeSel.innerHTML =
+      '<option value="edit_tags"'   + (rm === 'edit_tags'   ? ' selected' : '') + '>Edit Tags</option>' +
+      '<option value="remove_tags"' + (rm === 'remove_tags' ? ' selected' : '') + '>Remove Tags</option>' +
+      '<option value="remove_all"'  + (rm === 'remove_all'  ? ' selected' : '') + '>Remove All</option>';
+    modeSel.onchange = () => { pattern.replacementMode = modeSel.value; renderPatternList(); };
+    modeRow.appendChild(modeSel);
+
+    const regLbl = document.createElement('label');
+    regLbl.className = 'pf-checkbox';
+    const regChk = document.createElement('input');
+    regChk.type = 'checkbox';
+    regChk.checked = pattern.useRegex || false;
+    regChk.onchange = () => { pattern.useRegex = regChk.checked; };
+    regLbl.appendChild(regChk);
+    regLbl.appendChild(document.createTextNode(' Regex'));
+    modeRow.appendChild(regLbl);
+
+    container.appendChild(modeRow);
+
+    // Conditional: edit_tags shows replacement inputs, others show explanation
+    if (rm === 'edit_tags') {
+      const replRow = document.createElement('div');
+      replRow.style.cssText = 'display:flex; flex-direction:column; gap:4px; margin-top:4px;';
+
+      const openReplRow = document.createElement('div');
+      openReplRow.className = 'pf-row';
+      const openReplLbl = document.createElement('span');
+      openReplLbl.style.cssText = 'font-size:10px; color:var(--text-muted); white-space:nowrap; margin-right:4px;';
+      openReplLbl.textContent = 'New Open:';
+      openReplRow.appendChild(openReplLbl);
+      openReplRow.appendChild(mkInput('pf-input-flex', 'Replacement…',
+        (pattern.modifications && pattern.modifications.newOpeningTag) || '',
+        v => { if (!pattern.modifications) pattern.modifications = {}; pattern.modifications.newOpeningTag = v; }));
+      replRow.appendChild(openReplRow);
+
+      const closeReplRow = document.createElement('div');
+      closeReplRow.className = 'pf-row';
+      const closeReplLbl = document.createElement('span');
+      closeReplLbl.style.cssText = 'font-size:10px; color:var(--text-muted); white-space:nowrap; margin-right:4px;';
+      closeReplLbl.textContent = 'New Close:';
+      closeReplRow.appendChild(closeReplLbl);
+      closeReplRow.appendChild(mkInput('pf-input-flex', 'Replacement…',
+        (pattern.modifications && pattern.modifications.newClosingTag) || '',
+        v => { if (!pattern.modifications) pattern.modifications = {}; pattern.modifications.newClosingTag = v; }));
+      replRow.appendChild(closeReplRow);
+
+      container.appendChild(replRow);
+    } else {
+      const note = document.createElement('div');
+      note.className = 'pf-note';
+      note.textContent = rm === 'remove_tags'
+        ? 'Tags removed, content preserved'
+        : 'Tags and content completely removed';
+      container.appendChild(note);
+    }
+  }
+
+  return container;
+}
+
+// ─── Toggle / Delete / Add ───
+function togglePattern(index) {
+  if (expandedPatterns.has(index)) expandedPatterns.delete(index);
+  else expandedPatterns.add(index);
+  renderPatternList();
+}
+
+function deletePattern(index) {
+  getActiveProfile().searchParameters.splice(index, 1);
+  const newExp = new Set();
+  expandedPatterns.forEach(i => { if (i < index) newExp.add(i); else if (i > index) newExp.add(i - 1); });
+  expandedPatterns.clear();
+  newExp.forEach(i => expandedPatterns.add(i));
+  renderPatternList();
+}
+
+document.getElementById('btnAddPattern').addEventListener('click', () => {
+  const type = document.getElementById('addPatternType').value;
+  const profile = getActiveProfile();
+  profile.searchParameters.push(createSearchParameter({ patternType: type }));
+  expandedPatterns.add(profile.searchParameters.length - 1);
+  renderPatternList();
+});
+
+document.getElementById('btnExpandAll').addEventListener('click', () => {
+  getActiveProfile().searchParameters.forEach((_, i) => expandedPatterns.add(i));
+  renderPatternList();
+});
+
+document.getElementById('btnCollapseAll').addEventListener('click', () => {
+  expandedPatterns.clear();
+  renderPatternList();
+});
+
+// ─── Run Cleanup (wired to Ace editor) ───
+document.getElementById('btnRunCleanup').addEventListener('click', () => {
+  const profile = getActiveProfile();
+  if (profile.searchParameters.length === 0) return;
+
+  const source = editor.getValue();
+  const outcome = runProfile(source, profile);
+
+  if (outcome.totalMatches > 0) {
+    editor.setValue(outcome.result, -1);  // -1 = move cursor to start
+    const summary = outcome.perPattern
+      .filter(p => p.matchCount > 0)
+      .map(p => p.name + ': ' + p.matchCount)
+      .join(', ');
+    updateStatus('ready', outcome.totalMatches + ' replacement' + (outcome.totalMatches === 1 ? '' : 's') + ' — ' + summary);
+  } else {
+    updateStatus('ready', 'No matches found');
+  }
+});
+
+// ─── Auto-populate patterns from pandoc warnings ───
+function populateCleanupFromWarnings(warnings) {
+  const prof = getActiveProfile();
+  const skipped = warnings.filter(w => w.type === 'SkippedContent' && w.matchedText);
+  let added = 0;
+
+  for (const w of skipped) {
+    const text = w.matchedText;
+    // Check for \begin{env} patterns
+    const envMatch = text.match(/^\\begin\{([^}]+)\}$/);
+    if (envMatch) {
+      const envName = envMatch[1];
+      if (!prof.searchParameters.some(p =>
+        p.patternType === PatternType.MATCHED_PAIR &&
+        p.opening && p.opening.suffix === '{' + envName + '}')) {
+        prof.searchParameters.push(createSearchParameter({
+          name: 'Remove \\begin{' + envName + '}',
+          patternType: PatternType.MATCHED_PAIR,
+          opening: createTagPattern('', '\\begin', '{' + envName + '}'),
+          closing: createTagPattern('', '\\end', '{' + envName + '}'),
+          replacementMode: ReplacementMode.REMOVE_ALL,
+        }));
+        added++;
+      }
+    } else {
+      // Single string removal
+      if (!prof.searchParameters.some(p =>
+        p.patternType === PatternType.SINGLE_STRING &&
+        p.findString === text)) {
+        prof.searchParameters.push(createSearchParameter({
+          name: 'Remove ' + text,
+          patternType: PatternType.SINGLE_STRING,
+          findString: text,
+          replaceString: '',
+        }));
+        added++;
+      }
+    }
+  }
+  if (added > 0) renderPatternList();
+}
+
+// ─── Master render ───
+function renderCleanupUI() {
+  renderProfileSelect();
+
+  // Populate scope fields
+  const profile = getActiveProfile();
+  document.getElementById('scopeOpenPrefix').value  = (profile.scope && profile.scope.opening && profile.scope.opening.prefix) || '';
+  document.getElementById('scopeOpenAnchor').value  = (profile.scope && profile.scope.opening && profile.scope.opening.anchor) || '';
+  document.getElementById('scopeOpenSuffix').value  = (profile.scope && profile.scope.opening && profile.scope.opening.suffix) || '';
+  document.getElementById('scopeClosePrefix').value = (profile.scope && profile.scope.closing && profile.scope.closing.prefix) || '';
+  document.getElementById('scopeCloseAnchor').value = (profile.scope && profile.scope.closing && profile.scope.closing.anchor) || '';
+  document.getElementById('scopeCloseSuffix').value = (profile.scope && profile.scope.closing && profile.scope.closing.suffix) || '';
+
+  renderPatternList();
+}
+
+// Initialize cleanup UI
+renderCleanupUI();
+
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 9: OUTPUT TABS
+// ════════════════════════════════════════════════════════════════════
+
+document.querySelectorAll('.output-tab[data-tab]').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.output-tab[data-tab]').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const target = 'tab' + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1);
+    document.getElementById(target).classList.add('active');
+
+    // Resize source editor when its tab is shown
+    if (tab.dataset.tab === 'source') {
+      setTimeout(() => sourceEditor.resize(), 50);
+    }
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 10: LAYOUT & RESIZE
+// ════════════════════════════════════════════════════════════════════
+
+// ─── Sidebar toggle ───
+const sidebar = document.getElementById('sidebar');
+const btnCleanup = document.getElementById('btnCleanup');
+const sidebarClose = document.getElementById('sidebarClose');
+
+function toggleSidebar() {
+  sidebar.classList.toggle('collapsed');
+  btnCleanup.classList.toggle('active');
+  // Resize Ace editors after CSS transition completes
+  setTimeout(() => { editor.resize(); sourceEditor.resize(); }, 250);
+}
+
+btnCleanup.addEventListener('click', toggleSidebar);
+sidebarClose.addEventListener('click', toggleSidebar);
+
+// ─── Layout switching ───
+const outputPanel = document.getElementById('outputPanel');
+const resizeGutter = document.getElementById('resizeGutter');
+const centerWrap = document.getElementById('centerWrap');
+const editorArea = document.getElementById('editorArea');
+const btnSide   = document.getElementById('btnLayoutSide');
+const btnBottom = document.getElementById('btnLayoutBottom');
+const btnHide   = document.getElementById('btnLayoutHide');
+
+function setLayout(mode) {
+  [btnSide, btnBottom, btnHide].forEach(b => b.classList.remove('active'));
+
+  // Reset inline styles from any prior resize dragging
+  editorArea.style.flex   = '';
+  editorArea.style.width  = '';
+  editorArea.style.height = '';
+  outputPanel.style.flex   = '';
+  outputPanel.style.width  = '';
+  outputPanel.style.height = '';
+
+  if (mode === 'side') {
+    btnSide.classList.add('active');
+    centerWrap.className = 'center-wrap';
+    outputPanel.className = 'output-panel';
+    resizeGutter.className = 'resize-gutter';
+    resizeGutter.style.display = '';
+  } else if (mode === 'bottom') {
+    btnBottom.classList.add('active');
+    centerWrap.className = 'center-wrap vertical';
+    outputPanel.className = 'output-panel bottom-mode';
+    resizeGutter.className = 'resize-gutter horizontal';
+    resizeGutter.style.display = '';
+  } else {
+    btnHide.classList.add('active');
+    outputPanel.className = 'output-panel hidden-mode';
+    resizeGutter.style.display = 'none';
+    centerWrap.className = 'center-wrap';
+  }
+
+  // Reflow Ace editors after layout change
+  setTimeout(() => { editor.resize(); sourceEditor.resize(); }, 50);
+}
+
+btnSide.addEventListener('click',   () => setLayout('side'));
+btnBottom.addEventListener('click', () => setLayout('bottom'));
+btnHide.addEventListener('click',   () => setLayout('hide'));
+document.getElementById('btnOutputClose').addEventListener('click', () => setLayout('hide'));
+
+// ─── Resize gutter drag ───
+let isResizing = false;
+
+resizeGutter.addEventListener('mousedown', (e) => {
+  isResizing = true;
+  resizeGutter.classList.add('dragging');
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isResizing) return;
+  const rect = centerWrap.getBoundingClientRect();
+  const isBottom = outputPanel.classList.contains('bottom-mode');
+
+  if (isBottom) {
+    const editorH = e.clientY - rect.top;
+    const outputH = rect.bottom - e.clientY;
+    if (editorH > 100 && outputH > 100) {
+      editorArea.style.flex = 'none';
+      editorArea.style.height = editorH + 'px';
+      outputPanel.style.flex = '1';
+    }
+  } else {
+    const editorW = e.clientX - rect.left;
+    const outputW = rect.right - e.clientX;
+    if (editorW > 200 && outputW > 200) {
+      editorArea.style.flex = 'none';
+      editorArea.style.width = editorW + 'px';
+      outputPanel.style.flex = '1';
+    }
+  }
+
+  editor.resize();
+  sourceEditor.resize();
+});
+
+document.addEventListener('mouseup', () => {
+  if (isResizing) {
+    isResizing = false;
+    resizeGutter.classList.remove('dragging');
+  }
+});
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 11: KEYBOARD SHORTCUTS
+// ════════════════════════════════════════════════════════════════════
+
+document.addEventListener('keydown', (e) => {
+  // Ctrl+Enter = Convert
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    if (!document.getElementById('btnConvert').disabled) {
+      runConversion();
+    }
+  }
+});
+
+// ════════════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ════════════════════════════════════════════════════════════════════
+
+setLayout('side');
+initPandoc();
+
+</script>
+</body>
+</html>
