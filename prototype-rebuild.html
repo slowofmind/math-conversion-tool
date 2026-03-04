@@ -502,6 +502,8 @@
     margin-right: 4px;
   }
   .output-tab-action:hover { color: var(--text-primary); border-color: var(--text-muted); }
+  #btnDownloadOutput { color: var(--accent); border-color: var(--accent-dim); }
+  #btnDownloadOutput:hover { background: var(--accent-dim); color: #fff; }
 
   .output-body { flex: 1; overflow: auto; background: var(--bg-primary); }
 
@@ -788,21 +790,6 @@
 
   /* Toggle button in toolbar for options panel */
   .toolbar-btn.options-toggle.panel-open { color: var(--accent); }
-
-  /* Download link for binary output */
-  .download-link {
-    display: inline-block;
-    padding: 6px 14px;
-    background: var(--accent-dim);
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 500;
-    font-family: var(--font-sans);
-  }
-  .download-link:hover { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
@@ -1567,10 +1554,10 @@
         <button class="output-tab" data-tab="log">Log <span id="logBadge"></span></button>
         <button class="output-tab" data-tab="source">Source</button>
         <span class="output-tab-spacer"></span>
+        <button class="output-tab-action" id="btnDownloadOutput" title="Download output" style="display:none;">📥 Download</button>
         <button class="output-tab-action" id="btnOutputClose" title="Hide panel">×</button>
       </div>
       <div class="output-body">
-        <div id="downloadArea" style="display:none; padding:8px 12px; background:var(--bg-tertiary); border-bottom:1px solid var(--border-subtle);"></div>
         <div class="tab-content active" id="tabPreview">
           <iframe id="previewFrame" sandbox="allow-same-origin" title="HTML preview"></iframe>
         </div>
@@ -2550,6 +2537,20 @@ const BINARY_INPUT_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'fb2', 'ipynb'];
 // Track binary input file
 let inputBinaryFile = null;  // { name, blob }
 let inputFileName = 'untitled';  // tracks current input file name (without extension)
+let lastOutput = null;  // { blob, filename } — stores last conversion output for download
+
+// Download button handler
+document.getElementById('btnDownloadOutput').addEventListener('click', () => {
+  if (!lastOutput) return;
+  // Clean up previous URL if any
+  if (lastOutput.objectUrl) URL.revokeObjectURL(lastOutput.objectUrl);
+  const url = URL.createObjectURL(lastOutput.blob);
+  lastOutput.objectUrl = url;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = lastOutput.filename;
+  a.click();
+});
 
 // 1x1 transparent PNG placeholder for missing images
 const PLACEHOLDER_PNG = new Uint8Array([
@@ -2933,12 +2934,16 @@ async function runConversion() {
     updateLog(warnings, result.stderr);
 
     // Handle output
-    const downloadArea = document.getElementById('downloadArea');
+    const downloadBtn = document.getElementById('btnDownloadOutput');
 
     if (isBinaryOutput && files[outFileName]) {
-      // Binary output — show download link
+      // Binary output — show info in editor/preview, enable download
       const blob = files[outFileName];
       const sizeKB = (blob.size / 1024).toFixed(1);
+
+      lastOutput = { blob, filename: outFileName };
+      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
+      downloadBtn.style.display = '';
 
       sourceEditor.setValue(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`, -1);
 
@@ -2953,17 +2958,8 @@ async function runConversion() {
       </body>`);
       previewDoc.close();
 
-      // Show download area
-      if (downloadArea) {
-        // Clean up any previous object URL
-        if (downloadArea.dataset.objectUrl) URL.revokeObjectURL(downloadArea.dataset.objectUrl);
-        const url = URL.createObjectURL(blob);
-        downloadArea.dataset.objectUrl = url;
-        downloadArea.innerHTML = `<a href="${url}" download="${outFileName}" class="download-link">📥 Download ${outFileName} (${sizeKB} KB)</a>`;
-        downloadArea.style.display = '';
-      }
     } else {
-      // Text output — read from output file or stdout
+      // Text output — display in editor/preview, enable download
       let outputText = '';
       if (files[outFileName]) {
         outputText = await files[outFileName].text();
@@ -2973,15 +2969,17 @@ async function runConversion() {
 
       sourceEditor.setValue(outputText, -1);
 
-      // Preview
       const previewFrame = document.getElementById('previewFrame');
       const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
       previewDoc.open();
       previewDoc.write(outputText);
       previewDoc.close();
 
-      // Hide download area
-      if (downloadArea) downloadArea.style.display = 'none';
+      const blob = new Blob([outputText], { type: 'text/plain' });
+      const sizeKB = (blob.size / 1024).toFixed(1);
+      lastOutput = { blob, filename: outFileName };
+      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
+      downloadBtn.style.display = '';
     }
 
     // Auto-populate cleanup patterns from warnings
