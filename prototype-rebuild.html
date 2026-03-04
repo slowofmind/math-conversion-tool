@@ -2691,24 +2691,31 @@ function buildOptions() {
 
 // --- Build files object for pandoc.convert() ---
 function buildFiles() {
-  const files = { ...resourceFiles.auxFiles };
-  if (resourceFiles.bibFile) files[resourceFiles.bibFile.name] = resourceFiles.bibFile;
-  if (resourceFiles.cslFile) files[resourceFiles.cslFile.name] = resourceFiles.cslFile;
-  if (resourceFiles.abbrevFile) files[resourceFiles.abbrevFile.name] = resourceFiles.abbrevFile;
-  if (resourceFiles.abbreviationsFile) files[resourceFiles.abbreviationsFile.name] = resourceFiles.abbreviationsFile;
-  resourceFiles.cssFiles.forEach(f => { files[f.name] = f; });
-  if (resourceFiles.highlightThemeFile) files[resourceFiles.highlightThemeFile.name] = resourceFiles.highlightThemeFile;
-  resourceFiles.syntaxDefinitions.forEach(f => { files[f.name] = f; });
-  if (resourceFiles.templateFile) files[resourceFiles.templateFile.name] = resourceFiles.templateFile;
-  if (resourceFiles.referenceDoc) files[resourceFiles.referenceDoc.name] = resourceFiles.referenceDoc;
-  if (resourceFiles.metadataFile) files[resourceFiles.metadataFile.name] = resourceFiles.metadataFile;
-  if (resourceFiles.epubCoverImage) files[resourceFiles.epubCoverImage.name] = resourceFiles.epubCoverImage;
-  if (resourceFiles.epubMetadataFile) files[resourceFiles.epubMetadataFile.name] = resourceFiles.epubMetadataFile;
-  resourceFiles.epubFonts.forEach(f => { files[f.name] = f; });
-  resourceFiles.headerFiles.forEach(f => { files[f.name] = f; });
-  resourceFiles.beforeBodyFiles.forEach(f => { files[f.name] = f; });
-  resourceFiles.afterBodyFiles.forEach(f => { files[f.name] = f; });
-  resourceFiles.luaFilters.forEach(f => { files[f.name] = f; });
+  const raw = {};
+  // Collect all resource files
+  Object.entries(resourceFiles.auxFiles).forEach(([name, data]) => { raw[name] = data; });
+  if (resourceFiles.bibFile) raw[resourceFiles.bibFile.name] = resourceFiles.bibFile;
+  if (resourceFiles.cslFile) raw[resourceFiles.cslFile.name] = resourceFiles.cslFile;
+  if (resourceFiles.abbrevFile) raw[resourceFiles.abbrevFile.name] = resourceFiles.abbrevFile;
+  if (resourceFiles.abbreviationsFile) raw[resourceFiles.abbreviationsFile.name] = resourceFiles.abbreviationsFile;
+  resourceFiles.cssFiles.forEach(f => { raw[f.name] = f; });
+  if (resourceFiles.highlightThemeFile) raw[resourceFiles.highlightThemeFile.name] = resourceFiles.highlightThemeFile;
+  resourceFiles.syntaxDefinitions.forEach(f => { raw[f.name] = f; });
+  if (resourceFiles.templateFile) raw[resourceFiles.templateFile.name] = resourceFiles.templateFile;
+  if (resourceFiles.referenceDoc) raw[resourceFiles.referenceDoc.name] = resourceFiles.referenceDoc;
+  if (resourceFiles.metadataFile) raw[resourceFiles.metadataFile.name] = resourceFiles.metadataFile;
+  if (resourceFiles.epubCoverImage) raw[resourceFiles.epubCoverImage.name] = resourceFiles.epubCoverImage;
+  if (resourceFiles.epubMetadataFile) raw[resourceFiles.epubMetadataFile.name] = resourceFiles.epubMetadataFile;
+  resourceFiles.epubFonts.forEach(f => { raw[f.name] = f; });
+  resourceFiles.headerFiles.forEach(f => { raw[f.name] = f; });
+  resourceFiles.beforeBodyFiles.forEach(f => { raw[f.name] = f; });
+  resourceFiles.afterBodyFiles.forEach(f => { raw[f.name] = f; });
+  resourceFiles.luaFilters.forEach(f => { raw[f.name] = f; });
+  // pandoc.js expects Blob objects (calls blob.arrayBuffer())
+  const files = {};
+  for (const [name, data] of Object.entries(raw)) {
+    files[name] = (data instanceof Blob) ? data : new Blob([data]);
+  }
   return files;
 }
 
