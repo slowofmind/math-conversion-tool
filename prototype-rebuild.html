@@ -605,6 +605,201 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+
+  /* ─── BUILT-IN ASSETS OVERLAY ─── */
+  .builtin-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  .builtin-overlay.active { display: flex; }
+
+  .builtin-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: min(680px, 90vw);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+
+  .builtin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .builtin-header h2 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+  .builtin-close {
+    background: none; border: none; color: var(--text-muted);
+    font-size: 18px; cursor: pointer; padding: 2px 6px;
+  }
+  .builtin-close:hover { color: var(--text-primary); }
+
+  .builtin-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    padding: 0 18px;
+    flex-shrink: 0;
+  }
+  .builtin-tab {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    padding: 8px 16px;
+    background: none; border: none;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+  }
+  .builtin-tab:hover { color: var(--text-secondary); }
+  .builtin-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .builtin-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 18px;
+  }
+
+  .builtin-category-empty {
+    color: var(--text-muted);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-style: italic;
+    padding: 12px 0;
+  }
+
+  .builtin-asset {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: var(--bg-primary);
+    transition: border-color 0.15s;
+  }
+  .builtin-asset:hover { border-color: var(--border); }
+  .builtin-asset.disabled { opacity: 0.5; }
+
+  .builtin-toggle {
+    position: relative;
+    width: 36px; height: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .builtin-toggle input { opacity: 0; width: 0; height: 0; }
+  .builtin-toggle .slider {
+    position: absolute; inset: 0;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .builtin-toggle .slider::before {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    left: 2px; bottom: 2px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .builtin-toggle input:checked + .slider {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+  }
+  .builtin-toggle input:checked + .slider::before {
+    transform: translateX(16px);
+    background: var(--accent);
+  }
+
+  .builtin-info { flex: 1; min-width: 0; }
+  .builtin-name {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .builtin-badge {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+  .builtin-desc {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .builtin-filename {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    opacity: 0.7;
+  }
+  .builtin-view-btn {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 10px;
+    padding: 2px 8px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .builtin-view-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+
+  /* Source viewer for inspecting asset content */
+  .builtin-source-viewer {
+    margin-top: 8px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    padding: 10px;
+    max-height: 200px;
+    overflow: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
 </style>
 </head>
 <body>
@@ -646,6 +841,7 @@
   <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
+    <button class="toolbar-btn" id="btnBuiltIns" title="Manage built-in filters, templates & CSS">📦 Built-ins</button>
     <button class="toolbar-btn primary" id="btnConvert" disabled>▶ Convert</button>
   </div>
 
@@ -789,6 +985,24 @@
   <div class="statusbar-item" id="statusWarnings" style="display:none;"></div>
 </div>
 
+
+<div class="builtin-overlay" id="builtinOverlay">
+  <div class="builtin-panel">
+    <div class="builtin-header">
+      <h2>📦 Built-in Assets</h2>
+      <button class="builtin-close" id="builtinClose">×</button>
+    </div>
+    <div class="builtin-tabs" id="builtinTabs">
+      <button class="builtin-tab active" data-category="lua-filter">Lua Filters</button>
+      <button class="builtin-tab" data-category="template">Templates</button>
+      <button class="builtin-tab" data-category="css">CSS Stylesheets</button>
+    </div>
+    <div class="builtin-body" id="builtinBody">
+      <!-- Dynamically populated -->
+    </div>
+  </div>
+</div>
+
 <script type="module">
 // ════════════════════════════════════════════════════════════════════
 // SECTION 1: ACE EDITOR SETUP
@@ -868,6 +1082,306 @@ sourceEditor.setOptions({
   showPrintMargin: false,
   wrap: true,
 });
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 1.5: BUILT-IN ASSETS REGISTRY
+// ════════════════════════════════════════════════════════════════════
+//
+// ┌──────────────────────────────────────────────────────────────────┐
+// │  HOW TO ADD A NEW BUILT-IN ASSET                                │
+// │                                                                  │
+// │  1. Add a new object to the BUILT_IN_ASSETS array below         │
+// │  2. Set `category` to: 'lua-filter', 'template', or 'css'      │
+// │  3. Put file content in `content` as a template literal         │
+// │  4. Set `defaultEnabled: true` if it should be ON by default    │
+// │  5. Reload the page — it will appear in the Built-ins panel     │
+// │                                                                  │
+// │  Categories map to pandoc options:                               │
+// │    'lua-filter'  → --lua-filter=<path>   (multiple allowed)     │
+// │    'template'    → --template=<path>     (only one active)      │
+// │    'css'         → --css=<path>          (multiple allowed)     │
+// │                                                                  │
+// │  The `id` must be unique. The `filename` is what pandoc sees    │
+// │  in its virtual filesystem. Keep filenames descriptive.          │
+// └──────────────────────────────────────────────────────────────────┘
+
+const BUILT_IN_ASSETS = [
+
+  // ── Lua Filters ─────────────────────────────────────────────────
+
+  {
+    id: 'missing-image-placeholder',
+    name: 'Missing Image Placeholder',
+    description: 'Replaces missing images with styled warning boxes showing the filename and caption. Useful when source images are not uploaded alongside the document.',
+    category: 'lua-filter',
+    filename: 'missing-image-placeholder.lua',
+    defaultEnabled: true,
+    content: `-- missing-image-placeholder.lua
+-- Replaces Image elements with visible placeholder text when the
+-- referenced image file is not available in the virtual filesystem.
+-- Useful for browser-based pandoc conversions where images may not
+-- be uploaded alongside the source document.
+
+function Image(el)
+  -- Try to read the image file; if it fails, it's missing
+  local f = io.open(el.src, "r")
+  if f then
+    f:close()
+    return nil  -- image exists, leave it alone
+  end
+
+  -- Build placeholder content
+  local warning = pandoc.Str("⚠ Missing image: " .. el.src)
+  local caption_text = pandoc.utils.stringify(el.caption)
+
+  local blocks = {}
+  table.insert(blocks, pandoc.Para({
+    pandoc.Strong({ pandoc.Str("["), warning, pandoc.Str("]") })
+  }))
+
+  if caption_text ~= "" then
+    table.insert(blocks, pandoc.Para({
+      pandoc.Emph({ pandoc.Str("Caption: " .. caption_text) })
+    }))
+  end
+
+  -- Wrap in a Div with a border style (works in HTML; in docx the
+  -- text itself is the main indicator)
+  local div = pandoc.Div(blocks, pandoc.Attr("", {"missing-image-placeholder"}, {
+    {"style", "border: 2px dashed #c0392b; padding: 12px; margin: 12px 0; background: #fdf2f2; color: #c0392b; text-align: center;"}
+  }))
+
+  return div
+end
+`
+  },
+
+  // ── EXAMPLE: Add more Lua filters here ──
+  // {
+  //   id: 'my-custom-filter',
+  //   name: 'My Custom Filter',
+  //   description: 'Description of what this filter does.',
+  //   category: 'lua-filter',
+  //   filename: 'my-custom-filter.lua',
+  //   defaultEnabled: false,
+  //   content: `
+  //     function Pandoc(doc)
+  //       -- your filter logic here
+  //       return doc
+  //     end
+  //   `
+  // },
+
+  // ── Templates ───────────────────────────────────────────────────
+
+  // ── EXAMPLE: Add pandoc templates here ──
+  // {
+  //   id: 'clean-html-template',
+  //   name: 'Clean HTML Template',
+  //   description: 'A minimal, clean HTML5 template with sensible defaults.',
+  //   category: 'template',
+  //   filename: 'clean-html.html',
+  //   defaultEnabled: false,
+  //   content: `<!DOCTYPE html>
+  //     <html lang="en">
+  //     <head><meta charset="utf-8"><title>$title$</title></head>
+  //     <body>$body$</body>
+  //     </html>`
+  // },
+
+  // ── CSS Stylesheets ─────────────────────────────────────────────
+
+  // ── EXAMPLE: Add CSS stylesheets here ──
+  // {
+  //   id: 'academic-style',
+  //   name: 'Academic Paper Style',
+  //   description: 'Clean serif typography for academic papers.',
+  //   category: 'css',
+  //   filename: 'academic-style.css',
+  //   defaultEnabled: false,
+  //   content: `body { font-family: Georgia, serif; max-width: 42em; margin: auto; }`
+  // },
+
+];
+
+// ── State: track which built-ins are enabled ──
+// Initialized from each asset's defaultEnabled flag.
+// Persists only for the lifetime of the page (no localStorage needed yet).
+const builtInState = {};
+for (const asset of BUILT_IN_ASSETS) {
+  builtInState[asset.id] = asset.defaultEnabled;
+}
+
+// ── Helper: get enabled assets for a given category ──
+function getEnabledBuiltIns(category) {
+  return BUILT_IN_ASSETS.filter(a => a.category === category && builtInState[a.id]);
+}
+
+// ── Helper: get ALL enabled assets across categories ──
+function getAllEnabledBuiltIns() {
+  return BUILT_IN_ASSETS.filter(a => builtInState[a.id]);
+}
+
+// ── Pipeline integration: inject built-in assets into conversion ──
+// Call this in runConversion() to merge built-in assets into the
+// options and files objects before passing them to pandoc.convert().
+function applyBuiltInAssets(options, files) {
+  const encoder = new TextEncoder();
+
+  // Lua filters — append to lua-filter array
+  const enabledFilters = getEnabledBuiltIns('lua-filter');
+  if (enabledFilters.length > 0) {
+    if (!options['lua-filter']) options['lua-filter'] = [];
+    for (const f of enabledFilters) {
+      const path = `built-in/${f.filename}`;
+      files[path] = encoder.encode(f.content);
+      options['lua-filter'].push(path);
+    }
+  }
+
+  // Templates — only one can be active; first enabled wins
+  const enabledTemplates = getEnabledBuiltIns('template');
+  if (enabledTemplates.length > 0) {
+    const tmpl = enabledTemplates[0];
+    const path = `built-in/${tmpl.filename}`;
+    files[path] = encoder.encode(tmpl.content);
+    options['template'] = path;
+  }
+
+  // CSS stylesheets — append to css array
+  const enabledCSS = getEnabledBuiltIns('css');
+  if (enabledCSS.length > 0) {
+    if (!options['css']) options['css'] = [];
+    for (const c of enabledCSS) {
+      const path = `built-in/${c.filename}`;
+      files[path] = encoder.encode(c.content);
+      options['css'].push(path);
+    }
+  }
+
+  return { options, files };
+}
+
+// ── UI: render the built-in assets panel ──
+let currentBuiltInCategory = 'lua-filter';
+let expandedSourceViewer = null; // track which asset has source expanded
+
+function renderBuiltInPanel() {
+  const body = document.getElementById('builtinBody');
+  const assets = BUILT_IN_ASSETS.filter(a => a.category === currentBuiltInCategory);
+
+  if (assets.length === 0) {
+    body.innerHTML = `<div class="builtin-category-empty">
+      No built-in ${currentBuiltInCategory === 'lua-filter' ? 'Lua filters' :
+        currentBuiltInCategory === 'template' ? 'templates' : 'CSS stylesheets'} registered yet.
+      <br><br>Add entries to the <code>BUILT_IN_ASSETS</code> array in the source code.
+    </div>`;
+    return;
+  }
+
+  body.innerHTML = '';
+  for (const asset of assets) {
+    const enabled = builtInState[asset.id];
+    const row = document.createElement('div');
+    row.className = 'builtin-asset' + (enabled ? '' : ' disabled');
+
+    // Toggle switch
+    const toggle = document.createElement('label');
+    toggle.className = 'builtin-toggle';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = enabled;
+    checkbox.addEventListener('change', () => {
+      builtInState[asset.id] = checkbox.checked;
+      updateBuiltInBadge();
+      renderBuiltInPanel();
+    });
+    const slider = document.createElement('span');
+    slider.className = 'slider';
+    toggle.appendChild(checkbox);
+    toggle.appendChild(slider);
+    row.appendChild(toggle);
+
+    // Info
+    const info = document.createElement('div');
+    info.className = 'builtin-info';
+
+    const nameRow = document.createElement('div');
+    nameRow.className = 'builtin-name';
+    nameRow.textContent = asset.name;
+    const badge = document.createElement('span');
+    badge.className = 'builtin-badge';
+    badge.textContent = 'built-in';
+    nameRow.appendChild(badge);
+    info.appendChild(nameRow);
+
+    const desc = document.createElement('div');
+    desc.className = 'builtin-desc';
+    desc.textContent = asset.description;
+    info.appendChild(desc);
+
+    const fname = document.createElement('div');
+    fname.className = 'builtin-filename';
+    fname.textContent = asset.filename;
+    info.appendChild(fname);
+
+    // Source viewer (collapsible)
+    if (expandedSourceViewer === asset.id) {
+      const viewer = document.createElement('div');
+      viewer.className = 'builtin-source-viewer';
+      viewer.textContent = asset.content;
+      info.appendChild(viewer);
+    }
+
+    row.appendChild(info);
+
+    // View source button
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'builtin-view-btn';
+    viewBtn.textContent = expandedSourceViewer === asset.id ? 'Hide' : 'View';
+    viewBtn.addEventListener('click', () => {
+      expandedSourceViewer = expandedSourceViewer === asset.id ? null : asset.id;
+      renderBuiltInPanel();
+    });
+    row.appendChild(viewBtn);
+
+    body.appendChild(row);
+  }
+}
+
+// ── UI: wire up overlay open/close and tabs ──
+function updateBuiltInBadge() {
+  const count = BUILT_IN_ASSETS.filter(a => builtInState[a.id]).length;
+  const btn = document.getElementById('btnBuiltIns');
+  btn.textContent = count > 0 ? `📦 Built-ins (${count})` : '📦 Built-ins';
+}
+updateBuiltInBadge(); // set initial badge
+
+document.getElementById('btnBuiltIns').addEventListener('click', () => {
+  document.getElementById('builtinOverlay').classList.add('active');
+  renderBuiltInPanel();
+});
+
+document.getElementById('builtinClose').addEventListener('click', () => {
+  document.getElementById('builtinOverlay').classList.remove('active');
+});
+
+document.getElementById('builtinOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) {
+    e.currentTarget.classList.remove('active');
+  }
+});
+
+document.querySelectorAll('#builtinTabs .builtin-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#builtinTabs .builtin-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentBuiltInCategory = tab.dataset.category;
+    expandedSourceViewer = null;
+    renderBuiltInPanel();
+  });
+});
+
 
 // ════════════════════════════════════════════════════════════════════
 // SECTION 2: PANDOC WASM INITIALIZATION
@@ -1241,7 +1755,17 @@ async function runConversion() {
       standalone: true,
     };
 
-    const result = await pandocModule.convert(options, sourceText, {});
+    // Apply built-in assets (filters, templates, CSS)
+    const files = {};
+    applyBuiltInAssets(options, files);
+
+    // Log which built-ins are active
+    const activeBuiltIns = getAllEnabledBuiltIns();
+    if (activeBuiltIns.length > 0) {
+      console.log('[built-in] Active assets:', activeBuiltIns.map(a => a.category + ':' + a.filename).join(', '));
+    }
+
+    const result = await pandocModule.convert(options, sourceText, files);
 
     // Parse warnings
     const warnings = parseWarnings(result.warnings, result.stderr, sourceText);
@@ -2348,6 +2872,14 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     if (!document.getElementById('btnConvert').disabled) {
       runConversion();
+    }
+  }
+  // Escape = close built-in assets overlay
+  if (e.key === 'Escape') {
+    const overlay = document.getElementById('builtinOverlay');
+    if (overlay.classList.contains('active')) {
+      overlay.classList.remove('active');
+      e.preventDefault();
     }
   }
 });
