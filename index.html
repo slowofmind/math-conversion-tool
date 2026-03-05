@@ -2393,7 +2393,7 @@ local function basename(path)
 end
 
 local function swap_ext(path, new_ext)
-  return path:gsub("%.[^%.]+$", "." .. new_ext)
+  return (path:gsub("%.[^%.]+$", "." .. new_ext))
 end
 
 local function has_pdf_ext(path)
