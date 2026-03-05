@@ -1,2 +1,3 @@
-# pandoc-for-stem
-test repo for pandoc-wasm with some additional support for STEM content. Definitely not finished...
+# Pandoc-for-STEM
+
+This tool designed to help teaching staff convert LaTeX course materials in to accessible formats as an alternative to compiling to PDF
