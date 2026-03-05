@@ -11,6 +11,7 @@
 <script src="ace/mode-html.js"></script>
 <script src="ace/mode-markdown.js"></script>
 <script src="ace/theme-one_dark.js"></script>
+<script src="ace/ext-searchbox.js"></script>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
@@ -1770,46 +1771,7 @@ editor.setOptions({
 });
 
 // Default sample content
-editor.setValue(`\\documentclass{article}
-\\usepackage{amsmath}
-\\usepackage{graphicx}
-\\usepackage[utf8]{inputenc}
-
-\\title{Introduction to PDEs}
-\\author{N. Miller}
-\\date{\\today}
-
-\\begin{document}
-\\maketitle
-
-\\section{Introduction}
-
-This document explores the fundamental properties of
-differential equations in bounded domains, with emphasis
-on regularity results near the boundary.
-
-The governing equation takes the form:
-\\begin{equation}
-  \\frac{\\partial u}{\\partial t} - \\Delta u = f(x,t)
-\\end{equation}
-
-% TODO: Fix undefined citation key
-We refer the reader to \\cite{smith2024}
-for a comprehensive treatment.
-
-\\section{Preliminaries}
-
-Let \\( \\Omega \\subset \\mathbb{R}^n \\) be a bounded open set
-with Lipschitz boundary \\( \\partial\\Omega \\).
-
-\\begin{figure}[htbp]
-  \\centering
-  \\includegraphics[width=0.8\\textwidth]{domain.png}
-  \\caption{Bounded domain with Lipschitz boundary}
-\\end{figure}
-
-\\end{document}
-`, -1);
+editor.setValue('', -1);
 
 // Track cursor position in status bar
 editor.session.selection.on('changeCursor', () => {
@@ -1896,10 +1858,6 @@ fileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Update tab name and track filename
-  document.getElementById('tabFilename').textContent = file.name;
-  inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
-
   // Auto-detect format from extension
   const ext = file.name.split('.').pop().toLowerCase();
   const formatMap = {
@@ -1916,6 +1874,10 @@ fileInput.addEventListener('change', async (e) => {
     editor.setValue('', -1);
     editor.setReadOnly(true);
 
+    // Update tab name and track filename
+    document.getElementById('tabFilename').textContent = file.name;
+    inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
+
     if (fmt) {
       document.getElementById('selFrom').value = fmt;
       document.getElementById('statusFormat').textContent = fmt;
@@ -1931,8 +1893,12 @@ fileInput.addEventListener('change', async (e) => {
     document.getElementById('binaryInputOverlay').style.display = 'flex';
 
   } else {
-    // Text input — read into editor as before
+    // Text input — clear binary state first, then set names
     clearBinaryInput();
+
+    // Update tab name and track filename (after clear so they aren't overwritten)
+    document.getElementById('tabFilename').textContent = file.name;
+    inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
 
     const text = await file.text();
     editor.setValue(text, -1);
