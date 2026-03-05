@@ -410,6 +410,36 @@
     font-size: 13px;
   }
 
+  /* Binary input overlay */
+  .binary-input-overlay {
+    position: absolute; inset: 0; z-index: 10;
+    background: var(--bg-primary);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .binary-input-card {
+    text-align: center; padding: 32px 40px;
+    background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+    border-radius: 8px; max-width: 360px;
+  }
+  .binary-input-icon { font-size: 48px; margin-bottom: 12px; }
+  .binary-input-filename {
+    font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+    font-weight: 600; color: var(--text-primary); margin-bottom: 4px;
+    word-break: break-all;
+  }
+  .binary-input-meta {
+    font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;
+  }
+  .binary-input-hint {
+    font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 18px;
+  }
+  .binary-input-clear {
+    background: none; border: 1px solid var(--border-subtle); border-radius: 4px;
+    color: var(--text-secondary); font-size: 12px; padding: 5px 14px;
+    cursor: pointer; font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .binary-input-clear:hover { color: var(--error); border-color: var(--error); }
+
   /* Override Ace gutter background */
   .ace_gutter { background: var(--bg-secondary) !important; border-right: 1px solid var(--border-subtle) !important; }
   .ace_gutter-cell { color: var(--text-muted) !important; }
@@ -900,16 +930,13 @@
   <span class="toolbar-spacer"></span>
 
   <div class="toolbar-group">
-    <button class="toolbar-btn active" id="btnCleanup" title="Toggle cleanup sidebar">🧹 Cleanup</button>
+    <button class="toolbar-btn" id="btnCleanup" title="Toggle cleanup sidebar">🧹 Cleanup</button>
     <div class="toolbar-divider"></div>
     <button class="toolbar-btn active" id="btnLayoutSide" title="Preview: right side">◫</button>
     <button class="toolbar-btn" id="btnLayoutBottom" title="Preview: bottom">⬓</button>
     <button class="toolbar-btn" id="btnLayoutHide" title="Hide preview">▣</button>
   </div>
 </div>
-
-<!-- Binary input info bar -->
-<div id="binaryInputInfo" style="display:none; padding:4px 12px; background:var(--bg-tertiary); border-bottom:1px solid var(--border-subtle); font-size:11px; color:var(--text-secondary); align-items:center; gap:8px;"></div>
 
 <!-- ═══ OPTIONS PANEL ═══ -->
 <div class="options-panel" id="optionsPanel">
@@ -1544,7 +1571,7 @@
 <div class="main-area" id="mainArea">
 
   <!-- SIDEBAR: Cleanup Tool -->
-  <aside class="sidebar" id="sidebar" role="complementary" aria-label="LaTeX Cleanup">
+  <aside class="sidebar collapsed" id="sidebar" role="complementary" aria-label="LaTeX Cleanup">
     <div class="sidebar-header">
       <span class="sidebar-title">LaTeX Cleanup</span>
       <button class="sidebar-close" id="sidebarClose" aria-label="Close cleanup sidebar">×</button>
@@ -1621,6 +1648,15 @@
       </div>
       <div class="editor-content">
         <div id="aceEditor"></div>
+        <div id="binaryInputOverlay" class="binary-input-overlay" style="display:none;">
+          <div class="binary-input-card">
+            <div class="binary-input-icon" id="binaryInputIcon">📄</div>
+            <div class="binary-input-filename" id="binaryInputName"></div>
+            <div class="binary-input-meta" id="binaryInputMeta"></div>
+            <div class="binary-input-hint">This file will be passed directly to Pandoc for conversion.<br>Click <strong>▶ Convert</strong> to process.</div>
+            <button class="binary-input-clear" id="btnClearBinary">✕ Remove file</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1831,9 +1867,9 @@ fileInput.addEventListener('change', async (e) => {
   const fmt = formatMap[ext];
 
   if (fmt && BINARY_INPUT_FORMATS.includes(fmt)) {
-    // Binary input — store as blob, show placeholder in editor
+    // Binary input — store as blob, show overlay
     inputBinaryFile = { name: file.name, blob: file };
-    editor.setValue(`[Binary file loaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\n\nThis file will be passed directly to Pandoc for conversion.\nClick "▶ Convert" to process.`, -1);
+    editor.setValue('', -1);
     editor.setReadOnly(true);
 
     if (fmt) {
@@ -1842,23 +1878,17 @@ fileInput.addEventListener('change', async (e) => {
       updateExtensions();
     }
 
-    // Show clear button
-    document.getElementById('binaryInputInfo').style.display = 'flex';
-    document.getElementById('binaryInputInfo').innerHTML =
-      `<span>📎 ${file.name}</span><button class="toolbar-btn" id="btnClearBinary" title="Remove file and return to text editor" style="font-size:11px;padding:2px 6px;">✕ Clear</button>`;
-    document.getElementById('btnClearBinary').addEventListener('click', () => {
-      inputBinaryFile = null;
-      editor.setValue('', -1);
-      editor.setReadOnly(false);
-      inputFileName = 'untitled';
-      document.getElementById('binaryInputInfo').style.display = 'none';
-      document.getElementById('tabFilename').textContent = 'untitled';
-    });
+    // Show binary input overlay
+    const iconMap = { 'docx': '📝', 'odt': '📝', 'pptx': '📊', 'epub': '📚', 'fb2': '📚', 'ipynb': '📓' };
+    document.getElementById('binaryInputIcon').textContent = iconMap[fmt] || '📄';
+    document.getElementById('binaryInputName').textContent = file.name;
+    document.getElementById('binaryInputMeta').textContent =
+      `${fmt.toUpperCase()} · ${(file.size / 1024).toFixed(1)} KB`;
+    document.getElementById('binaryInputOverlay').style.display = 'flex';
+
   } else {
     // Text input — read into editor as before
-    inputBinaryFile = null;
-    editor.setReadOnly(false);
-    document.getElementById('binaryInputInfo').style.display = 'none';
+    clearBinaryInput();
 
     const text = await file.text();
     editor.setValue(text, -1);
@@ -2922,6 +2952,18 @@ const BINARY_INPUT_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'fb2', 'ipynb'];
 let inputBinaryFile = null;  // { name, blob }
 let inputFileName = 'untitled';  // tracks current input file name (without extension)
 let lastOutput = null;  // { blob, filename } — stores last conversion output for download
+
+// Clear binary input state and restore editor
+function clearBinaryInput() {
+  inputBinaryFile = null;
+  editor.setValue('', -1);
+  editor.setReadOnly(false);
+  inputFileName = 'untitled';
+  document.getElementById('binaryInputOverlay').style.display = 'none';
+  document.getElementById('tabFilename').textContent = 'untitled';
+}
+
+document.getElementById('btnClearBinary').addEventListener('click', clearBinaryInput);
 
 // Download button handler
 document.getElementById('btnDownloadOutput').addEventListener('click', () => {
