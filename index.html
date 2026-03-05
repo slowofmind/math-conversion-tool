@@ -440,6 +440,42 @@
   }
   .binary-input-clear:hover { color: var(--error); border-color: var(--error); }
 
+  /* PDF conversion prompt modal */
+  .pdf-modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pdf-modal {
+    background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+    border-radius: 8px; padding: 24px 28px; max-width: 420px; width: 90%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  .pdf-modal h3 {
+    margin: 0 0 8px; font-size: 15px; font-weight: 600; color: var(--text-primary);
+  }
+  .pdf-modal p {
+    margin: 0 0 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.5;
+  }
+  .pdf-modal ul {
+    margin: 0 0 16px; padding-left: 20px; font-size: 12px;
+    color: var(--text-secondary); line-height: 1.6;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .pdf-modal-actions {
+    display: flex; gap: 8px; justify-content: flex-end;
+  }
+  .pdf-modal-btn {
+    padding: 6px 16px; border-radius: 4px; font-size: 13px; cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif; border: 1px solid var(--border-subtle);
+    background: var(--bg-tertiary); color: var(--text-primary);
+  }
+  .pdf-modal-btn:hover { background: var(--bg-hover); }
+  .pdf-modal-btn.primary {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+  }
+  .pdf-modal-btn.primary:hover { opacity: 0.9; }
+
   /* Override Ace gutter background */
   .ace_gutter { background: var(--bg-secondary) !important; border-right: 1px solid var(--border-subtle) !important; }
   .ace_gutter-cell { color: var(--text-muted) !important; }
@@ -1051,6 +1087,14 @@
       <div class="opt-file-upload">
         <button class="upload-btn" id="btnAuxDir">Upload Directory</button>
         <input type="file" id="auxDirInput" webkitdirectory style="display:none;">
+      </div>
+      <div class="opt-group">
+        <label for="opt-pdf-image-mode">PDF image conversion:</label>
+        <select id="opt-pdf-image-mode" style="width:110px;">
+          <option value="prompt" selected>Prompt</option>
+          <option value="auto">Auto</option>
+          <option value="off">Off</option>
+        </select>
       </div>
     </div>
     <div class="opt-file-list" id="auxFileList"></div>
@@ -2221,6 +2265,7 @@ document.getElementById('auxFileInput')?.addEventListener('change', async (e) =>
   }
   renderAuxFileList();
   e.target.value = '';
+  await handlePdfAuxFiles();
 });
 
 document.getElementById('btnAuxDir')?.addEventListener('click', () => {
@@ -2234,6 +2279,7 @@ document.getElementById('auxDirInput')?.addEventListener('change', async (e) => 
   }
   renderAuxFileList();
   e.target.value = '';
+  await handlePdfAuxFiles();
 });
 
 const resourceFiles = {
@@ -3300,6 +3346,229 @@ function buildFiles() {
     files[name] = (data instanceof Blob) ? data : new Blob([data]);
   }
   return files;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 5C: PDF IMAGE CONVERSION (MuPDF WASM)
+// ════════════════════════════════════════════════════════════════════
+
+let mupdfModule = null;  // cached MuPDF module
+let mupdfLoading = false;
+
+/**
+ * Lazy-load MuPDF WASM module. Only fetched the first time a PDF image
+ * is detected. The module is cached for subsequent conversions.
+ * Expects mupdf.js and its .wasm binary to be hosted alongside the app.
+ */
+async function loadMuPDF() {
+  if (mupdfModule) return mupdfModule;
+  if (mupdfLoading) {
+    // Another call is already loading — wait for it
+    while (mupdfLoading) await new Promise(r => setTimeout(r, 100));
+    return mupdfModule;
+  }
+  mupdfLoading = true;
+  try {
+    updateStatus('loading', 'Loading MuPDF WASM…');
+    mupdfModule = await import('./mupdf.js');
+    updateStatus('ready', `Pandoc WASM ${pandocVersion} ready`);
+    return mupdfModule;
+  } catch (err) {
+    console.error('Failed to load MuPDF:', err);
+    updateStatus('error', 'MuPDF failed to load');
+    throw err;
+  } finally {
+    mupdfLoading = false;
+  }
+}
+
+/**
+ * Convert a single-page PDF to SVG string.
+ * Uses MuPDF's DocumentWriter with 'svg' format and 'text=text' option
+ * to preserve text as <text> elements rather than path outlines.
+ */
+async function convertPdfToSvg(pdfArrayBuffer) {
+  const mupdf = await loadMuPDF();
+  let doc, page, displayList, buffer, writer;
+  try {
+    doc = new mupdf.PDFDocument(pdfArrayBuffer);
+    page = doc.loadPage(0);
+    const bounds = page.getBounds();
+    displayList = page.toDisplayList();
+
+    buffer = new mupdf.Buffer();
+    writer = new mupdf.DocumentWriter(buffer, 'svg', 'text=text');
+    const device = writer.beginPage(bounds);
+    displayList.run(device, mupdf.Matrix.identity);
+    writer.endPage();
+    writer.close();
+    writer = null;
+
+    const svgString = buffer.asString();
+
+    // Cleanup MuPDF objects
+    buffer.destroy(); buffer = null;
+    displayList.destroy(); displayList = null;
+    page.destroy(); page = null;
+    doc.destroy(); doc = null;
+
+    return svgString;
+  } finally {
+    // Ensure cleanup on error
+    try { if (writer) writer.close(); } catch (_) {}
+    try { if (buffer) buffer.destroy(); } catch (_) {}
+    try { if (displayList) displayList.destroy(); } catch (_) {}
+    try { if (page) page.destroy(); } catch (_) {}
+    try { if (doc) doc.destroy(); } catch (_) {}
+  }
+}
+
+/**
+ * Convert a single-page PDF to PNG (raster fallback).
+ * Renders at specified DPI using MuPDF's toPixmap.
+ */
+async function convertPdfToPng(pdfArrayBuffer, dpi = 150) {
+  const mupdf = await loadMuPDF();
+  let doc, page, pixmap;
+  try {
+    doc = new mupdf.PDFDocument(pdfArrayBuffer);
+    page = doc.loadPage(0);
+    const scale = dpi / 72;
+    pixmap = page.toPixmap(
+      mupdf.Matrix.scale(scale, scale),
+      mupdf.ColorSpace.DeviceRGB
+    );
+    const pngData = pixmap.asPNG();
+
+    pixmap.destroy(); pixmap = null;
+    page.destroy(); page = null;
+    doc.destroy(); doc = null;
+
+    return pngData;  // Uint8Array
+  } finally {
+    try { if (pixmap) pixmap.destroy(); } catch (_) {}
+    try { if (page) page.destroy(); } catch (_) {}
+    try { if (doc) doc.destroy(); } catch (_) {}
+  }
+}
+
+/**
+ * Detect PDF files in a set of auxiliary files.
+ * Returns array of filenames ending in .pdf (case-insensitive).
+ */
+function detectPdfFiles(fileEntries) {
+  return fileEntries.filter(name => name.toLowerCase().endsWith('.pdf'));
+}
+
+/**
+ * Show a prompt dialog asking the user how to handle detected PDF images.
+ * Returns a Promise that resolves to 'convert' | 'skip'.
+ */
+function showPdfPrompt(pdfNames) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'pdf-modal-overlay';
+    const fileListHtml = pdfNames.map(n => `<li>${n}</li>`).join('');
+    overlay.innerHTML = `
+      <div class="pdf-modal">
+        <h3>PDF Images Detected</h3>
+        <p>${pdfNames.length} PDF image${pdfNames.length > 1 ? 's were' : ' was'} found in the uploaded files.
+           PDF images cannot be displayed in HTML output. Convert them to SVG?</p>
+        <ul>${fileListHtml}</ul>
+        <div class="pdf-modal-actions">
+          <button class="pdf-modal-btn" id="pdfSkipBtn">Skip</button>
+          <button class="pdf-modal-btn primary" id="pdfConvertBtn">Convert to SVG</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#pdfConvertBtn').addEventListener('click', () => {
+      document.body.removeChild(overlay);
+      resolve('convert');
+    });
+    overlay.querySelector('#pdfSkipBtn').addEventListener('click', () => {
+      document.body.removeChild(overlay);
+      resolve('skip');
+    });
+  });
+}
+
+/**
+ * Process PDF files in auxFiles: convert each to SVG (or PNG fallback),
+ * replace the .pdf entry with the converted file, and return a summary.
+ */
+async function processPdfAuxFiles(pdfNames) {
+  const results = { converted: 0, failed: 0, details: [] };
+  for (const pdfName of pdfNames) {
+    const pdfData = resourceFiles.auxFiles[pdfName];
+    if (!pdfData) continue;
+
+    const baseName = pdfName.replace(/\.pdf$/i, '');
+    try {
+      const arrayBuffer = pdfData.buffer.slice(
+        pdfData.byteOffset,
+        pdfData.byteOffset + pdfData.byteLength
+      );
+      const svgString = await convertPdfToSvg(arrayBuffer);
+      const svgName = baseName + '.svg';
+      const encoder = new TextEncoder();
+      resourceFiles.auxFiles[svgName] = encoder.encode(svgString);
+      delete resourceFiles.auxFiles[pdfName];
+      results.converted++;
+      results.details.push(`${pdfName} → ${svgName}`);
+    } catch (err) {
+      console.error(`Failed to convert ${pdfName}:`, err);
+      // Try PNG fallback
+      try {
+        const arrayBuffer = pdfData.buffer.slice(
+          pdfData.byteOffset,
+          pdfData.byteOffset + pdfData.byteLength
+        );
+        const pngData = await convertPdfToPng(arrayBuffer);
+        const pngName = baseName + '.png';
+        resourceFiles.auxFiles[pngName] = pngData;
+        delete resourceFiles.auxFiles[pdfName];
+        results.converted++;
+        results.details.push(`${pdfName} → ${pngName} (raster fallback)`);
+      } catch (err2) {
+        console.error(`PNG fallback also failed for ${pdfName}:`, err2);
+        results.failed++;
+        results.details.push(`${pdfName} — conversion failed`);
+      }
+    }
+  }
+  return results;
+}
+
+/**
+ * Main entry point: check uploaded aux files for PDFs and handle
+ * according to the selected mode (off/prompt/auto).
+ */
+async function handlePdfAuxFiles() {
+  const mode = document.getElementById('opt-pdf-image-mode').value;
+  if (mode === 'off') return;
+
+  const pdfNames = detectPdfFiles(Object.keys(resourceFiles.auxFiles));
+  if (pdfNames.length === 0) return;
+
+  if (mode === 'prompt') {
+    const choice = await showPdfPrompt(pdfNames);
+    if (choice === 'skip') return;
+  }
+
+  // Convert (either auto mode or user chose 'convert')
+  updateStatus('loading', `Converting ${pdfNames.length} PDF image${pdfNames.length > 1 ? 's' : ''}…`);
+  const results = await processPdfAuxFiles(pdfNames);
+  renderAuxFileList();
+
+  const summary = results.converted > 0
+    ? `Converted ${results.converted} PDF image${results.converted > 1 ? 's' : ''} to SVG`
+    : '';
+  const failSummary = results.failed > 0
+    ? `${results.failed} failed`
+    : '';
+  const statusMsg = [summary, failSummary].filter(Boolean).join(', ');
+  updateStatus('ready', `Pandoc WASM ${pandocVersion} ready` + (statusMsg ? ` · ${statusMsg}` : ''));
+  console.log('PDF conversion results:', results.details);
 }
 
 // ════════════════════════════════════════════════════════════════════
