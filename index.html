@@ -2367,6 +2367,97 @@ end
 `
   },
   {
+    id: 'resolve-image-paths',
+    name: 'Resolve Image Paths',
+    filename: 'resolve-image-paths.lua',
+    description: 'Fixes image paths by swapping .pdf extensions to .svg/.png and stripping folder prefixes to match uploaded files. Runs for all output formats.',
+    defaultEnabled: true,
+    content: `-- resolve-image-paths.lua
+-- Resolves image paths that fail due to:
+--   1. Extension mismatch: LaTeX says diagram.pdf but we converted to diagram.svg
+--   2. Path mismatch: LaTeX says images/tikz/diagram.svg but the file was
+--      uploaded as diagram.svg without the folder structure
+--
+-- Tries a cascade of fallbacks and rewrites to the first one found.
+-- Logs every rewrite to stderr so it appears in the conversion log.
+-- Runs for ALL output formats (not just HTML).
+
+local function file_exists(path)
+  local f = io.open(path, "r")
+  if f then f:close() return true end
+  return false
+end
+
+local function basename(path)
+  return path:match("([^/\\\\]+)$") or path
+end
+
+local function swap_ext(path, new_ext)
+  return path:gsub("%.[^%.]+$", "." .. new_ext)
+end
+
+local function has_pdf_ext(path)
+  return path:lower():match("%.pdf$") ~= nil
+end
+
+function Image(el)
+  local src = el.src
+
+  -- Skip data URIs and remote URLs
+  if src:match("^data:") or src:match("^https?://") then
+    return nil
+  end
+
+  -- If original path works, nothing to do
+  if file_exists(src) then return nil end
+
+  -- Build candidate list
+  local candidates = {}
+  local base = basename(src)
+  local is_pdf = has_pdf_ext(src)
+
+  -- Try extension swaps on full path
+  if is_pdf then
+    table.insert(candidates, swap_ext(src, "svg"))
+    table.insert(candidates, swap_ext(src, "png"))
+  end
+
+  -- Try basename only (strips folder prefix)
+  table.insert(candidates, base)
+
+  -- Try basename with extension swaps
+  if is_pdf then
+    table.insert(candidates, swap_ext(base, "svg"))
+    table.insert(candidates, swap_ext(base, "png"))
+  end
+
+  -- Also try non-pdf extension swaps on basename
+  -- (e.g. user uploaded .jpg but latex says .png)
+  if not is_pdf then
+    local exts = {"png", "jpg", "jpeg", "svg", "gif", "webp"}
+    for _, ext in ipairs(exts) do
+      local swapped = swap_ext(base, ext)
+      if swapped ~= base then
+        table.insert(candidates, swapped)
+      end
+    end
+  end
+
+  -- Try each candidate
+  for _, candidate in ipairs(candidates) do
+    if file_exists(candidate) then
+      io.stderr:write("[resolve-image-paths] " .. src .. " -> " .. candidate .. "\\n")
+      el.src = candidate
+      return el
+    end
+  end
+
+  -- Nothing found — leave unchanged for downstream filters to handle
+  return nil
+end
+`
+  },
+  {
     id: 'embed-images',
     name: 'Embed Images',
     filename: 'embed-images.lua',
