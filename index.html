@@ -2237,39 +2237,56 @@ const resourceFiles = {
 //   content: the Lua source as a string
 const BUILT_IN_FILTERS = [
   {
-    id: 'missing-image-placeholder',
-    name: 'Missing Image Placeholder',
-    filename: 'missing-image-placeholder.lua',
-    description: 'Replaces missing images with a visible placeholder box showing the filename',
+    id: 'default-lists',
+    name: 'Default Lists',
+    filename: 'default-lists.lua',
+    description: 'Assigns numbered list styles by nesting depth: 1,2,3 → a,b,c → i,ii,iii → A,B,C',
     defaultEnabled: true,
-    content: `-- missing-image-placeholder.lua
--- Replaces missing Image elements with a visible inline placeholder.
--- Image is an inline element in pandoc's AST, so we must return
--- inline elements (Span), not block elements (Div).
-
-function Image(el)
-  -- Try to read the image file; if it fails, it's missing
-  local f = io.open(el.src, "r")
-  if f then
-    f:close()
-    return nil  -- image exists, leave it alone
+    content: `function Pandoc(doc)
+  -- A recursive function to walk through the document blocks top-down
+  local function process_blocks(blocks, current_depth)
+    for i, block in ipairs(blocks) do
+      
+      -- If the block is an Ordered List
+      if block.t == 'OrderedList' then
+        local attrs = block.listAttributes
+        
+        -- 'DefaultStyle' means the author used a standard \\\\begin{enumerate}
+        -- If it is anything else, they manually set a marker, so we leave it alone.
+        if attrs.style == 'DefaultStyle' then
+          if current_depth == 1 then
+            attrs.style = 'Decimal'      -- 1, 2, 3
+          elseif current_depth == 2 then
+            attrs.style = 'LowerAlpha'   -- a, b, c
+          elseif current_depth == 3 then
+            attrs.style = 'LowerRoman'   -- i, ii, iii
+          elseif current_depth == 4 then
+            attrs.style = 'UpperAlpha'   -- A, B, C
+          else
+            attrs.style = 'Decimal'      -- Fallback for extremely deep lists
+          end
+        end
+        
+        -- Apply the updated attributes back to the list
+        block.listAttributes = attrs
+        
+        -- Recursively process the items inside this list, increasing the depth counter
+        for j, item_blocks in ipairs(block.content) do
+          block.content[j] = process_blocks(item_blocks, current_depth + 1)
+        end
+        
+      -- Traverse into container blocks (like Divs or Quotes) without increasing list depth
+      elseif block.t == 'Div' or block.t == 'BlockQuote' then
+        block.content = process_blocks(block.content, current_depth)
+      end
+      
+    end
+    return blocks
   end
 
-  -- Build inline placeholder text
-  local caption_text = pandoc.utils.stringify(el.caption)
-  local label = "[\\u{26A0} Missing image: " .. el.src
-  if caption_text ~= "" then
-    label = label .. " | Caption: " .. caption_text
-  end
-  label = label .. "]"
-
-  -- Return a Span (inline element) with styling
-  return pandoc.Span(
-    { pandoc.Strong({ pandoc.Str(label) }) },
-    pandoc.Attr("", {"missing-image-placeholder"}, {
-      {"style", "border: 1px dashed #c0392b; padding: 2px 6px; background: #fdf2f2; color: #c0392b;"}
-    })
-  )
+  -- Start processing the entire document at list depth 1
+  doc.blocks = process_blocks(doc.blocks, 1)
+  return doc
 end
 `
   }
