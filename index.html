@@ -285,9 +285,8 @@
     font-size: 11px;
     font-family: 'IBM Plex Mono', monospace;
     border-radius: 2px;
-    outline: none;
   }
-  .pf-input:focus { border-color: var(--accent); }
+  .pf-input:focus { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: -1px; }
   .pf-input::placeholder { color: var(--text-muted); opacity: 0.5; font-family: 'IBM Plex Sans', sans-serif; }
 
   .pf-input-anchor { width: 50px; flex-shrink: 0; }
@@ -918,22 +917,22 @@
 </head>
 <body>
 
-<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ">
+<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ" aria-label="Upload document file">
 
 <!-- ═══ TOOLBAR ═══ -->
 <div class="toolbar" role="toolbar" aria-label="Main toolbar">
-  <span class="toolbar-title">PANDOC WASM</span>
+  <h1 class="toolbar-title">PANDOC WASM</h1>
   <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
-    <button class="toolbar-btn" id="btnUpload" title="Upload file">📄 Upload</button>
+    <button class="toolbar-btn" id="btnUpload" title="Upload file" aria-label="Upload file">📄 Upload</button>
   </div>
 
   <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
     <span class="toolbar-label">From:</span>
-    <select class="toolbar-select" id="selFrom">
+    <select class="toolbar-select" id="selFrom" aria-label="Input format">
       <option value="latex">latex</option>
       <option value="markdown">markdown</option>
       <option value="html">html</option>
@@ -942,7 +941,7 @@
       <option value="typst">typst</option>
     </select>
     <span class="toolbar-label" style="margin-left:4px;">To:</span>
-    <select class="toolbar-select" id="selTo">
+    <select class="toolbar-select" id="selTo" aria-label="Output format">
       <option value="html">html</option>
       <option value="markdown">markdown</option>
       <option value="latex">latex</option>
@@ -961,39 +960,39 @@
   <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
-    <button class="toolbar-btn options-toggle panel-open" id="btnOptions" title="Toggle conversion options panel">⚙ Options</button>
+    <button class="toolbar-btn options-toggle panel-open" id="btnOptions" title="Toggle conversion options panel" aria-expanded="true" aria-controls="optionsPanel">⚙ Options</button>
   </div>
 
   <span class="toolbar-spacer"></span>
 
   <div class="toolbar-group">
-    <button class="toolbar-btn" id="btnCleanup" title="Toggle cleanup sidebar">🧹 Cleanup</button>
+    <button class="toolbar-btn" id="btnCleanup" title="Toggle cleanup sidebar" aria-expanded="false" aria-controls="sidebar">🧹 Cleanup</button>
     <div class="toolbar-divider"></div>
-    <button class="toolbar-btn active" id="btnLayoutSide" title="Preview: right side">◫</button>
-    <button class="toolbar-btn" id="btnLayoutBottom" title="Preview: bottom">⬓</button>
-    <button class="toolbar-btn" id="btnLayoutHide" title="Hide preview">▣</button>
+    <button class="toolbar-btn active" id="btnLayoutSide" title="Preview: right side" aria-label="Side-by-side layout" aria-pressed="true">◫</button>
+    <button class="toolbar-btn" id="btnLayoutBottom" title="Preview: bottom" aria-label="Bottom layout" aria-pressed="false">⬓</button>
+    <button class="toolbar-btn" id="btnLayoutHide" title="Hide preview" aria-label="Hide preview" aria-pressed="false">▣</button>
   </div>
 </div>
 
 <!-- ═══ OPTIONS PANEL ═══ -->
-<div class="options-panel" id="optionsPanel">
-  <div class="options-tabs" id="optionsTabs">
-    <button class="options-tab active" data-tab="general">General</button>
-    <button class="options-tab" data-tab="headings">Headings</button>
-    <button class="options-tab" data-tab="media">Media</button>
-    <button class="options-tab" data-tab="citations">Citations</button>
-    <button class="options-tab" data-tab="math">Math</button>
-    <button class="options-tab" data-tab="code">Code</button>
-    <button class="options-tab" data-tab="format">Format-Specific</button>
-    <button class="options-tab" data-tab="template">Template</button>
-    <button class="options-tab" data-tab="metadata">Metadata</button>
-    <button class="options-tab" data-tab="filters">Filters</button>
-    <button class="options-tab" data-tab="wrapping">Wrapping</button>
-    <button class="options-tab" data-tab="extensions">Extensions</button>
+<div class="options-panel" id="optionsPanel" role="region" aria-label="Conversion options">
+  <div class="options-tabs" id="optionsTabs" role="tablist" aria-label="Conversion options">
+    <button class="options-tab active" data-tab="general" role="tab" id="opttab-general" aria-selected="true" aria-controls="panel-general" tabindex="0">General</button>
+    <button class="options-tab" data-tab="headings" role="tab" id="opttab-headings" aria-selected="false" aria-controls="panel-headings" tabindex="-1">Headings</button>
+    <button class="options-tab" data-tab="media" role="tab" id="opttab-media" aria-selected="false" aria-controls="panel-media" tabindex="-1">Media</button>
+    <button class="options-tab" data-tab="citations" role="tab" id="opttab-citations" aria-selected="false" aria-controls="panel-citations" tabindex="-1">Citations</button>
+    <button class="options-tab" data-tab="math" role="tab" id="opttab-math" aria-selected="false" aria-controls="panel-math" tabindex="-1">Math</button>
+    <button class="options-tab" data-tab="code" role="tab" id="opttab-code" aria-selected="false" aria-controls="panel-code" tabindex="-1">Code</button>
+    <button class="options-tab" data-tab="format" role="tab" id="opttab-format" aria-selected="false" aria-controls="panel-format" tabindex="-1">Format-Specific</button>
+    <button class="options-tab" data-tab="template" role="tab" id="opttab-template" aria-selected="false" aria-controls="panel-template" tabindex="-1">Template</button>
+    <button class="options-tab" data-tab="metadata" role="tab" id="opttab-metadata" aria-selected="false" aria-controls="panel-metadata" tabindex="-1">Metadata</button>
+    <button class="options-tab" data-tab="filters" role="tab" id="opttab-filters" aria-selected="false" aria-controls="panel-filters" tabindex="-1">Filters</button>
+    <button class="options-tab" data-tab="wrapping" role="tab" id="opttab-wrapping" aria-selected="false" aria-controls="panel-wrapping" tabindex="-1">Wrapping</button>
+    <button class="options-tab" data-tab="extensions" role="tab" id="opttab-extensions" aria-selected="false" aria-controls="panel-extensions" tabindex="-1">Extensions</button>
   </div>
 
   <!-- General -->
-  <div class="options-tab-panel active" id="panel-general">
+  <div class="options-tab-panel active" id="panel-general" role="tabpanel" aria-labelledby="opttab-general">
     <div class="options-grid">
       <div class="opt-group">
         <input type="checkbox" id="opt-standalone" checked>
@@ -1027,7 +1026,7 @@
   </div>
 
   <!-- Headings -->
-  <div class="options-tab-panel" id="panel-headings">
+  <div class="options-tab-panel" id="panel-headings" role="tabpanel" aria-labelledby="opttab-headings">
     <div class="options-grid">
       <div class="opt-group">
         <label for="opt-shift-heading">Shift heading level by:</label>
@@ -1066,7 +1065,7 @@
   </div>
 
   <!-- Media -->
-  <div class="options-tab-panel" id="panel-media">
+  <div class="options-tab-panel" id="panel-media" role="tabpanel" aria-labelledby="opttab-media">
     <div class="options-grid">
       <div class="opt-group">
         <input type="checkbox" id="opt-extract-media">
@@ -1081,13 +1080,13 @@
         <input type="text" id="opt-resource-path" placeholder=".:images" style="width:180px;">
       </div>
       <div class="opt-file-upload">
-        <label>Auxiliary files:</label>
+        <span>Auxiliary files:</span>
         <button class="upload-btn" id="btnAuxFiles">Upload Files</button>
-        <input type="file" id="auxFileInput" multiple style="display:none;">
+        <input type="file" id="auxFileInput" multiple style="display:none;" aria-label="Upload auxiliary files">
       </div>
       <div class="opt-file-upload">
         <button class="upload-btn" id="btnAuxDir">Upload Directory</button>
-        <input type="file" id="auxDirInput" webkitdirectory style="display:none;">
+        <input type="file" id="auxDirInput" webkitdirectory style="display:none;" aria-label="Upload auxiliary directory">
       </div>
       <div class="opt-group">
         <label for="opt-pdf-image-mode">PDF image conversion:</label>
@@ -1102,7 +1101,7 @@
   </div>
 
   <!-- Citations -->
-  <div class="options-tab-panel" id="panel-citations">
+  <div class="options-tab-panel" id="panel-citations" role="tabpanel" aria-labelledby="opttab-citations">
     <div class="options-grid">
       <div class="opt-group">
         <label for="opt-citation-method">Citation processing:</label>
@@ -1114,25 +1113,25 @@
         </select>
       </div>
       <div class="opt-file-upload">
-        <label>Bibliography:</label>
+        <span>Bibliography:</span>
         <button class="upload-btn" id="btnBibFile">Upload .bib/.json/.yaml</button>
-        <input type="file" id="bibFileInput" accept=".bib,.bibtex,.json,.yaml,.yml" style="display:none;">
+        <input type="file" id="bibFileInput" accept=".bib,.bibtex,.json,.yaml,.yml" style="display:none;" aria-label="Upload bibliography file">
         <span class="file-name" id="bibFileName"></span>
         <button class="file-remove" id="bibFileRemove" style="display:none;">×</button>
       </div>
     </div>
     <div class="options-grid" style="margin-top:6px;" id="citeprocOptions">
       <div class="opt-file-upload">
-        <label>CSL style:</label>
+        <span>CSL style:</span>
         <button class="upload-btn" id="btnCslFile">Upload .csl</button>
-        <input type="file" id="cslFileInput" accept=".csl" style="display:none;">
+        <input type="file" id="cslFileInput" accept=".csl" style="display:none;" aria-label="Upload CSL style file">
         <span class="file-name" id="cslFileName"></span>
         <button class="file-remove" id="cslFileRemove" style="display:none;">×</button>
       </div>
       <div class="opt-file-upload">
-        <label>Citation abbreviations:</label>
+        <span>Citation abbreviations:</span>
         <button class="upload-btn" id="btnAbbrevFile">Upload .json</button>
-        <input type="file" id="abbrevFileInput" accept=".json" style="display:none;">
+        <input type="file" id="abbrevFileInput" accept=".json" style="display:none;" aria-label="Upload citation abbreviations file">
         <span class="file-name" id="abbrevFileName"></span>
         <button class="file-remove" id="abbrevFileRemove" style="display:none;">×</button>
       </div>
@@ -1140,7 +1139,7 @@
   </div>
 
   <!-- Math -->
-  <div class="options-tab-panel" id="panel-math">
+  <div class="options-tab-panel" id="panel-math" role="tabpanel" aria-labelledby="opttab-math">
     <div class="options-grid">
       <div class="opt-group">
         <label for="opt-math">Math rendering method:</label>
@@ -1157,7 +1156,7 @@
   </div>
 
   <!-- Code -->
-  <div class="options-tab-panel" id="panel-code">
+  <div class="options-tab-panel" id="panel-code" role="tabpanel" aria-labelledby="opttab-code">
     <div class="options-grid">
       <div class="opt-group">
         <label for="opt-highlight-style">Highlight style:</label>
@@ -1181,23 +1180,23 @@
         <input type="text" id="opt-indented-code-classes" placeholder="e.g. haskell, python" style="width:160px;">
       </div>
       <div class="opt-file-upload" id="customThemeUpload" style="display:none;">
-        <label>Custom theme:</label>
+        <span>Custom theme:</span>
         <button class="upload-btn" id="btnHighlightTheme">Upload .theme</button>
-        <input type="file" id="highlightThemeInput" accept=".theme" style="display:none;">
+        <input type="file" id="highlightThemeInput" accept=".theme" style="display:none;" aria-label="Upload highlight theme file">
         <span class="file-name" id="highlightThemeName"></span>
         <button class="file-remove" id="highlightThemeRemove" style="display:none;">×</button>
       </div>
       <div class="opt-file-upload">
-        <label>Syntax definitions:</label>
+        <span>Syntax definitions:</span>
         <button class="upload-btn" id="btnSyntaxDefs">Add .xml files</button>
-        <input type="file" id="syntaxDefsInput" accept=".xml" multiple style="display:none;">
+        <input type="file" id="syntaxDefsInput" accept=".xml" multiple style="display:none;" aria-label="Upload syntax definition files">
       </div>
     </div>
     <div class="opt-file-list" id="syntaxDefsList"></div>
   </div>
 
   <!-- Format-specific -->
-  <div class="options-tab-panel" id="panel-format">
+  <div class="options-tab-panel" id="panel-format" role="tabpanel" aria-labelledby="opttab-format">
     <!-- Reader options -->
     <details class="fmt-section">
       <summary>Reader / Input</summary>
@@ -1212,9 +1211,9 @@
           <input type="text" id="opt-default-image-extension" placeholder=".png" style="width:60px;">
         </div>
         <div class="opt-file-upload">
-          <label>Abbreviations file:</label>
+          <span>Abbreviations file:</span>
           <button class="upload-btn" id="btnAbbrevsFile">Upload</button>
-          <input type="file" id="abbrevsFileInput" style="display:none;">
+          <input type="file" id="abbrevsFileInput" style="display:none;" aria-label="Upload abbreviations file">
           <span class="file-name" id="abbrevsFileName"></span>
           <button class="file-remove" id="abbrevsFileRemove" style="display:none;">×</button>
         </div>
@@ -1269,9 +1268,9 @@
           </select>
         </div>
         <div class="opt-file-upload">
-          <label>CSS files:</label>
+          <span>CSS files:</span>
           <button class="upload-btn" id="btnCssFiles">Add .css</button>
-          <input type="file" id="cssFilesInput" accept=".css" multiple style="display:none;">
+          <input type="file" id="cssFilesInput" accept=".css" multiple style="display:none;" aria-label="Upload CSS files">
         </div>
       </div>
       <div class="opt-file-list" id="cssFileList"></div>
@@ -1385,23 +1384,23 @@
       <div class="fmt-section-body">
       <div class="options-grid">
         <div class="opt-file-upload">
-          <label>Cover image:</label>
+          <span>Cover image:</span>
           <button class="upload-btn" id="btnEpubCover">Upload image</button>
-          <input type="file" id="epubCoverInput" accept="image/*" style="display:none;">
+          <input type="file" id="epubCoverInput" accept="image/*" style="display:none;" aria-label="Upload EPUB cover image">
           <span class="file-name" id="epubCoverName"></span>
           <button class="file-remove" id="epubCoverRemove" style="display:none;">×</button>
         </div>
         <div class="opt-file-upload">
-          <label>EPUB metadata:</label>
+          <span>EPUB metadata:</span>
           <button class="upload-btn" id="btnEpubMeta">Upload .xml</button>
-          <input type="file" id="epubMetaInput" accept=".xml" style="display:none;">
+          <input type="file" id="epubMetaInput" accept=".xml" style="display:none;" aria-label="Upload EPUB metadata file">
           <span class="file-name" id="epubMetaName"></span>
           <button class="file-remove" id="epubMetaRemove" style="display:none;">×</button>
         </div>
         <div class="opt-file-upload">
-          <label>Fonts:</label>
+          <span>Fonts:</span>
           <button class="upload-btn" id="btnEpubFonts">Add fonts</button>
-          <input type="file" id="epubFontsInput" accept=".ttf,.otf,.woff,.woff2" multiple style="display:none;">
+          <input type="file" id="epubFontsInput" accept=".ttf,.otf,.woff,.woff2" multiple style="display:none;" aria-label="Upload EPUB font files">
         </div>
         <div class="opt-group">
           <input type="checkbox" id="opt-epub-title-page" checked>
@@ -1478,19 +1477,19 @@
   </div>
 
   <!-- Template -->
-  <div class="options-tab-panel" id="panel-template">
+  <div class="options-tab-panel" id="panel-template" role="tabpanel" aria-labelledby="opttab-template">
     <div class="options-grid">
       <div class="opt-file-upload">
-        <label>Custom template:</label>
+        <span>Custom template:</span>
         <button class="upload-btn" id="btnTemplateFile">Upload template</button>
-        <input type="file" id="templateFileInput" style="display:none;">
+        <input type="file" id="templateFileInput" style="display:none;" aria-label="Upload custom template">
         <span class="file-name" id="templateFileName"></span>
         <button class="file-remove" id="templateFileRemove" style="display:none;">×</button>
       </div>
       <div class="opt-file-upload">
-        <label>Reference doc (docx/odt/pptx):</label>
+        <span>Reference doc (docx/odt/pptx):</span>
         <button class="upload-btn" id="btnRefDoc">Upload</button>
-        <input type="file" id="refDocInput" accept=".docx,.odt,.pptx" style="display:none;">
+        <input type="file" id="refDocInput" accept=".docx,.odt,.pptx" style="display:none;" aria-label="Upload reference document">
         <span class="file-name" id="refDocName"></span>
         <button class="file-remove" id="refDocRemove" style="display:none;">×</button>
       </div>
@@ -1500,19 +1499,19 @@
       <span class="opt-section-label">Include Files</span>
       <div class="options-grid" style="margin-top:3px;">
         <div class="opt-file-upload">
-          <label>In header:</label>
+          <span>In header:</span>
           <button class="upload-btn" id="btnHeaderFiles">Add files</button>
-          <input type="file" id="headerFilesInput" multiple style="display:none;">
+          <input type="file" id="headerFilesInput" multiple style="display:none;" aria-label="Upload header include files">
         </div>
         <div class="opt-file-upload">
-          <label>Before body:</label>
+          <span>Before body:</span>
           <button class="upload-btn" id="btnBeforeFiles">Add files</button>
-          <input type="file" id="beforeFilesInput" multiple style="display:none;">
+          <input type="file" id="beforeFilesInput" multiple style="display:none;" aria-label="Upload before-body include files">
         </div>
         <div class="opt-file-upload">
-          <label>After body:</label>
+          <span>After body:</span>
           <button class="upload-btn" id="btnAfterFiles">Add files</button>
-          <input type="file" id="afterFilesInput" multiple style="display:none;">
+          <input type="file" id="afterFilesInput" multiple style="display:none;" aria-label="Upload after-body include files">
         </div>
       </div>
       <div class="opt-file-list" id="headerFilesList"></div>
@@ -1543,12 +1542,12 @@
   </div>
 
   <!-- Metadata -->
-  <div class="options-tab-panel" id="panel-metadata">
+  <div class="options-tab-panel" id="panel-metadata" role="tabpanel" aria-labelledby="opttab-metadata">
     <div class="options-grid">
       <div class="opt-file-upload">
-        <label>Metadata file (.yaml/.json):</label>
+        <span>Metadata file (.yaml/.json):</span>
         <button class="upload-btn" id="btnMetadataFile">Upload</button>
-        <input type="file" id="metadataFileInput" accept=".yaml,.yml,.json" style="display:none;">
+        <input type="file" id="metadataFileInput" accept=".yaml,.yml,.json" style="display:none;" aria-label="Upload metadata file">
         <span class="file-name" id="metadataFileName"></span>
         <button class="file-remove" id="metadataFileRemove" style="display:none;">×</button>
       </div>
@@ -1567,12 +1566,12 @@
   </div>
 
   <!-- Filters -->
-  <div class="options-tab-panel" id="panel-filters">
+  <div class="options-tab-panel" id="panel-filters" role="tabpanel" aria-labelledby="opttab-filters">
     <div class="options-grid">
       <div class="opt-file-upload">
-        <label>Lua filters (.lua):</label>
+        <span>Lua filters (.lua):</span>
         <button class="upload-btn" id="btnLuaFilters">Add Lua filters</button>
-        <input type="file" id="luaFiltersInput" accept=".lua" multiple style="display:none;">
+        <input type="file" id="luaFiltersInput" accept=".lua" multiple style="display:none;" aria-label="Upload Lua filter files">
       </div>
     </div>
     <div id="luaFiltersList" style="margin-top:4px;"></div>
@@ -1580,7 +1579,7 @@
   </div>
 
   <!-- Wrapping -->
-  <div class="options-tab-panel" id="panel-wrapping">
+  <div class="options-tab-panel" id="panel-wrapping" role="tabpanel" aria-labelledby="opttab-wrapping">
     <div class="options-grid">
       <div class="opt-group">
         <label for="opt-wrap">Wrap mode:</label>
@@ -1598,7 +1597,7 @@
   </div>
 
   <!-- Extensions -->
-  <div class="options-tab-panel" id="panel-extensions">
+  <div class="options-tab-panel" id="panel-extensions" role="tabpanel" aria-labelledby="opttab-extensions">
     <div style="display:flex; gap:24px; flex-wrap:wrap; width:100%;">
       <div style="flex:1; min-width:200px;">
         <span class="opt-section-label" id="extInputHeader">Input Extensions</span>
@@ -1613,7 +1612,7 @@
 </div>
 
 <!-- ═══ MAIN AREA ═══ -->
-<div class="main-area" id="mainArea">
+<main class="main-area" id="mainArea">
 
   <!-- SIDEBAR: Cleanup Tool -->
   <aside class="sidebar collapsed" id="sidebar" role="complementary" aria-label="LaTeX Cleanup">
@@ -1626,31 +1625,31 @@
       <div class="cleanup-section">
         <div class="cleanup-section-label">Profile</div>
         <div style="display:flex; gap:4px;">
-          <select class="cleanup-select" id="cleanupProfile" style="flex:1;"></select>
-          <button class="toolbar-btn" id="btnDuplicateProfile" style="font-size:10px; padding:3px 6px;" title="Duplicate profile">⧉</button>
-          <button class="toolbar-btn" id="btnDeleteProfile" style="font-size:10px; padding:3px 6px; color:var(--error);" title="Delete profile">✕</button>
+          <select class="cleanup-select" id="cleanupProfile" style="flex:1;" aria-label="Cleanup profile"></select>
+          <button class="toolbar-btn" id="btnDuplicateProfile" style="font-size:10px; padding:3px 6px;" title="Duplicate profile" aria-label="Duplicate profile">⧉</button>
+          <button class="toolbar-btn" id="btnDeleteProfile" style="font-size:10px; padding:3px 6px; color:var(--error);" title="Delete profile" aria-label="Delete profile">✕</button>
         </div>
       </div>
 
       <!-- Profile scope -->
       <div class="cleanup-section">
         <div class="scope-section" id="profileScopeSection">
-          <div class="scope-header" id="profileScopeHeader">
+          <div class="scope-header" id="profileScopeHeader" role="button" tabindex="0" aria-expanded="false" aria-controls="profileScopeFields">
             <span>Scope (entire file)</span>
-            <span id="profileScopeToggle">›</span>
+            <span id="profileScopeToggle" aria-hidden="true">›</span>
           </div>
           <div class="scope-fields" id="profileScopeFields" style="display:none;">
             <div class="pf-row">
               <span class="pf-label">O:</span>
-              <input class="pf-input pf-input-flex" id="scopeOpenPrefix" placeholder="Prefix">
-              <input class="pf-input pf-input-anchor" id="scopeOpenAnchor" placeholder="Anchor">
-              <input class="pf-input pf-input-flex" id="scopeOpenSuffix" placeholder="Suffix">
+              <input class="pf-input pf-input-flex" id="scopeOpenPrefix" placeholder="Prefix" aria-label="Opening scope prefix">
+              <input class="pf-input pf-input-anchor" id="scopeOpenAnchor" placeholder="Anchor" aria-label="Opening scope anchor">
+              <input class="pf-input pf-input-flex" id="scopeOpenSuffix" placeholder="Suffix" aria-label="Opening scope suffix">
             </div>
             <div class="pf-row">
               <span class="pf-label">C:</span>
-              <input class="pf-input pf-input-flex" id="scopeClosePrefix" placeholder="Prefix">
-              <input class="pf-input pf-input-anchor" id="scopeCloseAnchor" placeholder="Anchor">
-              <input class="pf-input pf-input-flex" id="scopeCloseSuffix" placeholder="Suffix">
+              <input class="pf-input pf-input-flex" id="scopeClosePrefix" placeholder="Prefix" aria-label="Closing scope prefix">
+              <input class="pf-input pf-input-anchor" id="scopeCloseAnchor" placeholder="Anchor" aria-label="Closing scope anchor">
+              <input class="pf-input pf-input-flex" id="scopeCloseSuffix" placeholder="Suffix" aria-label="Closing scope suffix">
             </div>
           </div>
         </div>
@@ -1661,8 +1660,8 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <div class="cleanup-section-label" style="margin-bottom:0;">Patterns <span id="patternCount">(0)</span></div>
           <div style="display:flex; gap:4px;">
-            <button class="toolbar-btn" id="btnExpandAll" style="font-size:10px; padding:2px 6px;">⊞</button>
-            <button class="toolbar-btn" id="btnCollapseAll" style="font-size:10px; padding:2px 6px;">⊟</button>
+            <button class="toolbar-btn" id="btnExpandAll" style="font-size:10px; padding:2px 6px;" aria-label="Expand all patterns">⊞</button>
+            <button class="toolbar-btn" id="btnCollapseAll" style="font-size:10px; padding:2px 6px;" aria-label="Collapse all patterns">⊟</button>
           </div>
         </div>
         <div id="patternList" style="max-height: calc(100vh - 480px); overflow-y: auto;"></div>
@@ -1671,7 +1670,7 @@
       <!-- Add pattern -->
       <div class="cleanup-section">
         <div style="display:flex; gap:4px;">
-          <select class="cleanup-select" id="addPatternType" style="flex:1;">
+          <select class="cleanup-select" id="addPatternType" style="flex:1;" aria-label="New pattern type">
             <option value="matched_pair">Matched Pair</option>
             <option value="single_string">Single String</option>
           </select>
@@ -1710,38 +1709,38 @@
 
     <!-- OUTPUT PANEL -->
     <div class="output-panel" id="outputPanel">
-      <div class="output-tabs">
-        <button class="output-tab active" data-tab="preview">Preview</button>
-        <button class="output-tab" data-tab="log">Log <span id="logBadge"></span></button>
-        <button class="output-tab" data-tab="source">Source</button>
-        <button class="output-tab-action" id="btnDownloadOutput" title="Download output" style="display:none;">📥 Download</button>
+      <div class="output-tabs" role="tablist" aria-label="Output view">
+        <button class="output-tab active" data-tab="preview" role="tab" id="outtab-preview" aria-selected="true" aria-controls="tabPreview" tabindex="0">Preview</button>
+        <button class="output-tab" data-tab="log" role="tab" id="outtab-log" aria-selected="false" aria-controls="tabLog" tabindex="-1">Log <span id="logBadge"></span></button>
+        <button class="output-tab" data-tab="source" role="tab" id="outtab-source" aria-selected="false" aria-controls="tabSource" tabindex="-1">Source</button>
+        <button class="output-tab-action" id="btnDownloadOutput" title="Download output" aria-label="Download output" style="display:none;">📥 Download</button>
         <span class="output-tab-spacer"></span>
-        <button class="output-tab-action" id="btnOutputClose" title="Hide panel">×</button>
+        <button class="output-tab-action" id="btnOutputClose" title="Hide panel" aria-label="Close output panel">×</button>
       </div>
       <div class="output-body">
-        <div class="tab-content active" id="tabPreview">
+        <div class="tab-content active" id="tabPreview" role="tabpanel" aria-labelledby="outtab-preview">
           <iframe id="previewFrame" sandbox="allow-scripts" title="HTML preview"></iframe>
         </div>
-        <div class="tab-content" id="tabLog" role="log" aria-label="Conversion log" aria-live="polite">
+        <div class="tab-content" id="tabLog" role="tabpanel" aria-labelledby="outtab-log" aria-live="polite">
           <div class="log-container" id="logContainer">
             <div style="color: var(--text-muted); padding: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;">
               Run a conversion to see log output.
             </div>
           </div>
         </div>
-        <div class="tab-content" id="tabSource">
+        <div class="tab-content" id="tabSource" role="tabpanel" aria-labelledby="outtab-source">
           <div id="outputSource"></div>
         </div>
       </div>
     </div>
 
   </div><!-- /center-wrap -->
-</div><!-- /main-area -->
+</main><!-- /main-area -->
 
 <!-- ═══ STATUS BAR ═══ -->
 <div class="statusbar" role="status">
   <div class="statusbar-item">
-    <span class="status-dot loading" id="statusDot"></span>
+    <span class="status-dot loading" id="statusDot" aria-hidden="true"></span>
     <span id="statusText">Loading Pandoc WASM…</span>
   </div>
   <div class="statusbar-item" id="statusFormat">LaTeX</div>
@@ -1759,6 +1758,8 @@
 const editor = ace.edit('aceEditor');
 editor.setTheme('ace/theme/one_dark');
 editor.session.setMode('ace/mode/latex');
+editor.renderer.getContainerElement().setAttribute('aria-label', 'Source editor');
+editor.textInput.getElement().setAttribute('aria-label', 'Source editor');
 editor.setOptions({
   fontSize: '13px',
   fontFamily: "'IBM Plex Mono', monospace",
@@ -1785,6 +1786,8 @@ const sourceEditor = ace.edit('outputSource');
 sourceEditor.setTheme('ace/theme/one_dark');
 sourceEditor.session.setMode('ace/mode/html');
 sourceEditor.setReadOnly(true);
+sourceEditor.renderer.getContainerElement().setAttribute('aria-label', 'Output source viewer');
+sourceEditor.textInput.getElement().setAttribute('aria-label', 'Output source viewer');
 sourceEditor.setOptions({
   fontSize: '12px',
   fontFamily: "'IBM Plex Mono', monospace",
@@ -2185,21 +2188,53 @@ btnOptions.addEventListener('click', () => {
   btnOptions.classList.toggle('panel-open');
 });
 
-// --- Tab switching ---
+// --- Tab switching (with ARIA tab pattern) ---
 const optionsTabs = document.getElementById('optionsTabs');
+
+function activateOptionsTab(tab) {
+  const tabName = tab.dataset.tab;
+  // Deactivate all tabs and panels
+  optionsTabs.querySelectorAll('.options-tab').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+    t.setAttribute('tabindex', '-1');
+  });
+  document.querySelectorAll('.options-tab-panel').forEach(p => p.classList.remove('active'));
+  // Activate clicked tab and panel
+  tab.classList.add('active');
+  tab.setAttribute('aria-selected', 'true');
+  tab.setAttribute('tabindex', '0');
+  tab.focus();
+  const panel = document.getElementById('panel-' + tabName);
+  if (panel) panel.classList.add('active');
+}
+
 optionsTabs.addEventListener('click', (e) => {
   const tab = e.target.closest('.options-tab');
   if (!tab) return;
-  const tabName = tab.dataset.tab;
+  activateOptionsTab(tab);
+});
 
-  // Deactivate all tabs and panels
-  optionsTabs.querySelectorAll('.options-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.options-tab-panel').forEach(p => p.classList.remove('active'));
-
-  // Activate clicked tab and panel
-  tab.classList.add('active');
-  const panel = document.getElementById('panel-' + tabName);
-  if (panel) panel.classList.add('active');
+// Arrow key navigation for options tabs
+optionsTabs.addEventListener('keydown', (e) => {
+  const tabs = [...optionsTabs.querySelectorAll('.options-tab')];
+  const current = tabs.indexOf(e.target);
+  if (current < 0) return;
+  let next;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    next = tabs[(current + 1) % tabs.length];
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    next = tabs[(current - 1 + tabs.length) % tabs.length];
+  } else if (e.key === 'Home') {
+    e.preventDefault();
+    next = tabs[0];
+  } else if (e.key === 'End') {
+    e.preventDefault();
+    next = tabs[tabs.length - 1];
+  }
+  if (next) activateOptionsTab(next);
 });
 
 // --- Collected resource files (populated by future tabs) ---
@@ -2799,9 +2834,9 @@ function addTemplateVarRow(key, val) {
   const container = document.getElementById('templateVarRows');
   const row = document.createElement('div');
   row.className = 'opt-kv-row';
-  row.innerHTML = `<input type="text" placeholder="variable name" list="variable-suggestions" value="${key || ''}">` +
-    `<input type="text" placeholder="value" value="${val || ''}">` +
-    `<button class="kv-remove">×</button>`;
+  row.innerHTML = `<input type="text" placeholder="variable name" list="variable-suggestions" value="${key || ''}" aria-label="Template variable name">` +
+    `<input type="text" placeholder="value" value="${val || ''}" aria-label="Template variable value">` +
+    `<button class="kv-remove" aria-label="Remove variable">×</button>`;
   row.querySelector('.kv-remove').addEventListener('click', () => row.remove());
   container.appendChild(row);
 }
@@ -2817,9 +2852,9 @@ function addMetadataRow(key, val) {
   const container = document.getElementById('metadataKvRows');
   const row = document.createElement('div');
   row.className = 'opt-kv-row';
-  row.innerHTML = `<input type="text" placeholder="field name" list="metadata-suggestions" value="${key || ''}">` +
-    `<input type="text" placeholder="value" value="${val || ''}">` +
-    `<button class="kv-remove">×</button>`;
+  row.innerHTML = `<input type="text" placeholder="field name" list="metadata-suggestions" value="${key || ''}" aria-label="Metadata field name">` +
+    `<input type="text" placeholder="value" value="${val || ''}" aria-label="Metadata field value">` +
+    `<button class="kv-remove" aria-label="Remove field">×</button>`;
   row.querySelector('.kv-remove').addEventListener('click', () => row.remove());
   container.appendChild(row);
 }
@@ -2879,7 +2914,7 @@ function renderLuaFiltersList() {
       tag.className = 'opt-file-tag builtin-filter' + (enabled ? ' enabled' : '');
       tag.title = def.description;
       tag.innerHTML = `<span style="color:var(--text-muted);font-size:10px;margin-right:2px;">☰</span>` +
-        `<input type="checkbox" class="builtin-checkbox" data-builtin-id="${entry.id}" ${enabled ? 'checked' : ''}>` +
+        `<input type="checkbox" class="builtin-checkbox" data-builtin-id="${entry.id}" ${enabled ? 'checked' : ''} aria-label="Enable ${def.name} filter">` +
         `${def.name}<span class="builtin-label">(built-in)</span>`;
       // Checkbox toggle
       tag.querySelector('.builtin-checkbox').addEventListener('change', (ev) => {
@@ -4339,16 +4374,18 @@ document.getElementById('btnDeleteProfile').addEventListener('click', () => {
 });
 
 // ─── Profile scope toggle ───
-document.getElementById('profileScopeHeader').addEventListener('click', () => {
+const scopeHeader = document.getElementById('profileScopeHeader');
+function toggleScope() {
   const fields = document.getElementById('profileScopeFields');
   const toggle = document.getElementById('profileScopeToggle');
-  if (fields.style.display === 'none') {
-    fields.style.display = '';
-    toggle.textContent = '⌄';
-  } else {
-    fields.style.display = 'none';
-    toggle.textContent = '›';
-  }
+  const isExpanding = fields.style.display === 'none';
+  fields.style.display = isExpanding ? '' : 'none';
+  toggle.textContent = isExpanding ? '⌄' : '›';
+  scopeHeader.setAttribute('aria-expanded', isExpanding ? 'true' : 'false');
+}
+scopeHeader.addEventListener('click', toggleScope);
+scopeHeader.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleScope(); }
 });
 
 // Save scope on blur
@@ -4417,6 +4454,7 @@ function createPatternItem(pattern, index) {
   const del = document.createElement('button');
   del.className = 'pattern-delete';
   del.textContent = '×';
+  del.setAttribute('aria-label', 'Delete pattern');
   del.onclick = (e) => { e.stopPropagation(); deletePattern(index); };
 
   header.appendChild(toggle);
@@ -4442,6 +4480,7 @@ function mkInput(cls, placeholder, value, onBlur) {
   inp.className = 'pf-input ' + cls;
   inp.placeholder = placeholder;
   inp.value = value;
+  inp.setAttribute('aria-label', placeholder);
   inp.onblur = () => onBlur(inp.value);
   return inp;
 }
@@ -4707,20 +4746,58 @@ renderCleanupUI();
 // SECTION 9: OUTPUT TABS
 // ════════════════════════════════════════════════════════════════════
 
-document.querySelectorAll('.output-tab[data-tab]').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.output-tab[data-tab]').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    const target = 'tab' + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1);
-    document.getElementById(target).classList.add('active');
+// Output tabs (with ARIA tab pattern)
+const outputTabList = document.querySelector('.output-tabs[role="tablist"]');
+const outputTabs = [...document.querySelectorAll('.output-tab[data-tab]')];
 
-    // Resize source editor when its tab is shown
-    if (tab.dataset.tab === 'source') {
-      setTimeout(() => sourceEditor.resize(), 50);
-    }
+function activateOutputTab(tab) {
+  outputTabs.forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+    t.setAttribute('tabindex', '-1');
   });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+  tab.classList.add('active');
+  tab.setAttribute('aria-selected', 'true');
+  tab.setAttribute('tabindex', '0');
+  tab.focus();
+
+  const target = 'tab' + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1);
+  document.getElementById(target).classList.add('active');
+
+  // Resize source editor when its tab is shown
+  if (tab.dataset.tab === 'source') {
+    setTimeout(() => sourceEditor.resize(), 50);
+  }
+}
+
+outputTabs.forEach(tab => {
+  tab.addEventListener('click', () => activateOutputTab(tab));
 });
+
+// Arrow key navigation for output tabs
+if (outputTabList) {
+  outputTabList.addEventListener('keydown', (e) => {
+    const current = outputTabs.indexOf(e.target);
+    if (current < 0) return;
+    let next;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      next = outputTabs[(current + 1) % outputTabs.length];
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      next = outputTabs[(current - 1 + outputTabs.length) % outputTabs.length];
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      next = outputTabs[0];
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      next = outputTabs[outputTabs.length - 1];
+    }
+    if (next) activateOutputTab(next);
+  });
+}
 
 // ════════════════════════════════════════════════════════════════════
 // SECTION 10: LAYOUT & RESIZE
@@ -4734,6 +4811,8 @@ const sidebarClose = document.getElementById('sidebarClose');
 function toggleSidebar() {
   sidebar.classList.toggle('collapsed');
   btnCleanup.classList.toggle('active');
+  const isExpanded = !sidebar.classList.contains('collapsed');
+  btnCleanup.setAttribute('aria-expanded', String(isExpanded));
   // Resize Ace editors after CSS transition completes
   setTimeout(() => { editor.resize(); sourceEditor.resize(); }, 250);
 }
@@ -4751,7 +4830,10 @@ const btnBottom = document.getElementById('btnLayoutBottom');
 const btnHide   = document.getElementById('btnLayoutHide');
 
 function setLayout(mode) {
-  [btnSide, btnBottom, btnHide].forEach(b => b.classList.remove('active'));
+  [btnSide, btnBottom, btnHide].forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
 
   // Reset inline styles from any prior resize dragging
   editorArea.style.flex   = '';
@@ -4763,18 +4845,21 @@ function setLayout(mode) {
 
   if (mode === 'side') {
     btnSide.classList.add('active');
+    btnSide.setAttribute('aria-pressed', 'true');
     centerWrap.className = 'center-wrap';
     outputPanel.className = 'output-panel';
     resizeGutter.className = 'resize-gutter';
     resizeGutter.style.display = '';
   } else if (mode === 'bottom') {
     btnBottom.classList.add('active');
+    btnBottom.setAttribute('aria-pressed', 'true');
     centerWrap.className = 'center-wrap vertical';
     outputPanel.className = 'output-panel bottom-mode';
     resizeGutter.className = 'resize-gutter horizontal';
     resizeGutter.style.display = '';
   } else {
     btnHide.classList.add('active');
+    btnHide.setAttribute('aria-pressed', 'true');
     outputPanel.className = 'output-panel hidden-mode';
     resizeGutter.style.display = 'none';
     centerWrap.className = 'center-wrap';
