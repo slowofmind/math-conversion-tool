@@ -15,6 +15,7 @@ Still here? Ok. This tool is designed to help teaching staff convert LaTeX cours
 3. A "LaTeX Cleaning tool"; this is actually a language agnostic stack-based parser that handles nested the kind of nested commands (and occasionally environments) found in LaTeX. It offers options for editing the opening and closing "tags" of a command, removing them, or removing the tags and anything between them. The whole prefix/anchor/suffix structure takes some getting used to, but it's pretty robust. There is currently a partially-implemented experimental feature that autopopulates the fields with any element that Pandoc can't process during conversion. The profile system is not fully implemented at this time
 4. Three hardcoded lua filters which can be toggled on and off; these include
     - a filter for correcting minor issues with nested ```enumerate``` environments when converting HTML
+        - future enhancement will include ability to control list item types more easily and other improved handling for lists.
     - a filter for dealing with file path issues with uploaded images
     - a filter that converts uploaded images into base64 and embeds them directly into an output HTML file. (This allows student to receive a single inclusive HTML file and avoids a conflict between Pandoc's built-in "embed resources" and using MathJax via CDN.)
 5. New math content conversion options for HTML output:
