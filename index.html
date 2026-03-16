@@ -1199,11 +1199,12 @@
     <div class="options-grid">
       <div class="opt-group">
         <label for="opt-math">Math rendering method:</label>
-        <select id="opt-math" style="width:130px;">
-          <option value="">Default (plain)</option>
-          <option value="mathjax" selected>MathJax</option>
+        <select id="opt-math" style="width:auto;">
+          <option value="mathjax4" selected>MathJax 4</option>
+          <option value="mathjax" >MathJax 3 (Pandoc default)</option>
+          <option value="mathml">MathML (Pandoc texmath)</option>
+          <option value="">Do not convert math content</option>
           <option value="katex">KaTeX</option>
-          <option value="mathml">MathML</option>
           <option value="webtex">WebTeX (images)</option>
           <option value="gladtex">GladTeX</option>
         </select>
@@ -3367,7 +3368,16 @@ function buildOptions() {
 
   // Math (wired later)
   const mathEl = document.getElementById('opt-math');
-  if (mathEl && mathEl.value) opts['html-math-method'] = mathEl.value;
+  if (mathEl && mathEl.value) {
+    if (mathEl.value === 'mathjax4') {
+      opts['html-math-method'] = {
+        method: 'mathjax',
+        url: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js'
+      };
+    } else {
+      opts['html-math-method'] = mathEl.value;
+    }
+  }
 
   // Code highlighting (wired later)
   const hlStyle = document.getElementById('opt-highlight-style');

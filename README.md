@@ -1,11 +1,11 @@
 # Pandoc-for-STEM
 
 > [!WARNING]
-> This tool currently sits somewhere in the range between proof-of-concept and mad ravings. It is not yet accessible and the code is in need of serious review; it was constructed largely via LLM (a mix of Claude Sonnet and Opus models). It works for Pandoc conversions, and the cleanup tool is functional (if you know how to use it), but the code and the styling should be poked carefully from a distance with a long stick. You have been warned.
+> This tool currently sits somewhere in the range between proof-of-concept and mad ravings. The code is in need of serious review; it was constructed largely via LLM (a mix of Claude Sonnet and Opus models). It works for Pandoc conversions, and the cleanup tool is somewhat functional (if you know how to use it), but the code and the styling should be poked carefully from a distance with a long stick. You have been warned.
 
 Still here? Ok. This tool is designed to help teaching staff convert LaTeX course materials in to accessible formats as an alternative to compiling to PDF. The core is a version of ```Pandoc.wasm``` ("Pandoc in the browser"); it could theoretically be run offline from a user's desktop as well as hosted as a web page online but without any files leaving the user's local web browser.
 
-The tool also includes a number of custom features in various states of completion:
+## The tool also includes a number of custom features in various states of completion:
 
 1. An Ace code editor panel for minor LaTeX edits
 2. An output panel with three different viewing options:
@@ -18,4 +18,10 @@ The tool also includes a number of custom features in various states of completi
     - a filter for dealing with file path issues with uploaded images
     - a filter that converts uploaded images into base64 and embeds them directly into an output HTML file. (This allows student to receive a single inclusive HTML file and avoids a conflict between Pandoc's built-in "embed resources" and using MathJax via CDN.)
 
+
+## Additional Math options to be added
+
+Upgrade to pandoc conversion using MathJax version 4 (it currently defaults to version 3)
+
+autoinsert a Mathjax config script so that "assistive-mml: and other options are enables by default
 
