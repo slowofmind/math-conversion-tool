@@ -503,7 +503,7 @@
   .ace_gutter-cell { color: var(--text-muted) !important; }
   .ace_gutter-cell.ace_info {
     background-image: none !important;
-    border-left: 3px solid var(--accent);
+    border-left: 3px solid #d4a017;
   }
   .ace_gutter-cell.ace_warning {
     background-image: none !important;
@@ -515,12 +515,12 @@
   }
 
   /* Pandoc warning/error/info markers */
-  .pandoc-warning-line { position: absolute; background: rgba(184, 110, 0, 0.06); border-left: 3px solid var(--warning); }
-  .pandoc-error-line { position: absolute; background: rgba(198, 40, 40, 0.06); border-left: 3px solid var(--error); }
-  .pandoc-info-line { position: absolute; background: rgba(43, 66, 110, 0.04); border-left: 3px solid var(--accent); }
-  .pandoc-warning-text { position: absolute; background: rgba(184, 110, 0, 0.12); border-bottom: 2px solid var(--warning); }
-  .pandoc-error-text { position: absolute; background: rgba(198, 40, 40, 0.12); border-bottom: 2px solid var(--error); }
-  .pandoc-info-text { position: absolute; background: rgba(43, 66, 110, 0.08); border-bottom: 2px solid var(--accent); }
+  .pandoc-warning-line { position: absolute; background: rgba(255, 193, 7, 0.18); border-left: 3px solid var(--warning); }
+  .pandoc-error-line { position: absolute; background: rgba(198, 40, 40, 0.14); border-left: 3px solid var(--error); }
+  .pandoc-info-line { position: absolute; background: rgba(255, 193, 7, 0.13); border-left: 3px solid #d4a017; }
+  .pandoc-warning-text { position: absolute; background: rgba(255, 170, 0, 0.38); border-bottom: 2px solid var(--warning); }
+  .pandoc-error-text { position: absolute; background: rgba(198, 40, 40, 0.30); border-bottom: 2px solid var(--error); }
+  .pandoc-info-text { position: absolute; background: rgba(255, 170, 0, 0.32); border-bottom: 2px solid #d4a017; }
 
   /* ─── RESIZE GUTTER ─── */
   .resize-gutter {
@@ -1022,8 +1022,6 @@
   <span class="toolbar-spacer"></span>
 
   <div class="toolbar-group">
-    <button class="toolbar-btn" id="btnCleanup" title="Toggle cleanup sidebar" aria-expanded="false" aria-controls="sidebar">🧹 Cleanup</button>
-    <div class="toolbar-divider"></div>
     <button class="toolbar-btn active" id="btnLayoutSide" title="Preview: right side" aria-label="Side-by-side layout" aria-pressed="true">◫</button>
     <button class="toolbar-btn" id="btnLayoutBottom" title="Preview: bottom" aria-label="Bottom layout" aria-pressed="false">⬓</button>
     <button class="toolbar-btn" id="btnLayoutHide" title="Hide preview" aria-label="Hide preview" aria-pressed="false">▣</button>
@@ -1746,6 +1744,8 @@
     <div class="editor-area" id="editorArea">
       <div class="editor-tabs">
         <button class="editor-tab active" id="tabFilename">untitled.tex</button>
+        <span style="flex:1;"></span>
+        <button class="toolbar-btn" id="btnCleanup" title="Toggle cleanup sidebar" aria-expanded="false" aria-controls="sidebar" style="font-size:12px; padding:3px 10px; margin-right:2px;">🧹 Cleanup</button>
       </div>
       <div class="editor-content">
         <div id="aceEditor"></div>
@@ -2105,15 +2105,23 @@ function parseOneWarning(w, sourceText) {
   let matchedText = null;
 
   switch (wType) {
-    case 'SkippedContent':
+    case 'SkippedContent': {
       message = `Skipped '${contents}'`;
-      matchedText = contents;
+      // contents can be multi-line; use first line for matching
+      const firstLine = contents.split('\n')[0];
+      matchedText = firstLine;
       break;
+    }
 
-    case 'CouldNotLoadIncludeFile':
-      message = `Could not load include file: ${contents}`;
-      matchedText = contents;
+    case 'CouldNotLoadIncludeFile': {
+      // contents is empty for this type; filename is in w.path
+      const fname = toStr(w.path);
+      message = `Could not load include file: ${fname}`;
+      // Strip .sty/.cls/.tex extension to match package name in source
+      const baseName = fname.replace(/\.(sty|cls|tex)$/i, '');
+      matchedText = baseName;
       break;
+    }
 
     case 'CouldNotConvertTeXMath':
       message = `Could not convert TeX math: ${contents}`;
@@ -2121,10 +2129,18 @@ function parseOneWarning(w, sourceText) {
       level = 'warn';
       break;
 
-    case 'InlineNotRendered':
-      message = `Inline not rendered: ${contents}`;
-      matchedText = contents;
+    case 'InlineNotRendered': {
+      // contents is an AST node, e.g. {t: "RawInline", c: ["latex", "\\cite{foo}"]}
+      let rawText = contents;
+      if (w.contents && typeof w.contents === 'object' && !Array.isArray(w.contents)) {
+        if (w.contents.c && Array.isArray(w.contents.c) && typeof w.contents.c[1] === 'string') {
+          rawText = w.contents.c[1];
+        }
+      }
+      message = `Inline not rendered: ${rawText}`;
+      matchedText = rawText;
       break;
+    }
 
     case 'NoLangSpecified':
       message = 'No language specified';
@@ -2246,16 +2262,46 @@ function applyDecorations(warnings) {
       }
     }
 
-    // Fallback: highlight token at column position
+    // Fallback: use column position to find the construct
+    // Pandoc's column typically points 1 past the end of the construct,
+    // so we walk backward from the column to find where it starts.
     if (!textMarked && warn.column) {
-      const col = Math.min(warn.column - 1, lineText.length);
-      const rest = lineText.substring(col);
-      const tok = rest.match(/^\\?[a-zA-Z@*]+(?:\{[^}]*\})?|^\{[^}]*\}|^\S+/);
-      if (tok) {
-        const textRange = new Range(aceRow, col, aceRow, col + tok[0].length);
+      const endCol = Math.min(warn.column - 1, lineText.length);
+      // Walk backward to find the start of the LaTeX command or braced group
+      let startCol = endCol;
+      // Step 1: skip back past closing brace and its contents
+      if (startCol > 0 && lineText[startCol - 1] === '}') {
+        let depth = 0;
+        for (let i = startCol - 1; i >= 0; i--) {
+          if (lineText[i] === '}') depth++;
+          else if (lineText[i] === '{') depth--;
+          if (depth === 0) { startCol = i; break; }
+        }
+      }
+      // Step 2: skip back past the command name (letters after backslash)
+      if (startCol > 0 && /[a-zA-Z@*]/.test(lineText[startCol - 1])) {
+        while (startCol > 0 && /[a-zA-Z@*]/.test(lineText[startCol - 1])) startCol--;
+      }
+      // Step 3: include the leading backslash if present
+      if (startCol > 0 && lineText[startCol - 1] === '\\') startCol--;
+      
+      if (startCol < endCol) {
+        const textRange = new Range(aceRow, startCol, aceRow, endCol);
         activeMarkers.push(
           session.addMarker(textRange, `${cssPrefix}-text`, 'text', false)
         );
+        textMarked = true;
+      }
+      // Forward fallback if backward walk didn't find anything
+      if (!textMarked) {
+        const rest = lineText.substring(Math.min(endCol, lineText.length));
+        const tok = rest.match(/^\\?[a-zA-Z@*]+(?:\{[^}]*\})?|^\{[^}]*\}|^\S+/);
+        if (tok) {
+          const textRange = new Range(aceRow, endCol, aceRow, endCol + tok[0].length);
+          activeMarkers.push(
+            session.addMarker(textRange, `${cssPrefix}-text`, 'text', false)
+          );
+        }
       }
     }
   }

@@ -19,7 +19,7 @@ Still here? Ok. This tool is designed to help teaching staff convert LaTeX cours
     - a filter for dealing with file path issues with uploaded images
     - a filter that converts uploaded images into base64 and embeds them directly into an output HTML file. (This allows student to receive a single inclusive HTML file and avoids a conflict between Pandoc's built-in "embed resources" and using MathJax via CDN.)
 5. New math content conversion options for HTML output:
-    - option to use MathJax v4.1 via CDN (Pandoc's default MathJax option uses v3). 
+    - an option to use MathJax v4.1 via CDN (Pandoc's default MathJax option uses v3). 
     - the previous option also autoinserts a Mathjax config script so that "Include Hidden MathML" is enabled by default. MathJax normally has this option disabled due to "fragility" of hiding the MathML, and instead just inserts the MathJax-generated speech strings directly into the DOM. However this would mean that individuals using MathCat to control speech settings would be unabled to do so and could only use the MathJax options; including the hidden MathML gives them the full range of options.
     - possible future enhancement: user interface to customize Mathjax config for use with CDNs.
-
+    - an option that uses webpacks to bundle all of the necessary MathJax scripts directly into the HTML output file. While this signficantly increases the file size, it would allow students to use and configure MathJax while offline (if they do not have good internet access away from campus or if disabled for an exam). This would not be a solution to the problem of Canvas and the old version of MathJax; Canvas would still probably block the scripts from running even without the call to the CDNs.
