@@ -3,37 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pandoc WASM — Prototype</title>
+<title>Harvard Assistive Technology Center — LaTeX Conversion Tool</title>
 
 <!-- Ace Editor from CDN -->
 <script src="ace/ace.js"></script>
 <script src="ace/mode-latex.js"></script>
 <script src="ace/mode-html.js"></script>
 <script src="ace/mode-markdown.js"></script>
+<!-- Ace themes: textmate (light) is built-in; one_dark kept for potential future dark mode -->
 <script src="ace/theme-one_dark.js"></script>
 <script src="ace/ext-searchbox.js"></script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto+Mono:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap');
 
   :root {
-    --bg-primary: #1a1b26;
-    --bg-secondary: #1e1f2e;
-    --bg-tertiary: #24253a;
-    --bg-elevated: #2a2b3d;
-    --bg-surface: #30314a;
-    --border: #3b3d57;
-    --border-subtle: #2e3047;
-    --text-primary: #c8cad8;
-    --text-secondary: #8f91a8;
-    --text-muted: #5d5f78;
-    --accent: #7aa2f7;
-    --accent-dim: #3d5a9e;
-    --accent-glow: rgba(122, 162, 247, 0.12);
-    --success: #9ece6a;
-    --warning: #e0af68;
-    --error: #f7768e;
-    --toolbar-height: 42px;
+    /* Harvard identity */
+    --harvard-blue: #2b426e;
+    --harvard-blue-dark: #1e2f4d;
+    --harvard-crimson: #a51c30;
+    --harvard-crimson-dark: #8c1826;
+
+    /* Light theme surfaces */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #eaeaea;
+    --bg-elevated: #e0e0e0;
+    --bg-surface: #d9d9d9;
+    --border: #cccccc;
+    --border-subtle: #ddd;
+    --text-primary: #1e2124;
+    --text-secondary: #4a4a4a;
+    --text-muted: #666666;
+    --accent: #2b426e;
+    --accent-dim: #1e2f4d;
+    --accent-glow: rgba(43, 66, 110, 0.08);
+    --success: #2e7d32;
+    --warning: #b86e00;
+    --error: #c62828;
+    --titlebar-height: 32px;
+    --toolbar-height: 40px;
     --statusbar-height: 26px;
     --sidebar-width: 300px;
     --gutter: 5px;
@@ -42,7 +51,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: 'Roboto', sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     height: 100vh;
@@ -51,10 +60,29 @@
     flex-direction: column;
   }
 
-  /* ─── TOOLBAR ─── */
+  /* ─── TITLE BAR ─── */
+  .title-bar {
+    height: var(--titlebar-height);
+    background: var(--harvard-blue);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    flex-shrink: 0;
+    z-index: 101;
+  }
+
+  .toolbar-title {
+    font-family: 'Merriweather', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── TOOLBAR (controls) ─── */
   .toolbar {
     height: var(--toolbar-height);
-    background: var(--bg-secondary);
+    background: #ffffff;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -69,13 +97,13 @@
   .toolbar-spacer { flex: 1; }
 
   .toolbar-btn {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
     font-weight: 500;
     padding: 5px 12px;
     border: 1px solid var(--border);
     border-radius: 4px;
-    background: var(--bg-tertiary);
+    background: #ffffff;
     color: var(--text-primary);
     cursor: pointer;
     transition: all 0.15s;
@@ -84,33 +112,25 @@
     align-items: center;
     gap: 5px;
   }
-  .toolbar-btn:hover { background: var(--bg-elevated); border-color: var(--text-muted); }
-  .toolbar-btn.active { background: var(--accent-glow); border-color: var(--accent-dim); color: var(--accent); }
-  .toolbar-btn.primary { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
-  .toolbar-btn.primary:hover { background: var(--accent); }
+  .toolbar-btn:hover { background: var(--bg-secondary); border-color: var(--text-muted); }
+  .toolbar-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+  .toolbar-btn.primary { background: var(--harvard-blue); border-color: var(--harvard-blue); color: #fff; }
+  .toolbar-btn.primary:hover { background: var(--harvard-blue-dark); }
   .toolbar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .toolbar-select {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
     padding: 4px 8px;
     border: 1px solid var(--border);
     border-radius: 4px;
-    background: var(--bg-tertiary);
+    background: #ffffff;
     color: var(--text-primary);
     cursor: pointer;
     min-width: 100px;
   }
 
-  .toolbar-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.03em; }
-
-  .toolbar-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    letter-spacing: 0.04em;
-  }
+  .toolbar-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 
   /* ─── MAIN LAYOUT ─── */
   .main-area {
@@ -153,10 +173,10 @@
   }
 
   .sidebar-title {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     color: var(--text-secondary);
   }
 
@@ -181,19 +201,19 @@
   .cleanup-section { margin-bottom: 14px; }
 
   .cleanup-section-label {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
     color: var(--text-secondary);
     margin-bottom: 6px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
   }
 
   .cleanup-select {
     width: 100%;
     padding: 5px 8px;
-    font-size: 12px;
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-family: 'Roboto', sans-serif;
     border: 1px solid var(--border);
     border-radius: 3px;
     background: var(--bg-tertiary);
@@ -231,8 +251,8 @@
   .pattern-summary {
     flex: 1;
     min-width: 0;
-    font-size: 12px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-family: 'Roboto Mono', monospace;
     color: var(--text-secondary);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -282,12 +302,12 @@
     border: 1px solid var(--border);
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 11px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-family: 'Roboto Mono', monospace;
     border-radius: 2px;
   }
   .pf-input:focus { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: -1px; }
-  .pf-input::placeholder { color: var(--text-muted); opacity: 0.5; font-family: 'IBM Plex Sans', sans-serif; }
+  .pf-input::placeholder { color: var(--text-muted); opacity: 0.5; font-family: 'Roboto', sans-serif; }
 
   .pf-input-anchor { width: 50px; flex-shrink: 0; }
   .pf-input-flex { flex: 1; min-width: 40px; }
@@ -297,8 +317,8 @@
     border: 1px solid var(--border);
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 11px;
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
     border-radius: 2px;
   }
 
@@ -308,7 +328,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 10px;
+    font-size: 12px;
     color: var(--text-muted);
     white-space: nowrap;
     margin-left: 6px;
@@ -316,7 +336,7 @@
   }
 
   .pf-note {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--text-muted);
     font-style: italic;
     padding-left: 20px;
@@ -336,7 +356,7 @@
     align-items: center;
     padding: 5px 8px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
   }
   .scope-header:hover { background: var(--bg-tertiary); }
@@ -352,18 +372,18 @@
   .cleanup-run-btn {
     width: 100%;
     padding: 7px;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
     font-weight: 600;
-    background: var(--accent-dim);
+    background: var(--harvard-crimson);
     color: #fff;
-    border: 1px solid var(--accent);
+    border: 1px solid var(--harvard-crimson);
     border-radius: 4px;
     cursor: pointer;
     margin-top: 10px;
     transition: background 0.15s;
   }
-  .cleanup-run-btn:hover { background: var(--accent); }
+  .cleanup-run-btn:hover { background: var(--harvard-crimson-dark); }
 
   /* ─── EDITOR AREA ─── */
   .editor-area {
@@ -386,8 +406,8 @@
   }
 
   .editor-tab {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
     padding: 5px 14px;
     background: transparent;
     color: var(--text-muted);
@@ -400,30 +420,32 @@
   .editor-tab:hover { color: var(--text-secondary); }
   .editor-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); background: var(--bg-primary); }
 
-  .editor-content { flex: 1; position: relative; overflow: hidden; }
+  .editor-content { flex: 1; position: relative; overflow: hidden; border-left: 3px solid var(--harvard-crimson); transition: box-shadow 0.15s; }
+  .editor-content.drag-over { box-shadow: inset 0 0 0 3px var(--harvard-blue); }
 
   /* Ace editor custom theme overrides */
   #aceEditor {
     position: absolute;
     inset: 0;
-    font-family: 'IBM Plex Mono', monospace !important;
-    font-size: 13px;
+    font-family: 'Roboto Mono', monospace !important;
+    font-size: 14px;
   }
 
   /* Binary input overlay */
   .binary-input-overlay {
     position: absolute; inset: 0; z-index: 10;
-    background: var(--bg-primary);
+    background: rgba(255, 255, 255, 0.95);
     display: flex; align-items: center; justify-content: center;
   }
   .binary-input-card {
     text-align: center; padding: 32px 40px;
-    background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+    background: #ffffff; border: 1px solid var(--border);
     border-radius: 8px; max-width: 360px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
   }
   .binary-input-icon { font-size: 48px; margin-bottom: 12px; }
   .binary-input-filename {
-    font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+    font-family: 'Roboto Mono', monospace; font-size: 15px;
     font-weight: 600; color: var(--text-primary); margin-bottom: 4px;
     word-break: break-all;
   }
@@ -434,9 +456,9 @@
     font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 18px;
   }
   .binary-input-clear {
-    background: none; border: 1px solid var(--border-subtle); border-radius: 4px;
-    color: var(--text-secondary); font-size: 12px; padding: 5px 14px;
-    cursor: pointer; font-family: 'IBM Plex Sans', sans-serif;
+    background: #ffffff; border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-secondary); font-size: 13px; padding: 5px 14px;
+    cursor: pointer; font-family: 'Roboto', sans-serif;
   }
   .binary-input-clear:hover { color: var(--error); border-color: var(--error); }
 
@@ -447,9 +469,9 @@
     display: flex; align-items: center; justify-content: center;
   }
   .pdf-modal {
-    background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+    background: #ffffff; border: 1px solid var(--border);
     border-radius: 8px; padding: 24px 28px; max-width: 420px; width: 90%;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
   }
   .pdf-modal h3 {
     margin: 0 0 8px; font-size: 15px; font-weight: 600; color: var(--text-primary);
@@ -458,26 +480,26 @@
     margin: 0 0 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.5;
   }
   .pdf-modal ul {
-    margin: 0 0 16px; padding-left: 20px; font-size: 12px;
+    margin: 0 0 16px; padding-left: 20px; font-size: 13px;
     color: var(--text-secondary); line-height: 1.6;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Roboto Mono', monospace;
   }
   .pdf-modal-actions {
     display: flex; gap: 8px; justify-content: flex-end;
   }
   .pdf-modal-btn {
     padding: 6px 16px; border-radius: 4px; font-size: 13px; cursor: pointer;
-    font-family: 'IBM Plex Sans', sans-serif; border: 1px solid var(--border-subtle);
-    background: var(--bg-tertiary); color: var(--text-primary);
+    font-family: 'Roboto', sans-serif; border: 1px solid var(--border);
+    background: #ffffff; color: var(--text-primary);
   }
-  .pdf-modal-btn:hover { background: var(--bg-hover); }
+  .pdf-modal-btn:hover { background: var(--bg-secondary); }
   .pdf-modal-btn.primary {
-    background: var(--accent); color: #fff; border-color: var(--accent);
+    background: var(--harvard-blue); color: #fff; border-color: var(--harvard-blue);
   }
   .pdf-modal-btn.primary:hover { opacity: 0.9; }
 
   /* Override Ace gutter background */
-  .ace_gutter { background: var(--bg-secondary) !important; border-right: 1px solid var(--border-subtle) !important; }
+  .ace_gutter { background: var(--bg-secondary) !important; border-right: 1px solid var(--border) !important; }
   .ace_gutter-cell { color: var(--text-muted) !important; }
   .ace_gutter-cell.ace_info {
     background-image: none !important;
@@ -493,12 +515,12 @@
   }
 
   /* Pandoc warning/error/info markers */
-  .pandoc-warning-line { position: absolute; background: rgba(224, 175, 104, 0.08); border-left: 3px solid var(--warning); }
-  .pandoc-error-line { position: absolute; background: rgba(247, 118, 142, 0.08); border-left: 3px solid var(--error); }
-  .pandoc-info-line { position: absolute; background: rgba(122, 162, 247, 0.05); border-left: 3px solid var(--accent); }
-  .pandoc-warning-text { position: absolute; background: rgba(224, 175, 104, 0.18); border-bottom: 2px solid var(--warning); }
-  .pandoc-error-text { position: absolute; background: rgba(247, 118, 142, 0.18); border-bottom: 2px solid var(--error); }
-  .pandoc-info-text { position: absolute; background: rgba(122, 162, 247, 0.12); border-bottom: 2px solid var(--accent); }
+  .pandoc-warning-line { position: absolute; background: rgba(184, 110, 0, 0.06); border-left: 3px solid var(--warning); }
+  .pandoc-error-line { position: absolute; background: rgba(198, 40, 40, 0.06); border-left: 3px solid var(--error); }
+  .pandoc-info-line { position: absolute; background: rgba(43, 66, 110, 0.04); border-left: 3px solid var(--accent); }
+  .pandoc-warning-text { position: absolute; background: rgba(184, 110, 0, 0.12); border-bottom: 2px solid var(--warning); }
+  .pandoc-error-text { position: absolute; background: rgba(198, 40, 40, 0.12); border-bottom: 2px solid var(--error); }
+  .pandoc-info-text { position: absolute; background: rgba(43, 66, 110, 0.08); border-bottom: 2px solid var(--accent); }
 
   /* ─── RESIZE GUTTER ─── */
   .resize-gutter {
@@ -519,7 +541,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-left: 1px solid var(--border);
+    border-left: 3px solid var(--harvard-blue);
   }
   .output-panel.bottom-mode {
     width: 100%;
@@ -542,8 +564,8 @@
   }
 
   .output-tab {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
     padding: 5px 14px;
     background: transparent;
     color: var(--text-muted);
@@ -553,12 +575,12 @@
     transition: all 0.1s;
   }
   .output-tab:hover { color: var(--text-secondary); }
-  .output-tab.active { color: var(--text-primary); border-bottom-color: var(--success); }
+  .output-tab.active { color: var(--text-primary); border-bottom-color: var(--harvard-blue); }
 
   .output-tab-spacer { flex: 1; }
 
   .output-tab-action {
-    font-size: 11px;
+    font-size: 12px;
     padding: 3px 8px;
     background: none;
     border: 1px solid var(--border);
@@ -568,8 +590,8 @@
     margin-right: 4px;
   }
   .output-tab-action:hover { color: var(--text-primary); border-color: var(--text-muted); }
-  #btnDownloadOutput { color: var(--accent); border-color: var(--accent-dim); }
-  #btnDownloadOutput:hover { background: var(--accent-dim); color: #fff; }
+  #btnDownloadOutput { color: var(--harvard-blue); border-color: var(--harvard-blue); }
+  #btnDownloadOutput:hover { background: var(--harvard-blue); color: #fff; }
 
   .output-body { flex: 1; overflow: auto; background: var(--bg-primary); }
 
@@ -587,8 +609,8 @@
     flex: 1;
     overflow: auto;
     padding: 8px 12px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
     line-height: 1.7;
   }
 
@@ -607,16 +629,16 @@
   .log-level {
     flex-shrink: 0;
     font-weight: 600;
-    font-size: 10px;
+    font-size: 11px;
     padding: 1px 5px;
     border-radius: 2px;
     text-transform: uppercase;
     min-width: 38px;
     text-align: center;
   }
-  .log-level.info { color: var(--accent); background: rgba(122, 162, 247, 0.1); }
-  .log-level.warn { color: var(--warning); background: rgba(224, 175, 104, 0.1); }
-  .log-level.error { color: var(--error); background: rgba(247, 118, 142, 0.1); }
+  .log-level.info { color: var(--accent); background: rgba(43, 66, 110, 0.08); }
+  .log-level.warn { color: var(--warning); background: rgba(184, 110, 0, 0.08); }
+  .log-level.error { color: var(--error); background: rgba(198, 40, 40, 0.08); }
 
   .log-location { flex-shrink: 0; color: var(--text-muted); min-width: 60px; }
   .log-msg { color: var(--text-secondary); word-break: break-word; }
@@ -626,26 +648,26 @@
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     padding: 1px 6px;
     border-radius: 8px;
     margin-left: 4px;
   }
-  .log-badge.warn { background: rgba(224, 175, 104, 0.2); color: var(--warning); }
-  .log-badge.error { background: rgba(247, 118, 142, 0.2); color: var(--error); }
-  .log-badge.info { background: rgba(122, 162, 247, 0.15); color: var(--accent); }
+  .log-badge.warn { background: rgba(184, 110, 0, 0.12); color: var(--warning); }
+  .log-badge.error { background: rgba(198, 40, 40, 0.12); color: var(--error); }
+  .log-badge.info { background: rgba(43, 66, 110, 0.1); color: var(--accent); }
 
   /* ─── STATUS BAR ─── */
   .statusbar {
     height: var(--statusbar-height);
-    background: var(--bg-tertiary);
-    border-top: 1px solid var(--border);
+    background: var(--harvard-blue);
+    border-top: none;
     display: flex;
     align-items: center;
     padding: 0 12px;
-    font-size: 11px;
-    color: var(--text-muted);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
     gap: 16px;
     flex-shrink: 0;
   }
@@ -653,9 +675,9 @@
   .statusbar-item { display: flex; align-items: center; gap: 4px; }
 
   .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); }
-  .status-dot.ready { background: var(--success); }
-  .status-dot.loading { background: var(--warning); animation: pulse 1.2s infinite; }
-  .status-dot.error { background: var(--error); }
+  .status-dot.ready { background: #8bc34a; }
+  .status-dot.loading { background: #ffc107; animation: pulse 1.2s infinite; }
+  .status-dot.error { background: #ef5350; }
 
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
@@ -669,8 +691,8 @@
   /* Scrollbar */
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  ::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #999; }
 
   /* ─── OPTIONS PANEL ─── */
   .options-panel {
@@ -691,7 +713,7 @@
   }
   .options-tab {
     padding: 5px 10px;
-    font-size: 11px;
+    font-size: 13px;
     font-family: var(--font-ui);
     background: none;
     border: none;
@@ -701,7 +723,7 @@
     white-space: nowrap;
     transition: color 0.15s, border-color 0.15s;
   }
-  .options-tab:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
+  .options-tab:hover { color: var(--text-primary); background: rgba(0,0,0,0.03); }
   .options-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
 
   .options-tab-panel {
@@ -722,7 +744,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    font-size: 12px;
+    font-size: 13px;
     font-family: var(--font-ui);
     color: var(--text-secondary);
   }
@@ -733,15 +755,15 @@
     color: var(--text-primary);
     border: 1px solid var(--border);
     border-radius: 3px;
-    padding: 2px 5px;
-    font-size: 11px;
+    padding: 3px 6px;
+    font-size: 13px;
     font-family: var(--font-mono);
   }
   .opt-group select { padding-right: 18px; }
   .opt-group select:focus, .opt-group input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
 
   .opt-section-label {
-    font-size: 10px;
+    font-size: 12px;
     font-family: var(--font-ui);
     color: var(--text-muted);
     text-transform: uppercase;
@@ -754,13 +776,13 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 13px;
     font-family: var(--font-ui);
     color: var(--text-secondary);
   }
   .opt-file-upload .upload-btn {
-    padding: 2px 8px;
-    font-size: 11px;
+    padding: 3px 8px;
+    font-size: 12px;
     background: var(--bg-primary);
     color: var(--text-secondary);
     border: 1px solid var(--border);
@@ -771,7 +793,7 @@
   .opt-file-upload .upload-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
   .opt-file-upload .file-name {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--accent);
     max-width: 200px;
     overflow: hidden;
@@ -800,8 +822,8 @@
     background: var(--bg-primary);
     border: 1px solid var(--border);
     border-radius: 3px;
-    padding: 1px 6px;
-    font-size: 11px;
+    padding: 2px 6px;
+    font-size: 12px;
     font-family: var(--font-mono);
     color: var(--accent);
   }
@@ -824,7 +846,7 @@
     margin: 0;
   }
   .opt-file-tag .builtin-label {
-    font-size: 9px;
+    font-size: 11px;
     color: var(--text-muted);
     margin-left: 2px;
   }
@@ -841,8 +863,8 @@
     color: var(--text-primary);
     border: 1px solid var(--border);
     border-radius: 3px;
-    padding: 2px 5px;
-    font-size: 11px;
+    padding: 3px 6px;
+    font-size: 13px;
     font-family: var(--font-mono);
     width: 140px;
   }
@@ -868,7 +890,7 @@
   }
   details.fmt-section > summary {
     text-transform: uppercase;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.08em;
     color: var(--text-muted);
@@ -899,8 +921,8 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    padding: 1px 4px;
-    font-size: 11px;
+    padding: 2px 4px;
+    font-size: 12px;
     font-family: var(--font-mono);
     color: var(--text-secondary);
     border-radius: 2px;
@@ -911,18 +933,52 @@
   .ext-item.default-on label { font-weight: 500; }
   .ext-item.toggled label { color: var(--accent); }
 
+  /* Filter reorder buttons */
+  /* Filter list: tags should stretch full width for arrow alignment */
+  #luaFiltersList { display: flex; flex-direction: column; gap: 4px; }
+  #luaFiltersList .opt-file-tag { width: 100%; }
+
+  .filter-reorder-wrap {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .filter-reorder-btn {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1;
+    padding: 1px 3px;
+    cursor: pointer;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .filter-reorder-btn:hover { color: var(--text-primary); background: var(--bg-tertiary); border-color: var(--border); }
+  .filter-reorder-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+
   /* Toggle button in toolbar for options panel */
   .toolbar-btn.options-toggle.panel-open { color: var(--accent); }
+
+  /* Harvard accent borders on bottom-mode output */
+  .output-panel.bottom-mode {
+    border-left: none;
+    border-top: 3px solid var(--harvard-blue);
+  }
 </style>
 </head>
 <body>
 
 <input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ" aria-label="Upload document file">
 
+<!-- ═══ TITLE BAR ═══ -->
+<div class="title-bar">
+  <h1 class="toolbar-title">Harvard Assistive Technology Center — LaTeX Conversion Tool</h1>
+</div>
+
 <!-- ═══ TOOLBAR ═══ -->
 <div class="toolbar" role="toolbar" aria-label="Main toolbar">
-  <h1 class="toolbar-title">PANDOC WASM</h1>
-  <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
     <button class="toolbar-btn" id="btnUpload" title="Upload file" aria-label="Upload file">📄 Upload</button>
@@ -1575,7 +1631,7 @@
       </div>
     </div>
     <div id="luaFiltersList" style="margin-top:4px;"></div>
-    <div style="margin-top:4px; font-size:10px; color:var(--text-muted);">Drag to reorder execution sequence. Built-in filters can be enabled/disabled with the checkbox.</div>
+    <div style="margin-top:4px; font-size:12px; color:var(--text-muted);">Filters can be enabled/disabled with the checkbox. Drag or click arrows to reorder filter execution sequence.</div>
   </div>
 
   <!-- Wrapping -->
@@ -1756,13 +1812,13 @@
 // ════════════════════════════════════════════════════════════════════
 
 const editor = ace.edit('aceEditor');
-editor.setTheme('ace/theme/one_dark');
+editor.setTheme('ace/theme/textmate');
 editor.session.setMode('ace/mode/latex');
 editor.renderer.getContainerElement().setAttribute('aria-label', 'Source editor');
 editor.textInput.getElement().setAttribute('aria-label', 'Source editor');
 editor.setOptions({
-  fontSize: '13px',
-  fontFamily: "'IBM Plex Mono', monospace",
+  fontSize: '14px',
+  fontFamily: "'Roboto Mono', monospace",
   showPrintMargin: false,
   wrap: true,
   tabSize: 2,
@@ -1783,14 +1839,14 @@ editor.session.selection.on('changeCursor', () => {
 
 // Output source viewer (read-only Ace)
 const sourceEditor = ace.edit('outputSource');
-sourceEditor.setTheme('ace/theme/one_dark');
+sourceEditor.setTheme('ace/theme/textmate');
 sourceEditor.session.setMode('ace/mode/html');
 sourceEditor.setReadOnly(true);
 sourceEditor.renderer.getContainerElement().setAttribute('aria-label', 'Output source viewer');
 sourceEditor.textInput.getElement().setAttribute('aria-label', 'Output source viewer');
 sourceEditor.setOptions({
-  fontSize: '12px',
-  fontFamily: "'IBM Plex Mono', monospace",
+  fontSize: '13px',
+  fontFamily: "'Roboto Mono', monospace",
   showPrintMargin: false,
   wrap: true,
 });
@@ -1853,12 +1909,8 @@ function updateStatus(state, text) {
 
 const fileInput = document.getElementById('fileInput');
 
-document.getElementById('btnUpload').addEventListener('click', () => {
-  fileInput.click();
-});
-
-fileInput.addEventListener('change', async (e) => {
-  const file = e.target.files[0];
+// Shared file upload handler (used by button upload and drag-and-drop)
+async function handleFileUpload(file) {
   if (!file) return;
 
   // Auto-detect format from extension
@@ -1914,8 +1966,49 @@ fileInput.addEventListener('change', async (e) => {
       updateExtensions();
     }
   }
+}
 
+document.getElementById('btnUpload').addEventListener('click', () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener('change', async (e) => {
+  await handleFileUpload(e.target.files[0]);
   fileInput.value = '';
+});
+
+// ─── Drag-and-drop file upload onto editor ───
+const editorContent = document.querySelector('.editor-content');
+let dragCounter = 0;  // track nested enter/leave events
+
+editorContent.addEventListener('dragenter', (e) => {
+  // Only respond to external file drags, not text/internal drags
+  if (!e.dataTransfer.types.includes('Files')) return;
+  e.preventDefault();
+  dragCounter++;
+  editorContent.classList.add('drag-over');
+});
+
+editorContent.addEventListener('dragover', (e) => {
+  if (!e.dataTransfer.types.includes('Files')) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+});
+
+editorContent.addEventListener('dragleave', (e) => {
+  dragCounter--;
+  if (dragCounter <= 0) {
+    dragCounter = 0;
+    editorContent.classList.remove('drag-over');
+  }
+});
+
+editorContent.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  dragCounter = 0;
+  editorContent.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) await handleFileUpload(file);
 });
 
 // ════════════════════════════════════════════════════════════════════
@@ -2635,6 +2728,7 @@ end
 // We rebuild this on every render from the DOM order after drag operations.
 const builtInState = {};
 BUILT_IN_FILTERS.forEach(f => { builtInState[f.id] = f.defaultEnabled; });
+const userFilterState = {};  // { idx: true/false } — tracks enabled/disabled for user filters
 
 // Unified filter ordering — initialized with built-ins first, users appended as added
 let filterOrder = BUILT_IN_FILTERS.map(f => ({ type: 'builtin', id: f.id }));
@@ -2892,6 +2986,14 @@ function syncFilterOrder() {
   });
 }
 
+// Move a filter in the order array and re-render
+function moveFilter(fromIdx, toIdx) {
+  if (toIdx < 0 || toIdx >= filterOrder.length) return;
+  const [moved] = filterOrder.splice(fromIdx, 1);
+  filterOrder.splice(toIdx, 0, moved);
+  renderLuaFiltersList();
+}
+
 function renderLuaFiltersList() {
   const list = document.getElementById('luaFiltersList');
   if (!list) return;
@@ -2907,16 +3009,20 @@ function renderLuaFiltersList() {
     tag.dataset.orderIdx = orderIdx;
     tag.style.cursor = 'grab';
 
+    // Determine display name and enabled state for both filter types
+    let filterName = '';
+    let isEnabled = true;
+
     if (entry.type === 'builtin') {
       const def = BUILT_IN_FILTERS.find(f => f.id === entry.id);
       if (!def) return;
-      const enabled = builtInState[entry.id];
-      tag.className = 'opt-file-tag builtin-filter' + (enabled ? ' enabled' : '');
+      filterName = def.name;
+      isEnabled = builtInState[entry.id];
+      tag.className = 'opt-file-tag builtin-filter' + (isEnabled ? ' enabled' : '');
       tag.title = def.description;
-      tag.innerHTML = `<span style="color:var(--text-muted);font-size:10px;margin-right:2px;">☰</span>` +
-        `<input type="checkbox" class="builtin-checkbox" data-builtin-id="${entry.id}" ${enabled ? 'checked' : ''} aria-label="Enable ${def.name} filter">` +
+      tag.innerHTML = `<span style="color:var(--text-muted);font-size:12px;margin-right:2px;" aria-hidden="true">☰</span>` +
+        `<input type="checkbox" class="builtin-checkbox" ${isEnabled ? 'checked' : ''} aria-label="Enable ${def.name} filter">` +
         `${def.name}<span class="builtin-label">(built-in)</span>`;
-      // Checkbox toggle
       tag.querySelector('.builtin-checkbox').addEventListener('change', (ev) => {
         ev.stopPropagation();
         builtInState[entry.id] = ev.target.checked;
@@ -2925,13 +3031,35 @@ function renderLuaFiltersList() {
     } else {
       const f = resourceFiles.luaFilters[entry.idx];
       if (!f) return;
-      tag.className = 'opt-file-tag';
-      tag.innerHTML = `<span style="color:var(--text-muted);font-size:10px;margin-right:2px;">☰</span>${f.name}<button class="file-remove" data-useridx="${entry.idx}">×</button>`;
+      filterName = f.name;
+      // Default to enabled if no state recorded
+      if (userFilterState[entry.idx] === undefined) userFilterState[entry.idx] = true;
+      isEnabled = userFilterState[entry.idx];
+      tag.className = 'opt-file-tag' + (isEnabled ? '' : ' builtin-filter');
+      tag.innerHTML = `<span style="color:var(--text-muted);font-size:12px;margin-right:2px;" aria-hidden="true">☰</span>` +
+        `<input type="checkbox" class="builtin-checkbox" ${isEnabled ? 'checked' : ''} aria-label="Enable ${f.name} filter">` +
+        `${f.name}<button class="file-remove" data-useridx="${entry.idx}" aria-label="Remove ${f.name}">×</button>`;
+      // Checkbox toggle for user filter
+      tag.querySelector('.builtin-checkbox').addEventListener('change', (ev) => {
+        ev.stopPropagation();
+        userFilterState[entry.idx] = ev.target.checked;
+        renderLuaFiltersList();
+      });
       // Remove button
       tag.querySelector('.file-remove').addEventListener('click', (ev) => {
         ev.stopPropagation();
         const removedIdx = entry.idx;
         resourceFiles.luaFilters.splice(removedIdx, 1);
+        // Clean up userFilterState and adjust indices
+        delete userFilterState[removedIdx];
+        const newState = {};
+        for (const [k, v] of Object.entries(userFilterState)) {
+          const ki = parseInt(k);
+          if (ki > removedIdx) newState[ki - 1] = v;
+          else if (ki < removedIdx) newState[ki] = v;
+        }
+        Object.keys(userFilterState).forEach(k => delete userFilterState[k]);
+        Object.assign(userFilterState, newState);
         // Remove from filterOrder and adjust indices
         filterOrder = filterOrder.filter(e => !(e.type === 'user' && e.idx === removedIdx));
         filterOrder.forEach(e => {
@@ -2940,6 +3068,26 @@ function renderLuaFiltersList() {
         renderLuaFiltersList();
       });
     }
+
+    // Keyboard-accessible reorder buttons (right-justified)
+    const arrowWrap = document.createElement('span');
+    arrowWrap.className = 'filter-reorder-wrap';
+
+    const btnUp = document.createElement('button');
+    btnUp.className = 'filter-reorder-btn';
+    btnUp.textContent = '↑';
+    btnUp.setAttribute('aria-label', `Move ${filterName} up`);
+    btnUp.addEventListener('click', (ev) => { ev.stopPropagation(); moveFilter(orderIdx, orderIdx - 1); });
+    arrowWrap.appendChild(btnUp);
+
+    const btnDown = document.createElement('button');
+    btnDown.className = 'filter-reorder-btn';
+    btnDown.textContent = '↓';
+    btnDown.setAttribute('aria-label', `Move ${filterName} down`);
+    btnDown.addEventListener('click', (ev) => { ev.stopPropagation(); moveFilter(orderIdx, orderIdx + 1); });
+    arrowWrap.appendChild(btnDown);
+
+    tag.appendChild(arrowWrap);
 
     // Drag events for reordering (unified)
     tag.addEventListener('dragstart', (e) => {
@@ -2958,9 +3106,7 @@ function renderLuaFiltersList() {
       const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
       const toIdx = parseInt(tag.dataset.orderIdx);
       if (fromIdx !== toIdx) {
-        const [moved] = filterOrder.splice(fromIdx, 1);
-        filterOrder.splice(toIdx, 0, moved);
-        renderLuaFiltersList();
+        moveFilter(fromIdx, toIdx);
       }
     });
 
@@ -3382,8 +3528,10 @@ function buildOptions() {
           if (def) filterNames.push(def.filename);
         }
       } else {
-        const f = resourceFiles.luaFilters[entry.idx];
-        if (f) filterNames.push(f.name);
+        if (userFilterState[entry.idx] !== false) {
+          const f = resourceFiles.luaFilters[entry.idx];
+          if (f) filterNames.push(f.name);
+        }
       }
     }
     if (filterNames.length > 0) opts.filters = filterNames;
@@ -3756,11 +3904,11 @@ async function runConversion() {
       sourceEditor.setValue(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`, -1);
 
       const previewFrame = document.getElementById('previewFrame');
-      previewFrame.srcdoc = `<body style="background:#1e1e2e;color:#cdd6f4;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
+      previewFrame.srcdoc = `<body style="background:#f5f5f5;color:#1e2124;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
         <div style="font-size:48px;margin-bottom:16px;">📄</div>
         <div style="font-size:16px;">${outFileName} (${sizeKB} KB)</div>
-        <div style="font-size:12px;color:#6c7086;margin-top:8px;">Binary file — use the download button above</div>
-        ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#fab387;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
+        <div style="font-size:12px;color:#666666;margin-top:8px;">Binary file — use the download button above</div>
+        ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#b86e00;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
       </body>`;
 
     } else {
