@@ -17,11 +17,8 @@ Still here? Ok. This tool is designed to help teaching staff convert LaTeX cours
     - a filter for correcting minor issues with nested ```enumerate``` environments when converting HTML
     - a filter for dealing with file path issues with uploaded images
     - a filter that converts uploaded images into base64 and embeds them directly into an output HTML file. (This allows student to receive a single inclusive HTML file and avoids a conflict between Pandoc's built-in "embed resources" and using MathJax via CDN.)
-
-
-## Additional Math options to be added
-
-Upgrade to pandoc conversion using MathJax version 4 (it currently defaults to version 3)
-
-autoinsert a Mathjax config script so that "assistive-mml: and other options are enables by default
+5. New math content conversion options for HTML output:
+    - option to use MathJax v4.1 via CDN (Pandoc's default MathJax option uses v3). 
+    - the previous option also autoinserts a Mathjax config script so that "Include Hidden MathML" is enabled by default. MathJax normally has this option disabled due to "fragility" of hiding the MathML, and instead just inserts the MathJax-generated speech strings directly into the DOM. However this would mean that individuals using MathCat to control speech settings would be unabled to do so and could only use the MathJax options; including the hidden MathML gives them the full range of options.
+    - possible future enhancement: user interface to customize Mathjax config for use with CDNs.
 

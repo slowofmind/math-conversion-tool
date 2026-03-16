@@ -3930,6 +3930,27 @@ async function runConversion() {
         outputText = result.stdout;
       }
 
+      // Post-process: inject MathJax 4 config (hidden MathML for accessibility)
+      const mathMethod = document.getElementById('opt-math')?.value;
+      if (mathMethod === 'mathjax4' && outputText.includes('tex-mml-chtml.js')) {
+        const mjConfig = '<script>\n'
+          + 'MathJax = {\n'
+          + '  loader: { load: ["a11y/assistive-mml"] },\n'
+          + '  options: {\n'
+          + '    menuOptions: {\n'
+          + '      settings: {\n'
+          + '        assistiveMml: true\n'
+          + '      }\n'
+          + '    }\n'
+          + '  }\n'
+          + '};\n'
+          + '</' + 'script>\n';
+        outputText = outputText.replace(
+          /(<script\s+defer[\s\S]*?tex-mml-chtml\.js[\s\S]*?<\/script>)/,
+          mjConfig + '$1'
+        );
+      }
+
       sourceEditor.setValue(outputText, -1);
 
       const previewFrame = document.getElementById('previewFrame');
