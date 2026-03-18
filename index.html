@@ -1199,7 +1199,6 @@
         <label for="opt-math">Math rendering method:</label>
         <select id="opt-math" style="width:auto;">
           <option value="mathjax4" selected>MathJax 4</option>
-          <option value="mathjax4-offline">MathJax 4 (offline)</option>
           <option value="mathjax" >MathJax 3 (Pandoc default)</option>
           <option value="mathml">MathML (Pandoc texmath)</option>
           <option value="">Do not convert math content</option>
@@ -1853,61 +1852,6 @@ sourceEditor.setOptions({
   wrap: true,
 });
 
-
-// ════════════════════════════════════════════════════════════════════
-// SECTION 1.6: EMBEDDED MATHJAX OFFLINE BUNDLE
-// ════════════════════════════════════════════════════════════════════
-//
-// MathJax 4 core (tex-mml-chtml.js) + assistive-mml.js, gzip-compressed
-// and base64-encoded. Decompressed at conversion time when the user
-// selects "MathJax 4 (offline)" to produce self-contained HTML output
-// that renders math without internet access.
-
-const MATHJAX_OFFLINE_CORE_GZ_B64 = 
-const MATHJAX_OFFLINE_A11Y_GZ_B64 = 
-
-/**
- * Decompress a gzip+base64 encoded string back to text.
- * Uses the browser's native DecompressionStream API.
- */
-async function decompressGzipBase64(b64str) {
-  const binaryStr = atob(b64str);
-  const bytes = new Uint8Array(binaryStr.length);
-  for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-
-  const ds = new DecompressionStream('gzip');
-  const writer = ds.writable.getWriter();
-  writer.write(bytes);
-  writer.close();
-
-  const reader = ds.readable.getReader();
-  const chunks = [];
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-  }
-  const totalLen = chunks.reduce((s, c) => s + c.length, 0);
-  const result = new Uint8Array(totalLen);
-  let offset = 0;
-  for (const c of chunks) { result.set(c, offset); offset += c.length; }
-  return new TextDecoder().decode(result);
-}
-
-// Cache decompressed MathJax so we only decompress once per session
-let _mjCoreCache = null;
-let _mjA11yCache = null;
-async function getMathJaxOfflineScripts() {
-  if (!_mjCoreCache) {
-    updateStatus('loading', 'Decompressing MathJax offline bundle\u2026');
-    let core = await decompressGzipBase64(MATHJAX_OFFLINE_CORE_GZ_B64);
-    let a11y = await decompressGzipBase64(MATHJAX_OFFLINE_A11Y_GZ_B64);
-    // Escape closing-script tags so the HTML parser won't break inline scripts
-    _mjCoreCache = core.replace(/<\/script/gi, '<\\/script');
-    _mjA11yCache = a11y.replace(/<\/script/gi, '<\\/script');
-  }
-  return { core: _mjCoreCache, a11y: _mjA11yCache };
-}
 
 // ════════════════════════════════════════════════════════════════════
 // SECTION 2: PANDOC WASM INITIALIZATION
@@ -3472,7 +3416,7 @@ function buildOptions() {
   // Math (wired later)
   const mathEl = document.getElementById('opt-math');
   if (mathEl && mathEl.value) {
-    if (mathEl.value === 'mathjax4' || mathEl.value === 'mathjax4-offline') {
+    if (mathEl.value === 'mathjax4') {
       opts['html-math-method'] = {
         method: 'mathjax',
         url: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js'
@@ -4033,13 +3977,11 @@ async function runConversion() {
         outputText = result.stdout;
       }
 
-      // Post-process: inject MathJax 4 config (online or offline bundle)
+      // Post-process: inject MathJax 4 config with accessibility defaults
       // Strategy: (1) remove Pandoc's CDN <script defer> tag,
-      //           (2) insert replacement scripts before </head>.
-      // This avoids fragile single-regex replacement on the defer tag.
+      //           (2) insert config + CDN script before </head>.
       const mathMethod = document.getElementById('opt-math')?.value;
-      if ((mathMethod === 'mathjax4' || mathMethod === 'mathjax4-offline')
-          && outputText.includes('tex-mml-chtml.js')) {
+      if (mathMethod === 'mathjax4' && outputText.includes('tex-mml-chtml.js')) {
 
         // Step 1: Remove Pandoc's CDN script tag
         // (RegExp constructor avoids literal <\/script> in source — HTML parser safe)
@@ -4048,31 +3990,17 @@ async function runConversion() {
         );
         outputText = outputText.replace(deferRE, '');
 
-        // Step 2: Build replacement script block
+        // Step 2: Build config + CDN script block
         const ES = '<' + '/script>';   // end-script token (HTML-parser-safe)
-        let mathScripts = '';
-
-        if (mathMethod === 'mathjax4-offline') {
-          // Offline: config + inline MathJax core + assistive-mml
-          const { core, a11y } = await getMathJaxOfflineScripts();
-          mathScripts =
-              '<script>\n'
-            + 'MathJax = {};\n'
-            + ES + '\n'
-            + '<script>\n' + core + '\n' + ES + '\n'
-            + '<script>\n' + a11y + '\n' + ES + '\n';
-        } else {
-          // Online: config + CDN script tag for MathJax 4
-          mathScripts =
-              '<script>\n'
-            + 'MathJax = {\n'
-            + '  loader: { load: ["a11y/assistive-mml"] },\n'
-            + '  options: { menuOptions: { settings: { assistiveMml: true } } }\n'
-            + '};\n'
-            + ES + '\n'
-            + '<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js">'
-            + ES + '\n';
-        }
+        const mathScripts =
+            '<script>\n'
+          + 'MathJax = {\n'
+          + '  loader: { load: ["a11y/assistive-mml"] },\n'
+          + '  options: { menuOptions: { settings: { assistiveMml: true } } }\n'
+          + '};\n'
+          + ES + '\n'
+          + '<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js">'
+          + ES + '\n';
 
         // Step 3: Insert before </head>
         outputText = outputText.replace('</head>', () => mathScripts + '</head>');
