@@ -1,0 +1,451 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 10 - Modeling Periodic Phenomena}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{enumerate}
+
+\item
+Shown below are graphs of three different phenomena. For each, explain briefly why someone might decide against using a sinusoid to model the behavior.
+
+\begin{enumerate}
+
+\item 
+    \begin{problem}
+        A patient's blood pressure in mmHg vs. time in seconds.
+    \begin{center}
+        \begin{tikzpicture}
+            \begin{axis}[ymin=0, height=1.5in, width=5in
+            ]
+                \addplot[domain=0:15, samples=100] {75-2*x+20*sin(deg(5*x))};
+            \end{axis}
+        \end{tikzpicture}
+    \end{center}
+    \end{problem}
+    \pspace{\vfill}
+
+\begin{solution}
+    The behavior is not periodic and the wave does not have a consistent midline. (The midline value looks to be decreasing over time.)
+\end{solution}
+
+    \item 
+    \begin{problem}
+        The tide height in a bay (in feet) vs. time (in hours).
+    \begin{center}
+        \begin{tikzpicture}
+            \begin{axis}[
+            ymin=0, ymax=25, height=1.5in, width=5in
+            ]
+                \addplot[domain=0:48] {15+3*sin(deg(x*pi/12))-4*cos(deg(x*pi/6))};
+            \end{axis}
+        \end{tikzpicture}
+    \end{center}
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        Although the behavior is periodic, the amplitude of the wave is not consistent.
+    \end{solution}
+
+            \item 
+    \begin{problem}
+            An FM radio signal. (FM stands for \emph{frequency modulation}.)
+    \begin{center}
+        \begin{tikzpicture}
+            \begin{axis}[
+            height=1.5in, width=5in, xtick=\empty,
+            ytick=\empty
+            ]
+                \addplot[domain=0:10, samples=500] {sin(deg(x^2))};
+            \end{axis}
+        \end{tikzpicture}
+    \end{center}
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        The behavior is not periodic. The frequency/period of the wave is not consistent.
+    \end{solution}
+
+        
+    
+\end{enumerate}
+
+\pspace{\newpage}
+
+
+\item
+\begin{problem}
+A mass attached to a spring will oscillate back and forth when set in motion. This is called \emph{simple harmonic motion}, and it turns out that the position of the mass can be described \emph{exactly} by a sinusoidal function. (Mass-spring systems are used to model more complex physical and biological systems.)
+
+\begin{center}
+\includegraphics[width=3in]{images/spring-diagram.pdf}
+\end{center}
+
+A mass attached to a spring oscillates back and forth between $x=+3$ cm and $x=-3$ cm with a period of $10$ s. At $t=0$, the mass is at $x=0$ and is traveling in the negative direction. Find a sinusoidal function of time that describes the mass's position. (It may help to sketch the graph first.)
+    \end{problem}
+    \pspace{\vfill}
+
+\begin{solution}
+The position-time graph for the mass looks like this.
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+        xlabel=$t$ (s),
+        ylabel=$x$ (cm),
+        ytick={-3,0,3},
+        minor y tick num=2,
+        minor x tick num=1,
+        grid=both,
+        ]
+            \addplot[domain=0:20] {-3*sin(deg(x*pi/5))};
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+\end{solution}
+
+The amplitude is $3$, the midline value is $0$, and the period is $10$. At $t=0$, the wave is decreasing through the midline. A function that describes this behavior could be \fbox{$f(t)=-3\sin(\frac{\pi}{5}t)$.}
+\item 
+
+\begin{problem}
+    A remarkable fact is that $y=\sin ^2 x$ and $y=\cos^2 x$ are sinusoids. This means that $\sin^2x$ and $\cos^2x$ can be rewritten in the form of a sinusoid, $A\sin(Bx)+C$ or $A\cos(Bx)+C$.
+    \begin{center}
+        \begin{tikzpicture}
+    \begin{groupplot}[
+        group style={
+            group size=2 by 1,
+            horizontal sep=2cm,
+            vertical sep=1.5cm,
+        },
+        width=6cm,
+        height=5cm,
+        xlabel={$x$},
+        ylabel={$y$},
+        xmin=0, xmax=2*pi,
+        xtick={0,pi/2,pi,3*pi/2,2*pi},
+        xticklabels={0, $\frac{\pi}{2}$, $\pi$, $\frac{3\pi}{2}$, $2\pi$},
+        domain=0:2*pi,
+        samples=100,
+        grid=major,
+        height=1.5in
+    ]
+
+    \nextgroupplot[title={(a) $y=\sin^2(x)$}]
+    \addplot[very thick] {sin(deg(x))^2};
+
+
+    \nextgroupplot[title={(b) $y=\cos^2(x)$}]
+    \addplot[very thick] {cos(deg(x))^2};
+
+
+    \end{groupplot}
+\end{tikzpicture}
+
+    \end{center}
+\end{problem}
+
+\begin{enumerate}
+    \item 
+    \begin{problem}
+    Given the graph of $y=\sin^2x$ shown, rewrite $\sin^2x$ in sinusoidal form.
+    \end{problem}
+    
+    \vspace{16pt}
+    $\sin^2x=\solonly{\boxed{-\frac{1}{2}\cos(2x)+\frac{1}{2}}}$ 
+    \vspace{16pt}
+    
+    \item
+    \begin{problem}
+    Given the graph of $y=\cos^2x$ shown, rewrite $\cos^2x$ in sinusoidal form.
+    \end{problem}
+    
+    \vspace{16pt}
+    $\cos^2x=\solonly{\boxed{\frac{1}{2}\cos(2x)+\frac{1}{2}}}$ 
+    \vspace{16pt}
+
+\end{enumerate}
+\probonly{\emph{These trigonometric identities are known as the power-reducing formulas.}}    
+
+
+\pspace{\newpage}
+
+% \item
+% \begin{problem}
+% In February, the temperature in Cambridge, MA typically ranges from a low of 22 degrees Fahrenheit to a high of 40 degrees Fahrenheit.
+
+
+%         Find a sinusoidal function to model the temperature variation under the assumption that the high temperature occurs at exactly noon and the low temperature occurs at exactly midnight. Let $t=0$ correspond to midnight. (It may help to sketch the graph first.)
+%     \end{problem}
+%     \pspace{\vfill}
+
+\item 
+
+
+\begin{grading}
+15 points. 2 for part (a)i, 3 for part (a)ii, 5 for part (a)iii, 2 for part (b), 3 for part (c).
+\end{grading}
+
+  The average rental price for a two-bedroom apartment in Malden was \$800
+  in 1990 and \$1000 in 2000. The price was increasing over the entire
+  decade. We want to model the price of a two-bedroom apartment in Malden
+  as a function of time.
+
+
+  \begin{enumerate}
+
+  \item Suppose we let $t=0$ correspond to the year 1990 and measure time
+    in years. Help your friends find formulas for the models they propose. Accompany each
+    function formula with a sketch.
+    \probonly{}
+      \begin{enumerate}
+      \item
+        \begin{problem}[\vfill]
+          Alex thinks that prices are increasing at a constant rate, so he wants to
+    model the price with a linear function, $L(t)$.
+        \end{problem}
+
+        \begin{solution}
+          We're looking for the equation of the line through $(0, 800)$
+          and $(10, 1000)$.  This line has slope $20$ and $y$-intercept
+          800, so its equation is \fbox{$L(t) = 20t + 800 $}.
+        \end{solution}
+
+      \item
+        \begin{problem}[\vfill]
+            Jamey thinks that the percent change in price is constant, so he
+    wants to model the price with an exponential function, $E(t)$.
+        \end{problem}
+
+        \begin{solution}
+          The price has grown by 25\% in 10 years, so an exponential model
+          is \fbox{$E(t) = 800\cdot1.25^{t/10} $}.
+        \end{solution}
+
+
+      \item
+        \begin{problem}[\vfill]
+            Mike, an optimist who loves trigonometry, thinks that price is a
+    sinusoidal function of time. He thinks that \$800 is an all-time low
+    and \$1000 is an all-time high. He wants to model the price with a sinusoidal
+    function, $T(t)$.
+        \end{problem}
+
+        \begin{solution}
+          The graph of the function that Mike is imagining looks like
+          this:
+          \begin{center}
+            \begin{tikzpicture}
+              \begin{axis}[ymin=0]
+                \addplot+[domain=0:40] {900-100*cos(deg(pi/10*x))};
+              \end{axis}
+            \end{tikzpicture}
+          \end{center}
+          This sinusoid has amplitude $100$, balance value $900$, and
+          period 20.  Since it has a minimum at $t = 0$, it's easiest to
+          model it by starting with $-\cos t$: if we stretch this
+          vertically by 100, horizontally by $\frac{20}{2\pi}$, and then
+          move it up by $900$, we'll get Mike's graph.  This gives us the
+          formula $\boxed{ T(t) = -100\cos\left(\frac{\pi}{10}t\right) +
+            900}$.
+        \end{solution}
+
+      \end{enumerate}      
+      \probonly{}
+
+    \probonly{\emph{You can graph your formulas
+        with a calculator to check whether they match your graphs.}}
+
+
+        \pspace{\newpage}
+  \item
+    \begin{problem}[\stretch{0.8}]
+      Which model predicts the highest price for the year 2003? Which
+      model predicts the lowest price for the year 2003?
+    \end{problem}
+
+    \begin{solution}
+      Both the linear and exponential models continue to increase after
+      the year 2000, so \fbox{Mike's sinusoidal model predicts the lowest
+        price}.  The exponential function will grow faster than the linear
+      one after 2000, so \fbox{Jamey's exponential function predicts the
+        highest price}.  
+    \end{solution}
+
+  \item Alex, Jamey, and Mike are combing the newspapers for information
+    that might lend credence to one model over the others. Which model ---
+    the linear, exponential, or sinusoidal --- is best supported by each
+    of the following statements?  (Choose one model for each
+    statement.)
+    \begin{enumerate}
+
+    \item
+      \begin{problem}[\stretch{0.4}]
+        ``Prices in Malden have been growing at an increasing rate over
+        the past decade.''
+      \end{problem}
+
+      \begin{solution}
+        This supports the exponential model; graphically, it says that the
+        price graph is concave up.
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.4}]
+        ``In the early 1990s prices in Malden were increasing at an
+        increasing rate. After 1995 the rate of increase began to drop
+        off.''
+      \end{problem}
+
+      \begin{solution}
+        This supports the sinusoidal model; graphically, it says that the
+        price graph is concave up on $(0, 5)$ and concave down on $(5,
+        10)$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.4}]
+        ``Prices of apartments in Malden have been increasing very
+        steadily over the past decade.''
+      \end{problem}
+
+      \begin{solution}
+        This supports the linear model. 
+      \end{solution}
+
+    \end{enumerate}
+
+  \end{enumerate}
+
+\item 
+
+\begin{grading}
+2 points. 
+\end{grading}
+
+  \begin{problem}
+    Recall from Math Ma that the graph of a polynomial function can have at most $n$ $x$-intercepts and at most $n-1$ turning points, where $n$ is the degree of the polynomial. The end behavior (as $x\to\pm\infty$) depends on the degree and the sign of the leading coefficient but is always either $y\to \infty$ or $y\to-\infty$.
+    
+    Explain how the graph of $f(x) = \sin x$ indicates that it is not a polynomial function. Refer to the number of $x$-intercepts, the number of
+    turning points, and the end behavior.
+  \end{problem}
+  
+    \begin{solution}
+     The graph of $y=\sin(x)$ has
+    infinitely many $x$-intercepts and turning points, and $\displaystyle \lim_{x
+      \to \infty} \sin x$ and $\displaystyle \lim_{x \to -\infty} \sin x$ do not
+    exist because both ``ends'' of the graph oscillate between $-1$ and
+    $1$ forever.  So, $\sin x$ cannot be a polynomial. 
+  \end{solution}
+  
+  \pspace{2in}
+  
+  \begin{problemonly}   
+    {\it Although $\sin x$ isn't a polynomial, in Math 1b, you'll learn how it is like a ``polynomial of infinite
+      degree.'' \[ \sin x = x -
+      \tfrac{1}{6}x^3 + \tfrac{1}{120}x^5 -
+      \tfrac{1}{5040}x^7 + \tfrac{1}{362880}x^9-\cdots\] }
+      \end{problemonly}
+\pspace{-36pt}
+
+      \pspace{\newpage}
+
+\item
+
+\begin{problem}
+    Next class, we will investigate derivatives of trigonometric functions. Let $f(x)=\sin x$ and $g(x)=\cos x$.
+\end{problem}
+
+\begin{enumerate}
+    \item 
+    \begin{problem}
+    Fill in the limit definition of $f'(0)$. $f'(0) = \displaystyle
+      \lim_{h \to 0} \fitb[\vphantom{\dfrac{0}{0}}]{3in}{\frac{\sin(h)}{h}}$
+      \end{problem}
+
+    \item 
+    \begin{problem}
+    Use a calculator to find approximations of $f'(0)$. (Plug in values of $h$ close to $0$.) Come up with a guess for the exact value.
+      \end{problem}
+      \pspace{\vfill}
+
+    \begin{solution}
+        Here is a table of a few approximations.
+        
+\begin{tabular}{c|c}
+$h$     & $\frac{\sin h}{h}$ \\ \hline
+$-0.1$  & $0.998$           \\
+$-0.01$ & $0.999$           \\
+$0$     & undefined          \\
+$0.01$  & $0.999$           \\
+$0.1$   & $0.998$          
+\end{tabular}
+
+Based on these values, it seems like $f'(0)=1$.
+    \end{solution}
+
+        \item 
+    \begin{problem}
+    Fill in the limit definition of $g'(0)$. $g'(0) = \displaystyle
+      \lim_{h \to 0} \fitb[\vphantom{\dfrac{0}{0}}]{3in}{\frac{\cos(h)-1}{h}}$
+      \end{problem}
+
+    \item 
+    \begin{problem}
+    Use a calculator to find approximations of $g'(0)$. (Plug in values of $h$ close to $0$.) Come up with a guess for the exact value.
+      \end{problem}
+      \pspace{\vfill}
+
+    \begin{solution}
+        Here is a table of a few approximations.
+
+        \begin{tabular}{c|c}
+$h$     & $\frac{\cos h-1}{h}$ \\ \hline
+$-0.1$  & $0.050$             \\
+$-0.01$ & $0.005$             \\
+$0$     & undefined            \\
+$0.01$  & $-0.005$            \\
+$0.1$   & $-0.050$           
+\end{tabular}
+
+Based on these values, it seems like $g'(0)=0$.
+    \end{solution}
+
+    \item 
+    \begin{problem}
+        Are your guesses for $f'(0)$ and $g'(0)$ consistent with the graphs of sine and cosine? Explain briefly.
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        The graph of $y=\sin(x)$ is increasing at $x=0$, so $f'(0)=1$ is consistent with the graph of sine. The graph of $y=\cos(x)$ has a turning point and horizontal tangent at $x=0$, so $g'(0)=0$ is consistent with the graph of cosine.
+    \end{solution}
+\end{enumerate}
+
+\end{enumerate}
+
+
+
+\psreflection{
+Optional reading for next class is \S 21.1, 21.2 in Gottlieb.
+}
+
+\end{document}

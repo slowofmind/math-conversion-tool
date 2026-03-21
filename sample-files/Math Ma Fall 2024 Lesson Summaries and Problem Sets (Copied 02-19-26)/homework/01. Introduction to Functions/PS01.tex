@@ -1,0 +1,526 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\newcommand{\axes}[1][]{
+  \begin{tikzpicture}
+    \begin{axis}[xtick=\empty, ytick=\empty, ymin=-2, ymax=2,
+      xmin=-4.25, xmax=4.25, #1]
+    \end{axis}
+  \end{tikzpicture}
+}
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\makeatletter
+
+% underline links               
+\let\@href=\href
+\renewcommand{\href}[2]{\@href{#1}{\ul{#2}}}
+
+\newcommand\calculator{
+  \begin{tikzpicture}[x=0.15ex, y=0.15ex, baseline=1.5pt]
+    \begin{scope}[thick]
+      \draw (0, 0) -- (10, 0) -- (10, 14) -- (0, 14) -- cycle;
+      \foreach \x in {10/3, 20/3}
+      {
+        \draw (\x, 0) -- (\x, 10);
+      }
+      \foreach \y in {10/3, 20/3, 10}
+      {
+        \draw (0, \y) -- (10, \y);
+      }
+    \end{scope}
+  \end{tikzpicture}
+}
+\newcommand{\calcitem}{\refstepcounter{enum\romannumeral\@enumdepth}%
+\item[\calculator \csname labelenum\romannumeral\@enumdepth\endcsname]}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\newcommand{\psreflection}[2][]{
+
+  \ifthenelse{\not\equal{#1}{nocite}}{
+    \begin{enumerate}[resume]
+    \item
+      \begin{problem}[1in]
+        Please cite any help you got on this problem set:
+        \begin{itemize}[nosep]
+        \item If you worked with other students, please list their names here.
+        \item If you used resources other than those on our Canvas site, please list them here.
+        \end{itemize}
+      \end{problem}
+
+    \end{enumerate}
+  }
+
+  \probonly{%
+    #2
+
+    \newpage
+
+    \emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!
+    \begin{itemize}
+    \item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!
+
+      \vspace{1.5in}
+
+    \item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.
+
+      \vspace{1.5in}
+
+    \item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!
+
+      \vfill
+    \end{itemize}      
+  }
+}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 1 - Introduction to Functions}
+\end{center}
+
+\begin{problemonly}
+  \begin{tcolorbox}[colframe=green!80!black, colback=green!10!white, 
+    sharp corners, size=fbox, parbox=false, boxrule=0.5mm]
+    \textbf{Guidelines for homework in Math Ma:}
+    \begin{itemize}
+    \item Write your answers on this paper / PDF.
+
+    \item When writing up your homework, you should show your work or explain your reasoning unless a problem explicitly says that's unnecessary. Your homework will be graded primarily on your reasoning and communication, \emph{not} on your final answer.
+
+    \item Homework should be presented in a clear, professional manner. If you decide to use new variables or other notation, you need to explain those choices and your line of reasoning clearly, using labeled diagrams and graphs as appropriate. Remember that your CA is reading your work, and they aren't a mind reader.
+
+    \item When you prepare for exams, you will almost certainly want to look back at some of your homework to refresh your understanding of the material, so write down your thoughts in a way that your future self will understand and benefit from! 
+
+    \item If you need extra room for any problem, please add extra pages \textbf{to the end of the assignment}, and write your grader a note in the relevant problem indicating where that extra work is (like ``See rest on page 9'').
+
+    \item Please \textbf{scan} your work rather than taking a photo, as it makes your work much easier to read. GeniusScan (\url{https://thegrizzlylabs.com/genius-scan/}), Dropbox Scan (\url{https://www.dropbox.com/doc-scanner-app}), and Adobe Scan (\url{https://www.adobe.com/acrobat/mobile/scanner-app.html}) are good free phone scanning apps.
+
+    \item Make sure the pages of the PDF you submit exactly match the pages of the assignment. This is the first page of the assignment and it shoudl be the first page of your scan. Otherwise, your CA may not see all of your work in Gradescope. For example, your PDF for this homework should have 8 pages, with \#1 on page 2, \#2(a)-(c) on page 3, \#2(d)-(e) on page 4, \#3 on page 5, \#4 on page 6, and \#6 on page 7. (And you may have extra pages if you need extra room for a probem.) 
+
+    \item The written problem sets are due at by the start of your section time. Gradescope is very intuitive, but if you need guidance, there's a video showing how to upload your homework on the Worksheets \& Homework page of Canvas. There is also a lot of online documentation and tutorials from Gradescope to help troubleshoot. 
+
+    \end{itemize}
+
+  \end{tcolorbox}
+
+  % \calcitem
+  \emph{Notes:}
+  \begin{itemize}
+  %\item This assignment is shorter than usual because we know you will be spending time on the algebra diagnostic tomorrow night.
+
+  \item We expect you to be able to do most of the homework problems we assign without technology (although you're welcome to use technology to check your calculations). When we assign a problem where we expect you'll need a calculator, we'll point this out using the symbol \calculator. You'll notice that no problems on this homework have that symbol; that's because you should be able to do them all without technology! (Calculators and other technology will not be permitted on exams or skills checks, so we encourage you to use homework as practice for that.)
+
+  \end{itemize}
+\end{problemonly}
+
+\pspace{\newpage}
+
+\begin{enumerate}
+\item  \note{
+    \begin{itemize}[nosep]
+    \item Vertical line test
+    \item Match descriptions of bike rides with graphs (all linear) 
+    \item Identify domain and range graphically
+    \item Translate ``There are 7 times as many undergraduates as professors'' into an equation. (\href{https://people.umass.edu/~clement/pdf/algebra.pdf}{In this study of 150 freshman engineering students, 63\% answered this correctly.})
+    \end{itemize}
+  }
+
+  \begin{problem}[\newpage]
+    Do the Edfinity assignment ``Problem Set 1''. To access Edfinity, go to our Canvas site and click the Edfinity link in the left sidebar. 
+
+    We encourage you to write down any scratch work here, as well as things you want to tell your future self to remember. Nothing you write here will be graded.
+  \end{problem}
+
+\item \label{graph-two-runs} 
+
+  One day, Akiko and Bahar jog along the Charles River from Harvard to the Museum of Science, a distance of 9 miles. They leave from Harvard at the same time. Akiko jogs at a constant speed of 6 miles per hour the entire way from Harvard to the Museum of Science. Bahar starts more slowly than Akiko but steadily speeds up throughout her run, passing Akiko after 1 hour.
+
+  Let $A(t)$ be the distance, in miles, that Akiko has run after $t$
+  hours. Let $B(t)$ be the distance, in miles, that Bahar has run
+  after $t$ hours.
+
+  \begin{enumerate}
+
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[1in]
+      Explain why $B$ is a function of $t$.
+    \end{problem}
+
+    \begin{solution}
+      For each input (time) $t$, there's exactly 1 output (distance) that Bahar has run.
+    \end{solution}
+
+  \item
+    \begin{grading}
+      6 points.
+
+      Features to look for (1 point each):
+      \begin{itemize}[nosep]
+      \item They've put time on the horizontal axis and distance on the vertical axis and labeled the axes in some way to make this clear.
+      \item Both graphs are increasing.
+      \item The graph of $A$ is linear with slope 6.
+      \item The graph of $B$ is concave up.
+      \item The domain and range of the graphs match what the students say in \ref{graph-two-runs-domain-range}.
+      \item On the $t$-axis, 1 and 1.5 should be labeled; on the vertical axis, 9 should be labeled. (They can also label 6 on the vertical axis as the value where $A$ and $B$ cross, but it's okay if they don't.)
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[0.25in]
+      Sketch the graphs of both $A(t)$ and $B(t)$ on the axes below. (So both graphs will be on the same set of axes.) Label the axes to say what each represents, and also mark any values you know on the axes. Clearly indicate which graph is $A(t)$ and which is $B(t)$. No explanation is necessary.
+
+      Make sure that you've accurately reflected all of the information above!
+    \end{problem}
+
+    \begin{problemonly}
+      \axes[xmin=0, ymin=0, enlarge x limits=auto, enlarge y
+      limits=auto, width=4in, height=3in]
+    \end{problemonly}
+
+    \begin{solution}
+      Since Akiko jogs at a constant speed, she runs the same amount in each second. Using the strategy of {{\#3}} on \href{https://people.math.harvard.edu/~jjchen/mathma/docs/worksheets/worksheet01-sols.html}{the worksheet ``Introduction to Functions''}, this means the graph of her distance will be linear, and the slope will be 6 miles per hour. Bahar starts out running more slowly than Akiko but speeds up; using the strategy of {{\#3}} on \href{https://people.math.harvard.edu/~jjchen/mathma/docs/worksheets/worksheet01-sols.html}{the worksheet ``Introduction to Functions''}, this means her graph will be increasing and concave up. Finally, we know that Bahar catches up to Akiko at $t = 1$, so the graphs should cross there. (And, at that time, Akiko has run 6 miles.) 
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick={1, 1.5}, ytick={6, 9}, xlabel=$t$, ylabel=distance, 
+            enlarge x limits=auto]
+            \addplot+[domain=0:1.5] {6 * x} node[above] {$A$};
+            \addplot+[domain=0:sqrt(1.5)] {6*x^2} node[above] {$B$}; 
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+    \pspace{0.25in}
+
+  \item \label{graph-two-runs-domain-range}
+
+    \begin{grading}
+      4 points: 1 for each answer
+    \end{grading}
+
+    \begin{problem}[\vfill\newpage]
+      What are the domain and range of $A(t)$ and $B(t)$? If you don't have enough information to determine one of these, just write ``not enough info'' and explain why.
+    \end{problem}
+
+    \begin{solution}
+      Both $A(t)$ and $B(t)$ have range $[0, 9]$ since each jogger runs 9 miles. The domain of $A(t)$ is $[0, 1.5]$ since it takes Akiko 1.5 hours to run the 9 miles. We don't know when Bahar reaches the Museum of Science (except that it's sometime between $t = 1$ and $t = 1.5$), so we don't have enough information to determinate the domain of $B(t)$.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1 point, 0.5 for identifying that it's linear and 0.5 for identifying that this is because Akiko runs at a constant speed.
+    \end{grading}
+
+    \begin{problem}[1in]
+      Is $A(t)$ linear, concave up, or concave down? Explain why in terms of the rate that Akiko runs.
+    \end{problem}
+
+    \begin{solution}
+      Since Akiko runs at a constant speed, $A$ is linear. 
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1 point, graded for consistency with whatever they drew in their graph.
+    \end{grading}
+
+    \begin{problem}[\nstretch{0.25}]
+      Is $B(t)$ linear, concave up, or concave down? No explanation is necessary.
+    \end{problem}
+
+    \begin{solution}
+      $B$ is concave up. 
+    \end{solution}
+
+  \end{enumerate}
+
+\item \label{cleaning-greenough} 
+
+  Before 2020, Harvard hired students to clean dorms at the end of each summer.
+
+  Let $G(s)$ be the number of hours it would take $s$ students working together to completely clean Greenough. For example, writing $G(100) = 5$ means it would take 100 students working together 5 hours to completely clean Greenough.
+
+  In this problem, you'll model $G(s)$. As is often the case, there isn't a single correct model; rather, the important thing is to communicate how you're interpreting the situation and using your interpretation to create your model.
+
+  \begin{enumerate}
+  \item
+
+    \begin{grading}
+      2 points.
+
+      They don't have to give the same answer that the solution does; they should get full credit for any choice that has a consistent explanation. So, for instance, they might argue something like ``When there are just a few students, more students will make the work go faster; but once there are too many students, more will just slow it down. So, the graph will decrease, then increase''. That should get full credit.
+
+      But if they misinterpret the situation or write an explanation that disagrees with their choice, then you should take a deduction. 
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Do you think $G(s)$ is increasing or decreasing, or does it switch from one to the other? Explain your thinking.
+    \end{problem}
+
+    \begin{solution}
+      I think that, the more students there are, the less time it will take the students to clean Greenough. (More students should make it go faster.) So, I think $G$ is \fbox{decreasing}.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      2 points. Again, they don't have to give the same answer as the solution, but they should be thinking about how a change in the number of students causes a change in the total number of hours required to clean Greenough, and they should give an answer consistent with what they think about that change.
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Do you think $G(s)$ is linear? Explain.
+    \end{problem}
+
+    \begin{solution}
+      No. I think that increasing from, say, 1 to 2 students would reduce the total time needed to clean Greenough by a lot, while increasing from 100 to 101 students would reduce the total time needed by only a little. So, there isn't a constant rate of change in this situation.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1 point for properly interpreting what this would mean 
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Do you think the graph of $G(s)$ should intersect the horizontal axis? Why or why not?
+    \end{problem}
+
+    \begin{solution}
+      If the graph intersected the horizontal axis at some value $a$, that would say that $a$ students working together can clean Greenough in 0 hours. That doesn't make sense, so the graph shouldn't intersect the horizontal axis.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      4 points:
+      \begin{itemize}[nosep]
+      \item 1 for putting students on the horizontal axis, hours on the vertical axis, and labeling the axes so you can tell which variable is which
+      \item 3 points for sketching a graph that matches their answers to the 3 previous parts
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[0.1in]
+      Sketch what you think the graph of $G(s)$ looks like. Be sure to label your axes to indicate which variable each represents. No additional explanation is necessary.
+    \end{problem}
+
+    \begin{problemonly}
+      \axes[xmin=0, ymin=0, enlarge x limits=auto, enlarge y
+      limits=auto, width=3.6in, height=2.7in]      
+    \end{problemonly}
+
+    \begin{solution}
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xmin=0, xtick={1}, xlabel=students, ylabel={hours}, 
+            ytick=\empty] 
+            \addplot+[domain=1:10] {1 / x}; 
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+\item 
+
+  \emph{In the previous two problems, you went from a verbal description of a function to a graph. We also often want to go from an algebraic formula for a function, like $f(x) = x^2$, to a graph. This is something you've almost certainly done in prior math classes; if you'd like a refresher on how to do this, watch \href{https://www.youtube.com/watch?v=2-dUHLHeyTY}{this video}. (Note: If you're doing this on paper, underlined text like this is a link in the PDF, so see the PDF on Canvas for the link.)}
+
+  \begin{enumerate}
+  \item
+
+    \begin{grading}
+      2 points: 1 for having a line with positive slope, 1 for having reasonable intercepts (a negative $x$-intercept and a positive $y$-intercept)
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Sketch the graph of $f(x) = 2x + 1$. No explanation is necessary. 
+    \end{problem}
+
+    \begin{solution}
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal image, ytick={-5, -4, ..., 5}, width=3in]
+            \addplot+[domain=-2.2:2.2] {2*x+1};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      2 points, 0.5 for going through the origin and 1.5 for the right
+      general shape 
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Sketch the graph of $g(x) = x^2$. No explanation is necessary. 
+    \end{problem}
+
+    \begin{solution}
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal image, ytick={-5, -4, ..., 5}, width=3in]
+            \addplot+[domain=-2.2:2.2] {x^2};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \end{enumerate}
+
+\item  \begin{grading}
+    Nothing to grade here
+  \end{grading}
+
+  \begin{problem}[\newpage]
+    The math department is interested in better understanding how students choose their first math course and how those choices support students in accomplishing their goals. Ultimately, we want to try and give the best advice we can to students. You can help by filling out \href{https://harvard.az1.qualtrics.com/jfe/form/SV_8cOBN54O9Gyypo2}{this survey} by September 8. Your responses will be aggregated by a research team and anonymized before being shared with the teaching staff.
+  \end{problem}
+
+\item 
+
+  \begin{grading}
+    There's nothing to grade here.
+  \end{grading}
+
+  \begin{problem}[1in]
+    At the end of every problem set, we'll ask you to cite any help you got.
+    \begin{itemize}[nosep]
+    \item If you worked with other students, please list their names here.
+    \item If you used resources other than those on our Canvas site, please list them here.
+    \end{itemize}
+    Please make sure you have read the Collaboration \& Academic Integrity section of the \href{https://people.math.harvard.edu/~jjchen/mathma/docs/handouts/syllabus.html}{syllabus} and understand what help is and isn't acceptable.
+  \end{problem}
+
+\end{enumerate}
+\psreflection[nocite]{To prepare for next class, we encourage you to read \S 2.1, 2.2 of \href{https://canvas.harvard.edu/files/20608911/download?download_frd=1}{Gottlieb}, which is on the Textbooks \& Handouts page of Canvas and can be downloaded by clicking the link. 
+
+  When you read before class, the goal isn't to understand every detail; instead, just try to get a general sense of the main ideas and terminology. That will help you get more out of class!}
+
+\end{document}

@@ -1,0 +1,15 @@
+\documentclass{standalone}
+\usepackage{plotstyle}
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}[
+    axis equal image,
+    xmin=-2.5, xmax=2.5,
+    ymin=-2.5, ymax=2.5,
+    xtick distance=1, ytick distance=1,
+    xlabel={$x$}, ylabel={$y$}
+  ]
+  \addplot[domain=-3:3, draw=none]{x};
+  \end{axis}
+\end{tikzpicture}
+\end{document}

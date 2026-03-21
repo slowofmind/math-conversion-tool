@@ -1,0 +1,19 @@
+\documentclass{standalone}
+\usepackage{plotstyle}
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}[
+    axis equal image,
+    xmin=-2.5, xmax=2.5,
+    ymin=-2.5, ymax=2.5,
+    xtick distance=1, ytick distance=1,
+    xlabel={$x$}, ylabel={$y$}
+  ]
+  \addplot[domain=-3:3, draw=none]{x};
+  \addplot[closed, mark size=2] coordinates {(1.732,1)};
+  \node[above right] at (1.732,1) {$(a,b)$};
+  \draw[very thick] (0,0) -- (1.732,1) -- (1.732,0) -- cycle;
+  \draw[very thick] (1.532, 0) -- (1.532, 0.2) -- (1.732,0.2);
+  \end{axis}
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,534 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{marvosym}
+
+\usepackage{marginnote}
+\usepackage[colorinlistoftodos]{todonotes}
+\renewcommand{\marginpar}{\marginnote}
+
+\usepackage{soul}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\newlength{\tipmargin}
+\makeatletter
+
+\newdimen\SOUL@dimen %new
+\def\SOUL@ulunderline#1{{%
+    \setbox\z@\hbox{#1}%
+    % \dimen@=\wd\z@
+    \SOUL@dimen=\wd\z@ %new
+    \dimen@i=\SOUL@uloverlap
+    \advance\SOUL@dimen2\dimen@i %\dimen@ exchanged too
+    \rlap{%
+      \null
+      \kern-\dimen@i
+      % \SOUL@ulcolor{\SOUL@ulleaders\hskip\dimen@}%
+      \SOUL@ulcolor{\SOUL@ulleaders\hskip\SOUL@dimen}% new
+    }%
+    \unhcopy\z@
+  }}
+
+\renewenvironment{framed}{
+  \setlength{\tipmargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\tipmargin
+  \def\FrameCommand{\hspace{\tipmargin}\fbox}%
+  \advance\linewidth\tipmargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+}
+{\endMakeFramed}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\newcommand{\highlight}[1]{\boldmath\hl{\textbf{#1}}\unboldmath}
+
+\newcommand{\goal}[1]{\textbf{\textcolor{skyblue}{#1}}}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\htitle{21. Optimization}
+
+\begin{problemonly}
+  \begin{framed}
+
+You should be able to:
+    \begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+    \item Set up and solve optimization problems using calculus.
+
+    \item Justify that your solution is optimal using appropriate techniques from calculus.
+
+    \end{itemize}
+  \end{framed}
+\end{problemonly}
+
+\begin{enumerate}
+\item  
+  \begin{enumerate}
+  \item
+
+    \note{Here, I want to talk about the general method: finding the critical points and comparing with end behavior (either plugging to endpoints or taking one-sided limits).}
+
+    \begin{problem}[\vfill]
+      Last time, we talked about how to determine whether a continuous function $f$ has a global maximum / minimum on a given domain and, if so, where. Summarize the method.
+    \end{problem}
+
+    \begin{solution}
+      First, we find the critical points of the function and calculate the value of
+      the function at each critical point. Then we determine the end behavior of the function
+      by plugging in endpoints or taking one-sided limits. If the largest value of all
+      of these occurs at a point in the domain (critical point or included endpoint), then
+      it is the global maximum. Otherwise, there is no global maximum. The smallest value
+      tells us about the global minimum.
+    \end{solution}
+
+  \item
+
+    \note{If there's only one critical point and it's a local min/max, then it's a global min/max. This is often useful in optimization problems!}
+
+    \begin{problem}[\vfill\newpage]
+      \emph{Important special case!} Suppose we're maximizing or minimizing a continuous function $f$ on an interval, and $f$ has exactly one critical point in the interval. Are there any other methods we could use to show that $f$ has a global maximum or minimum there?
+    \end{problem}
+
+    \begin{solution}
+      If there's only one critical point on an interval and it is a local maximum,
+      then it's the global maximum. Similarly, if it's a local minimum, then
+      it's the global minimum. Therefore if there's only one critical point,
+      the First or Second Derivative Tests can tell us about global extrema.
+    \end{solution}
+
+  \end{enumerate}
+
+\item  
+
+  \note{Very standard, but on a closed interval.}
+
+  \begin{problem}[\nstretch{3}]
+    A farmer has 40 feet of fencing, and she wants to fence off a rectangular pen next to her barn. The barn will be one side of the pen, so that side needs no fencing. In order for the cow to be able to turn around in the pen, the pen needs to be at least 5 feet long and 5 feet wide. What is the largest area the pen could have?
+  \end{problem}
+
+  \begin{solution} 
+    \highlight{Goal:} We want to maximize \goal{area}.
+     
+    \highlight{Define variables:}
+      \begin{itemize}[nosep]
+        \item $A$ = area of pen
+        \item $\ell$ = length of pen
+        \item $w$ = width of pen
+      \end{itemize}
+
+    Here are two examples of what the pen might look like. 
+      \begin{center} 
+        \begin{tikzpicture} [xscale=1,yscale=1]
+          \draw[-][ultra thick] (0,0) -- (0,4) -- (2,4) -- (2,0) -- cycle; 
+          \draw[-][ultra thick,black] (0,1) -- (-1,1);
+          \draw[-][ultra thick,black] (0,3) -- (-1,3);
+          \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick]
+          (0,.85) -- (-1,.85); 
+          \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick]
+          (-1.1,1) -- (-1.1,3); 
+          \draw[-][ultra thick,black] (-1,1) -- (-1,3);
+          \draw (1,2) node {barn};
+          \draw (-1.6,2) node {$\ell$};
+          \draw (-.5,.4) node {$w$};
+        \end{tikzpicture}
+        \qquad
+        \begin{tikzpicture} [xscale=1,yscale=1]
+          \draw[-][ultra thick] (0,0) -- (0,4) -- (2,4) -- (2,0) -- cycle; 
+          \draw[-][ultra thick,black] (0,1.5) -- (-1.5,1.5);
+          \draw[-][ultra thick,black] (0,2.5) -- (-1.5,2.5);
+          \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick]
+          (0,1.35) -- (-1.5,1.35); 
+          \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick]
+          (-1.6,1.5) -- (-1.6,2.5); 
+          \draw[-][ultra thick,black] (-1.5,1.5) -- (-1.5,2.5);
+          \draw (1,2) node {barn};
+          \draw (-2.1,2) node {$l$};
+          \draw (-.75,.9) node {$w$};
+        \end{tikzpicture}
+        \end{center} 
+    \highlight{Formula for goal:} $\goal{$A$} = \ell w$
+    
+      Now we need to \highlight{relate $\ell$ and $w$ using something we're told in
+      the problem} to get the area as a function
+      of only one variable. We're told that the farmer has 40 feet of fencing.
+      \begin{align*}
+        2w +\ell &= 40 \\
+        \ell &= 40-2w
+      \end{align*}
+      So we can find area as a function of $w$, 
+      \[\goal{$A(w)$} = w (40-2w) = 40w-2w^2.\]
+      
+      Now we need to identify the domain. From the problem we know that $w \geq 5$.  Since there is only so much fencing, there is an upper bound to $w$ too. That upper bound happens when $\ell$ is at its lower bound:$$40=2w +5$$
+      $$w= 17.5$$ 
+      So the domain is $5 \leq w \leq 17.5$.
+
+      \highlight{Critical points:} Now we need to find the critical points
+      on this interval. $A'(w)=40-4w$, so the only critical point is $w=10$.
+
+      \highlight{Global maximum:} Since there is only one critical point, if we can show
+      that it is a local maximum, then it must be the global maximum. Let's use
+      the Second Derivative Test. Since $A''(w) = -4$, $A''(10)$ is negative, so
+      there is a local maximum at $w=10$, which is also the global maximum.
+
+      We could have also determined
+      this by comparing the values of $A(w)$ at the critical point and the
+      endpoints.
+
+      \begin{center} 
+        \begin{tabular} {c|| c cc}
+          $w$ &5 &10 & 17.5\\
+          \hline 
+          $A(w)$& 150&200&87.5
+        \end{tabular} \end{center} 
+
+      \highlight{Answer the question:} The maximum value of $A(w)$ is $A(10)=200$. So
+      the largest area the pen can have is \fbox{$200$ square feet}.
+
+  \end{solution}
+
+\item 
+
+  \note{A common error is to try to minimize surface area rather than cost.}
+
+  \begin{problem}[\vfill\newpage]
+    A soda company wants its aluminum soft drink cans to have a volume of $120 \pi$ cubic centimeters. They need to use stronger aluminum for the tops and bottoms of the cans, and this stronger aluminum costs twice as much per cm$^2$ as the aluminum used for the sides. If the company wants to minimize the cost of each can, what dimensions should their cans be?
+  \end{problem}
+
+  \begin{solution}
+    \highlight{Goal:} Minimize \goal{cost of a can}.
+
+    \highlight{Define variables:}
+    There are many possible cylinders with the same volume. We want to find the dimensions that minimize the cost. Below are several different cylinders with the same volume: \begin{center} 
+          \begin{tikzpicture}
+            \draw (0,0) ellipse (1.25 and 0.5);
+            \draw (-1.25,0) -- (-1.25,-3.5);
+            \draw (-1.25,-3.5) arc (180:360:1.25 and 0.5);
+            \draw [dashed] (-1.25,-3.5) arc (180:360:1.25 and -0.5);
+            \draw (1.25,-3.5) -- (1.25,0);  
+            \fill [gray,opacity=0.5] (-1.25,0) -- (-1.25,-3.5) arc (180:360:1.25 and 0.5) -- (1.25,0) arc (0:180:1.25 and -0.5);
+          \end{tikzpicture} \hfill 
+          \begin{tikzpicture}[xscale=1.5, yscale=.44]
+            \draw (0,0) ellipse (1.25 and 0.5);
+            \draw (-1.25,0) -- (-1.25,-3.5);
+            \draw (-1.25,-3.5) arc (180:360:1.25 and 0.5);
+            \draw [dashed] (-1.25,-3.5) arc (180:360:1.25 and -0.5);
+            \draw (1.25,-3.5) -- (1.25,0);  
+            \fill [gray,opacity=0.5] (-1.25,0) -- (-1.25,-3.5) arc (180:360:1.25 and 0.5) -- (1.25,0) arc (0:180:1.25 and -0.5);
+          \end{tikzpicture} \hfill 
+          \begin{tikzpicture}[xscale=1.25, yscale=.64]
+            \draw (0,0) ellipse (1.25 and 0.5);
+            \draw (-1.25,0) -- (-1.25,-3.5);
+            \draw (-1.25,-3.5) arc (180:360:1.25 and 0.5);
+            \draw [dashed] (-1.25,-3.5) arc (180:360:1.25 and -0.5);
+            \draw (1.25,-3.5) -- (1.25,0);  
+            \fill [gray,opacity=0.5] (-1.25,0) -- (-1.25,-3.5) arc (180:360:1.25 and 0.5) -- (1.25,0) arc (0:180:1.25 and -0.5);
+          \end{tikzpicture} \end{center} 
+        Note that the cost is different than the surface area since the material for the tops and the bottoms cost more per square inch than the material for the sides. To
+        help us figure out what variables we'll need, let's
+        write an equation in words first.
+        \begin{align*}
+          \goal{cost of a can} &= \text{cost of top and bottom} + \text{cost of sides} \\
+          &= (\text{price per area of stronger aluminum})(\text{area of top and bottom}) \\
+           &\hspace{1em}+ (\text{price per area of weaker aluminum})(\text{area of sides})
+        \end{align*}
+        
+        We'll call the cost of a can $C$, and we'll need to have variables $r$ and $h$, where
+        $r$ is the radius of the cylinder and $h$ is the height. We will also
+        need to have a \textit{constant} $P$ to represent the price per area of
+        the weaker aluminum.
+
+        \highlight{Formula for goal:} $\goal{C} = 2P(2\pi r^2) + P(2\pi r h)$.
+        
+        We currently have $C$ as a function of both $h$ and $r$, so we
+        need to \highlight{relate $h$ and $r$ using information from the problem.} We're
+        told that the volume of the cylinder is $120\pi$ cubic centimeters.
+        $$ 120 \pi = \pi r^2 h$$ 
+        We have a choice here about which variable to isolate. It is algebraically simpler
+        to solve for $h$ since solving for $r$ would require taking a square root. 
+        $$ h = \frac{120 \pi}{\pi r^2} = \frac{120}{r^2}$$ 
+        Now we can find $C$ as a function of $r$.
+        \begin{align*}
+        C(r) &= 2P(2 \pi r^2) + P(2 \pi r \frac{120}{r^2}) \\
+        &=4P \pi r^2 +\frac{240P\pi}{r} \\
+        &= 4P\pi\left(r^2 + \frac{60}{r}\right)
+        \end{align*}
+        Now we should determine the domain of the function. No bounds
+        are given in the problem, but we know that $r$ should be strictly
+        greater than zero, otherwise the can would have zero volume. We can make
+        $r$ arbitrarily large and keep the volume constant by making $h$ arbitrarily small.
+        So the domain is $r < 0$, or $(0, \infty)$.
+        
+        \highlight{Critical points:} Now we need to find the critical points on the domain.
+        Using derivative rules, we find that 
+        $C'(r) = 4P\pi\left(2r - \frac{60}{r^2}\right)$.
+        \begin{align*}
+          4P\pi\left(2r - \frac{60}{r^2}\right) &= 0 \\
+          2r - \frac{60}{r^2} &= 0 \\
+          \frac{2r^3 - 60}{r^2} &= 0 \\
+          2r^3 - 60 &= 0 \\
+          r^3 &= 30 \\
+          r &= \sqrt[3]{30}
+        \end{align*}
+        (Note that $C'(r)$ is undefined at $r=0$, but this isn't in the domain,
+        so it's not a critical point.)
+
+        \highlight{Global minimum:} There's only one critical point on the
+        domain, so if we can show that it's a local minimum, then it must be
+        the global minimum. Let's use the Second Derivative Test. 
+        $C''(r) = 4P\pi(2+\frac{120}{r^3})$, and so $C''(\sqrt[3]{30})$ is
+        positive. This means that the global minimum occurs at $r=\sqrt[3]{30}$.
+
+        \highlight{Answer the question:} The global minimum occurs
+        at $r=\sqrt[3]{30}$, and since $h=\frac{120}{r^2}$, this corresponds to
+        $h=\frac{120}{\sqrt[3]{30^2}}$. To minimize cost, the company should make a can with a \fbox{radius of $\sqrt[3]{30}$
+        centimeters} and a \fbox{height of $\frac{120}{\sqrt[3]{30^2}}$ centimeters}.
+  \end{solution} 
+
+\end{enumerate}
+\begin{framed}
+  General strategy in optimization problems:
+  \begin{enumerate}[nosep]
+  \item Identify the goal. (Like: ``Maximize area'' or ``Minimize cost'')
+  \item Express the goal quantity as a function of 1 variable.
+  \item Find critical points.
+  \item[\refstepcounter{enumi}\Pointinghand\ 4.] \solonly{\textbf{Find the global maximum or minimum of the function on the relevant domain. (Don't just find the critical points; make sure you've actually found the global minimum or maximum, and justify how you know that.)}}\
+
+    \pspace{0.25in}
+
+  \item Make sure you answer the question!
+  \end{enumerate}
+\end{framed}
+
+\begin{enumerate}[resume]
+\item  \label{optimization-walter-jewelry-box}
+
+  \note{There is only one critical point with $s > 0$, and it's a local maximum, so it must also be a global maximum. (So, there's no real need to be specific about what the domain is.)}
+
+  \begin{problem}[\vfill\newpage]
+    Walter is planning to buy a custom-made jewelry box for his mother's next birthday. The bottom of the box will be a square. The sides and bottom will be made out of mahogany, which costs 30 cents per square inch. The top will be made out of maple, which costs 50 cents per square inch. Walter has \$60 to spend on the present and wants to get a box with the largest volume possible. What dimensions should his box be?
+  \end{problem}
+
+  \begin{solution}
+    \highlight{Goal:} Maximize \goal{volume}.
+
+    \highlight{Define variables:}
+    \begin{itemize}[nosep]
+    \item $s$ = length of the sides of the square bottom
+    \item $h$ = height
+    \item $V$ = volume
+    \end{itemize}
+    Here are two possible examples:
+    \begin{center}
+      \begin{tikzpicture}
+        \draw (0, 0) -- node[below]{$s$} (1, 0) -- node[anchor=north
+        west]{$s$} (1.5, 0.5) -- node[right]{$h$} (1.5, 2.5) -- (0.5,
+        2.5) -- (0, 2) -- (0, 0); %
+        \draw (0, 2) -- (1, 2) -- (1.5, 2.5); \draw (1, 0) -- (1, 2);
+      \end{tikzpicture}
+      \qquad 
+      \begin{tikzpicture}[x=1.75cm, y=0.5cm]
+        \draw (0, 0) -- node[below]{$s$} (1, 0) -- node[anchor=north
+        west]{$s$} (1.5, 0.5) -- node[right]{$h$} (1.5, 2.5) -- (0.5,
+        2.5) -- (0, 2) -- (0, 0); %
+        \draw (0, 2) -- (1, 2) -- (1.5, 2.5); \draw (1, 0) -- (1, 2);
+      \end{tikzpicture}
+    \end{center}
+
+    \highlight{Formula for goal:} $\goal{$V$} = s^2 h$
+
+    This formula involves both $s$ and $h$, so we need to \highlight{relate $s$ and $h$ using something else we're told in the problem}. We're told that the cost of the box is \$60. Let's work in cents:
+    \begin{align*}
+      6000 &= \textrm{cost of box (in cents)} \\
+      &= \textrm{cost of top} + \textrm{cost of bottom} + 4 (\textrm{cost
+        of each side}) \\
+      \intertext{The top costs 50 cents per square inch, while all other
+        sides cost 30 cents per square inch:}
+      &= (50) (\textrm{area of top}) + (30) (\textrm{area of bottom}) + 4
+      (30) 
+      (\textrm{area of each side}) \\
+      &= 50 s^2 + 30s^2 + 4 (30) sh \\
+      &= 80s^2 + 120 sh
+    \end{align*}
+    Now, we can solve this equation for $h$:
+    \begin{align*}
+      6000 &= 80s^2 + 120sh \\
+      \intertext{Divide both sides by 40 to make the numbers simpler:}
+      150 &= 2 s^2 + 3 sh \\
+      150 - 2s^2 &= 3sh \\
+      \frac{150 - 2s^2}{3s} &= h \\
+      \frac{50}{s} - \frac{2s}{3} &= h
+    \end{align*}
+    Plugging this into our volume formula gives $V$ in terms of $s$:
+    \[ \goal{$V(s)$} = s^2 \left( \frac{50}{s} - \frac{2s}{3} \right) = 50 s - \frac{2s^3}{3}.\]
+
+    \highlight{Critical points:} $V'(s) = 50 - 2s^2$. So, the critical points are where
+    \begin{align*}
+      50 - 2s^2 &= 0 \text{ ($V'(s)$ is never undefined)} \\
+      50 &= 2s^2 \\
+      25 &= s^2 \\
+      5 &= s 
+    \end{align*}
+    ($s$ must be positive because it represents a length.)
+
+    \highlight{Global maximum:} Since there's only one critical point, let's try the Second Derivative Test: $V''(s) = -4s$, so $V''(5) = -20 < 0$. Therefore, $5$ is a local maximum. Since it's the only critical point in our domain, it must be a global maximum as well.
+
+    \highlight{Answer the question:} Since we found that $\displaystyle h = \frac{50}{s} - \frac{2s}{3}$, the height when $s = 5$ is $\displaystyle \frac{50}{5} - \frac{2 \cdot 5}{3} = \frac{20}{3}$. So, the dimensions for the box should be \fbox{5 inches $\times$ 5 inches $\times$ $\dfrac{20}{3}$ inches}.
+  \end{solution}
+
+\item 
+
+  \begin{problem}[\newpage]
+    Cambridge Common is renovating its grounds. They want to include a beautiful fountain surrounded by a walking path. The fountain will be in the shape of a rectangle. There will be a walking path in the park to enjoy the fountain. The path will follow two opposite sides of the fountain and two semi-circles on the other sides of the rectangle. If the path around the fountain is going to be 440 yards long, what dimensions would maximize the area of the fountain?
+
+    \begin{tikzpicture}
+      \draw (0, -1) arc[radius=1, start angle=270, end angle=90] -- (2,
+      1) arc[radius=1, start angle=90, end angle=-90] -- cycle;
+      \draw[dashed] (0, -1) -- (0, 1);
+      \draw[dashed] (2, -1) -- (2, 1);
+    \end{tikzpicture}
+  \end{problem}
+
+  \begin{solution} 
+    \highlight{Goal:} Maximize \goal{area of the rectangle}.
+
+    \highlight{Define variables:}
+    \begin{itemize}[nosep]
+    \item $r$ = radius of the semicircles
+    \item $w$ = width of the rectangular portion of the path
+    \item $A$ = area of the rectangle
+    \end{itemize}
+    \begin{center}
+      \begin{tikzpicture}
+        \draw (0, -1) arc[radius=1, start angle=270, end angle=90] -- (2,
+        1) arc[radius=1, start angle=90, end angle=-90] -- cycle; %
+        \draw[dashed] (0, -1) -- (0, 1); %
+        \draw[dashed] (2, -1) -- (2, 1); %
+        \draw[blue, decorate, decoration={brace}, xshift=-2pt] (2, 0) -- node[left, xshift=-1pt] {$r$} (2, 1); %
+        \draw[blue, decorate, decoration={brace}, yshift=2 pt] (0, 1) --
+        node[above, yshift=2pt] {$w$} (2, 1); %
+      \end{tikzpicture}
+    \end{center}
+
+    \highlight{Formula for goal:} $\goal{$A$} = 2rw$
+
+    This formula involves both $r$ and $w$, so we need to \highlight{relate $r$ and $w$ using something else we're told in the problem}. We're told that the path must be 440 yards long. In terms of $r$ and $w$, the length of the path is $2 \pi r + 2w$, so
+    \begin{align}
+      2 \pi r + 2w &= 440 \nonumber \\
+      2w &= 440 - 2 \pi r \nonumber \\
+      w &= 220 - \pi r \label{eq:optimization-northern-kansas-running-path-relation}
+    \end{align}
+    Plugging this into our formula for $A$, we get $A$ in terms of just
+    $r$:
+    \[ \goal{$A(r)$} = 2r \left( 220 - \pi r \right) = 440r-2\pi r^2.\]
+    No bounds on $r$ are given in the problem, but we can say that the lower bound
+    for $r$ is zero. (Including or not including zero in the domain does not affect
+    the answer, since
+    the area of the fountain is zero when $r=0$, but let's include it since closed intervals
+    are easier to work with.) Because the length of the path is constant, we can't
+    make $r$ arbitrarily large. The upper bound for $r$ is achieved when $w$ is at
+    its lower bound, zero.
+    \begin{align*}
+      2\pi r + 2(0) &= 440 \\
+      r &= \frac{220}{\pi}
+    \end{align*}
+    So the domain of the function is $0 \leq r \leq \frac{220}{\pi}$.
+    
+    \highlight{Critical points:} Now we need to find the critical points on the
+    domain. $A'(r)=440-4\pi r$, so
+    \begin{align*}
+      440 - 4\pi r &= 0 \\
+      r &= \frac{110}{\pi}
+    \end{align*}
+    This is in the domain, so $r=\frac{110}{\pi}$ is a the only critical point.
+
+    \highlight{Global maximum:} Since there's only one critical point, if we can show
+    that it is a local maximum, then it will be the global maximum. Let's use the Second
+    Derivative Test. $A''(r) = -4\pi$, so $A''(\frac{110}{\pi})$ is negative, 
+    and therefore $A(r)$ achieves its global maximum at $r=\frac{110}{\pi}$. 
+
+    \highlight{Answer the question:} From equation \eqref{eq:optimization-northern-kansas-running-path-relation}, the corresponding value of $w$ is $110$. So, the path should have \fbox{semicircles of radius $\frac{110}{\pi}$ yards} and \fbox{straight sides of length $110$ yards}.
+  \end{solution}
+
+\end{enumerate}
+\end{document}

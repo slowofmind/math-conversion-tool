@@ -1,0 +1,142 @@
+%Notes from Cliff Toubes, transcribed with ChatGPT
+%\documentclass[12pt,letterpaper]{article}
+%\usepackage{amsmath, amssymb, amsthm}
+
+%\input{../worksheet-setup.tex}
+
+\section{{Quadratic Forms and Optimization, $\vec\S$7.2, 7.3}}
+
+\chead{\large\textbf{Quadratic Forms and Optimization, $\vec\S$7.2, 7.3}}
+
+%\begin{document}
+\thispagestyle{fancy}
+
+Review from previously:
+
+\begin{enumerate}
+    \item Symmetric matrices: $A^T = A$.
+    \item Fundamental fact about transpose: $u \cdot Av = (A^T u) \cdot v$.
+    \item If $A$ is symmetric:
+    \begin{enumerate}
+        \item Two eigenvectors with distinct eigenvalues are orthogonal.
+        \item All eigenvalues are real.
+    \end{enumerate}
+    \item Definition: An $n \times n$ matrix $A$ is said to be orthogonally diagonalizable if there is a diagonal matrix $D$ and orthogonal matrix $P$ with $P^T = P^{-1}$ such that $A = PDP^{-1}$.
+    \item Theorem: A matrix is orthogonally diagonalizable if and only if it is symmetric.
+    \begin{enumerate}
+        \item Thus, $A$ has $n$ real eigenvalues counting multiplicity.
+        \item The eigenvectors form a complete, orthogonal basis.
+    \end{enumerate}
+    \item Spectral theorem: Let $A$ be a symmetric matrix. Fix an orthonormal basis $\{v_k\}$ of eigenvectors. Then
+    \[
+    A = \lambda_1 v_1v_1^T + \cdots + \lambda_n v_nv_n^T.
+    \]
+\end{enumerate}
+
+\textbf{Definition}:
+A \textbf{quadratic form on $\mathbb{R}^n$} is a function (denoted by $Q$) whose value at $x$ can be computed using the rule $Q(x) = x^T A x = x \cdot A x$, where $A$ is a symmetric matrix.
+
+\begin{enumerate}
+    \Problem Which of the following functions are quadratic forms (and which aren't)? For those that are, write the corresponding symmetric matrix.
+    \begin{enumerate}
+        \item $Q(x) = x \cdot x$\vfill
+        \item $Q(x) = -x_1^2 - x_2^2 + x_3^2 + x_4^2$\vfill
+        \item $Q(x) = x_1x_2 + x_3x_4$\vfill
+        \item $Q(x) = x_1 - x_2x_3$\vfill
+        \item $Q(x) = \cos(x_1^2 - x_2^2)$\vfill
+    \end{enumerate}
+
+\newpage
+
+    \Problem Consider the quadratic form $Q(x) = x_1^2 - x_2^2$. Compute the quadratic form $y \mapsto Q(Py)$ where $P$ is the matrix below:
+    \begin{enumerate}
+        \item $P = \begin{pmatrix} 2 & 0 \\ 0 & \frac{1}{2} \end{pmatrix}$\vfill
+        \item $P = \frac{1}{\sqrt{5}} \begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}$\vfill
+    \end{enumerate}
+
+    \Problem Diagonalize the following quadratic forms (find the diagonal matrix $D$ and the orthogonal change of variable matrix $P$):
+    \begin{enumerate}
+        \item $Q(x) = x_1^2 - 2x_1x_2 + x_2^2$\vfill
+        \item $Q(x) = 2x_1^2 - 6x_1x_2 + 2x_2^2$\vfill
+        \item $Q(x) = x_1x_2 + x_3x_4$\vfill
+    \end{enumerate}
+
+\newpage
+    \Problem For each of the quadratic forms below, what are the minimum and maximum values on the set where $\|x\| = 1$? And at what points are they achieved? And what are the saddle points and the corresponding value for $Q$?
+    \begin{enumerate}
+        \item $Q(x) = x_1^2 - 4x_2^2$\vfill
+        \item $Q(x) = 7x_1^2 + 4x_2^2 + 3x_3^2$\vfill
+        \item $Q(x) = -7x_1^2 + 4x_2^2 + 3x_3^2$\vfill
+        \item $Q(x) = -7x_1^2 - 4x_2^2 + 3x_3^2$\vfill
+        \item $Q(x) = -7x_1^2 - 4x_2^2 - 3x_3^2$\vfill
+    \end{enumerate}
+
+\newpage
+
+    \Problem Find the minimum and maximum values of the following quadratic forms on the set where $\|x\| = 1$; and give their coordinates. Also, find all saddle points with their coordinates.
+    \begin{enumerate}
+        \item $Q(x) = 2x_1x_2 + 2x_2x_3 + 2x_3x_1$\vfill
+        \item $Q(x) = 2x_1x_2 - 2x_2x_3$\vfill
+        \item $Q(x) = 4x_1x_2 - x_1^2 - x_2^2$\vfill
+    \end{enumerate}
+\end{enumerate}
+
+
+
+
+
+\begin{comment}
+
+%TODO
+% -Format the below and check the answers
+
+\newpage
+\chead{\Large\textbf{Quadratic Forms and Optimization, - Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+
+\begin{enumerate}
+    \item 
+    \begin{enumerate}
+        \item Yes, $A = I_n$.
+        \item Yes, $A = \begin{pmatrix} -1 & 0 & 0 & 0 \\ 0 & -1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{pmatrix}$.
+        \item Yes, $A = \begin{pmatrix} 0 & 1 & 0 & 0 \\ 1 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix}$.
+        \item No.
+        \item No.
+    \end{enumerate}
+
+    \item 
+    \begin{enumerate}
+        \item $Q(Py) = 4y_1^2 - \frac{1}{4} y_2^2$.
+        \item $Q(Py) = y_1^2 - y_2^2$.
+    \end{enumerate}
+
+    \item 
+    \begin{enumerate}
+        \item $D = \begin{pmatrix} 2 & 0 \\ 0 & 0 \end{pmatrix}$, $P = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ -1 & 1 \end{pmatrix}$.
+        \item $D = \begin{pmatrix} 5 & 0 \\ 0 & -1 \end{pmatrix}$, $P = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ -1 & 1 \end{pmatrix}$.
+        \item $D = \frac{1}{2} \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & -1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & -1 \end{pmatrix}$, $P = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 & 0 & 0 \\ 1 & -1 & 0 & 0 \\ 0 & 0 & 1 & 1 \\ 0 & 0 & 1 & -1 \end{pmatrix}$.
+    \end{enumerate}
+
+    \item 
+    \begin{enumerate}
+        \item Maximum value = 1 where $x_2 = 0$, minimum = -4 where $x_1 = 0$.
+        \item Maximum value = 7 where $x_2 = x_3 = 0$, minimum value = 3 where $x_1 = x_2 = 0$, saddle points where $x_1 = x_3 = 0$ with value 4.
+        \item Maximum value = 4 where $x_1 = x_3 = 0$, minimum value = -7 where $x_2 = x_3 = 0$, saddle points where $x_1 = x_2 = 0$ with value 3.
+        \item Maximum value = 3 where $x_1 = x_2 = 0$, minimum value = -7 where $x_2 = x_3 = 0$, saddle points where $x_1 = x_2 = 0$ with value -4.
+        \item Maximum value = -3 where $x_1 = x_2 = 0$, minimum value = -7 where $x_2 = x_3 = 0$, saddle points where $x_1 = x_3 = 0$ with value -4.
+    \end{enumerate}
+
+    \item 
+    \begin{enumerate}
+        \item The matrix for $A$ is $\begin{pmatrix} 0 & 1 & 1 \\ 1 & 0 & 1 \\ 1 & 1 & 0 \end{pmatrix}$ which has eigenvalues $\lambda = 2$ with eigenvector $\begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix}$, and $\lambda = -1$ with a 2-dimensional eigenspace spanned by $\begin{pmatrix} 1 \\ 0 \\ -1 \end{pmatrix}$ and $\begin{pmatrix} 0 \\ 1 \\ -1 \end{pmatrix}$. Thus, the maximum of $Q$ on the sphere where $\|x\| = 1$ is 2 at the points $\pm \frac{1}{\sqrt{3}} \begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix}$, and the minimum is -1 on the circle of radius 1 in the plane where $x + y + z = 0$.
+        \item The matrix for $A$ is $\begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & -1 \\ 0 & -1 & 0 \end{pmatrix}$ which has eigenvalues $\lambda = 0$ and $\lambda = \pm \sqrt{2}$. The maximum of $Q$ is therefore $\sqrt{2}$ and that is taken on at the points $\pm \frac{1}{2} \begin{pmatrix} 1 \\ \sqrt{2} \\ -1 \end{pmatrix}$, the minimum is $-\sqrt{2}$ which is taken on at $\pm \frac{1}{2} \begin{pmatrix} 1 \\ -\sqrt{2} \\ -1 \end{pmatrix}$, and then there are saddle points at $\pm \frac{1}{\sqrt{2}} \begin{pmatrix} 1 \\ 0 \\ 1 \end{pmatrix}$ where $Q$ is zero.
+        \item The matrix $A$ is $\begin{pmatrix} -1 & 2 \\ 2 & -1 \end{pmatrix}$ which has eigenvalues $\lambda = 1$ and $\lambda = -3$. Thus, the maximum of $Q$ is 1 which occurs at the points $\pm \frac{1}{\sqrt{2}} \begin{pmatrix} 1 \\ 1 \end{pmatrix}$, and the minimum of $Q$ is -3 which occurs at $\pm \frac{1}{\sqrt{2}} \begin{pmatrix} 1 \\ -1 \end{pmatrix}$.
+    \end{enumerate}
+\end{enumerate}
+
+\end{comment}
+
+%\end{document}

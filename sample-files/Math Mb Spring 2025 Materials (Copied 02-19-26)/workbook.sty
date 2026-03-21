@@ -1,0 +1,178 @@
+\ProvidesPackage{workbook}
+
+% \textwidth=6.5in
+% \textheight=8.5in
+% \voffset=-54pt
+% \oddsidemargin=0in
+% \evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[shortlabels,inline]{enumitem}
+\setlist{topsep=0pt}
+
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=black]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+\usepackage{icomma}
+\usepackage{siunitx}
+\sisetup{per-mode=symbol}
+\sisetup{input-digits = 0123456789\pi}
+
+\usepackage{pifont}
+
+\usepackage{diffcoeff}
+\difdef { f } {}
+{
+outer-Ldelim = \left . ,
+outer-Rdelim = \right |,
+sub-nudge = 0 mu
+}
+
+\usepackage{cancel}  
+
+\usepackage{soul}
+
+\usepackage{plotstyle}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{ideacolor}{rgb}{0.7,0,0}
+\newcommand{\ideas}[1]{\color{ideacolor} #1 \color{black}}
+\newcommand{\ideacolor}{maroon}
+
+\newlength{\tipmargin}
+\makeatletter
+
+\renewenvironment{framed}{
+  \setlength{\tipmargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\tipmargin
+  \def\FrameCommand{\hspace{\tipmargin}\fbox}%
+  \advance\linewidth\tipmargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+}
+{\endMakeFramed}
+\newcommand{\calcitem}{\item}
+\makeatother
+
+\newlength{\highlightwidth}
+\newcommand{\highlight}[1]{\setlength{\highlightwidth}{\linewidth}%
+  \addtolength{\highlightwidth}{-55pt}%
+  \hspace{24pt}\begin{minipage}[t]{\highlightwidth} \setlength{\parskip}{8pt} #1 \end{minipage}\hspace{24pt}}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+\definecolor{cyan}{rgb}{0, 1, 1}
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\newcommand{\sub}[1]{{\color{blue}#1\color{black}}}
+\definecolor{subd}{rgb}{1, 0, 0.5}
+\newcommand{\subd}[1]{{\color{subd}#1\color{black}}}
+\definecolor{sube}{rgb}{0, 0.7, 0}
+\newcommand{\sube}[1]{{\color{sube}#1\color{black}}}
+
+\usepackage{xstring}
+
+\newcommand{\setcounterrefbeforedot}[2]{%
+  \begingroup
+  \StrBefore{\getrefnumber{#2}}{.}[\setcountertoreftemp]%
+  \setcounter{#1}{\setcountertoreftemp}%
+  \endgroup
+}
+
+\newcommand{\setcounterrefafterdot}[2]{%
+  \begingroup
+  \StrBehind{\getrefnumber{#2}}{.}[\setcountertoreftemp]%
+  \setcounter{#1}{\setcountertoreftemp}%
+  \endgroup
+}
+
+\makeatletter
+\def\pr@m@s{%
+  \ifx'\@let@token
+    \expandafter\pr@@@s
+  \else
+    \ifx^\@let@token
+      \expandafter\expandafter\expandafter\pr@@@t
+    \else
+      \expandafter\expandafter\expandafter\pr@@@end
+    \fi
+  \fi}
+\def\pr@@@end{\egroup
+    \@ifnextchar({\mkern-2mu }{\@ifnextchar\{{\mkern-2mu }{\@ifnextchar[{\mkern-.5mu }{}}}}
+
+\newcommand{\mquote}[1]{{\mathpalette\mqu@te{#1}}}
+
+\newcommand{\mqu@te}[2]{%
+  \sbox0{$\m@th#1\text{``}$}%
+  \sbox2{$\m@th#1\text{''}$}%
+  \sbox4{$\m@th#1#2$}%
+  \ifdim\ht4>\dimexpr\ht0+1pt\relax
+    \raisebox{\dimexpr\ht4-\height}{\box0}%
+    #2%
+    \raisebox{\dimexpr\ht4-\height}{\box2}%
+  \else
+    \box0 #2\box2
+  \fi
+}
+\makeatother
+
+% Make an environment that puts items in columns, first going across. 
+\usepackage{tabto}
+\newenvironment{enumeratecols}[2][]
+{\NumTabs{#2}%
+  \begin{enumerate*}[%before={\hspace{\dimexpr-\parindent-1pt}\tab},%
+    itemjoin={\tab},#1]}%
+  {\end{enumerate*}}
+
+\usepackage{tasks}
+
+\usepackage{tikzangle}
+
+\newcommand{\outside}[1]{
+    \fcolorbox{red}{white}{#1}
+}
+
+\newcommand{\inside}[1]{
+    \fcolorbox{blue}{white}{#1}
+}
+
+\newcommand{\lheq}{\stackrel{\text{L'H}}{=}}
+\newcommand{\nolheq}{\mathrel{\makebox[\widthof{$\lheq$}]{=}}}
+
+\newcounter{imagecounter}
+\newcounter{columncounter}
+\newenvironment{imagetable}[3][]{%
+  \setcounter{imagecounter}{0}
+  \setcounter{columncounter}{#2}
+  \addtocounter{columncounter}{-1}
+  \newcolumntype{i}{>{\raisebox{-1ex-\height}{\makebox[1em]{\hfill\stepcounter{imagecounter}(#3{imagecounter})}}\hspace{4pt}\begin{minipage}[t]{\linewidth/#2-1em-\tabcolsep*3}\arraybackslash\vspace{0pt}}l<{\end{minipage}}}
+\begin{tabular}{i*{\value{columncounter}}{#1i}}}
+{\end{tabular}}  

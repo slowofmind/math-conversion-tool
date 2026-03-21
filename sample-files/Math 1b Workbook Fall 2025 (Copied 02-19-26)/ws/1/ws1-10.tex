@@ -1,0 +1,273 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws1-10}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterone}
+}{}
+
+\section{Improper Integrals II} \label{ws1-10}
+\begin{framed}
+\textbf{Lesson Goals:}
+\begin{itemize}
+\item You should be able to determine if an improper integral of an unbounded function on a bounded interval converges or diverges, by converting it to a one-sided limit and evaluating. 
+\item You should be able to identify all the ways in which an integral is improper, and split it into a sum of limits of proper integrals.
+\item You should be able to use multiple strategies (including the Comparison Theorem) to determine if an improper integral converges or diverges. 
+\item You should be able to reason abstractly about the convergence behavior of improper integrals.
+\end{itemize}
+\end{framed}
+
+\begin{enumerate}
+\item
+\begin{problem}[2in]
+Suppose $f(x)$ is a function which is defined, continuous, and
+positive on $[1, \infty)$, and you are told that $\displaystyle
+\lim_{x \to \infty} f(x) = 1$.  Does $\displaystyle \int_1^\infty
+f(x)~dx$ converge or diverge, or is there not enough information to
+tell?
+\end{problem}
+
+\begin{solution}
+Here is a possible graph of $f(x)$ (in red), with the line $y = 1$
+(the dashed line):
+\begin{center}
+\includegraphics[width=1.5in]{ws/images/improper-general-convergence-limit}
+\end{center}
+Since $\displaystyle \lim_{x \to \infty} f(x) = 1$, as $x$ increases,
+$f(x)$ gets really really close to 1.\footnote{This is not the
+technical definition of what happens, but it's good enough for this
+problem.}  In particular, $f(x)$ gets so close to 1 that we can be
+sure that it's greater than $\frac{1}{2}$.\footnote{$\frac{1}{2}$ is
+quite arbitrary; we can also be sure that eventually $f(x) >
+0.9999999$.}  Let's say this happens at $x = a$:
+\begin{center}
+\includegraphics[width=1.5in]{ws/images/improper-general-convergence-limit-bound}
+\end{center}
+For $x \geq a$, $0 < \frac{1}{2} < f(x)$.  We know that $\displaystyle
+\int_a^\infty \frac{1}{2}\ dx$ diverges, since it represents the area
+of an infinitely long rectangle of height $\frac{1}{2}$.\footnote{We
+can also verify this by computing:
+\begin{align*}
+\int_a^\infty \frac{1}{2}~dx &= \lim_{b \to \infty} \int_a^b
+\frac{1}{2}~dx \\
+&= \lim_{b \to \infty} \left( \left. \frac{1}{2} x \right|_a^b
+\right) \\
+&= \lim_{b \to \infty} \frac{1}{2} b - \frac{1}{2} a \\
+&= \infty \textrm{ (diverges)}
+\end{align*}}
+Therefore, the Comparison Theorem tells us that $\displaystyle
+\int_a^\infty f(x)~dx$ diverges as well.  Since $\displaystyle
+\int_1^\infty f(x)~dx = \int_1^a f(x)~dx + \int_a^\infty f(x)~dx$,
+this means that $\displaystyle \int_1^\infty f(x)~dx$ \fbox{diverges}.
+\end{solution}
+
+\item 
+        \note{Up to this point, it's been reasonable to just think of an improper integral as representing the area of a region that goes on
+        forever.  That doesn't work so well for functions that take on both positive and negative values. I like to have students think about
+        this graphically first.}
+
+        \begin{problem}[1.25in]
+        Does the improper integral $\displaystyle \int_0^\infty \sin x~dx$
+        converge or diverge?  If it converges, what is its value?  How about
+        $\displaystyle \int_{-\infty}^0 \sin x~dx$?
+        \end{problem}
+
+        \begin{solution}
+        By definition, we compute the improper integral $\displaystyle
+        \int_0^\infty \sin x~dx$ as a limit of definite integrals:
+        \begin{align*}
+        \int_0^\infty \sin x~dx & = \lim_{b \to \infty} \left( \int_0^b
+        \sin x~dx \right) \\
+        & = \lim_{b \to \infty} \left( - \cos x \Big|_0^b \right) \\
+        & = \lim_{b \to \infty} (- \cos b + 1)
+        \end{align*}
+        This limit does not exist, so the improper integral \fbox{diverges}.
+        Similarly, we can compute $\displaystyle \int_{-\infty}^0 \sin x~dx$
+        as a limit of definite integrals:
+        \begin{align*}
+        \int_{-\infty}^0 \sin x~dx &= \lim_{a \to -\infty} \left( \int_a^0
+        \sin x~dx \right) \\
+        &= \lim_{a \to -\infty} \left( -\cos x \Big|_a^0 \right) \\
+        &= \lim_{a \to -\infty} (-1 + \cos a)
+        \end{align*}
+        This limit does not exist, so this improper integral also
+        \fbox{diverges}. 
+        \end{solution}
+
+\pspace{\newpage}
+
+  \item
+  \begin{enumerate}
+    \item 
+  \begin{problem}
+    Does the improper integral $\displaystyle \int_0^1 \frac{1}{x} \,dx$ converge or diverge?  (Why is it improper?)
+  \end{problem}
+  \probonly{\vfill}
+
+  \begin{solution}
+      The integral is improper because the integrand $\frac{1}{x}$ has an infinite discontinuity at the left hand edge of the interval of integration.
+
+      We always deal with improprieties in the same way, namely by approaching them with limits.
+
+      \begin{eqnarray*}
+        \int_0^1 \frac{1}{x}\,dx  
+        &=& \lim_{a\rightarrow 0^+} \int_a^1 \frac{1}{x}\,dx \\        
+        &=& \lim_{a\rightarrow 0^+} \left[ \ln x \right|_a^1 \\
+        &=& \lim_{a\rightarrow 0^+} \ln 1 - \ln a \\
+        &=& \lim_{a\rightarrow 0^+} -\ln a
+      \end{eqnarray*}  
+
+      This final limit diverges to infinity, and so the improper integral diverges.
+    \end{solution}
+
+  \item 
+  \begin{problem}[\vfill]
+    Does the improper integral $\displaystyle \int_0^1 \frac{1}{x^2} \,dx$ converge or diverge?
+  \end{problem}
+
+
+  \begin{solution}
+    Again, we compute the improper integral using limits to approach the impropriety.
+    \begin{eqnarray*}
+        \int_0^1 \frac{1}{x^2}\,dx  
+        &=& \lim_{a\rightarrow 0^+} \int_a^1 \frac{1}{x^2}\,dx \\        
+        &=& \lim_{a\rightarrow 0^+} \left[ -\frac{1}{x} \right|_a^1 \\
+        &=& \lim_{a\rightarrow 0^+} \frac{1}{a} - 1 \\
+    \end{eqnarray*}
+    Again, the last limit diverges to infinity, so the improper integral $\displaystyle \int_0^1 \frac{1}{x^2}\,dx$ diverges.
+  \end{solution}  
+\pspace{\newpage}
+  \item   \begin{problem}[\vfill]
+    Does the improper integral $\displaystyle \int_0^1 \frac{1}{x^\frac{1}{2}} \,dx$ converge or diverge?
+  \end{problem}
+
+  \begin{solution}
+      Again, we compute the improper integral using limits to approach the impropriety.
+    \begin{eqnarray*}
+        \int_0^1 \frac{1}{x^\frac{1}{2}}\,dx  
+        &=& \lim_{a\rightarrow 0^+} \int_a^1 \frac{1}{x^{\frac{1}{2}}}\,dx \\        
+        &=& \lim_{a\rightarrow 0^+} 2\sqrt{x} \vert _a^1 \\
+        &=& \lim_{a\rightarrow 0^+} 2\sqrt{1} - 2\sqrt{a}=2 \\
+    \end{eqnarray*}
+    Therefore this integral converges.
+  \end{solution}
+  \end{enumerate}
+  
+   
+ \item \begin{problem}[\vfill]
+     For which $p$ does $\displaystyle\int_0^1 \frac{1}{x^p}\,dx$ converge?
+ \end{problem}
+ 
+ \begin{solution}
+     The integral
+\[
+\int_0^1 \frac{1}{x^p}\,dx
+\]
+is improper at $x = 0$, since the integrand blows up as $x \to 0^+$ if $p > 0$. We write it as a limit:
+\[
+\int_0^1 \frac{1}{x^p}\,dx = \lim_{a \to 0^+} \int_a^1 x^{-p} \, dx.
+\]
+
+Let us consider two cases: $p \neq 1$ and $p = 1$.
+
+
+\textbf{Case 1: $p \neq 1$}
+
+\[
+\int x^{-p}\,dx = \frac{x^{-p+1}}{-p+1} + C.
+\]
+So,
+\[
+\int_a^1 x^{-p} dx = \left[ \frac{x^{-p+1}}{-p+1} \right]_a^1 = \frac{1^{-p+1} - a^{-p+1}}{-p+1} = \frac{1 - a^{-p+1}}{1-p}.
+\]
+Taking the limit as $a \to 0^+$:
+\begin{itemize}
+    \item If $-p+1>0$, i.e., $p<1$, then $a^{-p+1} \to 0$ and 
+    \[
+    \lim_{a\to 0^+}\frac{1 - a^{-p+1}}{1-p} = \frac{1}{1-p}
+    \]
+    which is finite, so the integral \textbf{converges}.
+    \item If $-p+1<0$, i.e., $p>1$, then $a^{-p+1} \to \infty$ as $a\to 0^+$, and so the integral \textbf{diverges}.
+\end{itemize}
+
+\textbf{Case 2: $p = 1$}
+
+We have already seen in the previous problem that this integral diverges.
+
+\textbf{Conclusion:}
+
+\[
+\boxed{
+\int_0^1 \frac{1}{x^p}\,dx \text{ converges if and only if } p < 1.
+}
+\]
+ \end{solution}
+
+\pspace{\newpage}
+ \item 
+  \begin{problem}[\vfill]
+  Does the improper integral $\displaystyle \int_{-\infty}^\infty
+  \frac{x}{1 + x^2}~dx$ converge or diverge?  If it converges, to what
+  number does it converge?
+
+  \includegraphics[width=2in]{ws/images/improper-R-odd-1}
+  \end{problem}
+  
+
+  \begin{solution}
+  We need to split this up as a sum of two improper integrals.  We may
+  as well split it at 0 to write it as
+  \[ \int_{-\infty}^\infty \frac{x}{1 + x^2}~dx = \int_{-\infty}^0
+  \frac{x}{1 + x^2}~dx + \int_{0}^\infty \frac{x}{1 + x^2}~dx.\]
+  We need to look at each piece individually.  Let's first just evaluate
+  the indefinite integral $\displaystyle \int \frac{x}{1 + x^2}~dx$ by
+  substituting $u = 1 + x^2$ (so $du = 2x~dx$):
+  \begin{align*}
+  \int \frac{x}{1 + x^2}~dx &= \int \frac{1}{2} \cdot \frac{1}{u}~du
+  \\
+  &= \frac{1}{2} \ln |u| + C \\
+  &= \frac{1}{2} \ln |1 + x^2| + C \\
+  &= \frac{1}{2} \ln (1 + x^2) + C \textrm{ since $1 + x^2$ is always
+  positive}
+  \end{align*}
+  Therefore,
+  \begin{align*}
+  \int_0^\infty \frac{x}{1 + x^2}~dx &= \lim_{b \to \infty} \int_0^b
+  \frac{x}{1 + x^2}~dx \\
+  &= \lim_{b \to \infty} \left( \ln (1 + x^2) \Big|_0^b \right) \\
+  &= \lim_{b \to \infty} [\ln(1 + b^2) - \ln 1] \\
+  &= \lim_{b \to \infty} \ln (1 + b^2) \\
+  &= \infty \textrm{ (diverges)}
+  \end{align*}
+  Since this piece diverges, we know that $\displaystyle
+  \int_{-\infty}^\infty \frac{x}{1 + x^2}~dx$ \fbox{diverges}.  (We
+  don't even need to evaluate $\displaystyle \int_{-\infty}^0 \frac{x}{1
+  + x^2}~dx$ since we've already concluded that this one piece
+  diverges.) 
+  \end{solution}
+
+  \item 
+  \begin{problem}[\vfill]
+  True or false: For any function $f(x)$, $\displaystyle
+  \int_{-\infty}^\infty f(x)~dx = \lim_{a \to \infty} \left( \int_{-a}^a
+  f(x)~dx \right)$.
+  \end{problem}
+
+  \begin{solution}
+  False, and {\#2} gives us an example of this.  If
+  $f(x) = \dfrac{x}{1 + x^2}$, then no matter what $a$ is,
+  $\displaystyle \int_{-a}^a f(x)~dx = 0$.  (You can see this by
+  evaluating, or from symmetry.)  Therefore, $\displaystyle \lim_{a \to
+  \infty} \left( \int_{-a}^a f(x)~dx \right) = 0$, while
+  $\displaystyle \int_{-\infty}^\infty f(x)~dx$ is divergent.
+  \end{solution}
+
+
+
+
+            
+\end{enumerate}
+
+\end{document}

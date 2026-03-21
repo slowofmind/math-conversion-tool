@@ -1,0 +1,157 @@
+\documentclass[12pt,letterpaper]{article}
+
+
+
+\input{../worksheet-setup.tex}
+\usetikzlibrary{arrows}
+\usepackage{wrapfig}
+\usepackage{amsfonts,amsmath}
+
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+	\hskip -\arraycolsep
+	\let\@ifnextchar\new@ifnextchar
+	\array{#1}}
+\makeatother
+
+\def\env@matrix{\hskip -\arraycolsep
+	\let\@ifnextchar\new@ifnextchar
+	\array{*\c@MaxMatrixCols c}}
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\chead{\Large\textbf{Least Squares, $\vec\S$6.5, 6.6}}% 
+
+\begin{document}
+\thispagestyle{fancy}
+
+Recall from previously:
+
+\begin{itemize}
+\item An {\bf orthogonal matrix} $U$ is a square matrix so that $U^{-1}=U^{T}$.
+\item  {\bf Orthogonal Decomposition Theorem:} Let $W$ be a subspace of $\mathbb{R}^n$. Then each $y \in \mathbb{R}^n$ can be uniquely written as $$y=\hat{y} + z$$ where $\hat{y} \in W$ and $z \in W^{\perp}$. 
+
+Moreover, if $\{u_1, \dots, u_p\}$ is any orthogonal basis for $W$, then $$\hat{y}= \left(\frac{y \cdot u_1}{u_1 \cdot u_1} \right)u_1+\dots+  \left(\frac{y \cdot u_p}{u_p \cdot u_p} \right)u_p,$$ and $z=y-\hat{y}$.
+\item The vector $\hat{y}$ is the {\bf orthogonal projection} of $y$ onto the subspace $W$. Written as $$\hat{y}=\text{proj}_{W}{y}.$$
+\item {\bf Best Approximation Theorem:} Let $W$ be a subspace of $\mathbb{R}^n$. Let $\hat{y}$ be the orthogonal projection of $y$ onto $W$, then $$\norm{y-\hat{y}} < \norm{y-v}$$ for all $v\in W \setminus \{\hat{y}\}$.
+\item {\bf Theorem 6.10:} If $\{ u_1, \dots, u_p\}$ is an orthonormal basis for $W$, then $$\text{proj}_{W}{y} =(y\cdot u_1) u_1 +\dots +(y \cdot u_p) u_p.$$ If $U=[u_1 \; \dots \; u_p$, then $$\text{proj}_{W}{y} =U U^{T} y.$$
+\item {\bf Gram-Schmidt Orthogonalization.} Given a basis $\{x_1, \dots, x_p\}$ for a non-zero subspace $W$ of $\mathbb{R}^n$, define 
+\begin{align*}
+v_1 & = x_1\\
+v_2 & = x_2 - \left( \frac{x_2 \cdot v_1}{v_1 \cdot v_1} \right) v_1\\
+v_3 & = x_3 -\left( \frac{x_3 \cdot v_1}{v_1 \cdot v_1} \right) v_1-\left( \frac{x_3 \cdot v_2}{v_2 \cdot v_2} \right) v_2\\
+&\vdots\\
+v_p & = x_p -\left( \frac{x_p \cdot v_1}{v_1 \cdot v_1} \right) v_1-\dots -\left( \frac{x_p \cdot v_{p-1}}{v_{p-1} \cdot v_{p-1}} \right) v_{p-1}.
+\end{align*}
+Then $\{v_1, \dots, v_p\}$ is an orthogonal basis for $W$. In addition $\text{Span}\{v_1,\dots, v_k\}=\text{Span}\{ x_1, \dots, x_k\}$ for all $1 \leq k \leq p$.
+\item {\bf QR Factorization.} If $A$ is an $m\times n$ matrix with linearly independent columns, then $A=QR$ where $Q$ is an $m\times n$ matrix whose columns form an orthonormal basis for the column space of $A$ and $R$ is an upper triangular $n \times n$ matrix with positive entries along the diagonal. 
+\end{itemize}
+
+\newpage
+
+
+{\bf Goal:} Solve the matrix $Ax=b$.
+
+What if the matrix equation is inconsistent?
+
+\begin{defn} A {\bf least squares solution} to $Ax=b$ is a vector $\hat{x} \in \mathbb{R}^n$ such that $$\norm{b-A\hat{x}} \leq \norm{b-Ax}$$ for all $x \in \mathbb{R}^n$.
+\end{defn}
+
+How can we find least squares solutions?
+
+{\bf Theorem 6.13:} The set of least squares solutions to $Ax=b$ is the same as the set of solutions to the normal squares $A^{T}Ax=A^{T}b$.
+
+\begin{enumerate}
+
+
+
+\Problem Prove the theorem.
+
+\vfill
+
+\newpage
+
+\begin{defn} The {\bf least squares error} is given by the distance from $b$ to $A\hat{x}$.
+\end{defn}
+
+\Problem Let $A=\begin{bmatrix} 4 & 0\\ 0 & 2\\ 1 & 1\\ \end{bmatrix}$ and $b=\begin{bmatrix} 2\\ 0\\ 11\\ \end{bmatrix}$. Find a least squares solutions to $Ax=b$.
+
+\vfill
+
+\Problem Let $A=\begin{bmatrix} 1 & -6\\ 1 & -2\\ 1 & 1\\1 & 7\\ \end{bmatrix}$ and $b=\begin{bmatrix} -1\\ 2\\ 1\\ 6\\ \end{bmatrix}$. Find a least squares solutions to $Ax=b$.
+
+\vfill
+
+\newpage
+
+\Problem Find the best fit line through the points $(-6,-1), (-2,2), (1,1), (7,6).$
+
+\vfill
+
+\Problem   Here are the number of daylight hours in Cambridge on a few days of
+  2019, from the Astronomical Applications Department of the
+  U.S. Naval Observatory.
+  % https://aa.usno.navy.mil/cgi-bin/aa_rstablew.pl?ID=AA&year=2019&task=0&state=MA&place=cambridge
+
+  \begin{center}
+    \begin{tabular}{l l l}
+      Day & Which day of the year & number of daylight hours \\
+      \hline
+      May 17 & 137th & 14 hours and 40 minutes \\
+      June 1 & 152nd & 15 hours and 5 minutes \\
+      July 1 & 182nd & 15 hours and 14 minutes \\
+      August 8 & 220th & 14 hours and 12 minutes
+    \end{tabular}
+  \end{center}
+
+  Suppose you would like to fit a function $f$ that gives the
+  number of hours of daylight on a particular day, so that you can
+  predict the number of daylight hours on the shortest day of the
+  year.  Describe how you would go about this; what form would your
+  function $f$ have? 
+  
+  \vfill
+
+\newpage
+
+\end{enumerate}
+
+\begin{comment}
+
+\newpage
+\chead{\Large\textbf{Least Squares -- Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+\Answer 
+\begin{proof}
+We prove the two sets are equal by showing that each is a subset of the other.
+
+First, let $\hat{x}$ be a least squares solutions to $Ax=b$. Let $\hat{b} =\text{proj}_{\text{Col(A)}}{b}$. Thus $A\hat{x} =\hat{b}$. By the Orthogonal Decomposition Theorem, $b -\hat{b}$ is orthogonal to $\text{Col}(A)$, and hence $b-\hat{b}$ is orthogonal to the columns $a_j$ of $A$. Thus we have $a_j^{T}(b-A\hat{x})=0$ for $1\leq j \leq n$. Hence $A^{T}(b-A\hat{x})=0$, and rearranging we get $A^T b =A^{T} A \hat{x}$. Thus $\hat{x}$ is a solution to the normal equations.
+
+Second, suppose $\hat{x}$ is a solution to the normal equations. Rearranging the normal equations, we get $$A^{T}(b-A\hat{x})=0.$$ Thus $b-A\hat{x}$ is orthogonal to the the column space of $A$. Since $b=A\hat{x} +(b-A\hat{x})$ is an orthogonal decomposition of $b$ and the orthogonal decomposition is unique, we know $A\hat{x}=\text{proj}_{\text{Col}(A)}{b}$. By the Best Approximation Theorem, $\hat{x}$ is a least squares solution.
+\end{proof}
+\Answer We use the normal equations to find the least squares solutions.
+Note $$A^{T}A=\begin{bmatrix} 17 & 1\\ 1 & 5\\ \end{bmatrix}\text{ and } A^{T}b=\begin{bmatrix} 19\\ 1\\ \end{bmatrix}.$$ Thus $$\hat{x} = \begin{bmatrix} 17 & 1\\ 1 & 5\\ \end{bmatrix}^{-1} \begin{bmatrix} 19\\11\\ \end{bmatrix}=\begin{bmatrix} 1\\ 2\\ \end{bmatrix}.$$
+\Answer Note the columns of $A$ are orthogonal. Now $$\hat{b}=\text{proj}_{\text{Col}(A)}{b} =\frac{b \cdot a_1}{a_1 \cdot a_1} a_1 +\frac{b \cdot a_2}{a_2\cdot a_2} a_2=\frac{8}{4}a_1+\frac{45}{90}a_2=\begin{bmatrix} -1\\ 1\\ 5/2\\ 11/2\\ \end{bmatrix}.$$ Now we need to solve $Ax =\hat{b}$, and hence we get $\hat{x}=\begin{bmatrix} 2\\ 1/2\\ \end{bmatrix}$.
+\Answer We fit the data to the line $y=\beta_0 +\beta_1 x$, and hence we get the following four equations.
+\begin{align*}
+-1  =& \beta_0 +\beta_1 (-6)\\
+2  =& \beta_0 +\beta_1 (-2)\\
+1  =& \beta_0 +\beta_1 (1)\\
+6  =& \beta_0 +\beta_1 (7)\\
+\end{align*}
+Thus we can use the matrix $A$ and the vector $b$ from the last problem. The least squares solution is then $\begin{bmatrix} 2\\ 1/2\\ \end{bmatrix}$. Thus the best fit line is $y=2+\frac{x}{2}$.
+\Answer We can try to fit the data to the function $$f(t)=c_0+c_1 \cos \left( \frac{2\pi}{365} t\right)+c_2 \sin \left( \frac{2\pi}{365} t\right).$$
+\end{enumerate}  
+
+\end{comment}
+\end{document}
+
+
+%%% Local ables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

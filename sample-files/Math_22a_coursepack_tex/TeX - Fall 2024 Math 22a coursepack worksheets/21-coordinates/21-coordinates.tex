@@ -1,0 +1,190 @@
+\documentclass[12pt,letterpaper]{article}
+
+
+
+\input{../worksheet-setup.tex}
+\usetikzlibrary{arrows}
+\usepackage{wrapfig}
+
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+	\hskip -\arraycolsep
+	\let\@ifnextchar\new@ifnextchar
+	\array{#1}}
+\makeatother
+
+\def\env@matrix{\hskip -\arraycolsep
+	\let\@ifnextchar\new@ifnextchar
+	\array{*\c@MaxMatrixCols c}}
+
+\chead{\Large\textbf{Coordinates, $\vec\S$4.4}}% 
+
+\begin{document}
+\thispagestyle{fancy}
+
+Recall from previously:
+
+\begin{itemize}
+\item 	The subset $\{ v_1, v_2, \dots, v_p\}$ of the vector space $V$ is {\bf linearly independent} if $$c_1 v_1+\dots+ c_p v_p =0_V$$ has only the trivial solution.
+\item {\bf Theorem:} Given $\{ v_1, \dots, v_p\}$ with $p\geq 2$ and $v_1\neq 0_V$. The vectors $v_1, \dots, v_p$ are linearly dependent if and only if for some $j>1$, the vector $v_j$ is a linear combination of $v_1, \dots, v_{j-1}$.
+\item Let $H$ be a subspace of a vector space $V$. The set $\{v_1, \dots, v_p\}$ is a {\bf basis} for $H$ if
+	\begin{enumerate}
+		\item  $\{v_1, \dots, v_p\}$ is linearly independent,
+		\item $H=\text{Span}\{v_1, \dots, v_p \}$.
+	\end{enumerate}
+\item {\bf Spanning Set Theorem:} Let $S=\{ v_1,\dots,v_p\} \subseteq V$ and $H=\text{Span}\{v_1,\dots, v_p \}$.
+\begin{enumerate}
+	\item Suppose $v_k$ can be written as a linear combination of the other vectors in $S$, then $S-\{v_k\}$ still spans $H$.
+	\item If $H\neq \{ 0_V\}$, some subset of $S$ is a basis for $H$.
+\end{enumerate} 
+\item {\bf Theorem:} The pivot columns of an $m \times n$ matrix $A$ form a basis for $\text{Col}(A)$.
+\end{itemize}
+
+\newpage
+
+{\bf Theorem:} Let $\mathcal{B} =\{b_1, \dots, b_n\}$ be a basis for a  vector space $V$. Then for each $x \in V$ there exists unique scalars $c_1,\dots, c_n$ such that $x=c_1 b_1+\dots+ c_n b_n$.
+
+
+
+\begin{enumerate}
+
+
+\Problem Prove the theorem.
+
+\vfill
+
+\begin{defn} Suppose $\mathcal{B}=\{b_1, \dots, b_n\}$ is a basis for a vector space $V$. The {\bf coordinates of $x$ relative to $\mathcal{B}$} are the weights $c_1, \dots, c_n$ such that $x=c_1 b_1 +\dots c_n b_n$. We define the {\bf coordinate mapping} from $V$ to $\mathbb{R}^n$ by $[x]_\mathcal{B}=\begin{bmatrix} c_1\\ \vdots\\ c_n \end{bmatrix}$.
+\end{defn}
+
+\Problem Let $V=\mathbb{R}^3$ with basis $\mathcal{E}=\{e_1, e_2, e_3\}$. Let $x= 3e_1 +4e_2+5e_3$, then find $[x]_\mathcal{E}$. Let $\mathcal{B}=\left\{\begin{bmatrix} 1\\ 0\\ 0\\\end{bmatrix},\begin{bmatrix} 1\\ 1\\ 0\\\end{bmatrix},\begin{bmatrix} 1\\ 1\\ 1\\\end{bmatrix} \right\}.$ Find $[x]_\mathcal{B}$.
+
+\vfill
+
+\newpage
+
+\Problem Let $b_1=\begin{bmatrix} 1\\ 1\\ \end{bmatrix}$ and $b_2=\begin{bmatrix} 2\\ 1\\ \end{bmatrix}$, then $\mathcal{B}=\{b_1, b_2\}$ is a basis for $\mathbb{R}^2$. Let $x =\begin{bmatrix} 1\\ 0\\ \end{bmatrix}$. Find $[x]_\mathcal{B}$.
+
+\vfill
+
+\begin{defn} Let $\mathcal{B}=\{b_1, \dots, b_n\}$, then define $P_\mathcal{B}=[b_1 \; \dots \; b_n]$. We call $P_\mathcal{B}$ the {\bf change of coordinates matrix}.
+\end{defn}
+Note $x = P_\mathcal{B} [x]_{\mathcal{B}}$ and $[x]_\mathcal{B}=P_{\mathcal{B}}^{-1} x.$
+
+{\bf Theorem:} Let $\mathcal{B}=\{ b_1, \dots, b_n\}$ be a basis for a vector space $V$. Then the coordinate mapping $x \mapsto [x]_\mathcal{B}$ is a one-to-one, onto, linear transformation from $V$ to $\mathbb{R}^n$.
+
+\Problem Prove the theorem.
+
+\vfill
+
+\newpage
+
+\begin{defn}
+	Let $T: V \to W$ be a linear map of vector spaces. If $T$ is one-to-one and onto, then $T$ is a {\bf vector space isomorphism}, and we say $V$ and $W$ are isomorphic. We write $V \cong W$.
+\end{defn}
+
+\Problem Show that $\mathbb{P}_3$ and $\mathbb{R}^4$ are isomorphic.
+
+\vfill
+
+{\bf Theorem:} If a vector space $V$ has a basis $\mathcal{B}=\{b_1, \dots, b_n\}$, then any set in $V$ containing more than $n$ vectors is linearly dependent.
+
+\Problem Prove the theorem.
+
+\vfill
+
+{\bf Cor:} If $V$ is a vector space with basis $\mathcal{B}=\{b_1, \dots, b_n\}$, then each set of linearly independent vectors has at most $n$ elements.
+
+{\bf Theorem:} If a vector space $V$ has a basis with $n$ elements, then every basis of $V$ must have exactly $n$ vectors.
+
+\Problem Prove the theorem.
+
+\vfill
+
+\begin{defn}
+If $V$ is spanned by a finite set, then $V$ is called {\bf finite dimensional,} and the {\bf dimension} of $V$, written $\text{dim}(V)$, is the number of vectors in a basis of $V$. Define $\text{dim}(\{0_V\})=0$. If $V$ is not spanned by any finite set, then $V$ is called {\bf infinite dimensional}.
+\end{defn}
+
+\end{enumerate}
+
+\begin{comment}
+\newpage
+\chead{\Large\textbf{Coordinates -- Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+  \Answer 
+  
+  \begin{proof}
+  Since $\mathcal{B}$ is a basis, we know there exists scalars $c_1, \dots, c_n \in \mathbb{R}$ such that $$x=c_1 b_1 +\dots +c_n b_n.$$ In order to prove the scalars are unique, we suppose $d_1, \dots, d_n$ are scalars such that $x=d_1 b_1+\dots +d_n b_n$. Now subtracting the two representations of $x$, we get$$0=x-x= (c_1 b_1 +\dots +c_n b_n) -(d_1 b_1+\dots +d_n b_n).$$ Using the vector space axioms, we rearrange the terms and factor to get $$0= (c_1-d_1)b_1+\dots+ (c_n -d_n)b_n.$$ Since $\mathcal{B}$ is a basis, we know $b_1, \dots, b_n$ are linearly independent, and hence $$c_1-d_1=0, \dots, c_n-d_n=0.$$ Thus $c_1=d_1,\dots, c_n=d_n$. Thus the scalars are unique.
+  \end{proof}
+
+\Answer $[x]_\mathcal{E}=\begin{bmatrix} 3\\ 4\\ 5\\ \end{bmatrix}$. In order to find $[x]_\mathcal{B}$ we want to find scalars $c_1, c_2, c_3$ such that $x= c_1 b_1 +c_2 b_2+c_3 b_3$. Thus we form the augmented matrix $[b_1 \; b_2 \; b_3 \; | x]$ and solve
+$$\begin{amatrix}{3}
+1 & 1 & 1 & 3\\
+0 & 1 & 1 & 4\\
+0 & 0 & 1 & 5\\
+\end{amatrix}\sim
+\begin{amatrix}{3}
+1 & 0 & 0 & -1\\
+0 & 1 & 0 & -1\\
+0 & 0 & 1 & 5\\
+\end{amatrix}.$$ Thus $x=(-1)b_1 + (-1) b_2+5b_3$, and hence $[x]_\mathcal{B}=\begin{bmatrix} -1\\ -1\\ 5\\ \end{bmatrix}$.
+
+\Answer Again we form the augmented matrix corresponding to the vector equation $x=c_1 b_1 +c_2 b_2$:
+$\begin{amatrix}{2}
+1 & 2 & 1\\
+1 & 1 & 0\\
+\end{amatrix}\sim\begin{amatrix}{2}
+1 & 0 & -1\\
+0 & 1 & 1\\
+\end{amatrix}$. Thus $[x]_\mathcal{B}=\begin{bmatrix} -1\\ 1\\ \end{bmatrix}$.
+
+\Answer
+
+\begin{proof} Let $\mathcal{B}=\{b_1,\dots, b_n\}$ be a basis for the vector space $V$. Let $T: V \to \mathbb{R}^n$ be given by $T(x)=[x]_\mathcal{B}$.
+
+{\bf Subclaim 1:} $T$ is linear.
+
+Let $x,y\in V$. Since $\mathcal{B}$ is a basis, there exists (unique) scalars $c_1, \dots, c_n, d_1, \dots, d_n$ such that $$x=c_1 b_1+\dots+ c_n b_n,$$ and $$y=d_1 b_1+\dots+ d_n b_n.$$
+Thus using the vector space axioms, we get
+$$
+[x+y]_\mathcal{B}=[(c_1+d_1)b_1+\dots+(c_n+d_n)b_n]_\mathcal{B}=\begin{bmatrix} c_1+d_1\\ \vdots\\ c_n+d_n\\ \end{bmatrix}=\begin{bmatrix} c_1\\ \vdots\\ c_n\\ \end{bmatrix}+\begin{bmatrix} d_1\\ \vdots\\ d_n\\ \end{bmatrix}=[x]_\mathcal{B}+[y]_\mathcal{B}.$$
+
+Let $c\in \mathbb{R}$, then $[cx]_\mathcal{B}=[cc_1b_1+\dots +c c_n b_n]_\mathcal{B}=\begin{bmatrix} c c_1\\ \vdots\\ c c_n\\ \end{bmatrix}=c [x]_\mathcal{B}$.
+
+Thus $T$ is linear.
+
+{\bf Subclaim 2:} $T$ is one-to-one (injective).
+
+Let $x, y \in V$ such that $T(x)=T(y)$. By the first theorem today, the coordinates are unique, so $x=y$.
+
+{\bf Subclaim 3:} $T$ is onto (surjective).
+
+Let $f=\begin{bmatrix} f_1 \\ \vdots \\ f_n\end{bmatrix} \in \mathbb{R}^n$, then $f_1b_1+\dots +f_n b_n \in V$ and $T(f_1b_1+\dots +f_n b_n)= f$. Thus $T$ is surjective.
+\end{proof}
+\Answer Let $\mathcal{B}=\{1, t, t^2, t^3 \}$ be the standard basis on $\mathbb{P}_3$. By the previous theorem the coordinate mapping with respect to basis $\mathcal{B}$ is a vector space isomorphism.
+
+\Answer 
+
+\begin{proof}
+Let $a_1,\dots, a_p \in V$ with $p>n$, then $[a_1]_\mathcal{B}, \dots, [a_p]_\mathcal{B} \in \mathbb{R}^n$. We have more than $n$ vectors in $\mathbb{R}^n$, so we proved they must be linearly dependent. Thus there exists $c_1,\dots, c_p \in \mathbb{R}$, not all zero, such that  $$0 = c_1 [a_1]_\mathcal{B}+\dots+c_p[a_p]_\mathcal{B}.$$ Since the coordinate mapping is linear, we get $$0=[c_1 a_1 + \dots + c_p a_p]_\mathcal{B}.$$ Since the coordinate mapping is injective, we get $0=c_1 a_1 + \dots +c_p a_p$ where not all $c_1, \dots, c_p$ are zero. Thus the vectors are linearly dependent in $V$.
+\end{proof}
+
+\Answer
+
+\begin{proof}
+Let $\mathcal{B} =\{b_1,\dots, b_n\}$ be a basis for $V$ and let $\mathcal{C} =\{c_1, \dots, c_m\}$ be a basis for $V$. Since $\mathcal{B}$ is a set of linearly independent vectors in $V$, the previous theorem tells us that $n \leq m$. Since $\mathcal{C}$ is a set of linearly independent vectors in $V$, the previous theorem tell us that $m \leq n$. Thus $n=m$. 
+\end{proof}
+
+\end{enumerate}  
+
+\end{comment}
+\end{document}
+
+
+%%% Local ables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

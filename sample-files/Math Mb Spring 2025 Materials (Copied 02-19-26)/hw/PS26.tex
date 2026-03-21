@@ -1,0 +1,449 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 26 - Antiderivatives}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{grading}
+\begin{enumerate}
+    \item 10 points
+    \item 10 points
+    \item 10 points
+    \item 8 points
+  
+\end{enumerate}
+Total: 38 points.
+\end{grading}
+
+\begin{enumerate}
+\item 
+
+\begin{grading}
+10 points. 2 per part. If they forget $+C$ on multiple parts, only deduct a half point once.
+\end{grading}
+
+  Find the following indefinite
+  integrals.  Remember that an indefinite integral is always a family of
+  functions (practically speaking, this means your answers should include
+  ``$ + C$''). For help, read pp. 783-786 in Gottlieb, focusing on Example 25.1.
+
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int (3x^3 +2x +\pi)\,dx$
+      \end{problem}
+
+      \begin{solution}
+        $\dfrac{3}{4}x^4+x^2+\pi x+C$
+      \end{solution}
+
+    \item 
+      \begin{problem}[\vfill]
+        $\displaystyle \int 3x^{-1} \,dx$
+      \end{problem}
+
+      \begin{solution}
+        $3\ln |x| + C$
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{e}{\pi x^2}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        $\displaystyle \int \frac{e}{\pi x^2}\,dx = \frac{e}{\pi} \int
+        x^{-2}\,dx = \boxed{- \frac{e}{\pi} x^{-1} + C}$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\nstretch{1}]
+        $\displaystyle \int \left( 3\sin t -\frac{3}{1+t^2} \right)\,dt$
+      \end{problem}
+
+      \begin{solution}
+        $-3\cos t -3\arctan t + C$
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{2\cos w}{3}\, dw$
+      \end{problem}
+
+      \begin{solution}
+        $ \dfrac{2\sin w}{3} + C$ 
+      \end{solution}
+
+    \end{enumerate}    
+  \probonly{}
+  $\checkmark$ Remember that you can check your answers by
+    differentiating them!
+
+\item 
+
+\begin{grading}
+10 points. 2 for each subpart of (a), and 2 for part (b). They don't need $+C$ for part (a).
+\end{grading}
+  \begin{enumerate}
+  \item
+Find antiderivatives for the given functions. In other words, for each
+    function $f$, find a function $F$ such that $F' = f$.
+
+    \probonly{}
+      \begin{enumerate}
+      \item
+        \begin{problem}[\vfill]
+          $f(x) = e^{3x}\vphantom{\dfrac{1}{1}}$
+        \end{problem}
+
+        \begin{solution} % Jason Bland
+          We can take $F(x) = \boxed{\frac{1}{3} e^{3x}}$ (plus any
+          constant).
+        \end{solution}
+
+      \item
+        \begin{problem}[\vfill]
+          $f(x) = \dfrac{3}{e^x}$
+        \end{problem}
+
+        \begin{solution} % Jason Bland
+          We can rewrite $f(x) = 3 e^{-x}$, so $F(x) = \boxed{-3 e^{-x}}$
+          works.
+        \end{solution}
+
+      \item
+        \begin{problem}[\vfill\newpage]
+          $f(x) = \dfrac{1}{2x}$
+        \end{problem}
+
+        \begin{solution}
+          We can rewrite $\displaystyle f(x) = \frac{1}{2} \cdot
+          \frac{1}{x}$, so $F(x) = \boxed{\dfrac{1}{2} \ln |x|}$ is one
+          antiderivative.
+        \end{solution}
+
+      \item
+        \begin{problem}[\vfill]
+          $f(x) = \dfrac{(x + 1)^2}{\sqrt{x}}$ \\
+          \emph{Hint: expand the numerator so you can break up the 
+          fraction into the sum of simpler pieces.}
+        \end{problem}
+
+        \begin{solution}
+          We don't have a Quotient Rule for antiderivatives, so let's
+          first expand this out: $\displaystyle f(x) = \frac{x^2 + 2x +
+            1}{\sqrt{x}} = x^{3/2} + 2 x^{1/2} + x^{-1/2}$.  Then, one
+          antiderivative of $f$ is $F(x) = \boxed{\frac{2}{5} x^{5/2} +
+            \frac{4}{3} x^{3/2} + 2 x^{1/2}}$.
+        \end{solution}
+
+      \end{enumerate}
+      \probonly{}
+
+  \item
+    \begin{problem}[\nstretch{2}]
+      Check your answers to {{{{\#2}}(a)}} by
+      differentiating them and write your work below.
+    \end{problem}
+
+    \begin{solution}
+      \begin{enumerate}
+      \item The derivative of $F(x) = \frac{1}{3} e^{3x}$ is $\frac{1}{3}
+        \cdot 3 e^{3x} = e^{3x}$.
+      \item The derivative of $F(x) = - 3 e^{-x}$ is $- 3 \left( - e^{-x}
+        \right) = 3 e^{-x}$.
+      \item The derivative of $F(x) = \frac{1}{2} \ln |x|$ is $\frac{1}{2}
+        \cdot \frac{1}{x} = \frac{1}{2x}$.
+      \item The derivative of $F(x) = \frac{2}{5} x^{5/2} +
+            \frac{4}{3} x^{3/2} + 2 x^{1/2}$ is $x^{3/2} + 2 x^{1/2} +
+            x^{-1/2}$, which can be rewritten as $\frac{x^2 + 2x +
+              1}{\sqrt{x}}$. 
+      \end{enumerate}
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+\begin{grading}
+10 points, as follows: 4/4/2.
+\end{grading}
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      Suppose the velocity of an object at time $t$ is $v(t) =
+      \frac{1}{1+t^2}$ miles per hour, where $t$ is measured in hours.
+      What is the net change in the object's position from $t=0$ to $t=1$?
+      What is the total distance the object travels between $t = 0$ and $t
+      = 1$?
+    \end{problem}
+
+    \begin{solution}
+      The object's net change in position from $t = 0$ to $t = 1$ is
+      $\displaystyle \int_0^1 \frac{1}{1 + t^2}\,dt = \arctan t \Big|_0^1
+      = \boxed{\frac{\pi}{4} \text{ miles}}$.
+
+      Since the rate of change of distance traveled is speed and the
+      object's speed at time $t$ is $|v(t)|$, the distance traveled is
+      $\displaystyle \int_0^1 |v(t)|\,dt$.  In this case, the object's
+      velocity $\frac{1}{1 + t^2}$ is always positive, so its speed is the
+      same as its velocity; therefore, the total distance traveled is also
+      $\boxed{\frac{\pi}{4} \text{ miles}}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Suppose the velocity of another object at time $t$ is $v(t) =
+      5t(t-1)$ meters per second, where $t$ is measured in seconds.
+      What is the net change in the object's position from $t=0$ to $t=2$?
+      What is the total distance the object travels between $t = 0$ and $t
+      = 2$?
+    \end{problem}
+
+    \begin{solution}
+      The object's net change in position from $t = 0$ to $t = 2$ is
+      \begin{align*}
+        \int_0^2 5t (t - 1)\,dt &= 5 \int_0^2 (t^2 - t)\,dt \\
+        &= 5 \left( \left. \frac{t^3}{3} - \frac{t^2}{2} \right|_0^2
+        \right) \\
+        &= \boxed{\frac{10}{3} \text{ meters}}
+      \end{align*}
+      This object's velocity is negative on $(0, 1)$ and positive on $(1,
+      2)$\footnote{You can see this by making a sign chart for $v(t)$, or
+        by graphing it: you can graph it by hand since it's a quadratic.},
+      so the total distance it travels between $t = 0$ and $t = 2$ is
+      different from its net change in position.  To get the total
+      distance traveled, we need to integrate the object's speed, which is
+      $|v(t)|$.  On $(0, 1)$, $v(t)$ is negative, so $|v(t)| = -v(t) =
+      -5t(t-1)$; on $(1, 2)$, $v(t)$ is positive, so $|v(t)| = v(t) =
+      5t(t-1)$.  So, the total distance the object travels between $t = 0$
+      and $t = 2$ is:
+      \begin{align*}
+        \int_0^1 -5t(t-1)\,dt + \int_1^2 5t(t-1)\,dt &= -5 \int_0^1 (t^2 -
+        t)\,dt + 5 \int_1^2 (t^2 - t)\,dt \\
+        &= -5 \left( \left. \frac{t^3}{3} - \frac{t^2}{2} \right|_0^1
+        \right) + 5 \left( \left. \frac{t^3}{3} - \frac{t^2}{2} \right|_1^2
+        \right) \\
+        &= -5 \left( - \frac{1}{6} \right) + 5 \left( \frac{5}{6} \right)
+        \\
+        &= \boxed{5 \text{ meters}}
+      \end{align*}
+      (You may also want to look back at
+        {{\#5}} on the worksheet for another example of the
+        distinction between ``change in position'' and ``distance
+        traveled''.)
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      When is net change in position equal to total distance traveled?
+      (That is, what must be true about the velocity function?)
+    \end{problem}
+
+    \begin{solution}
+      Net change in position is equal to total distance traveled if the
+      velocity is always positive.  (This should make sense intuitively:
+      if the object is always traveling in the positive direction, then
+      its net change in position will simply be the distance it traveled.)
+
+      \emph{Note:} If the object is always traveling in the negative
+      direction, then its net change in position will simply be the
+      negative of the distance traveled. 
+    \end{solution}
+  \end{enumerate}
+
+\iffalse
+\item 
+
+An economist has been tracking housing prices in Cambridge for the past
+  several years.  He estimates that the \emph{rate} at which the median
+  price of a 1-bedroom house has been increasing over the past several
+  years is an exponential function.  At time $t = 0$, corresponding to
+  January 2007, the median price was increasing at a rate of \$15,000 per
+  year.  At time $t = 1$, corresponding to January 2008, the median price
+  was increasing at a rate of \$15,750 per year.
+  \begin{enumerate}
+  \item
+
+    \begin{problem}
+      Write an exponential function $r(t)$ which models the \emph{rate} at
+      which the median price is increasing over time, in dollars per
+      year.  
+    \end{problem}
+
+    \begin{solution}
+      We are looking for an exponential function $r(t)$ with $r(0) =
+      15,000$ and $r(1) = 15,750$.  Remember that exponential functions
+      have a constant \textbf{percent} change per year.\footnote{They also
+        have a constant percent change per month, or per day, or per any
+        other unit of time.}
+
+      In the first year, the percent change in $r(t)$ was $\frac{15750 -
+        15000}{15000} = 5\%$.  So, our exponential function $r(t)$ must
+      increase by 5\% per year: $\boxed{r(t) = 15,000 (1.05)^t}$.
+    \end{solution}
+
+  \calcitem
+    \begin{problem}
+      At time $t = 0$, the median price of a 1-bedroom house in Cambridge
+      was \$300,000.  Assuming the economist's trend held, find the median
+      price of a 1-bedroom house in Cambridge at $t = 2$.  Please give an
+      exact answer, and then use a calculator to give a decimal
+      approximation. 
+    \end{problem}
+
+    \begin{solution}
+      The house's price at $t = 2$ is
+      \begin{align*}
+        300,000 + \int_0^2 r(t)\,dt &= 300,000 + 15,000 \int_0^2
+        1.05^t\,dt \\
+        &= 300,000 + 15,000 \left( \left. \frac{1.05^t}{\ln 1.05}
+          \right|_0^2 \right) \\
+        &= \boxed{300,000 + 15,000 \left( \frac{1.05^2 - 1 }{\ln 1.05}
+          \right)} \\
+        & \boxed{\approx 331512.50}
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}  
+\fi
+
+\pspace{\newpage}
+
+\item 
+
+\begin{grading}
+8 points. 3 for part (a), 5 for part (b).
+\end{grading}
+
+ \textbf{Reflect Back.}
+
+  \begin{enumerate}
+  \item Decide whether each of the following statements is true or false. Write 1-2 sentences explaining your choice.
+
+  \probonly{\raggedcolumns}
+    \begin{enumerate}
+    \item
+      \begin{problem}
+        $\displaystyle \int \cos u\,du = \sin u + C$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        True, because the derivative of $\sin u$ is $\cos u$.
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \int \cos(x + 7)\,dx = \sin(x + 7) + C$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        True, because the derivative of $\sin(x + 7)$ is $\cos(x + 7)
+        \cdot 1$. 
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \int \cos (3x + 7)\,dx = \sin(3x + 7) + C$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        False, because the derivative of $\sin(3x + 7)$ is $\cos(3x + 7)
+        \cdot 3$.
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \int \cos (3x + 7)\,dx = \frac{1}{3} \sin (3x + 7)
+        + C$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        True, because the derivative of $\frac{1}{3} \sin(3x + 7)$ is
+        $\frac{1}{3} \cos(3x + 7) \cdot 3$.
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \int \cos (x^2)\,dx = \sin (x^2) + C$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        False, because the derivative of $\sin(x^2)$ is $\cos(x^2) \cdot
+        2x$. 
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \int \cos (x^2)\,dx = \frac{1}{2x} \sin (x^2) + C$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        False, because we need to use either the Product or Quotient
+        Rule to evaluate the derivative of $\frac{1}{2x} \sin (x^2) =
+        \frac{1}{2} x^{-1} \sin(x^2)$; the derivative is $\frac{1}{2}
+        \left[ - x^{-2} \sin(x^2) - x^{-2} \cos(x^2) \cdot 2x \right]$.
+      \end{solution}
+
+    \end{enumerate}
+    \probonly{}
+
+    \probonly{\emph{Hint:} Exactly three are true.}
+
+    \pspace{\newpage}
+
+  \item
+
+    \note{When we do integration by substitution, it will be really
+      important for students to know what integrals they know.}
+
+    \begin{problem}[\vfill]
+      Five of the indefinite integrals below are ones you should 
+      know.  (The others are ones that you are not expected to be able to
+      find yet.)  Pick out the five that you know, and find them.
+      \[ \int \sin x\,dx \quad \int \tan x\,dx \quad \int e^x\,dx \quad \int
+      \ln x\,dx \quad \int \frac{1}{x}\,dx \]
+      \[ \int \frac{1}{1 + x^2}\,dx \quad \int \frac{1}{1 - x^2}\,dx \quad
+      \int \frac{1}{\sqrt{1 + x^2}}\,dx \quad \int \frac{1}{\sqrt{1 -
+          x^2}}\,dx \]
+    \end{problem}
+
+    \begin{solution}
+      The five we know are:
+      \begin{itemize}
+      \item $\displaystyle \int \sin x\,dx = - \cos x + C$
+      \item $\displaystyle \int e^x \,dx = e^x + C$
+      \item $\displaystyle \int \frac{1}{x}\,dx = \ln |x| + C$
+      \item $\displaystyle \int \frac{1}{1 + x^2}\,dx = \arctan x + C$
+      \item $\displaystyle \int \frac{1}{\sqrt{1 - x^2}}\,dx = \arcsin x +
+        C$ (or $-\arccos x + C$)
+      \end{itemize}
+    \end{solution}
+
+  \end{enumerate}
+
+
+\end{enumerate}
+
+\spaceonly{\psreflection{}}
+
+\end{document}

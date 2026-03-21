@@ -1,0 +1,462 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{soul}
+\usepackage[normalem]{ulem}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[]{handout}
+\renewcommand{\workshopnote}{CA Notes.}    
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\makeatletter
+
+% underline links               
+\let\@href=\href
+\renewcommand{\href}[2]{\@href{#1}{\ul{#2}}}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\htitle{Workshop 1: Working with Exponents}
+
+\begin{workshop}
+  In general, workshop is an opportunity for students to practice material. Some important goals:
+  \begin{itemize}[nosep]
+  \item For students to develop persistence in tackling problems. 
+  \item For students to practice communicating their thoughts and assessing others' ideas.
+  \end{itemize}
+  So, most of workshop should be spent with students working in groups. Many workshops will also have a segment on metacognitive learning strategies, to help students become more effective learners of math. 
+
+  In general, you don't need to go over problems as a class unless you notice common misconceptions that you think it's important to address. 
+
+  For this first workshop:
+  \begin{itemize}
+  \item An important goal is to establish the tone of workshop: encourage students to collaborate and work to create a friendly environment where mistakes are opportunities for exploration.
+
+  \item The mathematical goal is to help students (re)discover how exponents work, so that exponent rules don't just seem like mysterious statements that must be memorized.
+
+  \item Help students develop strategies for when they're not sure about something. For example, if they can't remember whether there's a rule for simplifying $x^a \cdot x^b$, thinking about a simple example like $x^3 \cdot x^5$ is helpful.
+  \end{itemize}
+
+  Here's one possible plan:
+  \begin{itemize}
+  \item Put students in groups, and have group members introduce themselves to each other and work together on \ref{exponents-write-out-then-simplify} and \ref{basic-exponent-rules}. Then have each group introduce itself to the whole workshop and present a part of some problem.
+
+  \item Make sure everyone is comfortable with the exponent rules in \ref{basic-exponent-rules}. It can be helpful to say them in words.
+
+    Some students may have trouble seeing how to apply a rule about $(ab)^n$ to something like $(a^2 b^6)^5$, so I like to describe the rule about $(ab)^n$ as telling us what happens when we raise a product to a power.
+
+  \item Give the groups some time to work on the next few problems, where they practice applying the exponent rules. \ref{summarize-zero-negative-reciprocal-exponents} is important, so please make sure everyone is comfortable with it (either by checking in with each group or by discussing it as a class). 
+
+  \item The next several problems are more practice applying the facts they've established. If students seem very comfortable with exponents, you can have them jump ahead to \ref{graph-with-pinhole-3}, but there's no need to push students; it's more important for them to really understand the exponent problems they work on than to do a lot of problems (and there's no need for them to do \ref{graph-with-pinhole-3}). 
+
+  \end{itemize}
+\end{workshop}
+
+\begin{enumerate}
+\item 
+  \label{exponents-write-out-then-simplify}
+
+  \begin{workshop}
+    The point of this problem is to give students a very concrete
+    understanding of why the exponent rules work.
+  \end{workshop}
+
+  Write out each of the following expressions \emph{without} exponents, 
+  and then rewrite again to a simplified form with exponents.
+
+  \textbf{Example:}
+  $(x y^2)^3 = (xy^2)(xy^2)(xy^2) = (xyy)(xyy)(xyy) = x^3 y^6$.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}
+      $(cd)^4$
+    \end{problem}
+    \begin{solution}
+        $=(cd)(cd)(cd)(cd)=c^4d^4$
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $w^3 w^5$
+    \end{problem}
+    \begin{solution}
+        $=(www)(wwwww)=w^8$
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $\dfrac{s^7}{s^3}$
+    \end{problem}
+    \begin{solution}
+        $\dfrac{sssssss}{sss}=s^4$
+    \end{solution}
+  \item
+    \begin{problem}
+      $(q^3)^4$
+    \end{problem}
+    \begin{solution}
+        $(qqq)(qqq)(qqq)(qqq)=q^{12}$
+    \end{solution}
+
+  \end{enumerate}
+
+\item  \label{basic-exponent-rules}
+
+  \begin{workshop}
+    The reason I've put $a, b > 0$ is that there are some subtleties when $a, b < 0$ that aren't worth bringing up at this point. For example, when $a > 0$, $\left( a^2 \right)^{1/2} = a$, but this isn't true when $a < 0$.
+
+    If students ask about what happens when $a, b < 0$, you can let them know that the rules below are still true if the exponents $m, n$ are integers. 
+  \end{workshop}
+
+  Generalize what you figured out in
+  \ref{exponents-write-out-then-simplify}: If $a, b > 0$, then:
+
+  \begin{itemize}
+  \item $(ab)^n = $
+  \begin{solution}
+      $=a^nb^n$
+  \end{solution}
+  \item $a^m a^n = $
+    \begin{solution}
+        $=a^{m+n}$
+    \end{solution}
+  \item $\dfrac{a^m}{a^n} = $
+    \begin{solution}
+        $a^{m-n}$
+    \end{solution}
+  \item $(a^m)^n = $
+    \begin{solution}
+        $=a^{mn}$
+    \end{solution}
+  \end{itemize}
+
+  \begin{problem}[\vfill]
+    These four rules are the main ones to remember. If you forget them, what can you do to come up with them again?
+  \end{problem}
+
+  \begin{problem}[\vfill\newpage]
+    You might wonder whether there's a rule for $a^m + a^n$. Do a concrete example (that is, pick concrete values of $a, m, n$) to convince yourself there isn't.
+
+    \emph{Note:} Not every example will be convincing, so if your first attempt isn't convincing, try another!
+  \end{problem}
+
+\item 
+
+  Use the four rules from \ref{basic-exponent-rules} to simplify the following expressions:
+
+  \begin{enumerate}
+
+  \item
+
+    \begin{workshop}      
+      Some groups will probably want to tell you whether their answer are right. In a problem like this, one thing you can do to help them develop independence is to say something like, ``Before I tell you, is there something you could do to check yourself that your answer is reasonable?'' (One example is that they could pick a concrete value of $r$ like $r = 2$ and use the idea of \ref{exponents-write-out-then-simplify} to simplify this example.) 
+    \end{workshop}
+
+    \begin{problem}[\vfill]
+      $ab^5 (ab^3)^r$
+    \end{problem}
+    \begin{solution}
+        $=ab^5a^rb^{3r}=a^{r+1}b^{5+3r}$
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\dfrac{(2a^3)^4}{a^5} + 6 a^3 - 5a^7$\\
+    \end{problem}
+    \begin{solution}
+        $=\dfrac{2^4a^{3\cdot 4}}{a^5} + 6a^3-5a^7=\dfrac{16a^{12}}{a^5}+6a^3-5a^7=16a^7+6a^3-5a^7=11a^7+6a^3$
+    \end{solution}
+
+  \end{enumerate}
+
+\item  \label{understanding-zero-negative-reciprocal-exponents}
+
+  \begin{workshop}
+    This problem is meant to help students understand why $a^0 = 1$, $a^{-n} = \dfrac{1}{a^n}$, and $a^{1/n}$ is the $n$-th root of $a$.
+  \end{workshop}
+
+  Use the rules from \ref{basic-exponent-rules} to fill in the boxes in each statement (in each one, $a > 0$).
+
+  \begin{enumerate}
+  \item $\dfrac{a^7}{a^7} = a^{\raisebox{1ex}{\cfitbox[\vphantom{1}]{0.2in}{0}}}$, which simplifies to $a^{\raisebox{1ex}{\cfitbox[\vphantom{1}]{0.2in}{0}}} = 1$.
+
+  \item $a^5 \cdot a^{-5} = a^{\raisebox{1ex}{\cfitbox[\vphantom{1}]{0.2in}{0}}} = \cfitbox[\vphantom{\int}]{0.2in}{1}$.
+
+    So, $a^{-5} = \cfitbox[\vphantom{\dfrac{1}{1}}]{0.25in}{\frac{1}{a^5}}$. (Express your answer in terms of $a^5$.)
+
+  \item $\left( a^{1/5} \right)^5 = a^{\raisebox{1ex}{\cfitbox[\vphantom{1}]{0.2in}{1}}} = \cfitbox[\vphantom{\int}]{0.2in}{a}$.
+
+  \end{enumerate}
+
+\item  \label{summarize-zero-negative-reciprocal-exponents} Summarize what you figured out in \ref{understanding-zero-negative-reciprocal-exponents}: If $a > 0$, then:
+  \begin{itemize}
+  \item $a^0 = $
+    \begin{solution}
+        1
+    \end{solution}
+  \item $a^{-n} = $
+  \begin{solution} 
+  $\dfrac{1}{a^n}$
+  \end{solution}
+
+  \item $a^{1/n}$ is the positive number that, when raised to the power $n$, results in $\fitb{0.25in}{a}$. This is called the \uline{$n$-th root of $a$} and can also be written as $\sqrt[n]{a}$.
+
+  \end{itemize}
+
+  \pspace{\newpage}
+
+\item  Simplify the following. 
+
+  \begin{enumerate}
+  \item
+    \begin{problem}
+      $2^{-3}$
+    \end{problem}
+    \begin{solution}
+        $\dfrac{1}{2^3}=\dfrac{1}{8}$
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $1000^{1/3}$, which can also be written $\sqrt[3]{1000}$
+    \end{problem}
+    \begin{solution}
+        10
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $25^{-1/2}$
+    \end{problem}
+    \begin{solution}
+       $\dfrac{1}{25^{1/2}}=\dfrac{1}{5}$
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $8^{2/3}$ (Hint: $8^{2/3} = \left( 8^{1/3} \right)^{\raisebox{1ex}{\cfitbox[\vphantom{1}]{0.2in}{$\bm{2}$}}}$.)
+    \end{problem}
+    \begin{solution}
+        $8^{2/3}=(8^{1/3})^2=(2)^2=4$
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $16^{-3/4}$
+    \end{problem}
+    \begin{solution}
+        $=(16^{1/4})^{-3}=2^{-3}=\dfrac{1}{2^3}=\dfrac{1}{8}$
+    \end{solution}
+  \end{enumerate}
+
+\item  
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[0.25in]
+      Simplify $\sqrt[3]{64 x^{12}}$.
+    \end{problem}
+
+    \begin{solution}
+      $4 x^4$
+    \end{solution}
+
+  \item
+    \begin{problem}[0.25in]
+      Let $y$ be your answer to (a).  Using the same method as in
+      \ref{exponents-write-out-then-simplify}, simplify $y^3$ to make sure
+      that it's equal to $64 x^{12}$.
+    \end{problem}
+
+  \item
+    \begin{problem}[0.25in]
+      Simplify $\left( 32 a^{100} \right)^{1/5}$. 
+    \end{problem}
+
+    \begin{solution}
+      $2 a^{20}$
+    \end{solution}
+
+  \end{enumerate}
+
+\item  
+
+  \begin{workshop}
+    It's okay if students leave their answers in a slightly different form than the answers below. The reason we have them practice simplifying is not that we really want them to get their answers in a particular form; it's that later, when we want to do things like solve for critical points of a function $f$, it's often easiest to simplify $f$, take the derivative, and then simplify $f'$ before setting it equal to 0. So, we want them to get comfortable manipulating expressions.
+  \end{workshop}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Simplify
+      $\displaystyle \frac{[(2 x^5)^3 + \sqrt[3]{8 x^6} \cdot
+        x^4]^2}{2x^7}$. (In particular, there should be no fractions
+      in your final answer.)
+    \end{problem}
+
+    \begin{solution}
+      $32 x^{23} + 16 x^{14} + 2 x^5$
+    \end{solution}
+
+  \item Simplify the following expressions completely; express your
+    answers without using negative exponents. (You may assume all
+    variables are positive.)
+
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \frac{\quad \dfrac{(xy)^{-3}}{x^3y^{-4}}
+          \quad}{x^2 \sqrt{y}}$
+      \end{problem}
+
+      \begin{solution}
+        \begin{align*}
+          \frac{\quad \dfrac{(xy)^{-3}}{x^3y^{-4}} \quad}{x^2 \sqrt{y}}
+          &= \frac{(xy)^{-3}}{x^3 y^{-4} \cdot x^2 \sqrt{y}} \\
+          &= \frac{x^{-3} y^{-3}}{x^5 y^{-3.5}} \\
+          &= x^{-8} y^{0.5} \\
+          &= \boxed{\frac{\sqrt{y}}{x^8}}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\sqrt{x^{2n}}\cdot\sqrt[3]{x^{9n}}\cdot\sqrt[4]{x^{8n+4}}$
+      \end{problem}
+
+      \begin{solution}
+        \begin{align*}
+          \sqrt{x^{2n}}\cdot\sqrt[3]{x^{9n}}\cdot\sqrt[4]{x^{8n+4}} &=
+          x^{2n / 2} \cdot x^{9n / 3} \cdot x^{(8n + 4) / 4} \\
+          &= x^n \cdot x^{3n} \cdot x^{2n + 1} \\
+          &= x^{n + 3n + (2n + 1)} \\
+          &= \boxed{x^{6n + 1}}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\dfrac{x^{-1}y+y^{-1}x}{x^2+y^2}$
+      \end{problem}
+
+      \begin{solution}
+        Let's multiply the numerator and denominator by $xy$ to get rid
+        of the negative exponents: 
+        \begin{align*}
+          \dfrac{x^{-1}y+y^{-1}x}{x^2+y^2} &= \frac{ \left( x^{-1} y +
+              y^{-1} x \right) xy}{(x^2 + y^2) xy} \\
+          &= \frac{y^2 + x^2}{(x^2 + y^2) xy} \\
+          &= \boxed{\frac{1}{xy}}
+        \end{align*}
+      \end{solution}
+    \end{enumerate}
+  \end{enumerate}
+
+\item  \label{graph-with-pinhole-3}
+  \begin{enumerate}
+  \item
+
+    \begin{problem}[\stretch{0.5}]
+      In \href{https://canvas.harvard.edu/courses/138327/files/20648274?wrap=1}{Problem Set 2}, {{\#5}}, you sketched the graph of $f(x) = \dfrac{(x^2 - 4x + 3)(x + 5)}{x^2 + 4x - 5}$. Describe the strategy you used there.
+    \end{problem}    
+
+    \probonly{\emph{Testing yourself in this way is one of the most powerful learning strategies. In fact, \href{https://knowledgeplus.nejm.org/blog/what-is-the-testing-effect-and-how-does-it-affect-learning-knowledge-and-retention/}{studies show that ``you will recall 50\% more of learned information by testing yourself than by using the same amount of time to study''}!}
+
+      \emph{If you had trouble remembering the strategy for this problem, that's a sign that you should frequently test yourself on recent psets to improve your understanding.}}
+    \begin{solution}
+        Our general strategy is to re-write the algebraic formula so that we can more easily identify the foundational relationship along with $x$-values that are not included in the domain. This is best done by factoring. Common factors between the numerator and denominator indicate holes when sketching the graph of the function, and factoring allows us to isolate and see the function equation at work separate from the holes (often called point discontinuities, which we will get to later!).
+    \end{solution}
+  \item
+    \begin{problem}[\vfill]
+      Sketch the graph of
+      $f(x) = \dfrac{x^3 - 4x^2 + 3x}{(x - 1)(x^4 - 3x^3)}$.
+    \end{problem}
+
+    \begin{solution}
+        $\dfrac{x(x^2-4x+3)}{x^5-3x^4-x^4+3x^3}=\dfrac{x(x-3)(x-1)}{x^5-4x^4+3x^3}=\dfrac{x(x-3)(x-1)}{x^3(x^2-4x+3)}=\dfrac{x(x-3)(x-1)}{x^3(x-3)(x-1)}$\\
+        This shows us that the graph of the function will look like $\dfrac{1}{x^2}$ with holes at $x=3$ and $x=1$.
+    \end{solution}
+  \end{enumerate}
+
+\end{enumerate}
+\end{document}

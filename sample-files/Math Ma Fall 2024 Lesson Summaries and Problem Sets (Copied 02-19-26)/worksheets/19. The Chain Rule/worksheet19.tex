@@ -1,0 +1,572 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt}
+
+\usepackage{xcolor}
+\usepackage[pdftex]{graphicx}
+
+\usepackage{siunitx}
+\sisetup{per-mode=fraction}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=black]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+\usepackage{icomma}
+\usepackage{diffcoeff}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotscreateplotcyclelist{mycolor}{%
+  black, blue, red, green!70!black,magenta,
+  purple, cyan, orange
+}
+\pgfplotsset{
+  cycle list name=mycolor,
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },
+  tick label style = {font=\footnotesize, fill=white, inner sep=0pt},
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  compat=1.18
+}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\small}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{ideacolor}{rgb}{0.7,0,0}
+\newcommand{\ideas}[1]{\color{ideacolor} #1 \color{black}}
+\newcommand{\ideacolor}{maroon}
+
+\newcommand{\outside}[1]{
+    \fcolorbox{red}{white}{#1}
+}
+
+\newcommand{\inside}[1]{
+    \fcolorbox{blue}{white}{#1}
+}
+
+\newlength{\tipmargin}
+\makeatletter
+\newcommand{\version}[2]{\ifthenelse{\equal{#1}{Mb}}{#2}{}}
+
+\renewenvironment{framed}{
+  \setlength{\tipmargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\tipmargin
+  \def\FrameCommand{\hspace{\tipmargin}\fbox}%
+  \advance\linewidth\tipmargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+}
+{\endMakeFramed}
+
+\makeatother
+
+\newlength{\highlightwidth}
+\newcommand{\highlight}[1]{\setlength{\highlightwidth}{\linewidth}%
+  \addtolength{\highlightwidth}{-55pt}%
+  \hspace{24pt}\begin{minipage}[t]{\highlightwidth} \setlength{\parskip}{8pt} #1 \end{minipage}\hspace{24pt}}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\newcommand{\textbook}[0]{\href{http://isites.harvard.edu/fs/docs/icb.topic1511355.files/fullbook.pdf}{textbook}}
+
+% change to \usepackage[sols]{handout} to see solutions
+% change to \usepackage[notes]{handout} to see notes
+\usepackage[]{handout}
+\renewcommand{\workshopnote}{CA Notes.}    
+
+\begin{document}
+
+\htitle{Worksheet 1 - The Chain Rule}
+\begin{problemonly}
+    \begin{framed}
+
+You should be able to:
+
+\begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+
+\item You should be able to use the Chain Rule to find the derivative of
+  the composition of two functions.
+
+\item You should understand why the Chain Rule makes sense in a real-world
+  problem (such as {{\#1}} on {the worksheet ``The Chain Rule''}).
+
+\item You should be comfortable looking at a function and determining its
+  structure: is it a product?  A composition?  (If so, what is the outer
+  function?)
+
+\end{itemize} 
+
+    \end{framed}
+\end{problemonly}
+
+\begin{enumerate}
+\item 
+  \note{I'll use this to try to convince them that the Chain Rule is
+    reasonable.}
+
+  A rainwater collection tank is shaped so that 
+  when the tank is filled with $v$ liters of rainwater,
+  then the height of water in the tank will be $v^2$ mm.
+  (The tank narrows at the top).
+  \begin{enumerate}
+  \item
+    \note{Students' first instinct here will probably be to take the
+      derivative of $f(v) = v^2$ and plug in $v = 10$.  (Make sure they
+      are absolutely solid with the connection between ``instantaneous
+      rate of change'' and ``derivative''.)  So, we'll talk about how 
+      $f'(10)$ is $\frac{dh}{dv}$ and what this represents.  From an
+      intuitive perspective, they should see that the answer to the
+      question must depend on the precipitation rate: if it's not
+      raining at all, the rate in question is definitely 0. 
+
+      Something that will probably seem pretty new to them is thinking of
+      a quantity (height, in this case) as a function of different
+      independent variables (volume vs. time).
+    }
+
+    \begin{problem}[\vfill]
+      During a storm, the tank begins filling up.  At 1 pm, the tank contains
+      exactly 10 L of water.  Can you tell what the
+      instantaneous rate of change of the height of the water with respect to time
+      is at 1 pm, or do you need more information?
+    \end{problem}
+
+    \begin{solution}
+      We need more information; we aren't told how quickly water is
+      entering the tank, so there's no way we could tell the instantaneous
+      rate of change of the height of the water with respect to time.  (For
+      instance, if the rain had temporarily paused at 1 pm, then
+      the instantaneous rate of change of height of water with respect to
+      time at that moment would be 0.)
+    \end{solution}
+
+  \item
+
+    \note{I'll use this to get the Chain Rule in Leibniz notation:
+      $\displaystyle \frac{dh}{dt} = \frac{dh}{dv} \cdot \frac{dv}{dt}$.
+      (I won't try to prove anything.) Some students will immediately
+      notice the similarity to the dimensional analysis that they learned
+      in high school. It's worth bringing this up if none of the students
+      does.
+
+      If you can, it's worthwhile to already start using the framework
+      we'll use in related rates: identify the rate you want
+      ($\frac{dh}{dt}$) and the rate you're told ($\frac{dv}{dt} = 2$). 
+    }
+
+    \begin{problem}[\vfill]
+      Suppose that you are also told that, at 1 pm, rainwater is
+      pouring into the tank at an instantaneous rate of 2 L/s.  Now, can
+      you tell what the instantaneous rate of change of the height of the water
+      with respect to time is, or do you need more information?
+    \end{problem}
+
+    \begin{solution}
+      Intuitively, it should feel like we have enough information because
+      we're now told how quickly water is entering the tank. Since we know
+      that water is entering the tank at a rate of $2$ L/s, to determine the
+      how fast the height of the water is increasing, we just need to determine
+      the rate at which the height increases with respect to volume.
+
+      We are told that $h=v^2$, so the rate of change of the height of the water 
+      in the tank with
+      respect to the volume is $\frac{dh}{dv} = 2v$. This means that, when
+      there are $10$ L of water in the tank, the $\frac{dh}{dv} = 2 \cdot 10 =
+      20$ mm/L.
+
+      Combining the two pieces of information, we can determine that the
+      instantaneous rate of change of the height of the water in the tank
+      with respect to time is 
+      \[\qty{2}{\liter\per\second} \cdot \qty{20}{\milli\meter\per\liter} = 
+      \qty{40}{\milli\meter\per\second}.\]
+
+      This demonstrates the following relationship between $\diff{h}{t}$,
+      $\diff{h}{v}$, and $\diff{v}{t}$:
+      \[
+        \frac{dh}{dt} = \frac{dh}{dv} \frac{dv}{dt}
+      \]
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+  \note{The goal here is to connect {{\#1}} with the Chain
+    Rule they saw on the homework. It's important that students are
+    comfortable with both Leibniz and Lagrange notation.}
+
+  \begin{problem}[\vfill]
+    On your homework, you looked at the derivative of a composition of
+    functions, $h(t) = f(g(t))$.  What does this have to do with what we
+    figured out in {{\#1}}?
+  \end{problem}
+
+  \begin{solution}
+    Let's say $v = g(t)$ and $h = f(v)$.  What we learned from
+    {{\#1}} was that $\displaystyle \frac{dh}{dt} =
+    \frac{dh}{dv} \cdot \frac{dv}{dt}$.  Let's see what this says in terms
+    of $f$ and $g$.  First of all, we know that
+    \begin{align*}
+      h &= f(v) \\
+      &= f(g(t)) \text{ since $v = g(t)$} \\
+      &= h(t)
+    \end{align*}
+    So, another way of writing $\frac{dh}{dt}$ is $h'(t)$.    On the other
+    hand, $\frac{dh}{dv} = f'(v)$ 
+    and $\frac{dv}{dt} = g'(t)$.  So, we can rewrite the equation
+    $\displaystyle \frac{dh}{dt} = \frac{dh}{dv} \cdot \frac{dv}{dt}$ as
+    \begin{align*}
+      h'(t) &= f'(v) g'(t) \\
+      \intertext{Since $v = g(t)$,
+        this is the same as saying}
+      h'(t) &= f'(g(t)) g'(t),
+    \end{align*}
+    and this is exactly the Chain Rule you looked at in your homework. 
+  \end{solution}
+
+\pspace{1in}
+
+\begin{framed}
+    \textbf{The Chain Rule:} Given a composition of functions $f(g(t))$, the derivative is:
+    $$\dfrac{d}{dt}[f(g(t))]= \solonly{f'(g(t))\cdot g'(t) }
+    \hspace{1.5 in} \text{or} \hspace{.5 in} \dfrac{df}{dt} = 
+    \solonly{\dfrac{df}{dg} \cdot \dfrac{dg}{dt}}
+    $$ 
+\end{framed}
+
+\pspace{\newpage}
+
+\item 
+  \note{This will hopefully help them see better how we apply the Chain
+    Rule in practice.  For example, when we want to differentiate ln of
+    something, students sometimes need help seeing that they can use the
+    Chain Rule by viewing it as $\ln [ g(x)]$.  You might encourage the
+    students to fill this out for themselves first, before checking with a
+    neighbor; if you do this, you might also mention that self-quizzing is
+    a very effective studying tactic.}
+
+  Fill in the following tables.
+  \begin{center}
+    \begin{tabular}{| l | l | c | l | l |}
+      \multicolumn{2}{c}{Table 1: Derivatives we knew before} &
+      \multicolumn{1}{c}{} 
+      & \multicolumn{2}{c}{Table 2: Derivatives we know now} \\ 
+      \cline{1-2} \cline{4-5} & & & & \\
+      $f(x) = x^n$ & $f'(x) = \solonly{nx^{n-1}}$ \hspace{0.4in} &
+      \hspace{0.5in} &
+      $h(x) = [g(x)]^n$ & $h'(x) = \solonly{n[g(x)]^{n-1}g'(x)}$
+      \hspace{0.9in} \\ 
+      & & & & \\
+      $f(x) = e^{kx}$ & $f'(x) = \solonly{ke^{kx}}$ & & $h(x) = e^{g(x)}$
+      & $h'(x) = \solonly{e^{g(x)}g'(x)}$ \\ 
+      & & & & \\
+      $f(x) = b^{x}$ & $f'(x) = \solonly{\ln(b)b^x}$ & & $h(x) = b^{g(x)}$
+      & $h'(x) = \solonly{\ln(b)b^{g(x)}g'(x)}$ \\ 
+      & & & & \\
+      $f(x) = \ln x$ & $f'(x) = \solonly{\frac{1}{x}}$ & & $h(x) = \ln
+      [g(x)]$ & 
+      $h'(x) = \solonly{\frac{g'(x)}{g(x)}}$ \\ 
+      & & & & \\
+      \cline{1-2} \cline{4-5} 
+    \end{tabular}
+  \end{center}
+  
+  \note{In class, I write another table:
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabular}{| l | l |}
+  \hline
+  $ y = (\text{mess})^n $ & $ y' = n(\text{mess})^{n-1} (\text{mess})' $ \\
+  $ y = e^\text{mess} $ & $ y' = e^\text{mess} (\text{mess})' $\\
+  $ y = \ln(\text{mess}) $ & $ y' = \dfrac{1}{\text{mess}}(\text{mess})' $ \\
+  \hline
+  \end{tabular} and then I comment that I always try to use log rules
+  to simplify the mess because making extra work for oneself is NOT a virtue! For example, $\ln(x^3/(2x+7))$ could be done using the chain rule and quotient rule, but it's so much simpler to write this as $3\ln x - \ln(2x+7)$ and then go about differentiating.}
+
+\item 
+  \note{It's worthwhile to discuss efficiency and flexibility here.  For
+    instance, students may want to decompose (b) as $f(g(t))$ with $f(t) =
+    12e^t - e^2$ and $g(t) = t^3$; this works, but it might be simpler to
+    first think about the fact that we have a difference, and that it's
+    easy to take the derivative of the second piece of that difference. If
+    you haven't done so already, this is a natural place to start having
+    students work on problems at the board.}
+
+  Differentiate each of the following functions. Try to be energy-efficient.
+  Don't operate on automatic pilot.
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      $h(x) = \ln (7x^2 + 3)$
+    \end{problem}
+
+    \begin{solution}
+      We can decompose $h(x)$ as $f(g(x))$ with $g(x) = 7x^2 + 3$ and
+      $f(x) = \ln x$.  Then, $g'(x) = 14 x$ and $f'(x) = \frac{1}{x}$, so
+      $h'(x) = f'(g(x)) g'(x) = f'(7x^2 + 3) g'(x) = \boxed{\frac{1}{7x^2
+          + 3} \cdot 14x}$ by the Chain Rule. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $q(t) = e^{t^3} - 12 e^2 t$
+    \end{problem}
+
+    \begin{solution}
+      We can decompose $e^{t^3}$ as $f(g(t))$ with $g(t) = t^3$ and $f(t)
+      = e^t$.  Then, the Chain Rule says that $\frac{d}{dt} \left(e^{t^3}
+      \right) = f'(g(t)) g'(t) = e^{t^3} \cdot 3t^2$, so $q'(t) =
+      \boxed{3t^2 e^{t^3} - 12 e^2}$.
+
+      Instead of writing out functions $f(t)$ and $g(t)$, we'll often
+      write that we're going to use the Chain Rule simply by putting a red
+      box around where we're going to use the Chain Rule ($e^{t^3}$ in
+      this case) and then putting a blue box around the inner function
+      $g(t)$: 
+      \begin{align*}
+        q'(t) &= \frac{d}{dt} \left(\fcolorbox{red}{white}{$\displaystyle
+            e^ { \fcolorbox{blue}{white}{$\displaystyle t^ { 3} $}}
+            $} - 12 e^2 t \right) \\ 
+        &= e^ { t^ { 3} } \cdot 3 t^ { 2} -12 e^2
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      $h(x) = \pi^3 (7x + 3)^{10}$
+    \end{problem}
+
+    \begin{solution}
+      Since $\pi^3$ is a constant,
+      \begin{align*}
+        h'(x) = {} & \pi ^3\cdot \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle \fcolorbox{blue}{white}{$\displaystyle  \left(7 x+ 3\right)$}^ { 10} $}\right) \\
+        = {} & \pi ^3\cdot 10 \left(7 x+ 3\right)^ { 9} \cdot 7
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{0.5}]
+      $y = \displaystyle \frac{\sqrt{x^2 + 1}}{\pi}$.
+    \end{problem}
+
+    \begin{solution}
+      We can rewrite $y$ as $\frac{1}{\pi} \sqrt{x^2 + 1}$; since
+      $\frac{1}{\pi}$ is a constant,
+      \begin{align*}
+        y' = {} \frac{1}{\pi} \frac{d}{dx}
+        \left(\fcolorbox{red}{white}{$\displaystyle
+            \fcolorbox{blue}{white}{$\displaystyle  \left(x^2 + 1
+              \right)$}^ { \frac{1}{2}} $}\right) = {} & \frac{1}{\pi} \cdot
+        \frac{1}{2}
+        \left(x^2 + 1 \right)^ { -\frac{1}{2}} \cdot
+        \frac{d}{dx}\left(x^2 + 1 \right) \\ 
+        = {} & \frac{1}{2\pi} \left(x^2 + 1 \right)^ { -\frac{1}{2}}
+        \left(2x \right) 
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $f(t) = \displaystyle \frac{5}{\sqrt[3]{1 + e^t}}$.  (Can you
+      rewrite this so that you don't need to use the Quotient Rule?)
+    \end{problem}
+
+    \begin{solution}
+      This can be rewritten as $f(t) = 5 (1 + e^t)^{-1/3}$.  Since $5$ is
+      a constant, 
+      \begin{align*}
+        f'(t) = {} & 5\cdot \frac{d}{dt} \left(\fcolorbox{red}{white}{$\displaystyle \fcolorbox{blue}{white}{$\displaystyle  \left(1+ e^ { t} \right)$}^ { -\frac{1}{3}} $}\right) \\
+        = {} & 5 \left(-\frac{1}{3} \left(1+ e^ { t} \right)^ { -\frac{4}{3}} \cdot \frac{d}{dt}\left(1+ e^ { t} \right)\right) \\
+        = {} & -\frac{5}{3} \left(1+ e^ { t} \right)^ { -\frac{4}{3}}
+        \cdot e^ { t} 
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $h(x) = e^{x^2} \cdot \ln (7x^2 + 3)$
+    \end{problem}
+
+    \begin{solution}
+      Here, the first rule we need is the Product Rule, because $h(x)$ is
+      the product of $e^{x^2}$ and $\ln(7x^2 + 3)$; we'll show this in
+      green by boxing $e^{x^2}$ and $\ln(7x^2 + 3)$ separately:
+      \begin{align*}
+        h'(x) = {} & \frac{d}{dx} \left(\fcolorbox{green}{white}{$\displaystyle  e^ { x^ { 2} } $}\cdot \fcolorbox{green}{white}{$\displaystyle  \ln\left(7 x^ { 2} + 3\right)$}\right) \\
+        = {} & e^ { x^ { 2} } \cdot \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle \ln\left(\fcolorbox{blue}{white}{$\displaystyle 7 x^ { 2} + 3$}\right)$}\right)+ \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle e^ { \fcolorbox{blue}{white}{$\displaystyle x^ { 2} $}} $}\right)\cdot \ln\left(7 x^ { 2} + 3\right) \\
+        = {} & e^ { x^ { 2} } \cdot \frac{1}{7 x^ { 2} + 3}\cdot 14 x+ e^
+        { x^ { 2} } \cdot 2 x \cdot \ln\left(7 x^ { 2} + 3\right)
+      \end{align*}
+    \end{solution}
+
+  \item
+    \note{Preparation for logarithmic differentiation.}
+
+    \begin{problem}[\vfill\newpage]
+      $\displaystyle f(x) = \ln\left( \frac{x^2}{(x-2)(3x+5)}
+      \right)$.  (This will be \textit{much} easier if you rewrite $f(x)$
+      {before} differentiating.)
+    \end{problem}
+
+    \begin{solution}
+      We can first use log rules to rewrite $f(x)$:
+      \begin{align*}
+        f(x) &= \ln x^2 - \ln [(x - 2) (3x + 5)] \\
+        &= 2 \ln x - \left[ \ln(x - 2) + \ln (3x + 5)
+        \right] \\
+        &= 2 \ln x - \ln(x - 2) - \ln (3x + 5)
+      \end{align*}
+      Now let's differentiate, using the Chain Rule:
+      \begin{align*}
+        f'(x) = {} & 2 \cdot \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle \ln\left(\fcolorbox{blue}{white}{$\displaystyle x$}\right)$}\right)-\frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle \ln\left(\fcolorbox{blue}{white}{$\displaystyle x-2$}\right)$}\right)-\frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle \ln\left(\fcolorbox{blue}{white}{$\displaystyle 3x+ 5$}\right)$}\right) \\
+        = {} & 2\cdot \frac{1}{x}\cdot 1-\frac{1}{x-2}\cdot 1-\frac{1}{3x+ 5}\cdot 3
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{2}]
+      $j(x) = [\ln (7x^2 + 3)]^5$
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        j'(x) = {} & \frac{d}{dx}
+        \left(\fcolorbox{red}{white}{$\displaystyle
+            \fcolorbox{blue}{white}{$\displaystyle \ln\left(7 x^ { 2} +
+                3\right)$}^ { 5} $}\right) \\
+        = {} & 5 \left[ \ln\left(7 x^ { 2} + 3\right) \right]^ { 4} \cdot
+        \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle
+            \ln\left(\fcolorbox{blue}{white}{$\displaystyle 7 x^ { 2} +
+                3$}\right)$}\right) \\
+        = {} & 5 \left[ \ln\left(7 x^ { 2} + 3\right) \right]^ { 4}
+        \left(\frac{1}{7 x^ { 
+              2} + 3}\cdot 14 x\right)
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+  \begin{enumerate}
+  \item 
+    \begin{problem}[\stretch{2}]
+      How does the graph of $\ln(x + 5)$ relate to the graph of $\ln x$?
+      Use the Chain Rule to differentiate $\ln (x + 5)$.  Is your answer
+      consistent with the graph and what you know about the derivative of
+      $\ln x$?
+    \end{problem}
+
+    \begin{solution}
+      The graph of $\ln(x + 5)$ is simply the graph of $\ln x$ shifted 5
+      units to the left.  Graphically, this means that the derivative of
+      $\ln(x + 
+      5)$ should be the derivative of $\ln x$ shifted left by 5.  That is,
+      it should be $\frac{1}{x}$ shifted left by $5$, which has the
+      formula $\frac{1}{x + 5}$. 
+
+      Let's check.  By the Chain Rule,
+      \[ \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle
+          \ln\left(\fcolorbox{blue}{white}{$\displaystyle x+
+              5$}\right)$}\right) = \frac{1}{x+ 5}\cdot 1 = \frac{1}{x +
+        5},\]
+      as we expected.        
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      More generally, if $c$ is a constant, how does the graph of $f(x +
+      c)$ relate to the graph of $f(x)$?  What does the Chain Rule tell
+      you about the derivative of $f(x + c)$?
+    \end{problem}
+
+    \begin{solution}
+      More generally, 
+      the graph of $f(x + c)$ is simply the graph of $f(x)$ shifted $c$
+      units to the left, so we expect the derivative of $f(x + c)$ (which
+      we write as $\frac{d}{dx} f(x + c)$) to be $f'(x)$ shifted $c$ units
+      to the left, or $f'(x + c)$. 
+
+      By the Chain Rule,     
+      \[ \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle
+          f\left(\fcolorbox{blue}{white}{$\displaystyle x+
+              c$}\right)$}\right) = f'\left(x+ c\right)\cdot 1 = f'(x +
+      c),\] as we expected. 
+    \end{solution}    
+
+  \end{enumerate}
+
+\end{enumerate}
+
+
+\end{document}

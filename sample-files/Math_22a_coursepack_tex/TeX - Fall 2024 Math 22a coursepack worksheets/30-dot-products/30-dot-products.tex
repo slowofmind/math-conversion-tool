@@ -1,0 +1,194 @@
+\documentclass[12pt,letterpaper]{article}
+
+
+
+\input{../worksheet-setup.tex}
+\usetikzlibrary{arrows}
+\usepackage{wrapfig}
+\usepackage{amsfonts,amsmath}
+
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+	\hskip -\arraycolsep
+	\let\@ifnextchar\new@ifnextchar
+	\array{#1}}
+\makeatother
+
+\def\env@matrix{\hskip -\arraycolsep
+	\let\@ifnextchar\new@ifnextchar
+	\array{*\c@MaxMatrixCols c}}
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\chead{\Large\textbf{Dot Product and Geometry, $\vec\S$6.1, 6.2}}% 
+
+\begin{document}
+\thispagestyle{fancy}
+
+Recall from last class:
+
+\begin{itemize}
+\item If $A$ is an $n \times n$ matrix, then $\lambda \in \mathbb{R}$ is an {\bf eigenvalue} of $A$ if there exists a non-zero vector $v$, called an {\bf eigenvector} corresponding to $\lambda$, such that $$Av=\lambda v.$$
+\item If $\lambda$ is an eigenvalue of an $n \times n$ matrix $A$, then the set of all solutions $v$ to $Av = \lambda v$ is the {\bf eigenspace} of $A$ corresponding to $\lambda$.
+\item {\bf Theorem 1:} The eigenvalues of a triangular matrix are the diagonal entries.
+\item {\bf Theorem 2:} If $v_1, \dots, v_p$ are eigenvectors corresponding to distinct eigenvalues $\lambda_1, \dots, \lambda_p$ of an $n\times n$ matrix $A$, then $v_1, \dots, v_p$ are linearly independent.
+\item If $A$ is an $n\times n$ matrix, then the characteristic polynomial of $A$, denoted by $p_A(\lambda)$, is given by $$p_A(\lambda)=\text{det}(A-\lambda I_n).$$
+\item $\lambda$ is an eigenvalue of an $n\times n$ matrix $A$ if and only if $\lambda$ is a zero of the characteristic polynomial.
+\item If $A$ and $B$ are similar matrices, then they have the same characteristic polynomials and hence the same eigenvalues (with the same algebraic multiplicities). 
+\item An $n\times n$ matrix $A$ is {\bf diagonalizable} if $A$ is similar to a diagonal matrix.
+\item {\bf Diagonalization Theorem:} An $n \times n$ matrix $A$ is diagonalizable if and only if $A$ has $n$ linearly independent eigenvectors. Moreover, $A=PDP^{-1}$ with $D$ diagonal if and only if the columns of $P$ are $n$ linearly independent eigenvectors of $A$. In this case the diagonal entires of $D$ are the corresponding eigenvalues of $A$.
+\item {\bf Theorem 6:} An $n \times n$ matrix $A$ with $n$ distinct eigenvalues is diagonalizable.
+\item 
+{\bf Theorem 7:} Let $A$ be an $n\times n$ matrix with distinct eigenvalues $\lambda_1, \dots, \lambda_p$.
+\begin{enumerate}
+\item For $1\leq k \leq p$, the dimension of the eigenspace of $\lambda_k$ is at most the algebraic multiplicity of the eigenvalue $\lambda_k$.
+\item The matrix $A$ is diagonalizable if and only if the sum of the dimensions of the eigenspaces is $n$ if and only if the characteristic polynomial factors into linear factors and the dimension for each eigenspace is exactly the algebraic multiplicity.
+\item If $A$ is diagonalizable and $\mathcal{B}_k$ is a basis for the eigenspace corresponding to $\lambda_k$, then $\mathcal{B}_1, \dots, \mathcal{B}_p$ is an eigenbasis for $\mathbb{R}^n$.
+\end{enumerate}
+\end{itemize}
+
+\newpage
+
+\begin{defn} Let $u, v \in \mathbb{R}^n$, then the {\bf dot product} of $u$ and $v$ is given by $$u \cdot v= u^{T}v=u_1 v_1+\dots+ u_n v_n.$$
+\end{defn}
+
+{\bf Theorem 6.1:} Let $u, v, w \in \mathbb{R}^n$ and $c\in \mathbb{R}$.
+\begin{enumerate}
+\item $$ u \cdot v = v \cdot u.$$
+\item $$(u+v)\cdot w= u \cdot w+ v \cdot w.$$
+\item $$(cu)\cdot v = c(u\cdot v)= u \cdot (cv).$$
+\item $u \cdot u \geq 0$ and $u \cdot u =0$ if and only if $u=0$.
+\end{enumerate}
+
+\begin{defn} The {\bf length} or {\bf norm} of the vector $v$ is a non-negative scalar, denoted by $\norm{v}$, and defined by $$\norm{v}= \sqrt{v\cdot v}.$$
+\end{defn}
+
+\begin{defn} We define the {\bf distance} between $u$ and $v$ by $$\text{dist}(u,v)=\norm{u-v}.$$
+\end{defn}
+
+\begin{defn} The vectors $u$ and $v$ are {\bf orthogonal} if $u\cdot v=0$.
+\end{defn}
+
+{\bf Theorem 6.2:} The vectors $u$ and $v$ are orthongal if and only if $$\norm{u}^2+\norm{v}^2=\norm{u+v}^2.$$
+
+\begin{enumerate}
+
+\Problem Prove the Theorem.
+
+\vfill
+
+\begin{defn} The set $$W^{\perp} =\{ z \in \mathbb{R}^n: z \cdot w=0 \text{ for all } w \in W\}$$ is called the {\bf orthogonal complement} of $W$.
+\end{defn}
+
+\newpage
+
+{\bf Note:} $x \in W^{\perp}$ if and only if $x$ is orthogonal to each vector in a set that spans $W$. Also $W^{\perp}$ is a subspace of $\mathbb{R}^n$.
+
+\vfill
+
+{\bf Theorem 6.3} Let $A$ be an $m\times n$ matrix, then $$(\text{Row}(A))^{\perp} = \text{Null}(A) \text{ and } (\text{Col}(A))^{\perp}= \text{Null}(A^{T}).$$
+
+\Problem Prove the Theorem.
+
+\vfill
+
+{\bf Cauchy-Schwarz Inequality:} For all ${\bf x}, {\bf y} \in {\mathbb R}^n$ we have
+$$ |{\bf x} \cdot {\bf y}| \le \|{\bf x}\| \ \|{\bf y}\|. $$
+
+\item Prove Cauchy-Schwarz.
+
+\vfill
+
+{\bf Note:} We can use the dot product to find the angles between vectors; namely $$u\cdot v = \norm{u} \norm{v} \cos \theta.$$
+
+{\bf Triangle Inequality:} For all ${\bf x}, {\bf y} \in {\mathbb R}^n$  we have $\|{\bf x}+{\bf y}\| \le \|{\bf x}\| + \|{\bf y} \| $.
+
+\item Prove the triangle inequality.
+
+\vfill
+
+\newpage
+
+\begin{defn}
+	A set of vectors $\{ u_1, \dots, u_p\}$ in $\mathbb{R}^n$ is {\bf orthogonal} if $u_k \cdot u_j=0$ for all $j\neq k$.
+\end{defn}
+
+{\bf Theorem 6.4:} If $S=\{ u_1, \dots, u_p\}$ is an orthogonal set of non-zero vectors in $\mathbb{R}^n$, then $S$ is linearly independent and hence a basis for $\text{Span} \; S$.
+
+\Problem Prove the Theorem.
+
+\vfill
+
+\begin{defn} An {\bf orthogonal basis} for a subspace $W$ of $\mathbb{R}^n$ is a basis for $W$ that is also an orthogonal set.
+\end{defn}
+
+
+{\bf Theorem 6.5:} Let $\{u_1, \dots,u_p\}$ be an orthogonal basis for a subspace $W$ of $\mathbb{R}^n$. For each $y\in W$, then $$y=c_1 u_1+\dots+c_p u_p$$ where $$c_j=\frac{y\cdot u_j}{u_j \cdot u_j}.$$
+
+\Problem Prove the Theorem.
+
+\vfill
+
+\Problem Let $u_1=\begin{bmatrix} 2\\ -3\\ \end{bmatrix}$ and $u_2= \begin{bmatrix} 6\\4\\ \end{bmatrix}$ and $x=\begin{bmatrix} 9\\ -7\\ \end{bmatrix}$. Find $x$ in the $\{u_1, u_2\}$-coordinates.
+
+
+
+\vfill
+
+
+\newpage
+
+
+
+
+\end{enumerate}
+
+\begin{comment}
+\newpage
+\chead{\Large\textbf{Dot Product -- Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+\Answer 
+
+\begin{proof}
+	Let $u, v \in \mathbb{R}^n$, then $$\norm{u+v}^2 =(u+v)\cdot (u+v)=u \cdot u +2 u \cdot v + v \cdot v =\norm{u}^2 +2 u\cdot v+ \norm{v}^2.$$ Thus $\norm{u+v}^2=\norm{u}^2+\norm{v}^2$ if and only if $u \cdot v =0$, which is equivalent to $u$ and $v$ are orthogonal.
+\end{proof}
+
+\Answer
+\begin{proof}
+	We first prove $(\text{Row}(A))^{\perp} = \text{Null}(A)$. Let $x \in (\text{Row}(A))^{\perp}$ and let $a_1, \dots, a_n$ be the rows of $A$. Since $x \in (\text{Row}(A))^{\perp}$, we know that $x \cdot a_k$ for all $1 \leq k \leq p$. Now we check if $x$ is in the null space of $A$: $$Ax = \begin{bmatrix} a_1 \cdot x\\ \vdots\\ a_n \cdot x\\ \end{bmatrix} =0.$$ Thus $x \in \text{Null}(A)$.
+	
+	Suppose $x \in \text{Null}(A)$, then $$0=Ax = \begin{bmatrix} a_1 \cdot x\\ \vdots\\ a_n \cdot x\\ \end{bmatrix}.$$ Thus $a_k \cdot x$ =0 for all $1\leq k \leq n$. Since $a_1, \dots, a_n$ is a spanning set for the row space of $A$, we know that $x$ is orhogonal to all of the row space. Thus $x \in \text{Row}(A)^\perp$.
+	
+	Now we prove $(\text{Col}(A))^{\perp}= \text{Null}(A^{T})$. Recall $\text{Col}(A)=\text{Row}(A^{T})$, and hence by the first part of the theorem, we get $$(\text{Col}(A))^{\perp}=(\text{Row}(A^{T}))^{\perp}= \text{Null}(A^{T}).$$
+\end{proof}
+\Answer For any scalar $t$ and any ${\bf x}, {\bf y}$ we have
+$$ 0 \le \|{\bf x} + t {\bf y}\|^2 = \|{\bf x}\|^2 + 2 t {\bf x} \cdot {\bf y} + t^2 \|{\bf y}\|^2. \eqno (55) $$
+The idea is to choose $t$ so as to minimize the expression on the right-hand side of (55).
+Call the right-hand side $\phi(t)$. It is a quadratic polynomial in $t$, and it has its minimum when
+$\phi'(t) = 0$. The corresponding value is when
+$$ t = {- {\bf x} \cdot {\bf y} \over \|{\bf y}\|^2} .$$
+Plugging in this value of $t$ and simplifying gives the Cauchy-Schwarz inequality. 
+\Answer Since both sides of the inequality are non-negative, it holds if and only if it holds after squaring both sides. Doing so and cancelling terms
+shows that it follows from Cauchy-Schwarz. 
+\Answer
+\begin{proof}
+Suppose $c_1 u_1+\dots+	c_p u_p=0$. Taking the dot product with $u_k$, we get $$c_1 u_1 \cdot u_k + \dots +c_p u_p\cdot u_k=0,$$ and using orthogonality of $u_1, \dots, u_p$, we get $c_k u_k \cdot u_k=0$. Now since $u_k$ is non-zero, we get $c_k=0$. Thus $c_k=0$ for all $1\leq k \leq p$, and hence $u_1, \dots, u_p$ are linearly independent.
+\end{proof}
+\Answer
+\begin{proof} Suppose $y= c_1 u_1+\dots c_pu_p$. Now take the dot product of both sides with $u_k$ to get $$y\cdot u_k = (c_1 u_1+\dots +c_p u_p)\cdot u_k.$$ Using the orthogonality of $u_1, \dots, u_p$, we can simplify the right hand side to get $$y \cdot u_k= c_k u_k \cdot u_k.$$ Therefore $$c_k=\frac{y \cdot u_k}{u_k\cdot u_k}.$$
+\end{proof}
+\Answer In order to find $x$ in the $u_1, u_2$ coordinates, we need to find scalars $c_1, c_2$ such that $$x=c_1 u_1+ c_2 u_2.$$ Notice that $u_1\cdot u_2=0$, and hence we can use the previous theorem to conclude $$c_1=\frac{x\cdot u_1}{u_1\cdot u_1}= \frac{39}{13}=3,$$ and $$c_2=\frac{x\cdot u_2}{u_2\cdot u_2}= \frac{26}{52}=\frac{1}{2}.$$ Thus $[x]_{\{u_1,u_1\}}=\begin{bmatrix} 3\\ \frac{1}{2}\\ \end{bmatrix}$.
+\end{enumerate}  
+
+\end{comment}
+\end{document}
+
+
+%%% Local ables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

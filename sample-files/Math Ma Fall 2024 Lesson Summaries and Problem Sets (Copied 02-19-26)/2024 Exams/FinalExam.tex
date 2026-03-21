@@ -1,0 +1,493 @@
+\documentclass{article}
+
+\textwidth=7in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=-.21in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{mathtools, amssymb}
+\usepackage{ifthen}
+\usepackage{multicol}
+\usepackage{tabularx}
+
+\renewcommand{\arraystretch}{1.5}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt}
+\usepackage{tzplot}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=blue,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+
+\usepackage{graphicx}
+\usepackage{svg}
+
+\graphicspath{ {./images/} }
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+\usepackage{icomma}
+\usepackage{diffcoeff}
+\usepackage[per-mode=symbol]{siunitx}
+
+\usepackage{pgfplots}
+\usepackage{tikz}
+    \usetikzlibrary{ % enables the snake paths
+      decorations.pathmorphing,%
+      % enables bigger arrows
+      decorations.markings,%
+      decorations.pathreplacing,%
+      decorations.text,%
+      calc,%
+      patterns,%
+      shapes.geometric,%
+      arrows,
+      decorations.shapes,
+      positioning,
+      plotmarks, angles, quotes,
+      pgfplots.groupplots}
+
+\pgfplotscreateplotcyclelist{mycolor}{%
+  black, blue, red, green!70!black,magenta,
+  purple, cyan, orange
+}
+\pgfplotsset{
+  cycle list name=mycolor,
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },
+  tick label style = {font=\footnotesize, fill=white, inner sep=0pt},
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=300,
+  minor tick length=0,
+  grid style = {dotted,black},
+  scatter/classes={
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  holdot/.style={color=black,fill=white,only marks,mark=*},
+  soldot/.style={color=black,fill=black,only marks,mark=*},
+  rholdot/.style={color=red,fill=white,only marks,mark=*},
+  rsoldot/.style={color=red,fill=black,only marks,mark=*},
+  compat=1.13
+}
+
+\usepackage{pifont}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\usepackage{tcolorbox}
+\newenvironment{feedback}{%
+  \begin{tcolorbox}[colframe=skyblue, colback=skyblue!10!white]
+  }{\end{tcolorbox}}
+
+\usepackage{soul}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\newlength{\tipmargin}
+\makeatletter
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+\def\exend{\hfill\ding{118}}
+\@ifundefined{Example}{}{}
+\renewenvironment{Example}
+{\refstepcounter{equation}\normalfont\normalsize\textbf{Example \theequation.}}
+{\exend}
+\renewcommand{\theequation}{\arabic{equation}}
+
+\renewenvironment{framed}{
+  \setlength{\tipmargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\tipmargin
+  \def\FrameCommand{\hspace{\tipmargin}\fbox}%
+  \advance\linewidth\tipmargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+}
+{\endMakeFramed}
+
+\makeatother
+
+
+
+\begin{document}
+
+
+\noindent
+{\large \mbox{} \hfill \bf Name:\underline{\hspace{3in}}}\\
+
+{\large \mbox{} \hfill \bf HUID:\underline{\hspace{3in}}}\\
+{\mbox{} \hfill \it (Please write your name neatly in print.)}\\
+
+
+ 
+\medskip
+ 
+\noindent
+{\large\bf
+Final Exam \\ Math Ma/Ma5 - Fall 2024}
+\noindent
+
+
+{\Large
+\begin{center}\textbf{Directions---Please read carefully!} \end{center}}
+
+
+
+
+This assessment is subject to the Harvard College Honor Code. No calculators or any other aids are permitted on this exam.  Please write as neatly as possible, as answers that can't be read can't be graded and thus can't receive credit. {\bf To receive full credit, you must show relevant working
+and include units when appropriate.} You have 180 minutes to complete this exam.   \\
+
+There are some back pages of scratch paper. You may ask for additional scratch paper if you would like to have some extra space to work on the problems, but we will not consider the scratch papers as part of your submission. Only this packet will be scanned and graded, so make sure to include all relevant work in the space provided for each question. 
+
+\begin{center}\textbf{Good luck! -- the Ma/Ma5 Team}\end{center}
+
+
+
+
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+      \textbf{Problem Number}   & \textbf{Points}  \\
+             \hline \hline
+                Problem 1   &   \\
+            \hline
+                 Problem 2 &   \\
+        \hline 
+                Problem 3 &   \\
+        \hline 
+                Problem 4 &   \\
+        \hline 
+                Problem 5 &   \\
+        \hline 
+         Problem 6 &   \\
+        \hline 
+         Problem 7 &   \\
+        \hline 
+        Problem 8 &   \\
+        \hline
+               
+               
+         \textbf{Total} &   \\
+         \hline 
+    \end{tabular}\\
+\vspace{0.5in}
+\emph{As a member of Harvard College, I pledge that I will not give or receive assistance on this exam.}\\
+\vspace{0.5in}{\large \mbox{} \hfill \bf Signature:\underline{\hspace{3in}}}\\
+
+\newpage
+
+\begin{enumerate}
+     \item The chemical hydrogen peroxide is used as a cleaning agent. Over time, it decomposes into water and oxygen, diluting its strength. At the start of her lab, Sophie is working with a high-strength solution of hydrogen peroxide, whose concentration is  30 parts per hundred (pph) hydrogen peroxide and 70 parts per hundred (pph) water. 
+    
+   {\bf  Sophie determines that the rate at which the concentration of hydrogen peroxide decreases is proportional to the concentration remaining in the solution.} 
+    
+    \begin{enumerate}
+        \item The decomposition of hydrogen peroxide is best reflected by which of the following models? (Circle one.) 
+\begin{multicols}{2}
+        \begin{enumerate}
+    
+            \item Linear growth
+            \item Linear decrease
+            \item Exponential growth
+            \item Exponential decay
+        \end{enumerate}
+        \end{multicols}
+    \item Describe the graph of the function $C(t)$, the solution's concentration of hydrogen peroxide in parts per hundred as a function of $t$, the time since the start of Sophie's lab, measured in minutes. Your graph should reflect the model you choose in (a), and the initial concentration of hydrogen peroxide. Please label your axes and include units.\\
+    
+    %\begin{tikzpicture}
+  %\tzaxes(-1,-1)(5,4)
+
+%\end{tikzpicture}\\
+
+    \item At the start of Sophie's lab ($t=0$), the concentration of hydrogen peroxide is decreasing at a rate of 3 pph every minute. Describe how to visualize this information on the graph from part (b).
+  
+        
+    
+    \item   \begin{problem}[\vfill]Using this rate of change, approximate the concentration of hydrogen peroxide two minutes after the start of Sophie's lab. Include units and describe where you would see your approximation on your graph in part (b).
+    \end{problem}
+    \item \begin{problem}[\vfill] Is your approximation in part (d) an overestimate or underestimate? Explain how you determined this in 1-2 sentences.\end{problem}
+        \newpage
+        \item \begin{problem}[\vfill]Would the concentration's average rate of change over the first two minutes of the lab be greater than or less than the concentration's rate of change at the start of the lab? Explain in 1-2 sentences.\end{problem}
+        \item Here, again, is the information we know about Sophie's hydrogen peroxide solution:
+        \begin{itemize}
+            \item The hydrogen peroxide concentration is decreasing at a rate proportional to the remaining concentration.
+            \item At the start of lab, the solution's hydrogen peroxide concentration was 30 pph.
+            \item At the start of lab, the concentration was decreasing at a rate of 3 pph every minute.
+        \end{itemize}
+        Given this, which of the following could be a possible formula for $C(t)$, the concentration of hydrogen peroxide as a function of time $t$ in minutes. (Circle one.)
+        \begin{multicols}{2}
+        \begin{enumerate}
+            \item $\displaystyle C(t) = 30e^{3t}$
+            \item $\displaystyle C(t) = 30e^{-3t}$
+            \item $\displaystyle C(t) = 30e^{-t/10}$
+            \item $\displaystyle C(t) = 30-3t$
+            \item $\displaystyle C(t) = 30+ 3t$
+            \item $\displaystyle C(t) = 30-\frac{1}{10} t$
+        \end{enumerate}
+        \end{multicols}
+         \item \begin{problem}[\vfill]Considering your chosen formula and what is known about the scenario: When, if ever, will the concentration of hydrogen peroxide reach 10 pph? Include units. Give an exact answer or explain why the concentration will never reach 10 pph. 
+        \end{problem}
+        \item \begin{problem}[\vfill] Considering your chosen formula and what is known about the scenario: When, if ever, will the concentration of hydrogen peroxide reach 0 pph? Include units. Give an exact answer or explain why the concentration will never reach 0 pph.
+        \end{problem}
+\newpage
+        \item \begin{problem}
+        Is $C$ invertible? In 1 sentence, explain how you know.
+        \end{problem}
+        \vspace{1.5in}
+        \item If you answered that $C$ was invertible, explain in 1 sentence what $C^{-1}$ represents. If you answered that $C$ was not invertible, give the restricted domain on which $C$ is invertible.
+        \vspace{1.5in}
+    \end{enumerate}
+   \item Annie is building an ice rink in her backyard. Its shape is a rectangle capped on either end by a semicircle. She plans to use exactly $40\pi$ feet of siding to line the perimeter of the rink. Each of the straight, rectangular sides must be at least $2\pi$ feet to make space for an entrance. Annie wants to maximize the area of her rink; what dimensions should she make it?\\
+
+ For full credit on this problem, please show your work fully and make sure to highlight the following:
+
+  \begin{itemize}[nosep]
+  \item State your goal (like ``Minimize cost'').
+  \item Using a diagram, clearly define your variables.
+  \item Communicate your thought process, one step at a time. Write down how you find the global extrema, and \textbf{justify that it is global extrema and not just a local max/min}. 
+  \item Be sure to answer the original question, asking for the dimensions of the rink: radius and length!
+  \end{itemize}
+  \emph{There is a blank sheet for your work on the next page.}
+
+
+\newpage 
+ 
+ \emph{This space left blank for work on 2.}
+
+ 
+     
+    \newpage
+     
+    \newpage
+
+  \item  The parts of this question are not related.
+    \begin{enumerate}
+        \item The graph of a polynomial function $p(x)$ is below. \\
+        
+          \begin{tikzpicture}
+      \begin{axis}[xmin=-2, xmax=5, ymin=-30, ymax=20, ytick=\empty , grid=both, y label style={rotate=-90},
+      xtick=\empty, xlabel=$x$, ylabel=$y$,  minor tick num=1,
+      ]
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -2:6, color = black]{-1/2*(x+1)^2*(x-1)*(x-3)^2*(x-4)};
+    
+    \end{axis}
+        \end{tikzpicture}\\
+        
+        Which of the following could be the degree of $p(x)$? (Circle one.) In 1-2 sentences, explain your choice.
+        \begin{multicols}{4}
+        \begin{enumerate}
+            \item 4
+            \item 5
+            \item 6
+            \item 7
+        \end{enumerate}
+        
+        \end{multicols}
+        \vspace{0.75in}
+        \item Consider the polynomial $g(x)=2x^3-9x^2+1$. Determine whether it achieves any global extrema on the interval $[0,\,4]$, where they happen, and what those global maximum and minimum values are (this means both $x$- and $y$-values). Show your work clearly so the reader can follow.
+        
+        \vfill
+        \newpage
+        \emph{Additional space for (b)}
+        \vspace{2in}
+        \
+        \item Let $f(x)=\log_2(x-2)+5$. Find the formula for $f'(x)$.
+        \vfill
+        \item Compute $\displaystyle \lim_{x\to\infty}\frac{\ln x + x^2}{x^3}$. Make sure to support your reasoning by clearly showing your work.
+        \vfill
+    \end{enumerate}
+   
+\newpage
+
+ \item In each part, decide whether there is a polynomial with the specified properties. If so, give the equation
+of an example and explain briefly how you know it has the specified properties. If there is no such
+polynomial, explain why.
+\begin{enumerate}
+   \item \begin{problem}[\vfill] A degree $4$ polynomial with no critical points.
+   \end{problem}
+    \item \begin{problem}[\vfill]A degree $4$ polynomial which is concave up on all of $(-\infty, \infty)$.
+    \end{problem}
+    \item \begin{problem}[\vfill]A degree $4$ polynomial with $3$ $x$-intercepts.
+    \end{problem}
+    \item \begin{problem}[\vfill]A degree $4$ polynomial that is invertible.
+    \end{problem}
+    
+\end{enumerate}
+\newpage
+
+ \item Giant sequoia trees observe some of the most unique growth patterns found in nature. 
+  \begin{enumerate}
+        
+   \item Let $h(t)$ be a function that represents a sequoia tree's height in inches after t years from today. In 1 sentence, interpret the following value in the context of the problem: $h'(0)=16$
+        \vfill
+        \item Justin says sequoia trees' height exhibits exponential growth. Fill in the missing value to support Justin's hypothesis. 
+        \begin{center}
+            \begin{tabular}{ |c|c| } 
+                \hline
+                $t$ & $h'(t)$ \\ 
+                0 & 16 \\ 
+                1 & 20 \\ 
+                2 &  \\ 
+                \hline
+            \end{tabular}
+        \end{center}
+        \item Sarah says sequoia trees' height exhibits linear growth. Fill in the missing values to support Sarah's hypothesis: 
+         \begin{center}
+            \begin{tabular}{ |c|c| } 
+                \hline
+                $t$ & $h'(t)$ \\ 
+                0 & 16 \\ 
+                1 &  \\ 
+                2 &  \\ 
+                \hline
+            \end{tabular}
+        \end{center}
+    \item According to California's State Parks website, ``...the giant sequoia is more likely to grow about two feet in height per year throughout its first fifty to one hundred years." Whose model is more appropriate for the situation: Justin's exponential model or Sarah's linear model? Support your decision in 1-2 sentences.
+    \vfill 
+    
+    \end{enumerate}
+\newpage
+
+    \item Let $f(x)=\dfrac{e^x}{x^3}$.
+    \begin{enumerate}
+        \item \begin{problem}What is the domain of $f$? Express your answer using interval notation.
+        \end{problem}
+        \vspace{1in}
+        \item \begin{problem}[\vfill]Find and classify all discontinuities of $f$. That is, say whether each discontinuity is a removable discontinuity, jump discontinuity, or vertical asymptote. Please justify your answer completely, calculating all relevant limits. If a limit doesn’t exist, calculate both one-sided limits.
+        \end{problem}
+        \item \begin{problem}Evaluate $\displaystyle\lim_{x\to \infty}f(x)$. 
+        \vspace{1in}
+        \end{problem}
+        \newpage
+        \item \begin{problem}Evaluate $\displaystyle\lim_{x\to -\infty}f(x)$. 
+        \end{problem}
+        \vspace{1in}
+        \item \begin{problem}[\vfill]Find and classify the critical points of $f(x)$.
+        \end{problem}
+        \item Use your work in parts (a)-(e) to describe a plausible graph of a $f$ on the axes below. Please include any asymptotes and extrema you found earlier in the problem.\\
+      % \begin{center} \begin{tikzpicture}
+ % \tzaxes(-6,-4)(6,4)
+
+%\end{tikzpicture}\\
+%\end{center}
+    \end{enumerate} 
+\newpage
+ 
+\item For this problem, you will be working with a logarithmic function. 
+
+    \begin{enumerate}
+        \item Use the concept of graph transformations to describe the graph of $f(x)=\log_2(x-2)+5$ from its parent function. Describe the transformations needed and determine all intercepts and asymptotes.\\
+        \begin{center}
+            
+        
+       % \begin{tikzpicture}
+ % \tzaxes(-5,-3)(5,3)
+
+%\end{tikzpicture}\\
+\end{center}
+        \item \begin{problem}[\vfill]Find an equation for $f^{-1}(x)$. Describe its graph and make sure to include asymptotes and intercepts. 
+        \end{problem}
+        \item \begin{problem}[\vfill]Let $g(x)=2\log_2(x-4)+5$. Compute all intersection points of $f$ and $g$. Give both the $x$ and $y$ coordinates. \\
+        
+        \end{problem}
+        \newpage
+       
+
+        
+\end{enumerate}
+\newpage
+
+\item The graph of  $f'$, the derivative of a function $f$,   is shown in the figure below. Decide whether each of the following statements must be true and support your choice in 1-2 sentences. 
+
+\begin{center}
+ \begin{tikzpicture}
+      \begin{axis}[xmin=-2, xmax=5, ymin=-2, ymax=2, ytick=\empty , grid=none, y label style={rotate=-90},
+      xtick={-1.6,4.6}, xlabel=$x$,
+      xticklabels={{$ a$}, { $b$}}, ylabel=$y$,  minor tick num=1,
+      ]
+      \node at (1,0.75) {\footnotesize $y=f'(x)$};
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -2:6, color = black]{-rad(atan(x-1))};
+    
+    \end{axis}
+        \end{tikzpicture}\\
+  \end{center}      
+
+\begin{enumerate}
+		\item 
+        \begin{problem}[\vfill]$f$  is continuous on the  interval  $(a,b)$
+        \end{problem}
+		\item 
+        \begin{problem}[\vfill]$f$ is  decreasing on the  interval  $(a,b)$
+        \end{problem}
+		\item  
+        \begin{problem}[\vfill]The graph of $f$  is concave down on the  interval  $(a,b)$
+        \end{problem}
+\end{enumerate}
+\newpage
+
+
+
+   
+
+
+\end{enumerate}
+
+\emph{This page left blank for scratch work. It will not be graded.}
+
+\newpage
+
+
+
+\emph{This page left blank for scratch work. It will not be graded.}
+
+\newpage
+
+
+
+\emph{This page left blank for scratch work. It will not be graded.}
+
+
+\end{document}

@@ -1,0 +1,511 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[]{handout}
+
+\begin{document}
+
+
+
+
+
+\begin{center}
+  \large\textsc{Problem Set 17 - Limits, Indeterminate Forms, and L'H\^opital's Rule}
+\end{center}
+
+\begin{grading}
+\begin{enumerate}
+    \item 18 points
+    \item 21 points
+    \item 9 points
+    \item 5 points
+    \item 5 points
+
+    
+\end{enumerate}
+Total: 58 points
+\end{grading}
+
+\begin{enumerate}
+\item 
+
+\begin{grading}
+18 points. 2 per part.
+\end{grading}
+
+ Compute the following limits. These limits are mostly a review of ideas
+ from Math Ma.
+
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to \pi/4} \frac{\sin x}{x}$
+      \end{problem}
+
+      \begin{solution}
+        This function is continuous at $x=\pi/4$, so the limit is 
+        $\boxed{\frac{\sin(\pi/4)}{\pi/4} = \frac{2\sqrt{2}}{\pi}.}$
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to 5} \frac{6}{(x-5)^2}$
+      \end{problem}
+
+      \begin{solution}
+        We can obtain the graph of this function by shifting the graph of
+        $y=1/x^2$ to the right by 5 units and scaling it vertically by a
+        factor of 6. Based on this, we can determine that 
+        the function has a vertical asymptote at $x=5$, and both one-sided
+        limits, and therefore the two-sided limit, are $\boxed{\infty.}$
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to 2} x^3 + 1$
+      \end{problem}
+
+      \begin{solution}
+        The function is continuous at $x=2$, so the limit is
+        $2^3+1=\boxed{9.}$
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \lim_{x \to 2} \frac{(x^3 + 1)(x-2)}{x-2}$
+        \emph{(Hint: We just poked a hole in $x^3 +1$ at $x=2$.)}
+      \end{problem}
+
+      \begin{solution}
+        The function has a removable discontinuity at $x=2$. By cancelling
+        $x-2$ in the numerator and denominator, we can see that this
+        function is the same as $x^3 + 1$ everywhere but $x=2$. Thus, 
+        the value of the limit as $x$ approaches $2$ is $2^3 + 1 =
+        \boxed{9.}$
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to \infty} \frac{\cos x}{x}$
+      \end{problem}
+
+      \begin{solution}
+        As $x$ approaches infinity, $\cos x$ is always a value between
+        $-1$ and $1$, while the $x$ in the denominator
+        attains larger and larger values. This
+        means that the value of $\frac{\cos x}{x}$ is tending closer
+        and closer to $\boxed{0.}$
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to 0} \frac{\cos x}{x}$
+      \end{problem}
+
+      \begin{solution}
+        As $x$ approaches $0$, $\cos x$ approaches $1$, while the $x$
+        in the denominator moves through smaller and smaller values,
+        negative from the left side and positive from the right side.
+        Thus, as $x \to 0^-$, the fraction approaches $-\infty$, but as
+        $x \to 0^+$, the fraction approaches $\infty$. Therefore the
+        limit \fbox{does not exist.}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to \infty} \frac{e^{-x}}{\pi}$
+      \end{problem}
+
+      \begin{solution}
+        We can rewrite the function as $\frac{1}{\pi e^x}$. As $x$
+        approaches infinity, the denominator takes on larger and
+        larger values, so the limit is $\boxed{0}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        Which of the expressions in (a)-(g) are limits of the form
+        ``$\frac{0}{0}$'' or ``$\frac{\infty}{\infty}$''?
+      \end{problem}
+
+      \begin{solution}
+        The only such limit is (d), which is a ``$\frac{0}{0}$'' limit.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        Are there any of the problems (a)-(g) for which L'Hôpital's Rule
+        would be helpful? (If you answered yes, think again!)
+      \end{problem}
+
+      \begin{solution}
+        The only limit to which L'Hôpital's Rule can be applied is the
+        one in (d), but cancelling $x-2$ in the numerator and denominator
+        to find the function value at the hole takes much less effort.
+      \end{solution}
+
+    \end{enumerate}    
+    \probonly{}
+
+\item 
+
+\begin{grading}
+21 points. 3 per part.
+\end{grading}
+
+  Evaluate the following limits. You will need to
+  decide whether L'H\^opital's Rule is applicable to each. For help, read pages 1113 - 1114 in Gottlieb.
+
+    \begin{problemonly}
+    \emph{\textbf{Hint:} L'H\^opital's Rule can only be used for five of the
+      limits!} 
+  \end{problemonly}
+
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to \infty} \frac{\ln x}{x}$
+      \end{problem}
+
+      \begin{solution}
+        This is an $\frac{\infty}{\infty}$ limit, so we can use
+        L'H\^opital's Rule: $\displaystyle \lim_{x\to\infty} \frac{\ln
+          x}{x} \lheq \lim_{x\to\infty} \frac{\quad \frac{1}{x} \quad}{1}
+        = \boxed{0}$.
+
+              You can also appeal to relative growth rates, and since $\ln(x) \ll x$, $\displaystyle \lim_{x\to\infty} \frac{\ln
+          x}{x} = \boxed{0}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to 0^+ } \frac{\ln x}{x}$
+      \end{problem}
+
+      \begin{solution}
+        As $x \to 0^+$, $\ln x \to -\infty$ and $x \to 0^+$, so
+        $\displaystyle \lim_{x \to 0^+ } \frac{\ln x}{x} =
+        \boxed{-\infty}$.  (If you were to plug a tiny positive value of
+        $x$ into $\frac{\ln x}{x}$, you'd end up dividing a very negative
+        number by a tiny positive number, which would give a huge negative
+        result.)
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to \infty} \frac{\ln (5 + e^x)}{3x}$
+      \end{problem}
+
+      \begin{solution}
+        This is an $\frac{\infty}{\infty}$ limit, so we apply
+        L'H\^opital's Rule:
+        \begin{align*}
+          \lim_{x\to\infty} \frac{\ln(5+e^x)}{3x}  & \lheq
+          \lim_{x\to\infty} \frac{\quad \dfrac{e^x}{5+e^x} \quad}{3} \\
+          & \nolheq \lim_{x \to \infty} \frac{e^x}{15 + 3e^x} \\
+          \intertext{This is again an $\frac{\infty}{\infty}$ limit, so we
+            can use L'H\^opital's Rule again:\footnotemark}
+          & \lheq \lim_{x \to \infty} \frac{e^x}{3e^x} \\
+          \intertext{We can cancel $e^x$ from the numerator and
+            denominator:} %
+          & \nolheq \lim_{x \to \infty} \frac{1}{3} \\
+          & \nolheq \boxed{\frac{1}{3}}
+        \end{align*}
+        \footnotetext{Alternatively, you could use a strategy from Math
+          Ma and keep just the fastest growing term in the numerator and
+          denominator.} 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \lim_{x \to \pi/4 } \frac{\tan x -1}{4x - \pi}$
+      \end{problem}
+
+      \begin{solution}
+        This is a $ \frac{0}{0}$ limit, so we can use L'H\^opital's Rule:
+        $\displaystyle \lim_{x\to\frac{\pi}{4}}\frac{\tan x - 1}{4x - \pi}
+        \lheq \lim_{x\to\frac{\pi}{4}} \frac{\sec^2 x}{4} = \frac{2}{4} =
+        \boxed{\frac{1}{2}}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to \pi^- } \frac{\sin x}{1 - \cos x}$
+      \end{problem}
+
+      \begin{solution}
+        As $x \to \pi^-$, $\sin x \to \sin \pi = 0$ and $1 - \cos x \to 1
+        - \cos \pi = 2$, so this limit is equal to $\frac{0}{2} =
+        \boxed{0}$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to 1} \frac{\ln x}{\sin (\pi x)}$
+      \end{problem}
+
+      \begin{solution}
+        As $x \to 1$, $\ln x \to 0$ and $\sin(\pi x) \to \sin \pi = 0$, so
+        we can use L'H\^opital's Rule:
+        \begin{align*}
+          \lim_{x\to1} \frac{\ln x}{\sin(\pi x)} & \lheq \lim_{x\to1}
+          \frac{1/x}{\pi\cos(\pi x)} \\
+          \intertext{Now, the numerator $\frac{1}{x} \to 1$ and the
+            denominator $\to \pi \cos(\pi) = - \pi$, so this limit is
+            equal to} %
+          & \nolheq \boxed{- \frac{1}{\pi}}
+        \end{align*}
+      \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        $\displaystyle\lim_{x \to -\infty}xe^x$
+    \end{problem}
+
+    \begin{solution}
+        As $x \to -\infty$, $e^x \to 0$, so this is a $"0 \cdot \infty"$ limit, and we should rewrite it so that we can use L'H\^opital's
+    Rule:
+    \begin{align*}
+      \lim_{x \to -\infty} x e^x & \nolheq \lim_{x \to -\infty}
+      \frac{x}{e^{-x}} \\
+      & \lheq \lim_{x \to -\infty} \frac{1}{-e^{-x}} \\
+      & \nolheq \boxed{0}
+    \end{align*}
+    \end{solution}
+    
+      
+    \end{enumerate}
+    \probonly{}
+
+
+
+\item 
+
+\begin{grading}
+    9 points. 3 per part.
+\end{grading}
+
+ Luna is working on some limits, but she's making some common
+  mistakes.  In each part, figure out what is wrong with her reasoning,
+  and solve the problem correctly.  (Luna writes ``L'H'' whenever she uses
+  L'H\^opital's Rule.)
+  \begin{enumerate}
+  \item
+    \begin{problem}[\nstretch{1.5}]
+      \textbf{Problem:} Evaluate $\displaystyle \lim_{x \to \pi}
+      \frac{\cos x}{x - \pi}$.
+
+      \textbf{Luna's reasoning:} I'll use L'H\^opital's Rule:
+      \[ \lim_{x \to \pi} \frac{\cos x}{x - \pi} \lheq \lim_{x \to \pi}
+      \frac{-\sin x}{1} = 0 \]
+    \end{problem}
+
+    \begin{solution}
+      \fbox{L'H\^opital's Rule does not apply}, because the original limit
+      is not a $\frac{0}{0}$ or $\frac{\infty}{\infty}$ limit.  Instead,
+      as $x \to \pi$, $\cos x \to \cos \pi = -1$, and $x - \pi \to 0$.  To
+      evaluate this limit, we need to think about the sign of the
+      denominator.  Whenever $x$ is just a bit less than $\pi$, $x - \pi <
+      0$, so $\displaystyle \lim_{x \to \pi^-} \frac{\cos x}{x - \pi} =
+      \infty$.  On the other hand, whenever $x$ is just a bit bigger than
+      $\pi$, $x - \pi > 0$, so $\displaystyle \lim_{x \to \pi^+}
+      \frac{\cos x}{x - \pi} = - \infty$.  Since the left-hand and
+      right-hand limit are not equal, $\displaystyle \lim_{x \to \pi}
+      \frac{\cos x}{x - \pi}$ \fbox{does not exist}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      \textbf{Problem:} Evaluate $\displaystyle \lim_{x \to 0} \frac{2^x -
+        1}{x}$.
+
+      \textbf{Luna's reasoning:} As $x \to 0$, the numerator $2^x - 1 \to
+      0$.  0 over anything is 0, so the limit must be 0.
+    \end{problem}
+
+    \begin{solution}
+      The problem with Luna's reasoning is that the denominator also
+      approaches $0$ as $x \to 0$, so \fbox{this is a $\frac{0}{0}$
+        limit}.  Luna's idea that ``0 over anything is 0'' is incorrect;
+      see {{\#6}} for more explanation.
+
+      Here, since we have a $\frac{0}{0}$ limit, we can use L'H\^opital's
+      Rule: $\displaystyle \lim_{x\to 0} \frac{2^x - 1}{x} \lheq
+      \lim_{x\to 0} \frac{2^x\ln 2}{1} = \boxed{\ln 2}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      \textbf{Problem:} Evaluate $\displaystyle \lim_{x \to \infty}
+      \frac{\ln x}{4 \sqrt{x}}$.
+
+      \textbf{Luna's reasoning:} This is of the form
+      $\frac{\infty}{\infty}$, so I'll use L'H\^opital's Rule:
+      \begin{align*}
+        \lim_{x \to \infty} \frac{\ln x}{4 x^{1/2}} & \lheq
+        \lim_{x \to \infty} \frac{1/x}{2 x^{-1/2}} \\
+        \intertext{Now, this is of the form $\frac{0}{0}$, so I'll use
+          L'H\^opital's Rule again:} %
+        & \lheq \lim_{x \to \infty} \frac{-x^{-2}}{-
+          x^{-3/2}} \\
+        \intertext{This is still of the form $\frac{0}{0}$, so I'll use
+          L'H\^opital's Rule again\ldots}
+      \end{align*}
+      Luna's reasoning so far is correct, but she's not getting anywhere.
+      What should she do differently to evaluate this limit?
+    \end{problem}
+
+    \begin{solution}
+      Luna should simplify before using L'H\^opital's Rule again:
+      \begin{align*}
+        \lim_{x \to \infty} \frac{\ln x}{4 x^{1/2}} & \lheq
+        \lim_{x \to \infty} \frac{1/x}{2 x^{-1/2}} \\
+        \shortintertext{Simplify!}
+        & \nolheq \lim_{x \to \infty} \frac{1}{2 \sqrt{x}} \\
+        & \nolheq \boxed{0}
+      \end{align*}      
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+\begin{grading}
+5 points, as follows: 1/2/2.
+\end{grading}
+
+In Math Ma in the fall, we had a discussion about dominant terms and how, when we evaluate certain types of limits, we can just focus on the dominant terms. In this problem, we will explore an algebraic justification for why this is sufficient. Consider the limit
+    \[ \lim_{x \to \infty} \frac{5x^4-2x^2-17x^2+1}{2x^3+24x^2+8}. \]
+    In this problem, we will adopt the strategy of dividing
+    the numerator and the denominator by the highest power of $x$ \emph{that
+    appears in the denominator.} We will choose this because
+    \begin{enumerate}[label=(\roman*)]
+    \item it eliminates the issue of ``0'' in the denominator\footnote{
+    That's an issue that forces you to look at the sign of the 
+    denominator.} and
+    \item it will lead us nicely to a shortcut.
+    \end{enumerate}
+
+    \begin{enumerate}[topsep=0pt]
+    
+      \item
+        \begin{problem}[\vfill]
+          Why is it alright to divide every term in the numerator and
+          denominator by $x^3$? Write 2-3 sentences explaining why dividing the same term in the numerator and denominator preserves equality.
+        \end{problem}
+
+        \begin{solution}
+          Dividing every term in the numerator and denominator by $x^3$
+          is equivalent to multiplying by the fraction 
+          $\dfrac{1/x^3}{1/x^3}$. This is the same as multiplying by $1$,
+          as long as $x \neq 0$.
+        \end{solution}
+
+      \item
+        \begin{problem}[\vfill]
+          Now that you know it's fine to do so, divide the numerator
+          and denominator by $x^3$, and compute the limit as $x \to 
+          \infty$.
+        \end{problem}
+
+        \begin{solution}
+          When we divide numerator and denominator by $x^3$, we obtain
+          \[
+          \lim_{x \to \infty} \frac{5x-\frac{2}{x}-\frac{17}{x}+\frac{1}{x^3}}
+          {2+\frac{24}{x}+\frac{8}{x^3}}.
+          \]
+          As $x\to\infty$, the numerator approaches $\infty$, while the
+          denominator approaches $2$. Thus, the entire limit is
+          \fbox{$\infty$.}
+        \end{solution}
+
+      \item
+        \begin{problem}[\vfill\newpage]
+          Claim: As $x \to \infty$, the dominant term in the
+          numerator is $5x^4$ and the dominant term in the denominator
+          is $2x^3$. We can ignore every other term and simply look at
+          \[ \lim_{x \to \infty} \frac{5x^4}{2x^3} =
+          \lim_{x \to \infty} \frac{5x}{2} = \infty. \]
+          Put in your own words why we focus on the dominant terms over the others.
+        \end{problem}
+
+        \begin{solution}
+          As $x\to\infty$, the dominant terms in the numerator and 
+          denominator are the terms of the highest degree. It is okay
+          to ignore all but the dominant terms because as $x\to\infty$, 
+          higher degree terms are much much larger than lower degree
+          terms. (This is why the highest degree term
+          of a polynomial determines the end behavior of the graph.)
+          
+          After we divide the numerator and denominator by the
+          largest power of $x$ in the denominator, only the terms
+          of equal or higher degree will not go to zero in the limit.
+          This means that the largest power of $x$ in the numerator
+          and the largest power of $x$ in the denominator entirely
+          determine the limit as $x \to \infty$.
+          
+        \end{solution}
+
+    \end{enumerate}
+
+
+
+
+\item 
+
+\begin{grading}
+5 points.
+\end{grading}
+
+\begin{problem}[\vfill]
+    \textbf{Reflect Back.} Luna doesn't understand why $\frac{0}{0}$ is an
+    indeterminate form. After all, she reasons that $0$ divided by anything should
+    always be 0.  What would you tell Luna to fix her misconception? (\textbf{Your response should definitely mention limits!}) Hint - it might be helpful to come up with some examples.
+  \end{problem}
+
+  \begin{solution}
+    Having a limit of the form $\frac{0}{0}$ does not mean we're actually
+    dividing 0 by 0; it's more accurate to think about dividing something
+    really close to 0 by something else that is very close to 0.
+
+    % Not sure who wrote this
+    When we consider $\displaystyle \lim_{x \to a} \frac{f(x)}{g(x)}$,
+    we're not really interested in what is happening to $f(x)$ and $g(x)$
+    {\bf at} $x=a$; we're interested in what's going on {\bf near} $x = a$
+    (or, if $a$ is $\infty$, what happens as $x$ increases without bound).
+    So we're really looking at quotients of very small numbers: as $x$
+    gets closer and closer to $a$, $\displaystyle \lim_{x \to a}
+    \frac{f(x)}{g(x)}$ measures the relationship between these numbers.
+    Is one going to zero {\bf faster} than the other?  Are the two numbers
+    getting {\bf closer and closer} together?  Is one always {\bf twice as
+      big} as the other?  Any of these things (and many others) can
+    happen.  For example,
+    \begin{itemize}[nosep]
+    \item $\displaystyle \lim_{x \to 0} \frac{x^2}{x} = \lim_{x \to 0} x =
+      0$
+    \item $\displaystyle \lim_{x \to 0} \frac{2x}{x} = 2$
+    \item $\displaystyle \lim_{x \to 0} \frac{x}{-7x} = - \frac{1}{7}$
+    \end{itemize}
+  \end{solution}
+
+\end{enumerate}
+
+
+
+\spaceonly{\psreflection{
+\textit{Reminder: Exam 1 is Tuesday, March 11th from 5:30-7:30pm.}}}
+
+
+
+\end{document}

@@ -1,0 +1,503 @@
+\PassOptionsToPackage{sols}{handout}
+\documentclass[main]{subfiles}
+\setcounterrefbeforedot{chapter}{m-ws6-4}
+\setcounterrefafterdot{section}{m-ws6-4}
+\addtocounter{section}{-1}
+\usepackage{solutions}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptersix}
+}{}
+
+\section{Integration Strategy} \label{ws6-4}
+
+\begin{problemonly}
+    \begin{framed}
+
+\textbf{Key Ideas}:
+
+\begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+
+
+\item You should be comfortable with integration by substitution as a
+  way of ``undoing'' the Chain Rule.
+  
+  \item You should be comfortable with integration by parts as a
+  way of ``undoing'' the Product Rule.
+
+\item You should utilize flexibility in figuring out what to
+  pick for $u$ in substitution, and $u$ and $dv$ in integration by parts.  There is a lot of trial and error involved in this, so don't feel discouraged if your first guesses don't work out: that's
+  normal!  With practice, you will develop stronger intuition about what
+  to pick.
+
+\item You should be comfortable using a variety of methods to evaluate definite and indefinite integrals, and you should use appropriate notation when dealing with the endpoints of definite integrals
+
+  \item You should keep in mind that you can always check whether you've correctly found an antiderivative $F$ of a function $f$ by differentiating $F$.
+
+
+\end{itemize}
+\end{framed}
+\end{problemonly}
+
+\note{This first problem is here to bring back all of the methods and strategies they've come across over the last several classes. They'll be doing lots of mixed practice today, so I'm putting this hear to jog their memory before diving into any computations.}
+
+\begin{enumerate}
+\item \textit{Recap}
+\begin{enumerate}
+    \item 
+    \begin{problem}[\vfill]
+        What's the strategy for choosing $u$ in integration by substitution?
+    \end{problem}
+
+    \begin{solution}
+        We can choose $u$ so that it's derivative is also in the integrand (thus helping us undo the chain rule), or we choose $u$ so that the integrand becomes algebraically simpler to work with.
+    \end{solution}
+
+    \item 
+    \begin{problem}[\vfill]
+        What's the strategy for choosing $u$ and $dv$ in integration by parts?
+    \end{problem}
+
+    \begin{solution}
+     We want to choose $u$ so that it becomes simpler when we differentiate, and choose $dv$ so that it does not get more complicated when we integrate.      
+    \end{solution}
+
+    \item 
+    \begin{problem}[\vfill]
+        What other options are there for evaluating integrals,
+        either definite or indefinite?
+    \end{problem}
+
+    \begin{solution}
+       We can use our basic antiderivatives, basic geometry (in the case of definite integrals), use properties of integrals to change the problem (such as perhaps breaking one integral into multiple, easier to work with integrals), or relying on properties of functions to make some argument about areas (again in the case of definite integrals).
+    \end{solution}
+
+    \item 
+    \begin{problem}[\vfill]
+        How can we check if we have integrated correctly?
+    \end{problem}
+
+    \begin{solution}
+        We can always check our integration by differentiating!
+    \end{solution}
+\end{enumerate}
+
+ \textbf{Basic Indefinite Integrals.}
+  (\emph{Know these!})
+
+  \begin{itemize}[topsep=0pt]
+  \item When $n$ is a constant other than $-1$, $\displaystyle \int x^n\,dx
+    = {}$ \solonly{$\displaystyle \bm{\frac{x^{n+1}}{n+1} + C}$}
+
+\begin{multicols}{2}
+  \item
+
+    $\displaystyle \int \frac{1}{x}\,dx = {}$ \solonly{$\displaystyle
+      \bm{\ln |x| + C}$}
+
+  \item $\displaystyle \int e^x\,dx = {}$ \solonly{$\displaystyle
+      \bm{e^x + C}$} 
+
+\end{multicols}
+      
+  \item When $b$ is a positive constant, $\displaystyle \int b^x\,dx = {}$
+    \solonly{$\displaystyle \bm{\frac{1}{\ln b} b^x + C}$} 
+
+    \begin{multicols}{2}
+  \item $\displaystyle \int \sin x\,dx = {}$ \solonly{$\displaystyle
+      \bm{- \cos x + C}$} 
+  \item $\displaystyle \int \cos x\,dx = {}$ \solonly{$\displaystyle
+      \bm{\sin x + C}$} 
+  \item $\displaystyle \int \sec^2 x\,dx = {}$ \solonly{$\displaystyle
+      \bm{\tan x + C}$} 
+  \item $\displaystyle \int \sec x \tan x\,dx = {}$ \solonly{$\displaystyle
+      \bm{\sec x + C}$}
+  \item $\displaystyle \int \frac{1}{1 + x^2}\,dx = {}$
+    \solonly{$\displaystyle \bm{\arctan x + C}$}
+
+  \item
+
+    $\displaystyle \int \frac{1}{\sqrt{1 - x^2}}\,dx = {}$
+    \solonly{$\displaystyle \bm{\arcsin x + C}$}
+      \end{multicols}
+  \end{itemize}
+
+\pspace{\newpage}
+
+\item 
+\note{This is direct practice with integration by parts}
+
+Find the following integrals.
+    \begin{enumerate}
+        \item 
+        \begin{problem}[\stretch{3}]
+        $\displaystyle \int_0^{\ln 2} xe^{-x} \, dx$
+        \end{problem}
+
+        \begin{solution}
+            We'll use integration by parts with
+            \begin{align*}
+                u = x \qquad & dv = e^{-x}\, dx \\
+                du = dx \qquad & v = -e^{-x}
+            \end{align*}
+            Substituting into the integration by parts formula:
+            \begin{align*}
+                \int xe^{-x}\, dx &= 
+                -xe^{-x} + \int e^{-x}\, dx \\
+                &= -xe^{-x} - e^{-x} +C.
+            \end{align*}
+            Now that we've found an antidervative, we
+            can evaluate the definite integral:
+            \[
+            \int_0^{\ln 2} xe^{-x}\, dx =
+            \left[-xe^{-x} - e^{-x}\right]_0^{\ln 2}
+            = -\tfrac{1}{2}\ln2 - \tfrac{1}{2} - (0 - 1)
+            = -\tfrac{1}{2}\ln2 + \tfrac{1}{2}
+            = \tfrac{1}{2}(1-\ln 2).
+            \]
+        \end{solution}
+
+        \item 
+        \begin{problem}[\stretch{3}]
+        $\displaystyle \int \arctan(x) \, dx$
+        \end{problem}
+
+        \begin{solution}
+            We'll use the integration by parts formula with
+            \begin{align*}
+                u = \arctan(x) \qquad & dv = dx \\
+                du = \frac{1}{1+x^2}dx \qquad & v = x,
+            \end{align*}
+            we have
+            \begin{align*}
+                \int \arctan(x)\, dx 
+                &= x\arctan(x) - \int \frac{x}{1+x^2}\, dx.
+                \intertext{We can the substitution $w=1+x^2$, $dw = 2x\, dx$
+                for the remaining integral:}
+                \int \arctan(x)\, dx
+                &= x\arctan(x) - \frac{1}{2}\int\frac{1}{w}\, dw \\
+                &= x\arctan(x) - \frac{1}{2}\ln(1+x^2) +C.
+            \end{align*}
+        \end{solution}
+    \end{enumerate}
+
+\item 
+\note{I have this here to deliberately have them think about what their ''first'' move would be. The actual computations are in the next problem, so I'm going to make sure they are clear here that this is specifically asking for their strategy, not to do the integration.}
+
+In each part, decide how you would go about evaluating the integral (you'll do the integration in the next problem). If you would use substitution, what would $u$ be? If you would use integration by parts, what would $u$ and $dv$ be? If you would use some other reasoning, explain what it could be.
+
+\begin{enumerate}
+    \item 
+    \begin{problem}[\vfill]
+        $\displaystyle \int \frac{\cos x}{\sqrt{1+\sin x}}\, dx$
+    \end{problem}
+
+    \begin{solution}
+        Use the substitution $u=1+\sin x$ since $du = \cos x\,dx$ also
+        appears in the integrand.
+
+
+    \end{solution}
+
+
+
+    \item
+    \begin{problem}[\vfill\newpage]
+        $\displaystyle \int x^2 \sin x\, dx$
+    \end{problem}
+
+    \begin{solution}
+        This is a classic integration by parts integral where you
+        do integration by parts twice, in the first case letting
+        $u=x^2$ and $dv= \sin x \, dx$, and in the second
+        letting $u=x$ and $dv = \cos x \, dx$.
+    \end{solution}
+
+    \item 
+    \begin{problem}[\vfill]
+        $\displaystyle \int_0^5 \sqrt{25-x^2}\;dx$
+    \end{problem}
+
+    \begin{solution}
+        The integrand is the equation for the top half of a circle of radius 5 centered at the origin, so we would use our knowledge of geometry.
+      
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        $\displaystyle \int\frac{x}{x^2-1}\,dx$
+    \end{problem}
+
+    \begin{solution}
+        We can use the substitution $u=x^2-1$, since a constant multiple of 
+        $du = 2x\,dx$ appears in the integrand.
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        $\displaystyle \int xe^{x^2}\, dx$
+    \end{problem}
+
+    \begin{solution}
+        Substitution with $u=x^2$ since a multiple of $du = 2x\, dx$ also appears.
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        $\displaystyle \int \frac{e^t}{1+e^t}\, dt$
+    \end{problem}
+
+    \begin{solution}
+        Use substitution with $u=1+e^t$ since $du = e^t\,dt$ also appears.
+    \end{solution}
+
+    \item 
+    \begin{problem}[\vfill]
+        $\displaystyle\int_{-2}^{2} |x|\;dx$
+    \end{problem}
+
+    \begin{solution}
+        We don't have an antiderivative for $|x|$, but we could draw the region being defined here and see it is two triangles and then compute the area from there.
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill\newpage]
+        $\displaystyle \int \arcsin x \, dx$
+    \end{problem}
+
+    \begin{solution}
+        Use integration by parts with $u=\arcsin x$ and $dv = dx$. 
+    \end{solution}
+\end{enumerate}
+
+\item Now compute each of the integrals from the previous problem.
+
+\begin{enumerate}
+    \item 
+    \begin{problem}[\vfill]
+        $\displaystyle \int \frac{\cos x}{\sqrt{1+\sin x}} \,dx$
+    \end{problem}
+
+    \begin{solution}
+        Use the substitution $u=1+\sin x$ since $du = \cos x\,dx$ also
+        appears in the integrand.
+        \begin{align*}
+            \int \frac{\cos(x)}{\sqrt{1+\sin(x)}}\, dx &= \int \frac{1}{\sqrt{u}}\, du \\
+            &= \int u^{-\frac{1}{2}}\;du \\
+            &= 2u^{\frac{1}{2}}+C \\
+            &= 2\sqrt{1+\sin(x)} + C
+        \end{align*}
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        $\displaystyle \int x^2 \sin x\, dx$
+    \end{problem}
+
+    \begin{solution}
+        This is a classic integration by parts integral where you
+        do integration by parts twice, in the first case letting
+        $u=x^2$ and $dv= \sin x \, dx$, and in the second
+        letting $u=x$ and $dv = \cos x \, dx$.
+
+        For the first round, we have
+        \begin{align*}
+            u = x^2 \qquad & dv = \sin x \\
+            du = 2x\, dx \qquad & v = -\cos x
+        \end{align*}
+        giving us
+        \begin{align*}
+            \int x^2 \sin x \, dx &= -x^2 \cos x + 2\int x \cos x \,dx.
+        \end{align*}
+        For the integral on the right, we apply integration by
+        parts again with
+        \begin{align*}
+            u = x \qquad & dv = \cos x \\
+            du = dx \qquad & v = \sin x
+        \end{align*}
+        giving us
+        \begin{align*}
+            \int x^2 \sin x \, dx &= -x^2 \cos x + 2\int x \cos x \,dx \\
+            &= -x^2 \cos x + 2\left[x\sin x - \int \sin x\,dx\right] \\
+            &= -x^2 \cos x + 2x\sin x + 2\cos x + C.
+        \end{align*}
+    \end{solution}
+
+        \item 
+    \begin{problem}[\vfill\newpage]
+        $\displaystyle \int_0^5 \sqrt{25-x^2}\;dx$
+    \end{problem}
+
+    \begin{solution}
+        The integrand is the equation for the top half of a circle of radius 5 centered at the origin, so we would use our knowledge of geometry.
+
+        The signed area of the region indicated is  
+        $\displaystyle \int_0^5 \sqrt{25-x^2}\;dx = \frac{25\pi}{4}$.
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal=true, xmin=-5.1, xmax=5.1, width=2.5in,
+            height=1.5in, xtick={-5, 5}, ytick={5}, cycle list=black]
+            \addplot+[domain=0:5, plusarea] {sqrt(25-x^2)} \closedcycle; 
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    
+        
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        $\displaystyle \int\frac{x}{x^2-1}\,dx$
+    \end{problem}
+
+    \begin{solution}
+        We can use the substitution $u=x^2-1$, since a constant multiple of 
+        $du = 2x\,dx$ appears in the integrand.
+        \begin{align*}
+            \int\frac{x}{x^2-1}\,dx &= \frac{1}{2} \int \frac{1}{u}\, du \\
+            &= \frac{1}{2}\ln|u| +C \\
+            &= \frac{1}{2}\ln|x^2-1| + C.
+        \end{align*}
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        $\displaystyle \int xe^{x^2}\, dx$
+    \end{problem}
+
+    \begin{solution}
+        Substitution with $u=x^2$ since a multiple of $du = 2x\, dx$ also appears.
+
+        \begin{align*}
+            \int xe^{x^2}\, dx &= \frac{1}{2} \int e^u\, du \\
+            &= \frac{1}{2}e^u +C \\
+            &= \frac{1}{2}e^{x^2} + C.
+        \end{align*}
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill\newpage]
+        $\displaystyle \int \frac{e^t}{1+e^t}\, dt$
+    \end{problem}
+
+    \begin{solution}
+        Use substitution with $u=1+e^t$ since $du = e^t\,dt$ also appears.
+        \begin{align*}
+            \int \frac{e^t}{1+e^t}\, dt &= \int \frac{1}{u}\,du\\
+            &= \ln|u| + C \\
+            &= \ln(1+e^t) +C.
+        \end{align*}
+    \end{solution}
+
+    \item 
+    \begin{problem}[\vfill]
+        $\displaystyle\int_{-2}^{2} |x|\;dx$
+    \end{problem}
+
+    \begin{solution}
+        We don't have an antiderivative for $|x|$, but we could draw the region being defined here and see it is two triangles and then compute the area from there.
+
+        The signed area of the region indicated is 
+        $\displaystyle\int_{-2}^{2} |x|\;dx = 4$.
+        \begin{center}
+            \begin{tikzpicture}
+              \begin{axis}[cycle list=black, axis equal=true, xtick={-2, 2},
+                ytick={2}, width=2.5in]
+                \addplot+[domain=-2:2, plusarea] {abs(x)} \closedcycle;
+                \addplot+[domain=-2.5:2.5] {abs(x)};
+              \end{axis}
+            \end{tikzpicture} 
+            \end{center}
+
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        $\displaystyle \int \arcsin x \, dx$
+    \end{problem}
+
+    \begin{solution}
+        Use integration by parts with $u=\arcsin x$ and $dv = dx$.
+
+        We have 
+        \begin{align*}
+            u = \arcsin x \qquad & dv = dx \\
+            du = \frac{1}{\sqrt{1-x^2}}\, dx \qquad & v = x
+        \end{align*}
+        giving us
+        \begin{align*}
+            \int \arcsin x \, dx &= x\arcsin x - 
+            \int \frac{x}{\sqrt{1-x^2}}\,dx.
+        \end{align*}
+        For the integral on the right, we can do substitution
+        with $w=1-x^2$, $dw = -2x\,dx$.
+        \begin{align*}
+            \int \arcsin x \, dx &= x\arcsin x - 
+            \int \frac{x}{\sqrt{1-x^2}}\,dx \\
+            &= x\arcsin x  
+            +\frac{1}{2}\int \frac{1}{\sqrt{w}}\,dw \\
+            &= x\arcsin x  
+            +\frac{1}{2}\int w^{-1/2}\,dw \\
+            &= x\arcsin x  
+            +w^{1/2} + C  \\
+            &= x\arcsin x  
+            + (1-x^2)^{1/2}\ + C.
+        \end{align*}
+    \end{solution}
+\end{enumerate}
+
+
+
+
+\item 
+\begin{problem}[\vfill]
+Consider $\int e^{-x^2}\, dx$. Why do our integration techniques not work on this integral?
+\end{problem}
+
+\begin{solution}
+    First, $e^{-x^2}$ is not a derivative of any familiar function.
+    If we attempt a substitution with $u=-x^2$, we can't find $du = -2x\,dx$ in
+    the integrand. If we try integration by parts with $u=e^{-x^2}$ and $dv = dx$,
+    then we will have
+    \[\int e^{-x^2}\, dx = xe^{-x^2} +2 \int x^2e^{-x^2}\, dx,\]
+    and the integral we end up with is not any simpler than the one we started 
+    with. We could try to continue applying integration by parts, but
+    we won't be able to make any progress.
+\end{solution}
+
+% \item 
+% \note{This is to just start the transition to slicing by bringing back Riemann sums and sigma notation. There is a problem on the PSET that leads directly into next class' first problem involving slicing, so it would be good to at least read through this problem with them.}
+
+
+
+% In our next few classes, we will be working again with Riemann sums, and so we will review how to set up Riemann sums by considering $\displaystyle \int_0^5 x^2 \; dx$. 
+% \begin{enumerate}
+%     \item 
+%     \begin{problem}
+%     For $R_{10}$, the right-hand sum approximation of the region with 10 rectangles, how could we express $\Delta x$, $x_0$, and $x_k$?
+%     \end{problem}
+
+%     \begin{solution}
+%         \begin{align*}
+%         \Delta x = \dfrac{5-0}{10}= \dfrac{1}{2}, \\
+%         x_0 = 0, \\
+%         x_k = x_0 + k\Delta x = \dfrac{k}{2}
+%         \end{align*}
+%     \end{solution}
+
+%     \item 
+%     \begin{problem}
+%         What would the area of the $k$-th rectangle be?
+%     \end{problem}
+
+%     \begin{solution}
+%        The area of the $k$-th rectangle would be $f(x_k) \Delta x = (x_k)^2 \cdot \Big(\dfrac{1}{2}\Big)$.
+%     \end{solution}
+% \end{enumerate}
+
+
+\end{enumerate}
+
+\end{document}

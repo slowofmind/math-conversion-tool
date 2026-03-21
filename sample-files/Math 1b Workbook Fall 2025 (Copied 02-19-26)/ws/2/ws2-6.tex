@@ -1,0 +1,411 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws2-6}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptertwo}
+}{}
+
+\section{Geometric Series} \label{ws2-6}
+\begin{framed}
+\centerline{\textbf{Lesson Goals}}
+
+You should be able to:
+\begin{itemize}
+\item Determine whether a given series is geometric, and identify the first term and the common ratio for a geometric series
+\item Find what value a convergent geometric series converges to 
+\item Determine if a given geometric series converges or diverges
+\end{itemize}
+\end{framed}
+
+ 
+ \begin{enumerate}
+     
+
+    \item If you suffer from allergies, your doctor may
+    suggest that you take Claritin once a day.  Each Claritin tablet
+    contains 10 mg of loratadine (the active ingredient).  Because of the
+    way the human body metabolizes loratadine, no matter how much is in your
+    body at a given time, only $\frac{1}{8}$ of that amount remains 24 hours
+    later.\footnote{This estimate comes from the fact that the average
+    half-life of loratadine is known to be 8 hours.}
+    \begin{enumerate}
+      \item
+      \begin{problem}[\vfill]
+      If you take one Claritin tablet each morning for 2 successive days,
+      how much loratadine is in your body right after you take the 2nd
+      tablet? (\textbf{Don't} simplify your answer! Just write an arithmetic expression that gives the amount.)
+      \end{problem}
+
+      \begin{solution}
+      Immediately after taking the first tablet, you have 10 mg of
+      loratadine in your body.  The following morning, only $\frac{1}{8}$
+      of that is left, so you have $10 \left( \frac{1}{8} \right)$ mg in
+      your body.  You then take another pill containing 10 mg, so you have
+      a total of $\boxed{10 + 10 \left( \frac{1}{8} \right)}$ mg of
+      loratadine in your body.
+      \end{solution}      
+
+      \item
+      \begin{problem}[\vfill\vfill]
+      If you take one Claritin tablet every morning for a week, how much
+      loratadine is in your body right after you take the 3rd tablet?  7th
+      tablet?  (\textbf{Don't} try to simplify your computations! Just write out an
+      arithmetic expression that gives the amount. Try to find a pattern.)
+      \end{problem}
+
+      \begin{solution}
+      In (a), we established that you have $10 + 10 \left( \frac{1}{8}
+      \right)$ mg of loratadine in your body immediately after taking the
+      2nd tablet.
+
+      The following morning, 1/8 of that remains, or $\left[10 + 10 \left(
+      \frac{1}{8} \right) \right] \frac{1}{8} = 10 \left( \frac{1}{8}
+      \right) + 10 \left( \frac{1}{8} \right)^2$.  You then take another
+      pill containing 10 mg, so you have a total of $10 + 10 \left(
+      \frac{1}{8} \right) + 10 \left( \frac{1}{8} \right)^2$ mg of
+      loratadine in your body after taking the 3rd pill.
+
+      Continuing this reasoning, you will have $10 + 10 \left( \frac{1}{8}
+      \right) + 10 \left( \frac{1}{8} \right)^2+ 10 \left( \frac{1}{8}
+      \right)^3 + 10 \left( \frac{1}{8} \right)^4+ 10 \left( \frac{1}{8}
+      \right)^5 + 10 \left( \frac{1}{8} \right)^6$ mg in your body after
+      the 7th pill.
+      \end{solution}
+
+      \item
+      \begin{problem}[\vfill\vfill\vfill]
+      If you take Claritin for years and years, will the amount of
+      loratadine in your body level off?  Or will your bloodstream be pure
+      loratadine?
+      \end{problem}
+
+      \begin{solution}
+      Right after you take the $n$-th pill, you will have $10 + 10 \left(
+      \frac{1}{8} \right) + 10 \left( \frac{1}{8} \right)^2 + 10 \left(
+      \frac{1}{8} \right)^3 + \cdots + 10 \left( \frac{1}{8}
+      \right)^{n-1}$ mg of loratadine in your body.  Let's call this
+      amount $s_n$.  We are wondering what happens to $s_n$ as $n$ gets
+      very large.
+
+      We will use a clever algebraic manipulation to get a closed form expression for $s_n$.  We
+      know
+      \begin{equation}
+      s_n = 10 + 10 \left( \frac{1}{8} \right) + 10 \left( \frac{1}{8}
+      \right)^2 + \cdots + 10 \left( \frac{1}{8} \right)^{n-2} + 
+      10 \left( \frac{1}{8} \right)^{n-1}
+      \end{equation}
+      Notice that, if we multiply both sides by $\frac{1}{8}$ (multiplying
+      term-by-term on the right side), we get something similar looking on
+      the right side:
+      \begin{equation}
+      \frac{1}{8} s_n = 10 \left(
+      \frac{1}{8} \right) + 10 \left( \frac{1}{8} \right)^2 + 10
+      \left( \frac{1}{8} \right)^3 + \cdots + 10 \left( \frac{1}{8}
+      \right)^{n-1} + 10 \left( \frac{1}{8} \right)^n
+      \end{equation}
+      If we subtract (2) from (1), most of the terms on
+      the right side cancel, and we are left with $\displaystyle
+      \frac{7}{8} s_n = 10 - 10 \left( \frac{1}{8} \right)^n$.  Dividing
+      both sides by $\displaystyle \frac{7}{8}$, $\displaystyle s_n =
+      \frac{10 - 10(1/8)^n}{7/8}$.
+
+      Using this expression for $s_n$, it is easy to see what happens as
+      $n$ gets bigger and bigger: $\left( \frac{1}{8} \right)^n$ gets
+      closer and closer to 0, so $\frac{10 - 10(1 / 8)^n}{7 / 8}$ gets
+      closer and closer to $\frac{10}{7 / 8} = \frac{80}{7}$.  Thus, over
+      time, the amount of loratadine in your body gets closer and closer
+      to $\frac{80}{7}$ mg.
+
+      Notice that what we've shown mathematically is that the sum of the
+      infinite series $10 + 10 \left( \frac{1}{8} \right) + 10 \left(
+      \frac{1}{8} \right)^2 + \cdots$ is $\frac{80}{7}$.  After all,
+      $s_n$ is just the $n$-th partial sum of this series, and we showed
+      that $\displaystyle \lim_{n \to \infty} s_n = \frac{80}{7}$.
+      \end{solution}
+
+    \end{enumerate}
+  \end{enumerate}
+  \pspace{\newpage}
+ \begin{problemonly}
+  \begin{framed}
+  \textbf{Definition.} A \uline{geometric series} is a series that can be
+  written in the form $\displaystyle \sum_{k=0}^\infty ar^k = a + ar +
+  ar^2 + ar^3 + \cdots$.  In particular, a geometric series has a \textit{common ratio} $r$ such that any term multiplied by $r$ gives the next term in the series.
+  \end{framed}  
+  \end{problemonly}
+
+  \begin{enumerate}[resume]
+
+    \item  Which of the
+  following series are geometric?  For each geometric series, identify $a$
+  and $r$. 
+  
+  \textbf{Hint}: Start by writing out the first few terms of each series in $\cdots$ notation!
+  \begin{enumerate}
+    \item
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{k=0}^\infty \frac{(-1)^k 4^{k+2}}{3^{2k}}$.
+    \end{problem}
+
+    \begin{solution}
+This series is geometric. $a=16$ and $r=\frac{-4}{9}$.
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{k=1}^{\infty} \frac{2^k}{k^3}$.
+    \end{problem}
+
+    \begin{solution}
+    If we write this series out, it is $2 + \frac{4}{8} + \frac{8}{27} +
+    \frac{16}{64} + \cdots$.  We can already see that it's not geometric
+    because the terms don't have a common ratio.  (To elaborate: if it
+    was geometric, the first term would be $a$ and the second term would
+    be $ar$; this means that $a$ would have to be 1, and $r$ would have
+    to be $\frac{1}{8}$.  But then the third term isn't $\frac{1}{8}$ times the second term,
+    so there is no geometric series pattern here.)
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{n=4}^{\infty} (-1)^n\left(\frac{2}{3}\right)^n$.
+    \end{problem}
+
+    \begin{solution}
+   This series is geometric. $a=\left(\frac{2}{3}\right)^4=\frac{16}{81}$ and $r=\frac{-2}{3}$.
+    \end{solution}
+\end{enumerate}
+  \pspace{\newpage}
+  \item 
+  Let $s_n$ be the $n$-th partial sum
+  of the geometric series $a + ar + ar^2 + ar^3 + \cdots$.  That is, $s_n$
+  is the sum of the first $n$ terms.  In this problem, we'll consider only
+  geometric series with $a \neq 0$.
+  \begin{enumerate}
+
+    \item
+    \begin{problem}[0.75in]
+    Write a closed form expression for $s_n$ if $r = 1$.  (A ``closed
+    form expression'' is a formula without $\cdots$ or $\sum$; if you had
+    values for $a$ and $n$, you could plug them into your formula 
+    and evaluate it directly.)
+    \end{problem}
+
+    \begin{solution}
+    If $r = 1$, then $s_n = a + a + \cdots + a$ (with $n$ terms), so
+    $s_n = na$. 
+    \end{solution}
+    
+    \item
+    \begin{problem}[2.5in]
+    Write a closed form expression for $s_n$, assuming $r \neq 1$.
+    \end{problem}
+
+    \begin{solution}
+    Since $s_n$ is the sum of the first $n$ terms of the series, $s_n =
+    a + ar + ar^2 + \cdots + ar^{n-1}$.  We multiply this equation by
+    $r$ and then subtract that from the original equation:
+    \[ \begin{array}{rcrcrcrcccrcr}
+    s_n & = & a & + & ar & + & ar^2 & + & \cdots & + & ar^{n-1}
+    \\
+    r s_n & = & & & ar & + & ar^2 & + & \cdots & + &
+    ar^{n-1} & + & ar^n \\
+    \hline 
+    (1 - r) s_n & = & a & + & 0 & + & 0 & + & \cdots & + & 0 & - & a
+    r^n 
+    \end{array}\]
+    Dividing both sides by $1 - r$, $s_n = \boxed{\frac{a - ar^n}{1 -
+    r}}$.  (It's fine to divide by $1 - r$ since $r \neq 1$.)
+    \end{solution}
+
+    \item
+    \begin{problem}[3in]
+    For what values of $a$ and $r$ does the geometric series $a + ar +
+    ar^2 + \cdots$ converge?  For what values does it diverge?  When it
+    converges, what is its sum?
+
+    \probonly{\textbf{This result is incredibly important; you should
+    feel free to cite it from now on without proof.  When using it, be sure to
+    always explain what $a$ (the first term) and $r$ (the common ratio) are for your geometric series.}}
+    \end{problem}
+
+    \begin{solution}
+    By definition of convergence, we need to look at the limit of
+    partial sums $\displaystyle \lim_{n \to \infty} s_n$.  If $r \neq
+    1$, we have shown that this is equal to $\displaystyle \lim_{n \to
+    \infty} \frac{a - ar^n}{1 - r} = \frac{a}{1-r}\cdot\lim_{n \to \infty} (1-r^n)$. (We can factor out $\frac{a}{1-r}$, since the limit only depends on $n$.)  When $|r| > 1$ or $r = -1$, this
+    limit does not exist (if $|r| > 1$, then $r^n$ just grows bigger and
+    bigger in magnitude; if $r = -1$, then $r^n$ just bounces between
+    $1$ and $-1$ forever).  When $|r| < 1$, $r^n$ tends to 0, so
+    $\displaystyle \lim_{n \to \infty} \frac{a - ar^n}{1 - r} =
+    \frac{a}{1 - r}$.
+
+    When $r = 1$, we have shown that $\displaystyle \lim_{n \to \infty}
+    s_n = \lim_{n \to \infty} na$, which does not exist.
+
+    So, to summarize,
+   \[ a + ar + ar^2 + ar^3 + \cdots \left\{
+    \begin{array}{l l}
+    \textrm{converges to } \frac{a}{1 - r} & \textrm{ if } |r| < 1 \\
+    \textrm{diverges} & \textrm{ if } |r| \geq 1
+    \end{array} \right.\]
+    \end{solution}
+  \end{enumerate}
+  \pspace{\newpage}
+  \item 
+  Remember that a geometric series is a series that can be expressed in the form $a + ar +
+  ar^2 + \cdots = \displaystyle \sum_{k=0}^\infty ar^k$.  Which of the
+  following series are geometric?  For each geometric series, identify $a$
+  and $r$, and say whether the series converges or diverges; if it
+  converges, find its sum. 
+  
+  \textbf{Hint}: Start by writing out the first few terms of each series in $\cdots$ notation!
+  \begin{enumerate}
+    \item
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{k=1}^\infty \frac{(-1)^k 2^{k+1}}{3^k}$.
+    \end{problem}
+
+    \begin{solution}
+    We can write the given series in $\cdots$ notation as $- \frac{4}{3}
+    + \frac{8}{9} - \frac{16}{27} + \cdots$.  If this is geometric, then
+    $a = - \frac{4}{3}$ and $ar = \frac{8}{9}$, so $r = - \frac{2}{3}$.
+
+    To see whether the series really is geometric, we need to make sure
+    that the rest of the series follows the pattern that each term is
+    $r$ times the previous term.
+
+    If we write the $k$-th term as $a_k = \frac{(-1)^k 2^{k+1}}{3^k}$,
+    then the next term is $a_{k+1} = \frac{(-1)^{k + 1} 2^{k+2}}{3^{k +
+    1}}$, which is indeed equal to $-\frac{2}{3} a_k$.  So, the
+    series is geometric with $a = -\frac{4}{3}$ and $r = -\frac{2}{3}$.
+    Since $|r| < 1$, the series converges, and its sum is $\frac{a}{1 -
+    r} = -\frac{4}{5}$.
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{k=1}^{\infty} \frac{1}{k^3}$.
+    \end{problem}
+
+    \begin{solution}
+    If we write this series out, it is $1 + \frac{1}{8} + \frac{1}{27} +
+    \frac{1}{64} + \cdots$.  We can already see that it's not geometric
+    because the terms don't have a common ratio.  (To elaborate: if it
+    was geometric, the first term would be $a$ and the second term would
+    be $ar$; this means that $a$ would have to be 1, and $r$ would have
+    to be $\frac{1}{8}$.  But then the third term isn't $\frac{1}{8}$ times the second term,
+    so there is no geometric series pattern here.)
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{n=4}^{\infty} \frac{2}{3^{2n}}$.
+    \end{problem}
+
+    \begin{solution}
+    $\displaystyle \sum_{n=4}^{\infty} \frac{2}{3^{2n}} = \frac{2}{3^8}
+    + \frac{2}{3^{10}} + \frac{2}{3^{12}} + \cdots$, which looks like it
+    could be geometric with $a = \frac{2}{3^8}$ and $r =
+    \frac{1}{3^2}$.  Indeed, if we write $a_n = \frac{2}{3^{2n}}$, then
+    the next term is $a_{n+1} = \frac{2}{3^{2 (n+ 1)}} = \frac{2}{3^{2n
+    + 2}}$, which is equal to $\frac{1}{3^2} a_n$, so each term is
+    $r$ times the previous.
+
+    So, the series is geometric with $a = \frac{2}{3^8}$ and $r =
+    \frac{1}{3^2}$.  Since $|r| < 1$, the series converges and has sum
+    $\frac{a}{1 - r} = \frac{1}{2916}$.
+    \end{solution}
+\end{enumerate} 
+
+\pspace{\newpage}
+  \item 
+  \begin{enumerate}
+    \item
+    \begin{problem}[\vfill]
+    For what values of $x$ does the geometric series $\displaystyle
+    \sum_{k=0}^\infty x^k = 1 + x + x^2 + \cdots$ converge?  For what
+    values of $x$ does it diverge?  When it converges, what does it
+    converge to?
+    \end{problem}
+    
+    \begin{solution}
+    This is a geometric series $a + ar + ar^2 + ar^3 + \cdots$ with $a =
+    1$ and $r = x$ (remember that when we write a geometric series as $a
+    + ar + ar^2 + ar^3 + \cdots$, this means that the first term is $a$
+    and the common ratio is $r$).  Therefore, we know that it diverges
+    when $|x| \geq 1$.  When $|x| < 1$, it converges to $\displaystyle \frac{a}{1 - r}
+    = \frac{1}{1 - x}$.
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+    How would you graph the function $\displaystyle 1+x+x^2+x^3+\cdots$?
+    \end{problem}
+    
+    \begin{solution}
+    We know from {{\#3}(a)} that 
+ \[ \displaystyle 1+x+x^2+\cdots=\sum_{k=0}^\infty x^k= 
+    \begin{cases}
+   \frac{1}{1 - x} &\text{ when } |x| < 1 \\
+    \text{diverges} &\text{ when } |x| \geq 1
+    \end{cases}\]
+   
+    So, when $|x| < 1$, the graph of $\displaystyle \sum_{k=0}^\infty
+    x^k$ should look exactly like the graph of $\frac{1}{1 - x}$.  When
+    $|x| \geq 1$, $\displaystyle \sum_{k=0}^\infty x^k$ diverges, which
+    basically means it's undefined.  So, $\displaystyle
+    \sum_{k=0}^\infty x^k$ really has a domain of just $(-1,1)$, and on
+    that domain, it should look exactly like $\frac{1}{1 - x}$.  So, we
+    end up with this graph of $\displaystyle \sum_{k=0}^\infty x^k$: 
+    \begin{center}
+    \includegraphics[width=2in]{ws/images/geometric-power-series-1}
+    \end{center}
+    For reference, here is the graph of $\frac{1}{1 - x}$:
+    \begin{center}
+    \includegraphics[width=2in]{ws/images/geometric-power-series-1-base}
+    \end{center}
+    
+    Most importantly, recall that $1+x+^2+\cdots$ is the Taylor series for the function $f(x)=\frac{1}{1-x}$ centered at 0. Therefore, this result also tells us that the Taylor series for $f(x)=\frac{1}{1-x}$ centered at 0 is actually \textit{equal} to $f(x)$ on the interval $(-1.1)$. This is the first example we have found where we can prove that a Taylor series of a function is not merely an approximation of the function, but actually equivalent to the function for some $x$-values!
+    \end{solution}
+   
+  \end{enumerate}
+  
+
+ 
+  
+
+      \item 
+  \begin{problem}[\vfill]
+Use a geometric series to show that $0.999...=1$. 
+
+%\textbf{Hint:} How can you express $0.999...$ as a sum of infinitely many fractions? What is the first term $a$? What is the common ratio $r$?
+  \end{problem}
+  
+  \begin{solution}
+  The repeating decimal $0.999...$ can be expressed as:
+  
+  $$0.999...=0.9+0.09+0.009+\cdots=\frac{9}{10}+\frac{9}{100}+\frac{9}{1000}+\cdots$$
+  
+  This is just a geometric series whose first term is $a=\frac{9}{10}$ and whose common ratio is $r=\frac{1}{10}$. Since $|r|<1$, this geometric series converges, and thus its sum is given by $\frac{a}{1-r}$. Therefore,
+  
+  $$0.999...=\frac{9}{10}+\frac{9}{100}+\frac{9}{1000}+\cdots=\frac{9/10}{1-1/10}=\frac{9/10}{9/10}=1$$
+  
+  Many people struggle to believe this, thinking that 1 must be larger than $0.999...$. (More generally, it can be hard to believe that a convergent infinite sum is actually \textit{equal} to the number it converges to, instead of just \textit{really close to} the number to which it converges.) 
+  
+However, if you believe that 1 is larger than $0.999...$, then it must be larger by some finite positive amount. But what is that amount?
+  
+  \end{solution}
+ 
+  
+
+
+    
+   
+
+  \end{enumerate}
+
+\end{document}

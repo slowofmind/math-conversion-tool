@@ -1,0 +1,185 @@
+%\documentclass[12pt,letterpaper]{article}
+
+
+
+%\input{../worksheet-setup.tex}
+
+
+\section{{Linear Transformations,  $\vec\S$1.8}}% 
+\chead{\Large\textbf{Linear Transformations,  $\vec\S$1.8}}% 
+
+%\begin{document}
+\thispagestyle{fancy}
+
+Recall from a previous class:
+
+\begin{itemize}
+
+\item A set of vectors $\{ \vec{v}_1, \dots, \vec{v}_p\}$ in $\mathbb{R}^n$ is said to be {\bf linearly independent} if $$x_1 \vec{v}_1 +x_2 \vec{v}_2 +\dots +x_p \vec{v}_p = \vec{0}$$ has only the trivial solution. The set is called {\bf linearly dependent} if the equation has non-trivial solutions and the equation is called the {\bf dependence relation}.
+\item Let $A= [\vec{a}_1 \; \dots \; \vec{a}_n ]$, then $\{ \vec{a}_1 ,  \dots , \vec{a}_n \}$ are linearly independent if and only if $A \vec{x} = \vec{0}$ has only the trivial solution.
+\item {\bf Theorem 7:} A set $S=\{ \vec{v}_1, \dots, \vec{v}_p \}$ of two or more vectors is linearly dependent if and only if one of the vectors of $S$ is a linearly combination of the others.
+
+Moreover if $\vec{v}_1\neq \vec{0}$, then some $\vec{v}_j$ for $j>1$ is a linear combination of $\vec{v}_1, \dots, \vec{v}_{j-1}$.
+\item {\bf Theorem 8:} Any set $\{ \vec{v}_1, \dots, \vec{v}_p \}$ in $\mathbb{R}^n$ is linearly dependent if $p>n$.
+\end{itemize}
+
+\newpage
+
+Define a transformation $T : \R^n \to \R^m$ to be a function from $\R^n$ to $\R^m$.   Recall we call $\R^n$ the domain and $\R^m$ the codmain. The set of outputs, $\{T(\vec{x}):\vec{x}\in \R^n\}$, is the image or the range of $T$.
+
+One common example of a transformation $T$ is given by $T(\vec{x})=A\vec{x}$ where $A$ is an $m$ by $n$ matrix
+
+\begin{defn}
+A transformation $T$ is {\bf linear} if 
+\begin{enumerate}
+	\item $T(\vec{u}+\vec{v})=T(\vec{u})+T(\vec{v})$ for all $\vec{u},\vec{v}$ in $\R^n$,
+	\item $T(c\vec{u})=cT(\vec{u})$ for all $\vec{u}$ in $\R^n$ and $c$ in $\R$.
+\end{enumerate}
+\end{defn}
+
+\begin{enumerate}
+
+\Problem {\bf Properties of Linear Transformations.}
+\Part Prove if $T$ is linear, then $T(\vec{0})=\vec{0}$.
+
+\vfill 
+
+\Part $T(c\vec{u}+d\vec{v})=cT(\vec{u})+dT(\vec{v})$.
+
+\vfill
+
+\Problem Let $T(\vec{x})=A\vec{x}$ where $A=\begin{bmatrix}
+1 & 0\\
+-3 & 1\\
+2 & -2\\
+\end{bmatrix}$ and let $\vec{b}=\begin{bmatrix}
+-2\\3\\-1\\
+\end{bmatrix}$. 
+\Part Is $\vec{b}$ in the range of $T$?
+
+\vfill
+
+\Part What is the range of $T$?
+
+\vfill
+
+\newpage
+
+\Part Is $T$ surjective?
+
+\vfill
+
+\Part Is the transformation $T$ injective?
+
+\vfill
+
+\newpage
+
+
+\Problem Let $T(\vec{x})=A\vec{x}$ where $A=\begin{bmatrix}
+1 & 0 &-3\\
+-3 & 1 & 6\\
+2 & -2 & -1\\
+\end{bmatrix}$ and let $\vec{b}=\begin{bmatrix}
+-2\\3\\-1\\
+\end{bmatrix}$. Is $\vec{b}$ in the range of $T$?
+
+\vfill
+
+\Problem Let $T:\R^n \to \R^m$ be linear and $\{\vec{v}_1, \vec{v}_2,\vec{v}_3\}$ be a linearly dependent set. Is $\{T(\vec{v}_1), T(\vec{v}_2),T(\vec{v}_3)\}$ linearly dependent?
+
+\vfill
+
+
+\Problem Let $T:\R^n \to \R^m$ be linear and $\{\vec{v}_1, \vec{v}_2,\vec{v}_3\}$ be a linearly \textbf{in}dependent set.  Is $\{T(\vec{v}_1), T(\vec{v}_2),T(\vec{v}_3)\}$ linearly \textbf{in}dependent?
+
+
+%\Problem Suppose $T: \R^2 \to \R^3$ is linear and $
+
+\vfill
+
+
+\end{enumerate}
+
+%\end{document}
+\begin{comment}
+
+
+\newpage
+\chead{\Large\textbf{Linear Transformations -- Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+  \Answer 
+  
+  \Part Suppose $T$ is linear, then $$T(\vec{0}) = T(0 \cdot \vec{u})= 0 \cdot T(\vec{u})=\vec{0}.$$
+  
+  \Part Suppose $T$ is linear. By property (1) of linearity, we know $$T(c \vec{u}+d\vec{v}) =T(c\vec{u})+T(d\vec{v}).$$ By property (2), we know $$T(c\vec{u}))+T(d\vec{v})) =cT(\vec{u})+dT(\vec{v}).$$ Thus we have the result.
+  
+  \Answer
+  
+  \Part In order to determine if $\vec{b}$ is in the range of $T$, we solve the matrix equation $A\vec{x}=\vec{b}.$ Forming the augmented matrix and row-reducing, we get 
+  $$\begin{amatrix}{2}
+  1 & 0 & -2\\
+  -3 & 1 & 3\\
+  2 & -2 & -1\\
+  \end{amatrix}\sim
+  \begin{amatrix}{2}
+  1 & 0 & -2\\
+  0 & 1 & -3\\
+  0 & 0 & -3\\
+\end{amatrix}.$$
+
+Thus there is no solution to $A\vec{x}=\vec{b}$.
+  
+  \Part Replacing $\vec{b}$ for the previous part with arbitrary components will give the range of $T$. We get 
+  $$\begin{amatrix}{2}
+  1 & 0 & b_1\\
+  -3 & 1 & b_2\\
+  2 & -2 & b_3\\
+  \end{amatrix}\sim
+  \begin{amatrix}{2}
+  1 & 0 & b_1\\
+  0 & 1 & b_2+3b_1\\
+  0 & 0 & b_3+2b_2+4b_1\\
+  \end{amatrix}.$$
+  Thus $\vec{b}$ is in the range of $T$ if and only if $b_3+2b_2+4b_1=0$. We can see that the range is a plane in $\R^3$.
+  
+  \Part No, $T$ is not surjective. In particular, we showed in part (a) that there is no element in the domain that will map to $\vec{b}=\begin{bmatrix}
+  -2\\3\\-1\\
+  \end{bmatrix}$ under $T$. Equivalently we can say that $T(\vec{x})=\vec{b}$ has no solutions.
+  
+  \Part Recall $T$ is injective if for all $\vec{b}$, there is at most one $\vec{x}$ such that $T(\vec{x})=\vec{b}$. We use the contrapositive form of injectivity. Suppose $T(\vec{x})=T(\vec{y})$, then we get $A\vec{x}=A\vec{y}$. Rearranging the equation we get $A\vec{x}-A\vec{y}=\vec{0}$, and factoring, we get $A(\vec{x}-\vec{y})=\vec{0}$. We want to show that $A\vec{z}=\vec{0}$ has only the trivial solution. Forming the augmented matrix and row-reducing, we find $A\vec{z}=\vec{0}$ has only the trivial solution. Therefore $A(\vec{x}-\vec{y})=\vec{0}$ if and only if $\vec{x}-\vec{y}=\vec{0}$, and hence $\vec{x}=\vec{y}$. Thus $T$ is injective.
+  
+  \Answer Yes, $\vec{b}$ is in the range of $T$. In order to determine if $\vec{b}$ is in the range of $T$, we solve the matrix equation $A\vec{x}=\vec{b}.$ Forming the augmented matrix and row-reducing, we get 
+  $$\begin{amatrix}{3}
+  1 & 0 & -3 &-2\\
+  -3 & 1 & 6 & 3\\
+  2 & -2 & -1 & -1\\
+  \end{amatrix}\sim
+  \begin{amatrix}{3}
+  1 & 0 & 0&7\\
+  0 & 1 & 0&6\\
+  0 & 0 & 1&3\\
+  \end{amatrix}.$$
+  
+  Thus there is a unique solution to $A\vec{x}=\vec{b}$.
+  
+  \Answer Let $T:\R^n \to \R^m$ be linear and $\{\vec{v}_1, \vec{v}_2,\vec{v}_3\}$ be a linearly dependent set. Since $\{\vec{v}_1, \vec{v}_2,\vec{v}_3\}$ is linearly dependent, we know there exists $c_1, c_2, c_3$, not all zero, such that $c_1 \vec{v}_1+ c_2 \vec{v}_2+c_3\vec{v}_3 =\vec{0}.$ Applying $T$ to both sides of the equation we get $$T(c_1 \vec{v}_1+ c_2 \vec{v}_2+c_3\vec{v}_3) =T(\vec{0}).$$ Using linearity of $T$, we get $$c_1 T(\vec{v}_1)+ c_2T( \vec{v}_2)+c_3T(\vec{v}_3) =\vec{0}.$$ Since not all $c_1, c_2, c_3$ are zero, we have a non-trivial solution to the vector equation
+  $$x_1 T(\vec{v}_1)+x_2 T(\vec{v}_2)+x_3 T(\vec{v}_3)=\vec{0},$$ and hence $\{T(\vec{v}_1), T(\vec{v}_2),T(\vec{v}_3)\}$ is linearly dependent.
+
+\Answer No.  For example the transformation $T(\vec x) = A \vec x$ where $A$ is the $m$ by $n$ matrix with all entries equal to zero is a linear transformation.  However $\{T(\vec v_1), T(\vec v_2), T(\vec v_3)\}= \{ \vec 0, \vec 0, \vec 0\}$ is a linearly dependent set for any vectors $\vec v_i$. 
+
+
+\end{enumerate}
+
+\end{comment}
+%\end{document}
+
+
+%%% Local ables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

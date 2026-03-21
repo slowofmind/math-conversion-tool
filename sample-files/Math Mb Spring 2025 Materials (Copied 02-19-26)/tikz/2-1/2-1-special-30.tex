@@ -1,0 +1,32 @@
+\documentclass{standalone}
+\usepackage{plotstyle}
+
+\begin{document}
+\begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=\large$x$, ylabel=\large$y$,
+  xtick=\empty, ytick=\empty,
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+    }
+    \foreach \A in {60, 150, 210, 330} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+    }
+    \foreach \A in {30, 120, 240, 300} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+    }
+  \end{scope}
+  
+  \end{tikzpicture}
+\end{document}

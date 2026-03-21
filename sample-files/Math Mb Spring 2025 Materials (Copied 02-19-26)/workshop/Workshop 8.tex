@@ -1,0 +1,387 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[workshop]{handout}
+\renewcommand{\workshopnote}{CA Notes.} 
+\usepackage{lipsum}
+ \usepackage{microtype}
+ \usepackage{vwcol}
+ 
+\begin{document}
+\htitle{Workshop 8: The Fundamental Theorem of Calculus and Antiderivatives}
+\begin{workshop}
+    Welcome to Workshop 8! 
+    \newline 
+    The objectives for Workshop 8 are for students to:
+    \begin{itemize}
+        \item review the 3 interpretations of the definite integral and some key information about area functions, the Fundamental Theorem of Calculus, and antiderivatives.
+        \item compute a variety of definite and indefinite integrals.
+        \item reason about the properties of an area function (increasing/decreasing, concavity, $x$-intercept) to sketch its graph.
+    \end{itemize}
+    Here is an example plan: 
+    \begin{itemize}
+        \item 15 minutes: Attendance, review and fill in the blanks in the boxes on the first two pages as a class
+        \item 35-45 minutes: \#1 and \#2. You might have students work on these together at the boards and come back together to review a selection of a few problems that seem to give students the most trouble.
+        \item 15-25 minutes: \#3
+    \end{itemize}
+\end{workshop}
+\begin{framed}
+\textbf{The Definite Integral} When $a$ and $b$ are constants, the definite integral $\displaystyle \int_a^b f(t)\,dt$ equals some number that we can interpret in three ways:
+    \begin{itemize}
+        \item By definition, $\displaystyle \int_a^b f(t)\,dt$ is the limit of a Riemann sum of $n$ slices as $n \to \infty$: 
+        \[ \lim_{n \to \infty} \underbrace{\sum_{k=1}^n f(x_k)\, \Delta x}_{R_n}
+    = \lim_{n \to \infty} \underbrace{\sum_{k=0}^{n-1} f(x_k)\, \Delta
+      x}_{L_n}, \text{ where } \Delta x = \frac{b - a}{n} \text{ and } x_k
+    = a + k \Delta x\]
+    \vspace{-17pt}
+        \item If $a<b$, we can visualize $\displaystyle \int_a^b f(t)\,dt$ graphically as $\fitb{2.5in}{\text{\textcolor{red}{the signed area between $f(t)$ and the}}}$
+        \newline
+        \newline
+        $\fitb{5.6in}{\text{\textcolor{red}{horizontal axis between $t=a$ and $t=b$}}}$
+        \newline
+        \item In the case that $f(t)$ is a rate function, then $\displaystyle \int_a^b f(t)\,dt$ is $\fitb{2.2in}{\text{\textcolor{red}{the net change in an amount}}}$
+        \newline
+        \newline
+        $\fitb{5.6in}{\text{\textcolor{red}{between $t=a$ and $t=b$, or the accumulation of some amount between $t=a$ and $t=b$}}}$
+    \end{itemize}
+    \end{framed}
+
+\begin{framed}
+    \textbf{The Area Function}
+When $a$ is a constant and $x$ is a variable, we can think of the integral $\displaystyle \int_a^x f(t)\,dt$ as a \textit{function} of $x$. We call the function $A(x) = \displaystyle \int_a^x
+  f(t)\,dt$ the ``area function" or ``accumulation function".
+   \begin{center}
+    \begin{tikzpicture}[declare function={f(\x)=-(\x-6)/2;}] 
+      \begin{axis}[axis equal image, xtick={0, 1, 4}, xticklabels={$0$, $a$, $x$}, ytick=\empty, xlabel=$t$, width=2.5in, clip=false]
+        \addplot+[domain=-1:12] {f(x)} node[pos=0, left]{$y = f(t)$}; %
+        \addplot+[fill=black!50!white, fill opacity=0.5, domain=1:4, draw=none] {f(x)} \closedcycle; % 
+      \end{axis}
+    \end{tikzpicture}
+    \hspace{0.25in}
+    \begin{tikzpicture}[declare function={f(\x)=-(\x-6)/2;}] 
+      \begin{axis}[axis equal image, xtick={0, 1, 10}, xticklabels={$0$, $a$, $x$}, ytick=\empty, xlabel=$t$, width=2.5in, clip=false]
+        \addplot+[domain=-1:12] {f(x)} node[pos=0, left]{$y = f(t)$}; %
+        \addplot+[fill=black!50!white, fill opacity=0.5, domain=1:10, draw=none] {f(x)} \closedcycle; % 
+      \end{axis}
+    \end{tikzpicture}
+     
+  \end{center}
+    \begin{itemize}
+        \item The \underline{input} to $A(x) = \displaystyle \int_a^x
+  f(t)\,dt$ is an $x$-value that serves as the \textit{variable} upper bound of the integral of $f(t)$ anchored at a \textit{constant} lower bound of $t=a$. The \underline{output} of $A(x) = \displaystyle \int_a^x
+  f(t)\,dt$ is the \textit{area} 
+  between $f(t)$ and the horizontal axis from the anchor $t=a$ to the variable upper bound $t=x$. \newline
+  \vfill
+  \item $A(x)$ represents an \textit{accumulation} of some quantity between $t=a$ and $t=x$ if $f(t)$ is a rate function.\newline
+  \vfill
+  \item Two area functions $A(x) = \displaystyle \int_a^x
+  f(t)\,dt$ and $B(x) = \displaystyle \int_b^x
+  f(t)\,dt$ for the
+same function $f$ with different anchors $a$ and $b$ differ only by a constant. Their graphs are vertical shifts of each other.
+  \end{itemize}
+  \end{framed}
+  \vfill 
+  \newpage
+  \begin{framed}
+  \vspace{0.05in}
+   \textbf{The Fundamental Theorem of Calculus} The Fundamental Theorem of Calculus (FTOC) establishes the relationship between two central operations in calculus, the derivative and the integral, and allows us to compute definite integrals without calculating limits of Riemann sums.
+  \begin{itemize}
+  \item The function $A(x) = \displaystyle \int_a^x
+  f(t)\,dt$ outputs the \textit{area} 
+  between $f(t)$ and the horizontal axis from the \newline
+      \vfill
+      anchor $t=a$ to the variable upper bound $t=x$.
+      \item The FTOC Part 1 states that, if $f(t)$ is a continuous function, then $\dfrac{d}{dx}A(x) = \fitb{1.1in}{\textcolor{red}{f(x)}}$.\newline
+      \vfill
+      We can also write this as $A'(x)=\fitb{1.4in}{\textcolor{red}{f(x)}}$ or $\dfrac{d}{dx}\displaystyle \int_a^x
+  f(t)\,dt = \fitb{1.4in}{\textcolor{red}{f(x)}}$.
+      \newline
+      \vfill
+      \item The FTOC Part 2 states that, if $f$ is
+  a continuous function on $[a, b]$ and $F$ is an \textbf{antiderivative} of \newline \vfill  $f$,
+  that is, $F'=f$, then $\displaystyle \int_a^b f(t)\,dt
+  = {}$ \fitb{3.6in}{$\bm{\textcolor{red}{F(b)-F(a)}}$}. 
+  \vfill
+  \end{itemize}
+  \end{framed}
+  \vfill 
+  \begin{framed}
+  \vspace{0.05in}
+\textbf{Antiderivatives} An antiderivative of $f(x)$ is a function whose derivative is $f(x)$. If $F'(x)=f(x)$, the family of antiderivatives of $f(x)$ takes the form $F(x)+C$, since the derivative of the constant $C$ is $0$. This family of functions is given by the indefinite integral $\displaystyle \int f(x)\,dx$. 
+    \vfill
+    \begin{itemize}
+    \item Common indefinite integrals include:
+
+\begin{multicols}{2}
+ $\displaystyle \int 1\,du\ =$
+ \solonly{\textcolor{red}{$u+C$}}
+ \newline
+ 
+$\displaystyle \int \dfrac{1}{\sqrt{1-u^2}}\,du\ =$
+\solonly{\textcolor{red}{$\arcsin u+C$}}
+\newline
+ 
+$\displaystyle \int \dfrac{1}{1+u^2}\,du\ =$
+\solonly{\textcolor{red}{$\arctan u+C$}}
+\newline
+
+ $\displaystyle \int e^u\,du\ =$
+ \solonly{\textcolor{red}{$e^u+C$}}
+ \newline 
+ 
+ $\displaystyle \int b^u\,du\ =$\probonly{\hspace{0.9in}, where $b>0$ and $b\neq1$}
+\solonly{\textcolor{red}{$\dfrac{b^{u}}{\ln b}+C$, where $b>0$ and $b\neq1$}}
+\newline
+
+$\displaystyle \int \cos(u)\,du\ =$
+\solonly{\textcolor{red}{$\sin u+C$}}
+\newline
+
+$\displaystyle \int u^n\,du\ =$\probonly{\hspace{1.2in}, where $n\neq -1$}
+\solonly{\textcolor{red}{$\dfrac{u^{n+1}}{n+1}+C$, where $n\neq -1$}}
+\newline
+
+$\displaystyle \int \sin(u)\,du\ =$
+\solonly{\textcolor{red}{$-\cos u +C$}}
+\newline
+
+$\displaystyle \int \sec^2(u)\,du\ =$
+\solonly{\textcolor{red}{$\tan u +C$}}
+\newline
+
+$\displaystyle \int \sec(u) \tan(u)\,du\ =$
+\solonly{\textcolor{red}{$\sec u +C$}}
+\newline 
+
+$\displaystyle \int \dfrac{1}{u}\,du\ =$
+\solonly{\textcolor{red}{$\ln |u| +C$}}
+\newline
+\newline
+\newline
+
+\end{multicols}
+
+\end{itemize}
+\end{framed}
+\vfill 
+\newpage
+\begin{enumerate}
+\item Compute the following indefinite integrals. Don't forget the $+C$!
+\begin{enumerate}
+\begin{multicols}{2}
+\item $\displaystyle \int u\,du\ $
+\solonly{\textcolor{red}{$=\dfrac{u^2}{2}+C$}}
+\vspace{1in}
+\item $\displaystyle \int u^2\,du\ $
+\solonly{\textcolor{red}{$=\dfrac{u^3}{3}+C$}}
+\vspace{1in}
+
+    \item $\displaystyle \int \dfrac{1}{u^2}\,du\ $
+    \solonly{\textcolor{red}{$=-\dfrac{1}{u}+C$}}
+\vspace{1in}
+    \item $\displaystyle \int u^{-2.5}\,du\ $
+    \solonly{\textcolor{red}{$=\dfrac{u^{-1.5}}{-1.5}+C$}}
+    \solonly{\textcolor{red}{$=-\dfrac{2}{3u^{1.5}}+C$}}
+\vspace{1in}
+\item $\displaystyle \int u^3\,du\ $
+\solonly{\textcolor{red}{$=\dfrac{u^4}{4}+C$}}
+\vspace{1in}
+\item $\displaystyle \int u^{20}\,du\ $
+\solonly{\textcolor{red}{$=\dfrac{u^{21}}{21}+C$}}
+\vspace{1in}
+    \item $\displaystyle \int \sqrt{u}\,du\ $
+    \solonly{\textcolor{red}{$=\dfrac{u^{3/2}}{3/2}+C$}}
+    \solonly{\textcolor{red}{$=\dfrac{2u^{3/2}}{3}+C$}}
+\vspace{1in}
+    \item $\displaystyle \int u^{-\frac{2}{3}}\,du\ $
+    \solonly{\textcolor{red}{$=\dfrac{u^{1/3}}{1/3}+C$}}
+    \solonly{\textcolor{red}{$=3u^{1/3}+C$}}
+\vspace{1in}
+
+
+\end{multicols}
+\end{enumerate}
+
+
+\vfill 
+\item Evaluate the following definite integrals.
+\begin{enumerate}
+    \item $\displaystyle \int_{1}^{5} 6u^2\,du\ $
+    \solonly{\textcolor{red}{$=\displaystyle \left. 2u^3 \right|_{u=1}^{u=5}=2(5)^3-2(1)^3=248$}}
+    \vfill 
+    \item $\displaystyle \int_{0}^{\ln3} 2e^u\,du\ $
+    \solonly{\textcolor{red}{$=\displaystyle \left. 2e^u \right|_{u=0}^{u=\ln3}=2e^{(\ln3)}-2e^{(0)}=4$}}
+        \vfill 
+        \newpage
+    \item $\displaystyle \int_{0}^{\pi} \sin u\,du\ $
+    \solonly{\textcolor{red}{$=\displaystyle \left. -\cos u \right|_{u=0}^{u=\pi}=-\cos(\pi)-(-\cos(0))=1-(-1)=2$}}
+        \vfill 
+    \item $\displaystyle \int_{\pi}^{3\pi} (2\cos u+1)\,du\ $
+    \solonly{\textcolor{red}{$=\displaystyle \left. (2\sin u + u) \right|_{u=\pi}^{u=3\pi}=[2\sin (3\pi) + (3\pi)] - [(2\sin (\pi) + (\pi)]=2\pi$}}
+        \vfill
+    \item 
+    \begin{workshop}
+        Knowing familiar values of inverse trig functions is important to be able to answer all types of integral questions that we could ask.
+    \end{workshop}
+    $\displaystyle \int_{-\frac{1}{2}}^{\frac{\sqrt{3}}{2}} \dfrac{1}{\sqrt{1-u^2}}\,du\ $
+    \solonly{\textcolor{red}{$=\displaystyle \left. \arcsin u \right|_{u=-1/2}^{u=\sqrt{3}/2}=\arcsin (\sqrt{3}/2) - \arcsin (-1/2)=\pi/3-(-\pi/6)=\pi/2$}}
+        \vfill 
+       
+    \item $\displaystyle \int_{0}^{1} \dfrac{2}{1+u^2}\,du\ $
+    \solonly{\textcolor{red}{$=\displaystyle \left. 2\arctan u \right|_{u=0}^{u=1}=2\arctan(1)-2\arctan(0)=\pi/2$}}
+        \vfill 
+         \newpage
+    \item $\displaystyle \int_{e}^{e^{10}} \dfrac{2}{3u}\,du\ $
+    \solonly{\textcolor{red}{$=\displaystyle \left. \frac{2}{3}\ln(|u|) \right|_{u=e}^{u=e^{10}}=\frac{2}{3}\ln(|e^{10}|)-\frac{2}{3}\ln(|e|)=\frac{2}{3}\ln(e^{10})-\frac{2}{3}\ln(e)=6$}}
+        \vfill
+        \begin{workshop}
+            This problem is meant for students to see that the antiderivative of $\frac{1}{x}$ necessitates the absolute value of $x$ in the argument of the natural log for negative $x$ values. Generally, $\displaystyle \int \dfrac{1}{x}\,dx\ = \ln {|x|} +C$ for $x<0$.
+        \end{workshop}
+    \item $\displaystyle \int_{-e^{10}}^{-e} \dfrac{2}{3u}\,du\ $
+    \solonly{\textcolor{red}{$=\displaystyle \left. \frac{2}{3}\ln(|u|) \right|_{u=-e^{10}}^{u=-e}=\frac{2}{3}\ln(|-e|)-\frac{2}{3}\ln(|-e^{10}|)=\frac{2}{3}\ln(e)-\frac{2}{3}\ln(e^{10})=-6$}}
+    \vfill
+    \item $\displaystyle \int_{0}^{3} (u^2-2u-5)\,du\ $
+   \solonly{\textcolor{red}{$=\displaystyle \left. \left(\frac{u^3}{3}-u^2-5u\right) \right|_{u=0}^{u=3}=\left[\frac{(3)^3}{3}-(3)^2-5(3)\right]-\left[\frac{(0)^3}{3}-(0)^2-5(0)\right]=-15$}}
+    \vfill
+    \item $\displaystyle \int_{0}^{1} \dfrac{(u+1)^2}{\sqrt{u}}\,du\ $
+    \solonly{\textcolor{red}{$=\displaystyle \int_{0}^{1} \dfrac{u^2+2u+1}{u^{1/2}}\,du\ = \displaystyle \int_{0}^{1} (u^{3/2}+2u^{1/2}+u^{-1/2})\,du\ = \displaystyle \left. \left(\frac{u^{5/2}}{5/2}+\frac{2u^{3/2}}{3/2}+\frac{u^{1/2}}{1/2}\right) \right|_{u=0}^{u=1}= \frac{2}{5}+\frac{4}{3}+2=\frac{56}{15}$}}
+    \vfill
+        \end{enumerate}
+        \newpage
+    \item In this problem we will explore the properties of $A(x)=\displaystyle \int_{1}^{x} (t^2-8t+15)\,dt\ $ to sketch its graph.
+    \begin{enumerate}
+        \item Find $A'(x)$ using the Fundamental Theorem of Calculus, Part 1. 
+        \solonly{\textcolor{red}{$A'(x)=x^2-8x+15$}}
+        \vfill
+        \item Where is $A(x)$ increasing? Where is $A(x)$ decreasing?
+        
+        \begin{solution}
+         $A(x)$ increases when $A'(x)$ is positive, and  $A(x)$ decreases when $A'(x)$ is negative. Let's see where $A'(x)=0$:
+         \begin{align*}
+             A'(x)&=0\\
+             x^2-8x+15&=0\\
+             (x-3)(x-5)&=0\\
+         \end{align*}
+         Thus, $A'(x)=0$ when $x=3$ and $x=5$. When $x<3$ and $x>5$, $A'(x)>0$, so $A(x)$ increases on $(-\infty, 3)\cup(5, \infty)$. When $3<x<5$, $A'(x)<0$, so $A(x)$ decreases on $(3, 5)$.
+        \end{solution}
+        \vfill \vfill
+        \item Find $A''(x)$.
+        \solonly{\textcolor{red}{$A''(x)=2x-8$}}
+        \vfill
+        \item Where is $A(x)$ concave up? Where is $A(x)$ concave down?
+        
+        \begin{solution}
+            $A''(x)=0$ when $x=4$. When $x>4$, $A''(x)>0$, so $A(x)$ is concave up when $x>4$. When $x<4$, $A''(x)<0$, so $A(x)$ is concave down when $x<4$.
+        \end{solution}
+        \vfill \vfill
+        \newpage
+        \begin{center}
+    \fbox{We're still working with $A(x)=\displaystyle \int_{1}^{x} (t^2-8t+15)\,dt\ $.}
+    \end{center}
+        \item The graph of $A(x)$ has exactly one $x$-intercept. Find this $x$-intercept. (You should not compute the integral to answer this question.) 
+        \solonly{\textcolor{red}{$x=1$}}\vfill 
+        \item Use your answers to parts (a) through (e) to sketch a graph of $A(x)$.
+        \solonly{
+        \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick={0,1,3,4,5},ytick=\empty,
+        width=2.75in, height=1.75in]
+    \addplot+[domain=0.5:6.9]{x^3/3-4*x^2+15*x-11.3};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      }
+        \vfill \vfill\vfill 
+        \item Compute $\displaystyle \int_{1}^{x} (t^2-8t+15)\,dt\ $ to find a formula for $A(x)$ without an integral sign. (In other words, find an antiderivative of $t^2-8t+15$, and evaluate its difference between $t=1$ and $t=x$.)
+        
+        \begin{solution}
+          $\displaystyle \int_{1}^{x} (t^2-8t+15)\,dt\ = \displaystyle \left. \left(\frac{t^3}{3}-4t^2+15t\right) \right|_{t=1}^{t=x}=\left[\frac{x^3}{3}-4x^2+15x\right]-\left[\frac{(1)^3}{3}-4(1)^2+15(1)\right]=\frac{x^3}{3}-4x^2+15x-\frac{34}{3}$. Thus, $A(x)=\frac{x^3}{3}-4x^2+15x-\frac{34}{3}$.
+        \end{solution}
+        \vfill\vfill\vfill 
+        
+        \item Is your formula in part (f) consistent with your graph in part (g)? 
+        \solonly{\textcolor{red}{Yes, the graph of $A(x)$ appears cubic in part (f), and it turns out that $A(x)$ is in fact a cubic in part (g).}}
+      
+\newpage  
+
+    
+    \item Recall $A(x)=\displaystyle \int_{1}^{x} (t^2-8t+15)\,dt\ $. Let $B(x)=\displaystyle \int_{2}^{x} (t^2-8t+15)\,dt\ $. Compute $A(x)-B(x)$.
+   
+    \begin{solution}
+    \begin{align*}
+        A(x)-B(x)&=\displaystyle \int_{1}^{x} (t^2-8t+15)\,dt\ - \displaystyle \int_{2}^{x} (t^2-8t+15)\,dt\ \\&=\displaystyle \int_{1}^{x} (t^2-8t+15)\,dt\ + \displaystyle \int_{x}^{2} (t^2-8t+15)\,dt\ \\&= \displaystyle \int_{1}^{2} (t^2-8t+15)\,dt\ \\ &= \displaystyle \left. \left(\frac{t^3}{3}-4t^2+15t\right) \right|_{t=1}^{t=2}
+        \\ &= \left(\frac{8}{3}-16+30\right)
+        - \left(\frac{1}{3}-4+15\right)
+        \\ & = \frac{50}{3}-\frac{34}{3}=\frac{16}{3}
+        \end{align*}
+
+    \end{solution}
+    \vfill\vfill\vfill
+    \end{enumerate}
+
+
+  \item
+  \begin{enumerate}
+      \item 
+ 
+    \begin{problem}
+      Find $\displaystyle \int_{-1}^1|x|\,dx$ by interpreting it as a
+      signed area. 
+    \end{problem}
+
+    \begin{solution} 
+      We can picture this integral as the signed area under $y = |x|$ from
+      $x = -1$ to $x = 1$:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.5in, height=1.75in,
+            xtick={-1, 1}, ytick={1}]
+            \addplot+[domain=-1:1, plusarea] {abs(x)} \closedcycle;
+            \addplot+[domain=-1.5:1.5, black] {abs(x)};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      This area is $\boxed{1}$.
+    \end{solution}
+\vfill \vfill 
+  \item
+    \begin{problem}
+      Show that $\dfrac{|x|^2}{2}$ is \emph{not} an antiderivative of
+      $|x|$ on $[-1,1]$ by showing that $\displaystyle \int_{-1}^1 |x|\,dx
+      \neq \left. \frac{|x|^2}{2} \right|_{-1}^1$. 
+    \end{problem}
+
+    \begin{solution} 
+      We just found that $\displaystyle \int_{-1}^1 |x|\,dx = 1$.  On
+      the other hand, $\displaystyle \left. \frac{|x|^2}{2}
+      \right|_{-1}^1 = \frac{1}{2} - \frac{1}{2} = 0$, so $\displaystyle
+      \int_{-1}^1 |x|\,dx \neq \left. \frac{|x|^2}{2} \right|_{-1}^1$.
+    \end{solution}
+\vfill \vfill 
+  \item
+    \begin{problem}
+      Find an antiderivative of $f(x)=|x|$ on $(0, 1]$ and on $[-1,0)$.  (\emph{Hint:} Write $f(x)$ as a piecewise function.)
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      On $(0, 1]$, $|x|$ is just $x$, so $\frac{1}{2} x^2$ is one
+      antiderivative.  On $[-1, 0)$, $|x|$ is equal to $-x$, so
+      $-\frac{1}{2} x^2$ is an antiderivative.  
+    \end{solution}
+    \vfill \vfill 
+
+
+
+
+\end{enumerate}
+\end{enumerate}
+\end{document}

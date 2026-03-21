@@ -1,0 +1,481 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws2-13}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptertwo}
+}{}
+
+\section{Series Wrap-Up} \label{ws2-13}
+\begin{enumerate}
+
+\item Series toolbox final review.
+\begin{enumerate}
+    \item 
+    \begin{problem}[2.5in]
+    Make a list of all the tests and criteria for determining convergence or divergence of series. Specify the conditions for being able to apply each of them.    
+    \end{problem}
+
+    \begin{solution}
+
+    Here is one possible way of organizing the tests:
+
+\begin{enumerate}
+    \item \textbf{Tests based on type of series:}
+        \begin{itemize}
+            \item $p$-series
+            \begin{itemize}
+                \item \textit{Condition:} Only applies to series of the form $\displaystyle\sum_{k=1}^\infty \frac{1}{k^p}$
+
+                \item \textit{Conclusion:} The series converges when $p > 1$ and diverges when $p \leq 1$
+            \end{itemize}
+            
+            \item Geometric series
+            \begin{itemize}
+                \item \textit{Condition:} Only applies to series of the form $\displaystyle\sum_{k=0}^\infty ar^k$
+
+                \item \textit{Conclusion:} The series converges to $a/(1-r)$ when $|r| <1$ and diverges when $|r| \geq 1$
+            \end{itemize}
+
+            \item Alternating series test
+            \begin{itemize}
+                \item \textit{Condition:} Only applies to series of the form $\displaystyle\sum_{k=1}^\infty (-1)^k|a_k|$
+
+                \item \textit{Conclusion:} If $|a_{k+1}|<|a_k|$ and $\displaystyle\lim_{k \to \infty} |a_k| = 0$ then the series converges
+            \end{itemize}
+        \end{itemize}
+
+    \item \textbf{Tests based on limits:}
+        \begin{itemize}
+            \item $n$-th term test
+            \begin{itemize}
+                \item \textit{Condition:} Can always be used
+
+                \item \textit{Conclusion:} If $\displaystyle\lim_{k\to \infty} a_k \neq 0$ the series diverges
+            \end{itemize}
+
+            \item Finding closed form for partial sums $s_n$
+            \begin{itemize}
+                \item \textit{Condition:} In principle can always be used (in practice mostly helps in theoretical settings)
+
+                \item \textit{Conclusion:} If $\displaystyle \lim_{k \to \infty} s_n$ exists the series converges; if the limit does not exist the series diverges
+            \end{itemize}
+
+            \item Ratio test
+            \begin{itemize}
+                \item \textit{Condition:} Can always be applied as long as $a_k \neq 0$
+
+                \item \textit{Conclusion:} If $L = \displaystyle\lim_{k \to \infty} |a_{k+1}/a_k| < 1$ the series converges absolutely. If $L>1$ the series diverges
+            \end{itemize}
+
+            
+        \end{itemize}
+    
+
+    \item \textbf{Comparison tests:}
+        \begin{itemize}
+            \item Direct comparison test
+            \begin{itemize}
+                \item \textit{Condition:} requires the terms of the series to be non-negative
+
+                \item \textit{Conclusion:} Assume $0 \leq a_k \leq b_k$. If $\sum a_k$ diverges, then $\sum b_k$ diverges. If $\sum b_k$ converges, then $\sum a_k$ converges.
+            \end{itemize}
+
+            \item Integral comparison test
+            \begin{itemize}
+                \item \textit{Condition:} requires $a_k = f(k)$ where $f(x)$ is a non-negative, decreasing function defined on $[a,\infty)$
+
+                \item \textit{Conclusion:} If $\displaystyle\int_a^\infty f(x) ~dx$ converges/diverges, then $\displaystyle\sum_{k=a}^\infty a_k$ converges/diverges as well
+            \end{itemize}
+
+            \item Asymptotic comparison test
+            \begin{itemize}
+                \item \textit{Condition:} requires terms to be non-negative
+
+                \item \textit{Conclusion:} Assume $0 \leq a_k \sim b_k$. If $\sum b_k$ converges/diverges, then $\sum a_k$ covnerges diverges as well
+            \end{itemize}
+
+            \item Absolute convergence
+            \begin{itemize}
+                \item \textit{Condition:} can always be used
+
+                \item \textit{Conclusion:} if $\sum |a_k|$ converges, then $\sum a_k$ converges absolutely (and, in particular, converges)
+            \end{itemize}
+
+            
+        \end{itemize}
+\end{enumerate}
+
+        
+    \end{solution}
+        
+
+    \item 
+    \begin{problem}[2.5in]
+    For each test above, find one series for which that test would be appropriate. Try to make a choice such that no other test would be as effective.    
+    \end{problem}
+    
+
+    \item
+    \begin{problem}[1.5in]
+    Come up with a strategy for deciding what order of tests you should try when you encounter a new series.
+    \end{problem}
+\end{enumerate}
+
+
+
+\pspace{\newpage}
+\begin{problemonly}
+\begin{framed}
+\textbf{Theorem:} A function $f(x)$ is \textit{equal} to its Taylor series on its interval of convergence if and only if the exact error from its $n$th degree Taylor approximation approaches 0 as $n$ approaches $\infty$. That is:
+$$f(x)=\text{ Taylor series of } f(x) \qquad \Longleftrightarrow \qquad \lim_{n\to \infty} \left|f(x)-P_n(x)\right|=0$$
+for all $x$ in the interval of convergence.
+\end{framed}
+\end{problemonly}
+
+
+\item 
+  \note{I want to make a big deal of this exercise and go through it carefully to
+  make the point that the Remainder Theorem helps us resolve the big questions that have bugged us for weeks (e.g., how good of an approximation is $P_{n}(x)$, and does a Taylor series converge to the function it was intended to represent).}
+
+  Let $f(x) = e^{x}$.  
+  \begin{enumerate}
+     \item 
+     \begin{problem}[1in]
+       Write down the Taylor series for $f(x)$ centered at $0$.  What is its interval of convergence?
+     \end{problem}
+
+     \begin{solution}
+       In Problem Set 13 \#1, you computed this Taylor series.  Because $f^{(k)}(x) = e^{x}$ for each $k \geq 0$,
+       we have $f^{(k)}(0) = 1$.  It follows that the Taylor series for $f$ centered at $0$ is given by
+       $$
+	 \sum_{k = 0}^{\infty} \frac{1}{k!} x^{k}.
+       $$
+       By the Ratio Test, this series converges for all $x$.
+     \end{solution}
+
+
+     \item 
+     \begin{problem}[1in]
+       Give an upper bound on how much error is committed in using
+       $P_{10}(3)$ to approximate $f(3) = e^{3}$.
+     \end{problem}
+
+     \begin{solution}
+	Using the notation in the statement of the Remainder Theorem, we'll apply the theorem using
+        $n = 10$, $d = 3$, and $c = 0$.  To do so, we need to supply $M_{(11)}$, an upper bound on
+        $|f^{(11)}(x)|$ for $x$ the interval $[-3,3]$.  Since $f^{(11)}(x) = e^{x}$ is positive and increasing,
+        we see that $|f^{(11)}(x)|$ achieves a maximum at the right endpoint of the domain $[-3,3]$.
+        Therefore, a safe choice for $M_{(11)}$ would be
+        $$
+	  M_{(11)} = e^{3}.
+        $$
+        The Remainder Theorem tells us that
+        $$
+          |f(3) - P_{10}(3)| \leq \frac{e^{3}}{11!}\cdot (3-0)^{11} \leq 0.08914.
+        $$
+        In fact, it also tells us that $|f(x) - P_{10}(x)| \leq 0.08914$ {\em for all $x$}
+        in the domain $[-3, 3]$.
+     \end{solution}
+
+     \item 
+     \begin{problem}[1in]
+       How large should $n$ be in order to guarantee that $|f(3) - P_{n}(3)| \leq 10^{-10}$?    
+     \end{problem}
+
+     \begin{solution}
+        The Remainder Theorem tells us that
+        $$
+          |f(3) - P_{n}(3)| \leq \frac{M_{(n+1)}}{(n+1)!}\cdot |3-0|^{n+1},
+        $$
+        where $M_{(n+1)}$ is an upper bound on $|f^{(n+1)}(x)|$ for $x$ in the
+        interval $[-3,3]$.  Since $f^{(n+1)} = e^{x}$, the same reasoning we
+        used in the preceding part ensures that a safe choice for $M_{(n+1)}$ is $e^{3}$.
+        Therefore,
+        $$
+          |f(3) - P_{n}(3)| \leq \frac{e^{3}}{(n+1)!}\cdot 3^{n+1}.
+        $$
+        If we can produce an $n$ for which
+        $$
+          \frac{e^{3}}{(n+1)!}\cdot 3^{n+1} \leq 10^{-10},
+        $$
+        then we'll know that $|f(3) - P_{n}(3)| \leq 10^{-10}$ as well.  You're welcome
+        to try finding such an $n$ by pen-and-paper ``practical" estimates.  If you use 
+        the WolframAlpha website to experiment with various choices of $n$, you'll find
+        that $n = 22$ is the smallest choice that works.  
+     \end{solution}
+
+     \item 
+     \begin{problem}[1in]
+       Use the Remainder Theorem to show that the series you wrote down in Part (a)
+       converges to $e^{x}$ for all $x$ in $[-3,3]$.  
+     \end{problem}
+
+     \begin{solution}
+        In Part (c), we noted that
+        $$
+          |f(x) - P_{n}(x)| \leq \frac{e^{3} \cdot 3^{n+1}}{(n+1)!}
+        $$
+        for every $x$ in the interval $[-3,3]$.  Note that the series in Part (a)
+        is a limit of Taylor polynomials, namely $\displaystyle \lim_{n \to \infty} P_{n}(x)$.
+        If we were to let $n \to \infty$,
+        the right-hand side of the above inequality will approach zero because
+        $3^{n+1} \ll (n+1)!$.  It follows that the Taylor series is an {\em exact}
+        representation of $e^{x}$ throughout the interval $[-3,3]$.
+     \end{solution}
+
+     \item 
+     \begin{problem}[1in]
+       Generalize Part (d) to show that the series you wrote down in Part (a) converges to $e^{x}$
+       for all real $x$.  That is, the series really {\em is} a power series representation for $e^{x}$.
+     \end{problem}
+
+     \begin{solution}
+        There was nothing special about the choice $d = 3$ in the above calculations.
+        Suppose $d > 0$ and retrace the steps in the preceding parts of this problem. 
+        You'll find that $M_{(n+1)} = e^{d}$ is an upper bound on $|f^{(n+1)}(x)|$
+        for $x$ in the interval $[-d, d]$.  The Remainder Theorem ensures that
+        $$
+          |f(x) - P_{n}(x)| \leq \frac{e^{d} \cdot d^{n+1}}{(n+1)!}
+        $$
+        for every $x$ in the interval $[-d,d]$.  As before, note that $d^{n+1} \ll (n+1)!$,
+        which means that $|f(x) - P_{n}(x)| \to 0$ for all $x$ in $[-d,d]$ as $n \to \infty$.
+        Because $d$ was arbitrary, we conclude that the Taylor series converges to $e^x$
+        for all real $x$.  That is, the series really {\em is} a power series representation for $e^x$.
+     \end{solution}
+
+
+  \end{enumerate}
+  
+  \pspace{\newpage}
+
+ \item  \label{alt-series-bound}
+ Consider the series
+ $$
+   \sum_{k = 10}^{\infty} (-1)^{k} \frac{1}{\ln(\ln k)}.
+ $$
+
+ \begin{enumerate}
+   \item  
+   \begin{problem}[1.5in]
+     Explain why this series converges.
+   \end{problem}
+
+   \begin{solution}
+     The Alternating Series Test applies.  To see why, note that
+     $$
+       |a_{k+1}| = \frac{1}{\ln(\ln(k+1))}  \; \leq \; \frac{1}{\ln(\ln k)} \; = \; |a_{k}|
+     $$
+     for each $k \geq 10$.  Moreover, $\displaystyle \lim_{k \to \infty} a_{k} = 0$.
+     Therefore, the series converges by the Alternating Series Test.
+     (As an exercise, you should explain why the series does NOT converge absolutely.)
+   \end{solution}
+
+   \item
+   \begin{problem}[1.5in]
+     Let $S$ denote the number that the above series converges to, and for each $n \geq 10$, let
+     $$
+       s_{n} = \sum_{k = 10}^{n} (-1)^{k} \frac{1}{\ln(\ln k)}.
+     $$
+     Give an example of an $n$ for which $s_{n}$ is definitely within $0.01$ of $S$.
+   \end{problem}
+
+   \begin{solution}
+     Because this series satisfies the conditions of the Alternating Series Test, the
+     associated error bound applies.  That is,
+     $$
+       |s_{n} - S| \; \leq \; \frac{1}{\ln(\ln(n+1))}.
+     $$
+     In order to guarantee that the partial sum $s_{n}$ is within $0.01$ of $S$, we
+     can insist that
+     $$
+       \frac{1}{\ln(\ln(n+1))} \; \leq \; 0.01.
+     $$
+     Equivalently, we need $\ln(\ln(n+1)) \geq 100$, which means that
+     $$
+       n \geq e^{e^{100}}.
+     $$
+     So we can use any integer choice of $n$ that's larger than $\displaystyle e^{e^{100}}$, for example $3^{3^{100}}$.
+     This is an absurdly large number (it has more than $10^{43}$ digits).  It would be
+     impossible to compute such a partial sum, even if all of the computers on Earth had
+     been working in tandem since the dawn of the universe.
+   \end{solution}
+   \end{enumerate} 
+   
+\pspace{\newpage}
+
+
+    
+
+
+\item 
+For each series below, describe a strategy for finding an upper bound for the error associated to the sum of the first 50 terms, $s_{50}$:
+
+\begin{enumerate}
+    \item 
+    \begin{problem}[\vfill]
+        $\displaystyle \sum_{k=1}^\infty \frac{3^k}{9^k+1}$
+    \end{problem}
+
+    \begin{solution}
+        The error associated to the approximation $s_{50}$ is the sum $\displaystyle \sum_{k=51}^\infty \frac{3^k}{9^k+1}$. We can upper bound that sum by the geometric series $\displaystyle \sum_{k=51}^\infty \frac{3^k}{9^k} = \sum_{k=51}^\infty \frac{1}{3^k}$ which converges to $\frac{1/3^{51}}{1- 1/3}$. Thus 
+        \[\textrm{Error} \leq \frac{1}{2\cdot 3^{50}}\]
+    \end{solution}
+
+    \item 
+    \begin{problem}[\vfill]
+        $\displaystyle \sum_{k=1}^\infty \frac{1}{k^3}$
+    \end{problem}
+
+    \begin{solution}
+        The error associated to the approximation $s_{50}$ is the sum $\displaystyle \sum_{k=51}^\infty \frac{1}{k^3}$. We can upper bound that sum by the integral $\displaystyle\int_{50}^{\infty} \frac{1}{x^3} ~dx$, which can be computed and results in $\frac{1}{2 \cdot 50^2}$. Thus,
+        \[\textrm{Error} \leq \frac{1}{2 \cdot 50^2}\]
+    \end{solution}
+    
+\end{enumerate}
+
+
+
+
+
+
+
+\pspace{\newpage}
+
+\item 
+ Your roommate is working on some series practice problems.  In each part, decide
+ whether their solution is reasoned correctly.  If it isn't, explain
+ exactly what is wrong with their reasoning and provide a correct argument to conclude convergence or divergence of the given series.
+ 
+ \begin{enumerate}
+ \item
+   \begin{problem}
+     \textbf{Problem:} Decide whether $\displaystyle \sum_{k=10}^\infty 
+     \frac{k^2 + 2^k}{k! - k}$ converges.
+
+     \textbf{Your roommate's answer:} $\displaystyle \frac{k^2 + 2^k}{k! - k} \sim
+     \frac{2^k}{k!}$ because $2^k \gg k^2$ and $k! \gg k$.  I can use the
+     Asymptotic Comparison Test to say that $\displaystyle \sum \frac{k^2
+       + 2^k}{k! - k}$ behaves the same way as $\displaystyle \sum
+     \frac{2^k}{k!}$ since $\displaystyle \frac{2^k}{k!} > 0$.  I know
+     that $2^k \ll k!$, so $\displaystyle \sum \frac{2^k}{k!}$ converges
+     because the numerator $\ll$ the denominator.  Therefore,
+     $\displaystyle \sum_{k=10}^\infty \frac{k^2 + 2^k}{k! - k}$
+     converges as well.
+   \end{problem}
+
+   \begin{solution}
+     Your roommate's reasoning is invalid.  They are correct that $\displaystyle
+     \frac{k^2 + 2^k}{k! - k} \sim \frac{2^k}{k!}$ and that $2^k \ll k!$.
+     However, the reasoning that $\sum \frac{2^k}{k!}$ converges because
+     numerator $\ll$ denominator is incorrect.
+
+     Here's an example which demonstrates that this reasoning is invalid:
+     $1 \ll k$, but $\sum \frac{1}{k}$ still diverges.
+
+    We could use the asymptotic comparison test, but apply the ratio test to the simplified series $\displaystyle \sum_{k=10}^\infty 
+     \frac{2^k}{k!}$. Notice that
+
+     $$\lim_{k\to \infty} \left|\frac{a_{k+1}}{a_k}\right| = \lim_{k\to \infty} \left|\frac{2^{k+1}}{(k+1)!}\frac{k!}{2^k}\right| = \lim_{k\to \infty} \frac{2}{k+1} = 0 <1$$
+
+     So the series $\displaystyle \sum_{k=10}^\infty \frac{2^k}{k!}$ converges by the ratio test and thus $\displaystyle \sum_{k=10}^\infty \frac{k^2 + 2^k}{k! - k}$ converges by the asymptotic comparison test.
+     
+   \end{solution}
+
+
+
+
+ \item
+   \begin{problem}
+     \textbf{Problem:} Decide whether $\displaystyle \sum_{k=10}^\infty
+     \frac{1}{k \cdot 4^k}$ converges.
+
+     \textbf{Your roommate's answer:} Since $k \ll 4^k$, $\displaystyle \frac{1}{k
+       \cdot 4^k} \sim \frac{1}{4^k}$.  We know that $\sum \frac{1}{4^k}$
+     converges because it's a geometric series with common ratio $r=
+     \frac{1}{4}$, and $\left|\frac{1}{4} \right| < 1$.  Since $\sum
+     \frac{1}{4^k}$ has positive terms, we can apply the Asymptotic
+     Comparison Test to conclude that $\sum \frac{1}{k \cdot 4^k}$ also
+     converges. 
+   \end{problem}
+
+   \begin{solution}
+     Your roommate is correct that $k \ll 4^k$, but it is \textbf{not} true that
+     $\displaystyle \frac{1}{k \cdot 4^k} \sim \frac{1}{4^k}$.  (This is
+     a common mistake: a \textit{sum} is asymptotic to its largest term,
+     but the same is not true for products.)
+
+     A valid argument would be to use the direct comparison test. Notice that 
+
+     $$0 \leq \frac{1}{k 4^k} \leq \frac{1}{4^k}$$
+
+     We know that $\sum_{k=10}^\infty \frac{1}{4^k}$ is a geometric series with $|r| = 1/4 <1$, so it converges. Therefore, by the direct comparison test the original series converges as well.
+   \end{solution}
+
+ \item
+   \begin{problem}
+     \textbf{Problem:} Decide whether $\displaystyle \sum_{k=2}^\infty
+     \frac{1}{k (\ln k)^2}$ converges.
+
+     \textbf{Your roommate's answer:} $(\ln k)^2 \gg 1$, so $\displaystyle
+     \frac{1}{k (\ln k)^2} \ll \frac{1}{k}$.  This means that
+     $\displaystyle \frac{1}{k (\ln k)^2}$ goes to 0 much more quickly
+     than $\displaystyle \frac{1}{k}$ does.  Since $\displaystyle \sum
+     \frac{1}{k}$ just barely diverges, $\displaystyle \sum_{k=2}^\infty
+     \frac{1}{k (\ln k)^2}$ must converge.
+   \end{problem}
+
+   \begin{solution}
+     Your roommate is correct that $\displaystyle \frac{1}{k (\ln k)^2} \ll
+     \frac{1}{k}$.  However, they have fallen into the ``harmonic series as
+     dividing line'' trap (see Problem Set 16, {\#2}) of thinking
+     that things which are smaller than the harmonic series must
+     converge.  Remember: If you're trying to show that a series
+     converges by comparing it with another series, you must compare it
+     with a convergent series.
+
+     We can apply the integral comparison test. Let us look at the improper integral
+     \begin{align*}
+     \int_2^\infty \frac{1}{x (\ln x)^2}~dx & = \lim_{b \to \infty} \int_2^b \frac{1}{x (\ln x)^2}~dx =  \lim_{b \to \infty} \int_{x=2}^{x=b} \frac{1}{u^2}~du\\
+     & = \lim_{b \to \infty} -\left.\frac{1}{(\ln x)^2} \right|_{x=2}^{x=b} = \lim_{b \to \infty} \left(-\frac{1}{(\ln b)^2}+\frac{1}{(\ln 2)^2}\right) = \frac{1}{(\ln 2)^2}
+     \end{align*}
+
+     Since the integral above converges, by the integral comparsion test we know that the series $\sum_{k=2}^\infty
+     \frac{1}{k (\ln k)^2}$ converges as well.
+    \end{solution}
+
+
+ \item
+   \begin{problem}
+     \textbf{Problem:} Decide whether $\displaystyle \sum_{k=1743}^\infty
+     \frac{0.95^k + k^{1.05}}{k \sqrt{k}}$ converges.
+
+     \textbf{Your roommate's answer:} We can rewrite $k \sqrt{k}$ as $k^{1.5}$.
+     Since $0.95^k \ll k^{1.05}$, $\displaystyle \frac{0.95^k +
+       k^{1.05}}{k^{1.5}} \sim \frac{k^{1.05}}{k^{1.5}} =
+     \frac{k^{1.05}}{k^{1.5}} = \frac{1}{k^{0.45}}$.  We know that
+     $\displaystyle \sum \frac{1}{k^{0.45}}$ diverges because it's a
+     $p$-series with $p = 0.45 \leq 1$.  Since $\displaystyle \sum
+     \frac{1}{k^{0.45}}$ has positive terms, we can apply the Asymptotic
+     Comparison Test to conclude that $\displaystyle \sum \frac{0.95^k +
+       k^{1.05}}{k \sqrt{k}}$ also diverges.
+   \end{problem}
+
+   \begin{solution}
+     Your roommate is completely correct.
+   \end{solution}
+   
+ \end{enumerate}
+
+ \begin{problemonly}
+   \textit{Hint:} Only one of your roommate's answers is completely correct.
+ \end{problemonly}
+
+
+ \end{enumerate}
+
+
+
+\end{document}

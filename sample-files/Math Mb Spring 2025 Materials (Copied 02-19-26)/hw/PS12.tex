@@ -1,0 +1,549 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 12 - Applications of Trig Derivatives}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{enumerate}
+
+\item Consider the curve given by $\sin (xy)  + y^2 = 5-x $.
+\begin{center}
+\includegraphics[width=6cm, height=4cm]{images/implicit-sinxy.png}
+\end{center} 
+
+\begin{enumerate}
+    \item Find the slope of the line tangent to the curve at the point $(5, 0)$. 
+
+\pspace{\stretch{3}}
+\begin{solution}
+    In order for us to find the slope of the curve, we'll differentiate this equation, treating $y$ as an implicit function of $x$.
+    \begin{align*}
+        \sin(xy)+y^2&= 5-x \\
+        \dfrac{d}{dx}(\sin(xy)+y^2) &= \dfrac{d}{dx} (5-x)\\
+        \cos (xy)\cdot \left(1\cdot y + x \cdot \frac{dy}{dx}\right) + 2y \cdot \frac{dy}{dx} &= -1 \\
+    \end{align*}
+    Evaluating this at $x=5,\, y=0$, we have
+    \begin{align*}
+        \cos (5\cdot 0)\cdot \left(1\cdot 0+5\cdot \frac{dy}{dx}\right) + 2\cdot 0 \cdot \frac{dy}{dx} &= -1\\
+        \cos (0)\left(5 \frac{dy}{dx}\right)&=-1\\
+        5\frac{dy}{dx} &= -1\\
+        \dfrac{dy}{dx} &= \dfrac{-1}{5}
+    \end{align*}
+\end{solution}
+
+    \item Write the equation of the line tangent to the  curve at $(5, 0)$.  
+
+\pspace{\vfill}
+
+
+\begin{solution}
+    Using point-slope form of a line, we write the equation as \fbox{$\displaystyle y-0 = \frac{-1}{5}(x-5)$.}
+    
+\end{solution}
+    \item Suppose an object is moving along this curve and has just passed the point $(5, 0)$. The object's $x$-coordinate is now $5.5$. Estimate its $y$-coordinate using linear approximation.
+
+\pspace{\vfill}
+
+    \begin{solution}
+    We use the tangent line to approximate the $y$-coordinate when the $x$ coordinate is 5.5
+    \begin{align*}
+        y&=\frac{-1}{5}(x-5)\\
+        y&=\frac{-1}{5}(5.5-5)\\
+        y&=\frac{-1}{5}\cdot\frac{1}{2}\\
+        y&=\frac{-1}{10}
+    \end{align*}
+    \fbox{The $y$-coordinate is approximately $\frac{-1}{10}$.}
+\end{solution}
+\end{enumerate}
+
+\pspace{\newpage}
+
+\item
+\begin{problem}
+  A lookout tower is located 0.5 kilometers from a line of warehouses.  A
+  searchlight on the tower is rotating at a rate of 6 revolutions per
+  minute. How fast is the beam of light moving along the wall of
+  warehouses when it passes by a window located 1 kilometer from the
+  tower? Include units.
+\end{problem}
+\pspace{\stretch{2}}
+
+\begin{solution}
+    
+    We begin by sketching two diagrams, illustrating the described scenario at different points in time. The diagram on the left is our ``snapshot" diagram, showing the specific point in time described in the question. The diagram on the right is the ``generic" diagram, showing a point in time after the snapshot. \\
+\begin{multicols}{2}
+Snapshot Diagram\\
+    \begin{tikzpicture}
+        \draw(0,4) -- (0,-2);
+        \draw[dashed](0,0) -- (2,0);
+        \draw(0,0.2) -- (0.2,0.2) -- (0.2,0);
+        \draw(0,3) -- (2,0);
+        \draw(0,3) -- (1, 1.5) node[label={right:1 km}] {};
+        \draw[dashed](0,0) -- (1.5,0) node[above]{$\theta$};
+        \draw(0,3) -- (2,0);
+        \filldraw (2,0) circle (0.1cm) node[anchor=west]{tower};
+        \filldraw (0,3) circle (0.1cm);
+        \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0,3) -- (0,0) node[midway,xshift=-2em]{$x$};
+  \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0.1,0) -- (2,0) node[midway,yshift=-2em]{0.5 km};
+  
+    \end{tikzpicture}
+
+Generic Diagram\\
+    \begin{tikzpicture}
+        \draw(0,4) -- (0,-2);
+        \draw[dashed](0,0) -- (2,0);
+        \draw(0,0.2) -- (0.2,0.2) -- (0.2,0);
+        \draw(0,1) -- (2,0); 
+        \draw[dashed](0,0) -- (1.1,0) node[above]{$\theta$};
+         \filldraw (2,0) circle (0.1cm) node[anchor=west]{tower};
+         \filldraw (0,1) circle (0.1cm);
+         \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0,1) -- (0,0) node[midway,xshift=-2em]{$x$};
+   \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0.1,0) -- (2,0) node[midway,yshift=-2em]{0.5 km};
+  
+    \end{tikzpicture}
+    \end{multicols}
+    This helps us to identify quantities that are changing and staying the same. As we re-read the prompt, we're able to identify constants and variables:
+    \begin{itemize}
+    \item The lookout tower is 0.5 km from the warehouses. This is a constant quantity that never changes.
+    \item We're told the searchlight rotates at 6 revolutions per minute, and we're asked about how fast the light is moving. 
+    \begin{itemize}
+        \item This means that in our diagram, we'll be labeling the distance between a point due left of the searchlight and the searchlight $x$, because its rate of change $\frac{dx}{dt}$ is the rate we're looking for.
+        \item and the angle between the horizontal dotted line above and the searchlight, $\theta$, because that's the rate we're given, $\frac{d\theta}{dt}$.
+    \end{itemize}
+    \end{itemize}
+    We find a relationship between the quantity whose rate of change we know $\theta$, and the quantity whose rate of change we're asked for $x$.
+    $$\sin \theta = \frac{x}{1}$$
+    We differentiate both sides with respect to $t$, giving us:
+    \begin{align*}
+        \frac{d}{d\theta}\tan \theta &= \frac{d}{d\theta}\frac{x}{0.5}\\
+        \sec^2\theta \frac{d\theta}{dt}&= \frac{1}{0.5}\cdot \frac{dx}{dt}\\
+        \sec^2\theta \frac{d\theta}{dt}&=
+        2\cdot \frac{dx}{dt}
+    \end{align*}
+    Each revolution is $2\pi$ radians, so we know $\dfrac{d\theta}{dt}=2\pi*6=12\pi$, and since $\theta$ is decreasing, this rate is $-12\pi$ radians/minute. We also know that $\cos \theta = 0.5$, which means $\sec \theta = 2$. Evaluating, we have:
+    \begin{align*}
+        (2)^2 \cdot (-12\pi) &= 2 \cdot \frac{dx}{dt}\\
+        -24\pi &= \frac{dx}{dt}
+    \end{align*}
+    We have found that the searchlight is moving at a rate of \fbox{$24\pi$ kilometers/minute.}
+\end{solution}
+
+
+\item 
+\begin{problem}
+    Find the derivative of $f(x)=x^{\tan(x)}$.
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    \begin{align*}
+        f(x)&= x^{\tan(x)}\\
+        \intertext{Taking the natural logarithm of both sides, we have}
+        \ln(f(x))&=\ln(x^{\tan(x)})\\
+        \intertext{Using logarithm rules, we have}
+        \ln(f(x))&=\tan(x)\ln(x)\\
+        \intertext{Taking the derivative of both sides, we have}
+        \frac{1}{f(x)}\cdot f'(x) &= \sec^2(x)\ln(x)+\tan(x)\cdot\frac{1}{x}\\
+        f'(x) &= f(x)\left(\sec^2(x)\ln(x)+\frac{\tan(x)}{x}\right)\\
+        f'(x) &= x^{\tan(x)}\left(\sec^2(x)\ln(x)+\frac{\tan(x)}{x}\right)
+    \end{align*} 
+\end{solution}
+
+\pspace{\newpage}
+
+
+\item
+\begin{problem}
+  A woman is standing, facing a long, straight fence 80 feet away, when
+  she notices a bear running along the fence. The bear is currently to the woman's left, running towards the right. She points her phone camera at the bear and rotates her hand to keep it pointed at the bear as it runs along the fence.
+  \end{problem}
+  \begin{enumerate}
+  \item  
+  \begin{problem}
+      When the distance between her and the bear is 100
+    feet, the bear's speed is 25 feet per second. How fast
+    is she rotating her hand at this moment? Give an exact answer in radians per second and a decimal approximation in degrees per second.
+  \end{problem}
+  \pspace{\stretch{3}}
+
+  \begin{solution}
+      We've sketched two diagrams, one the snapshot and one the generic representation of the situation. \\
+      
+       \begin{multicols}{2}
+Snapshot Diagram\\
+
+    \begin{tikzpicture}
+         \draw(-2,2) -- (2,2);
+        \draw[dashed](0,0) -- (0,2);
+        \draw(0,0) -- (-1.5,2); 
+        \draw(-0.2,2) -- (-0.2, 1.8) -- (0,1.8);
+        \draw(-1.5,2) -- (-.45,.6) node[anchor=west]{$\theta$};
+        \draw(-1.5,2) -- (-.75,1) node[anchor=east]{100 ft};
+        %\draw[dashed](0,0) -- (1.1,0) node[above]{$\theta$};
+         \filldraw (-1.5,2) circle (0.1cm) node[anchor=north]{bear};
+         \filldraw (0,0) circle (0.1cm) node[anchor=north]{woman};
+         \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0,0) -- (0,2) node[midway,xshift=2.5em]{80 ft};
+   %\draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  %(0.1,0) -- (3,0) node[midway,yshift=-2em]{200ft};
+  
+    \end{tikzpicture}\\
+
+Generic Diagram\\
+   \begin{tikzpicture}
+         \draw(-2,2) -- (2,2);
+         \draw(-0.2,2) -- (-0.2, 1.8) -- (0,1.8);
+        \draw[dashed](0,0) -- (0,2);
+        \draw(0,0) -- (-1,2); 
+        \draw(-1,2) -- (-.45,.9) node[anchor=west]{$\theta$};
+        %\draw(-1,2) -- (-.75,1.5) node[anchor=east]{100ft};
+        %\draw[dashed](0,0) -- (1.1,0) node[above]{$\theta$};
+         \filldraw (-1,2) circle (0.1cm) node[anchor=north]{bear};
+         \filldraw (0,0) circle (0.1cm) node[anchor=north]{woman};
+         \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0,0) -- (0,2) node[midway,xshift=2.5em]{80 ft};
+  \draw [decorate,decoration={brace,amplitude=5pt,raise=2pt}]
+  (-1,2) -- (0,2) node[midway,above, yshift=.5em]{$x$};
+   %\draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  %(0.1,0) -- (3,0) node[midway,yshift=-2em]{200ft};
+  \end{tikzpicture}
+    \end{multicols}
+    
+    Some observations: 
+      \begin{itemize}
+          \item Given that we know how fast the bear is moving, that tells us the rate at which the distance between the bear and a point directly in front of the woman is decreasing. We name this distance $x$, and the rate $\frac{dx}{dt}=-25$ ft/second since the distance $x$ is decreasing. This is our {\bf given information.}
+          \item Our {\bf unknown rate} for which we'll solve is $\frac{d\theta}{dt}$.
+      \end{itemize} 
+      We begin by relating the variable whose rate we know $x$, with the variable whose rate we're looking for, $\theta$. We don't want to introduce other quantities that are changing, because we don't know their rates, so we'll use the constant distance of 80 feet between the woman and the fence too.
+      $$\tan \theta = \frac{x}{80}$$
+      We differentiate the above with respect to $t$, and find:
+      \begin{align*}
+         \frac{d}{dt} (\tan \theta) &= \frac{d}{dt}\left(\frac{x}{80}\right)\\
+         \sec^2\theta \frac{d\theta}{dt} &= \frac{1}{80}\cdot \frac{dx}{dt}
+         \end{align*}
+         Evaluating at the moment in time we're interested in, we have:
+         \begin{align*}
+             \left(\frac{100}{80}\right)^2\cdot \frac{d\theta}{dt} &= \frac{1}{80}\cdot (-25)\\
+             \left(\frac{5}{4}\right)^2 \cdot \frac{d\theta}{dt}&=\frac{-25}{80}\\
+             \frac{d\theta}{dt}&=\frac{-25}{80}\cdot \left(\frac{4}{5}\right)^2\\
+             \frac{d\theta}{dt}&=\frac{-1}{5}
+         \end{align*}
+         We've found that she's rotating her hand in the {\bf clockwise direction} at a rate of \fbox{$\frac{1}{5} $ radians/second.}
+  \end{solution}
+
+  
+
+  \item
+    \begin{problem}
+      If the bear's speed is a constant 25 ft/s, when will the
+      woman's hand be rotating the fastest?  Answer with the distance between the bear and the woman at that moment. Explain briefly.
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+      
+      This translates into asking when $\frac{d\theta}{dt}$ is the greatest. From our previous work, we can solve for $\frac{d\theta}{dt}$ after differentiating:
+      \begin{align*}
+           \sec^2\theta \frac{d\theta}{dt} &= \frac{1}{80}\cdot \frac{dx}{dt}\\
+           \frac{d\theta}{dt}&=\cos^2 \theta \cdot \frac{1}{80}\cdot \frac{dx}{dt}
+      \end{align*}
+      The bear is still moving at 25 feet per second, so we can input $\frac{dx}{dt}=-25$, giving us:
+      $$\frac{d\theta}{dt}= \frac{-25}{80}\cdot \cos^2 \theta $$
+      The magnitude of a quantity is separate from its sign. \\
+      
+      We can see from this equation that $\frac{d\theta}{dt}$ will be at its largest when $\cos^2\theta$ is at its largest, which occurs when $\cos^2\theta = 1$, or when $\theta = 0$. Where is the bear when $\theta = 0$? Directly in front of the woman, which makes the bear \fbox{80 feet away.}
+  \end{solution}
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+\item \label{gottlieb-21.3.23}
+\begin{problem}
+  You're in a glass elevator in the Hyatt Hotel right next to the
+  Charles River, and you spot a duck in the water swimming towards you. The elevator is rising at a speed of 10 feet
+  per second, and the duck is swimming at a speed of 5 feet per second. As you pass the eighth floor, 100 feet above the river level, the duck is 200 feet away from the elevator shaft.
+\end{problem}
+  \begin{enumerate}
+
+  \item 
+\begin{problem}
+  At this instant, how fast is the total distance between you and the
+    duck changing?
+\end{problem}
+\pspace{\vfill}
+
+    \begin{solution}
+        We begin with two diagrams, one of the our snapshot, and a generic snapshot at a point in time a little bit later (higher elevator, duck closer to the elevator shaft) during the described scenario. This helps us identify what quantities are being discussed in the problem, what's changing, and what's constant. \\
+        
+        \begin{multicols}{2}
+Snapshot Diagram\\
+    \begin{tikzpicture}
+         \draw(0,4) -- (0,0);
+        \draw[dashed](0,0) -- (3,0);
+         \draw (0,0.2) -- (0.2,0.2) -- (0.2,0);
+        \draw(0,1.5) -- (3,0); 
+        %\draw[dashed](0,0) -- (1.1,0) node[above]{$\theta$};
+         \filldraw (3,0) circle (0.1cm) node[anchor=west]{duck};
+         \filldraw (0,1.5) circle (0.1cm) node[anchor=east]{elevator};
+         \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0,1.3) -- (0,0) node[midway,xshift=-2em]{100ft };
+   \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0.1,0) -- (3,0) node[midway,yshift=-2em]{200ft};
+  
+    \end{tikzpicture}
+
+Generic Diagram\\
+    \begin{tikzpicture}
+    \draw(0,4) -- (0,0);
+        \draw[dashed](0,0) -- (2,0);
+         \draw (0,0.2) -- (0.2,0.2) -- (0.2,0);
+        \draw(0,3) -- (2,0);
+        \draw(0,3) -- (1, 1.5) node[label={right:$z$}] {};
+        %\draw[dashed](0,0) -- (1.5,0) node[above]{$\theta$};
+        \draw(0,3) -- (2,0);
+        \filldraw (2,0) circle (0.1cm) node[anchor=west]{duck};
+        \filldraw (0,3) circle (0.1cm) node[anchor=east]{elevator};
+        \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0,2.85) -- (0,0) node[midway,xshift=-2em]{$y$};
+  \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0.1,0) -- (2,0) node[midway,yshift=-2em]{$x$};
+
+  
+       
+    \end{tikzpicture}
+    \end{multicols}
+    
+    Re-reading the prompt, we note the following:
+        \begin{itemize}
+            \item we're given the speed of the elevator rising, so we'll define the variable $y$ to be the height of the elevator off the ground, which means $\dfrac{dy}{dt}=10$ ft/sec.
+            \item We're also told the speed of the duck, so we'll define the variable $x$ to be the distance between the duck and the elevator shaft. This makes $\dfrac{dx}{dt}=-5$ ft/sec, since the distance between the duck and the elevator shaft is decreasing.
+        \end{itemize}  
+        The goal of the problem, to determine how fast the distance between us and the duck is changing, means we need to define another variable $z$ to be the distance between us and the duck, which makes our goal determining $\frac{dz}{dt}$.\\
+
+        We relate the variables whose rates we know $x, \, y$ with the variable whose rate we want to find, $z$.
+        $$x^2+y^2=z^2$$
+        Differentiating with respect to time, we have
+        \begin{align*}
+            \frac{d}{dt}(x^2+y^2)&= \frac{d}{dt}(z^2)\\
+            2x\cdot \frac{dx}{dt}+2y\cdot \frac{dy}{dt} &= 2z\cdot \frac{dz}{dt}
+        \end{align*}
+        Evaluating, we also need to compute the value of $z$ at the point in time relevant to the problem. $200^2+100^2=z^2$, which makes $z=100\sqrt{5}$. Plugging in these values, we have:
+        \begin{align*}
+        2(200)\cdot (-5)+2(100)\cdot (10) &= 2\cdot 100\sqrt{5}\cdot \frac{dz}{dt}\\
+        -2000+2000&=200\sqrt{5}\cdot\frac{dz}{dt}\\
+        0&=200\sqrt{5} \cdot \frac{dz}{dt}\\
+        0&=\frac{dz}{dt}
+        \end{align*}
+        At this instant, the total distance between us and duck is \fbox{not changing.}
+    \end{solution}
+  \item 
+\begin{problem} 
+  You have to look down at more and
+    more of an angle to see the duck as it swims. At the same instant as before, how fast is your angle of depression
+    increasing?
+    Include units.
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    Let's begin by adjusting our diagrams from earlier to include the angle of depression - recall that our angle of depression is between the horizontal and our line of sight to the duck in the pond.\\
+     \begin{multicols}{2}
+Snapshot Diagram\\
+    \begin{tikzpicture}
+         \draw(0,4) -- (0,0);
+        \draw[dashed](0,0) -- (3,0);
+        \draw[dashed](0,1.5) -- (3,1.5);
+        \draw(2.8,1.5) -- (2.8, 1.3) -- (3,1.3);
+         \draw (0,0.2) -- (0.2,0.2) -- (0.2,0);
+        \draw[dashed](0,1.5) -- (1, 1.5) node[anchor=north]{$\theta$};
+        \draw[dashed](3,1.5) -- (3,0);
+        \draw(0,1.5) -- (3,0); 
+        %\draw[dashed](0,0) -- (1.1,0) node[above]{$\theta$};
+         \filldraw (3,0) circle (0.1cm) node[anchor=west]{duck};
+         \filldraw (0,1.5) circle (0.1cm) node[anchor=east]{elevator};
+         \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0,1.3) -- (0,0) node[midway,xshift=-2em]{100ft };
+   \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0.1,0) -- (3,0) node[midway,yshift=-2em]{200ft};
+  
+    \end{tikzpicture}
+
+Generic Diagram\\
+    \begin{tikzpicture}
+    \draw(0,4) -- (0,0);
+    \draw (1.8, 3) -- (1.8, 2.8) -- (2, 2.8);
+    \draw (0,0.2) -- (0.2,0.2) -- (0.2,0);
+        \draw[dashed](0,0) -- (2,0);
+        \draw[dashed] (0.5,3) -- (2,3);
+        \draw[dashed] (0,3) -- (0.5,3) node[anchor=north]{$\theta$};
+        \draw[dashed] (2,3) -- (2,0);
+        \draw(0,3) -- (2,0);
+        \draw(0,3) -- (1, 1.5) node[label={right:$z$}] {};
+        %\draw[dashed](0,0) -- (1.5,0) node[above]{$\theta$};
+        \draw(0,3) -- (2,0);
+        \filldraw (2,0) circle (0.1cm) node[anchor=west]{duck};
+        \filldraw (0,3) circle (0.1cm) node[anchor=east]{elevator};
+        \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0,2.85) -- (0,0) node[midway,xshift=-2em]{$y$};
+  \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=1.5ex}]
+  (0.1,0) -- (2,0) node[midway,yshift=-2em]{$x$};
+
+  
+       
+    \end{tikzpicture}
+    \end{multicols}
+    
+    Truth be told, there are a few different ways to work this problem, but finding out that $\frac{dz}{dt}=0$ at the moment in question signals that our work will be simpler if we involve $z$ in our original equation. Here, we'll proceed with $\sin\theta$, but this problem can be worked with a variety of trig functions.\\
+    $$\sin \theta = \frac{y}{z}$$
+    Differentiating with respect to time, we have 
+    \begin{align*}
+        \frac{d}{dt}(\sin \theta) &= \frac{d}{dt}\left(\frac{y}{z}\right)\\
+        \cos \theta \cdot \frac{d\theta}{dt} &= \frac{z\cdot \frac{dy}{dt}-\frac{dz}{dt}\cdot y}{z^2}
+    \end{align*}
+    Evaluating at the moment in question, we have:
+    \begin{align*}
+       \frac{200}{100\sqrt{5}} \cdot \frac{d\theta}{dt} &= \frac{100\sqrt{5}\cdot 10-0 \cdot 100}{(100\sqrt{5})^2}\\
+       \frac{d\theta}{dt} &= \frac{100\sqrt{5}\cdot 10}{(100\sqrt{5})^2}\cdot \frac{100\sqrt{5}}{200}\\
+       \frac{d\theta}{dt} &= \frac{10}{200}\\
+       \frac{d\theta}{dt} &= \frac{1}{20}
+    \end{align*}
+    The angle of depression is \fbox{{\bf increasing} at a rate of $\frac{1}{20}$ radians per second.}
+\end{solution}
+  \end{enumerate}
+
+\pspace{\newpage}
+
+% \item
+% \begin{problem}
+%     A dog running around on the beach spots an interesting stick in the
+%     water, 800 meters ahead and 500 meters off-shore.  The dog gets to the
+%     stick by first running $x$ meters along the shore and then swimming
+%     directly toward the stick.  Suppose that the dog runs at a speed of
+%     $\sqrt{5}$ meters per second and swims at a speed of 1 meter per
+%     second.  What value of $x$ minimizes the amount of time it takes the
+%     dog to reach the stick?
+
+%  \emph{This optimization problem can also be done using using Math Ma methods, but it can also be done using trigonometric functions, which is
+%   what you'll do in this problem.}
+% \end{problem}
+%   \begin{center}
+%     \includegraphics[width=2in]{images/dog-swim-path} \qquad \qquad 
+%     \includegraphics[width=2in]{images/dog-swim-path-x-and-angle}
+%   \end{center}
+%   \begin{enumerate}
+%   \item 
+%     \begin{problem}
+%       Express the amount of time it takes the dog to reach the stick as a
+%       function of $\theta$, the angle shown in the right diagram above.
+%       (\emph{Hint:} Start by expressing the sides of the right triangle in
+%       the picture in terms of $\theta$ and 500.)
+%     \end{problem}
+%     \pspace{\vfill}
+    
+
+%     \begin{solution}
+%     \textcolor{red}{NEEDS SOLUTION}
+%       $\dfrac{800 - 500 \tan \theta}{\sqrt{5}} + 500 \sec \theta$
+%     \end{solution}
+
+%   \item \label{optimization-dog-swim-path-using-trig-optimize-angle}
+%     \begin{problem}
+%       Find the value of $\theta$ that minimizes the time it takes the dog
+%       to reach the stick.  (As always, be sure to justify that the value
+%       you find actually \emph{minimizes} the time.)
+%     \end{problem}
+%     \pspace{\stretch{3}}
+
+%     \begin{solution}
+%       $\theta = \arccos \frac{2}{\sqrt{5}}$.  
+%     \end{solution}
+
+%   \item
+%     \begin{problem}
+%       If $\theta$ is the value you found in
+%       \ref{optimization-dog-swim-path-using-trig-optimize-angle}, what is
+%       $x$?  (This ought to agree with your answer to
+%       \ref{optimization-dog-swim-path-using-trig}!) 
+%     \end{problem}
+%     \pspace{\vfill}
+
+%     \begin{solution}
+%       $550$
+%     \end{solution}
+    
+%   \end{enumerate}
+
+\pspace{\newpage}
+
+\item
+  \begin{problem}
+    Will is trying to find the maximum values of two functions,
+    $f(x) = \cos x + \sin x$ and $g(x) = \cos^2(x)$.  His friend Broc says, ``You definitely don't need calculus to find the maximum value for one of them.''
+  \end{problem}
+
+  \begin{enumerate}
+      \item 
+      \begin{problem}
+          Which one definitely doesn't need calculus? Find the maximum value of that function and explain. \emph{Hint: You know the range of one of them. If you're not sure, look back at Problem Set 10 \#3.}
+      \end{problem}
+      \pspace{\vfill}
+
+  \begin{solution}
+   $\cos x$ and $\sin x$ both oscillate between -1 and 1, but these occur at different values of $x$. It's hard to know what their sum is (outside of the special angles), where the maximum sum would happen, or what its value would be. We'll need calculus for that. On the other hand, $\cos^2 x$ only depends on $\cos x$. It will achieve only positive outputs, with a range of $[0, 1]$. Its max happens when $\cos x =1$, and the square of that is also 1, so the absolute maximum value of $g(x)$ is $1$. We don't need calculus to determine that.
+  \end{solution}
+
+    \item 
+      \begin{problem}
+          Find the maximum value of the other function. (\emph{This one can also be done without calculus, but not as easily as the other one. It's simpler for us to just use calculus.})
+      \end{problem}
+      \pspace{\stretch{3}}
+
+\begin{solution}
+    We find the maximum value of the other function by first looking for critical points, and then classifying them. Let's take the derivative and set it equal to zero:
+    \begin{align*}
+        f(x)&= \cos x + \sin x \\
+        f'(x) &= -\sin x + \cos x \\
+        0&= -\sin x + \cos x\\
+        \sin x &= \cos x
+    \end{align*}
+
+    From the above work we see that the derivative is zero when $\sin x$ and $\cos x$ are equal. This occurs at $\pi/4 + \pi k$ where $k$ is any integer. This corresponds to  $\pi/4$ and $5\pi/4$ on the unit circle.\\
+
+    Let's take a look at classifying this critical point. \\
+    The second derivative there is $f''(x) = -\cos x -\sin x=-(\cos x + \sin x)$. We investigate the sign of the second derivative at $x=\pi/4$ and $x=5\pi/4$ locations on the unit circle.\\
+   $f''(\frac{\pi}{4})= -(\cos \frac{\pi}{4} + \sin\frac{\pi}{4})<0$, which means the function is concave down, and therefore a {\bf local maximum} at the critical points $x=\frac{\pi}{4}+2\pi k$ where $k$ is any integer. \\
+   $f''(\frac{5\pi}{4})= -(\cos \frac{5\pi}{4} + \sin\frac{5\pi}{4})>0$ which means the function is concave up, and therefore a {\bf local minimum} at the critical points $x=\frac{5\pi}{4}+2\pi k$ where $k$ is any integer. 
+   We'll evaluate the original function at $x=\frac{\pi}{4}$ to determine the maximum value. 
+   $$f(\frac{\pi}{4})=\cos\frac{\pi}{4}+\sin\frac{\pi}{4}=\frac{\sqrt{2}}{2}+\frac{\sqrt{2}}{2}=\sqrt{2}$$
+
+   The maximum value of $f(x)$ is \fbox{$\sqrt{2}$.}
+\end{solution}
+    \end{enumerate}
+  
+\end{enumerate}
+\psreflection{
+Optional reading for next class is \S20.3 in Gottlieb.
+}
+\end{document}

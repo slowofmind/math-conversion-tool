@@ -1,0 +1,129 @@
+%%
+%% Required packages:
+%%
+\usepackage{etex}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsthm}
+\usepackage{fancyhdr,fancybox}
+\usepackage{mathrsfs} % need for \mathscr command
+\usepackage{multicol}
+\usepackage[normalem]{ulem}
+%\usepackage{pictex,pictexplus}
+\usepackage{pictexwd}
+\usepackage{rotating}
+\usepackage{tikz}
+\usepackage{url}
+\usepackage{xfrac}
+
+
+
+%%
+%% Common formatting commands
+%%
+\setlength{\parindent}{0in}
+\setlength{\textwidth}{7in}
+\setlength{\evensidemargin}{-0.25in}
+\setlength{\oddsidemargin}{-0.25in}
+\setlength{\parskip}{.5\baselineskip}
+\setlength{\topmargin}{-0.5in}
+\setlength{\textheight}{9in}
+
+%               Problem and Part
+\newcounter{problemnumber}
+\newcounter{partnumber}
+\newcounter{subpartnumber}
+\newcommand{\Problem}{%
+  \refstepcounter{problemnumber}%
+  \setcounter{partnumber}{0}%
+  \setcounter{subpartnumber}{0}%
+  \item[\makebox{\hfil\textbf{\theproblemnumber.}\hfil}]%
+  }
+\newcommand{\InProblem}[2][1.6]{%
+  \refstepcounter{problemnumber}%
+  \setcounter{partnumber}{0}%
+  \setcounter{subpartnumber}{0}%
+  \textbf{\theproblemnumber.}\ \ \parbox[t]{#1in}{#2}%
+}
+\newcommand{\InSmallProblem}[1]{\InProblem[1.05]{#1}}
+\newcommand{\NoProblem}[1]{%
+  \mbox{\hfil\textbf{#1}\hfil}%
+  }
+\newcommand{\UnProblem}{%
+  \refstepcounter{problemnumber}%
+  \setcounter{partnumber}{0}%
+  \setcounter{subpartnumber}{0}%
+  \mbox{\hfil\textbf{\theproblemnumber.}\hfil}%
+  }
+\newcommand{\InFlexProblem}[1]{%
+  \refstepcounter{problemnumber}%
+  \setcounter{partnumber}{0}%
+  \setcounter{subpartnumber}{0}%
+  \textbf{\theproblemnumber.}\ \ #1%
+}
+%%  Part:
+\newcommand{\Part}{%
+  \renewcommand{\thepartnumber}{(\alph{partnumber})}%
+  \refstepcounter{partnumber}
+  \setcounter{subpartnumber}{0}%
+  \item[(\alph{partnumber})]%
+}
+\newcommand{\InPart}[2][1.75]{%
+  \renewcommand{\thepartnumber}{(\alph{partnumber})}%
+  \refstepcounter{partnumber}%
+  \setcounter{subpartnumber}{0}%
+  (\alph{partnumber})\ \ \parbox[t]{#1in}{#2}%
+}
+\newcommand{\UnPart}{%
+  \refstepcounter{partnumber}%
+  \renewcommand{\thepartnumber}{(\alph{partnumber})}%
+  \setcounter{subpartnumber}{0}%
+  (\alph{partnumber})%
+}
+\newcommand{\InLargePart}[1]{\InPart[3.05]{#1}}
+\newcommand{\InFullPart}[1]{\InPart[6.2]{#1}}
+\newcommand{\InSmallPart}[1]{\InPart[1.05]{#1}}
+%% SubPart:
+\newcommand{\SubPart}{%
+  \refstepcounter{subpartnumber}%
+  \item[(\roman{subpartnumber})]%
+  }
+\newcommand{\InSubPart}[2][2.25]{%
+  \stepcounter{subpartnumber}%
+  (\roman{subpartnumber})\ \ \parbox[t]{#1in}{#2}%
+}
+\newcommand{\InSmallSubPart}[1]{\InSubPart[1.5]{#1}}
+\newcommand{\InTinySubPart}[1]{%
+  \stepcounter{subpartnumber}%
+  (\roman{subpartnumber})\ \ \makebox{#1}%
+}
+\newcommand{\InMySubPart}[2][2.25]{%
+  \stepcounter{subpartnumber}%
+  \parbox[t]{#1in}{\makebox[0.3in][l]{(\roman{subpartnumber})}\ \ {#2}}%
+}
+\newcommand{\TrueFalse}{\textbf{T}\ \ \textbf{F}\ \ }
+\newcommand{\TFPart}[1]{% 
+  \stepcounter{partnumber}%
+  \setcounter{subpartnumber}{0}%
+  \item[(\alph{partnumber})] \TrueFalse\parbox[t]{5.5in}{#1}}
+
+\newcommand{\Points}[1]{(#1 points) \ }
+\newcommand{\Point}[1]{(#1 point) \ }
+
+
+%% For Answers:
+\newcounter{answernumber}
+\newcommand{\Answer}{%
+  \refstepcounter{answernumber}%
+  \setcounter{partnumber}{0}%
+  \setcounter{subpartnumber}{0}%
+  \item[\makebox{\hfil\textbf{\theanswernumber.}\hfil}]%
+  }
+
+\pagestyle{empty}
+\lhead{\textsc{Math 22a}}
+\rhead{\textsc{Fall 2022}}
+\cfoot{}
+\renewcommand{\headrulewidth}{0pt}
+

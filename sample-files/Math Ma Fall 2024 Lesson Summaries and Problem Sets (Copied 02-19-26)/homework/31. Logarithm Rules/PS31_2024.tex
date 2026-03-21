@@ -1,0 +1,616 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols, workshop, grading]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\newcommand{\doedfinity}[2][\newpage]{
+  \begin{problem}[#1]
+    Do the Edfinity assignment ``Problem Set #2''.
+
+    We encourage you to write down any scratch work here, as well as
+    things you want your future self to remember. Nothing you write
+    here will be graded; it's just for you!
+  \end{problem}
+}
+
+\newcommand{\psrnewpage}{\newpage}
+\newcommand{\psreflection}[2][]{
+
+  \ifthenelse{\not\equal{#1}{nocite}}{
+    \begin{enumerate}[resume]
+    \item
+      \begin{problem}[1in]
+        Please cite any help you got on this problem set:
+        \begin{itemize}[nosep]
+        \item If you worked with other students, please list their names here.
+        \item If you used resources other than those on our Canvas site, please list them here.
+        \end{itemize}
+      \end{problem}
+
+    \end{enumerate}
+  }
+
+  \probonly{%
+    #2
+
+    \psrnewpage
+
+    \emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!
+    \begin{itemize}
+    \item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!
+
+      \vspace{1.5in}
+
+    \item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.
+
+      \vspace{1.5in}
+
+    \item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!
+
+      \vfill
+    \end{itemize}      
+  }
+}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 30 - Logarithm Rules}
+\end{center}
+
+\begin{enumerate}
+\item  \note{
+    \begin{itemize}[nosep]
+    \item Match $e^x$, $5^x$, $\ln x$, $\log_5 x$ with graphs 
+    \item Some simplifying like \href{https://people.math.harvard.edu/~jjchen/mathma/docs/homework/PS29.html}{Problem Set 29}, {{{{\#5}}(a)}}
+    \item Basic log rules
+    \item Rewrite $\log_b a$ as $\dfrac{\ln b}{\ln a}$
+    \item Derivative of $b^x$
+    \end{itemize}
+  }
+
+  \doedfinity{31}
+
+\item %({\it 13.2.2})
+
+  If $\log_2 u = A$ and $\log_2 w = B$, express the following in terms of $A$ and $B$. (Your final answer shouldn't involve $u$, $w$, or any logarithms.) Show your work, using one rule per step so that your grader can follow your reasoning.
+
+  \begin{enumerate}
+
+  \item
+
+    \begin{grading}
+      1.5 points. A possible breakdown is:
+      \begin{itemize}[nosep]
+      \item 0.5 for knowing $\displaystyle \log_2\left(\frac{u^3}{\sqrt[3]{w}}\right) = \log_2 (u^3) - \log_2(\sqrt[3]{w})$
+      \item 0.5 for knowing $\log_2(u^3) = 3 \log_2 u$
+      \item 0.5 for knowing $\log_2(\sqrt[3]{w}) = \frac{1}{3} \log_2 w$
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      $\displaystyle \log_2\left(\frac{u^3}{\sqrt[3]{w}}\right)$
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        \log_2\left(\frac{u^3}{\sqrt[3]{w}}\right) &= 
+        \log_2 (u^3) - \log_2 \sqrt[3]{w} \\
+        &= \log_2 (u^3) - \log_2 (w^{1/3}) \\
+        &= 3\log_2 u - \tfrac{1}{3} \log_2 w\\
+        &= \boxed{3A - \tfrac{1}{3} B}
+      \end{align*}
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      3.5 points. Here's one possible breakdown, but students might do this in different orders:
+      \begin{itemize}[nosep]
+      \item 0.5 for $\displaystyle \log_2\left(\frac{1}{8 \sqrt{w}}\right) = \log_2(1) - \log_2 (8 w^5)$
+      \item 0.5 for knowing $\log_2(1) = 0$
+      \item 0.5 for $\log_2 (8 w^5) = \log_2 8 + \log_2 (w^5)$. (A common error is to instead say this is equal to $5 \log_2 (8w)$.) 
+      \item 0.5 for $\log_2 8 = 3$
+      \item 0.5 for $\log_2 (w^5) = 5 \log_2 w$
+      \item 1 for keeping track of negatives and parentheses. (For example, a common error is to forget to multiply the 6 by everything.) 
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      $\displaystyle 6 \log_2\left(\frac{1}{8 w^5}\right)$
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        6 \log_2\left(\frac{1}{8 w^5}\right) 
+        &= 6\left[\log_2 1 - \log_2(8w^5)\right] \\
+        &= 6\left[\log_2 1 - (\log_2(8) + \log_2(w^5))\right] \\
+        &= 6\left[\log_2 1 - \log_2(8) - \log_2(w^5)\right] \\
+        &= 6\left[\log_2 1 - \log_2(8) - 5\log_2(w)\right] \\
+        &= 6\left[0 - 3 - 5B\right] \\
+        &= \boxed{-6(3+5B)}
+      \end{align*}
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      3.5 points. Here's one possible breakdown:
+      \begin{itemize}[nosep]
+      \item 0.5 for $\log_2(wu^2) = \log_2 w + \log_2(u^2)$
+      \item 0.5 for $\log_2 \left( \dfrac{u^2}{4w} \right) = \log_2(u^2) - \log_2(4w)$
+      \item 0.5 for knowing $\log_2(u^2) = 2 \log_2 u$ and $\log_2(w^2) = 2 \log_2 w$
+      \item 0.5 for $\log_2(4w) = \log_2 4 + \log_2 w$
+      \item 0.5 for $\log_2 4 = 2$
+      \item 1 for keeping track of parentheses. 
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\vfill\newpage]
+      $\displaystyle \log_2 \left( w u^2 \right) \log_2 \left( \frac{u^2}{4w} \right)$
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        \log_2 \left( w u^2 \right) \log_2 \left( \frac{u^2}{4w} \right)
+        &= \left[\log_2 w + \log_2 (u^2)\right] \cdot
+        \left[\log_2(u^2)-\log_2(4w) \right] \\
+        &= \left[\log_2 w + 2\log_2 u\right] \cdot
+        \left[2 \log_2 u-\log_2(4w) \right] \\
+        &= \left[\log_2 w + 2\log_2 u\right] \cdot
+        \left[2 \log_2 u-(\log_2 4 + \log_2 w) \right] \\
+        &= \left[\log_2 w + 2\log_2 u\right] \cdot
+        \left[2 \log_2 u-\log_2 4 - \log_2 w \right] \\
+        &= \boxed{(B + 2A)(2 A-2 - B)} \\
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+  Let $a = \log_{10} 2$ and $b = \log_{10} 3$. Express each of the following in term of $a$ and $b$. (There should be no logarithms in your final answer.)
+
+  \begin{enumerate}[resume]
+  \item
+
+    \begin{grading}
+      3 points. Here's one possible breakdown:
+      \begin{itemize}[nosep]
+      \item 0.5 for knowing $\displaystyle \log_{10} \left( \frac{16}{\sqrt[4]{9}} \right) = \log_{10}(16) - \log_{10} (\sqrt[4]{9})$
+      \item 0.5 for knowing $\log_{10} (16) = 4 \log_{10} 2$
+      \item 0.5 for knowing $\log_{10} (\sqrt[4]{9}) = \dfrac{1}{4} \log_{10} 9$
+      \item 0.5 for knowing $\log_{10} 9 = 2 \log_{10} 3$
+      \item 1 for keeping track of parentheses / distributing constants correctly. (For example, a common mistake is for students to write $\displaystyle 5 \log_{10} \left( \frac{16}{\sqrt[4]{9}} \right) = 5 \log_{10} 16 - \log_{10} \left( \sqrt[4]{9} \right)$.) 
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      $\displaystyle 5 \log_{10} \left( \frac{16}{\sqrt[4]{9}} \right)$
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        5 \log_{10} \left( \frac{16}{\sqrt[4]{9}} \right) &=
+        5\left[\log_{10} 16 - \log_{10} \sqrt[4]{9}\right] \\
+        &= 5 \left[\log_{10} 16 - \log_{10} (9^{1/4})\right] \\
+        &= 5 \left[\log_{10} (2^4) - \log_{10} (3^{1/2})\right] \\
+        &= 5 \left[4 \log_{10} 2 - \tfrac{1}{2} \log_{10} 3 \right] \\
+        &= \boxed{5(4a - \tfrac{1}{2}b)}
+      \end{align*}
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      3 points. There are many ways to do this problem, so here's one possible breakdown.
+      \begin{itemize}[nosep]
+      \item 0.5 for knowing $\log_{10} \left(30 \sqrt{60} \right) = \log_{10} 30 + \log_{10} (\sqrt{60})$
+      \item 0.5 for knowing $\log_{10} 30 = \log_{10} 3 + \log_{10} 10$
+      \item 0.5 for knowing $\log_{10} 10 = 1$
+      \item 0.5 for knowing $\log_{10} (\sqrt{60} ) = \frac{1}{2} \log_{10} (60)$
+      \item 0.5 for knowing $\log_{10} 60 = \log_{10} 10 + \log_{10} 2 + \log_{10} 3$
+      \item 0.5 for keeping track of parentheses / distributing constants correctly
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      $\displaystyle \log_{10} \left(30 \sqrt{60} \right)$
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        \log_{10} \left(30 \sqrt{60} \right) 
+        &= \log_{10} 30 + \log_{10} \sqrt{60} \\
+        &= \log_{10} 30 + \tfrac{1}{2} \log_{10} 60 \\
+        &= \log_{10} 3 + \log_{10} 10 
+          + \tfrac{1}{2} (\log_{10} 2 + \log_{10} 3 + \log_{10} 10) \\
+        &= \tfrac{1}{2}\log_{10} 2 + \tfrac{3}{2} \log_{10} 3 + 
+        \tfrac{3}{2} \log_{10} 10 \\
+        &= \boxed{\tfrac{1}{2} a + \tfrac{3}{2} b + \tfrac{3}{2}}
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\item  
+
+  \begin{enumerate}
+  \item
+
+    \begin{grading}
+      3 points:
+      \begin{itemize}[nosep]
+      \item 0.75 for knowing $\ln ( 2 e^{3x} ) = \ln 2 + \ln (e^{3x})$
+      \item 0.75 for knowing $\ln (e^{3x}) = 3x$
+      \item 1.5 for a graph that agrees with their simplified formula. (Check that their slope has the right sign and that their $y$-intercept is consistent with their formula.) 
+      \end{itemize}
+      A common error is to say $\ln (2 e^{3x}) = 3x \ln (2e)$. That should get a 0.75 point deduction. 
+    \end{grading}
+
+    \begin{problem}[\vfill\newpage]
+      Simplify $f(x) = \ln(2 e^{3x})$, and graph it. 
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        \ln(2e^{3x}) &= \ln 2 + \ln(e^{3x}) \\
+        &= \ln 2 + 3x
+      \end{align*}
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty]
+            \addplot[domain=-1:1] {0.693+3*x};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \end{enumerate}
+
+  In each of the next two parts, you're given a function $f(x)$. First, simplify the formula for $f(x)$ as much as you can; you should be able to express it in terms of a familiar function like $\dfrac{1}{x}$ or $\log_2 x$. Then, graph $f$, and explain how the graph of $f$ is related to the graph of the familiar function. (In other words, if you started with the graph of the familiar function, what graph transformations could you do to get the graph of $f$?)
+
+  \begin{enumerate}[resume]
+  \item
+
+    \begin{grading}
+      3.5 points:
+      \begin{itemize}[nosep]
+      \item 0.5 for knowing $e^{2 \ln x - 3 \ln 2} = \dfrac{e^{2 \ln x}}{e^{3 \ln 2}}$
+      \item 0.75 for knowing $e^{2 \ln x} = \left( e^{\ln x} \right)^2 = x^2$
+      \item 0.75 for simplifying $e^{3 \ln 2} = \left( e^{\ln 2} \right)^3 = 2^3 = 8$
+      \item 1 for the graph
+      \item 0.5 for a good description (vertical stretch of $x^2$)
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      $f(x) = e^{2 \ln x - 3 \ln 2}$
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+          e^{2\ln x - 3\ln 2} &= 
+          \frac{e^{2\ln x}}{e^{3\ln 2}} \\
+          &= \frac{e^{\ln(x^2)}}{e^{\ln(2^3)}} \\
+          &= \frac{x^2}{8}
+      \end{align*}
+      The graph of $y=f(x)$ is a vertical scaling of $y=x^2$ by
+      a factor of $\frac{1}{8}$.
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty]
+            \addplot[domain=-5:5] {x^2/8};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      5 points:
+      \begin{itemize}[nosep]
+      \item 0.5 for knowing $\log_5 \left( \dfrac{\sqrt{x}}{25} \right) = \log_5 (\sqrt{x}) - \log_5(25)$
+      \item 0.5 for knowing $\log_5(\sqrt{x}) = \frac{1}{2} \log_5 x$
+      \item 0.5 for knowing $\log_5(5x^3) = \log_5(5) + \log_5 (x^3)$
+      \item 0.5 for knowing $\log_5(x^3) = 3 \log_5 x$
+      \item 0.5 for knowing $\log_5(25) = 2$ and $\log_5 5 = 1$
+      \item 0.5 for combining the $\log_5 x$ terms
+      \item 1 for the graph
+      \item 1 for describing the transformations
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\nstretch{1.25}]
+      $\displaystyle f(x) = \log_5 \left( \dfrac{\sqrt{x}}{25} \right) - \frac{\log_5 (5x^3)}{2} - 3 \log_5 x$ 
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        \log_5 \left( \dfrac{\sqrt{x}}{25} \right) - \frac{\log_5 (5x^3)}{2} - 3 \log_5 x 
+        &= \log_5 \sqrt{x} - \log_5 25 -\tfrac{1}{2}(\log_5 5 
+          + \log_5 (x^3)) - 3 \log_5 x \\
+        &= \tfrac{1}{2}\log_5 x - 2 -\tfrac{1}{2}(1 + 3\log_5 x)
+          - 3\log_5 x\\
+        &= -4\log_5 x -\tfrac{5}{2}
+      \end{align*}
+      The graph of $y=f(x)$ is the graph of $y=\log_5 x$ reflected
+      over the $x$-axis, scaled vertically by a factor of $4$, and
+      shifted down $\frac{5}{2}$ units.
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty]
+            \addplot[domain=0:10] {-4*ln(x)/ln(5) - 2.5};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \end{enumerate}
+
+\item \label{change-of-base-practice}
+
+  \begin{grading}
+    2 points: 0.5 for the final answer and 1.5 for the process.
+  \end{grading}
+
+  \begin{problem}[\vfill]
+    In class, we saw that $\log_b a$ could be written in terms of natural logs as $\dfrac{\ln a}{\ln b}$. Use the same method as in class to express $\log_{12} 7$ in terms of base 3 logarithms. Be sure to write out all of your work. 
+  \end{problem}
+
+  \begin{solution}
+    First, let's say $y=\log_{12} 7$. We can rewrite this an 
+    exponential equation and take the logarithm base 3 of both sides.
+    \begin{align*}
+      12^y &= 7 \\
+      \log_3(12^y) &= \log_3 7 \\
+      y \log_3 12 &= \log_3 7 \\
+      y &= \frac{\log_3 7}{\log_3 12}
+    \end{align*}
+  \end{solution}
+
+\item \label{inverse-function-deriv-preview}
+
+  \emph{In this problem, you'll do some work with inverse functions that will be very important next class.}
+
+  \begin{enumerate}
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\stretch{0.75}]
+      Let $m$ and $b$ be constants, and let $f(x) = mx + b$. Find $f^{-1}(x)$.
+    \end{problem}
+
+    \begin{solution}
+      To find $f^{-1}(x)$, we solve $f(y)=x$ for $y$.
+      \begin{align*}
+        my + b &= x\\
+        my &= x-b \\
+        y &= \frac{x-b}{m}
+      \end{align*}
+      Therefore $f^{-1}(x)=\frac{1}{m}(x-b)$.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1.5 points: 0.5 for the answer, 1 for explanation
+    \end{grading}
+
+    \begin{problem}[\nstretch{0.75}]
+      If you reflect a line of slope $m$ over the line $y = x$, what is the slope of the reflection? Explain how you know.
+    \end{problem}
+
+    \begin{solution}
+      When we reflect over the line $y=x$, we are switching the $x$-values
+      and $y$-values. So if a line went through the points $(x_1, y_1)$
+      and $(x_2, y_2)$ with slope $m=\frac{y_2-y_2}{x_2-x_1}$, 
+      now it goes through the points $(y_1, x_1)$ and $(y_2, x_2)$
+      and has slope $\frac{x_2-x_1}{y_2-y_1}$, which is the reciprocal
+      of the original slope, or $\frac{1}{m}$.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1.5 points: 0.5 for knowing they need $f'(3)$, 1 for calculating it correctly 
+    \end{grading}
+
+    \begin{problem}[0.25in]
+      The following picture shows the graph of $f(x) = \dfrac{x^2}{4}$ on the domain $[0, \infty)$ together with the line tangent to $y = f(x)$ at $x = 3$. Find the slope of the tangent line.
+
+      \begin{tikzpicture}
+        \begin{axis}[axis equal image, xmax=4.75, ymax=4.75, xtick={1, 2, 3, 4, 5}, ytick={1, 2, 3, 4, 5}, clip=false, ymin=0, width=2.5in]
+          \addplot+[domain=0:{sqrt(19)}] {x^2 / 4} node[above]{$y = f(x)$}; %
+          \addplot+[closed] coordinates {(3, 9/4)}; %
+          \addplot+[domain=2:4] {1.5*(x-3)+9/4}; %
+        \end{axis}
+      \end{tikzpicture}
+    \end{problem}
+
+    \begin{solution}
+      The slope of the tangent line is $f'(3)$. Since 
+      $f'(x) = \tfrac{1}{2}x$, $f'(3)=\frac{3}{2}$.
+    \end{solution}
+
+  \item \label{tangent-line-reflection}
+
+    \begin{grading}
+      1 for recognizing and explaining that they're finding $g' \left( \dfrac{9}{4} \right)$, 1 for the right slope. 
+    \end{grading}
+
+    \begin{problem}[0.25in]
+      Here's the same picture, together with its reflection over $y = x$. We've given the reflection of $y = f(x)$ the name $y = g(x)$. Fill in the blanks in the following statement, and explain how you got your answer.
+      \begin{quote}
+        From the picture, we can see that 
+        $g' \left( \fitb{0.25in}{\frac{9}{4}} \right) = \fitb{0.5in}{\frac{2}{3}}$.
+      \end{quote}
+
+      \begin{tikzpicture}
+        \begin{axis}[axis equal image, xmax=4.75, ymax=4.75, xtick={1, 2, 3,
+            4, 5}, ytick={1, 2, 3, 4, 5}, clip=false, ymin=0, width=2.5in]
+          \addplot+[domain=0:{sqrt(19)}] {x^2 / 4} node[above]{$y = f(x)$}; %
+          \addplot+[closed] coordinates {(3, 9/4)}; %
+          \addplot+[domain=2:4] {1.5*(x-3)+9/4}; %
+          \addplot+[domain=0:4.75, thin, black!50!white, dashed] {x}; % 
+          \addplot+[domain=0:4.75] {2*sqrt(x)} node[right]{$y = g(x)$}; %
+          \addplot+[closed] coordinates {(9/4, 3)}; %
+          \addplot+[sharp plot] coordinates { (3/4, 2) (15/4, 4)}; % 
+        \end{axis}
+      \end{tikzpicture}
+
+      \begin{solution}
+        We know that $g'(\frac{9}{4})=\frac{2}{3}$ because the tangent line
+        to $y=g(x)$ at $x=\frac{9}{4}$ is the reflection over $y=x$ of
+        the tangent line to $y=f(x)$ at $x=3$, so $g'(\frac{9}{4})$ is the
+        reciprocal of $f'(3)$.
+      \end{solution}
+
+    \end{problem}
+
+  \item
+
+    \begin{grading}
+      2.5 points: 1 for finding a formula for $g$, 1.5 for evaluating $g' \left( \dfrac{9}{4} \right)$ correctly
+    \end{grading}
+
+    \begin{problem}[\vfill\newpage]
+      Find a formula for $g(x)$, and use that to algebraically verify
+      your answer to \ref{tangent-line-reflection}.
+    \end{problem}
+
+    \begin{solution}
+      To find $y=g(x)$, we solve $g(y)=x$ for $y$. 
+      \begin{align*}
+        \frac{y^2}{4} &= x \\
+        y^2 &= 4x \\
+        y &= \sqrt{4x} \text{ (since the domain is $[0, \infty)$)} \\
+        y&= 2\sqrt{x}
+      \end{align*}
+      So $g(x)=2\sqrt{x}$. Using derivative rules, $g'(x)=x^{-1/2}$.
+      Thus, $g'(\frac{9}{4}) = (\frac{9}{4})^{-1/2} = \frac{2}{3}$.
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+\psreflection{For next class, read \S 14.1 - 14.3.}
+\end{document}

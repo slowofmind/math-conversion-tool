@@ -1,0 +1,402 @@
+\documentclass[12pt,letterpaper]{article}
+
+
+
+\input{../worksheet-setup.tex}
+
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+	\hskip -\arraycolsep
+	\let\@ifnextchar\new@ifnextchar
+	\array{#1}}
+\makeatother
+
+\def\env@matrix{\hskip -\arraycolsep
+	\let\@ifnextchar\new@ifnextchar
+	\array{*\c@MaxMatrixCols c}}
+
+
+\chead{\Large\textbf{Determinants, $\vec\S$2.3}}% 
+
+\begin{document}
+\thispagestyle{fancy}
+
+Recall from the last few classes:
+
+\begin{itemize}
+\item We define the {\bf determinant} of $A=\begin{bmatrix} a & b \\ c & d\\ \end{bmatrix}$, denoted by $\text{det}(A)$, by $$\text{det}(A)=ad-bc.$$
+\item {\bf Theorem:} If $A$ is an $n$ by $n$ invertible matrix, then for each $\vec{b}\in \R^n$, $A\vec{x}=\vec{b}$ has a unique solution; namely $\vec{x}=A^{-1}\vec{b}$.
+\item {\bf Theorem:} Suppose $A$ and $B$ are $n$ by $n$ invertible matrices, then the following hold. 
+\begin{enumerate}
+\item $A^{-1}$ is invertible and $(A^{-1})^{-1}=A$.
+\item $(AB)^{-1}=B^{-1} A^{-1}$.
+\item $(A^{T})^{-1}=(A^{-1})^{T}$.
+\end{enumerate}
+\item An {\bf elementary matrix} $E$ is a matrix obtained from the identity matrix by a single elementary row operation.
+ \item {\bf Theorem:} $A$ is invertible if and only if $A$ is row equivalent to the identity matrix. Furthermore, any sequence of elementary row operations that reduces $A$ to $I_n$ also transforms $I_n$ into $A^{-1}$.
+\end{itemize}
+
+\newpage
+
+
+
+
+
+\begin{enumerate}
+
+\Problem 
+\Part Let $A=\begin{bmatrix}
+1 & -2 & -1\\
+-1 &5 & 6\\
+5 &-4 & 5\\
+\end{bmatrix}$. Find $A^{-1}$ if possible.
+
+\vfill
+
+\Part Let $A=\begin{bmatrix}
+1 & 0 & -2\\
+-3 &1 & 4\\
+2 &-3 & 4\\
+\end{bmatrix}$. Find $A^{-1}$ if possible.
+
+\vfill
+
+\newpage
+
+{\bf Invertible Matrix Theorem} Let $A$ be an $n \times n$ matrix, then the following are all equivalent.
+\begin{enumerate}
+\item $A$ is invertible.
+\item $A$ is row-equivalent to $I_n$.
+\item $A$ has $n$ pivot positions.
+\item $A\vec{x}=\vec{0}$ has only the trivial solution.
+\item The columns of $A$ are linearly independent.
+\item $x\mapsto A\vec{x}$ is one-to-one (injective).
+\item For all $\vec{b}\in \R^n$, $A\vec{x}=\vec{b}$ is consistent.
+\item The columns of $A$ span $\R^n$.
+\item $\vec{x} \mapsto A\vec{x}$ is onto (surjective).
+\item There exists a matrix $C$ such that $CA=I_n$.
+\item There exists a matrix $D$ such that $AD=I_n$.
+\item $A^{T}$ is invertible.
+\end{enumerate}
+
+\Problem Prove the theorem.
+
+\newpage
+
+\Problem Determine if the following matrices are invertible.
+\Part Let $A=\begin{bmatrix}
+3 & 0 & 0\\
+-3 &-4 & 0\\
+8 & 5 & -3\\
+\end{bmatrix}$.
+
+\vfill
+
+\Part Let $A=\begin{bmatrix}
+1 &2 & 3\\
+4 &5 & 6\\
+7 & 8 & 9\\
+\end{bmatrix}$.
+
+\vfill
+
+\newpage
+
+{\bf Theorem:} Let $T: \R^n \to \R^n$ be linear and let $A$ be the associated matrix. Then $T$ is invertible if and only if $A$ is invertible.
+
+\Problem Prove the theorem.
+
+\newpage
+
+{\bf Goal:} Develop a numerical test for invertibility.
+
+\Problem Let $A=\begin{bmatrix}
+a & b & c\\
+d & e &f\\
+g & h & i\\
+\end{bmatrix}$. Find a condition on the entries of $A$ for $A$ to be invertible.
+
+\newpage
+
+\begin{defn}
+For a matrix $A$ define  $A_{ij}$ to be the matrix obtained from $A$ by deleting row $i$ and column $j$.
+\end{defn}
+
+{\bf Remark:} $$\text{det} \begin{bmatrix}
+a & b & c\\
+d & e &f\\
+g & h & i\\
+\end{bmatrix} = a \text{det} A_{11} - b \text{det} A_{12} +c \text{det} A_{13}.$$
+
+\begin{defn}
+For $n\geq 2$, the determinant of an $n\times n$ matrix $A=[a_{ij}]$ is
+\begin{equation*}
+\operatorname{det}(A)= a_{11} \operatorname{det}(A_{11}) - a_{12} \operatorname{det}(A_{12})+\dots + (-1)^{n+1} a_{1n} \operatorname{det}(A_{1n})=\sum_{j=1}^{n}(-1)^{1+j}a_{1j} \operatorname{det}(A_{1j}).
+\end{equation*}
+\end{defn}
+
+\Problem Compute the determinant of $A=\begin{bmatrix}
+1 & 2 &3\\
+4 & 5 &6\\
+7 & 8 & 9\\
+\end{bmatrix}$.
+
+\vfill
+
+\begin{defn} The {\bf $(i,j)$-cofactor} of $A$ is given by $c_{ij} =(-1)^{i+j} \operatorname{det} A_{ij}$, and the {\bf cofactor expansion along row $i$} is given by $\sum_{j=1}^{n}a_{ij} c_{ij}$.
+\end{defn}
+
+
+
+{\bf Theorem:} Cofactor expansion across any row or column is the same, and hence each cofactor expansion gives the determinant.
+
+\newpage
+
+\Problem Compute the determinant of 
+$C=\begin{bmatrix}
+6 & 0 & 0 & 5\\
+1 & 7 & 2 & -5\\
+2 & 0 & 0 & 0\\
+8 & 3 & 1 & 8\\
+\end{bmatrix}$.
+
+\vfill
+
+\begin{defn} Let $A=[a_{ij}]$ be an $n\times n$ matrix, then $A$ is {\bf upper triangular} if $a_{ij}=0$ when $i>j$.
+\end{defn}
+
+{\bf Theorem:} Let $A$ be an $n\times n$ upper triangular matrix, then $$\operatorname{det}(A)= a_{11}a_{22}\dots a_{nn} = \prod_{j=1}^n a_{jj}.$$
+
+\Problem Prove the theorem.
+
+\vfill
+\vfill
+
+\end{enumerate}
+
+%\end{document}
+
+\newpage
+\chead{\Large\textbf{Determinants -- Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+  \Answer
+  
+ \begin{enumerate} 
+  \Part Let $A=\begin{bmatrix}
+  1 & -2 & -1\\
+  -1 &5 & 6\\
+  5 &-4 & 5\\
+  \end{bmatrix}$. We try augment $A$ by $I_n$ and try to use the result that if $A$ is invertible, then $[A|I_n]\sim [I_n | A^{-1}]$. Thus
+  
+  \begin{align*}
+  \begin{pmatrix}[ccc|ccc]
+  1 & -2 & -1 & 1 & 0 & 0\\
+  -1 &5 & 6 & 0 & 1 & 0\\
+  5 &-4 & 5 & 0 & 0 &1\\
+  \end{pmatrix}& \sim  \begin{pmatrix}[ccc|ccc]
+  1 & -2 & -1 & 1 & 0 & 0\\
+  0 &3 & 5 & 1 & 1 & 0\\
+  0 & 6 & 10 & -5 & 0 &1\\
+\end{pmatrix} \sim \begin{pmatrix}[ccc|ccc]
+1 & -2 & -1 & 1 & 0 & 0\\
+0 &3 & 5 & 1 & 1 & 0\\
+0 &0 & 0 & -7 & -2 &1\\
+\end{pmatrix},
+  \end{align*}
+and now we're stuck. Since $A$ is not row-equivalent to $I_n$ (which we're seeing on left), the algorithm fails to find an inverse for $A$. Thus we know $A$ is not invertible.
+
+\Part Let  $A=\begin{bmatrix}
+1 & 0 & -2\\
+-3 &1 & 4\\
+2 &-3 & 4\\
+\end{bmatrix}$. We again augment $A$ by $I_n$ and try to use the result that if $A$ is invertible, then $[A|I_n]\sim [I_n | A^{-1}]$. Thus
+
+\begin{align*}
+	\begin{pmatrix}[ccc|ccc]
+		1 & 0 & -2 & 1 & 0 & 0\\
+		-3 &1 & 4 & 0 & 1 & 0\\
+		2 &-3 & 4 & 0 & 0 &1\\
+	\end{pmatrix}& \sim  \begin{pmatrix}[ccc|ccc]
+		1 & 0 & -2 & 1 & 0 & 0\\
+		0 &1 & -2 & 3 & 1 & 0\\
+		0 & -3 & 8 & -2 & 0 &1\\
+	\end{pmatrix}\\ &\sim \begin{pmatrix}[ccc|ccc]
+		1 & 0 & -2 & 1 & 0 & 0\\
+		0 &1 & -2 & 3 & 1 & 0\\
+		0 &0 & 2 & 7 & 3 &1\\
+	\end{pmatrix}\\ &\sim
+\begin{pmatrix}[ccc|ccc]
+	1 & 0 & 0 & 8 & 3 &1 \\
+	0 &1 & 0 & 10 & 4 & 1\\
+	0 &0 & 2 & \frac{7}{2} & \frac{3}{2} &\frac{1}{2}\\
+\end{pmatrix},
+\end{align*}
+and hence $A^{-1}=\begin{bmatrix}
+8 & 3 & 1\\
+10 & 4 & 1\\
+\frac{7}{2} & \frac{3}{2} & \frac{1}{2}\\
+\end{bmatrix}.$
+
+\end{enumerate}
+  
+  \Answer 
+  
+ \begin{proof} There are many ways to organize all the implications. Here I try to use previous results from class as much as possible.
+ 
+ $(a)\implies (j)$ by definition.
+ 
+ $(j) \implies (d)$ by Theorem 2.5 (or above on this handout).
+ 
+ $(d) \implies (c)$ by Theorem 1.4.
+ 
+ $(c) \implies (b)$ since $A$ is square.
+ 
+ $(b) \implies (a)$ by Theorem 2.7 (or above on this handout).
+ 
+ Thus we have established $(a) \iff (b) \iff (c) \iff (d) \iff (j)$.
+ 
+Note $(a)\implies (k)$ by definition of invertibility. We prove $(k) \implies (g)$. Suppose $D$ is an $n\times n$ matrix such that $AD=I_n$. Let $\vec{b} \in \mathbb{R}^n$, and define $\vec{y} =D\vec{b}$. Now $A\vec{y}=AD\vec{b} =I_n\vec{b} =\vec{b}$, and hence $\vec{y}$ is a solution to the matrix equation $A\vec{x}=\vec{b}$. Thus the matrix equation is always consistent, and hence $(g)$ follows. Now we prove $(g)\implies (a)$. By Theorem 1.4, $A\vec{x}=\vec{b}$ being consistent for any $\vec{b}$ is equivalent to $A$ having a pivot position in each row. Since $A$ is square, we know $A$ must be row equivalent to the identity matrix. By the theorem above, $A$ is invertible, and hence $(a)$ holds. 
+
+Finally note $(d) \iff (e) \iff (f)$ and $(g) \iff (h) \iff (i)$ follows from Theorem 1.12. Finally we prove $(a)\iff (l)$ above on this handout.
+ \end{proof}
+  
+  \Answer 
+  
+  \begin{enumerate}
+  \Part We could row-reduce $A$ to determine if $A$ is row equivalent to the identity matrix, but in this case we can see the columns of $A$ are linearly independent, and hence we know $A$ must be invertible from the invertible matrix theorem.
+  
+  \Part We have previously seen this matrix does not span all of $\mathbb{R}^3$, and hence we can use the invertible matrix theorem to conclude $A$ is not invertible.
+  
+  \end{enumerate}
+  
+  \Answer
+  
+  \begin{proof} We prove both implications directly from the definitions.
+  
+  $\implies$ Suppose $T$ is invertible, then there exists a function $T^{-1} : \mathbb{R}^n \to \mathbb{R}^n$ such that $T(T^{-1}(\vec{x}))=\vec{x}$ and $T^{-1}(T(\vec{x}))=\vec{x}$ for all $\vec{x} \in \mathbb{R}^n$. If we knew that $T^{-1}$ was linear, then it would have an associated matrix we could use.
+  
+  {\bf Claim:} $T^{-1}$ is linear.
+  
+  {\bf Proof of Claim:} Let $\vec{x}, \vec{y} \in \mathbb{R}^n$ and $c \in \mathbb{R}$. Since $T$ is invertible, it is bijective. Thus there exists unique $\vec{a}, \vec{b} \in \mathbb{R}^n$ such that $T(\vec{a})=\vec{x}$ and $T(\vec{b})=\vec{y}$. Now we check the conditions for linearity: $$T^{-1}(\vec{x}+\vec{y})=T^{-1}(T(\vec{a})+T(\vec{b}))=T^{-1}(T(\vec{a}+\vec{b})=\vec{a}+\vec{b}=T^{-1}(\vec{x})+T^{-1}(\vec{y}).$$ and $$T^{-1}(c\vec{x})=T^{-1}(c T(\vec{a}))=T^{-1}(T(c\vec{a}))=c \vec{a} = c T^{-1}(\vec{x}).$$ Thus $T^{-1}$ is linear.
+  
+  Since $T^{-1}$ is linear, it has an associated matrix $D$. Now $$AD\vec{x} =T(T^{-1}(\vec{x}))=\vec{x}$$ and $$DA\vec{x} =T^{-1}(T(\vec{x})) =\vec{x}.$$ Thus $D$ is the inverse matrix of $A$, and hence $A$ is invertible. 
+  
+  $\impliedby$ Suppose $A$ is invertible. Define $S: \mathbb{R}^n \to \mathbb{R}^n$ by $S(\vec{x})=A^{-1}\vec{x}$. Then $T(S(\vec{x}))=AA^{-1}\vec{x} = \vec{x}$ and $S(T(\vec{x})) =A^{-1}A\vec{x}=\vec{x}$. Thus $S$ is the inverse function of $T$, and hence $T$ is invertible. 
+  \end{proof}
+
+
+  \Answer By the invertible matrix theorem, we know $A$ is invertible if and only if $A$ is row equivalent to the identity matrix. Thus we try to row-reduce $A$ and see what condition we get on the entries of the matrix.
+  
+  If the first column of $A$ is all zeros, then we know the matrix is not invertible. Thus we assume $a \neq 0$.
+  
+  \begin{align*}
+  A=\begin{bmatrix}
+  a & b & c\\
+  d & e & f\\
+  g & h & i\\
+  \end{bmatrix}&\sim
+\begin{bmatrix}
+	a & b & c\\
+	ad & ae & af\\
+	ag & ah & ai\\
+\end{bmatrix}\sim
+\begin{bmatrix}
+	a & b & c\\
+	0 & ae-bd & af-cd\\
+	0 & ah-bg & ai-cg\\
+\end{bmatrix}\\
+&\sim
+\begin{bmatrix}
+	a & b & c\\
+	0 & ae-bd & af-cd\\
+	0 & (ah-bg)(ae-bd) & (ai-cg)(ae-bd)\\
+\end{bmatrix}\\
+&\sim\begin{bmatrix}
+	a & b & c\\
+	0 & ae-bd & af-cd\\
+	0 & 0 & D\\
+\end{bmatrix} 
+  \end{align*}
+where $D=(ai-cg)(ae-bd)-(af-cd)(ah-bg)$.
+
+Now multiplying out $D$ and simplifying we get 
+$$D=a(aei-ceg-bdi -afh+cdh+bfg).$$ Since $a$ is non-zero, we know for $A$ to be row equivalent to the identity matrix, we need $(aei-acg-bdi -afh+cdh+bfg)\neq0$. We define $$\det(A)=(aei-acg-bdi -afh+cdh+bfg).$$ 
+
+This seems like a strange condition, so let's play around with it a bit more. Factoring we get the following $$(aei-acg-bdi -afh+cdh+bfg)= a(ei-fh)-b(di-fg)+c(dh-eg),$$ and now we see some smaller determinants showing up; namely $$a(ei-fh)-b(di-fg)+c(dh-eg)= a \cdot \det \begin{bmatrix} e & f\\ h & i \end{bmatrix} -b\cdot \det \begin{bmatrix} d & f\\ g & i \end{bmatrix}+c\cdot \det \begin{bmatrix} d & e\\ g & h \end{bmatrix}=\det(A).$$ This expression for the determinants suggests a way to define the determinant of an $n\times n$ matrix in terms of $(n-1)\times(n-1)$ matrices.
+  
+  \Answer We use the definition to compute the determinant:
+  \begin{align*}
+ \det A&=\det \begin{bmatrix}
+  1 & 2 &3\\
+  4 & 5 &6\\
+  7 & 8 & 9\\
+  \end{bmatrix}=1 \cdot \det \begin{bmatrix} 5 & 6\\ 8 & 9 \end{bmatrix}-2 \cdot \det \begin{bmatrix} 4 & 6\\ 7 & 9 \end{bmatrix}+3 \cdot \det \begin{bmatrix} 4 & 5\\ 7 & 8 \end{bmatrix}\\&=1(45-48)-2(36-42)+3(32-35)=0.
+\end{align*}
+
+We have previously seen that $A$ is not invertible, so it is reassuring to see the determinant is also zero.
+    
+  \Answer Again we use the definition to compute the determinant:
+  \begin{align*}
+  	\det C& =\det \begin{bmatrix}
+  6 & 0 & 0 & 5\\
+  1 & 7 & 2 & -5\\
+  2 & 0 & 0 & 0\\
+  8 & 3 & 1 & 8\\
+  \end{bmatrix}= 6\cdot \det \begin{bmatrix}
+  7 & 2 & -5\\
+  0 & 0 & 0\\
+  3 & 1 & 8\\
+\end{bmatrix}-5\cdot \det \begin{bmatrix}
+1 & 7 & 2\\
+2 & 0 & 0\\
+8 & 3 & 1\\
+\end{bmatrix}=-5(-2)=10.
+\end{align*}
+
+Using the last Theorem, we can expand about the third row as well. We show that here:
+  \begin{align*}
+	\det C& =\det \begin{bmatrix}
+		6 & 0 & 0 & 5\\
+		1 & 7 & 2 & -5\\
+		2 & 0 & 0 & 0\\
+		8 & 3 & 1 & 8\\
+	\end{bmatrix}= 2\cdot \det \begin{bmatrix}
+		0 & 0 & 5\\
+		7 & 2 & -5\\
+		3 & 1 & 8\\
+\end{bmatrix}
+=2(5)(7-6)=10.
+\end{align*}
+
+
+  \Answer 
+  
+  \begin{proof}
+  We prove the result by induction on the size of the matrix.
+  
+  {\bf Base Case:} Let $A=\begin{bmatrix} a & b\\ 0 & c\\ \end{bmatrix}$, then $\det(A)=ac$. Thus the result holds for $2\times 2$ matrices.
+  
+  {\bf Inductive Step:} We assume that the determinant of an $n\times n$ upper triangular matrix is given by the product of the diagonal elements.
+  
+  Let $A$ be an $(n+1)\times(n+1)$ upper triangular matrix. We compute the determinant by expanding along the first column:
+  \begin{align*}
+  \det(A)&= a_{11} \det(A_{11}) -a_{21}\det(A_{21})+\dots+(-1)^{n+1+1}a_{(n+1)1}\det(A_{(n+1)1})
+  \end{align*}
+
+Since $A$ is upper-triangular, $a_{21}=\dots=a_{(n+1)1}=0$. Thus
+$$\det(A)= a_{11} \det(A_{11}).$$ Since $A_11$ is an $n\times n$ upper triangular matrix, we can apply the induction hypothesis to get $$\det(A)= a_{11} \det(A_{11})=a_{11} (a_{22}\dots a_{(n+1)(n+1)}).$$ Thus the result holds by mathematical induction.
+  \end{proof}
+  
+\end{enumerate}
+
+\end{document}
+
+
+%%% Local ables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

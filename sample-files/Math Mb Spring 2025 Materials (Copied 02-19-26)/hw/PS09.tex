@@ -1,0 +1,894 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 9 - Trigonometric functions and Applications}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{enumerate}
+
+\item 
+%({Problem Set 9}, {{\#1}})
+
+\begin{grading}
+9 points: 3 for each part. Their explanation should either refer to the unit circle or to the graph of the tangent function. 
+\end{grading}
+
+
+ % 19.3.4
+  Suppose $\alpha$ is an angle and $\tan \alpha = m$. Find the following in terms of $m$.
+  Explain verbally and/or graphically by referring to the unit circle.
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\tan (\alpha + \pi)$
+      \end{problem}
+
+      \begin{solution}
+        If $\alpha$ is the red angle below, then $\alpha + \pi$ is the
+        blue angle: 
+        \begin{center}
+          \begin{tikzangle}[angle=pi/3, secondangle=4*pi/3]            
+          \end{tikzangle}
+        \end{center}
+        Therefore, we can interpret $\tan(\alpha)$ as the slope of the red
+        line and $\tan(\alpha + \pi)$ as the slope of the blue line; these
+        are clearly the same, so $\tan(\alpha + \pi) = \tan(\alpha) =
+        \boxed{m}$.
+
+        Another way to arrive at the same conclusion is to remember that
+        $\tan x$ has period $\pi$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\tan (-\alpha)$
+      \end{problem}
+
+      \begin{solution}
+        If $\alpha$ is the red angle below, then $-\alpha$ is the
+        blue angle: 
+        \begin{center}
+          \begin{tikzangle}[angle=pi/3, secondangle=-pi/3]            
+          \end{tikzangle}          
+        \end{center}
+        By symmetry, the slope of the blue line is the negative of the
+        slope of the red line, so $\tan(-\alpha) = - \tan(\alpha) =
+        \boxed{-m}$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\tan (\pi - \alpha)$
+      \end{problem}
+
+      \begin{solution}
+        If $\alpha$ is the red angle below, then $\pi-\alpha$ is the
+        blue angle: 
+        \begin{center}
+          \begin{tikzangle}[angle=pi/3, secondangle=2*pi/3]            
+          \end{tikzangle}          
+        \end{center}
+        By symmetry, the slope of the blue line is the negative of the
+        slope of the red line, so $\tan(\pi-\alpha) = - \tan(\alpha) =
+        \boxed{-m}$. 
+      \end{solution}      
+
+    \end{enumerate}    
+
+
+\item 
+
+%({Problem Set 9}, {{\#2}})
+
+\begin{grading}
+12 points: 3 for each part. Deduct points if their reasoning is incorrect or missing.
+\end{grading}
+
+Suppose $\alpha$ is an angle in $[0, \pi]$ and $\cos \alpha = -
+  \frac{3}{5}$.  Find the following; show work or explain your reasoning.
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\sin \alpha$
+      \end{problem}
+
+      \begin{solution}
+        By the Pythagorean identity, $\sin^2(\alpha) + \cos^2(\alpha) =
+        1$, so $\sin^2(\alpha) = 1 - \left( - \frac{3}{5} \right)^2 =
+        \frac{16}{25}$.  Therefore, $\sin \alpha$ is either
+        $\frac{4}{5}$ or $- \frac{4}{5}$.  Since $\alpha$ is
+        in $[0, \pi]$, $\sin \alpha$ must be positive, so it is
+        $\boxed{\frac{4}{5}}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\tan \alpha$
+      \end{problem}
+
+      \begin{solution}
+        $\displaystyle \tan \alpha = \frac{\sin \alpha}{\cos \alpha} = 
+        \boxed{-\frac{4}{3}}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\cos(\pi - \alpha)$
+      \end{problem}
+
+      \begin{solution}
+        We can picture $\alpha$ as the red angle below and $\pi -
+        \alpha$ as the blue angle below:
+        \begin{center}
+          \begin{tikzangle}[angle=rad(acos(-3/5)),
+            secondangle=pi-\angle, xtick={-0.6},
+            xticklabels={$-\frac{3}{5}$}]             
+          \end{tikzangle}
+        \end{center}
+        By symmetry, $\cos(\pi - \alpha) = \boxed{\frac{3}{5}}$. 
+      \end{solution}
+
+  \item
+\begin{problem}[\vfill]
+      Find all values of $x$ in $[0, 2\pi]$ with $\cos x = -
+      \frac{3}{5}$; express your answers in terms of $\alpha$.
+    \end{problem}
+
+    \begin{solution}
+      There are two such angles; $\alpha$ is one, and the other is $2\pi-\alpha$:
+      \begin{center}
+          \begin{tikzangle}[angle=rad(acos(-3/5)),
+            label = $\alpha$, secondlabel = $2\pi-\alpha$, 
+            secondangle=-\angle, xtick={-0.6},
+            xticklabels={$-\frac{3}{5}$}, func=cos]             
+          \end{tikzangle}
+      \end{center}
+    \end{solution}
+
+  \end{enumerate}
+
+\pspace{\newpage}
+
+\item 
+%({Problem Set 9}, {{\#3}})
+
+\begin{grading}
+5 points: 2 for part (a), 3 for part (b).
+\end{grading}
+
+  Meredith is reviewing her notes from class and realizes she's
+  confused about one thing.  She says,
+  \begin{quote}
+    I know that $\displaystyle \lim_{x \to (\pi/2)^-} \sin x = 1$,
+    $\displaystyle \lim_{x \to (\pi/2)^-} \cos x = 0$, and $\displaystyle
+    \lim_{x \to (\pi/2)^-} \frac{\sin x}{\cos x} = \infty$.
+
+    But since $\displaystyle \lim_{x \to (\pi/2)^+} \sin x = 1$ and
+    $\displaystyle \lim_{x \to (\pi/2)^+} \cos x = 0$, shouldn't
+    $\displaystyle \lim_{x \to (\pi/2)^+} \frac{\sin x}{\cos x}$ also be
+    $\infty$?
+  \end{quote}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\stretch{0.75}]
+      Write a response to Meredith: when you're looking at a limit
+      $\displaystyle \lim_{x \to a} \frac{f(x)}{g(x)}$ (or a one-sided
+      limit) where $f(x) \to
+      1$ and $g(x) \to 0$, what else do you need to look at to figure out
+      what $\displaystyle \lim_{x \to a} \frac{f(x)}{g(x)}$ is?  
+    \end{problem}
+
+    \begin{solution}
+      You also need to look at the sign of $g(x)$ when $x$ is near $a$.
+
+      To make this concrete in Meredith's example, as $x$ approaches
+      $\frac{\pi}{2}$ from the left, $\cos x$ is positive; so, for values
+      of $x$ just a tiny bit less than $\frac{\pi}{2}$, $\frac{\sin
+        x}{\cos x}$ involves dividing a number close to 1 by a tiny
+      positive number, which gives a huge positive result; that's why
+      $\displaystyle \lim_{x \to (\pi/2)^-} \frac{\sin x}{\cos x} =
+      \infty$.
+
+      In contrast, as $x$ approaches $\frac{\pi}{2}$ from the right, $\cos
+      x$ is negative; so, for values of $x$ just a tiny bit greater than
+      $\frac{\pi}{2}$, $\frac{\sin x}{\cos x}$ involves dividing a number
+      close to 1 by a negative number that is very close to 0, which gives
+      a huge negative result; that's why $\displaystyle \lim_{x \to
+        (\pi/2)^+} \frac{\sin x}{\cos x} = -\infty$.
+    \end{solution}
+
+  \item
+    \begin{problem}
+      Meredith has a follow-up
+      question.  She says, "the graph of $y=\frac{f(x)}{g(x)}$ must have vertical
+      asymptotes whenever $g(x)= 0$, no matter what $f(x)$ and $g(x)$ are, right?''  Give Meredith an
+      example to show her that this is not correct. 
+    \end{problem}
+    \pspace{\stretch{0.75}}
+
+    \begin{solution}
+      A simple example is the function $y = \frac{x}{x}$; the
+      denominator is 0 at $x = 0$, but the graph has a hole at $x = 0$, not a
+      vertical asymptote.
+    \end{solution}
+
+  \end{enumerate}
+
+\item
+    \begin{problem}[\vfill]
+      %(19.3.8) 
+      Sketch the graph of $g(x) = \tan 2x$ on $[0, 2 \pi]$,
+      labeling all intercepts and asymptotes.
+    \end{problem}
+
+    \begin{solution}
+      To get the graph of $\tan (2x)$, we can start with the graph of
+      $\tan x$ and stretch horizontally by a factor of $\frac{1}{2}$:
+      \begin{center}        
+        \begin{tikzpicture}
+          \begin{axis}[xtick={0., 1.5708, 3.14159, 4.71239, 6.28319},
+            xticklabels={$0.$, $\frac{\pi }{2}$, $\pi$, $\frac{3 \pi
+              }{2}$, $2 \pi$}, ytick=\empty, ymin=-5, ymax=5, extra x
+            ticks={0.785398, 2.35619, 3.92699, 5.49779}, extra x tick
+            labels={$\frac{\pi }{4}$, $\frac{3 \pi }{4}$, $\frac{5 \pi
+              }{4}$, $\frac{7 \pi }{4}$},
+              extra x tick style={grid=major, grid style={dashed,black}},]
+            \addplot+[domain=0:6.3, restrict y to domain=-15:15] {tan(2*deg(x))};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      Therefore, the $x$-intercepts are $x = 0$, $\frac{\pi }{2}$, $\pi$,
+      $\frac{3 \pi }{2}$, $2 \pi$, and the asymptotes are at $x =
+      \frac{\pi }{4}$, $\frac{3 \pi }{4}$, $\frac{5 \pi }{4}$, $\frac{7
+        \pi }{4}$.              
+    \end{solution}   
+
+
+\pspace{\newpage}
+
+
+\item 
+
+\begin{grading}
+12 points, as follows: 2/2/2/3/3.
+\end{grading}
+
+\begin{problem}
+In this problem, you'll sketch the graph of $y=\sec x$.
+\begin{enumerate}
+  \item 
+  Graph $y=\cos x$ on $[-2\pi, 2\pi]$ below.
+  You'll be graphing $y=\sec x$ on the same axes.
+
+\probonly{
+  \begin{center}
+\begin{tikzpicture}
+ \begin{axis}[
+ xmin = -2.25*pi, xmax = 2.25*pi, ymin = -2.8, ymax = 2.8,
+ xlabel = $x$, ylabel = $y$,
+ xtick = {-2*pi, -pi, 0, pi, 2*pi}, xticklabels = {$-2\pi$,
+ $-\pi$,$0$,$\pi$,$2\pi$}, minor x tick num = 1, 
+ ytick distance = 1, minor y tick num = 1, minor tick length = 4pt, 
+ restrict y to domain = -5:5, extra x ticks = {-3*pi/2,-pi/2,pi/2,3*pi/2},
+ extra x tick labels={}, width=5.5in, height=4in]
+ \addplot[domain=-2*pi:2*pi,draw=none]{sec(deg(x))};
+
+ \end{axis}
+ \end{tikzpicture}
+  \end{center}
+}
+
+  \item 
+  \begin{problem}
+  Given that $\sec x = \frac{1}{\cos x}$, plot the points at which $\sec x = 1$
+  on the interval $[-2\pi, 2\pi]$. Do the same for the points at which $\sec x = -1$.
+  \end{problem}
+
+  \item 
+  \begin{problem}
+  We know that the range of cosine is $[-1,1]$. What is the range of secant?
+  \end{problem}
+
+  \pspace{36pt}
+
+  \item
+  \begin{problem}
+  When $\cos x > 0$, what is the sign of $\sec x$?
+  \end{problem}
+  \pspace{36pt}
+
+  \begin{problem}
+  When $\cos x < 0$, what is the sign of $\sec x$?
+  \end{problem}
+  \pspace{36pt}
+
+  \begin{problem}
+  What is $\sec x$ when $\cos x = 0$?
+  \end{problem}
+  \pspace{36pt}
+
+  \item Finish your sketch of the graph of $y=\sec x$ on the axes above.
+
+  \end{enumerate}
+\end{problem}
+\pspace{\newpage}
+
+\begin{solution}
+\begin{enumerate}
+\item See part (e). 
+\item On $[-2\pi, 2\pi]$, $\cos x = 1$ at $-2\pi, 0, 2\pi$. Since $\sec x = \frac{1}  {\cos x}$, $\sec x =1$ at the same $x$-values. Similarly, $\cos x$ and $\sec x$ both equal $-1$ at the same $x$-values, $-\pi, \pi$.
+\item Since $\sec x = \frac{1}{\cos x}$, the range of secant is $(-\infty, -1] \cup [1,\infty)$.
+\item When $\cos x > 0$, $\sec x >0$. When $\cos x < 0$, $\sec x < 0$.
+  When $\cos x = 0$, $\sec x$ is undefined.
+\item
+ \begin{tikzpicture}
+ \begin{axis}[
+ xmin = -2.25*pi, xmax = 2.25*pi, ymin = -3, ymax = 3,
+ xlabel = $x$, ylabel = $y$,
+ xtick = {-2*pi, -pi, 0, pi, 2*pi}, xticklabels = {$-2\pi$,
+ $-\pi$,$0$,$\pi$,$2\pi$}, minor x tick num = 3, 
+ minor y tick num = 1, minor tick length = 4pt, 
+ restrict y to domain = -5:5, extra x ticks = {-3*pi/2,-pi/2,pi/2,3*pi/2},
+ extra x tick labels={}, extra x tick style={grid=major, grid style={dashed,black}}]
+ \addplot[domain=-2*pi:2*pi,red]{cos(deg(x))};
+ \addplot[domain=-2*pi:2*pi,black]{sec(deg(x))};
+ \addplot[closed] coordinates {(-2*pi,1) (-pi,-1) (0,1) (pi,-1) (2*pi,1)};
+ \end{axis}
+ \end{tikzpicture}
+  
+\end{enumerate}
+
+
+
+\end{solution}
+
+  \item 
+  
+\begin{grading}
+10 points. 2 per part. Their answers should be exact, and they need to have a sketch of the angle in standard position.
+\end{grading}
+
+Evaluate each expression. Do not use a calculator.
+
+\probonly{
+\begin{problem}
+\begin{tasks}(4)
+\task $\tan\frac{3\pi}{4}$
+\task $\sec(-\frac{5\pi}{3})$
+\task $\cot\frac{11\pi}{6}$ 
+\task $\csc\frac{7\pi}{2}$
+\end{tasks}
+\end{problem}
+}
+\pspace{\stretch{0.5}}
+
+\solonly{
+\begin{enumerate}
+      \item
+        \begin{problem}[\vfill]
+          $ \tan \frac{3 \pi}{4}$
+        \end{problem}
+
+        \begin{solution}
+          Here is $\frac{3 \pi}{4}$ (in red), along with the reference
+          triangle:
+          \begin{center}
+            \begin{tikzangle}[angle=3*pi/4, triangle=true]              
+            \end{tikzangle}
+          \end{center}
+          The reference angle is $\frac{\pi}{4}$, so the horizontal and
+          vertical side are both $\frac{1}{\sqrt{2}}$; therefore, the
+          slope of the hypotenuse is $\boxed{-1}$.
+        \end{solution}
+
+      \item
+        \begin{problem}[\vfill]
+          $\sec ( - \frac{5\pi}{3} )$
+        \end{problem}
+
+        \begin{solution}
+          $\sec \left( - \frac{5 \pi}{3} \right)$ is defined to be
+          $\frac{1}{\cos \left( - \frac{5 \pi}{3} \right)}$, so let's first
+          find $\cos \left( - \frac{5 \pi}{3} \right)$.  Here is the angle
+          $- \frac{5 \pi}{3}$ in standard position (in red), together with
+          the reference triangle (in green):
+          \begin{center}
+            \begin{tikzangle}[angle=-5*pi/3, triangle=true]
+            \end{tikzangle}
+          \end{center}
+          The reference angle is $\frac{\pi}{3}$, so the horizontal side has
+          length $\frac{1}{2}$.  Therefore, $\cos \left( - \frac{5 \pi}{3}
+          \right) = \frac{1}{2}$, and $\sec \left( - \frac{5 \pi}{3} \right)
+          = \boxed{2}$. 
+        \end{solution}
+
+      \item 
+        \begin{problem}[\vfill]
+          $\cot \left ( \frac{11\pi}{6} \right )$
+        \end{problem}
+
+        \begin{solution}
+          Here is the angle $\frac{11 \pi}{6}$ (in red) and the reference
+          triangle (in green):
+          \begin{center}
+            \begin{tikzangle}[angle=11*pi/6, triangle=true]
+            \end{tikzangle}
+          \end{center}
+          The reference angle is $\frac{\pi}{6}$, so the horizontal side of
+          the reference triangle has length $\frac{\sqrt{3}}{2}$, and the
+          vertical side has length $\frac{1}{2}$.  Therefore, $\cos \left (
+            \frac{11\pi}{6} \right ) = \frac{\sqrt{3}}{2}$ and $\sin \left (
+            \frac{11\pi}{6} \right ) = - \frac{1}{2}$, so $\cot \left (
+            \frac{11\pi}{6} \right ) = \frac{\sqrt{3}/2}{-1/2} = \boxed{-
+            \sqrt{3}}$.
+        \end{solution}
+
+      \item 
+        \begin{problem}[\vfill]
+          $\csc\frac{7\pi}{2}$
+        \end{problem}
+
+        \begin{solution}
+            Here is the angle $\frac{7\pi}{2}$. Since $\csc\frac{7\pi}{2}=\frac{1}{\sin\frac{7\pi}{2}}$, let's find $\sin\frac{7\pi}{2}$.
+            \begin{center}
+            \begin{tikzangle}[angle=7*pi/2]              
+            \end{tikzangle}
+          \end{center}
+          Looking at the unit circle, $\sin\frac{7\pi}{2}=-1$, so  $\csc\frac{7\pi}{2}=\fbox{$-1$}$.
+        \end{solution}
+
+      \end{enumerate}
+}
+
+\item 
+%({Problem Set 10}, {{\#2}})  % 20.1.5
+
+\begin{grading}
+5 points.
+\end{grading}
+
+  \note{It's fine for them to leave their answer in terms of
+    $\tan(\ang{16})$; let students know that it's very important to know
+    \emph{which} trig values we can simplify (i.e., integer multiples of
+    $\frac{\pi}{6}$ and $\frac{\pi}{4}$). }
+
+  Reading examples 20.1, 20.2, and 20.3 in Gottlieb may help you complete the
+  following problem.
+
+  \begin{problem}[\stretch{2}]
+    You are standing on an overpass trying to measure the height of an apartment building across the street. Using surveying equipment, you determine that, from 35 feet above street level, the angle of depression to the bottom of the building (on
+    street level) is \ang{16}, and the angle of elevation to the top of the building is \ang{54}. How tall is the building? Give an exact answer and use a calculator to get an approximation.
+  \end{problem}
+
+  \begin{solution}
+    Here is a diagram of the situation:
+    \begin{center}
+      \begin{tikzpicture}
+        \draw (0, 0) -- (45:5);
+        \pgfmathsetmacro{\x}{5/sqrt(2)/cos(15)};
+        \coordinate (bottom) at (-15:\x);
+        \draw (0, 0) -- (bottom);
+        \draw[dashed] (0, 0) -- ({5/sqrt(2)}, 0);
+        \filldraw (0, 0) circle(1.5pt) node[left] {you};
+        \draw[dashed] (0, 0) -- node[left] {35 ft} (0, 0 |- bottom);
+        \filldraw (45:5) circle(1.5pt) node[right] {};
+        \draw (45:5) -- node[right]{} (45:5 |- bottom);
+        \draw (-1, 0 |- bottom) -- ($(bottom) + (1, 0)$)
+        node[right]{street};
+        \draw[blue] (10pt, 0) arc[radius=10pt, start angle=0, end angle=45]
+        node[right] {$\ang{54}$};
+        \draw[red] (20pt, 0) arc[radius=20pt, start angle=0, end angle=-15]
+        node[right, xshift=2pt, yshift=1pt] {$\ang{16}$};
+      \end{tikzpicture}
+    \end{center}
+    There are two right triangles in this picture.  The lower one has an
+    angle of $\ang{16}$, and the side opposite that has length $35$ ft.
+    We can figure out the adjacent side: 
+    \begin{align*}
+    \tan \ang{16} &=
+    \frac{35\text{ ft}}{\text{adjacent side}} \\
+    \text{adjacent side} &= \frac{35\text{ ft}}{\tan\ang{16}}
+    \end{align*}
+    So the adjacent side has length
+    $\ang{16}$ is not one of our special
+    angles, so we won't simplify $\tan\ang{16}$.
+    
+    The upper right triangle has an angle of \ang{54}, and we now that we know that the adjacent side has length
+    $\frac{35}{\tan\ang{16}}$. We can determine the side opposite the \ang{54} angle: 
+    \begin{align*}
+        \tan\ang{54} &= \frac{\text{opposite side}}{\frac{35\text{ ft}}{\tan\ang{16}}} \\
+        \text{opposite side} &= \tan\ang{54} \cdot \frac{35\text{ ft}}{\tan\ang{16}}
+    \end{align*}
+    So the length of the side opposite the $\ang{54}$ angle is $\frac{\tan\ang{54}}{\tan\ang{16}}\cdot 35$ ft.
+    \begin{center}
+      \begin{tikzpicture}
+        \draw (0, 0) -- (45:5);
+        \pgfmathsetmacro{\x}{5/sqrt(2)/cos(15)};
+        \coordinate (bottom) at (-15:\x);
+        \draw (0, 0) -- (bottom);
+        \draw[green!70!black] (0, 0) -- node[above, pos=0.6]{$\frac{35}{\tan\ang{16}}$ ft} ({5/sqrt(2)}, 0);
+        \filldraw (0, 0) circle(1.5pt) node[left] {you};
+        \draw[dashed] (0, 0) -- node[left] {35 ft} (0, 0 |- bottom);
+        \filldraw (45:5) circle(1.5pt) node[right] {};
+        \draw[blue] (45:5) -- node[right]{$\frac{\tan\ang{54}}{\tan \ang{16}}\cdot 35$ ft}
+        ({5/sqrt(2)}, 0);
+        \draw[red] ({5/sqrt(2)}, 0) -- node[right]{35 ft} (bottom);
+        \draw (-1, 0 |- bottom) -- ($(bottom) + (1, 0)$)
+        node[right]{street};
+        \draw[blue] (10pt, 0) arc[radius=10pt, start angle=0, end angle=45]
+        node[right] {$\ang{54}$};
+        \draw[red] (20pt, 0) arc[radius=20pt, start angle=0, end angle=-15]
+        node[right, xshift=2pt, yshift=1pt] {$\ang{16}$};
+      \end{tikzpicture}
+    \end{center}
+    The height of the building is
+    \begin{align*}
+        35\text{ ft} + \frac{\tan\ang{54}}{\tan \ang{16}}\cdot 35 \text{ ft} &= 
+        \left(1+\frac{\tan\ang{54}}{\tan \ang{16}}\right)(35\text{ ft}) \\
+        &\approx 203 \text{ ft}
+    \end{align*}
+  \end{solution}
+
+
+
+\pspace{\newpage}
+
+% \item 
+% %({Problem Set 10}, {{\#4}}) (20.2.4, plus some)
+
+% \begin{grading}
+% 6 points, as follows: 1/1/2/2.
+% \end{grading}
+
+%  \emph{Note:} All of your answers in this problem should be exact and given in radians.
+
+%   \begin{enumerate}[topsep=0pt]
+
+%   \item
+%     \begin{problem}[\vfill]
+%       Find an acute angle $x$ such that $\sin x=0.5$.
+%     \end{problem}
+
+%     \begin{solution}
+%       The only one is $\displaystyle x = \boxed{\frac{\pi}{6}}$.
+%     \end{solution}
+
+%   \item
+%     \begin{problem}[\vfill]
+%       Find an acute angle $x$ such that $\cos x =0.5$.
+%     \end{problem}
+
+%     \begin{solution}
+%       The only one is $\displaystyle x = \boxed{\frac{\pi}{3}}$. 
+%     \end{solution}
+
+%   \item
+% \begin{problem}[\vfill]
+%       Find all $x$ in $[0, 2 \pi]$ such that $\sin x =0.5$.
+%     \end{problem}
+
+%     \begin{solution}
+%       There are two, which we can see from the unit circle:
+%       \begin{center}
+%         \begin{tabular}{ccc}
+%           \begin{tikzangle}[angle=pi/6]            
+%           \end{tikzangle} &&
+%           \begin{tikzangle}[angle=5*pi/6]            
+%           \end{tikzangle} \\   
+%           $\dfrac{\pi}{6}$ & \hspace{0.25in} & $\dfrac{5 \pi}{6}$
+%         \end{tabular}
+%       \end{center}
+
+%       \begin{checkanswer}
+%         A good check in this and the next few parts is to sketch the graph
+%         of $\sin x$ to make sure you have the right number of solutions.
+%         From the graph below, we can see that $\sin x = 0.5$ should have 2
+%         solutions on $[0, 2 \pi]$:
+%         \begin{center}
+%           \begin{tikzpicture}
+%             \begin{axis}[xtick={-6.28319, 0., 6.28319, 12.5664},
+%               xticklabels={$-2 \pi$, $0.$, $2 \pi$, $4 \pi$}, ytick={-1,
+%                 1}] 
+%               \addplot+[domain=-6.3:12.6, \tikzideacolor]{sin(deg(x))};
+%             \end{axis}
+%           \end{tikzpicture}
+%         \end{center}
+%       \end{checkanswer}
+%     \end{solution}
+
+%   \item
+%     \begin{problem}[\vfill\newpage]
+%       Find all $x$ in $[-2 \pi, 2 \pi]$ such that $\sin x = 0.5$.
+%     \end{problem}    
+
+%     \begin{solution}
+%       There are four:
+%       \begin{center}
+%         \begin{tabular}{cccc}
+%           \begin{tikzangle}[angle=-11*pi/6, func=sin, ytick={0.5},
+%             yticklabels={$\frac{1}{2}$}]
+%           \end{tikzangle} &
+%           \begin{tikzangle}[angle=-7*pi/6, func=sin, ytick={0.5},
+%             yticklabels={$\frac{1}{2}$}]            
+%           \end{tikzangle} &
+%           \begin{tikzangle}[angle=pi/6, func=sin, ytick={0.5},
+%             yticklabels={$\frac{1}{2}$}]            
+%           \end{tikzangle} &
+%           \begin{tikzangle}[angle=5*pi/6, func=sin, ytick={0.5},
+%             yticklabels={$\frac{1}{2}$}]            
+%           \end{tikzangle} 
+%           \\   
+%           $\dfrac{-11\pi}{6}$ & $\dfrac{-7\pi}{6}$ &
+%           $\dfrac{\pi}{6}$ & $\dfrac{5\pi}{6}$
+%         \end{tabular}
+%       \end{center}
+
+%       \begin{checkanswer}
+%         The graph we drew in {{{{\#4}}(c)}} to check confirms
+%         that $\sin x = 0.5$ has 4 solutions on $[-2 \pi, 2 \pi]$. 
+%       \end{checkanswer}      
+%     \end{solution} 
+    
+%   \end{enumerate}  
+
+\item 
+%({Problem Set 10}, {{\#5}})
+
+\begin{grading}
+12 points. 2 for each part.
+\end{grading}
+
+\note{Law of cosines}
+
+  Suppose we have an acute triangle (all angles are acute).  Let's call its
+  sides $a$, $b$, and $c$, and let $C$ be the angle opposite the side
+  of length $c$, as shown.
+
+  \begin{tikzpicture}[x=0.6cm, y=0.6cm]
+    \coordinate (P) at (0, 0);
+    \coordinate (Q) at (5.5, 3.5);
+    \coordinate (R) at (7, 0);
+    \draw (P) -- node[anchor=south east]{$b$} (Q) -- node[anchor=south
+    west]{$c$} (R) -- node[below] {$a$} (P);
+    \draw pic[draw=black, angle radius=20, "$C$",
+    angle eccentricity=1.5]{angle=R--P--Q};
+  \end{tikzpicture}
+
+  Since this is not a right triangle, the Pythagorean Theorem does not
+  apply. 
+
+  \begin{enumerate}[topsep=0pt]
+    \item 
+    \begin{problem}[\vfill]
+    If $C$ were a right angle, $c^2$ would be exactly $a^2+b^2$.
+    Since $C$ is an acute angle (less than \ang{90}), do you think $c^2$ is greater
+      than or less than $a^2+b^2$? What if $C$ were an obtuse
+      angle (>$\ang{90}$)?
+    \end{problem}
+
+    \begin{solution}
+        If $C$ is an acute angle, it would make sense for $c^2$
+        to be smaller than $a^2+b^2$, since side $c$ is short when
+        $C$ is small. If $C$ were an obtuse angle, then
+        side $c$ would be relatively long, so $c^2$ should be larger
+        than $a^2+b^2$.
+    \end{solution}
+  \end{enumerate}
+  
+  
+  It turns out that the Pythagorean Theorem can be adjusted to work with non-right triangles if we also include the angle $C$ in the formula.  To see how, we'll start by
+  labeling the triangle a little more and dropping a perpendicular from
+  vertex $Q$ to the opposite side.
+
+  \begin{tikzpicture}[x=0.6cm, y=0.6cm]
+    \coordinate (P) at (0, 0);
+    \coordinate (Q) at (5.5, 3.5);
+    \coordinate (R) at (7, 0);
+    \draw (P) -- node[anchor=south east]{$b$} (Q) -- node[anchor=south
+    west]{$c$} (R) -- (P);
+    \draw[dashed] (Q) -- (Q |- P);
+    \filldraw (P) circle(1.5pt) node[left] {$P$};
+    \filldraw (Q) circle(1.5pt) node[above] {$Q$};
+    \filldraw (R) circle(1.5pt) node[right] {$R$};
+    \filldraw (Q |- P) circle(1.5pt) node[below, inner sep=3pt] {$S$};
+    \draw ($(Q |- P) + (6pt, 0)$) -- ++ (0, 6pt) -- ++ (-6pt, 0);
+    \draw[|-|] ($(P) - (0, 16pt)$) -- node[fill=white]{$a$} ($(R) - (0,
+    16pt)$); 
+    \draw pic[draw=black, angle radius=20, "$C$",
+    angle eccentricity=1.5]{angle=R--P--Q};
+  \end{tikzpicture}
+
+  \begin{enumerate}[resume]
+  \item
+    \begin{problem}[\vfill]
+      Express the length of segment $QS$ in terms of $b$ and $C$.  
+    \end{problem}
+
+    \begin{solution}
+      From the right triangle $QPS$, $\sin C = \frac{\text{length of
+        } QS}{b}$, so $QS$ has length $\boxed{b \sin C}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Express the length of segment $PS$ in terms of $b$ and $C$. 
+    \end{problem}
+
+    \begin{solution}
+      From the right triangle $QPS$, $\cos C = \frac{\text{length of
+        } PS}{b}$, so $PS$ has length $\boxed{b \cos C}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Express the length of segment $SR$ in terms of $a$, $b$, and $C$. 
+    \end{problem}
+
+    \begin{solution}
+      Since segment $PR$ has length $a$ and segment $PS$ has length $b
+      \cos C$, segment $RS$ has length $\boxed{a - b \cos C}$.
+    \end{solution}
+
+  \item
+\begin{problem}[\vfill]
+      Triangle $QSR$ is a right triangle, so the Pythagorean Theorem
+      \textit{does} apply to it.  What relationship does the Pythagorean Theorem give us involving $a$, $b$, $c$, and $C$?
+    \end{problem}
+
+    \begin{solution}
+      It says:
+      \begin{align*}
+        (a - b \cos C)^2 + (b \sin C)^2 &= c^2 \\
+        a^2 - 2ab \cos C + b^2 \cos^2 C + b^2 \sin^2 C &=
+        c^2 \\
+        a^2 - 2ab \cos C + b^2( \cos^2 C + \sin^2 C) &= c^2
+        \\
+        a^2 - 2ab \cos C + b^2 &= c^2
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}
+      The equation you found in {{{{\#5}}(e)}} can be simplified to
+      which of the following? Circle one.
+      \begin{enumerate}[label=\protect\maybecircle{\Alph*.}]
+      \plainitem $a^2 + b^2 \cos^2 C - 2ab \cos C = c^2$.
+      \circleitem $a^2 + b^2 - 2ab \cos C = c^2$.
+      \plainitem $a^2 + b^2 = c^2$.
+      \end{enumerate}
+      Think about if your answer agrees with what you said in \#8(a).
+    \end{problem}
+
+    \probonly{\emph{The correct answer is known as the \textbf{Law of Cosines},
+        and it actually applies to all triangles (not only acute ones).
+        It is very helpful when working with triangles that are not right
+        triangles. We don't expect you to memorize the Law of Cosines.}}
+
+  \end{enumerate}
+
+
+\item 
+%(Problem Set 10, \#6)
+
+\begin{grading}
+5 points.
+\end{grading}
+
+  \begin{problem}[\stretch{0.5}]
+    A surveyor needs to find the distance across a lake from point $P$ to
+    point $Q$. She takes the measurements shown. Find the distance from 
+    $P$ to $Q$. Use a calculator to get a decimal approximation.
+    
+    (The surveyor knows the Law of Cosines.)
+
+    % \includegraphics{images/gottlieb-surveyor.pdf}
+
+    \begin{tikzpicture}[scale=1.5]
+    \coordinate (O) at (0,0);
+    \coordinate (P) at (10:3);
+    \coordinate (Q) at (-20:2.5);
+
+    \filldraw[ultra thick, draw=black, fill=gray!20] plot[smooth cycle, tension=0.8] coordinates
+    {(P) (2.5,0.3) (2,0.2) (1.7,-0.3) (Q) (3,-0.7) (3.5,-0.6)
+    (3.6,-0.2) (3.2,0.2)};
+
+    \filldraw[radius=1.5pt] (O) circle node {} (P) circle node[above] {P} (Q) circle node[above] {Q};
+    \draw (O) --node[above,sloped] {3 mi} (P);
+    \draw (O) --node[below,sloped] {2.5 mi} (Q);
+    \draw pic[draw=black, angle radius = 20,
+      angle eccentricity = 1.5, "$\ang{30}$"] {angle=Q--O--P};
+    \end{tikzpicture}
+  \end{problem}
+
+  \begin{solution}
+    We can apply the Law of Cosines to the triangle formed by the three points on the diagram.
+    Let's call the angle we know $C=\ang{30}$ and let $a=3$ and $b=2.7$. We want to find the
+    distance between $P$ and $Q$, which is $c$. Using the Law of Cosines,
+    we can solve for $c$:
+    \begin{align*}
+    c^2 &= (3)^2+(2.5)^2-2(3)(2.5)\cos(\ang{30}) \\
+    c^2 &= 15.25-7.5\sqrt{3}\\
+    c&= \sqrt{15.25-7.5\sqrt{3}}\approx 1.5
+    \end{align*}
+    Thus, the distance from $P$ to $Q$ is about \fbox{1.5 mi}.
+  \end{solution}
+
+\pspace{\newpage}
+
+\item 
+%({Problem Set 10}, {{\#3}})% 20.1.9
+
+\begin{grading}
+5 points.
+\end{grading}
+
+  \begin{problem}[\stretch{2}]
+    Peter is measuring the height of a church steeple. He stands on level
+    ground 500 feet away from the church and determines that the
+    angle of elevation to the bottom of the steeple is
+    \ang{23}. From the same spot he measures the angle of elevation to
+    the top of the steeple and finds it is \ang{29}.
+
+    How tall is the steeple ? Give an exact
+    answer and then give a numerical approximation.
+  \end{problem}
+
+  \begin{solution}
+    Here's a sketch of the situation:
+    \begin{center}
+      \begin{tikzpicture}
+        \coordinate (A) at (0, 0); %
+        \coordinate (B) at (4, 2); %
+        \coordinate (C) at (4, 3); %
+        \draw (A) -- (C) -- (C |- A) -- node[below]{500} (A); %
+        \draw (A) -- (B); %
+        \draw[decorate, decoration={brace}] ($(C) + (2pt, 0)$) --
+        node[xshift=2pt, right] {steeple} ($(B) + (2pt, 0)$); %
+        \draw[decorate, decoration={brace}] ($(B) + (2pt, 0)$) --
+        node[xshift=2pt, right] {church} ($(B |- A) + (2pt, 0)$); %
+        \draw[red] let \p1 = (B), \n1= {atan2(\x1, \y1)} in (12pt, 0)
+        arc[radius=12pt, start angle=0, end angle=26.56] node[right,
+        yshift=-1pt] {$23^\circ$}; %
+        \draw[blue] let \p2 = (C), \n2={atan2(\x2, \y2)} in (30pt, 0)
+        arc[radius=30pt, start angle=0, end angle={18.4}]
+        node[right]{$29^\circ$} arc[radius=30pt, start angle={18.4},
+        end angle={36.9}]; %
+      \end{tikzpicture}
+    \end{center}
+    We're asked for the height of the steeple; let's call this $s$. 
+    Let $h$ be the height of the church.  From the smaller right
+    triangle in the picture (the one with angle $23^\circ$), $\tan
+    23^\circ = \frac{h}{500}$, so $h = 500 \tan 23^\circ$.
+
+    From the larger right triangle (the one with angle $29^\circ$), $\tan
+    29^\circ = \frac{h + s}{500}$, so $h + s = 500 \tan 29^\circ$, and $s
+    = 500 \tan 29^\circ - h = \boxed{500 \tan 29^\circ - 500 \tan 23^\circ
+      \text{ feet}}$.  This is \fbox{$\approx 64.9$ feet}.
+  \end{solution}
+
+\end{enumerate}
+
+\psreflection{
+}
+
+\end{document}

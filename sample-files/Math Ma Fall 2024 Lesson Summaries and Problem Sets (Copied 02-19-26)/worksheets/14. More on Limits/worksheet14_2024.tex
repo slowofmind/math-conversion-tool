@@ -1,0 +1,789 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+% Make an environment that puts items in columns, first going across. 
+\usepackage{tabto}
+\newenvironment{enumeratecols}[2][]
+{\NumTabs{#2}%
+  \begin{enumerate*}[%before={\hspace{\dimexpr-\parindent-1pt}\tab},%
+    itemjoin={\tab},#1]}%
+  {\end{enumerate*}}
+
+\newlength{\tipmargin}
+\makeatletter
+
+\renewenvironment{framed}{
+  \setlength{\tipmargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\tipmargin
+  \def\FrameCommand{\hspace{\tipmargin}\fbox}%
+  \advance\linewidth\tipmargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+}
+{\endMakeFramed}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\newcounter{imagecounter}
+\newcounter{columncounter}
+\newenvironment{imagetable}[3][]{%
+  \setcounter{imagecounter}{0}
+  \setcounter{columncounter}{#2}
+  \addtocounter{columncounter}{-1}
+  \newcolumntype{i}{>{\raisebox{-1ex-\height}{\makebox[1em]{\hfill\stepcounter{imagecounter}(#3{imagecounter})}}\hspace{4pt}\begin{minipage}[t]{\linewidth/#2-1em-\tabcolsep*3}\arraybackslash\vspace{0pt}}l<{\end{minipage}}}
+\begin{tabular}{i*{\value{columncounter}}{#1i}}}
+{\end{tabular}}  
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\htitle{More on Limits}
+
+\begin{problemonly}
+  \begin{framed}
+
+You should be able to:
+    \begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+    \item Evaluate $\displaystyle \lim_{x \to \infty} f(x)$ and $\displaystyle \lim_{x \to -\infty} f(x)$ and interpret such limits graphically.
+
+    \item Find the horizontal asymptotes of a function $f(x)$ if given an algebraic formula for $f(x)$. 
+    \end{itemize}
+  \end{framed}
+\end{problemonly}
+
+\begin{enumerate}
+\item  
+
+  Sketch the graph of $f(x) = \frac{1}{x}$. Based on the graph, what do you think the following limits are? 
+
+  \begin{enumerate}
+  \item
+    \begin{problem}
+      $\displaystyle \lim_{x \to \infty} \frac{1}{x}$
+    \end{problem}
+
+    \begin{solution}
+      The graph of $y=\frac{1}{x}$ has a horizontal asymptote at $y=0$.
+
+      \begin{tikzpicture}
+        \begin{axis}[restrict y to domain=-5:5, xtick=\empty, ytick=\empty]
+          \addplot[domain=-5:5] {1/x};
+        \end{axis}
+      \end{tikzpicture}
+
+      Based on the graph, it would make sense that $\displaystyle \lim_{x \to \infty} \frac{1}{x}=0$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to -\infty} \frac{1}{x}$
+    \end{problem}
+
+    \begin{solution}
+      Similarly, the graph suggests that $\displaystyle \lim_{x \to -\infty} \frac{1}{x}=0$.
+    \end{solution}
+
+  \end{enumerate}
+
+  \note{Here, I just want students to recognize that, to figure out what happens as $x \to \infty$, we should think about what happens when we plug in really huge values of $x$.}
+
+  \begin{problem}[\stretch{0.5}]
+    If you didn't have the graph, how could you have found these limits algebraically? 
+  \end{problem}
+
+  \begin{solution}
+    Unlike previous limits, we can't use direct substitution, since $\infty$ isn't an actual number.
+    Instead, we can think about what happens as $x$ increases or decreases without bound. As $x$ increases
+    without bound, taking on larger and larger positive values, 
+    $\frac{1}{x}$ takes on values closer and closer to zero, and the same thing happens as $x$
+    decreases without bound. This tells us that both one-sided limits should be zero.
+    
+  \end{solution}
+
+\item  Calculate the following limits. 
+
+  \begin{enumerate}
+
+  \item
+
+    \note{The first thing I want students to understand is that just knowing that $3x^2 \to \infty$ and $10^{100} x \to \infty$ is inconclusive; thinking back to the Edfinity problem about $10^{30} \pm 10^{20}$, hopefully students will agree that we need to know which of $3x^2$ and $10^{100} x$ is bigger when $x$ is really big. Here, it's $3x^2$, so $\displaystyle \lim_{x \to \infty} 3x^2 - 10^{100} x - 7 = \lim_{x \to \infty} 3x^2$. In general, when we're trying to see what happens to a sum when $x \to \infty$, we can look at just the term with the highest power of $x$. 
+
+      If students are skeptical about this reasoning, there is some algebra that can make this more clear: $3x^2 - 10^{100} x - 7 = 3 x^2 \left( 1 - \dfrac{10^{100}}{3x} - \dfrac{7}{3x^2} \right)$, and we can see that $x^2 \to \infty$ while $1 - \dfrac{10^{100}}{3x} - \dfrac{7}{3x^2} \to 1$. Therefore, their product $\to \infty$. }
+
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to \infty} 3x^2 - 10^{100} x - 7$\\
+
+    \end{problem}
+
+    \begin{solution}
+      We want to determine what happens to the value of $3x^2 - 10^{100} x - 7$ as $x$ grows larger and larger.
+      When $x$ is large, the constant term $-7$ will be insignificant compared to the other terms. Eventually,
+      even the linear term $-10^{100}x$ will be insignificant compared to the quadratic term $3x^2$. For example,
+      when $x$ is $10^{1000}$, $3x^2=3\times 10^{2000}$, whereas $-10^{100}x = -10^{1100}$. 
+      
+      So when $x$ is very large, the value of $3x^2 - 10^{100}x - 7$ is influenced primarily by the value of $3x^2$, 
+      the dominant term. Returning to the limit,
+      $\displaystyle \lim_{x \to \infty} (3x^2-10^{100}x-7) = \lim_{x\to \infty} 3x^2=\infty$. 
+    \end{solution}
+\vfill 
+What information did you use to reason about this limit? 
+\vfill 
+\begin{framed}
+When reasoning about limits to infinity, we want to make use of two big ideas:\begin{itemize} 
+\item  that one term ``eventually grows much faster than" another, which is represented by the symbol ``$>>$"
+\item that one function ``behaves like" another function, which is represented by the symbol ``$\sim$".
+\end{itemize}
+Complete reasoning, (which you'll be asked to show in the future) requires: (1) identifying the fastest growing term in different parts of the function, (2) identifying which simplified function the given function behaves like, (3) computing the simplified function's limit, which computes our original function's limit.
+\end{framed}
+\begin{problemonly}
+   
+    \newpage
+\end{problemonly}
+
+
+  \item
+
+    \note{{\bf It's important to emphasize formality and how these new symbols help to write these ideas.} Help your students get into the pattern of the observations they want to make, which support the conclusions we'll be drawing. Using the idea of the previous part, this is equal to $\displaystyle \lim_{x \to \infty} \dfrac{3x^2}{4x^2}$, which we can simplify using algebra.}
+
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to \infty} \frac{3x^2 - 2x + 1}{4x^2 + 1}$      
+    \end{problem}
+
+    \begin{solution}
+      Using the idea of the previous part, we can identify that, as $x$ goes to $\infty$,
+      the dominant term in the numerator is $3x^2$, 
+      and the dominant term in the denominator is $4x^2$. \\
+      Writing this formally, for the numerator, as $x\to\infty$: $3x^2>>-2x>>1$, so $3x^2-2x+1 \sim3x^2$. \\
+      In the denominator as $x\to \infty$, $4x^2>>1$, so $4x^2 +1 \sim 4x^2$. This means that
+      \begin{align*}
+        \lim_{x \to \infty} \frac{3x^2-2x+1}{4x^2+1} &= \lim_{x \to \infty} \frac{3x^2}{4x^2}.\\
+        \intertext{We can simplify this using algebra and evaluate the limit.}
+        \lim_{x \to \infty} \frac{3x^2-2x+1}{4x^2+1} &= \lim_{x \to \infty} \frac{3x^2}{4x^2}= \lim_{x\to\infty} \frac{3}{4} = \frac{3}{4}
+      \end{align*}
+    \end{solution}
+
+  \item
+
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to -\infty} \frac{3x^2 - 2x + 1}{4x^2 + 1}$      
+    \end{problem}
+
+    \begin{solution}
+      As $x$ goes to $-\infty$, the dominant terms in the numerator and denominator are again $3x^2$ and $4x^2$. We would write out the formal argument the same way as in the previous part of this problem. The algebra follows in the same way:
+      $$\lim_{x \to -\infty} \frac{3x^2-2x+1}{4x^2+1} = \lim_{x \to -\infty} \frac{3x^2}{4x^2}= \lim_{x\to-\infty} \frac{3}{4} = \frac{3}{4}$$
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to \infty} \frac{x + 50 - 3x^3}{4x^2 + 7}$      
+    \end{problem}
+
+    \begin{solution}
+      As $x$ goes to $\infty$, the dominant term in the numerator is $-3x^3$, and the dominant term in the
+      denominator is $4x^2$, so here is how we write this formally:\\
+      In the numerator, as $x\to\infty$ $-3x^3>>x>>50$, so $x+50-3x^3 \sim -3x^3$.\\
+      In the denominator, as $x\to \infty$ $4x^2>>7$, so $4x^2+7 \sim 4x^2$. Therefore: 
+      \begin{align*}
+        \lim_{x \to \infty} \frac{x + 50 - 3x^3}{4x^2 + 7} &= \lim_{x \to \infty} \frac{-3x^3}{4x^2} \\
+        \intertext{We can use algebra to simplify this limit.}
+        \lim_{x \to \infty} \frac{x + 50 - 3x^3}{4x^2 + 7} &= \lim_{x \to \infty} \frac{-3x}{4} \\
+        \intertext{As $x$ goes to $\infty$, $-\frac{3}{4}x$ decreases without bound, so}
+        \lim_{x \to \infty} \frac{x + 50 - 3x^3}{4x^2 + 7} &= -\infty.
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to -\infty} \frac{x + 50- 3x^3}{4x^2 + 7}$      
+    \end{problem}
+
+    \begin{solution}
+      As $x$ goes to $-\infty$, the dominant terms in the numerator and denominator are again $-3x^3$
+      and $4x^2$, so we would write the formal part of the argument exactly the same:\\
+       In the numerator, as $x\to -\infty$ $-3x^3>>x>>50$, so $x+50-3x^3 \sim -3x^3$.\\
+      In the denominator, as $x\to-\infty$ $4x^2>>7$, so $4x^2+7 \sim 4x^2$. Therefore: 
+      \[\lim_{x \to -\infty} \frac{x + 50 - 3x^3}{4x^2 + 7} = \lim_{x \to -\infty} \frac{-3x^3}{4x^2}
+      = \lim_{x \to -\infty} \frac{-3x}{4}.\]
+      As $x$ goes to $-\infty$, $-\frac{3}{4}x$ increases without bound, so
+      \[\lim_{x \to -\infty} \frac{x + 50 - 3x^3}{4x^2 + 7} = \lim_{x \to -\infty} \frac{-3x^3}{4x^2}
+      = \lim_{x \to -\infty} \frac{-3x}{4} = \infty.\]
+    \end{solution}
+
+  \end{enumerate}
+
+  Which picture below shows the graph of $f(x) = \dfrac{3x^2 - 2x + 1}{4x^2 + 1}$? How about $g(x) = \dfrac{x + 50 - 3x^3}{4x^2 + 7}$?
+
+  \begin{imagetable}{3}{\Alph}
+    \begin{tikzpicture}
+      \begin{axis}[width=2in, xtick=\empty, ytick=\empty, disabledatascaling=false]        
+        \addplot+[domain=-10:10, samples=301] {(x+50-3*abs(x)^3)/(4*x^2+7)}; 
+      \end{axis}
+    \end{tikzpicture}
+    &
+    \begin{tikzpicture}
+      \begin{axis}[width=2in, xtick=\empty, ytick=\empty, disabledatascaling=false]        
+      \addplot+[domain=-10:10, samples=301] {(x+50-3*x^3)/(4*x^2+7)}; 
+      \end{axis}
+    \end{tikzpicture}
+    & 
+    \begin{tikzpicture}
+      \begin{axis}[width=2in, xtick=\empty, ytick=\empty, ymin=0]        
+      \addplot+[domain=-10:10, samples=301] {(3*x^2-2*x+1)/(4*x^2+1)}; 
+      \end{axis}
+    \end{tikzpicture}
+  \end{imagetable}
+
+  \pspace{\stretch{0.25}}
+
+  \note{Here, I will emphasize that limits as $x \to \pm \infty$ tell us about horizontal asymptotes. I will try to remember to ask them how many horizontal asymptotes a function can have.}
+
+  \begin{solution}
+    We determined that $\displaystyle \lim_{x \to -\infty} f(x) = \lim_{x \to \infty} f(x) = \tfrac{3}{4}$,
+    and this matches graph (C). The graph of $f$ has a horizontal asymptote at $y=\frac{3}{4}$.
+    
+    We determined that $\lim\limits_{x \to -\infty} g(x) = \infty$ and 
+    $\lim\limits_{x \to \infty} g(x) = -\infty$, and this matches graph (B). The graph of $f$ has no
+    horizontal asymptotes.
+  \end{solution}
+
+\begin{framed}
+Because horizontal asymptotes are a possible feature of a function's ``end behavior", we can determine whether a function has horizontal asymptotes by evaluating its limits as $x$ increases or decreases without bound. {\bf In calculus-speak, we determine whether a function $f(x)$ has horizontal asymptotes by evaluating $\displaystyle \lim_{x\to \infty} f(x)$ and $\displaystyle \lim_{x\to-\infty} f(x)$}
+\end{framed}
+\item 
+  \begin{problem}[\nstretch{1.75}]
+    Does $f(x) = \dfrac{3x^2}{4x^3 + 1}$ have any horizontal asymptotes? If so, find all. 
+  \end{problem}
+
+  \begin{solution}
+    To determine whether the graph has horizontal asymptotes, we should look at the limit of $f(x)$ as $x$
+    goes to $\infty$ and as $x$ goes to $-\infty$.
+
+    \begin{itemize}
+      \item $\lim\limits_{x \to -\infty} f(x)$: As $x$ goes to $-\infty$, the dominant term in the 
+      denominator is $4x^3$, and there's no reasoning we need to do about the numerator. \\
+      As $x\to -\infty$, $4x^3>>1$, so $4x^3+1 \sim 4x^3$ 
+      \[
+        \lim_{x \to -\infty} \frac{3x^2}{4x^3+1} = \lim_{x \to -\infty} \frac{3x^2}{4x^3} = 
+        \lim_{x \to -\infty} \frac{3}{4x} = 0.
+      \]
+      \item $\lim\limits_{x \to \infty} f(x)$: As $x$ goes to $\infty$, the dominant term in the 
+      denominator is $4x^3$, so we express this as follows: \\
+      As $x\to \infty$, $4x^3>>1$, so $4x^3+1 \sim 4x^3$ 
+      \[
+        \lim_{x \to \infty} \frac{3x^2}{4x^3+1} = \lim_{x \to \infty} \frac{3x^2}{4x^3} = 
+        \lim_{x \to \infty} \frac{3}{4x} = 0.
+      \]
+    \end{itemize}
+    This means that the graph has a horizontal asymptote at $y=0$. 
+  \end{solution}
+
+\item  \label{limit-laws-graphical-1}
+  The graphs of $f$ and $g$ are given below.
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[xmin=-3, xmax=3, ymin=-2, ymax=2, enlargelimits=0.06,
+        axis equal=true, width=3in, xtick={-3, -2, ..., 3}, ytick={-2, -1,
+          ..., 2}, height=2.25in]
+        \draw[thick] (-3, -1) -- (-1, 1);
+        \draw[thick] (-1, 2) -- (1, 2);
+        \draw[thick] (1, -1) -- (2, -1);
+        \addplot+[domain=2:3] {(x-2)^2-1};
+        \addplot+[closed] coordinates { (-3, -1) (-1, 1) (1, 1) (3, 0) };
+        \addplot+[open] coordinates { (-1, 2) (1, 2) (1, -1) };
+        \draw (-3, 2) node {$f$};
+      \end{axis}
+    \end{tikzpicture}
+    \hspace{0.5in}
+    \begin{tikzpicture}
+      \begin{axis}[xmin=-3, xmax=3, ymin=-2, ymax=2, enlargelimits=0.06,
+        axis equal=true, width=3in, xtick={-3, -2, ..., 3}, ytick={-2, -1,
+          ..., 2}, height=2.25in]
+        \draw[thick] (-3, -2) -- (-1, 2); %
+        \addplot+[sharp plot] coordinates { (-1, -2) (0, 0) (1, -2) }; %
+        \draw (1, 1) arc[radius=1, start angle=180, end angle=90]
+        arc[radius=1, start angle=180, end angle=270]; %
+        \addplot+[closed] coordinates { (-3, -2) (-1, 2) (1, 1) (2, 1) (3,
+          1) }; %
+        \addplot+[open] coordinates { (-1, -2) (1, -2) (2, 2) }; %
+        \draw (-3, 2) node {$g$}; %
+      \end{axis}
+    \end{tikzpicture}    
+  \end{center}
+  Evaluate each of the following quantities.
+  \probonly{\begin{multicols}{2}}
+    \begin{enumerate}
+
+    \item
+      \begin{problem}[0.65in]
+        $\displaystyle \lim_{x \to 2} g(x)$
+      \end{problem}
+
+      \begin{solution}
+        $2$
+      \end{solution}
+
+    \item
+      \begin{problem}[0.65in]
+        $g(2) \vphantom{\displaystyle \lim_{x \to 2}}$
+      \end{problem}
+
+      \begin{solution}
+        $1$
+      \end{solution}
+
+    \item
+
+      \begin{problem}[0.65in]
+        $\displaystyle \lim_{x \to 2} \frac{f(x)}{g(x)}$
+      \end{problem}
+
+      \begin{solution}
+        As $x \to 2$, $f(x) \to -1$ and $g(x) \to 2$, so $\displaystyle
+        \frac{f(x)}{g(x)} \to \boxed{-\frac{1}{2}}$.
+      \end{solution}
+
+    \item \label{limit-laws-graphical-1c}
+
+      \note{Students' first instinct is usually that this doesn't exist. After they do the next two parts, I'll have them look back at this one. The takeaway is: when individual limits don't exist, that just means you have to do more work to understand a limit.}
+
+      \begin{problem}[0.65in]
+        $\displaystyle \lim_{x \to 1} \dfrac{f(x)}{g(x)}$
+      \end{problem}
+
+      \begin{solution}
+        $\displaystyle \lim_{x \to 1} f(x)$ does not exist because the one-sided limits $\displaystyle \lim_{x \to 1^-} f(x)$ and $\displaystyle \lim_{x \to 1^+} f(x)$ do not agree. Therefore, we should look at the given limit from both sides.
+
+        As $x \to 1^-$, $f(x) \to 2$ and $g(x) \to -2$, so $\frac{f(x)}{g(x)} \to -1$. As $x \to 1^+$, $f(x) \to -1$ and $g(x) \to 1$, so $\frac{f(x)}{g(x)} \to -1$. Since both $\displaystyle \lim_{x \to 1^-} \frac{f(x)}{g(x)}$ and $\displaystyle \lim_{x \to 1^+} \frac{f(x)}{g(x)}$ are equal to $-1$, $\displaystyle \lim_{x \to 1} \frac{f(x)}{g(x)} = \boxed{-1}$.
+      \end{solution}
+
+    \item
+
+      \begin{problem}[0.65in]
+        $\displaystyle \lim_{x \to 1^-} \dfrac{f(x)}{g(x)}$
+      \end{problem}
+
+      \begin{solution}
+        As $x \to 1^-$, $f(x) \to 2$ and $g(x) \to -2$, so $\frac{f(x)}{g(x)} \to -1$.
+      \end{solution}
+
+      \probonly{\columnbreak}
+
+    \item
+
+      \begin{problem}[0.65in]
+        $\displaystyle \lim_{x \to 1^+} \dfrac{f(x)}{g(x)}$
+      \end{problem}
+
+      \begin{solution}
+        As $x \to 1^+$, $f(x) \to -1$ and $g(x) \to 1$, so $\frac{f(x)}{g(x)} \to -1$.
+      \end{solution}
+
+    \item
+
+      \note{Even if students don't immediately recognize this as the definition of the derivative, they should recognize that this is a $\frac{0}{0}$ limit, so we need to do more work. One option is to find a formula for $g(x)$ around $x = -2$ so that we can factor and cancel, but of course it's much simpler if we recognize this as $g'(-2)$.}
+
+      \begin{problem}[0.65in]
+        $\displaystyle \lim_{x \to -2} \dfrac{g(x) - g(-2)}{x - (-2)}$
+      \end{problem}
+
+      \begin{solution}
+        This is the definition of the derivative, $g'(-2)$. Based on the graph of $g$, $g'(-2)=\boxed{2}$.
+      \end{solution}
+
+    \item
+
+      \note{This is an example where the numerator tends to a non-zero number while the denominator tends to 0, so we can use the strategy from last class.}
+
+      \begin{problem}[0.65in]
+        $\displaystyle \lim_{x \to 0} \frac{f(x)}{g(x)}$
+      \end{problem}
+
+      \begin{solution}
+        As $x \to 0$, $f(x) \to 2$ and $g(x) \to 0$. This means $\frac{f(x)}{g(x)}$ is either increasing
+        without bound or decreasing without bound. Based on the graph of $g$, as $x$ approaches $0$ from either
+        side, $g(x)$ is negative, so $\frac{f(x)}{g(x)}$ will always be negative. This means $\frac{f(x)}{g(x)} \to
+        \boxed{-\infty}$.
+      \end{solution}
+
+    \item
+
+      \begin{problem}[0.65in]
+        $\displaystyle \lim_{x \to -1} \frac{f(x)}{g(x)}$
+      \end{problem}
+
+      \begin{solution}
+        $\displaystyle \lim_{x \to -1} f(x)$ does not exist because the one-sided limits $\displaystyle \lim_{x \to -1^-} f(x)$ and $\displaystyle \lim_{x \to -1^+} f(x)$ do not agree. Therefore, we should look at the given limit from both sides.
+
+        As $x \to -1^-$, $f(x) \to 1$ and $g(x) \to 2$, so $\frac{f(x)}{g(x)} \to \frac{1}{2}$. As $x \to -1^+$, $f(x) \to 2$ and $g(x) \to -2$, so $\frac{f(x)}{g(x)} \to -1$. Since $\displaystyle \lim_{x \to -1^-} \frac{f(x)}{g(x)}$ and $\displaystyle \lim_{x \to -1^+} \frac{f(x)}{g(x)}$ are not equal, $\displaystyle \lim_{x \to -1} \frac{f(x)}{g(x)}$ \fbox{does not exist}.
+      \end{solution}
+
+    \item
+      \begin{problem}[0.65in]
+        $\displaystyle \lim_{x \to 1} [f(x) + g(x)]$
+      \end{problem}
+
+      \begin{solution}
+        $\displaystyle \lim_{x \to 1} f(x)$ does not exist because the one-sided limits $\displaystyle \lim_{x \to 1^-} f(x)$ and $\displaystyle \lim_{x \to 1^+} f(x)$ do not agree. Therefore, we should look at the given limit from both sides.
+
+        As $x$ approaches $1$ from the left, $f(x) \to 2$ and $g(x) \to -2$, so $[f(x) + g(x)] \to 0$.
+        As $x$ approaches $1$ from the right, $f(x) \to -1$ and $g(x) \to 1$, so $[f(x) + g(x)] \to 0$.
+        Since the one-sided limits are equal, $\lim\limits_{x \to 1} \frac{f(x)}{g(x)} = \boxed{0}$.
+      \end{solution}
+
+    \end{enumerate}
+
+    \probonly{\end{multicols}}
+
+  \pspace{\newpage}
+
+\item 
+  \begin{problem}[\vfill]
+    What are important things to watch out for when calculating limits?
+    Useful strategies?
+  \end{problem}
+
+  \begin{solution}
+    When a non-piecewise function is given with its formula, we should try to use direct substitution. If
+    direct substitution gives $\frac{0}{0}$, a good strategy is to try to factor and cancel. 
+    If direct substitution gives
+    $\frac{a}{0}$, where $a$ is a non-zero number, then we should determine whether the function is increasing
+    or decreasing without bound and consider one-sided limits.
+
+    For limits at infinity, a good strategy is to identify the dominant terms and rewrite the limit by discarding
+    all but the dominant terms.
+
+    For piecewise functions, good strategies are to identify the relevant pieces and to consider
+    one-sided limits when necessary.
+
+    Lastly, be on the lookout for limits involving the definition of the derivative.
+  \end{solution}
+
+\item 
+  \begin{enumerate}
+  \item Evaluate the following limits. If the limit does not exist, can you say anything about the 1-sided limits?
+
+    \begin{enumerate}
+    \item
+      \begin{problem}[\stretch{0.5}]
+        $\displaystyle \lim_{x \to -\infty} \frac{2x - 6}{x^2 - 3x}$
+      \end{problem}
+
+      \begin{solution}
+      Use dominant terms. \\
+      As $x\to-\infty$, $2x>>-6$, so $2x-6 \sim 2x$. \\
+      As $x\to-\infty$, $x^2>>-3x$, so $x^2-3x\sim x^2$. Therefore, 
+        \[
+            \lim_{x \to -\infty} \frac{2x-6}{x^2-3x} = \lim_{x \to -\infty} \frac{2x}{x^2} 
+            = \lim_{x \to -\infty} \frac{2}{x} 
+            = 0.
+        \]
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.5}]
+        $\displaystyle \lim_{x \to 1} \frac{2x - 6}{x^2 - 3x}$
+      \end{problem}
+
+      \begin{solution}
+      Use direct substitution.
+        \[
+          \lim_{x \to 1} \frac{2x - 6}{x^2 - 3x} = \frac{2(1)-6}{(1)^2-3(1)} 
+          = 2.
+        \]
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.5}]
+        $\displaystyle \lim_{x \to 0} \frac{2x - 6}{x^2 - 3x}$
+      \end{problem}
+
+      \begin{solution}
+        Factor and cancel.
+        \[
+          \lim_{x \to 0} \frac{2x - 6}{x^2 - 3x} = \lim_{x \to 0} \frac{2(x-3)}{x(x-3)}
+          \]
+We can cancel the factor of $(x-3)$.
+          \[
+          \lim_{x \to 0} \frac{2(x-3)}{x(x-3)}
+          = \lim_{x \to 0} \frac{2}{x} 
+          \]
+
+        The simplified function is undefined at $x=0$, so we want to look at the one-sided limits:
+        \[
+          \lim_{x \to 0^-} \frac{2x - 6}{x^2 - 3x}
+          = \lim_{x \to 0^-} \frac{2}{x} 
+          = -\infty
+        \]
+        \[
+          \lim_{x \to 0^+} \frac{2x - 6}{x^2 - 3x}
+          = \lim_{x \to 0^+} \frac{2}{x} 
+          = \infty
+        \] 
+        This disagreement in the limits means the limit {\bf does not exist}. 
+        
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.5}]
+        $\displaystyle \lim_{x \to 3} \frac{2x - 6}{x^2 - 3x}$
+      \end{problem}
+
+      \begin{solution}
+        Factor and cancel.
+        \[
+          \lim_{x \to 3} \frac{2x - 6}{x^2 - 3x} = \lim_{x \to 3} \frac{2(x-3)}{x(x-3)} 
+          = \lim_{x \to 3} \frac{2}{x} 
+          = \frac{2}{3}.
+        \]
+         Remember computing this limit means reasoning about the function's value as $x$ approaches 3. Even though the function is not defined there, the limit does exist, since both one-sided limits approach $\frac{2}{3}$. 
+      \end{solution}
+
+    \end{enumerate}
+
+  \item
+
+    \begin{problem}[\vfill\newpage]
+      Sketch the graph of $f(x) = \dfrac{2x - 6}{x^2 - 3x}$, and use it to check your answers. 
+    \end{problem}
+
+    \begin{solution}
+      Since $f(x) = \dfrac{2x-6}{x^2-3x}=\frac{2}{x}, x\neq 3$, the graph of $y=f(x)$ is the same as the graph
+      of $y=\frac{2}{x}$ but with a hole at $x=3$.
+
+      \begin{tikzpicture}
+        \begin{axis}[restrict y to domain=-5:5]
+          \addplot[domain=-5:5] {2/x};
+          \addplot[open] coordinates {(3, 2/3)};
+        \end{axis}
+      \end{tikzpicture}
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Find $\displaystyle \lim_{x \to \infty} \frac{x}{\sqrt{4x^2 + 1}}$.
+    \end{problem}
+
+    \begin{solution}
+      As $x$ goes to $\infty$, the dominant term under the radical in the denominator is $4x^2$. Therefore,\\
+      As $x\to\infty$, $4x^2>>1$, so $4x^2+1\sim4x^2$.
+      \[
+        \lim_{x \to \infty} \frac{x}{\sqrt{4x^2+1}} = \lim_{x \to \infty} \frac{x}{\sqrt{4x^2}} 
+        = \lim_{x \to \infty} \frac{x}{2x} 
+        = \frac{1}{2}.
+      \]
+      (We can simplify $\sqrt{4x^2}$ to $2x$ because $x$ is positive as it approaches $\infty$.)
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Is $\displaystyle f(x) = \frac{x}{\sqrt{4x^2 + 1}}$ even, odd, or neither? 
+    \end{problem}
+
+    \begin{solution}
+      We need to inspect $f(-x)$. 
+      \[f(-x) = \frac{-x}{\sqrt{4(-x)^2+1}} = -\frac{x}{\sqrt{4x^2+1}} = -f(x).\]
+      This shows that $f$ is an odd function.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Based on your answers to (a) and (b), how many horizontal asymptotes does $\displaystyle \lim_{x \to \infty} \frac{x}{\sqrt{4x^2 + 1}}$ have? 
+    \end{problem}
+
+    \begin{solution}
+      Since $\lim\limits_{x \to \infty} f(x) = \frac{1}{2}$ and $f$ is odd, that means that
+      $\lim\limits_{x \to -\infty} f(x) = -\frac{1}{2}$, and so the graph of $f$ has 2 asymptotes. It looks
+      like this.
+
+      \begin{tikzpicture}
+        \begin{axis}[xtick=\empty, ytick=\empty, extra y ticks={-1/2, 1/2}]
+          \addplot[domain=-5:5]{x/sqrt(4*x^2+1)};
+        \end{axis}
+      \end{tikzpicture}
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+  \begin{enumerate}
+  \item Find the following limits.
+
+    \probonly{\begin{enumeratecols}{3}}
+    \item
+      \begin{problem}
+        $\displaystyle \lim_{x \to 2^+} \left( 3 - \frac{4}{x - 2} \right)$
+      \end{problem}
+
+      \begin{solution}
+        As $x$ approaches $2$ from the right, $x-2$ takes on positive values close to zero,
+        so $\frac{4}{x-2}$ will be increasing without bound, and thus 
+        $\displaystyle \lim_{x \to 2^+} \left( 3 - \frac{4}{x - 2} \right) = -\infty$.
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \lim_{x \to 2^-} \left( 3 - \frac{4}{x - 2} \right)$
+      \end{problem}
+
+      \begin{solution}
+        As $x$ approaches $2$ from the left, $x-2$ takes on negative values close to zero,
+        so $\frac{4}{x-2}$ will be decreasing without bound, and thus 
+        $\displaystyle \lim_{x \to 2-+} \left( 3 - \frac{4}{x - 2} \right) = \infty$.
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \lim_{x \to \infty} \left( 3 - \frac{4}{x - 2} \right)$
+      \end{problem}
+
+      \begin{solution}
+        As $x$ approaches $\infty$, $\frac{4}{x-2} \to 0$, so 
+        $\displaystyle \lim_{x \to \infty} \left( 3 - \frac{4}{x - 2} \right) =3$.
+      \end{solution}
+
+    \probonly{\end{enumeratecols}}
+
+    \pspace{1.5in}
+
+  \item
+    \begin{problem}[\vfill]
+      Sketch the graph of $3 - \dfrac{4}{x - 2}$.  Are your answers above
+      consistent with the graph? 
+    \end{problem}
+
+    \begin{solution}
+      The graph of $y = 3 - \dfrac{4}{x - 2}$ is the graph of $y=x$ but shifted to the right by $2$ units,
+      scaled vertically by a factor of $4$ and reflected over the $x$-axis, then shifted up by $3$ units.
+      It looks like this.
+
+      \begin{tikzpicture}
+        \begin{axis}[restrict y to domain=-15:15, xtick=\empty, ytick=\empty, extra x ticks={2}, extra y ticks={3}]
+          \addplot[domain=-10:10]{3-(4/(x-2))};
+        \end{axis}
+      \end{tikzpicture}
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+\end{document}

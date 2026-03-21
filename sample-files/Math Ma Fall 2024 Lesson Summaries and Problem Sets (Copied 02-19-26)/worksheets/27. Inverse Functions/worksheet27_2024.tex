@@ -1,0 +1,674 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{marginnote}
+\usepackage[colorinlistoftodos]{todonotes}
+\renewcommand{\marginpar}{\marginnote}
+
+\usepackage{soul}
+\usepackage[normalem]{ulem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\pgfplotsset{gridgraph/.style={clip=false, axis line style={shorten
+      >=-8pt}, xlabel style={xshift=8pt}, ylabel style={yshift=8pt},
+    enlargelimits=false, grid=major, tick style={black}}} 
+
+\newcommand{\axes}[1][]{
+  \begin{tikzpicture}
+    \begin{axis}[xtick=\empty, ytick=\empty, ymin=-2, ymax=2,
+      xmin=-4.25, xmax=4.25, #1]
+    \end{axis}
+  \end{tikzpicture}
+}
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+% Make an environment that puts items in columns, first going across. 
+\usepackage{tabto}
+\newenvironment{enumeratecols}[2][]
+{\NumTabs{#2}%
+  \begin{enumerate*}[%before={\hspace{\dimexpr-\parindent-1pt}\tab},%
+    itemjoin={\tab},#1]}%
+  {\end{enumerate*}}
+
+\newlength{\tipmargin}
+\makeatletter
+
+\newdimen\SOUL@dimen %new
+\def\SOUL@ulunderline#1{{%
+    \setbox\z@\hbox{#1}%
+    % \dimen@=\wd\z@
+    \SOUL@dimen=\wd\z@ %new
+    \dimen@i=\SOUL@uloverlap
+    \advance\SOUL@dimen2\dimen@i %\dimen@ exchanged too
+    \rlap{%
+      \null
+      \kern-\dimen@i
+      % \SOUL@ulcolor{\SOUL@ulleaders\hskip\dimen@}%
+      \SOUL@ulcolor{\SOUL@ulleaders\hskip\SOUL@dimen}% new
+    }%
+    \unhcopy\z@
+  }}
+
+\renewenvironment{framed}{
+  \setlength{\tipmargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\tipmargin
+  \def\FrameCommand{\hspace{\tipmargin}\fbox}%
+  \advance\linewidth\tipmargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+}
+{\endMakeFramed}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\htitle{27. Inverse Functions}
+
+\begin{problemonly}
+  \begin{framed}
+
+You should be able to:
+    \begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+
+    \item Determine whether a function $f$ is invertible based on a graph,
+      description, or formula. If so, determine the domain and range of $f^{-1}$. 
+
+    \item If $f$ is an invertible function given verbally (for example, if a farmer is growing a giant pumpkin and $f(t)$ gives the pumpkin's weight at time $t$), describe what $f^{-1}$ represents. 
+
+    \item Find a formula for $f^{-1}$ when given a formula for an invertible function $f$.
+
+    \item Sketch the graph of $f^{-1}$ from a graph of an invertible function $f$.
+
+    \end{itemize}
+  \end{framed}
+\end{problemonly}
+
+\begin{enumerate}
+\item  \label{inverse-functions-runner}
+
+  Last weekend, Shay went for a long leisurely walk around Boston.  Here's the graph of $f(t)$, the distance she'd walked $t$ hours after the start of
+  her walk.
+
+  \raisebox{2ex-\height}{
+    \parbox[t]{2.5in}{\vspace{0pt}
+      \begin{tikzpicture}[declare function={
+          f(\x) = and(0. <= \x, \x <=3.) * ((3894596383*\x + 54730404*\x^2 - 51755355*\x^3)/5389484100)
+          + and(3. < \x, \x <=5.) * ((-435507 + 438473*\x - 106885*\x^2 + 9375*\x^3)/85536)
+          + and(5. < \x, \x <=6.) * ((27129526 - 12232757*\x + 1758186*\x^2 - 64395*\x^3)/623672)
+          ;}]
+        \begin{axis}[xtick={1, 2, ..., 6}, ytick={0, 1, ..., 6}, axis equal
+          image, gridgraph, ymax=6]
+          \addplot+[domain=0:6]{f(x)};
+        \end{axis}    
+      \end{tikzpicture}
+    }
+  }
+  \begin{minipage}[t]{\linewidth-2.6in}
+    % \vspace{24pt}
+    \begin{enumerate}
+    \item
+
+      \note{When we go over these first 2 parts, I'll be sure to write something like ``3 because $f(3) = 2$''.}
+
+      \begin{problem}[0.7in]
+        How long did it take Shay to walk 2 km? 
+      \end{problem}
+
+      \begin{solution}
+        $3$ hours, because $f(3)=2$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[0.4in]
+        How long did it take Shay to walk 3 km?        
+      \end{problem}
+
+      \begin{solution}
+        $5$ hours, because $f(5)=3$.
+      \end{solution}
+
+    \end{enumerate}
+
+  \end{minipage}
+
+  It's natural to want a function that takes as input a distance and gives as output the amount of time it took Shay to walk that distance. We call this the \uline{inverse function} of $f$ and write it as $f^{-1}$.
+
+  \begin{enumerate}[start=3]
+  \item
+
+    \note{I just want students to see that we can rewrite (a) and (b) as $f^{-1}(2) = 3$ and $f^{-1}(3) = 5$. So, we're simply switching the roles of the input and output.}
+
+    \begin{problem}[0.5in]
+      What do your answers to (a) and (b) tell you about $f^{-1}$? 
+    \end{problem}
+
+    \begin{solution}
+      We know that $f^{-1}(2)=3$ and $f^{-1}(3)=5$.
+    \end{solution}
+
+  \end{enumerate}
+
+  In general, if $g$ is a function, then $g^{-1}$ is the function that \probonly{$\vphantom{\dfrac{1}{1}}$}\fitb{2.5in}{reverses the input-output} 
+  \probonly{$\vphantom{\dfrac{1}{1}}$}\fitb{2.5in}{relationship of $\bm{g}$}.
+
+  \begin{enumerate}[resume]
+
+  \item
+    \begin{problem}[0.75in]
+      What are the domain and range of $f^{-1}$? How do they relate to the domain and range of $f$?
+    \end{problem}    
+
+    \begin{solution} 
+      Because we are switching the inputs and the outputs, the domain of $f(x)$ becomes the range of $f^{-1}(x)$ and the range of $f(x)$ becomes the domain of $f^{-1}(x)$.
+    \end{solution}
+
+  \item
+
+    \note{We'll first talk about what the axes should be, and then I'll have students tell me how to come up with some points on the graph of $f^{-1}$. They should see that we can start with points on the graph of $f$ and just swap their $x$- and $y$-coordinates.
+
+      A super small thing I find helpful for having them understand why we're reflecting over $y = x$ is to draw my axes in 2 different colors, like the left picture below. We know we want to end up with axes like the right picture; how do we get there?
+      \begin{center}
+        \axes[xmin=0, xmax=6.25, ymin=0, ymax=5.25, axis equal image,
+        width=1.5in, x axis line style={thick, red}, y axis line
+        style={thick, blue, dashed}] \hspace{1in}
+        \axes[ymin=0, ymax=6.25, xmin=0, xmax=5.25, axis equal image,
+        height=1.5in, y axis line style={thick, red}, x axis line
+        style={thick, blue, dashed}]
+      \end{center}      
+    }
+
+    \begin{problem}[\newpage]
+      Can you sketch the graph of $f^{-1}$ on the above axes?
+    \end{problem}
+
+    \begin{solution}
+    
+        \begin{tikzpicture}[declare function={
+          f(\x) = and(0. <= \x, \x <=3.) * ((3894596383*\x + 54730404*\x^2 - 51755355*\x^3)/5389484100)
+          + and(3. < \x, \x <=5.) * ((-435507 + 438473*\x - 106885*\x^2 + 9375*\x^3)/85536)
+          + and(5. < \x, \x <=6.) * ((27129526 - 12232757*\x + 1758186*\x^2 - 64395*\x^3)/623672)
+          ;}]
+        \begin{axis}[xtick={1, 2, ..., 6}, ytick={0, 1, ..., 6}, axis equal
+          image, gridgraph, ymax=6]
+          \addplot+[domain=0:6]{f(x)};
+          \addplot[red,domain=0:6] (f(x),x);
+        \end{axis}    
+      \end{tikzpicture}
+    \end{solution}
+
+  \item
+    \begin{problem}[1in]
+      In general, if $g$ is a function, how does the graph of $g^{-1}$ relate to the graph of $g$?
+    \end{problem}
+
+    \begin{solution}
+      The graph of $y=g^{-1}(x)$ is the reflection of the graph of $y=g(x)$ over
+      the line $y=x$.
+    \end{solution}
+
+  \item
+
+    \note{I'll do this in the context of this problem, so that I can give meaning to the input to the composition: if $t$ is a time, then $f^{-1}(f(t)) = t$; if $d$ is a distance, then $f(f^{-1}(d)) = d$.}
+
+    \begin{problem}[1.5in]
+      Remember that, if $a$ and $b$ are two functions, we call $a(b(x))$ the \uline{composition} of $a$ and $b$. What happens if you compose $f^{-1}$ and $f$? How about in the opposite order?
+    \end{problem}
+
+    \begin{solution}
+      $f(t)$ gives the distance Shay had walked at time $t$, 
+      and $f^{-1}(d)$ gives the time it took
+      Shay to walk a distance $d$. Thus, $f^{-1}(f(t))$ is the time it took Shay to
+      walk the distance she had walked at time $t$, which is just $t$. So $f^{-1}(f(t))=t$. Similarly, $f(f^{-1}(d))$ is the distance Shay had walked in the time
+      it took Shay to walk a distance $d$, which is just $d$. So $f(f^{-1}(d))=d$.
+
+      In general, $f(f^{-1}(x))=x$, and $f^{-1}(f(x))=x$.
+    \end{solution}
+
+  \end{enumerate}
+
+\item   \label{inverse-functions-temp}
+
+  \note{Here's where I'll introduce the term \emph{invertible}.}
+
+  \begin{problem}
+    Suppose the following graph shows the temperature at Logan Airport over a particular 24-hour period. Let $f(t)$ be the temperature at time $t$. What's $f^{-1}(40)$?
+
+    \begin{tikzpicture}
+      \begin{axis}[xlabel={time}, ylabel={temperature}, ymin=0, xtick={0, 6, ..., 24}, xmax=25, width=2.5in]
+        \addplot+[domain=0:24]{38 + (5*(-2.5 + x/12)*(-1 + x/12)*x)/6};
+      \end{axis}
+    \end{tikzpicture}
+  \end{problem}
+
+  \begin{solution}
+    Based on the graph, there are two times at which the temperature was $40$,
+    so we can't say what $f^{-1}(40)$ would be. Remember that a function has exactly
+    one output for each input. In this case, temperature is a function of time, $T=f(t)$,
+    but time is not a function of temperature.
+    
+    If multiple inputs of a function $f$ correspond to the same output, we say that the 
+    function $f$ is not \emph{invertible}. A function is invertible if every output
+    corresponds with exactly one input. Graphically, a function is invertible
+    if it passes the horizontal line test: no horizontal line intersects the graph more
+    than once.
+    
+  \end{solution}
+
+\item  In this problem, we'll look at the two functions $a(x) = x^2$
+  and $b(x) = x^3$. 
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[2in]      
+      Is each function invertible? If so, find a formula for its
+      inverse. If not, explain why not. 
+    \end{problem}
+
+    \begin{solution}
+       We are looking for a function $a^{-1}$ that reverses the input-output
+       relationship of $a(x) = x^3$. We can express this relationship in a table.
+        \begin{center}
+          \begin{tabular} {c|c} 
+            $x$ & $a(x)$ \\ \hline
+            \textcolor{black}{$-2$ }&\textcolor{blue}{$-8$} \\
+            \textcolor{black}{$-1$ }&\textcolor{blue}{$-1$} \\
+            \textcolor{black}{$0$ }&\textcolor{blue}{$0$} \\
+            \textcolor{black}{$1$ }&\textcolor{blue}{$1$} \\
+            \textcolor{black}{$2$ }&\textcolor{blue}{$8$}\\ 
+            \textcolor{black}{$3$ }&\textcolor{blue}{$27$}\\ 
+          \end{tabular}
+        \end{center} 
+        We can see that every output of $a$ corresponds with exactly one input, which
+        means that $a$ is invertible. We would like to figure out the what the output of $a^{-1} $ is when we input $x$. Let's call this output $y$, so $a^{-1}(x)=y$. That means that $a(y)=x$.
+        \begin{center} \hfill 
+          \begin{tabular} {c|c} 
+            $x$ & $a(x)$ \\ \hline
+            \textcolor{black}{$0$ }&\textcolor{blue}{$0$} \\
+            \textcolor{black}{$1$ }&\textcolor{blue}{$1$} \\
+            \textcolor{black}{$2$ }&\textcolor{blue}{$8$}\\ 
+            \textcolor{black}{$y$ }&\textcolor{blue}{$x$} \\ 
+          \end{tabular} \hfill \begin{tabular} {c|c} 
+            $x$ & $a^{-1}(x)$ \\ \hline 
+            \textcolor{blue}{$1$} & \textcolor{black}{$1$} \\
+            \textcolor{blue}{$8$} & \textcolor{black}{$2$}\\ 
+            \textcolor{blue}{$27$} & \textcolor{black}{$3$}\\ 
+            \textcolor{blue}{$x$}& \textcolor{black}{$y$}\\
+          \end{tabular} \hfill 
+          \textcolor{white}{h} 
+        \end{center}
+        If $a(y)=x$, then $x=y^3$, so
+        $y=\sqrt[3]{x}$.
+        This means that $a^{-1}(x) = \sqrt[3]{x}$. This also gives us a broad strategy for finding the inverse of a function. \textcolor{blue}{Solve $f(y) =x$ for $y$.} 
+
+        Let's consider $b(x)=x^2$.
+        \begin{center}
+          \begin{tabular} {c|c} 
+            $x$ & $b(x)$ \\ \hline
+            \textcolor{black}{$-2$ }&\textcolor{blue}{$4$} \\
+            \textcolor{black}{$-1$ }&\textcolor{blue}{$1$} \\
+            \textcolor{black}{$0$ }&\textcolor{blue}{$0$} \\
+            \textcolor{black}{$1$ }&\textcolor{blue}{$1$} \\
+            \textcolor{black}{$2$ }&\textcolor{blue}{$4$}\\ 
+          \end{tabular}
+        \end{center} 
+        The table shows that multiple inputs correspond to the same
+        output, so $b$ is not invertible.
+
+        We would also see this if we attempted to solve $b(y)=x$ for $y$.
+        If $b(y)=x$, then $y^2=x$, and solving for $y$ gives $y=\pm\sqrt{x}$, which
+        is not a function.
+    \end{solution} 
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+  You should have found that one of the two functions is invertible. Let's call the invertible function $f$ and the non-invertible function $g$. 
+
+  \begin{enumerate}[resume]
+  \item
+    \begin{problem}[\vfill]
+      Graph $f(x)$ and $f^{-1}(x)$ on the same set of axes.
+    \end{problem}
+
+    \begin{solution}
+      We get the graph of $f^{-1}(x)$ by flipping the graph of $f(x)$
+      over the line $y = x$ (the dashed line in the picture below):
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick={-1, 1}, ytick={-1, 1}, axis equal image,
+            clip=false, xmin=-1.5, xmax=1.5, ymin=-1.5, ymax=1.5]
+            \addplot+[domain=-1.5:0, red] {-abs(x)^(1/3)};
+            \addplot+[domain=0:1.5, red] {x^(1/3)} node[right]
+            {$y = f^{-1}(x) = \sqrt[3]{x}$};%
+            \addplot+[domain={-1.5^(1/3)}:{1.5^(1/3)}, blue] {x^3}
+            node[above] {$y = f(x) = x^3$};%
+            \addplot+[domain=-1.5:1.5, dashed] {x};%
+          \end{axis}
+        \end{tikzpicture}
+      \end{center} 
+    \end{solution} 
+
+  \item
+    \begin{problem}[1in]
+      What's $(f(x))^{-1}$?  Is it the same as $f^{-1}(x)$? 
+    \end{problem}
+
+    \begin{solution} 
+      Notationally these two things look similar. However, they mean different things.
+      $f^{-1}(x)$ represents the inverse function we found, $f^{-1}=\sqrt[3]{x}$.
+      $(f(x))^{-1}$ represents raising $f(x)$ to the power $-1$, so $f(x)^{-1}= \frac{1}{f(x)} = \frac{1}{x^3}$.
+    \end{solution}
+
+  \item
+
+    \note{This is the last part we definitely need to cover. I think we should have enough time to do more though.}
+
+    \begin{problem}[\vfill\newpage]
+      Can you restrict the domain of $g(x)$ to make it invertible? Sketch the inverse of your restricted $g$. What's a formula for the inverse of your restricted $g$?
+    \end{problem}
+
+    \begin{solution}
+      The function $g(x)=x^2$ is not invertible because, for example, $g(-2)$ and $g(2)$
+      are both equal to $4$. We can avoid this if we restrict the domain of $g$ to
+      $[0, \infty)$. Then the graph of $g$ and its inverse would look like this.
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick={1,2,4}, ytick={1,2,4}, axis equal image,
+            clip=false, xmin=-0.1, xmax=4, ymin=-0.1, ymax=4]
+            \addplot+[domain=0:4, red] {x^(1/2)} node[right]
+            {$y = g^{-1}(x) = \sqrt{x}$};%
+            \addplot+[domain=0:2, blue] {x^2}
+            node[above] {$y = g(x) = x^2$};%
+            \addplot+[domain=0:4, dashed] {x};%
+          \end{axis}
+        \end{tikzpicture}
+      \end{center} 
+        Solving $g(y)=y^2=x$ for $y$, we get $y=\sqrt{x}$. We don't need to worry
+        about $-\sqrt{x}$, because we restricted $g$ to non-negative inputs only,
+        meaning $g^{-1}$ will only have non-negative outputs.
+
+        (We could also restrict the domain of $g$ to $(-\infty, 0]$. The inverse
+        would then be $g^{-1}(x)=-\sqrt{x}$.)
+      
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+  \note{One point that we might discuss here is that, although some of these are invertible, we really aren't able to solve for the inverses.}
+
+  Decide whether each of the following functions is invertible. \emph{Hint:} You know how to graph one of these functions. For the one you don't know the graph of, can you figure out where it's increasing / decreasing? How is that helpful?
+
+  \probonly{\begin{multicols}{2}}
+    \begin{enumerate}
+
+      % \item The price, $P(w)$, of mailing a letter weighing $w$ ounces, where
+      %   $w \in (0, 11)$.
+
+    \item
+
+      \note{I might also ask them to sketch the inverse.}
+
+      \begin{problem}
+        $f(x) = 2^{x} - 1$
+      \end{problem}
+
+      \begin{solution}
+        We can graph $f$, and we see that it passes the horizontal line test,
+        so it is invertible.
+        \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[xtick=\empty, ytick={-1}, width=2in ]
+              \addplot+[domain=-2:2] {2^(x) -1};%
+              \addplot+[domain=-2:2, dashed] { -1};%
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+        Since the range of $f$ is $(-1, \infty)$, the domain of $f^{-1}$ is $(-1, \infty)$.
+      \end{solution}
+
+    \item
+
+      \note{This is a chance to practice differentiating $\dfrac{1}{2 e^{3x}}$ (and to emphasize that it's much easier to do this without the Quotient Rule).}
+
+      \begin{problem}
+        $h(x) = \dfrac{1}{2 e^{3x}} - x^3$
+      \end{problem}
+
+      \begin{solution}
+        We don't immediately know what the graph of $y=h(x)$ looks like,
+        but we can determine where $h$ is increasing and decreasing.
+
+        To avoid using the Quotient Rule, let's rewrite $h(x)$
+        as $h(x)=\tfrac{1}{2}e^{-3x}-x^3$. Using derivative rules, 
+        $h'(x)=-\tfrac{3}{2}e^{-3x}-3x^2$. Notice that $h'(x)$ is always negative,
+        since $h'(x)=-(\tfrac{3}{2}e^{-3x}+3x^2)$, and the quantity
+        inside the parentheses is always positive. This means that $h$ is decreasing
+        on $(-\infty, \infty)$, so it will be invertible.
+      \end{solution}
+
+    \end{enumerate}
+
+  \probonly{\end{multicols}}
+
+  \pspace{\vfill}
+
+\item 
+  \begin{problem}[\vfill\newpage]
+    One of the following two functions is invertible. Which one? Find the domain and range of the inverse function, as well as a formula for the inverse function.
+
+    \begin{enumeratecols}{2}
+    \item $f(x) = -2 |x - 3|$
+    \item $g(x) = - \dfrac{5}{x - 2} + 3$
+    \end{enumeratecols}
+  \end{problem}
+
+  \begin{solution}
+    We know that the graph of $f$ is an upside-down V-shape, so $f$ is not invertible.
+    The graph of $g$ passes the horizontal line test, so $g$ is invertible.
+
+    The domain of $g$ is $(-\infty, 2) \cup (2, \infty)$ and the range of $g$ is
+    $(-\infty, 3) \cup (3, \infty)$. So the domain of $g^{-1}$ is
+    $(-\infty, 3) \cup (3, \infty)$ and the range of $g^{-1}$ is 
+    $(-\infty, 2) \cup (2, \infty)$.
+
+    To find a formula for the inverse function, we solve $g(y)=x$ for $y$.
+    \begin{align*}
+      -\frac{5}{y-2}+3 &= x \\
+      \frac{5}{y-2} &= 3-x\\
+      \frac{5}{3-x} &= y-2 \\
+      \frac{5}{3-x} +2 &= y
+    \end{align*}
+    Thus, $g^{-1}(x) = \dfrac{5}{3-x}+2$.
+  \end{solution}
+
+\item  The Wonderful Widget Company manufactures wonderful widgets. The company's costs in a given month depend on how many widgets they manufacture that month. Let $g(x)$ be their monthly costs, in dollars, if they produce $x$ widgets.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Is $g$ likely to be invertible?  Why or why not? If it is, what is its input and what is its output?
+    \end{problem}
+
+    \begin{solution}
+      It's likely that $g$ is invertible, because $g$ is likely always
+      increasing, so every output corresponds to exactly one input. Its input would be monthly costs and output would be the number of widgets produced.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      What does $g(400)$ represent?  What are its units?
+    \end{problem}
+
+    \begin{solution}
+      $g(400)$ represents the monthly cost (in dollars) of producing $400$ widgets.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      If $g$ is invertible, what does $g^{-1}(400)$ represent? What are its units?
+    \end{problem}
+
+    \begin{solution}
+      $g^{-1}(400)$ represents the number of widgets produced when the company's monthly
+      costs are $\$400$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      What does $g'(400)$ represent?  What are its units?
+    \end{problem}
+
+    \begin{solution}
+      $g'(400)$ represents the instantaneous rate at which the company's monthly costs
+      would change in response to a change in the number of widgets produced
+      when the company is producing
+      $400$ widgets per month. The units are dollars per widget. (This is known
+      in economics as marginal cost.)
+    \end{solution}
+
+  \end{enumerate}
+  It turns out that the Wonderful Widget Company has fixed monthly operating costs of \$10,000, and it costs them an additional \$7 to manufacture each widget.
+  \begin{enumerate}[resume]
+  \item
+    \begin{problem}[\vfill]
+      Using this information, write a formula for $g(x)$.
+    \end{problem}
+
+    \begin{solution}
+      $g(x)=10000+7x$
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Now, write a formula for $g^{-1}$. 
+    \end{problem}
+
+    \begin{solution}
+      We solve $g(y)=x$ for $y$.
+      \begin{align*}
+        10000+7y &= x \\
+        7y &= x-10000\\
+        y &= \tfrac{1}{7}(x-10000)
+      \end{align*}
+      Therefore $g^{-1}(x) = \tfrac{1}{7}(x-10000)$.
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+\end{document}

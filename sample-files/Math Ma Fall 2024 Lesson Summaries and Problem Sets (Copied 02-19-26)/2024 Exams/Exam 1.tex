@@ -1,0 +1,360 @@
+\documentclass{article}
+
+\textwidth=7in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=-.21in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{mathtools, amssymb}
+\usepackage{ifthen}
+\renewcommand{\arraystretch}{1.5}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt}
+
+\usepackage{xcolor}
+\usepackage[pdftex]{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=blue,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+
+\usepackage{graphicx}
+\usepackage{svg}
+
+\graphicspath{ {./images/} }
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+\usepackage{icomma}
+\usepackage{diffcoeff}
+\usepackage[per-mode=symbol]{siunitx}
+
+\usepackage{pgfplots}
+\usepackage{tikz}
+    \usetikzlibrary{ % enables the snake paths
+      decorations.pathmorphing,%
+      % enables bigger arrows
+      decorations.markings,%
+      decorations.pathreplacing,%
+      decorations.text,%
+      calc,%
+      patterns,%
+      shapes.geometric,%
+      arrows,
+      decorations.shapes,
+      positioning,
+      plotmarks, angles, quotes,
+      pgfplots.groupplots}
+
+\pgfplotscreateplotcyclelist{mycolor}{%
+  black, blue, red, green!70!black,magenta,
+  purple, cyan, orange
+}
+\pgfplotsset{
+  cycle list name=mycolor,
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },
+  tick label style = {font=\footnotesize, fill=white, inner sep=0pt},
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=300,
+  minor tick length=0,
+  grid style = {dotted,black},
+  scatter/classes={
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  holdot/.style={color=black,fill=white,only marks,mark=*},
+  soldot/.style={color=black,fill=black,only marks,mark=*},
+  rholdot/.style={color=red,fill=white,only marks,mark=*},
+  rsoldot/.style={color=red,fill=black,only marks,mark=*},
+  compat=1.13
+}
+
+\usepackage{pifont}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\usepackage{tcolorbox}
+\newenvironment{feedback}{%
+  \begin{tcolorbox}[colframe=skyblue, colback=skyblue!10!white]
+  }{\end{tcolorbox}}
+
+\usepackage{soul}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\newlength{\tipmargin}
+\makeatletter
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+\def\exend{\hfill\ding{118}}
+\@ifundefined{Example}{}{}
+\renewenvironment{Example}
+{\refstepcounter{equation}\normalfont\normalsize\textbf{Example \theequation.}}
+{\exend}
+\renewcommand{\theequation}{\arabic{equation}}
+
+\renewenvironment{framed}{
+  \setlength{\tipmargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\tipmargin
+  \def\FrameCommand{\hspace{\tipmargin}\fbox}%
+  \advance\linewidth\tipmargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+}
+{\endMakeFramed}
+
+\makeatother
+
+
+
+\begin{document}
+
+
+\noindent
+{\large \mbox{} \hfill \bf Name:\underline{\hspace{3in}}}\\
+
+{\large \mbox{} \hfill \bf HUID:\underline{\hspace{3in}}}\\
+{\mbox{} \hfill \it (Please write your name neatly in print.)}\\
+
+
+ 
+\medskip
+ 
+\noindent
+{\large\bf
+Exam 1  \\ Math Ma/Ma5 - Fall 2024}
+\noindent
+
+
+{\Large
+\begin{center}\textbf{Directions---Please read carefully!} \end{center}}
+
+
+
+This assessment is subject to the Harvard College Honor Code. No calculators or any other aids are permitted on this mini-exam.  Please write as neatly as possible, \textbf{as answers that can't be read can't be graded and thus can't receive credit}. You have 120 minutes to complete this mini-exam.   \\
+
+There is a back page of scratch paper. You may ask for additional scratch paper if you would like to have some extra space to work on the problems, but we will not consider the scratch papers as part of your submission. Only this packet will be scanned and graded, so make sure to include all relevant work in the space provided for each question. 
+
+\begin{center}\textbf{Good luck!}\end{center}
+
+
+
+
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+      \textbf{Problem Number}   & \textbf{Points}  \\
+             \hline \hline
+                Problem 1   &   \\
+            \hline
+                 Problem 2 &   \\
+        \hline 
+                Problem 3 &   \\
+        \hline 
+                Problem 4 &   \\
+        \hline 
+                Problem 5 &   \\
+        \hline 
+               
+               
+         \textbf{Total} &   \\
+         \hline 
+    \end{tabular}\\
+\vspace{0.5in}
+\emph{As a member of Harvard College, I pledge that I will not give or receive assistance on this exam.}\\
+\vspace{0.5in}{\large \mbox{} \hfill \bf Signature:\underline{\hspace{3in}}}\\
+
+\newpage
+
+\begin{enumerate}
+
+  \item Let $f(x)=1-\displaystyle\frac{2}{x+3}$. 
+    \begin{enumerate}
+        \item 
+        \begin{problem}[\vfill]
+        Find $f'(1)$ using the definition of the derivative. 
+        \end{problem}
+        
+        \item 
+        \begin{problem}[2.5in]
+        Describe the graph of $f(x)$ and the location of any asymptotes.
+        \end{problem}
+        \item 
+        \begin{problem}[1in]
+        Describe how we could represent $f'(1)$ on a graph of $f(x)$. (1 sentence)
+        \end{problem}
+
+   \newpage
+        \item 
+        \begin{problem}[2cm] Consider the function $g(x)$, which is a vertical shift of $f(x)$ down by 1 unit. Select the statement that best describes the relationship between $g'(x)$ and $f'(x)$.
+        
+        \begin{enumerate}[label=\Alph*.]
+            \item $g'(x)=f'(x)-1$
+            \item $g'(x)= f'(x-1)$
+            \item $g'(x) = f'(x)$
+            \item $g'(x) = -f'(x)$
+        \end{enumerate}
+        \end{problem}
+        
+    \end{enumerate}
+
+\item  Matt has been growing a plant he bought at the plant sale. The height of the plant was originally 20 cm when it was first planted. It grew the most on the first day. After that, the number of centimeters it grew each day decreased.  After 60 days, the height was 50 cm.
+
+Let $g(x)$ be the height of the plant in centimeters $x$ days after it was planted.  
+\begin{enumerate}
+    \item  
+    \begin{problem}[\vfill] Describe the graph of $g(x)$. Describe the axis labels and any known points on the graph.
+    \end{problem}
+    %\item {\bf Too long?:} Give a practical description of each of the quantities below. There is nothing to calculate, just explain what the expression means within the context of this situation. 
+    %\begin{enumerate}
+       % \item $g(20)$
+        %\item $g(40)-g(20)$ 
+    %\end{enumerate}
+    \item 
+    \begin{problem}[1.5in] What is the average rate of change of the height over the 60 days since it was planted? Make sure to include units in your answer.
+    \end{problem}
+
+    \newpage
+    \item 
+    \begin{problem}[\vfill]
+        Use a secant line to approximate the plant's height 40 days after being planted. Include units. 
+    \end{problem}
+    \item 
+    \begin{problem}[\vfill] Describe how to draw the secant line involved in the approximation you just calculated. Is the approximation you found in (c) an over or an underestimate? 
+    
+    \end{problem}
+    \item 
+    \begin{problem}[\vfill] Write a one-sentence interpretation of the statement $g'(60)=\dfrac{1}{4}$ in words. Include units. 
+    \end{problem}
+    \item 
+    \begin{problem}[\vfill] Use the fact that $g'(60)=\dfrac{1}{4}$ to approximate the plant's height 56 days after being planted. Include units.
+    \end{problem}
+    \item 
+    \begin{problem}[\vfill] Describe how to draw this approximation on a graph of $g(x)$. Is the approximation you found in (f) an over or an underestimate? 
+    
+    \end{problem}
+
+\end{enumerate}
+\newpage
+ \item Luke is carving pumpkins to sell at the state fair. Here are the important facts:
+ \begin{itemize}
+     \item He can sell  mini pumpkins for \$2 and regular pumpkins for \$10.
+     \item Time is limited. Luke has only 10 total hours to carve.  A mini pumpkin takes 15 minutes to carve, while a regular pumpkin takes 30 minutes to carve.
+ \end{itemize}  
+ His designs are so intricate that he's sure he will sell all of his pumpkins.
+    \begin{enumerate}
+        \item 
+        \begin{problem} Write a function $R(p)$ that describes the revenue Luke will make as a function of $p$, the number of regular pumpkins he carves. Make sure to communicate your reasoning clearly. 
+        \end{problem}
+        \vspace{4in}
+        \item 
+        \begin{problem}[\vfill] What's the domain of your function from part (a)?
+        \end{problem}
+        \item 
+        \begin{problem}[\vfill]
+            What's the range of your function from part (a)?
+        \end{problem}
+       % \item How many regular pumpkins should Jack carve to earn the most revenue?
+    \end{enumerate}
+\newpage
+\item 
+
+We have the following information about an unknown function $f$:
+\begin{itemize}
+    \item $f$ is an odd function
+    \item $f$ is continuous on $(-\infty, \infty)$
+    \item $f'(x)=-3x^2+27$
+    \item $f''(x) = -6x$
+\end{itemize}
+\begin{enumerate}
+    \item Determine where $f$ is increasing. Represent your answer using interval notation.
+    \pspace{\vfill}
+    
+    \item Determine where $f$ is decreasing. Represent your answer using interval notation.
+    \pspace{\vfill}
+    
+    \item Determine whether $f$ has any turning points. If it does, write the $x$-values where they occur.
+    \pspace{\vfill}
+
+    \newpage
+    
+    \item Determine where $f$ is concave up. Represent your answer using interval notation.
+    \pspace{\vfill}
+    
+    \item Determine where $f$ is concave down. Represent your answer using interval notation.
+    \pspace{\vfill}
+    \item Determine whether $f$ has any inflection points. If it does, write the $x$-values where they occur.
+    \pspace{\vfill}
+    \item Describe a possible graph of $f$. Include the information from previous parts to describe its increasing/decreasing and concavity behavior, as well as any known points.
+    \pspace{\stretch{1.5}}
+    \item Check that your description in part (f) is consistent with your answers to parts (a)-(e) and what you know about the function. \textit{(Nothing to write here.)}
+    
+\end{enumerate}
+\newpage
+\item Two students are worried about their coffee intake and are wondering about its physiological effects. They want to model the physiological effects of drinking a cup of coffee using two functions.
+\begin{itemize}
+    \item $c(t)$ is the amount of caffeine in the bloodstream measured in milligrams per liter (mg/L) $t$ hours after drinking a cup of coffee.
+    \item $h(y)$ is heart rate variability (measured in milliseconds) between consecutive heartbeats as a function of $y$, the amount of caffeine in the bloodstream (measured in mg/L).
+\end{itemize}
+Express the following quantities in function notation.
+\begin{enumerate}
+    \item The amount of caffeine in the bloodstream 6 hours after drinking a cup of coffee.
+    \pspace{\vfill}
+    \item Heart rate variability 6 hours after drinking a cup of coffee.
+    \pspace{\vfill}
+    \item The average rate at which heart rate variability is changing over the first 6 hours after drinking a cup of coffee. Include units.
+    \pspace{\vfill}
+    \item The instantaneous rate of change of the amount of caffeine in the bloodstream 1 hour after drinking a cup of coffee. Include units.
+    \pspace{\vfill}
+\end{enumerate}
+
+
+
+\newpage
+\emph{This page left blank for scratch work. It will not be graded.}
+
+\newpage
+\emph{This page left blank for scratch work. It will not be graded.}
+
+\end{enumerate}
+\end{document}

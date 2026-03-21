@@ -1,0 +1,833 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+\renewcommand{\workshopnote}{CA Notes.} 
+\usepackage{lipsum}
+ \usepackage{microtype}
+ \usepackage{vwcol}
+\begin{document}
+
+\htitle{Workshop 5: Inverse Trig Functions and their Derivatives}
+\begin{workshop}
+   This week's workshop is meant to provide students with many practice problems (more than can be completed in workshop!) that address the following goals:
+    \begin{itemize}
+        \item recall (or re-derive) the domain, range, derivative, and graph of each inverse trig function, as well as interpret the output of the inverse trig function as an angle within a certain restricted interval.
+        \item use inverse trig to compute the angles (inside restricted intervals) that correspond to familiar values of sine, cosine, and tangent (i.e., $\arcsin (-1)=-\dfrac{\pi}{2}$). 
+        \item solve equations involving trig functions, making use of substitution when necessary and using visual aids like the unit circle or a graph to find all solutions to an equation on an indicated interval.
+        \item use inverse trig to express non-familiar angle solutions to trig equations.
+        \item compute derivatives of inverse trig functions in combination with other function families, using a variety of derivative rules and techniques.
+        \item simplify compositions of inverse trig and trig functions.
+    \end{itemize}
+   There are many more problems on this worksheet than can be completed in workshop. Students should feel free to work on topics that are most challenging for them. However, students historically tend to have some trouble with solving trigonometric equations, especially when inverse trig and/or substitution is involved. Question 4 is designed to help students practice moving angles around the unit circle before they do so to find all solutions to equations in Question 5.
+
+   An example lesson plan is as follows:
+   \begin{itemize}
+       \item First 15 minutes: Attendance, Question 1 and 2 at tables
+       \item 10-15 minutes: Samples from Question 3 and 4 at tables or boards
+       \item up to 40 minutes: Question 5 at the boards, including how to use the unit circle as a visual aid to solve trig equations, and how to express non-familiar angles as solutions with inverse trig functions.
+       \item if time permits, 10 minutes: samples from Question 6 (computational practice with derivatives)
+   \end{itemize}
+Again, there are many more problems on this worksheet than can be completed in one workshop, with the purpose of giving students extra problems (with solutions posted at 5:45pm on Tuesdays). Also feel free to ask students what they'd like to see on the main board/discussed as a group.
+\end{workshop}
+\begin{enumerate}
+\item Fill in the following summary about inverse trigonometric functions and their derivatives. 
+
+\begin{enumerate}
+    
+\item
+\begin{itemize}
+    
+    
+
+    \item$\arcsin x$ is the angle in the interval $\fitb{1.2in}{\solonly\textcolor{red}{[-\frac{\pi}{2},\frac{\pi}{2}]}}$ whose sine is $\fitb{1.2in}{\solonly\textcolor{red}{x}}$.
+    \vspace{0.3cm}
+    \item$\arcsin x$ has a domain of $\fitb{1.47in}{\solonly\textcolor{red}{[-1,1]}}$ and a range of $\fitb{1.47in}{\solonly\textcolor{red}{[-\frac{\pi}{2},\frac{\pi}{2}]}}$. \vspace{0.3cm}
+
+
+   
+        \item $\dfrac{d}{dx}\arcsin x=$ \solonly{\textcolor{red}{$\dfrac{1}{\sqrt{1-x^2}}$}} 
+        \vspace{0.3cm}
+        \item $\dfrac{d}{dx}\arcsin \bigl(f(x)\bigl)=$
+        \solonly{\textcolor{red}{$\dfrac{1}{\sqrt{1-\bigl[f(x)\bigl]^2}}\cdot f'(x)$}}
+
+\end{itemize}
+\vfill\item  
+\begin{itemize}
+    \item$\arccos x$ is the angle in the interval $\fitb{1.2in}{\solonly\textcolor{red}{[0,\pi]}}$ whose cosine is $\fitb{1.2in}{\solonly\textcolor{red}{x}}$.
+    \vspace{0.3cm}
+    \item$\arccos x$ has a domain of $\fitb{1.47in}{\solonly\textcolor{red}{[-1,1]}}$ and a range of $\fitb{1.47in}{\solonly\textcolor{red}{[0,\pi]}}$. \vspace{0.3cm}
+
+
+   
+        \item $\dfrac{d}{dx}\arccos x=$ \solonly{\textcolor{red}{$\dfrac{-1}{\sqrt{1-x^2}}$}} 
+        \vspace{0.3cm}
+        \item $\dfrac{d}{dx}\arccos \bigl(f(x)\bigl)=$
+        \solonly{\textcolor{red}{$\dfrac{-1}{\sqrt{1-\bigl[f(x)\bigl]^2}}\cdot f'(x)$}}
+\end{itemize}
+
+\vfill\item 
+\begin{itemize}
+\begin{workshop}
+    Be prepared to explain graphically why the endpoints of the restricted interval ($\frac{\pi}{2}, \frac{\pi}{2}$) are excluded according to the domain exclusions (or graphically speaking, the vertical asymptotes) of $\tan x$.
+\end{workshop}
+    \item$\arctan x$ is the angle in the interval $\fitb{1.2in}{\solonly\textcolor{red}{(-\frac{\pi}{2},\frac{\pi}{2})}}$ whose tangent is $\fitb{1.2in}{\solonly\textcolor{red}{x}}$.
+    \vspace{0.3cm}
+    \item$\arctan x$ has a domain of $\fitb{1.47in}{\solonly\textcolor{red}{(-\infty,\infty)}}$ and a range of $\fitb{1.47in}{\solonly\textcolor{red}{(-\frac{\pi}{2},\frac{\pi}{2})}}$. \vspace{0.3cm}
+
+
+   
+        \item $\dfrac{d}{dx}\arctan x=$ \solonly{\textcolor{red}{$\dfrac{1}{1+x^2}$}} 
+        \vspace{0.3cm}
+        \item $\dfrac{d}{dx}\arctan \bigl(f(x)\bigl)=$
+        \solonly{\textcolor{red}{$\dfrac{1}{1+\bigl[f(x)\bigl]^2}\cdot f'(x)$}}
+
+\end{itemize}
+    
+    \end{enumerate}  
+\vfill
+\newpage
+\item Below are the graphs of three inverse trig functions.
+\vspace{0.3cm}
+
+% \begin{center}
+%     \begin{figure}[h]
+%         \centering
+%         \includegraphics[scale=0.5]{Graphs.png}
+%         \end{figure}
+% \end{center}
+
+
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{groupplot}[
+        group style = {group size=1 by 3},
+        grid = none,
+        xtick=\empty,
+        ytick=\empty,
+        width = 2.7in,
+        xmin=-3, xmax=3, ymin=-3.5, ymax=3.5,
+        restrict y to domain=-100:100]
+        
+    \nextgroupplot
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -1:1, color = black]{acos(x)/180*pi};
+    \solonly{
+    \coordinate (A) at (0,1.57);
+    \coordinate (B) at (1,0);
+    \coordinate (C) at (-1,3.14);
+    \filldraw[radius=2pt][color=red] (A) circle;
+    \node[right][color=red] at (A){$(0,\frac{\pi}{2})$};
+    \filldraw[radius=2pt][color=red] (B) circle;
+    \node[below][color=red] at (B){$(1,0)$};
+    \filldraw[radius=2pt][color=red] (C) circle;
+    \node[left][color=red] at (C){$(-1,\pi)$};
+    \node[left][color=red] at (-0.8,2){$y=\arccos x$};
+    }
+   
+
+    \nextgroupplot
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -1:1, color = black]{asin(x)/180*pi};
+    \solonly{
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1,1.57);
+    \coordinate (C) at (-1,-1.57);
+    \filldraw[radius=2pt][color=red] (A) circle;
+    \node[right][color=red] at (A){$(0,0)$};
+    \filldraw[radius=2pt][color=red] (B) circle;
+    \node[above][color=red] at (B){$(1,\frac{\pi}{2})$};
+    \filldraw[radius=2pt][color=red] (C) circle;
+    \node[left][color=red] at (C){$(-1,-\frac{\pi}{2})$};
+    \node[left][color=red] at (-1,2){$y=\arcsin x$};
+    }
+
+    \nextgroupplot
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -3:3, color = black]{atan(x)/180*pi};
+    \addplot[domain = -3:3, dashed, color = black]{pi/2};
+    \addplot[domain = -3:3, dashed, color = black]{-pi/2};
+    \solonly{
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1,0.79);
+    \coordinate (C) at (-1,-0.79);
+    \filldraw[radius=2pt][color=red] (A) circle;
+    \node[right][color=red] at (A){$(0,0)$};
+    \filldraw[radius=2pt][color=red] (B) circle;
+    \node[above][color=red] at (B){$(1,\frac{\pi}{4})$};
+    \filldraw[radius=2pt][color=red] (C) circle;
+    \node[below][color=red] at (C){$(-1,-\frac{\pi}{4})$};
+    \node[left][color=red] at (-0.8,0.6){$y=\arctan x$};
+    \node[right][color=red] at (0.5,-2){HA: $y=-\frac{\pi}{2}$};
+    \node[right][color=red] at (0.5,2){HA: $y=\frac{\pi}{2}$};
+    }
+    
+    \end{groupplot}
+   
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}
+    \item 
+    \begin{workshop}
+        It might help to point out to students how the domains and ranges they identify in Question 1 should agree with the inputs and outputs on the above graphs, as a check for consistency.
+    \end{workshop}
+    Label each graph above as either $\arcsin x$, $\arccos x$, or $\arctan x$. (Are the domains and ranges you listed in \#1 consistent with your choice for each graph above?)
+    \item On each graph, label the points $(x,y)$ whose $x$- coordinates are $x=0$, $x=1$, and $x=-1$.
+    \begin{workshop}
+        Students may not have seen these limits before, but they should be able to read them off of the graph. These are handy limits to have in the back of your mind in future problems or courses!
+    \end{workshop}
+    \item Label the horizontal asymptotes of $\arctan x$, then compute the following limits.
+    \begin{enumerate}
+\begin{multicols}{2}
+    \item $\displaystyle \lim_{x \to \infty} \arctan x$ \solonly{\textcolor{red}{$=\frac{\pi}{2}$}}
+    \item $\displaystyle \lim_{x \to -\infty} \arctan x$
+    \solonly{\textcolor{red}{$=-\frac{\pi}{2}$}}
+\end{multicols} 
+    \end{enumerate}
+\end{enumerate}
+\newpage
+\item 
+\begin{workshop}
+   Encourage students to follow the example.
+\end{workshop}
+Express the following quantities in words. Then, evaluate. An example is done below for you.
+\begin{enumerate}
+   
+    
+        
+    \item $\arccos (1)$ \hspace{0.6cm}\textbf{Solution.} $\arccos (1)$ is the angle in the interval $[0, \pi]$ whose cosine is 1, so $\arccos 1 = 0$.
+    \vfill\vfill
+    \item $\arcsin \left(\dfrac{1}{2}\right)$
+    
+    \solonly{\textcolor{red}{$\arcsin \left(\dfrac{1}{2}\right)$ is the angle in the interval $\left[-\dfrac{\pi}{2}, \dfrac{\pi}{2}\right]$ whose sine is $\dfrac{1}{2}$, so $\arcsin \left(\dfrac{1}{2}\right)=\dfrac{\pi}{6}$}}
+    \vfill\vfill
+   
+    
+    \item $\arcsin \left(-\dfrac{\sqrt{3}}{2}\right)$
+
+    \solonly{\textcolor{red}{$\arcsin \left(-\dfrac{\sqrt{3}}{2}\right)$ is the angle in the interval $\left[-\dfrac{\pi}{2}, \dfrac{\pi}{2}\right]$ whose sine is $-\dfrac{\sqrt{3}}{2}$, so $\arcsin \left(-\dfrac{\sqrt{3}}{2}\right)=-\dfrac{\pi}{3}$}}
+\vfill\vfill
+
+    \item $\arccos\left(-\dfrac{1}{2}\right)$
+    
+    \solonly{\textcolor{red}{$\arccos \left(-\dfrac{1}{2}\right)$ is the angle in the interval $[0, \pi]$ whose cosine is $-\dfrac{1}{2}$, so $\arccos \left(-\dfrac{1}{2}\right)=\dfrac{2\pi}{3}$}}
+    
+    \vfill\vfill
+    
+    \item $\arctan(\sqrt{3})$
+
+    \solonly{\textcolor{red}{$\arctan(\sqrt{3})$ is the angle in the interval $\left(-\dfrac{\pi}{2}, \dfrac{\pi}{2}\right)$ whose tangent is $\sqrt{3}$, so $\arctan(\sqrt{3})=\dfrac{\pi}{3}$}}
+    
+    \vfill\vfill
+    
+    \item $\arccos \left(\dfrac{1}{\sqrt{2}}\right)$
+
+\solonly{\textcolor{red}{$\arccos \left(\dfrac{1}{\sqrt{2}}\right)$ is the angle in the interval $[0, \pi]$ whose cosine is $\dfrac{1}{\sqrt{2}}$, so $\arccos \left(\dfrac{1}{\sqrt{2}}\right)=\dfrac{\pi}{4}$}}
+
+\vfill\vfill
+
+    \item $\arctan \left(-\dfrac{1}{\sqrt{3}} \right) $
+
+
+\solonly{\textcolor{red}{$\arctan \left(-\dfrac{1}{\sqrt{3}} \right) $ is the angle in the interval $\left(-\dfrac{\pi}{2}, \dfrac{\pi}{2}\right)$ whose tangent is $\left(-\dfrac{1}{\sqrt{3}} \right)$, so $\arctan \left(-\dfrac{1}{\sqrt{3}} \right)=-\dfrac{\pi}{6}$}}
+
+\vfill \vfill
+ 
+\end{enumerate}
+\newpage
+\item 
+\begin{workshop}
+   This problem is meant to address a sub-skill necessary for solving trig equations, amongst other things.
+\end{workshop}
+An acute angle $\theta$ is sketched in standard position on the unit circle below.
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[xmin=-1.2,xmax=1.2,ymin=-1.2,ymax=1.2,
+    width=2.4in, unit vector ratio*={1 1},
+    xtick={-1,1}, ytick={-1,1},clip=false,
+    x tick label style = {xshift = 6pt},
+    y tick label style = {yshift = 6pt}]
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (0.8,0.6);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \draw (O) -- (B) node[above left] {};
+    \draw pic[draw=black, angle radius=10, "$\theta$",
+    angle eccentricity = 1.8] {angle=A--O--B};
+    \filldraw[radius=2pt] (B) circle;
+    \end{axis}
+  \end{tikzpicture}
+  \end{center}
+  
+\begin{enumerate}
+\begin{multicols}{2}
+
+    \item Draw $\theta + \pi$.
+
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.3in, height=2.3in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+           \solonly{
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (-0.8,-0.6);
+    \coordinate (C) at (1,0);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \draw[thick][color=red] (O) -- (B) node[above left]{};
+    \draw[thick][color=red] (O) -- (C) node[above left]{};
+    \draw[thick] pic[draw=red, angle radius=10, text=red, anchor=east, "$\theta+\pi$",
+    angle eccentricity = 1.8] {angle=A--O--B};
+    \filldraw[radius=2pt] (B) circle;
+    }
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+
+\item Draw $\theta - \pi$.
+
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.3in, height=2.3in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+           \solonly{
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (-0.8,-0.6);
+    \coordinate (C) at (1,0);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \draw[thick][color=red] (O) -- (B) node[above left]{};
+    \draw[thick][color=red] (O) -- (C) node[above left]{};
+    \draw[thick] pic[draw=red, angle radius=10, text=red, anchor=west, "$\theta-\pi$",
+    angle eccentricity = 1.8] {angle=B--O--A};
+    \filldraw[radius=2pt] (B) circle;
+    }
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    
+    
+    \item Draw $-\theta$. 
+
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.3in, height=2.3in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+           \solonly{
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (0.8,-0.6);
+    \coordinate (C) at (1,0);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \draw[thick][color=red] (O) -- (B) node[above left]{};
+    \draw[thick][color=red] (O) -- (C) node[above left]{};
+    \draw[thick] pic[draw=red, angle radius=10, text=red, anchor=west, "$-\theta$",
+    angle eccentricity = 1.8] {angle=B--O--A};
+    \filldraw[radius=2pt] (B) circle;
+    }
+          \end{axis}
+        \end{tikzpicture}
+        
+      \end{center}
+
+      \item Draw $\pi-\theta$. 
+
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.3in, height=2.3in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+           \solonly{
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (-0.8,0.6);
+    \coordinate (C) at (1,0);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \draw[thick][color=red] (O) -- (B) node[above left]{};
+    \draw[thick][color=red] (O) -- (C) node[above left]{};
+    \draw[thick] pic[draw=red, angle radius=10, text=red, anchor=west, "$\pi-\theta$",
+    angle eccentricity = 1.8] {angle=A--O--B};
+    \filldraw[radius=2pt] (B) circle;
+    }
+          \end{axis}
+        \end{tikzpicture}
+        
+      \end{center}
+
+      \item Draw $2\pi-\theta$. 
+
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.3in, height=2.3in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+           \solonly{
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (0.8,-0.6);
+    \coordinate (C) at (1,0);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \draw[thick][color=red] (O) -- (B) node[above left]{};
+    \draw[thick][color=red] (O) -- (C) node[above left]{};
+    \draw[thick] pic[draw=red, angle radius=10, text=red, anchor=east, "$2\pi-\theta$",
+    angle eccentricity = 1.8] {angle=A--O--B};
+    \filldraw[radius=2pt] (B) circle;
+    }
+          \end{axis}
+        \end{tikzpicture}
+        
+      \end{center}
+
+      \item Draw $2\pi+\theta$. 
+
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.3in, height=2.3in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+           \solonly{
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (0.8,0.6);
+    \coordinate (C) at (1,0);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \draw[thick][color=red] (O) -- (B) node[above left]{};
+    \draw[thick][color=red] (O) -- (C) node[above left]{};
+    \draw[thick] pic[draw=red, angle radius=10, text=red, anchor=west, "$2\pi+\theta$",
+    angle eccentricity = 1.8] {angle=A--O--B};
+    \filldraw[radius=2pt] (B) circle;
+    
+    }
+          \end{axis}
+        
+        \end{tikzpicture}
+      \end{center}
+      \end{multicols}
+\end{enumerate}
+\newpage
+\item Solve the following equations on the indicated intervals. 
+\begin{enumerate}
+\begin{multicols}{2}
+   \item 
+   
+$\tan x = \dfrac{1}{\sqrt{3}}$ on $[0, 4\pi]$
+   \begin{workshop}
+   Recall our course's slope definition of tangent.
+\end{workshop}
+   \begin{solution}
+    Recall that $\dfrac{1}{\sqrt{3}}$  is a familiar trigonometric value for the angle \fbox{$\dfrac{\pi}{6}$} and \fbox{$\dfrac{7\pi}{6}$} on the unit circle on the interval $[0, 2\pi]$. One way to visualize this is plotting the line that passes through the point $(0,0)$ and the unit circle with slope $\dfrac{1}{\sqrt{3}}$. Because we are looking for solutions on $[0,4\pi]$, let's add $2\pi$ to each of the solutions we found previously: $\dfrac{\pi}{6}+2\pi=$\fbox{$\dfrac{13\pi}{6}$} and $\dfrac{7\pi}{6}+2\pi=$\fbox{$\dfrac{19\pi}{6}$}.
+    \columnbreak
+   \end{solution}
+   \columnbreak
+   \probonly{
+   \begin{flushright}
+       
+
+      \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.8in, height=2.8in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false, ytick={-1,1}, xtick={-1,1}]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+           \solonly{
+           \addplot[color=red][domain=-1.5:1.5] ({x}, {.57*x});
+           
+           }
+          \end{axis}
+        \end{tikzpicture}
+        \end{flushright}
+        }
+    \solonly{
+    
+    \begin{tikzangle}[angle=pi/6]
+        \end{tikzangle}
+    \begin{tikzangle}[angle=7*pi/6]
+        \end{tikzangle}
+        \newline
+    \begin{tikzangle}[angle=13*pi/6]
+        \end{tikzangle}
+        \begin{tikzangle}[angle=19*pi/6]
+        \end{tikzangle}
+    }
+\end{multicols}
+   
+\vfill
+\begin{multicols}{2}
+\item $2\cos^2x+\cos x = 1$ on $[0, 2\pi]$
+
+\begin{solution}
+    This equation is quadratic in $\cos x$, so let's use the substitution $u=\cos x$ to streamline our solving: $2u^2+u=1$. Rewritten to $2u^2+u-1=0$, this equation factors as $(2u-1)(u+1)=0$, where $u=\dfrac{1}{2}$ and $u=-1$. Since $\cos x=u$, we are now solving $\cos x=\dfrac{1}{2}$ and $\cos x=-1$ on $[0,2\pi]$. These are familiar trigonometric values for cosine; $\cos x=\dfrac{1}{2}$ when \fbox{$x=\dfrac{\pi}{3}$} and \fbox{$x=\dfrac{5\pi}{3}$}, and $\cos x=-1$ when \fbox{$x=\pi$}.
+\end{solution}
+
+  \columnbreak
+  \probonly{
+  \begin{flushright}
+     \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.8in, height=2.8in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false, ytick={-1,1}, xtick={-1,1}]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+          \end{axis}
+        \end{tikzpicture}
+    \end{flushright}}
+    \solonly{
+    
+    \begin{tikzangle}[angle=pi/3]
+        \end{tikzangle}
+    \begin{tikzangle}[angle=5*pi/3]
+        \end{tikzangle}
+    \newline
+    \begin{tikzangle}[angle=pi]
+        \end{tikzangle}
+        
+    }
+\end{multicols}
+\vfill
+
+\begin{multicols}{2}
+\item $2\sin(2x)+1=0$ on $[0, 2\pi]$
+\begin{workshop}
+    Students often forget to adjust the interval according to their substitution. It helps to identify the interval as $x=0$ to $x=2\pi$, where these $x$- values must also be substituted for $u$- valus.
+\end{workshop}
+  \columnbreak
+  \probonly{
+  \begin{flushright}
+      
+ 
+     \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.8in, height=2.8in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false,  ytick={-1,1}, xtick={-1,1}]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+          \end{axis}
+        \end{tikzpicture}
+         \end{flushright}
+         }
+\end{multicols}
+\begin{solution} 
+Let's rewrite this equation as $\sin (2x)=-\dfrac{1}{2}$ and make the substitution $u=2x$, such that $\sin u=-\dfrac{1}{2}$. Now, we will solve $\sin u=-\dfrac{1}{2}$ from $x=0$ to $x=2\pi$, which corresponds to $u=0$ to $u=4\pi$ given our substitution $u=2x$. So, you can now use the unit circle to solve the equation $\sin u=-\dfrac{1}{2}$ on $[0,4\pi].$ Here, $u=\dfrac{7\pi}{6}$ and  $u=\dfrac{11\pi}{6}$ with one revolution around the unit circle, then to find solutions on the next interval of $2\pi$, we add $2\pi$ to each of these solutions to obtain
+$u=\dfrac{19\pi}{6}$ and $u=\dfrac{23\pi}{6}$.
+Since $x=\dfrac{u}{2}$, \fbox{$x=\dfrac{7\pi}{12}$}, \fbox{$x=\dfrac{11\pi}{12}$},
+\fbox{$x=\dfrac{19\pi}{12}$}, and \fbox{$x=\dfrac{23\pi}{12}$}.
+\end{solution}
+ \vfill
+    
+    
+    
+
+  
+
+
+
+\newpage
+
+\begin{multicols}{2}
+   \item $\cos x =-0.6$ on $[0,2\pi]$
+   \begin{workshop}
+       It's a good idea to discuss part d or e as a class.
+   \end{workshop}
+  \probonly{
+   \begin{flushright}
+      \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.8in, height=2.8in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false, ytick={-1,1}, xtick={-1,1}]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+          \end{axis}
+        \end{tikzpicture}
+        \end{flushright}   
+        }
+        
+\begin{solution}
+      One solution of $\cos x = -0.6$ is $x = \arccos (-0.6)$.  For short,
+      let's call this $A$.  Remember that $A = \arccos(-0.6)$ is the angle
+      in $[0, \pi]$ whose cosine is $-0.6$; it is the blue angle.
+      (In particular, since $A$ must be in $[0, \pi]$ and $\cos A$ is
+      negative, $A$ is between $\frac{\pi}{2}$ and $\pi$.) 
+      
+      Now, we can
+      picture all values of $x$ in $[0, 2 \pi]$ such that $\cos x = -0.6$
+      and express these in terms of $A$.  The other possible angle is
+      shown in red. So, there are two values of $x$, $\boxed{\arccos(-0.6) \text{ and }
+        2 \pi - \arccos(-0.6)}$. 
+    
+      \begin{center}
+      \begin{tikzpicture}
+        \begin{axis}[axis equal=true, 
+          xmin=-1.3, xmax=1.3, ymin=-1.3, ymax=1.3, clip=false,
+          xtick=\empty, ytick=\empty, extra x ticks={-0.6}, width=3in,
+          set layers=tick labels on top]
+          \coordinate (O) at (0,0);
+          \coordinate (A) at (1,0);
+          \coordinate (R) at (\rtheta{1}{126.8});
+          \coordinate (P) at (\rtheta{1}{233.1});
+          \addplot[domain=0:360, data cs=polar] (x,1);
+          \draw[thick,blue] (O) -- (R);
+          \draw[thick,red] (O) -- (P);
+          \filldraw[fill=blue,radius=2pt] (R) circle;
+          \filldraw[fill=red,radius=2pt] (P) circle;
+          \draw pic[text=blue,draw=blue,thick,angle radius=18,
+          "\normalsize$A$",angle eccentricity=1.4]
+          {angle=A--O--R};
+          \draw pic[text=red,draw=red,thick,angle radius=10]
+          {angle=A--O--P};
+          \draw[->,draw=red,text=red] (-1,0.5) node[left] {$2\pi-A$}
+          to (-0.2,0.1);
+        \end{axis}
+      \end{tikzpicture}
+      \end{center}
+      
+    \end{solution}
+\end{multicols}
+   
+\vfill
+\begin{multicols}{2}
+\item $\sin x =-0.3$ on $[0,2\pi]$
+\probonly{
+  \columnbreak
+  \begin{flushright}
+      
+ 
+     \begin{tikzpicture}
+          \begin{axis}[axis equal=true, width=2.8in, height=2.8in, xmin=-1.25,
+            xmax=1.25, ymin=-1.25, ymax=1.25, clip=false,  ytick={-1,1}, xtick={-1,1}]
+            \addplot[domain=0:360] ({cos(x)}, {sin(x)});
+            %\filldraw[green!70!black] (axis cs: 0.33, -0.94) circle(2pt)
+           % node[anchor=north west]{$P(A) = \left( \frac{1}{3}, ? \right)$ };
+          \end{axis}
+        \end{tikzpicture}
+         \end{flushright}
+   }
+
+\end{multicols}
+
+\begin{solution}
+      We know one solution to $\sin x = -0.3$, $x = \arcsin (-0.3)$.  For short, let's call this $A$.  Remember
+      that $A = \arcsin (-0.3)$ is the angle in
+      $\left[ - \frac{\pi}{2}, \frac{\pi}{2} \right]$ whose sine is
+      $-0.3$; we can picture it like this:
+      \begin{center}
+        \begin{tikzangle}[angle=rad(asin(-0.3)), label=$\ A$, color=blue,
+          func=sin, functick=$-0.3$] %
+          \draw[blue] (axis cs: 1.5, 0) node[right] {$A = \arcsin (
+              -0.3 )$};
+        \end{tikzangle}
+      \end{center}
+      (In particular, since $A$ must be in $\left[ - \frac{\pi}{2},
+        \frac{\pi}{2} \right]$ and $\sin A$ is negative, $A$ is between
+      $-\frac{\pi}{2}$ and $0$.)
+
+      Because $A$ is negative, many people find it easier to work in terms
+      of $B = \arcsin (0.3))$, which is between $0$
+      and $\frac{\pi}{2}$; we can picture $B$ like this:
+      \begin{center}
+        \begin{tikzangle}[angle=rad(asin(0.3)), label=$\ B$, color=blue,
+          func=sin, functick=$0.3$] %
+          \draw[blue] (axis cs: 1.5, 0) node[right] {$B = \arcsin \left(
+              0.3 \right)$};
+        \end{tikzangle}
+      \end{center}
+      (From our diagrams, we can see that $B = -A$.)
+
+      There are two angles in $[0, 2 \pi]$ such that $\sin x = -0.3$; we can express them in terms of $A$ or $B$:
+      \begin{center}
+        \begin{tabular}{ccc}
+          \begin{tikzangle}[angle=pi+rad(asin(0.3)), func=sin,
+            functick=$-0.3$, label=$x$,
+            labelpos=0.6] % 
+          \end{tikzangle}
+          &&
+          \begin{tikzangle}[angle=2*pi-rad(asin(0.3), func=sin,
+            functick=$-0.3$, label=$x$,
+            labelpos=0.4] % 
+          \end{tikzangle}
+          \\
+          $\displaystyle
+          \begin{aligned}
+            x &= \pi + B \\
+            &= \pi - A            
+          \end{aligned}$
+          && $\displaystyle
+          \begin{aligned}
+            x &= 2 \pi - B \\
+            &= 2 \pi + A            
+          \end{aligned}$
+        \end{tabular} 
+      \end{center}
+      So, the two values of $x$ are $\boxed{ \pi + \arcsin (0.3) \text{ and } 2 \pi - \arcsin (0.3)}$.  Alternatively, these could be expressed
+      as $\pi - \arcsin ( -0.3)$ and $2 \pi + \arcsin
+      (-0.3)$. 
+
+      \emph{Note:} It may seem surprising that $\arcsin \left( -
+        0.3 \right)$ is not one of the values we want, but
+      remember that we figured out that it's negative (and therefore not
+      in $[0, 2 \pi]$).
+    \end{solution}
+
+      
+ \vfill
+    
+    
+    
+
+  
+\end{enumerate}
+
+
+
+\newpage
+\item Compute the derivatives of the following functions.
+\begin{enumerate}
+    \item $f(x)=\arcsin(x)+\arccos(x)$ 
+
+\begin{solution}
+    $f'(x)=\dfrac{1}{\sqrt{1-x^2}}+\dfrac{-1}{\sqrt{1-x^2}}=0$
+\end{solution}
+\vfill
+    \item $f(x)=\arccos{\bigl(x^2+x\bigl)}$
+    \begin{workshop}
+        Watch out for parenthesis errors here.
+    \end{workshop}
+    
+    \begin{solution}
+    $f'(x)=\dfrac{-1}{\sqrt{1-(x^2+x)^2}}\cdot(2x+1)$
+    \end{solution}
+    \vfill
+    \item $f(x)=x\arcsin{\bigl(\sqrt{x}\bigl)}$
+    
+    \begin{solution}
+    $f'(x)=\arcsin{\bigl(\sqrt{x}\bigl)}+x\cdot \dfrac{1}{\sqrt{1-(\sqrt{x})^2}}\cdot\dfrac{1}{2\sqrt{x}}$
+    \end{solution}
+    \vfill
+    \item $f(x)=\arctan{\left(\dfrac{5}{x}\right)}$ 
+    
+    \begin{solution}
+        $f'(x)=\dfrac{1}{1+\left(\frac{5}{x}\right)^2}\cdot\left(-\dfrac{5}{x^2}\right)$
+    \end{solution}
+    \vfill
+    \item $f(x)=x^{\arctan x}$
+    
+    \begin{solution}
+        \begin{align*}
+\ln\bigl[f(x)\bigl]&=\ln\left(x^{\arctan x}\right) \\
+        \ln\bigl[f(x)\bigl]&=(\arctan x)\cdot\ln x \\
+        \dfrac{1}{f(x)}\cdot f'(x)&=\dfrac{1}{1+x^2}\cdot \ln x + \arctan x \cdot \dfrac{1}{x} \\
+        \dfrac{f'(x)}{f(x)}&=\dfrac{\ln x}{1+x^2}+\dfrac{\arctan x}{x}\\
+        f'(x)&=f(x)\left[\dfrac{\ln x}{1+x^2}+\dfrac{\arctan x}{x}\right]\\
+        f'(x)&=x^{\arctan x}\left[\dfrac{\ln x}{1+x^2}+\dfrac{\arctan x}{x}\right]\\
+        \end{align*}
+    \end{solution}
+    \vfill 
+    \vfill
+\end{enumerate}
+   \newpage
+\item Evaluate the following expressions. Your answers should not include trig or inverse trig functions. 
+\begin{enumerate}
+     \item $\arcsin\!\left(\sin( \frac{\pi}{2})\right)$
+     
+     \begin{solution}
+         $\dfrac{\pi}{2}$
+     \end{solution}
+\vfill
+\item
+      $\arccos\!\left(\cos(\frac{3\pi}{2})\right)$
+\begin{workshop}
+    Students might be used to compositions of functions and their inverses ``canceling out", but remind them that this doesn't usually hold true for inverse trig and trig compositions. 
+\end{workshop}
+      \begin{solution}
+         $\dfrac{\pi}{2}$
+     \end{solution}
+\vfill
+\item $\sin\!\left(\arccos(-\frac{\sqrt{3}}{2})\right)$
+
+\begin{solution}
+ $\arccos\left(-\dfrac{\sqrt{3}}{2}\right)$ is the angle in the interval $[0, \pi]$ whose cosine is $-\dfrac{\sqrt{3}}{2}$, which is $\dfrac{5\pi}{6}$. Next, we compute $\sin\left(\dfrac{5\pi}{6}\right)=\dfrac{1}{2}$. Thus, $\sin\left(\arccos\left(-\dfrac{\sqrt{3}}{2}\right)\right)=\dfrac{1}{2}$.  
+\end{solution}
+\vfill
+      
+   
+\item $\cos\!\left(\arcsin(\frac{5}{13})\right)$
+
+\begin{solution}
+    $\arcsin\left(\dfrac{5}{13}\right)$ is the angle $\theta$ in the interval $\left[-\dfrac{\pi}{2},\dfrac{\pi}{2}\right]$ whose sine is $\dfrac{5}{13}$. Because sine is positive and $\theta$ is in the interval $\left[-\dfrac{\pi}{2},\dfrac{\pi}{2}\right]$, we know that $\theta$ lies in the first quadrant. Thus, we expect the cosine to be positive in the first quadrant as well. We can visualize $\sin \theta=\dfrac{5}{13}$ on a right triangle below with opposite side length $5$ and hypotenuse length $13$, and after solving for the adjacent side length with the Pythagorean Theorem, read off the triangle that $\cos \theta$, which is also $\cos\left(\arcsin\left(\dfrac{5}{13}\right)\right)$, equals $\dfrac{12}{13}$.
+
+    \begin{tikzpicture}[scale=0.4]
+     \draw[thick](0,0) -- (12,0) -- (12,5) -- (0,0);
+     \node[below] at (6,0){\solonly{\textcolor{red}{$12$}}};
+     \node[left] at (6,3){\solonly{\textcolor{red}{$13$}}};
+     \node[right] at (12,2.5){\solonly{\textcolor{red}{$5$}}};
+      \node[anchor=south west] at (2,0){$\theta$};
+     \end{tikzpicture}
+    
+\end{solution}
+\vfill\vfill
+
+\item $\tan\left(\arccos\left(-\dfrac{4}{5}\right)\right)$
+
+    \begin{solution}
+    $\arccos\left(-\dfrac{4}{5}\right)$ is the angle $\theta$ in the interval $[0,\pi]$ whose cosine is $-\dfrac{4}{5}$. Because the cosine is negative and $\theta$ falls in the interval $[0,\pi]$, we know that $\theta$ lies in the second quadrant. Thus, we expect the tangent to be negative as well. We can visualize $\cos \theta=\dfrac{4}{5}$ on a right triangle below with adjacent side length $4$ and hypotenuse length $5$, and after solving for the opposite side length with the Pythagorean Theorem, read off the triangle that $\tan \theta=\dfrac{3}{4}$. Thus, since we know $\theta$ lies in the second quadrant and expect tangent to be negative in the second quadrant, we know that $\tan\left(\arccos\left(-\dfrac{4}{5}\right)\right)=-\dfrac{3}{4}$.
+
+    \begin{tikzpicture}[scale=0.4]
+     \draw[thick](0,0) -- (6,0) -- (6,8) -- (0,0);
+     \node[below] at (3,0){\solonly{\textcolor{red}{$4$}}};
+     \node[right] at (6,4){\solonly{\textcolor{red}{$3$}}};
+     \node[left] at (3,4){\solonly{\textcolor{red}{$5$}}};
+      \node[anchor=south west] at (0.5,0){$\theta$};
+     \end{tikzpicture}
+
+\end{solution}
+     \vfill \vfill
+\end{enumerate}
+\item 
+Suppose $\theta=\arccos x$ and $0<\theta<\frac{\pi}{2}$. Use the right triangle below to show $-\csc(\arccos x)=\dfrac{-1}{\sqrt{1-x^2}}$. 
+\begin{workshop}
+    This question is meant to help students derive the derivative of $\arccos x$ on their p-set.
+\end{workshop}
+\vspace{1cm}
+\begin{tikzpicture}[scale=0.4]
+     \draw[thick](0,0) -- (8,0) -- (8,8) -- (0,0);
+     \node[below] at (4,0){\solonly{\textcolor{red}{$x$}}};
+     \node[left] at (4,4){\solonly{\textcolor{red}{$1$}}};
+     \node[right] at (8,4){\solonly{\textcolor{red}{$\sqrt{1-x^2}$}}};
+      \node[anchor=south west] at (0.8,0){$\theta$};
+     \end{tikzpicture}
+     
+     \begin{solution}
+     If $\theta=\arccos x$ and $0<\theta<\frac{\pi}{2}$, then $\cos \theta = x$. That's to say, the ratio of the adjacent side to the hypotenuse of this triangle is $x$, or $\frac{x}{1}$. So, the adjacent side has length $x$, the hypotenuse has length $1$, and by Pythagorean Theorem, the opposite side length would be $\sqrt{1-x^2}$. Now that we have the side lengths of a right triangle with acute angle $\theta$, we can compute $-\csc(\arccos x)$, which is just $-\csc\theta$. Cosecant of $\theta$ is the ratio of the hypotenuse to the side opposite of $\theta$, so $-\csc(\theta)=\dfrac{-1}{\sqrt{1-x^2}}$
+     \end{solution}
+   \end{enumerate}
+   
+
+
+
+\end{document}
+

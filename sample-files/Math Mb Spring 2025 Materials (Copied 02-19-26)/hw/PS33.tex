@@ -1,0 +1,943 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 33 - More Density Problems}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{grading}
+  
+    \begin{enumerate}[nosep]
+    \item 15 points 
+    \item 20 points 
+    \item 10 points
+    \item 2 points
+    \item 5 point
+    \end{enumerate}
+
+    Total: 52 points
+  
+\end{grading}
+
+\begin{enumerate}
+\item
+
+For help with this problem, read pp. 827-838 in Gottlieb.
+
+  \begin{enumerate}
+
+
+  \item
+\begin{grading}
+    15 points. Part (a): 2/3/1/1/3. Part (b): 2/2/1
+\end{grading}
+  
+  Suppose that the density of organisms in a circular petri dish
+    varies with distance from the center point of the dish.  The density
+    at a distance $x$ centimeters from the center is given by $f(x)$
+    organisms per square centimeter. The petri dish is 18 centimeters in
+    diameter.
+    \begin{enumerate}
+    \item
+      \begin{problem}[\stretch{3}]
+        Show in a sketch how you will slice the petri dish to solve this
+        problem.
+      \end{problem}
+
+      \begin{solution}
+        Since the density varies with distance to the center, we should
+        slice the dish in concentric rings.  Here's a picture, which also
+        shows the meaning of $x$; since $x$ measures distance to the
+        center, $x = 0$ at the center and $x = 9$ at the edge of the petri
+        dish:
+        \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[x=0.007in, y=0.007in, xmin=0, xmax=115,
+              ymin=-100, ymax=100, axis on top=true, clip=false, hide y
+              axis, xtick={0.1, 100}, xticklabels={0, 9},
+              xlabel=$x$, tick label style={fill=none}]              
+              %\draw[fill=cyan, draw=none] (0, 0) circle(75); %
+              %\draw[fill=white, draw=none] (0, 0) circle (62.5); %
+              \pgfplotsforeachungrouped \x in {12.5, 25, ..., 100.1}
+              {
+                \edef\temp{
+                  \noexpand\draw (0, 0) circle(\x);
+                }
+                \temp
+              }              
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+        Therefore, we're slicing the interval $[0, 9]$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        Approximate the number of organisms in the $k$-th slice.
+      \end{problem}
+
+      \begin{solution}
+        If we label $x_0 = 0, \ldots, x_n = 9$ as usual, here's a picture
+        of the $k$-th slice:
+        \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[x=0.007in, y=0.007in, xmin=0, xmax=115,
+              ymin=-100, ymax=100, axis on top=true, clip=false, hide y
+              axis, xtick={0.1, 12.5, 25, ..., 100},
+              xticklabels={$x_0$,,,,,,$x_k$,,$x_n$}, 
+              xlabel=$x$, tick label style={fill=none}]              
+              \draw[fill=cyan, draw=none] (0, 0) circle(75); %
+              \draw[fill=white, draw=none] (0, 0) circle (62.5); %
+              \pgfplotsforeachungrouped \x in {12.5, 25, ..., 100.1}
+              {
+                \edef\temp{
+                  \noexpand\draw (0, 0) circle(\x);
+                }
+                \temp
+              }              
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+        The slice is shaped like a ring with outer radius $x_k$ and
+        thickness $\Delta x$, so its area is approximately $2 \pi x_k
+        \Delta x$.  The density of organisms in this slice is
+        approximately $f(x_k)$, so the number of organisms in this slice
+        is approximately $(\text{density}) \cdot (\text{area}) \approx
+        \boxed{f(x_k) \cdot 2 \pi x_k \Delta x}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        Write a Riemann sum approximating the total number of organisms in
+        the petri dish.
+      \end{problem}
+
+      \begin{solution}
+        Summing up the approximate number of organisms in each slice, the
+        total number of organisms in the petri dish is approximately
+        $\boxed{\sum_{k=1}^n f(x_k) \cdot 2 \pi x_k \Delta x}$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        Write an integral that gives the exact number of organisms in the
+        dish.
+      \end{problem}
+
+      \begin{solution}
+        Taking the limit as the number of slices $\to \infty$, the exact
+        number of organisms in the dish is $\boxed{\int_0^{9} f(x) \cdot
+          2\pi x \,dx}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\nstretch{3}]
+        Find the number of organisms in the dish if $f(x)=100 e^{-x^2}$
+        organisms per square centimeter.
+      \end{problem}
+
+      \begin{solution}
+        In this case, the number of organisms is
+        \begin{align*}
+          \int_0^9 f(x) \cdot 2 \pi x\,dx &= 200 \pi \int_0^9 x
+          e^{-x^2}\,dx \\
+          \intertext{To evaluate this integral, we'll substitute $u =
+            -x^2$.  Then, $du = -2x\,dx$, so $-\frac{du}{2} = x\,dx$:}
+          &= 200 \pi \int_0^{-81} e^u \left( -\frac{du}{2} \right) \\
+          &= -100 \pi \int_0^{-81} e^u\,du \\
+          &= -100 \pi e^u \Big|_0^{-81} \\
+          &= \boxed{-100 \pi e^{-81} + 100 \pi}
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}
+
+  \item Suppose that the density of organisms in another circular petri
+    dish varies with the distance from a strip of nutrients running along
+    the diameter of the dish. The density at a distance $x$ centimeters
+    from the line of nutrients is given by $g(x)$ organisms per square
+    centimeter. The petri dish is 18 centimeters in diameter.
+    \begin{enumerate}
+
+    \item
+      \begin{problem}[\stretch{3}]
+        Show in a sketch how you will slice the petri dish to solve this
+        problem.
+      \end{problem}
+
+      \begin{solution}
+        As usual, we want to slice the region so that the density in each
+        slice is approximately constant.  In this case, density varies
+        with distance to the nutrient strip, so we'll need to slice
+        parallel to the strip.  If we draw the nutrient strip running
+        vertically through the petri dish (it's shown in blue), then the
+        situation looks like this:
+        \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[x=1.5cm, y=1.5cm, xmin=0, xmax=1.2, xtick={0.01,
+                1}, xticklabels={0, 9}, hide y axis, xlabel=$x$, ymin=-1,
+              ymax=1, clip=false]
+              \draw (0, 0) circle (1); %
+              \pgfplotsforeachungrouped \x in {-0.875, -0.75, ..., 0.876}
+              {
+                \edef\temp{
+                  \noexpand\draw (\x, {-sqrt(1-abs(\x)^2)}) -- (\x,
+                  {sqrt(1-abs(\x)^2)}); %
+                }
+                \temp
+              }
+              \draw[blue, very thick] (0, -1) -- (0, 1);
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{2}]
+        Write a Riemann sum approximating the total number of organisms in
+        the petri dish.
+      \end{problem}
+
+      \begin{solution}
+        By symmetry, there will be the same amount of bacteria on either
+        side of the nutrient strip.  In fact, symmetry tells us that, if
+        we cut the petri dish both horizontally and vertically through the
+        center, each quarter has the same amount of bacteria, so let's
+        just focus on the top right quadrant of the dish.  Remembering
+        that $x$ measures the distance from the nutrient strip, here is a
+        picture of the quarter dish with the $x$-axis:
+        \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[xmin=0, xmax=110, ymin=0, ymax=100, x=0.012in,
+              y=0.012in, hide y axis, axis x line=bottom, clip=false,
+              xlabel=$x$, xtick={0, 100}, xticklabels={0, 9}]  
+              \begin{scope}[yshift=8pt]
+                \draw (0, 0) -- (100, 0) arc[radius=100, start angle=0, end
+                angle=90]; %
+                \draw[blue, thick] (0, 0) -- (0, 100);
+              \end{scope}
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+        Slicing parallel to the nutrient strip means slicing the interval
+        $[0, 9]$; as usual, we'll slice into $n$ pieces of equal
+        thickness $\Delta x$ and label the values where we sliced as $x_0
+        = 0, x_1, \ldots, x_n = 9$.  Let's focus on the $k$-th slice:
+        \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[xmin=0, xmax=22, ymin=0, ymax=20, x=0.06in,
+              y=0.06in, hide y axis, axis x line=bottom, clip=false,
+              xlabel=$x$, xtick={0, 2.5, 5, ..., 20.1},
+              xticklabels={$x_0$,,,,$x_k$,,,,$x_n$}] 
+              \begin{scope}[yshift=8pt]
+                \addplot+[domain=7.5:10, fill=cyan, draw=none,yshift=-8pt]
+                {sqrt(20^2-\x^2)} -- (10, 0) -- (7.5, 0);
+                \draw (0, 0) -- (20, 0) arc[radius=20, start angle=0, end
+                angle=90]; %
+                \draw[blue, thick] (0, 0) -- (0, 20);
+                \pgfplotsforeachungrouped \x in {2.5, 5, ..., 19.9}
+                {
+                  \edef\temp{
+                    \noexpand\draw (\x, 0) -- (\x, {sqrt(20^2-\x^2)});
+                  }
+                  \temp
+                }              
+              \end{scope}
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+        The number of bacteria in the $k$-th slice is approximately
+        $(\text{density in $k$-th slice})(\text{area of $k$-th slice})$.
+        The density in the $k$-th slice is approximately $g(x_k)$.  To
+        approximate the area of the $k$-th slice, we can approximate the
+        slice as a rectangle of width $\Delta x$.  However, we still need
+        to express its height in terms of $x_k$.  The key is to use the
+        shape of the dish: it's part of a circle, so we need to use the
+        radius.  If we draw in the radius (shown in red) below, then we
+        can express the height $h_k$ in terms of $x_k$:
+        \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[xmin=0, xmax=22, ymin=0, ymax=20, x=0.06in,
+              y=0.06in, hide y axis, axis x line=bottom, clip=false,
+              xlabel=$x$, xtick=\empty, hide x axis] 
+              \begin{scope}[yshift=8pt]
+                \addplot+[domain=7.5:10, fill=cyan, draw=none,yshift=-8pt]
+                {sqrt(20^2-\x^2)} -- (10, 0) -- (7.5, 0); %
+                \draw (7.5, 0) -- (7.5, {sqrt(20^2-7.5^2)}); %
+                \draw (10, 0) -- node[right, inner sep=1pt] {$h_k$} (10,
+                {sqrt(20^2-10^2)}); %
+                \draw (0, 0) -- (20, 0) arc[radius=20, start angle=0, end
+                angle=90]; %
+                \draw[blue, thick] (0, 0) -- (0, 20); %
+                \draw[decorate, decoration={brace, mirror}, yshift=-2pt] (0,
+                0) -- node[yshift=-2pt, below] {$x_k$} (10, 0); %
+                \draw[red, thick] (0, 0) -- (10, {sqrt(20^2-10^2)}); %
+              \end{scope}
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+        We now see a right triangle in the picture: the hypotenuse is the
+        radius of the dish, which is 9; the two legs have lengths $x_k$
+        and $h_k$.  Therefore, by the Pythagorean Theorem, $x_k^2 + h_k^2
+        = 9^2$, so $h_k = \sqrt{81 - x_k^2}$.  So, we can approximate the
+        area of this slice as $h_k \Delta x = \sqrt{81 - x_k^2} \Delta x$.
+        Therefore,
+        \[ \text{number of bacteria in $k$-th slice} \approx g(x_k) \cdot
+        \sqrt{81 - x_k^2} \Delta x.\] Summing over all slices and
+        remembering that we were only looking at a quarter of the dish,
+        the number of bacteria in the dish is approximately $\boxed{4
+          \sum_{k=1}^n g(x_k) \cdot \sqrt{81 - x_k^2} \Delta x}$.
+      \end{solution}    
+
+    \item
+      \begin{problem}[\nstretch{2}]
+        Write an integral that gives the exact number of organisms in the
+        dish.
+      \end{problem}
+
+      \begin{solution}
+        Taking the limit of our Riemann sum as the number of slices $\to
+        \infty$, the number of bacteria in the dish is exactly
+        $\boxed{4 \int_0^9 g(x) \cdot \sqrt{81 - x^2}\,dx}$. 
+      \end{solution}
+    \end{enumerate}
+
+  \end{enumerate}
+
+\item
+\begin{grading}
+    20 points. 4/8/8.
+\end{grading}
+
+  The Three Aces pizzeria has two chefs, Paul and Tim.  Both toss lots of
+  garlic on their pizzas.
+  \begin{itemize}
+  \item Chef Paul tosses garlic so that the density of garlic on his pizza
+    is given by
+    \[ g(x) = \frac{1}{1 + x} \text{ grams per square inch of pizza},\]
+    where $x$ is distance from the center of the pizza.
+  \item Chef Tim tosses garlic so that the density of garlic on his pizza
+    is given by
+    \[ g(x) = \frac{1}{1 + x} \text{ grams per square inch of pizza},\]
+    where $x$ is distance from the \emph{edge} of the pizza.
+  \end{itemize}
+  Each pizza is 14 inches in diameter.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Which chef puts more garlic on a pizza?  (You should be able to
+      figure this out without doing any calculations; think about which
+      parts of each chef's pizza are most densely covered with garlic and
+      which parts are least densely covered.)  Explain.
+    \end{problem}
+
+    \begin{solution}
+      Both pizzas are the same size and have density of garlic varying
+      from $\frac{1}{8}$ grams of garlic per square inch to $1$ gram of
+      garlic per square inch.  The difference is that, on Chef Tim's
+      pizza, the edges of the pizza are where the garlic is most dense
+      while, on Chef Paul's pizza, the center of the pizza is where the
+      garlic is most dense.  Since there is a lot more edge than center,
+      \fbox{Chef Tim}'s pizza ends up with more garlic.  Here's a
+      visualization, where the dots represent garlic:
+      \begin{center}
+        \begin{tabular}{c c c}
+          \includegraphics[width=1.25in]{images/pizza-garlic-variations-1.pdf}
+          & \hspace{0.25in} &
+          \includegraphics[width=1.25in]{images/pizza-garlic-variations-2.pdf}
+          \\
+          Chef Paul's pizza & & Chef Tim's pizza
+        \end{tabular}
+      \end{center}
+    \end{solution}
+
+  \item
+    \begin{problem}[\nstretch{2}]
+      Find the amount of garlic on each of Chef Paul's pizzas.
+    \end{problem}
+
+    \begin{solution}
+      We must slice the pizza so that the density of garlic within each
+      slice is approximately constant.  Since density varies with distance
+      to the center, we slice into concentric rings.  So, we slice the
+      interval $[0, 7]$ (in $x$) into $n$ pieces of equal width $\Delta x
+      = \frac{7}{n}$, label $x_0 = 0, \ldots, x_n = 7$ as usual (so $x_k =
+      k \Delta x$), and focus on the $k$-th slice:
+      \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[x=0.007in, y=0.007in, xmin=0, xmax=115,
+              ymin=-100, ymax=100, axis on top=true, clip=false, hide y
+              axis, xtick={0.1, 75, 100}, xticklabels={$x_0$, $x_k$, $x_n$},
+              xlabel=$x$, tick label style={fill=none}]              
+              \draw[fill=cyan, draw=none] (0, 0) circle(75); %
+              \draw[fill=white, draw=none] (0, 0) circle (62.5); %
+              \pgfplotsforeachungrouped \x in {12.5, 25, ..., 100.1}
+              {
+                \edef\temp{
+                  \noexpand\draw (0, 0) circle(\x);
+                }
+                \temp
+              }              
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+      The area of this ring is approximately $2 \pi x_k \Delta x$ cm$^2$,
+      and the density of garlic in this ring is approximately $g(x_k)$
+      g/in$^2$, so the amount of garlic in this ring is approximately $2
+      \pi x_k g(x_k) \Delta x$ g.  Summing over all slices and taking a
+      limit as the number of slices $\to \infty$, the amount of garlic in
+      the pizza is $\displaystyle \int_0^7 2 \pi x g(x)\,dx$.  Now, we
+      must evaluate the integral:
+      \begin{align*}
+        \int_0^7 2 \pi x g(x)\,dx &= 2 \pi \int_0^7 \frac{x}{1 + x}\,dx
+        \\
+        \intertext{Let's substitute $u = 1 + x$; then $du = dx$ and $x = u
+          - 1$.  Also, $u$ goes from $1 + 0 = 1$ to $1 + 7 = 8$:}
+        &= 2 \pi \int_1^{8} \frac{u - 1}{u}\,du \\
+        &= 2 \pi \int_1^8 \left( 1 - \frac{1}{u} \right) du \\
+        &= 2 \pi \left( u - \ln |u| \right) \Big|_1^8 \\
+        &= \boxed{2 \pi (7 - \ln 8) \text{ grams}}
+      \end{align*}
+      (This is about $31$ grams.)
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Find the amount of garlic on each of Chef Tim's pizzas.      
+    \end{problem}
+
+    \begin{solution}
+      Again, we must slice the pizza so that the density of garlic within
+      each slice is approximately constant.  Since density varies with
+      distance to the edge, we still slice into concentric rings.  So
+      what's different?  Well, the meaning of $x$ is now different: $x$ is
+      0 on the edge of the pizza, and $x$ is 7 at the center of the pizza.
+
+     If we let $r$ represent the distance from the center of the pizza and we sliced into pieces of width $\Delta r$,
+     like this:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[x=0.007in, y=0.007in, xmin=0, xmax=115,
+            ymin=-100, ymax=100, axis on top=true, clip=false, hide y
+            axis, xtick={0.1, 75, 100}, xticklabels={$r_0$, $r_k$, $r_n$},
+            xlabel=$r$, tick label style={fill=none}]              
+            \draw[fill=cyan, draw=none] (0, 0) circle(75); %
+            \draw[fill=white, draw=none] (0, 0) circle (62.5); %
+            \pgfplotsforeachungrouped \x in {12.5, 25, ..., 100.1}
+            {
+              \edef\temp{
+                \noexpand\draw (0, 0) circle(\x);
+              }
+              \temp
+            }              
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      then the area of the $k$-th concentric ring would be $2\pi r_k\Delta r$,
+      same as before. However, since our density is in terms of $x$ and we want 
+      our
+      integral to be in terms of $x$, we should write the area in terms of $x$.
+
+      What is the relationship between $x$ and $r$? Since $x$ is the distance
+      from the edge and $r$ is the distance from the center, $r=7-x$.
+      This means that, if we slice into pieces of width $\Delta x$, the area of the $k$-th concentric ring
+      would be $2\pi(7- x_k)\Delta x$. 
+      
+      Summing over all slices and taking a limit as the number
+      of slices $\to \infty$, the amount of garlic in the pizza is
+      $\displaystyle \int_0^7 2 \pi (7-x) g(x)\,dx$.  Now, we must
+      evaluate the integral:
+      \begin{align*}
+        \int_0^7 2 \pi (7-x) g(x)\,dx &= \int_0^7 \frac{2 \pi (7-x)}{1 + x}\,dx \\
+        &= 2 \pi \int_0^7 \frac{7-x}{1+x}\,dx \\
+        \intertext{Let's substitute $u = 1+x$; then $du = dx$ and $x =
+          u-1$, and $u$ goes from $1 + 0 = 1$ to $1 + 7 = 8$:} %
+        &= 2 \pi \int_1^8 \frac{7- (u-1)}{u} du \\
+        &= 2 \pi \int_1^8 \frac{8-u}{u} du \\
+        &= 2 \pi \int_1^8 \left(\frac{8}{u} - 1 \right) du \\
+        &= 2 \pi \Bigl[8 \ln |u| - u \Bigr]_1^8 \\
+        &= \boxed{2 \pi \left( 8 \ln 8 - 7 \right)}
+      \end{align*}
+      (This is about $60.5$ grams, which confirms our intuition that
+      Chef Tim's pizza has more garlic.)
+    \end{solution}
+
+  \end{enumerate}
+
+% \item ({Problem Set 31}, {{\#3}})
+
+%   \begin{minipage}[t]{2in}
+%     \raisebox{2ex-\height}{      
+%       \includegraphics[width=1.95in]{images/bompas-parr-jelly-cone}}
+%     \begin{center}
+%       \parbox[t]{1.75in}{\emph{\small This cone is missing its tip, but Sam
+%           and Harry's cones do have tips!}}
+%     \end{center}
+%   \end{minipage}
+%   \begin{minipage}[t]{\linewidth-2.1in}
+%     \setlength{\parskip}{8pt} Bompas \& Parr is a British company that
+%     specializes in artwork made from gelatin.  One recipe they have
+%     published is for a cone-shaped ``striped jelly''.
+
+%     Sam and Harry each decide to make a jelly cone with a radius of 4 cm
+%     and height 7 cm; the tip of each cone will point up.  The density of
+%     sugar varies in the finished cones.  In Harry's cone, the density of
+%     sugar is given by $f(x) = x$ mg/cm$^3$, where $x$ is the vertical
+%     distance (in cm) from the tip of the cone.  In Sam's cone, the density
+%     of sugar is given by $f(x) = x$ mg/cm$^3$, where $x$ is the vertical
+%     distance (in cm) from the \emph{bottom} of the cone.
+%   \end{minipage}
+
+%   \begin{enumerate}
+%   \item
+%     \begin{problem}
+%       Whose cone will have more sugar in it?  (You should be able to
+%       figure this out without doing any calculations.)
+%     \end{problem}
+
+%     \begin{solution}
+%       The two cones are the same size, and both have density of sugar
+%       varying from $0$ mg/cm$^3$ to $7$ mg/cm$^3$.  The difference is
+%       that, in Harry's cone, the bottom is where the sugar is more dense; in
+%       Sam's cone, the top is where the sugar is more dense.  Since there
+%       is more bottom than top, \fbox{Harry's} cone will have more sugar in
+%       it.
+%     \end{solution}
+
+%   \item
+%     \begin{problem}
+%       Find the amount of sugar in Harry's cone.
+%     \end{problem}
+
+%     \begin{solution}
+%       Since the density of sugar varies with vertical distance to the tip,
+%       we should slice the cone parallel to its base so that the density of
+%       sugar within each slice is approximately constant.  Since $x =
+%       0$ at the top of the cone and $x = 7$ at the bottom, we're slicing
+%       the interval $[0, 7]$; we'll label $x_0 = 0, \ldots, x_n = 7$ as
+%       usual. 
+%       \begin{center}
+%         \begin{tikzpicture}[x=0.5cm, y=0.5cm]
+%           \coordinate (right) at (4, 0);
+%           \coordinate (left) at (-4, 0);
+%           \coordinate (top) at (0, 7);
+
+%           \begin{axis}[xmin=-4, xmax=4.5, ymin=-1, ymax=7, clip=false, hide x
+%             axis, axis y line=right, x=0.5cm, y=0.5cm, ytick={0, 0.7, ...,
+%               7.01},
+%             yticklabels={$x_n = 7$,,,,$x_k$,,,,,,$x_0 = 0$}, 
+%             axis line style={<-}]
+%             \draw[fill=cyan, draw=none] (2, 3.5) arc[x radius=2,
+%             y radius=0.5, start angle=0, end angle=-180] -- (-2.4, 2.8)
+%             arc[x radius=2.4, y radius=0.6, start angle=180, end
+%             angle=360] -- cycle; %
+%             \draw (right) arc[x radius=4, y radius=1, start angle=0, end
+%             angle=-180]; %
+%             \draw (right) -- (top) -- (left); %
+%             \draw (4.5, -1) node[below] {$x$}; %
+%             \pgfplotsforeachungrouped \y in {0, 0.7, ..., 7.01} {
+%               \pgfmathsetmacro{\x}{4/7*(7-\y)} %
+%               \edef\temp{%
+%                 \noexpand\draw (\x, \y) arc[x radius=\x, y radius={\x/4},
+%                 start angle=0, end angle=-180];
+%               }              
+%               \temp
+%             }
+%           \end{axis}
+%         \end{tikzpicture}
+%       \end{center}
+%       Then,
+%       \[ \text{amount of sugar in $k$-th slice} \approx (\text{density of
+%         sugar in $k$-th slice})(\text{volume of $k$-th slice}).\]
+%       The density of sugar in the $k$-th slice is approximately $f(x_k)$.
+%       To find the volume of the $k$-th slice, we can approximate the slice
+%       as a disk; then, its volume is approximately $\pi (\text{radius})^2
+%       \cdot \Delta x$, but we need to express its radius in terms of
+%       $\Delta x$.  Here's a picture that helps us do that: 
+%       \begin{center}
+%         \begin{tikzpicture}[x=0.5cm, y=0.5cm]
+%           \coordinate (right) at (4, 0);
+%           \coordinate (left) at (-4, 0);
+%           \coordinate (top) at (0, 7);
+
+%           \begin{axis}[xmin=-4, xmax=4.5, ymin=-1, ymax=7, clip=false, hide x
+%             axis, axis y line=right, x=0.5cm, y=0.5cm, ytick={0, 0.7, ...,
+%               7.01},
+%             yticklabels={$x_n = 7$,,,,$x_k$,,,,,,$x_0 = 0$}, 
+%             axis line style={<-}]
+%             \draw[fill=cyan, draw=none] (2, 3.5) arc[x radius=2,
+%             y radius=0.5, start angle=0, end angle=-180] -- (-2.4, 2.8)
+%             arc[x radius=2.4, y radius=0.6, start angle=180, end
+%             angle=360] -- cycle; %
+%             \draw (right) arc[x radius=4, y radius=1, start angle=0, end
+%             angle=-180]; %
+%             \draw (right) -- (top) -- (left); %
+%             \draw (4.5, -1) node[below] {$x$}; %
+%             \pgfplotsforeachungrouped \y in {2.8, 3.5} {
+%               \pgfmathsetmacro{\x}{4/7*(7-\y)} %
+%               \edef\temp{%
+%                 \noexpand\draw (\x, \y) arc[x radius=\x, y radius={\x/4},
+%                 start angle=0, end angle=-180];
+%               }              
+%               \temp
+%             }%            
+%             \draw[dashed] (2, 3.5) arc[x radius=2, y radius=0.5,
+%             start angle=0, end angle=180]; %
+%             \draw[red, thick] (0, 7) -- (0, 0) -- (4, 0);
+%             \draw[red, thick] (0, 2.8) -- (2.4, 2.8);
+%           \end{axis}
+%         \end{tikzpicture}
+%       \end{center}
+%       In the picture, we see similar triangles; the larger triangle has
+%       height 7 and width 4, while the smaller triangle has height $x_k$,
+%       and its width is exactly the radius we're interested in.  So,
+%       $\displaystyle \frac{7}{4} = \frac{x_k}{\text{approximate radius of
+%           $k$-th slice}}$.  Therefore, the approximate radius of the
+%       $k$-th slice is $\frac{4 x_k}{7}$.  Putting this all together, the
+%       amount of sugar in the $k$-th slice is approximately $\displaystyle
+%       f(x_k) \cdot \pi \left( \frac{4 x_k}{7} \right)^2 \Delta x \approx
+%       \frac{16\pi}{49}x_k^2\Delta x$.  Adding these up and taking the
+%       limit as the number of slices $\to \infty$, the amount of sugar in
+%       the entire cone is
+%       \begin{align*}
+%         \boxed{\int_0^7 \frac{16\pi}{49}x^2 f(x)\,dx} &=
+%         \frac{16\pi}{49} \int_0^7 x^3\,dx \\
+%         &=
+%         \left. \frac{16\pi}{49}\cdot\frac{1}{4} x^4 \right|_0^7 \\
+%         &= \boxed{196\pi \text{ mg of sugar}}
+%       \end{align*}
+%     \end{solution}
+
+%   \item
+%     \begin{problem}
+%       Find the amount of sugar in Sam's cone. 
+%     \end{problem}
+
+%     \begin{solution}
+%       Since the density of sugar varies with vertical distance from the
+%       bottom of the cone, we should again slice parallel to the base of
+%       the cone so that the density of sugar within each slice is
+%       approximately constant.  Now, $x = 0$ at the bottom of the cone, and
+%       $x = 7$ at the top, so we're again slicing the interval $[0, 7]$;
+%       however, the $x$-axis is oriented differently:
+%       \begin{center}
+%         \begin{tikzpicture}[x=0.5cm, y=0.5cm]
+%           \coordinate (right) at (4, 0);
+%           \coordinate (left) at (-4, 0);
+%           \coordinate (top) at (0, 7);
+
+%           \begin{axis}[xmin=-4, xmax=4.5, ymin=-0.02, ymax=8, clip=false,
+%             hide x axis, axis y line=right, x=0.5cm, y=0.5cm, ytick={7,
+%               6.3, ..., -0.01}, yticklabels={$x_n = 7$,,,,,,$x_k$,,,,$x_0
+%               = 0$}]
+%             \draw[fill=cyan, draw=none] (2, 3.5) arc[x radius=2, y
+%             radius=0.5, start angle=0, end angle=-180] -- (-2.4, 2.8)
+%             arc[x radius=2.4, y radius=0.6, start angle=180, end
+%             angle=360] -- cycle; %
+%             \draw (right) arc[x radius=4, y radius=1, start angle=0, end
+%             angle=-180]; %
+%             \draw (right) -- (top) -- (left); %
+%             \draw (4.5, 8) node[above] {$x$}; %
+%             \pgfplotsforeachungrouped \y in {0, 0.7, ..., 7.01} {
+%               \pgfmathsetmacro{\x}{4/7*(7-\y)} %
+%               \edef\temp{%
+%                 \noexpand\draw (\x, \y) arc[x radius=\x, y radius={\x/4},
+%                 start angle=0, end angle=-180]; } \temp }
+%           \end{axis}
+%         \end{tikzpicture}
+%       \end{center}
+%       Again,
+%       \[ \text{amount of sugar in $k$-th slice} \approx (\text{density of
+%         sugar in $k$-th slice})(\text{volume of $k$-th slice}),\] and the
+%       density of sugar in the $k$-th slice is approximately $f(x_k)$.  The
+%       $k$-th slice is approximately a disk, and we can again use similar
+%       triangles to approximate its radius:
+%       \begin{center}
+%         \begin{tikzpicture}[x=0.5cm, y=0.5cm]
+%           \coordinate (right) at (4, 0);
+%           \coordinate (left) at (-4, 0);
+%           \coordinate (top) at (0, 7);
+
+%           \begin{axis}[xmin=-4, xmax=4.5, ymin=-0.01, ymax=8, clip=false,
+%             hide x axis, axis y line=right, x=0.5cm, y=0.5cm, ytick={7,
+%               6.3, ..., -0.001}, yticklabels={$x_n = 7$,,,,,,$x_k$,,,,$x_0
+%               = 0$}]
+%             \draw[fill=cyan, draw=none] (2, 3.5) arc[x radius=2,
+%             y radius=0.5, start angle=0, end angle=-180] -- (-2.4, 2.8)
+%             arc[x radius=2.4, y radius=0.6, start angle=180, end
+%             angle=360] -- cycle; %
+%             \draw (right) arc[x radius=4, y radius=1, start angle=0, end
+%             angle=-180]; %
+%             \draw (right) -- (top) -- (left); %
+%             \draw (4.5, 8) node[above] {$x$}; %
+%             \pgfplotsforeachungrouped \y in {2.8, 3.5} {
+%               \pgfmathsetmacro{\x}{4/7*(7-\y)} %
+%               \edef\temp{%
+%                 \noexpand\draw (\x, \y) arc[x radius=\x, y radius={\x/4},
+%                 start angle=0, end angle=-180];
+%               }              
+%               \temp
+%             }%            
+%             \draw[dashed] (2, 3.5) arc[x radius=2, y radius=0.5,
+%             start angle=0, end angle=180]; %
+%             \draw[red, thick] (0, 7) -- (0, 0) -- (4, 0);
+%             \draw[red, thick] (0, 2.8) -- (2.4, 2.8);
+%           \end{axis}
+%         \end{tikzpicture}
+%       \end{center}
+%       The larger triangle still has height 7 and width 4, while the
+%       smaller triangle has height $7 - x_k$, and its width is exactly the
+%       radius we're interested in.  So, $\displaystyle \frac{7}{4} =
+%       \frac{7 - x_k}{\text{approximate radius of $k$-th slice}}$.
+%       Therefore, the approximate radius of the $k$-th slice is $\frac{4 (7
+%         - x_k)}{7}$, so the amount of sugar in the $k$-th slice is
+%       approximately $\displaystyle f(x_k) \cdot \pi \left( \frac{4 (7 -
+%           x_k)}{7} \right)^2 \Delta x \approx \frac{16 \pi}{49} (7 - x_k)^2
+%       \Delta x$.  Summing over all slices and taking the limit as the
+%       number of slices $\to \infty$, the amount of sugar in the entire
+%       cone is
+%       \begin{align*}
+%         \boxed{\int_0^7 \frac{16\pi}{49} (7 - x)^2 f(x)\,dx} &=
+%         \frac{16\pi}{49} \int_0^7 (7 - x)^2 x\,dx \\
+%         &= \frac{16\pi}{49} \int_0^7 (49 x - 14 x^2 + x^3)\,dx \\
+%         &= \frac{16 \pi}{49} \left( \left. \frac{49}{2} x^2 - \frac{14}{3}
+%             x^3 + \frac{1}{4} x^4 \right|_0^7 \right) \\
+%         &= \boxed{\frac{196 \pi}{3} \text{ mg of sugar}}
+%       \end{align*}
+%       This confirms our intuition that Harry's cone has more sugar. 
+%     \end{solution}
+
+%   \end{enumerate}
+
+% \item
+
+% \begin{problem}[\nstretch{1.5}]
+%     A boy left a puddle of maple syrup on a picnic table after a
+%     pancake breakfast.  The maple syrup is lying in a circular puddle of
+%     diameter 3 inches (radius 1.5 inches). Five hours after breakfast, the
+%     density of ants varies with the distance from the edge of the puddle
+%     of syrup. (There are no ants {\it in} the syrup, only around it.)  The
+%     density of ants is given by $\rho(x)$ ants per square inch, where $x$
+%     is the distance from the edge of the puddle. Write an integral for the
+%     number of ants within 7 inches of the edge of the puddle.
+%   \end{problem}
+
+%   \begin{solution}
+%     Here is a sketch of the region we are interested in: 
+%     \begin{center}
+%       \begin{tikzpicture}
+%         \begin{axis}[xmin=3, xmax=10, ymin=-9, ymax=9, clip=false, x=0.2cm,
+%           y=0.2cm, hide y axis, xtick={3.01, 9}, 
+%           xticklabels={0, 7}]
+%           \draw[fill=lightgray, fill opacity=0.5] (0, 0) circle (9);
+%           \draw[fill=white] (0, 0) circle (3);
+%           \filldraw[black] (0, 0) circle(1.5pt);
+%           \draw (10, 0) node[right] {$x$};
+%           \draw (0, 0) -- node[anchor=210, inner sep=0.5pt] {1.5} (120: 3);
+%           % \draw (0, 0) -- node[Anchor=225, inner sep=1pt] {9} (135:9);
+%         \end{axis}
+%       \end{tikzpicture}
+%     \end{center}
+%     The shaded portion is the area we need to look at; the hole in the
+%     middle is the puddle of maple syrup.  We've also drawn an ``$x$-axis''
+%     in the picture to show that $x$ measures distance from the edge of the
+%     puddle.  In particular, $x = 0$ at the edge of the puddle, and $x = 7$
+%     at the outer edge of the area we're interested in. 
+
+%     Since the density of ants varies with distance from the edge of the
+%     puddle, we need to slice so that all points in a slice are (roughly)
+%     the same distance from the edge of the puddle.  So, we'll slice into
+%     concentric rings around the puddle.  This means we'll slice $[0, 7]$
+%     into $n$ pieces of equal length $\Delta x = \frac{7}{n}$, label $x_0 =
+%     0, \ldots, x_n = 7$ as usual (so $x_k = k \Delta x$), and focus on the
+%     $k$-th slice:
+%     \begin{center}
+%       \begin{tikzpicture}
+%         \begin{axis}[xmin=3, xmax=10, ymin=-9, ymax=9, clip=false, x=0.2cm,
+%           y=0.2cm, hide y axis, xtick={3, 4, ..., 9}, 
+%           xticklabels={,,,,$x_k$,,}, axis on top=true, tick label
+%           style={fill=none}] 
+%           \draw[fill=white!90!black] (0, 0) circle (9);
+%           \draw[fill=cyan] (0, 0) circle (7);
+%           \draw[fill=white!90!black] (0, 0) circle (6);
+%           \draw[fill=white] (0, 0) circle (3);
+%           \filldraw[black] (0, 0) circle(1.5pt);
+%           \draw (10, 0) node[right] {$x$};
+%           \draw (0, 0) -- node[anchor=210, inner sep=0.5pt] {1.5} (120: 3);
+%           \pgfplotsforeachungrouped \x in {3, 4, ..., 9}
+%           {
+%             \edef\temp{
+%               \noexpand\draw (0, 0) circle(\x);
+%             }
+%             \temp
+%           }              
+%         \end{axis}
+%       \end{tikzpicture}
+%     \end{center}
+%     This slice has thickness $\Delta x$ and outer radius $r_k = 1.5+x_k$.
+%     Therefore, we can approximate its area as $2 \pi r_k \Delta x = 2 \pi
+%     (1.5 + x_k) \Delta x$.  The density of ants in this slice is
+%     approximately $\rho(x_k)$, so the number of ants in this slice is
+%     approximately $\rho(x_k) \cdot 2 \pi (1.5 + x_k) \Delta x$.  Summing
+%     over all slices and taking the limit as the number of slices $\to
+%     \infty$, the number of ants within $7$ inches of the edge of the
+%     puddle is $\boxed{\int_0^{7} 2\pi(1.5+x) \rho(x)\,dx}$.
+%   \end{solution}  
+
+\item 
+\begin{problem}[\vfill\newpage]
+Pizza Pythagoras is known for its ``pizza wedges,'' which are shaped
+like right triangles with sides of 3, 4, and 5 inches.  Parmesan
+cheese is sprinkled on each wedge so that the density of cheese is
+given by $\rho(x)$ ounces per square inch, where $x$ measures distance
+(in inches) from the 3-inch side of the slice. 
+Write a sum
+(involving $n$ slices) that approximates the amount of Parmesan on
+each wedge. Hint: consider graphing the wedge on the $xy$-plane first before slicing.
+
+Be sure to explain clearly how you are slicing and how you obtain your
+approximation for the amount of cheese in the $k$-th slice.  If you
+use notation such as $\Delta x$ or $x_k$, be sure to explain exactly
+what it means.
+\end{problem}
+
+\begin{solution}
+Let's imagine the slice as sitting on the coordinate plane so that the
+3-inch side lies along the $y$-axis and the 4-inch side lies along the
+$x$-axis.
+\begin{center}
+\includegraphics[width=1.5in]{images/pizza-pythagoras-region}
+\end{center}
+As in the previous problem, this choice has the advantage that $x$ in
+the picture matches $x$ in the problem: it measures distance from the
+3-inch side of the slice.  Notice that the 5-inch side of the pizza
+connects the points $(0, 3)$ and $(4, 0)$; therefore, it can be
+described by the line $y = - \frac{3}{4} x + 3$.
+
+Now, we must decide how to slice the pizza wedge.  Since we
+\textbf{want the density of Parmesan within each slice to be
+approximately constant} and we know that the density varies with
+distance to the 3-inch side, we should slice vertically.  Let's slice
+the wedge into $n$ vertical strips, each of width $\Delta x =
+\frac{4}{n}$.  We'll label the resulting endpoints $x_0 = 0, x_1 =
+\Delta x, \ldots, x_n = 4$.  Then, a general formula for $x_k$ is $x_k
+= k \Delta x$.
+\begin{center}
+\includegraphics[width=1.5in]{images/pizza-pythagoras-slice}
+\end{center}
+The density of Parmesan in the $k$-th slice is approximately
+$\rho(x_k)$.  (Really, $\rho(x_k)$ is the density of Parmesan along
+the right edge of the slice, but we've sliced so that the density
+within a slice doesn't vary too much, so this is a reasonable
+approximation.)  We can approximate the area of the $k$-th slice by
+drawing a rectangle that approximates the slice:
+\begin{center}
+\includegraphics[width=1.5in]{images/pizza-pythagoras-approximating-rectangle}
+\end{center}
+This rectangle has width $\Delta x$ and height $- \frac{3}{4} x_k +
+3$, so its area is $\left( - \frac{3}{4} x_k + 3 \right) \Delta x$.
+To summarize, so far we've made the following approximations:
+\begin{align*}
+\textrm{Parmesan density in $k$-th slice} & \approx \rho(x_k) \\
+\textrm{area of $k$-th slice} & \approx \left( - \frac{3}{4} x_k + 3
+\right) \Delta x \\
+\shortintertext{So,}
+\textrm{amount of Parmesan in $k$-th slice} & \approx
+(\textrm{Parmesan density in $k$-th slice}) \cdot (\textrm{area of
+$k$-th slice}) \\
+& \approx \rho(x_k) \cdot \left( - \frac{3}{4} x_k + 3 \right)
+\Delta x
+\end{align*}
+To get an approximation for the amount of Parmesan on the whole wedge
+of pizza, we must add up the approximate amounts of Parmesan on each
+slice, which gives us the approximation \[\boxed{\rho(x_1) \cdot
+\left( - \frac{3}{4} x_1 + 3 \right) \Delta x + \rho(x_2) \cdot
+\left( - \frac{3}{4} x_2 + 3 \right) \Delta x + \cdots + \rho(x_n)
+\cdot \left( - \frac{3}{4} x_n + 3 \right) \Delta x}\] or
+$\boxed{\sum_{k=1}^n \rho(x_k) \cdot \left( - \frac{3}{4} x_k + 3
+\right) \Delta x}$.
+\end{solution}
+
+\item
+
+\begin{grading}
+    1 point each.
+\end{grading}
+
+ \textbf{Reflect Back.} \emph{Which way to
+    slice?}
+Below are two problems about cylinders.  In each part, decide whether
+  you should slice into disks or tubes to solve the problem.  (You do
+  \textbf{not} need to actually solve the problems!)
+  \begin{center}
+    \begin{tabular}{c c c}
+      \includegraphics[width=1.25in]{images/density-slicing-cylinder-ways-disks.pdf}
+      & 
+      \hspace{0.25in}
+      & \includegraphics[width=1.25in]{images/density-slicing-cylinder-ways-tubes.pdf} 
+      \\
+      Disks & & Tubes 
+    \end{tabular}
+  \end{center}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill\newpage]
+      A chocolate popsicle is being made by taking a popsicle stick and
+      dipping it repeatedly into chocolate and other tasty ingredients.
+      Between each dip the ingredients are allowed to cool. What is
+      constructed at the end of this process is a cylindrical popsicle
+      with height 30 mm and radius 15 mm. Due to the way it has been made,
+      the number of calories per cubic millimeter varies with $x$, where
+      $x$ is the distance (in millimeters) from the central axis of the
+      popsicle. Suppose that the density of calories in the popsicle is
+      given by $\rho(x)$ calories per mm$^3$. Write an integral that gives
+      the total number of calories in the popsicle.  (You may assume that
+      the popsicle stick's width is negligible.)
+    \end{problem}
+
+    \begin{solution}
+      We need to slice into \fbox{tubes} in order for the density within
+      any slice to be approximately constant. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      A scientist studying sea ice is analyzing a cylindrical sample of
+      ice, called a ``core.'' It has height 2 meters and diameter 0.1
+      meters.  Suppose that algae is distributed throughout the ice with
+      density given by $\rho(h) = 300 + 50h^2$ g/m$^3$ where $h$ is the
+      depth (in meters) from the top surface of the ice sample.  Find the
+      number of grams of algae in the sample.
+    \end{problem}
+
+    \begin{solution}
+      We need to slice into \fbox{disks} in order for the density within
+      any slice to be approximately constant. 
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+
+\spaceonly{\psreflection{
+Optional reading for next class is \S 15.2, 31.2 in Gottlieb.
+}}
+\end{document}

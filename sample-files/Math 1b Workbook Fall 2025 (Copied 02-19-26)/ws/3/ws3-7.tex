@@ -1,0 +1,350 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws3-7}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterthree}
+}{}
+
+\section{Second Order Differential Equations II} \label{ws3-7}
+\begin{framed}
+\centerline{\textbf{Lesson Goals}}
+
+You should be able to:
+\begin{itemize}
+\item Find the general solution to a second-order differential equation with constant coefficients when the characteristic equation has distinct real roots, repeated real roots, and complex/imaginary roots
+\item Use Euler's Formula to express complex solutions to second-order differential equations as real-valued functions
+\item Use the characteristic equation to determine when a second-order differential equation models spring behavior, including damped motion, damped oscillating motion, and periodic motion 
+\item Solve initial value problems for second-order differential equations, and determine the short and long-term behavior of specific solutions
+\end{itemize}
+\end{framed}
+
+\begin{enumerate}
+ \item 
+  \note{Straightforward practice just to make sure they understand the
+  lessons of the previous problem set.}
+  
+  \begin{problem}[\vfill]
+  \uline{Warm-up}:  Find the general solution of the differential equation $y'' + 2y' - 15y = 0$ using its characteristic equation. Could this differential equation model a mass-spring system?
+  \end{problem}
+
+  \begin{solution}
+  The characteristic equation of $y'' + 2y' - 15y = 0$ is $r^2 + 2r - 15
+  = 0$, which factors as $(r + 5) (r - 3) = 0$.  The roots of the
+  characteristic equation are $r = -5$ and $r = 3$.
+
+  Since the characteristic equation has two distinct roots, the general
+  solution of the differential equation is $y(t) = \boxed{C_1 e^{-5t} +
+  C_2 e^{3t}}$.
+  \end{solution}
+
+
+  \item \begin{problem}[1.8in]
+      Does the equation $x^{\prime \prime}+ x=0$ describe a mass-spring system? Find two distinct solutions to the equation (\textit{Hint:} you can rewrite it as $x^{\prime \prime}= -x$ ).
+  \end{problem}
+
+  \begin{solution}
+    The differential equation describe a mass-spring system with no friction. The characteristic equation is $r^{2}+9=0$, which has the imaginary roots $r= \pm 3 i$. At this point we don't know the meaning of $e^{\pm 3 i}$
+    The general solution is $x(t)=C_{1} \cos (3 t)+C_{2} \sin (3 t)$
+  \end{solution}
+
+
+ 
+\pspace{\newpage}
+  
+\item 
+\begin{problem}[2.5in]
+Use the characteristic equation to try to find all solutions of the form $x(t) = e^{rt}$ for the differential equation $x'' + 2x' + 5x = 0$. What do you notice?
+\end{problem}
+  
+  \begin{solution}
+  The characteristic equation for this second-order differential equation is $r^2+2r+5=0$. Unfortunately, the left side cannot be factored as easily as the one in \#1, so we'll use the quadratic formula to solve this quadratic equation. In this case, $a=1$, $b=2$, and $c=5$, so we have:
+  
+  \begin{align*}
+  r &= \frac{-b\pm \sqrt{b^2-4ac}}{2a}\\
+  r&= \frac{-2\pm\sqrt{(2)^2-4(1)(5)}}{2(1)}\\
+  r&=\frac{-2\pm\sqrt{4-20}}{2}\\
+  r&=\frac{-2\pm\sqrt{-16}}{2}\\
+  r&=\frac{-2\pm\sqrt{-1}\sqrt{16}}{2}\\
+  r&= \frac{-2\pm4i}{2}\\
+  r&=-1\pm2i
+  \end{align*}
+  Here, $i=\sqrt{-1}$ is the \textit{imaginary number}. In general, a \textit{complex number} $z$ is a number of the form $a+bi$, where $a$ and $b$ are real numbers. We refer to $a$ as the \textit{real part of $z$} and $b$ as the \textit{imaginary part of $z$}.
+  
+  Thus, this characteristic equation has two \textit{complex} roots, $r=-1+2i$ and $r=-1-2i$. Then, following our previous scheme, the general solution to the differential equation should be: 
+  $$\boxed{x(t)=C_1e^{(-1+2i)t}+C_2e^{(-1-2i)t}}$$
+  However, it is difficult to make any sense of this solution, as we do not know what it means to raise $e$ to a complex number. So the current format of the solution is not very useful for finding the position of the spring at any given time.
+  \end{solution}
+  
+ \item 
+% \note{It's important to have them discover Euler's Formula on their own or in groups, but it's best to provide some structuring first. It's important to first have them recall the Taylor series for $e^x$ and write out at least the first 6 terms, as well as recalling the pattern with powers of $i$.}
+ 
+  \begin{problem}[1.5in]
+  Substitute $x = it$ into the power series representation of $e^x$ and simplify the powers of $i$ to try to make sense of the complex 
+  exponential $e^{it}$.  Specifically, what are the real and imaginary parts of $e^{it}$? Do they look familiar? Recall the Taylor series representation for $e^x$ (it's easier to work on $\cdots$-notation):
+  \[e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} + \frac{x^5}{5!} + \cdots\]
+
+  
+  \end{problem}
+  
+  \begin{solution}
+  As we learned in the series unit, the Taylor series for $e^x$ is actually \textit{equal} to $e^x$ for all real numbers. (See problem \#2 on the worksheet ``The Remainder Theorem".)
+  
+  Using this power series representation, and the fact that $i^2=-1$, $i^3=-i$, $i^4=1$, $i^5=i$, and so on, we have:
+  
+  \begin{align*}
+  e^x &= 1 + x + \frac{1}{2!}x^2 +  \frac{1}{3!}x^3 + \frac{1}{4!}x^4 + \frac{1}{5!}x^5 + \cdots\\
+  e^{it} &= 1 + (it) + \frac{1}{2!}(it)^2 + \frac{1}{3!}(it)^3 + \frac{1}{4!}(it)^4 + \frac{1}{5!}(it)^5 + \cdots\\
+  e^{it} &= 1 + it + \frac{1}{2!}i^2t^2+\frac{1}{3!}i^3t^3 + \frac{1}{4!}i^4t^4 + \frac{1}{5!}i^5t^5 + \cdots\\
+  e^{it} &= 1 + it - \frac{1}{2!}t^2-\frac{1}{3!}it^3 + \frac{1}{4!}t^4 + \frac{1}{5!}it^5 - \cdots\\
+  e^{it} &= \left(1 - \frac{1}{2!}t^2 +\frac{1}{4!}t^4 - \cdots\right) + \left(it -\frac{1}{3!}it^3+ \frac{1}{5!}it^5 - \cdots \right)\\
+  e^{it} &= \left(1 - \frac{1}{2!}t^2 +\frac{1}{4!}t^4 - \cdots\right) + i\left(t -\frac{1}{3!}t^3+ \frac{1}{5!}t^5 - \cdots \right)\\
+  e^{it} &= \cos(t) + i\sin(t)
+  \end{align*}
+  
+  The last line is known as \textit{Euler's Formula}, named after the Swiss mathematician Leonhard Euler (who also discovered that $\displaystyle \sum_{k=1}^{\infty} \frac{1}{k^2}=\frac{\pi^2}{6}$ using power series representations). In fact, we call the constant ``$e$" after Euler! 
+  
+  Euler's Formula is generally written as: $\boxed{e^{i\theta}=\cos(\theta)+i\sin(\theta)}$
+  
+ Note carefully that in the second line of our algebra work above, we made the assumption that $e^x$ is equal to its Taylor series even for \textit{complex} values of $x$, and that the series converges for complex inputs. Also, in line 5, we made the assumption that we can reorder the terms of the series and still achieve the same sum. While both of these manipulations turn out to be true in this case, they are NOT true in general. So we should be aware of the assumptions we are making in our work!
+  
+  \end{solution}
+  
+\pspace{\newpage}
+
+ \item  Express each of the following complex numbers in the form $a+b i$ and show its position in the complex plane. (Hint: Use Euler's formula.)
+
+ \probonly{\begin{multicols}{3}}
+\begin{enumerate}
+    \item  \begin{problem}[1in]
+    $\displaystyle 3 e^{i \pi / 4}$    
+    \end{problem}
+    
+    \begin{solution}
+     By Euler's Formula 
+    \begin{align*}
+    3 e^{i \pi / 4} & =3\left(\cos \frac{\pi}{4}+i \sin \frac{\pi}{4}\right) \\
+    & =3\left(\frac{1}{\sqrt{2}}+i \frac{1}{\sqrt{2}}\right) \\
+    & =\frac{3}{\sqrt{2}}+i \frac{3}{\sqrt{2}}
+    \end{align*}
+    We can visualize this as the green point in the diagram:
+    \begin{center}
+        \includegraphics[width=3in]{ws/images/complexpoints.jpeg}
+    \end{center}
+    \end{solution}
+
+    \item  \begin{problem}[1in]
+    $\displaystyle 5e^\frac{i\pi}{3}$
+    \end{problem}
+    
+    \begin{solution}
+    By Euler's formula,
+
+    \begin{align*}
+    5 e^{i \pi / 3} & =5\left(\cos \frac{\pi}{3}+i \sin \frac{\pi}{3}\right) \\
+    & =5\left(\frac{1}{2}+i \frac{\sqrt{3}}{2}\right) \\
+    & =\frac{5}{2}+i \frac{5 \sqrt{3}}{2}
+    \end{align*}
+
+    We can visualize this as the blue point in the diagram above.    
+    \end{solution}
+
+    \item  \begin{problem}[1in]
+    $\displaystyle e^{i\pi}$
+    \end{problem}
+    
+    \begin{solution}
+    By Euler's formula, $e^{i \pi}=\cos \pi+i \sin \pi=-1$. We can visualize this as the red point in the complex plane above.        
+    \end{solution}
+
+    
+\end{enumerate}
+ \probonly{\end{multicols}}
+
+\pspace{1.25in}
+
+\item
+\note{This problem picks up where \#3 leaves off, and directly uses Euler's Formula and the properties of sine and cosine to write the solution in terms of real-valued functions. I use it as a way to introduce the formula for the general solution when the characteristic equation has complex roots $\alpha + \beta i$ and $\alpha - \beta i$.}
+
+\begin{problem}[3in]
+Use Euler's Formula, along with your answer to \#3, to find the general solution to the differential equation $x'' + 2x' + 5x = 0$. Express your answer in terms of real-valued functions \textit{without} complex numbers. Why does your solution make sense in the context of spring motion?
+\end{problem}
+  
+\begin{solution}
+From \#3, we have the proposed general solution to the equation $x'' + 2x' + 5x = 0$:
+$$x(t)=C_1e^{(-1+2i)t}+C_2e^{(-1-2i)t}$$
+Using exponent rules, we can re-write this in order to isolate the real exponents from the imaginary ones:
+\begin{align*}
+x(t)&=C_1e^{-t+2it}+C_2e^{-t-2it}\\
+x(t)&=C_1e^{-t}e^{2it}+C_2e^{-t}e^{-2it}\\
+x(t)&=e^{-t}\left(C_1e^{2it}+C_2e^{-2it}\right)
+\end{align*}
+Now, we can use Euler's Formula to re-write the complex exponential, with $\theta = 2t$ for the first exponential and $\theta =-2t$ for the second exponential:
+\begin{align*}
+x(t)&=e^{-t}\left(C_1e^{i(2t)}+C_2e^{i(-2t)}\right)\\
+x(t)&=e^{-t}\left(C_1\left[\cos(2t)+i\sin(2t)\right]+C_2\left[\cos(-2t)+i\sin(-2t)\right]\right)
+\end{align*}
+We can use the fact that $\cos(-\theta)=\cos(\theta)$ (since $\cos$ is an even function) and the fact that $\sin(-\theta)=-\sin(\theta)$ (since $\sin$ is an odd function) to expand, combine terms, and simplify the expression:
+\begin{align*}
+x(t)&=e^{-t}\left(C_1\left[\cos(2t)+i\sin(2t)\right]+C_2\left[\cos(2t)-i\sin(2t)\right]\right)\\
+x(t)&=e^{-t}\left[C_1\cos(2t)+iC_1\sin(2t)+C_2\cos(2t)-iC_2\sin(2t)\right]\\
+x(t)&=e^{-t}\left[(C_1+C_2)\cos(2t)+(C_1-C_2)i\sin(2t)\right]
+\end{align*}
+However, $(C_1+C_2)$ is just another constant, as is $(C_1-C_2)i$. Thus, we can replace each of these with single constants $A_1$ and $A_2$ to re-write our general solution:
+$$\boxed{x(t)=e^{-t}\left[A_1\cos(2t)+A_2\sin(2t)\right]}$$
+
+This solution makes MUCH more sense than the original one we found in \#3, as we can actually imagine what the functions looks like for different values of $t$. Also, since the differential equation $x'' + 2x' + 5x = 0$ modeled the motion of a spring with low friction and high spring coefficient, we expect that the motion of the spring should be oscillatory, but still eventually approach its equilibrium position due to the effect of friction slowing it down. Both of these features are now seen in our solution; the expressions in brackets indicate that our spring should have oscillating motion, while the $e^{-t}$ has a \textit{dampening effect}, decreasing the magnitude of the position over time. 
+
+More generally, if a second-order differential equation of the form $x'' + bx' + cx = 0$ has a characteristic equation with complex solutions $\alpha + \beta i$ and $\alpha - \beta i$, then the general solution will be:
+$$\boxed{x(t)=e^{\alpha t}\left[A_1\cos(\beta t)+A_2\sin(\beta t)\right]}$$
+where $A_1$ and $A_2$ are \textit{real} numbers. (You might expect from the work above that one or both of these constants would have to be complex numbers, but the next problem demonstrates that this is not the case!)
+\end{solution}
+\end{enumerate}
+\probonly{\newpage}
+
+
+
+\begin{framed}
+\begin{center}
+\textbf{\uline{The General Solution to Second-Order Differential Equations of the Form $x'' +bx'+cx=0$}}
+\end{center}
+
+\flushleft
+For a second-order differential equation of the form $x''(t)+bx'(t)+cx(t)=0$, let $r^2+br+c=0$ be its characteristic equation. Then there are three possibilities:
+
+\begin{enumerate}
+\item If the characteristic equation has \uline{two distinct real roots $r_1$ and $r_2$}, then the general solution is $$\boxed{x(t)=C_1e^{r_1t}+C_2e^{r_2t}}$$
+\item If the characteristic equation has \uline{one repeated real root $r_1$}, then the general solution is $$\boxed{x(t)=C_1e^{r_1t}+C_2te^{r_1t}}$$
+\item If the characteristic equation has \uline{two complex roots $\alpha\pm\beta i$}, then the general solution is $$\boxed{x(t)=e^{\alpha t}[C_1\cos(\beta t)+C_2\sin(\beta t)]}$$
+\end{enumerate}
+\end{framed}
+
+
+\begin{enumerate}[resume]
+  \item 
+  \note{Straightforward practice with using the general formula developed in the previous problem.}
+ 
+  \begin{problem}[\vfill]
+  Solve $x'' + 6x' + 13x = 0$ with initial conditions $x(0) = 7$ and
+  $x'(0) = -1$.  Interpret both the initial conditions and your solution
+  in the context of a mass-spring system.  What does the graph of your solution look like? What happens as $t \to \infty$?
+  \end{problem}
+
+  \begin{solution}
+  The characteristic equation is $r^2 + 6r + 13 = 0$.  The roots of this
+  are
+  \begin{align*}
+  r=\frac{-6 \pm \sqrt{(-6)^2 - 4 (1) (13)}}{2} & = \frac{-6 \pm
+  \sqrt{-16}}{2} \\
+  & = \frac{-6 \pm 4i}{2} \\
+  & = -3 \pm 2i
+  \end{align*}
+  From here, there are two possible ways to proceed.
+  \begin{itemize}
+    \item \textbf{Method 1: ``From scratch''}
+
+    \textit{This method more-or-less follows exactly the same path we used in the previous problem.  As we've seen, it is lengthy and messy, so we will not be using it in general. Instead, we show it here to demonstrate why Method 2 is preferred.}
+
+    Since the roots of the characteristic equation are $-3 + 2i$ and $-3
+    - 2i$, the general solution to the differential equation $x'' + 6x'
+    + 13x = 0$ is
+    \begin{equation}
+    x(t) = C_1 e^{(-3 + 2i) t} + C_2 e^{(-3 - 2i) t}
+    \end{equation}
+    Let's solve for $C_1$ and $C_2$ by using our initial conditions.
+    The first initial condition tells us
+    \[ 7 = x(0) = C_1 + C_2.\] To use the second initial condition, we
+    first calculate $x'(t)$ by differentiating
+    (1), and then we plug in 0:
+    \[ \begin{array}{r c r c l}
+    & & x'(t) & = & (-3 + 2i) C_1 e^{(-3 + 2i) t} + (-3 - 2i) C_2
+    e^{(-3 - 
+    2i) t} \\
+    -1 & = & x'(0) & = & (-3 + 2i) C_1 + (-3 - 2i) C_2
+    \end{array}\]
+    So, we have two equations in two variables that we want to solve:
+    \begin{align*}
+    7 & = C_1 + C_2 \\
+    -1 & = (-3 + 2i) C_1 + (-3 - 2i) C_2
+    \end{align*}
+    The solution is $C_1 = \frac{7 - 10i}{2}$ and $C_2 = \frac{7 +
+    10i}{2}$.\footnote{There are many ways to solve.  One way is to
+    use the first equation to write $C_2 = 7 - C_1$ and plug this into
+    the second equation to get an equation just involving $C_1$.  Then
+    solve that to find $C_1$ and use $C_2 = 7 - C_1$ to find $C_2$.}
+    Putting this back into (1), we find that
+    \[ x(t) = \frac{7 - 10i}{2} e^{(-3 + 2i) t} + \frac{7 + 10i}{2}
+    e^{(-3 - 2i) t}.\] We can factor out $e^{-3t}$ to rewrite this as
+    \begin{equation}
+    x(t) = e^{-3t}
+    \left( \frac{7 - 10i}{2} e^{2it} + \frac{7 + 10i}{2} e^{-2it}
+    \right) = e^{-3t} \left[ \frac{7}{2} \left(e^{2it} + e^{-2it}
+    \right) - 5i \left( e^{2it} - e^{-2it} \right)
+    \right]
+    \end{equation}
+    By Euler's formula,
+    \begin{align*}
+    e^{2it} & = \cos 2t + i \sin 2t \\
+    e^{-2it} & = \cos (-2t) + i \sin (-2t) \\
+    & = \cos 2t - i \sin 2t \textrm{ since $\cos$ is an even function
+    and $\sin$ is an odd function}
+    \end{align*}
+    Plugging these into (2),
+    \begin{align*}
+    x(t) & = e^{-3t} \left[ \frac{7}{2} (2 \cos 2t) - 5i (2i
+    \sin 2t) \right] \\
+    & = \boxed{e^{-3t} \left( 7 \cos 2t + 10 \sin 2t \right)}
+    \end{align*}
+
+    \item \textbf{Method 2: ``The fast way''}
+
+As we saw in problem \#6, if the roots of the characteristic equation are $\alpha + \beta i$ and $\alpha - \beta i$, then the general solution will be:
+$$x(t)=e^{\alpha t}\left[A_1\cos(\beta t)+A_2\sin(\beta t)\right]$$
+    Since we know that the roots of the characteristic equation are
+    $-3 + 2i$ and $-3 - 2i$, we can identify that $\alpha=-3$ and $\beta=2$. Thus, we can just say that the general solution
+    of the differential equation is:
+     $$x(t) = e^{-3t} (A_1 \cos 2t + A_2\sin 2t)$$
+
+    Now, we just need to plug in the initial conditions to find $A_1$
+    and $A_2$.  The first initial condition is
+    \[ 7 = x(0) = A_1.\]
+    Therefore, $x(t) = e^{-3t} (7 \cos 2t + A_2 \sin 2t)$. 
+    To use the second initial condition, we first find $x'(t)$:
+    \[ x'(t) = e^{-3t} (-14 \sin 2t + 2 A_2 \cos 2t) - 3e^{-3t} (7
+    \cos 2t + A_2 \sin 2t).\] Then we plug in $t = 0$ to get
+    \[ -1 = x'(0) = 2 A_2 - 21,\] or $A_2 = 10$.  So, $
+    \boxed{x(t)=e^{-3t} \left( 7 \cos 2t + 10 \sin 2t \right)}$.
+
+Notice that the coefficients worked out to be \textit{real} numbers, which we would like to see, since we hope that this equation actually models the motion of a mass on a real spring. Indeed, if we look at the graph of this solution, we see that it seems to match our expectations:
+
+
+\begin{center}
+\resizebox{0.2\textwidth}{!}{
+  \begin{tikzpicture}
+\begin{axis}[
+unit vector ratio*=1 1 1,
+%axis lines = middle,
+            xlabel=$t$,
+            ylabel=$x(t)$,
+            ymin={-0.1},
+            ymax={7.1}
+            ]   
+\addplot[-][domain={0:3}]{(2.71)^((-3)*x)*(7*cos(deg(2*x))+10*sin(deg(2*x)))};
+\end{axis}
+\end{tikzpicture}
+}
+\end{center}
+
+Because $x(0)=7$, the mass on the spring starts out 7 units above the $t$-axis. Because $x'(0)=-1$, the mass has an initial velocity of 1 unit per second toward its equilibrium position, so our mass immediately starts moving toward the $t$-axis. Because of the high spring coefficient of $13$, we achieved complex solutions, which led to trigonometric functions in our general solution, giving us the slight oscillatory behavior we observe after $t=1$. However, due to the relatively high friction coefficient of $6$, the real part of the complex roots becomes $\frac{-6}{2}=-3$, which leads to the exponential function $e^{-3t}$ in our general solution, giving us a drastic dampening effect. This is seen on our graph after $t=2$, after which we can barely notice the oscillations around the equilibrium line. As $t \to \infty$, we see that the position of the mass approaches its equilibrium position, which is what we expect in real life.
+  \end{itemize}
+  \end{solution}  
+  
+     
+
+\end{enumerate}
+
+
+
+\end{document}

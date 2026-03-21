@@ -1,0 +1,413 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[workshop]{handout}
+\renewcommand{\workshopnote}{CA Notes.} 
+\usepackage{lipsum}
+ \usepackage{microtype}
+ \usepackage{vwcol}
+
+ \begin{document}
+
+\htitle{Workshop 9: Integration by Substitution}
+\begin{workshop}
+    Welcome to Workshop 9! The learning objectives for this workshop are for students to:
+    \begin{itemize}
+    \item recall the basic indefinite integrals.
+    \item evaluate definite and indefinite integrals with substitution.
+    \item reason about whether or not an integral requires a substitution to evaluate, and if it does, what substitution is most helpful in evaluating the integral.
+    \end{itemize}
+ A sample lesson plan for Workshop 9 is:
+ \begin{itemize}
+     \item  5 min: Attendance and \#1. Students should be able to recall basic indefinite integrals, as we have done this often in previous lessons.
+     \item 20 min: \#2 and \#3. These problems are meant for students to take time to develop or refresh the reasoning behind substitution. The goal of a substitution is to transform an integral we can't directly find into an integral we can find using our knowledge of the basic antiderivatives from \#1 and properties of integrals. However, sometimes we encounter integrals we can find either immediately or after some algebraic rewriting. On our first day of integration by substitution, we honed in on ``undoing" the Chain Rule on a composition of functions by identifying the derivatives of ``the inner function" and ``the outer function" within the integrand. In other words, we began to develop the skill of choosing the ``right $u$" to undo the Chain Rule. On our second day, we focused more on integrals where a substitution streamlines algebraic rewriting of the integrand before evaluating.
+     \item 50 min: 25 Practice Problems for Integration by Substitution. These problems are meant to provide mechanical and computational practice with integration by substitution. 
+ \end{itemize}
+
+    
+\end{workshop}
+\begin{enumerate}
+    \item Find the following basic indefinite integrals. 
+    \begin{multicols}{2}
+    \begin{enumerate}
+    \item $\displaystyle \int 1\,du\ $ \solonly{\textcolor{red}{$=u+C$}}
+    \item If $n\neq-1$, $\displaystyle \int u^n\,du\ $
+    \solonly{\textcolor{red}{$=\frac{u^{n+1}}{n+1}+C$}}
+    \item $\displaystyle \int \dfrac{1}{u}\,du\ $
+    \solonly{\textcolor{red}{$=\ln|u|+C$}}
+    \item $\displaystyle \int \dfrac{1}{1+u^2}\,du\ $
+    \solonly{\textcolor{red}{$=\arctan u+C$}}
+    \item $\displaystyle \int \dfrac{1}{\sqrt{1-u^2}}\,du\ $
+    \solonly{\textcolor{red}{$=\arcsin u+C$}\newline}
+    \solonly{\textcolor{red}{\hspace{0.95in}$=-\arccos u+C$}}
+    \item $\displaystyle \int e^u\,du\ $
+    \solonly{\textcolor{red}{$=e^u+C$}}
+    \item $\displaystyle \int \sin u\,du\ $
+  \solonly{\textcolor{red}{$=-\cos u+C$}}   
+     \item $\displaystyle \int \cos u\,du\ $
+     \solonly{\textcolor{red}{$=\sin u+C$}}
+      \item $\displaystyle \int \sec^2 u\,du\ $
+      \solonly{\textcolor{red}{$=\tan u+C$}}
+       \item $\displaystyle \int \sec u \tan u \,du\ $
+       \solonly{\textcolor{red}{$=\sec u+C$}}
+    \end{enumerate}
+    \end{multicols}
+
+\item In each part below you are given a pair of integrals. Use substitution to evaluate \underline{one} of the integrals per pair, and evaluate the other directly.
+\begin{enumerate}
+    \item
+        \begin{enumerate}
+        \begin{multicols}{2}
+        \item $\displaystyle \int \dfrac{1}{1+x^2}\,dx\ $
+        \item $\displaystyle \int \dfrac{x}{1+x^2}\,dx\ $
+        \end{multicols}
+        \begin{solution}
+         For the first indefinite integral, we know $\displaystyle \int \dfrac{1}{1+x^2}\,dx\ =\arctan x +C$ \newline
+
+         For the second indefinite integral, let $u=1+x^2$ and $du=2xdx$, where $\frac{du}{2}=xdx$. Thus, the substituted integral is
+
+         $\dfrac{1}{2} \displaystyle \int \dfrac{1}{u}\,du\ =\frac{1}{2}\ln |u| + C = \frac{1}{2}\ln |1+x^2| + C =\frac{1}{2}\ln (1+x^2) + C$.
+         
+        \end{solution}
+        \end{enumerate}
+    \pspace{\vfill}\item
+        \begin{enumerate}
+        \begin{multicols}{2}
+        \item $\displaystyle \int \dfrac{1}{\sqrt{1-x^2}}\,dx\ $
+        \item $\displaystyle \int \dfrac{x}{\sqrt{1-x^2}}\,dx\ $
+        \end{multicols}
+        \begin{solution}
+         For the first indefinite integral, we know $\displaystyle \int \dfrac{1}{\sqrt{1-x^2}}\,dx\ =\arcsin x + C$ \newline
+
+         For the second indefinite integral, let $u=1-x^2$ and $du=-2xdx$, where $\frac{-du}{2}=xdx$. Thus, the substituted integral is
+
+         $-\dfrac{1}{2} \displaystyle \int \dfrac{1}{\sqrt{u}}\,du\ = -\dfrac{1}{2} \displaystyle \int u^{-1/2}\,du\ = -\frac{1}{2}\cdot\frac{u^{1/2}}{1/2} + C = -u^{1/2} + C =-(1-x^2)^{1/2} + C = -\sqrt{1-x^2}+C$.
+         
+        \end{solution}
+        \end{enumerate}
+    \pspace{\vfill}
+    \pspace{\newpage}
+    \item
+        \begin{enumerate}
+        \begin{multicols}{2}
+        \item $\displaystyle \int \dfrac{x}{x+1}\,dx\ $
+        \item $\displaystyle \int \dfrac{x+1}{x}\,dx\ $
+        \end{multicols}
+        \begin{solution}
+            For the second integral, we can use algebra to break up the integrand into two functions whose antiderivatives we know: \newline\newline
+            $\displaystyle \int \dfrac{x+1}{x}\,dx\ = \displaystyle \int \left(\dfrac{x}{x}+\dfrac{1}{x}\right)\,dx\ = \displaystyle \int \left(1+\dfrac{1}{x}\right)\,dx\ =x + \ln |x| +C$
+
+            For the first integral, let $u=x+1$ and $du=dx$, where $u-1=x$. Thus, the substituted integral is:
+
+            $\displaystyle \int \dfrac{u-1}{u}\,du\ = \displaystyle \int \left(\dfrac{u}{u}+\dfrac{1}{u}\right)\,du\ = \displaystyle \int \left(1-\dfrac{1}{u}\right)\,du\ =u - \ln |u| +C = (x+1) - \ln|x+1| +C$
+        \end{solution}
+        \end{enumerate}
+\pspace{\vfill}   
+\pspace{\vfill}
+\pspace{\vfill}
+\pspace{\vfill}
+\pspace{\vfill}
+\end{enumerate}
+\item With the right $u$-substitution, each of the following integrals in terms of $x$ can be transformed into a simpler integral in terms of $u$, listed in the box below. Choose the appropriate substitution to match an integral in the box, then evaluate the indefinite integral.
+\begin{center}
+\fbox{
+\hspace{0.5in}$\displaystyle \int \dfrac{1}{u}\,du\ $\hspace{1in} $\displaystyle \int \dfrac{1}{2u}\,du\ $\hspace{1in} $\displaystyle \int \dfrac{1}{1+u^2}\,du\ $\hspace{0.5in}
+
+}
+\end{center}
+\begin{enumerate}
+    \item $\displaystyle \int \dfrac{e^x}{1+e^x}\,dx\ $ \solonly{\textcolor{red}{$=\displaystyle \int \dfrac{1}{u}\,du\ = \ln |u| + C = \ln |1+e^x| + C = \ln (1+e^x) + C$}}
+    \newline
+    \newline
+    \newline
+    $u=$\phantom{x}\fitb{1in}{\solonly{\textcolor{red}{$1+e^x$}}}
+    \newline
+    \newline
+    \newline
+    $du=$\phantom{x}\fitb{1in}{\solonly{\textcolor{red}{$e^xdx$}}}
+    \newline
+    \newline
+    \pspace{\vfill}
+    \item $\displaystyle \int \dfrac{e^x}{1+e^{2x}}\,dx\ $ \solonly{\textcolor{red}{$=\displaystyle \int \dfrac{1}{1+u^2}\,du\ = \arctan u + C = \arctan(e^x) +C$}}
+    \newline
+    \newline
+    \newline
+    $u=$\phantom{x}\fitb{1in}{\solonly{\textcolor{red}{$e^x$}}}
+    newline
+    \newline
+    \newline
+    $du=$\phantom{x}\fitb{1in}{\solonly{\textcolor{red}{$e^xdx$}}}
+    \newline
+    \newline
+    \pspace{\vfill}
+    \item $\displaystyle \int \dfrac{e^{2x}}{1+e^{2x}}\,dx\ $ \solonly{\textcolor{red}{$=\dfrac{1}{2} \displaystyle \int \dfrac{1}{u}\,du\ = \dfrac{1}{2} \ln |u| +C= \dfrac{1}{2} \ln |1+e^{2x}| +C = \dfrac{1}{2} \ln (1+e^{2x}) +C$}}
+    \newline
+    \newline
+    \newline
+    $u=$\phantom{x}\fitb{1in}{\solonly{\textcolor{red}{$u=e^{2x}$}}}
+    \newline
+    \newline
+    \newline
+    $du=$\phantom{x}\fitb{1in}{\solonly{\textcolor{red}{$=2e^{2x}dx$}}}
+    \newline
+    \newline
+    \pspace{\vfill}
+\end{enumerate}
+\end{enumerate}
+
+\pspace{\newpage}
+\htitle{25 Practice Problems for Integration by Substitution}
+\vspace{-10pt}
+\underline{Directions}: Evaluate the following definite and indefinite integrals by substitution. Some integrals are accompanied by hints.
+\begin{enumerate}
+\item $\displaystyle \int_{-2}^{-5/3} (3x+6)^5\,dx\ $
+
+\begin{solution}
+    Let $u=3x+6$ and $du=3dx$, where $dx=\frac{du}{3}$. The lower bound $x=-2$ becomes $u=0$ and the upper bound $x=-\frac{5}{3}$ becomes $u=1$.
+
+    $\displaystyle \frac{1}{3}\int_{0}^{1} u^5\,du\ = \left. \frac{1}{3}\cdot\frac{u^6}{6}\right|_{u=0}^{u=1}=\frac{1}{18}$
+    
+    
+\end{solution}
+\pspace{\vfill}
+\item $\displaystyle \int \dfrac{7}{5x+8}\,dx\ $
+
+\begin{solution}
+By the constant multiple property, we are computing $7\displaystyle \int \dfrac{1}{5x+8}\,dx\ $. Let $u=5x+8$ and $du=5dx$, where $\frac{du}{5}=dx$. 
+
+$\dfrac{7}{5}\displaystyle \int \dfrac{1}{u}\,du\ = \frac{7}{5}\ln|u| + C = \frac{7}{5}\ln|5x+8| + C$
+\end{solution}
+\pspace{\vfill}
+\item $\displaystyle \int x^2\sqrt{x^3+1}\,dx\ $
+
+\begin{solution}
+    Let $u=x^3+1$ and $du=3x^2dx$, where $\frac{du}{3}=x^2dx$.
+
+    $\dfrac{1}{3}\displaystyle \int \sqrt{u}\,du\ = \dfrac{1}{3}\displaystyle \int u^{1/2}\,du\ = \dfrac{1}{3}\cdot\dfrac{u^{3/2}}{3/2}+C=\dfrac{2}{9}u^{3/2}+C=\dfrac{2}{9}(x^3+1)^{3/2}+C$
+\end{solution}
+\pspace{\vfill}
+\item $\displaystyle \int \dfrac{\ln (5x)}{x}\,dx\ $
+
+\begin{solution}
+    Let $u=\ln (5x)$ and $du=\frac{1}{x}dx$.
+
+    $\displaystyle \int u\,du\ = \frac{u^2}{2}+C=\frac{1}{2}[\ln(5x)]^2+C$
+\end{solution}
+\pspace{\vfill}
+
+\item $\displaystyle \int \dfrac{x^2}{x+3}\,dx\ $
+
+\begin{solution}
+    Let $u=x+3$, where $u-3=x$, and $du=dx$. 
+\newline
+\newline
+    $\displaystyle \int \dfrac{(u-3)^2}{u}\,du\ = \displaystyle \int \dfrac{u^2-6u+9}{u}\,du\ = \displaystyle \int 
+    \left(u-6+\frac{9}{u}\right)\,du\ = \dfrac{u^2}{2}-6u+9\ln|u|+C $ \newline 
+    \newline
+    \newline
+    $=\frac{1}{2}(x+3)^2-6(x+3)+9\ln|x+3|+C$
+\end{solution}
+
+\pspace{\vfill}
+\pspace{\newpage}
+\item $\displaystyle \int_{64}^{81} \dfrac{e^{\sqrt{x}}}{2\sqrt{x}}\,dx\ $
+
+\begin{solution}
+Let $u=\sqrt{x}$ and $du=\frac{1}{2\sqrt{x}}dx$. The lower bound $x=64$ becomes $u=8$ and the upper bound $x=81$ becomes $u=9$.
+
+$\displaystyle \int_{8}^{9} e^u \,du\ = \left. e^u \right|_{u=8}^{u=9} = e^9-e^8$
+
+\end{solution}
+
+\pspace{\vfill}
+
+\item $\displaystyle \int \sin^5 (2x) \cos (2x)\,dx\ $
+
+\begin{solution}
+    Let $u=\sin(2x)$ and $du=2\cos(2x)dx$, where $\frac{du}{2}=\cos(2x)dx$. 
+
+$\displaystyle \frac{1}{2} \int u^5 \,du\ = \frac{1}{2} \cdot \frac{u^6}{6}+C= \frac{[\sin(2x)]^6}{12}+C$
+    
+\end{solution}
+\pspace{\vfill}
+
+\item $\displaystyle \int_{0}^{1} \dfrac{\arctan x}{1+x^2}\,dx\ $
+
+\begin{solution}
+    Let $u=\arctan x$ and $du=\frac{1}{1+x^2}dx$. The lower bound $x=0$ becomes $u=0$ and the upper bound $x=1$ becomes $u=\frac{\pi}{4}$.
+
+    $\displaystyle \int_{0}^{\pi/4} u\,du\ = \left. \dfrac{u^2}{2} \right|_{u=0}^{u=\pi/4}=\dfrac{\pi^2}{32}$
+\end{solution}
+\pspace{\vfill}
+
+\item $\displaystyle \int (x^3+1)\sqrt[3]{x^4+4x}\,dx\ $
+
+\begin{solution}
+    Let $u=x^4+4x$ and $du=(4x^3+4)dx$, where $\dfrac{du}{4}=(x^3+1)dx$.
+
+ $\displaystyle \dfrac{1}{4} \int \sqrt[3]{u}\,du\ = \displaystyle \dfrac{1}{4} \int u^{1/3}\,du\ = \dfrac{1}{4}\cdot\dfrac{u^{4/3}}{4/3}+C=\dfrac{3}{16}(x^4+4x)^{4/3}+C$   
+\end{solution}
+\pspace{\vfill}
+\pspace{\newpage}
+\item $\displaystyle \int \tan x\,dx\ $
+
+\begin{solution}
+   $\displaystyle \int \tan x\,dx\ = \displaystyle \int \dfrac{\sin x}{\cos x} \,dx\ $. Let $u=\cos x$ and $du=-\sin xdx$, where $-du=\sin xdx$. 
+
+$\displaystyle -\int \dfrac{1}{u} \,du\ = -\ln|u|+C=-\ln|\cos x|+C$
+   
+\end{solution}
+
+\pspace{\vfill}
+\item $\displaystyle \int x\tan\left(x^2\right)\,dx\ $
+
+\begin{solution}
+  Let $u=x^2$ and $du=2xdx$, where $\frac{du}{2}=xdx$.
+
+  Using the work in \#10, 
+
+  $\displaystyle \dfrac{1}{2}\int \tan\left(u\right)\,du\ =-\dfrac{1}{2}\ln|\cos u|+C = -\dfrac{1}{2}\ln|\cos (x^2)|+C$
+\end{solution}
+\pspace{\vfill}
+
+\item $\displaystyle \int_{1}^{2} x(x-1)^{10}\,dx\ $
+
+\begin{solution}
+    Let $u=x-1$, where $u+1=x$, and $du=dx$. The lower bound $x=1$ becomes $u=0$, and the upper bound $x=2$ becomes $u=1$.
+
+    $\displaystyle \int_{0}^{1} (u+1)(u)^{10}\,du\ = \displaystyle \int_{0}^{1} u^{11}+u^{10}\,du\ = \displaystyle \left. \left(\dfrac{u^{12}}{12}+\dfrac{u^{11}}{11}\right) \right|_{u=0}^{u=1}=\dfrac{1}{12}-\dfrac{1}{11}$
+\end{solution}
+\pspace{\vfill}
+
+\item $\displaystyle \int 2x \cos (x^2+1)\,dx\ $
+
+\begin{solution}
+    Let $u=x^2+1$ and $du=2xdx$.
+
+    $\displaystyle \int \cos u\,du\ = \sin u +C = \sin(x^2+1)+C$
+\end{solution}
+\pspace{\vfill}
+\pspace{\newpage}
+
+
+\item $\displaystyle \int \dfrac{\sec^2\left({\frac{1}{x^2}}\right)}{x^3}\,dx\ $
+
+\begin{solution}
+    Let $u=\dfrac{1}{x^2}$ and $du=-\dfrac{2}{x^3}dx$, where $-\dfrac{1}{2}du=\dfrac{1}{x^3}dx$.
+
+   $\displaystyle -\dfrac{1}{2}\int \sec^2u\,du\ = -\dfrac{1}{2}\tan u +C=-\dfrac{1}{2}\tan \left(\frac{1}{x^2}\right) +C$
+   
+\end{solution}
+\pspace{\vfill}
+\item $\displaystyle \int \dfrac{\cos(\ln x)}{x}\,dx\ $
+
+\begin{solution}
+    Let $u=\ln x$ and $du=\frac{1}{x}dx$.
+
+    $\displaystyle \int \cos u\,du\ = \sin u +C = \sin (\ln x)+C$
+\end{solution}
+
+\pspace{\vfill}
+\item $\displaystyle \int \dfrac{x}{1+x^4}\,dx\ $ \textit{Hint}: Let $u=x^2$.
+
+\begin{solution}
+ Let $u=x^2$ and $du=2xdx$, where $\dfrac{du}{2}=xdx$.
+
+$\displaystyle \dfrac{1}{2} \int \dfrac{1}{1+u^2}\,dx\ = \frac{1}{2}\arctan u +C = \frac{1}{2}\arctan(x^2) +C$
+ 
+\end{solution}
+\pspace{\vfill}
+
+\item $\displaystyle \int \dfrac{x^2}{\sqrt{1-x^6}}\,dx\ $ \textit{Hint}: Let $u=x^3$.
+
+\begin{solution}
+    Let $u=x^3$ and $du=3x^2dx$, where $\dfrac{du}{3}=x^2dx$.
+
+    $\displaystyle \frac{1}{3} \int \dfrac{1}{\sqrt{1-u^2}}\,du\ =\dfrac{1}{3}\arcsin u +C = \dfrac{1}{3}\arcsin (x^3) +C $
+\end{solution}
+\pspace{\vfill}
+\pspace{\newpage}
+\item $\displaystyle \int \dfrac{2x\cos\big(\ln (x^2+1)\big)}{x^2+1}\,dx\ $
+
+\begin{solution}
+    Let $u=\ln(x^2+1)$ and $du=\dfrac{2x}{x^2+1}dx$.
+
+    $\displaystyle \int \cos u\,du\ = \sin u+C=\sin(\ln(x^2+1))+C$
+\end{solution}
+\pspace{\vfill}
+
+\item $\displaystyle \int \dfrac{\cos x}{e^{\sin x}}\,dx\ $
+
+\begin{solution}
+    Let $u=\sin x$ and $du=\cos xdx$.
+    
+$\displaystyle \int \dfrac{1}{e^u}\,du\ = \displaystyle \int e^{-u}\,du\ = -e^{-u}+C=-e^{-\sin x}+C$
+    
+\end{solution}
+\pspace{\vfill}
+
+\item $\displaystyle \int \dfrac{\sec \left(\sqrt{x}\right)\tan\left(\sqrt{x}\right)}{\sqrt{x}}\,dx\ $
+
+\begin{solution}
+    Let $u=\sqrt{x}$ and $du=\dfrac{1}{2\sqrt{x}}dx$, where $2du=\dfrac{1}{\sqrt{x}}dx$.
+
+    $\displaystyle \dfrac{1}{2}\int \sec u \tan u \,du\ = \dfrac{1}{2}\sec u+C = \dfrac{1}{2}\sec (\sqrt{x})+C$
+\end{solution}
+\pspace{\vfill}
+
+\item $\displaystyle \int \dfrac{3}{x\ln x}\,dx\ $
+
+\begin{solution}
+    By the constant multiple property we are computing $\displaystyle 3\int \dfrac{1}{x\ln x}\,dx\ $. Let $u=\ln x$ and $du=\dfrac{1}{x}dx$. 
+
+    $\displaystyle 3\int \dfrac{1}{u}\,du\ =3\ln|u|+C=3\ln|\ln x|+C\ $
+\end{solution}
+\pspace{\vfill}
+\pspace{\newpage}
+\item $\displaystyle \int \dfrac{e^{\arcsin x}}{\sqrt{1-x^2}}\,dx\ $
+
+\begin{solution}
+    Let $u=\arcsin x$ and $du=\dfrac{1}{\sqrt{1-x^2}}dx$.
+
+    $\displaystyle \int e^u\,du\ =e^u+C=e^{\arcsin x}+C$
+\end{solution}
+\pspace{\vfill}
+\item $\displaystyle \int \cot x \,dx\ $
+\begin{solution}
+$\displaystyle \int \cot x\,dx\ = \displaystyle \int \dfrac{\cos x}{\sin x} \,dx\ $. Let $u=\sin x$ and $du=\cos xdx$.
+
+$\displaystyle \int \dfrac{1}{u} \,du\ = \ln|u|+C=\ln|\sin x|+C$
+\end{solution}
+
+\pspace{\vfill}
+\item $\displaystyle \int \dfrac{2x+3}{x^2+1}\,dx\ $
+
+\begin{solution}
+    $\displaystyle \int \dfrac{2x+3}{x^2+1}\,dx\ = \displaystyle \int \dfrac{2x}{x^2+1}\,dx\ + \displaystyle \int \dfrac{3}{x^2+1}\,dx\ = \displaystyle 2\int \dfrac{x}{x^2+1}\,dx\ + \displaystyle 3\int \dfrac{1}{x^2+1}\,dx\ $. Using our work in \#2ai and \#2aii from the first page of Workshop 9, 
+
+    $\displaystyle 2\int \dfrac{x}{x^2+1}\,dx\ + \displaystyle 3\int \dfrac{1}{x^2+1}\,dx\ = 2\cdot \dfrac{1}{2}\ln(1+x^2) + 3\arctan x+C = \ln(1+x^2) + 3\arctan x+C$. 
+\end{solution}
+\pspace{\vfill}
+\item $\displaystyle \int \dfrac{40x^3+60x^2+60x}{10x^4+20x^3+30x^2}\,dx\ $
+
+\begin{solution}
+    Let $u=10x^4+20x^3+30x^2$ and $du=(40x^3+60x^2+60x)dx$.
+
+$\displaystyle \int \dfrac{1}{u}\,du\ = \ln|u|+C=\ln|10x^4+20x^3+30x^2|+C$
+    
+\end{solution}
+\pspace{\vfill}
+
+\end{enumerate}
+
+
+\end{document}

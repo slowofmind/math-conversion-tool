@@ -1,0 +1,448 @@
+\PassOptionsToPackage{sols}{handout}
+\documentclass[main]{subfiles}
+\setcounterrefbeforedot{chapter}{m-ws7-2}
+\setcounterrefafterdot{section}{m-ws7-2}
+\addtocounter{section}{-1}
+\usepackage{solutions}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptersix}
+}{}
+
+\section{Modeling with Differential Equations} \label{ws7-2}
+
+\begin{problemonly}
+    \begin{framed}
+
+\textbf{Key Ideas}:
+
+\begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+
+\item You should be able to write a differential equation that reasonably
+  models a given scenario.  You should also be able to write down an
+  initial condition, if the scenario includes one.
+
+\item You should understand how continuously compounded interest can be
+  expressed using a differential equation.
+
+\end{itemize}
+\end{framed}
+\end{problemonly}
+
+Let's take a moment to examine the difference between the differential equations 
+$\dfrac{dy}{dt}=y$ and $\dfrac{dy}{dt}=t$.
+
+\begin{itemize}[topsep=0pt]
+    \item $\dfrac{dy}{dt}=y$ is a differential equation of the form
+          $\dfrac{dy}{dt}=f(y)$. The rate of change of $y$ is a function
+          of \mbox{$y$ itself.}
+    \item $\dfrac{dy}{dt}=t$ is a differential equation of the form
+          $\dfrac{dy}{dt}=f(t)$. The rate of change of $y$ is a function
+          of $t$.
+\end{itemize}
+
+The general solution of $\dfrac{dy}{dt}=y$ is $y(t)=\cfitb{1in}{Ce^t}$.
+
+The general solution of $\dfrac{dy}{dt}=t$ is $y(t)=\cfitb{1in}{\frac{1}{2}t^2+C}$.
+    \begin{enumerate}
+
+\item
+\note{Students struggle with the difference between a differential equation
+and its solution when they first see differential equations. These next
+two questions are to help them tackle this head on.}
+    \begin{enumerate}
+        \item Last class we talked about a population of bacteria, denoted
+        $P(t)$, that was growing at a rate proportional to itself. We found the
+        proportionality constant was $0.2$. We found a differential equation
+        modeling the situation, and a solution corresponding to an initial
+        condition.
+        \begin{center}
+            \begin{tabular}{ll}
+            Differential equation: \cfitb{1in}{$\dfrac{dP}{dt}=0.2P$} &
+            General solution: \cfitb{1in}{$P(t)=Ce^{0.2t}$} \\
+            & \\
+            Initial condition: \underline{\parbox[t]{1in}{\centering$P(0)=200$}} &
+            Corresponding particular solution: \cfitb{1in}{$P(t)=200e^{0.2t}$}
+            \end{tabular}
+        \end{center}
+        
+  %  \pspace{\newpage}
+    
+    \item Ebony puts $\$2000$ in a bank account earning a nominal annual interest
+    rate of $3\%$ compounded continuously. She makes no further deposits or
+    withdrawals on this particular account. Let $M(t)$ be the amount
+    of money in her account at time $t$. (Note that money in an interest-earning
+    account grows at a rate proportional to itself.)
+
+    Fill in the blanks from the options below. \vspace{-12pt} 
+    \begin{center}
+            \begin{tabular}{ll}
+            Differential equation: \cfitb{1in}{$\dfrac{dM}{dt}=0.03M$} &
+            General solution: \cfitb{1in}{$M(t)=Ce^{0.03t}$} \\
+            & \\
+            Initial condition: 
+            \cfitb{1in}{$M(0)=2000$}&
+            Corresponding particular solution: \cfitb{1.1in}{$M(t)=2000e^{0.03t}$}
+            \end{tabular}
+        \end{center}
+    \begin{multicols}{2}
+        \begin{enumerate}[topsep=0pt]
+        \item $M(0)=2000$
+        \item $M(t)=2000e^{0.03t}$
+        \item $M(t)=2000(1+0.03)^t$
+        \item $\frac{dM}{dt}=2000e^{0.03t}$
+        \item $M(t)=Ce^{0.03t}$
+        \item $\frac{dM}{dt}=Ce^{0.03t}$
+        \columnbreak
+        \item $\frac{dM}{dt}=0.03$
+        \item $\frac{dM}{dt}=1.03$
+        \item $\frac{dM}{dt}=0.03t$
+        \item $\frac{dM}{dt}=0.03M$
+        \item $\frac{dM}{dt}=1.03M$
+        \end{enumerate}
+    \end{multicols}
+    \end{enumerate}
+
+\end{enumerate}
+\vfill
+  \begin{framed}
+    \textbf{Key Idea 1.} Saying that two quantities $A$ and $B$ are
+    \uline{proportional} to each other means that one is a constant
+    multiple of the other.  That is,
+    \[ A = k B \]
+    for some constant $k$.
+  \end{framed}
+
+
+\begin{enumerate}[resume]
+\item 
+  \begin{problem}[\vfill]
+    The population of a certain country increases at a rate proportional
+    to the population size.  If $P(t)$ is the population size at time $t$,
+    write a differential equation that models the situation. 
+  \end{problem}
+
+  \begin{solution}
+    We are told that
+    \[ \underbrace{\text{The rate at which the population
+        increases}}_{\frac{dP}{dt}} \text{ } \underbrace{\text{is
+        proportional to}}_{= k \text{ times}} \text{ }
+    \underbrace{\text{the population size}}_{P}.\] So, our differential
+    equation is $\boxed{\frac{dP}{dt} = k P}$.  (Since the population is
+    increasing, $\frac{dP}{dt}$ is positive.  The population $P$ is also
+    positive, so the constant $k$ must be positive.)
+  \end{solution}
+
+\item 
+  One way that psychologists study how people learn is by asking them to
+  learn a list of nonsense words.\footnote{This is meant to be a ``pure''
+    experiment, in that the learners won't have any prior knowledge that
+    would help them with the task.}  Suppose that $L(t)$ is the percent of
+  such a list that a particular person has learned at time $t$, where $t$
+  is measured in days.
+  \begin{enumerate}
+  \item
+
+    \note{You might like to have students talk about whether this model
+      seems reasonable.}
+
+    \begin{problem}[\vfill]
+      A simple model for learning is to assume that learning happens at a
+      rate proportional to the percent of the list left to be learned.
+      Write a differential equation that expresses this.  Can you write an
+      initial condition?
+    \end{problem}
+
+    \begin{solution}
+      In this model, we assume that the rate at which learning happens
+      ($\frac{dL}{dt}$) is proportional to the percent of the list left to
+      be learned ($100 - L$).  That is, $\boxed{\frac{dL}{dt} = k (100 -
+        L)}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{1.5}]
+      A student who has learned a fifth of the list already is currently
+      learning at a rate of 10\% of the list per day.  Incorporate this
+      into your model.
+    \end{problem}
+
+    \begin{solution}
+      At this particular moment, $L = 20$ (the student has learned 20\% of
+      the list) and $\frac{dL}{dt} = 10$ (the student is learning at a
+      rate of 10\% per day).  If we plug this into the differential
+      equation $\frac{dL}{dt} = k(100 - L)$, then we find that $10 = k
+      (100 - 20)$, so we are able to solve for $k$: it's $\frac{10}{80} =
+      \frac{1}{8}$.  Thus, $\boxed{\frac{dL}{dt} = \frac{1}{8} (100 -
+        L)}$.
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+  \note{This can also be a basic model for the spread of a disease, which
+    students usually find really interesting.}
+
+  A juicy rumor is spreading through Harvard's freshman class, which
+  has 1600 students.  The rumor spreads at a rate proportional to the
+  product of the number of freshmen who have already heard it and the
+  number of freshmen who have not yet heard it.  At time $t = 0$, 5
+  freshmen have heard the rumor.
+
+  \begin{enumerate}
+  \item 
+    \begin{problem}[\vfill]
+      If $R(t)$ is the number of people who have heard the rumor at time
+      $t$, write a differential equation that models the situation.  Can
+      you write an initial condition?
+    \end{problem}
+
+    \begin{solution}
+      We are told that the rate at which the rumor spreads
+      ($\frac{dR}{dt}$) is proportional to the product of the number of
+      freshmen who have already heard it ($R$) and the number of freshmen
+      who have not yet heard it ($1600 - R$).  So, $\boxed{\frac{dR}{dt} =
+        kR(1600-R)}$.  We are also told that $\boxed{R(0) = 5}$; this is
+      the initial condition.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Lucy thinks that the rumor should instead spread at a rate
+      proportional to the number of students who haven't heard the rumor
+      yet.  Which model (Lucy's or the original one) do you think is more
+      reasonable?  Why?
+    \end{problem}
+
+    \begin{solution}
+      Lucy's model is $\frac{dR}{dt} =k(1600-R)$.
+
+      To decide which is more reasonable, we can think about some special
+      cases; if nobody has heard the rumor ($R = 0$), we'd expect
+      $\frac{dR}{dt}$ to be 0 (nobody knows the rumor, so nobody can
+      spread it).  This is true in the original model but not in Lucy's
+      model, so the original model seems to make more sense. 
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        Could a similar model be used for the spread of an infectious disease?
+        Why or why not? (Or in what circumstances could it be used?)
+    \end{problem}
+
+    \begin{solution}
+        In epidemiology, a very simple model for the spread of an infectious
+        disease could be $\dfrac{dI}{dt}=kI(P-I)$, where $k$ is a constant, $I$
+        is the number of infected individuals, and $P$ is the population size.
+        In practice, epidemiologists use more complicated models that also take
+        into account the number of susceptible individuals $S$ and the number
+        of recovered individuals $R$. (This is called the SIR model.)
+
+        This model can also be used in ecology to model population growth, e.g.
+        $\dfrac{dP}{dt}=\dfrac{r}{K}P(K-P)$, where $P$ is population size,
+        $r$ is growth rate, and $K$ is the carrying capacity (the maximum
+        population an ecological system can support.) It can also be used
+        in chemistry to model reaction rates.
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+
+
+\probonly{\newpage}
+
+  \begin{framed}
+    \textbf{Key Idea 2.}  Differential equations can be used to model more
+    complicated situations.  When we want to do this, a key equation is
+    \begin{align*}
+      \text{overall rate of change} &= \text{(rate in)} - \text{(rate out)} \\
+      \textit{or} \hspace{0.5in} \text{overall rate of change} &= \text{(rate of
+        increase)} - \text{(rate of decrease)}
+    \end{align*}
+  \end{framed}
+
+   % \pspace{\newpage}
+
+\begin{enumerate}[resume]
+\item 
+
+  \note{Students often have trouble putting all of the information
+    together.  The first principle they need to recognize is that the rate
+    of change is (rate in) $-$ (rate out).  Some students will want the
+    rate in to involve $t$ somehow.  For instance, one common mistake it
+    to say the rate in is $10t$; what they seem to be thinking is that,
+    after $t$ minutes, the \emph{amount} that has been administered is
+    $10t$.  It may help to emphasize that the rate is a constant rate so
+    should not depend on $t$. Thinking about the units of $\frac{dM}{dt}$
+    may also help.}
+
+
+
+  \begin{problem}[1in]
+    A drug is being administered to a patient at a constant rate of $10$
+    mg/hr.  The patient metabolizes and eliminates the drug at a rate
+    proportional to the amount in his body. Let $M = M(t)$ be the amount
+    (in mg) of medicine in the patient's body at time $t$, where $t$ is
+    measured in hours.  Write a differential equation that models the
+    situation.
+  \end{problem}
+
+  \begin{solution}
+    The rate of change of medicine in the patient's body is equal to (rate
+    in) $-$ (rate out).  The rate in of medicine is $10$ mg/hr.  The rate
+    out is proportional to the amount of medicine in his body, so it's
+    $kM$ for some positive constant $k$.  Therefore, the appropriate model
+    is $\boxed{\frac{dM}{dt} = 10 - kM}$.
+  \end{solution}
+
+\item Estella opens a bank account with \$20,000. The account has a nominal
+annual interest rate of 4\% per year compounded continuously. She withdraws
+money at a rate of \$2400/year (about \$200/month.) 
+\begin{enumerate}
+    \item 
+    \begin{problem}[1in] Write a differential equation for $M(t)$,
+    the amount of money in her account at time $t$. What is the initial condition?
+    \end{problem}
+
+    \begin{solution}
+        The rate of change of $M(t)$ over time, $\frac{dM}{dt}$, is equal
+        to the rate at which Estella earns interest minus the rate at which
+        she withdraws money. The rate at which she earns interest is proportional
+        to $M(t)$, $0.04M$. She withdraws money at a constant rate of 
+        2400 (in dollars per year, and we assume that she withdraws money
+        continuously.) So \fbox{$\frac{dM}{dt}=0.04M-2400$.} The initial
+        condition is \fbox{$M(0)=20,000$.}
+    \end{solution}
+
+    \item Which of the following gives Estella's balance at time $t$?
+    \begin{enumerate}
+        \item $M(t)=20,000e^{0.04t}-2400t$
+        \probonly{\item $M(t)=60,000-40,000e^{0.04t}$}
+        \solonly{\item \fbox{$M(t)=60,000-40,000e^{0.04t}$}}
+    \end{enumerate}
+    \pspace{\vfill}
+
+    \begin{solution}
+        Let's check.
+        \begin{enumerate}
+            \item If $M(t)=20,000e^{0.04t}-2400t$, then 
+            $\frac{dM}{dt}=800e^{0.04t}-2400$. If we substitute $M(t)$ into
+            the right side of the differential equation, we get 
+            \begin{align*}
+            0.04M-2400 &= 0.04(20,000e^{0.04t}-2400t)-2400\\
+            &=800e^{0.04t}-96t-2400.
+            \end{align*}
+            This is not the same as $\frac{dM}{dt}$, so this is not a solution. 
+            \item If $M(t)=60,000-40,000e^{0.04t}$, then
+            $\frac{dM}{dt}=-1600e^{0.04t}$. If we substitute $M(t)$ into the
+            right side of the differential equation, we get
+            \begin{align*}
+            0.04M-2400 &= 0.04(60,000-40,000e^{0.04t})-2400\\
+            &=-1600e^{0.04t}.
+            \end{align*}
+            This is the same as $\frac{dM}{dt}$, so this is a solution.
+        \end{enumerate}
+    \end{solution}
+\end{enumerate}
+
+
+\probonly{\newpage}
+
+\item 
+
+  Dante borrows \$150,000 from the bank.  He pays money back at a rate of
+  \$1000 per month, while the bank charges him interest at a nominal
+  annual interest rate of 6\% per year compounded continuously.
+
+  \begin{enumerate}
+  \item
+
+    \note{I've made this a monthly payment rather than yearly for two
+      reasons: that's typically how mortgages are structured, and a
+      monthly payment feels more continuous than a yearly one.
+      Nonetheless, students may object to modeling the \$12000/year
+      continuously, so you may want to point out that we very often model
+      discrete phenomena continuously (e.g., when we model the number of
+      people in a town at time $t$).}
+
+    \begin{problem}[1in]
+      Write a differential equation that models $B(t)$, the balance Dante
+      owes the bank at time $t$, where $t$ is measured in years and $t =
+      0$ is the time at which Dante borrows the money.  \emph{Be careful
+        with units!} \emph{Note that for the purposes of our model, we will model
+        the payments, which total to \$12,000/year, as if they were being made
+        continuously.}
+    \end{problem}
+
+    \begin{solution}
+      $\frac{dB}{dt}$ is the rate of change of Dante's balance; since $B$
+      is in dollars and $t$ is in years, this rate should be in dollars
+      per year.  This rate is equal to (rate of increase due to interest)
+      $-$ (rate of decrease due to payments).  The rate of increase due to
+      interest is $0.06 B$, while the rate of decrease due to payments is
+      a constant \$1000 per month, or \$12,000 per year.  So,
+      $\boxed{\frac{dB}{dt} = 0.06B - 12,000}$.  We also have an initial
+      condition, $\boxed{B(0) = 150,000}$, since we know that Dante owes
+      \$150,000 at $t = 0$.
+    \end{solution}
+
+  \item
+
+    \note{Here, I'd like to make the point that figuring this out directly
+      from the scenario is very hard; however, once we've written down the
+      differential equation, it's easy to check whether a given function
+      satisfies the differential equation.  What I want them to get out of
+      this problem in the end is that writing down $B(t)$ directly is
+      actually very hard, but it's easy to model the situation using
+      differential equation.  I'll probably say a little bit about the
+      fact that there are methods that allow us to find the solution of
+      the differential equation methodically, although we won't cover
+      those in this course.
+
+      I'll also try to use the scenario to convince students that there is
+      exactly one function that satisfies the differential equation and
+      initial condition.
+    }
+
+    \begin{problem}[\vfill]
+      Which of the following gives Dante's balance at time $t$? 
+      \begin{enumerate}[label=\protect\maybecircle{\roman*.}]
+      \plainitem $B(t) = 150,000 e^{0.06 t} - 12,000 t$
+      \circleitem $B(t) = 200,000 - 50,000 e^{0.06 t}$
+      \plainitem $B(t) = (150,000 - 12,000 t) e^{0.06 t}$
+      \end{enumerate}
+    \end{problem}
+
+    \begin{solution}
+      We simply need to determine which of the choices satisfies both the
+      differential equation $\frac{dB}{dt} = 0.06 B - 12,000$ and the
+      initial condition $B(0) = 150,000$.  Let's look at each one:
+      \begin{enumerate}[label=\roman*.]
+      \item If $B(t) = 150,000 e^{0.06 t} - 12,000 t$, then $\frac{dB}{dt}
+        = 0.06 (150,000 e^{0.06 t}) - 12,000$ while $0.06 B - 12,000 =
+        0.06 (150,000 e^{0.06 t} - 12,000 t) - 12,000$.  So,
+        $\frac{dB}{dt} \neq 0.06 B - 12,000$.
+      \item If $B(t) = 200,000 - 50,000 e^{0.06 t}$, then $\frac{dB}{dt} =
+        - 0.06 (50,000 e^{0.06 t})$ while $0.06 B - 12,000 = 0.06 \left(
+          200,000 - 50,000 e^{0.06 t} \right) - 12,000$, which simplifies
+        to $- 0.06 (50,000 e^{0.06 t})$.  These are equal, so we at least
+        have a solution of the differential equation.  We should also see
+        if this function satisfies the initial condition: $B(0) = 200,000
+        - 50,000 e^{0} = 150,000$.  So, this must be Dante's balance at
+        time $t$.
+      \item We don't need to check this one, because we already figured
+        out that $B(t) = 200,000 - 50,000 e^{0.06 t}$.  (There is exactly
+        one function that satisfies both the differential equation and the
+        initial condition.)
+      \end{enumerate}
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+
+\end{document}

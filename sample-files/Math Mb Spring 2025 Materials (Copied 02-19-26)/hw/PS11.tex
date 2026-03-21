@@ -1,0 +1,400 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 11 - Derivatives of Trigonometric Functions}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{enumerate}
+
+\item 
+
+\begin{grading}
+6 points. 2 per part.
+\end{grading}
+
+Use the derivatives of sine and cosine and either the Product Rule +
+  Chain Rule or the Quotient Rule to show the following:
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\dfrac{d}{dx} (\sec x) = \sec x \tan x$
+      \end{problem}
+
+      \begin{solution}
+        We can rewrite $\sec x$ as $\frac{1}{\cos x}$ and use the Quotient
+        Rule, or we can rewrite it as $(\cos x)^{-1}$ and use the Chain
+        Rule; here, we'll use the latter strategy:
+        \begin{align*}
+          \frac{d}{dx} (\sec x) &= \frac{d}{dx} \left[ (\cos x)^{-1}
+          \right] \\
+          &= - (\cos x)^{-2} (-\sin x) \\
+          &= \frac{\sin x}{\cos^2 x} \\
+          &= \frac{1}{\cos x} \cdot \frac{\sin x}{\cos x} \\
+          &= \sec x \tan x
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\dfrac{d}{dx} (\csc x) = -\csc x \cot x$
+      \end{problem}
+
+      \begin{solution}
+        We can rewrite $\csc x$ as $\frac{1}{\sin x} = (\sin x)^{-1}$ and
+        use the Chain Rule:
+        \begin{align*}
+          \frac{d}{dx} (\csc x) &= \frac{d}{dx} \left[ (\sin x)^{-1}
+          \right] \\
+          &= - (\sin x)^{-2} (\cos x) \\
+          &= - \frac{\cos x}{\sin^2 x} \\
+          &= - \frac{1}{\sin x} \cdot \frac{\cos x}{\sin x} \\
+          &= - \csc x \cot x
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\dfrac{d}{dx} (\cot x) = - \csc^2 x$
+      \end{problem}
+
+      \begin{solution}
+        We can rewrite $\cot x = \frac{\cos x}{\sin x}$ and use the
+        Quotient Rule:
+        \begin{align*}
+          \frac{d}{dx} (\cot x) &= \frac{d}{dx} \left( \frac{\cos x}{\sin
+              x} \right) \\
+          &= \frac{(\sin x)(-\sin x) - (\cos x) (\cos x)}{(\sin x)^2} \\
+          &= \frac{ - (\sin^2 x + \cos^2 x)}{\sin^2 x} \\
+          &= - \frac{1}{\sin^2 x} \\
+          &= - \csc^2 x
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}
+    \probonly{}
+
+  \probonly{\emph{It's helpful to memorize these so that you can more
+      easily tackle derivatives such as the one in 
+      {{3(e)}}.}}
+
+\item 
+
+\begin{grading}
+5 points.
+\end{grading}
+
+  \begin{problem}[\vfill\newpage]
+    Use linear approximation of $\tan x$ at $x=0$ in order
+    to approximate $\tan 0.1$.
+  \end{problem}
+
+  \begin{solution}
+    \ideas{The idea of linear approximation is that the line tangent to
+      a graph $y = f(x)$ at $x = a$ is a good approximation for the actual
+      graph around $x = a$.}
+    We first need to pick a function to approximate; the obvious choice is
+    $f(x) = \tan x$.  We want to approximate $f(0.1)$, so we should pick a
+    value of $a$ near $0.1$ for our approximation; let's use $a = 0$,
+    since we can evaluate $f(0)$ exactly.
+
+    We'd like to find the line tangent to the graph of $f(x) = \tan x$ at
+    $x = 0$.  The slope of this tangent line is $f'(0)$; since $f'(x) =
+    \sec^2 x$, $f'(0) = \sec^2 (0) = \frac{1}{\cos^2 (0)} = 1$.  We also
+    know that $(0, f(0)) = (0, 0)$ is a point on the tangent line, so the
+    tangent line has equation $y - 0 = 1 (x - 0)$, or $y = x$.  Therefore,
+    $\tan x \approx x$ for $x$ near 0.  Plugging in $x = 0.1$ gives $\tan
+    (0.1) \approx \boxed{0.1}$.    
+  \end{solution}
+
+\item
+
+\begin{grading}
+15 points, as follows: 2/2/3/5/3
+\end{grading}
+
+Example 21.1 on page 692 in
+  Gottlieb may help with the following.
+
+ Differentiate the following; you need not simplify
+  your answers.  (\emph{Hint:} You will need logarithmic differentiation
+  for one part.)
+
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $y =\cos^2x$
+      \end{problem}
+
+      \begin{solution}
+        $\displaystyle
+        \frac{d}{dx}\left(\fcolorbox{red}{white}{$(\fcolorbox{blue}{white}{$\cos
+              x$})^2$}\right)= 2 (\cos x)(-\sin x)$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $y = \cos(x^2)$
+      \end{problem}
+
+      \begin{solution}
+        $\displaystyle \frac{d}{dx}\fcolorbox{red}{white}{$\cos\left(
+            \fcolorbox{blue}{white}{$x^{2}$}
+          \right)$}=-2x\sin\left(x^{2}\right)$
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{2}]
+        $y = x\tan^2 x$
+      \end{problem}
+
+      \begin{solution}
+        $\displaystyle \frac{d}{dx}
+        \left(\fcolorbox{green}{white}{$\displaystyle x$}\cdot
+          \fcolorbox{green}{white}{$\displaystyle \tan^2 x$} \right) =
+        x\cdot \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle
+            \fcolorbox{blue}{white}{$\displaystyle \tan x$}^ { 2}
+            $}\right)+ \tan^2 x = x\cdot 2 \tan x \cdot \sec^2 x + \tan^2
+        x$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\nstretch{3}]
+        $y = 7 [\cos(5x)+3]^x$
+      \end{problem}
+
+      \begin{solution}
+        \ideas{Since the base and exponent both depend on $x$, we should use
+          logarithmic differentiation.}  We start with the given equation:
+        \begin{align*}
+          y &= 7 [\cos(5x)+3]^x \\
+          \intertext{Take the natural log of both sides and simplify the
+            right side:} %
+          \ln y &= \ln \Big( 7 [\cos(5x)+3]^x \Big) \\
+          &= \ln 7 + \ln \Big( [\cos(5x)+3]^x \Big) \\
+          &= \ln 7 + x \ln \Big( \cos(5x) + 3 \Big) \\
+          \intertext{Differentiate both sides with respect to $x$:} %
+          \frac{d}{dx} (\ln y) &= \frac{d}{dx} \left[ \ln 7 +
+            \fcolorbox{green}{white}{$\displaystyle x$}\cdot
+            \fcolorbox{green}{white}{$\displaystyle \ln\Big(\cos (5x)+
+              3\Big)$} \right] \\
+          \frac{1}{y} \frac{dy}{dx} &= x\cdot \frac{d}{dx}
+          \left(\fcolorbox{red}{white}{$\displaystyle
+              \ln\left(\fcolorbox{blue}{white}{$\displaystyle \cos (5x)+
+                  3$}\right)$}\right)+ \ln\Big(\cos (5x)+ 3\Big) \\
+          &= x\cdot \frac{1}{\cos (5x)+ 3}\cdot \left(-\sin (5x)\cdot
+            5\right)+ \ln\Big(\cos (5x)+ 3\Big) \\
+          &= - \frac{5 x \sin(5x)}{\cos (5x) + 3} + \ln \Big( \cos(5x) + 3
+          \Big) \\
+          \intertext{Solve for $\frac{dy}{dx}$:} %
+          \frac{dy}{dx} &= y \left[ - \frac{5 x \sin(5x)}{\cos (5x) + 3} +
+            \ln \Big( \cos(5x) + 3
+            \Big) \right] \\
+          &= \boxed{7 [\cos(5x)+3]^x \left[ - \frac{5 x \sin(5x)}{\cos
+                (5x) + 3} + \ln \Big( \cos(5x) + 3 \Big) \right]}
+        \end{align*}        
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{3}]
+        $y = \sqrt{\sec(2x^3)}$
+      \end{problem}
+
+      \begin{solution}
+        \begin{align*}
+          \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle
+              \fcolorbox{blue}{white}{$\displaystyle  \sec \left(2 x^ { 3}
+                \right)$}^ { \frac{1}{2}} $}\right) = {} & \frac{1}{2}
+          \sec \left(2 x^ { 3} \right)^ { -\frac{1}{2}} \cdot \frac{d}{dx}
+          \left(\fcolorbox{red}{white}{$\displaystyle \sec
+              \left(\fcolorbox{blue}{white}{$\displaystyle 2 x^ { 3}
+                  $}\right)$}\right) \\ 
+          = {} & \frac{1}{2} \sec \left(2 x^ { 3} \right)^ { -\frac{1}{2}}
+          \cdot \sec \left(2 x^ { 3} \right) \tan \left(2 x^ { 3}
+          \right)\cdot 6 x^ { 2}  
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}
+
+    \probonly{}
+
+\item 
+
+\begin{grading}
+10 points. 5 for each part. In both parts, students should either reference the connection with the limit definition of the derivative at $x=0$, or mention that the limits imply that $\sin(x)\approx x$ and $\cos(x)\approx 1$ near $x=0$.
+\end{grading}
+
+\begin{enumerate}
+
+\item
+
+\begin{problem}[\stretch{2}]
+Find the equation of the tangent line to $y=\sin x$ at $x=0$. What does the limit $\displaystyle \lim_{x\to0} \frac{\sin x}{x} = 1$ have to do with the tangent line?
+\end{problem}
+
+\begin{solution}
+We start by finding $\frac{dy}{dx}$ when $x=0$. $\frac{dy}{dx}=
+\frac{d}{dx}\sin x = \cos x$, so the slope of the tangent line at
+$x=0$ is $1$. Using the point $(0,0)$, we find that 
+the equation of the tangent line is $\boxed{y=x}$.
+
+We have shown in class that $\displaystyle \lim_{x\to0} \frac{\sin x}{x} = 1$. This is the limit definition of the derivative applied to $\sin x$ at $x=0$, so it gives us the slope of the tangent line at $x=0$. 
+
+This means than for $x$ very small, i.e. very close to 0, $\dfrac{\sin x}{x}
+\approx 1$. That is, $\sin x \approx x$. Notice that this \textbf{is} the linear
+approximation of $\sin x$ at $x=0$. 
+\end{solution}
+
+
+
+\item
+\begin{problem}[\nstretch{2}]
+Find the equation of the tangent line to $\cos x$ at $x=0$.
+(You can find this by observation without doing any calculus.) What does the limit $\displaystyle\lim_{x\to0}\frac{\cos x-1}{x}=0$ have to do with the tangent line?
+\end{problem}
+
+\begin{solution}
+We can see that the tangent line to $y=\cos x$ at $x=0$ is horizontal.
+Thus, the equation of the tangent line is $y=1$. 
+
+$\lim\limits_{x\to0}\dfrac{\cos x -1}{x}$ is the definition of the derivative of $\cos x$ at $x=0$, so the slope of the tangent line at $x=0$ is $0$. 
+
+Also, for small $x$, $\dfrac{\cos x -1}{x}
+\approx0$ implies $\cos x - 1 \approx 0$, or $\cos x \approx 1$.  
+\end{solution}
+
+\end{enumerate}
+
+\item 
+% 21.2.16
+% Gottlieb 21.2.16
+
+\begin{grading}
+5 points.
+\end{grading}
+
+  \begin{problem}[\vfill]
+    Radians are the best angle unit for doing
+    calculus with trig functions, because otherwise the derivatives are more complicated, as we'll see in this problem. Suppose we define a
+    function $\operatorname{sindeg}(x)$ that gives the sine of the \textbf{number of degrees} $x$. In terms of our usual function $\sin(\theta)$ that uses radians,
+    \[\operatorname{sindeg}(x) =  \sin (\tfrac{\pi
+        }{180}x)\] where the factor $\frac{\pi}{180}$ is needed to convert from degrees to radians.\footnote{For example, $\operatorname{sindeg}(30) = \sin
+      (\frac{\pi}{6})$.}  Find the derivative of $\operatorname{sindeg}(x)$.
+    Is $\operatorname{cosdeg}(x)=\cos(\frac{\pi}{180}x)$ the derivative of $\operatorname{sindeg}(x)$?
+  \end{problem}
+
+  \begin{solution} % solution written by ??
+    \begin{align*}
+    \frac{d}{dx} \operatorname{sindeg}(x)
+    &= \frac{d}{dx}  \sin( \tfrac{\pi 
+    }{180}x) \\[4pt]
+    &= \cos ( \tfrac{\pi}{180}x) \cdot
+    \tfrac{\pi}{180} \\[4pt]
+    &=\operatorname{cosdeg}(x) \cdot
+    \tfrac{\pi}{180}
+    \end{align*}
+    So, the derivative of $\operatorname{sindeg}(x)$ is not $\operatorname{cosdeg}(x)$.
+  \end{solution}  
+
+\item 
+
+\begin{grading}
+10 points. 6 for part (a), 4 for part (b).
+\end{grading}
+
+In this problem, you'll look at the function $f(x) =
+  e^{-x} \cos x$.
+  \begin{enumerate}
+  \item
+    \begin{problem}[\nstretch{3}]
+      Find all critical points of $f(x) = e^{-x} \cos x$ on $[0, 2\pi]$. 
+    \end{problem}
+
+    \begin{solution}
+      First, let's find $f'(x)$; using the Product Rule (and the Chain
+      Rule on $e^{-x}$), $f'(x) = - e^{-x} \cos x + e^{-x} (-\sin x) = -
+      e^{-x} (\cos x + \sin x)$.  This is never undefined, so we just need
+      to figure out when it's 0.  $e^{-x}$ is never 0, so we're solving
+      \begin{align*}
+        \cos x + \sin x &= 0 \\
+        \shortintertext{Let's first solve for $\tan x$:}
+        \sin x &= - \cos x \\
+        \frac{\sin x}{\cos x} &= -1 \\
+        \tan x &= - 1 \\
+        \intertext{The solutions of this equation on $[0, 2 \pi]$ are}
+        x &= \frac{3 \pi}{4}, \frac{7 \pi}{4}
+      \end{align*}
+      So the critical points are $\boxed{\frac{3
+          \pi}{4}, \frac{7 \pi}{4}}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Find the absolute minimum and maximum values of $f(x) = e^{-x} \cos
+      x$ on $[0, 2 \pi]$.  Where do these occur?
+      \probonly{\emph{Check by graphing $f(x)$ using a calculator or computer.}} 
+    \end{problem}
+
+    \begin{solution}
+      The easiest strategy is to evaluate $f$ at the critical points and the endpoints.
+      \begin{align*}
+        f(0) &= 1 \\
+        f\left(\frac{3\pi}{4}\right) &=
+        -\frac{1}{\sqrt2}e^{-3\pi / 4} \\
+        f\left(\frac{7\pi}{4}\right) &=
+        \frac{1}{\sqrt2}e^{- 7\pi / 4}\\
+        f(2\pi) &= e^{-2\pi}
+      \end{align*}
+      The smallest of these values is $f \left( \frac{3 \pi}{4} \right)$,
+      as that's the only negative value.  The largest of these values is
+      $1$ (it's clear the other three values are $< 1$).  
+      \begin{framed}
+        So, the absolute maximum value is $1$ (occurring at $x = 0$), and
+        the absolute minimum value is $-\frac{1}{\sqrt2}e^{-3\pi / 4}$
+        (occurring at $x = \frac{3 \pi}{4}$).
+      \end{framed}
+    \end{solution}
+
+  \end{enumerate}
+\end{enumerate}
+
+
+\psreflection{
+\textbf{Reflect Back.} Your first midterm exam is on Tuesday, March 11th,
+    in a little over two weeks. You should reflect back on what you've learned and do
+    at least one practice exam.
+
+    How to study for an exam that covers several weeks of material:
+    \begin{itemize}[topsep=0pt]
+        \item Think about what we've studied and how the material
+        is connected. How would you summarize what we've learned to someone who hasn't taken the class? Look for themes and problem-solving strategies.
+
+        \item The best way to study is to do problems: that's why
+        you've got several practice exams. You can use one of them as
+        a diagnostic to guide your studying. Do \textbf{not} rely on notes or solutions while doing problems. This will give you a false sense of your ability. They are learning resources, not problem-solving aids.
+    \end{itemize}
+    More guidelines can be found on the exams page. Start studying early.
+
+For next time, read \S 21.3 in Gottlieb.
+}
+  
+\end{document}

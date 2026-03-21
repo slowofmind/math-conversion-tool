@@ -1,0 +1,512 @@
+\PassOptionsToPackage{sols}{handout}
+\documentclass[main]{subfiles}
+\setcounterrefbeforedot{chapter}{m-ws6-2}
+\setcounterrefafterdot{section}{m-ws6-2}
+\addtocounter{section}{-1}
+\usepackage{solutions}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptersix}
+}{}
+
+\section{More Integration by Substitution} \label{ws6-2}
+
+\begin{problemonly}
+    \begin{framed}
+
+\textbf{Key Ideas}:
+
+\begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+
+\item You should be able to use substitution to rewrite certain
+  integrals in a more manageable form.  (For example, if we substitute
+  $u = x + 2$ in the integral $\displaystyle \int x \sqrt{x + 2}\,dx$,
+  then we can rewrite the integral as a difference of two simpler
+  integrals.)
+
+\item You should develop flexibility with integration by substitution
+  and feel more comfortable recognizing when to use substitution.  For
+  example, the following integrals look similar but are evaluated using
+  very different steps:
+  \[ \int \frac{1}{x+1} \, dx \qquad \int \frac{1}{x^2+1} \, dx \qquad
+  \int \frac{x}{x^2+1} \, dx \qquad \int \frac{x^2 +1}{x} \, dx\]
+
+\end{itemize}
+\end{framed}
+\end{problemonly}
+
+\begin{enumerate}
+\item 
+
+  \note{The point here is to give students a sense of the types of
+    integrals that we can do using just algebra (without substitution), so
+    that we have a ``target'' for our later substitutions.}
+
+  \textbf{Warm-Up.}  Evaluate the following integrals; you should
+  \textit{not} need to use substitution, only algebra.
+
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\stretch{0.5}]
+        $\displaystyle \int (u - 5) \sqrt{u}\,du$
+      \end{problem}
+
+      \begin{solution} % originally by Henry Shin, modified by Janet
+        If we multiply out the integrand, then we can do the integral
+        easily: 
+        \begin{align*}
+          \int (u -5) \sqrt{u}\,du 
+          & =  \int \left( u^{3/2} -5 u^{1/2} \right) du \\
+          & =  \boxed{\frac{2}{5}u^{5/2} - \frac{10}{3} u^{3/2} + C} 
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.5}]
+        $\displaystyle \int \frac{(t + 1)^2}{t}\,dt$
+      \end{problem}
+
+      \begin{solution}
+        Let's first rewrite the numerator: 
+        \begin{align*}
+          \int \frac{(t + 1)^2}{t}\,dt &= \int \frac{t^2 + 2t + 1}{t}\,dt \\
+          &= \int \left( \frac{t^2}{t} + \frac{2t}{t} + \frac{1}{t}
+          \right) dt \\
+          &= \int \left( t + 2 + \frac{1}{t} \right) dt \\
+          &= \boxed{\frac{1}{2} t^2 + 2t + \ln |t| + C}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\nstretch{0.5}]
+        $\displaystyle \int \frac{2u + 3}{\sqrt{u}}\,du$
+      \end{problem}
+
+      \begin{solution}
+        Here, we have a sum in the numerator, so we can split the
+        integrand into a sum of two fractions:
+        \begin{align*}
+          \int \frac{2u + 3}{\sqrt{u}}\,du &= \int \left( \frac{2u}{\sqrt{u}}
+            + \frac{3}{\sqrt{u}} \right) du \\
+          &= \int \left( 2u^{1/2} + 3 u^{-1/2} \right) du \\
+          &= \boxed{\frac{4}{3} u^{3/2} + 6 u^{1/2} + C}
+        \end{align*}
+      \end{solution}
+    \end{enumerate}    
+    \probonly{}
+
+\item 
+
+  \textit{So far, when we've used substitution, we've generally tried to
+    pick $u$ so that we also see $du$ in the integral.  However, sometimes
+    substitution is used simply to rewrite an integral in a friendlier
+    form.  This is the case in each of the following problems.}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int x \sqrt{x+5}\,dx$.  (Hint: Let $u = x + 5$.  What
+      is $x$ in terms of $u$?)
+    \end{problem}
+
+    \begin{solution} % originally by Henry Shin, modified by Janet
+      If $u = x+5$, then $x = u-5$ and $du =dx$, so
+      \begin{align*}
+        \int x \sqrt{x+5} \,dx & =  \int (u -5) \sqrt{u}\,du \\
+        \intertext{This is just the indefinite integral from
+          {{{{\#1}}(a)}}, so it's equal to} %
+        & =  \frac{2}{5}u^{5/2} - \frac{10}{3} u^{3/2} + C \\
+        & = \boxed{\frac{2}{5} (x+5)^{5/2} - \frac{10}{3} (x+5)^{3/2} + C}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int \frac{2x} {\sqrt{x - 3}}\,dx$
+    \end{problem}
+
+    \begin{solution} % originally by Henry Shin, modified by Janet
+      If we substitute $u = x - 3$, then $x = u + 3$ and $du = dx$, so
+      \begin{align*}
+        \int \frac{2x}{\sqrt{x - 3}}\,dx & = \int \frac{2 (u +
+          3)}{\sqrt{u}} du \\
+          &= 2\int \frac{u +
+          3}{\sqrt{u}} du \\
+          &= 2\int (u^{1/2}+3u^{-1/2})\, du \\
+        &= 2 \left( \frac{2}{3} u^{3/2} + 6 u^{1/2} \right) + C \\
+        &=  \frac{4}{3} u^{3/2} + 12 u^{1/2} + C \\
+        & = \boxed{\frac{4}{3}(x - 3)^{3/2} + 12 (x - 3)^{1/2} + C}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      $\displaystyle \int \frac{7x}{x + 3}\,dx$
+    \end{problem}
+
+    \begin{solution}
+      If we substitute $u = x + 3$, then $x = u - 3$ and $dx = du$, so
+      \begin{align*}
+        \int \frac{7x}{x + 3}\,dx &= \int \frac{7(u - 3)}{u}\,du \\
+        & = 7\int \left( 1 - \frac{3}{u} \right) du \\
+        & = 7(u - 3 \ln |u|) + C \\
+        &= 7u - 21\ln|u| + C \\
+        & = \boxed{7(x+3) - 21 \ln |x + 3| + C}
+      \end{align*}
+      (This can be written more simply as just $7x - 21 \ln |x + 3| + C$.) 
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+  \note{These are practice with both ``types'' of substitution (reversing
+    the Chain Rule and simplifying algebraically).  They require quite a
+    lot of flexibility.}
+
+  Evaluate each of the following integrals.
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\stretch{0.5}]
+      $\displaystyle \int \frac{e^{\sqrt{x}}}{\sqrt{x}}\,dx$
+    \end{problem}
+
+    \begin{solution}
+      It looks like a good substitution is \sub{$u = \sqrt{x} = x^{1/2}$}
+      because it's the inner function in the composition $e^{\sqrt{x}}$,
+      and we also see something related to $du = \frac{1}{2}
+      x^{-1/2}\,dx$, namely \subd{$2\,du = x^{-1/2}\,dx =
+        \dfrac{1}{\sqrt{x}}\,dx$}.  Then,
+      \begin{align*}
+        \int \frac{e^{\sub{\sqrt{x}}}}{\subd{\sqrt{x}}}\,\subd{dx} &= 
+        \int e^\sub{u} \cdot \subd{2\,du} \\
+        &= 2 \int e^u\,du \\
+        &= 2 e^u + C \\
+        &= \boxed{2 e^{\sqrt{x}} + C}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \note{This is quite challenging.  Often their first guess is $u =
+      x^2 + 1$, and from there you can get them to see that this works
+      well for $\displaystyle \int \frac{2x}{x^2 + 1}\,dx$, which
+      suggests splitting up the given integral.}
+
+    \begin{problem}[\vfill]
+      $\displaystyle \int_0^1 \frac{2x+3}{x^2+1}\,dx$
+    \end{problem}
+
+    \begin{solution}
+      We can rewrite this integral as a sum of two integrals and work on
+      the two integrals separately.\footnote{Is it obvious when you look
+        at this problem that this is the right first step?  Probably not!
+        But, as you practice more, you'll start to develop your intuition
+        about how to tackle integrals like this.}
+      \begin{equation} \label{eq:substitution-split-into-two-1}
+ \int_0^1
+        \frac{2x+3}{x^2+1}\,dx = \int_0^1 \frac{2x}{x^2+1}\,dx + \int_0^1
+        \frac{3}{x^2+1}\,dx
+      \end{equation}
+      The second integral is one you should just recognize:
+      \begin{align*}
+        \int_0^1 \frac{3}{x^2+1}\,dx &= 3 \arctan x \Big|_0^1 \\
+        &= 3 \cdot \frac{\pi}{4} - 3 \cdot 0 \\
+        &= \frac{3 \pi}{4}
+      \end{align*}
+      The first integral is not one we just recognize, but the
+      substitution \sub{$u = x^2 + 1$} looks useful, both because this is
+      the denominator and because we see \subd{$du = 2x\,dx$} in the
+      integral.  As $x$ goes from $0$ to $1$, $u = x^2 + 1$ goes from $0^2
+      + 1 = 1$ to $1^2 + 1 = 2$.
+      \begin{align*}
+        \int_0^1 \frac{\subd{2x}}{\sub{x^2+1}}\,\subd{dx} &= \int_1^2
+        \frac{1}{\sub{u}}\,\subd{du } \\
+        &= \ln |u| \Big|_1^2 \\
+        &= \ln 2 - \ln 1 \\
+        &= \ln 2
+      \end{align*}
+      Putting this all together with equation
+      \eqref{eq:substitution-split-into-two-1}, $\displaystyle \int_0^1
+      \frac{2x+3}{x^2+1}\,dx = \boxed{\ln 2 + \frac{3 \pi}{4}}$.
+    \end{solution}
+
+  \item 
+    \begin{problem}[\vfill\newpage]
+      $\displaystyle \int y \cdot \sqrt[3]{2y+5}\,dy$
+    \end{problem}
+
+    \begin{solution}
+      A reasonable substitution to try is \sub{$u = 2y + 5$}, since it's
+      the inner function in the composition $\sqrt[3]{2y + 5}$.  With this
+      substitution, $du = 2\,dy$, so \subd{$\frac{du}{2} = dy$}.  We also
+      see a $y$ by itself in the integral, but we can express this in
+      terms of $u$: the equation $u = 2y + 5$ can be rewritten as
+      \sube{$\frac{u - 5}{2} = y$}: 
+      \begin{align*}
+        \int \sube{y} \sqrt[3]{\sub{2y + 5}}\,\subd{dy} &= \int
+        \sube{\frac{u - 5}{2}} \sqrt[3]{\sub{u}} 
+        \cdot \subd{\frac{1}{2}\,du} \\
+        &= \frac{1}{4} \int (u - 5) \sqrt[3]{u}\,du \\
+        &= \frac{1}{4} \int \left( u^{4/3} - 5 u^{1/3} \right) du \\
+        &= \frac{1}{4} \left( \frac{3}{7} u^{7/3} - \frac{15}{4}
+          u^{4/3} \right) + C \\
+        &= \boxed{\frac{1}{4} \left( \frac{3}{7} (2y + 5)^{7/3} -
+            \frac{15}{4} (2y + 5)^{4/3} \right) + C}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int e^{3x} \sqrt{e^x + 2}\,dx$
+    \end{problem}
+
+    \begin{solution}
+      A reasonable substitution to try is \sub{$u = e^x + 2$}, since it's
+      the inner function in the composition $\sqrt{e^x + 2}$.  Then,
+      \subd{$du = e^x\,dx$}, which might not look promising at first since
+      we don't see this in the integral.  However, if we rewrite $e^{3x}$
+      as $e^{2x} e^x$, then we do see $du$ in the integral:
+      \begin{align*}
+        \int e^{3x} \sqrt{e^x + 2}\,dx &= \int e^{2x} \subd{e^x}
+        \sqrt{\sub{e^x + 2}}\,\subd{dx} \\
+        \intertext{However, we still have to figure out what to do with
+          $e^{2x}$.  We can rewrite it as $(e^x)^2$ or $e^x \cdot e^x$,
+          and the substitution $u = e^x + 2$ can be rewritten as \sube{$u
+            - 2 = e^x$}:} %
+        &= \int \left( \sube{e^x} \right)^2 \subd{e^x}
+        \sqrt{\sub{e^x + 2}}\,\subd{dx} \\
+        &= \int \left( \sube{u - 2} \right)^2 \sqrt{\sub{u}}\, \subd{du} \\
+        &= \int (u^2 - 4u + 4) u^{1/2}\,du \\
+        &= \int \left( u^{5/2} - 4u^{3/2} + 4u^{1/2} \right)\,du \\
+        &= \frac{2}{7} u^{7/2} - \frac{8}{5} u^{5/2} + \frac{8}{3}
+        u^{3/2} + C \\
+        &= \boxed{\frac{2}{7} (e^x + 2)^{7/2} - \frac{8}{5} (e^x +
+          2)^{5/2} + \frac{8}{3} (e^x + 2)^{3/2} + C}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int \frac{e^x}{e^{2x} + 2 e^x + 1}\,dx$
+    \end{problem}
+
+    \begin{solution}
+      There's not an obvious substitution to use here, but we might try
+      \sub{$u = e^x$} because everything in the integral can be written in
+      terms of that, and we see \subd{$du = e^x\,dx$} in the integral:
+      \begin{align*}
+        \int \frac{e^x}{e^{2x} + 2 e^x + 1}\,dx &= \int
+        \frac{\subd{e^x}}{(\sub{e^x})^2 + 2 \sub{e^x} + 1}\,\subd{dx} \\ 
+        &= \int \frac{1}{u^2 + 2u + 1}\,du \\
+        &= \int \frac{1}{(u + 1)^2}\,du \\
+        \intertext{Now, we see a composition of functions, so we might try
+          substituting for the inner function: if \sub{$v = u + 1$}, then
+          \subd{$dv = du$}, and 
+          so the previous integral can be rewritten as}
+        &= \int \frac{1}{\sub{v}^2}\,\subd{dv} \\
+        &= \int v^{-2}\,dv \\
+        &= - v^{-1} + C \\
+        &= - \frac{1}{v} + C \\
+        &= - \frac{1}{u + 1} + C \\
+        &= \boxed{- \frac{1}{e^x + 1} + C}
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+  
+  \pspace{\newpage}
+
+
+\item  It is 10 am, and five ants have found their way into a picnic
+  basket.  Ants are notorious followers, so ants from all over the
+  vicinity follow their five brethren into the basket. The culinary treat
+  awaiting them is unsurpassed elsewhere, so once the ants find their way
+  into the basket they choose not to leave.  Suppose the rate at which
+  ants are climbing into the basket is well modeled by $100 e^{-0.2t}$
+  ants per hour, where $t=0$ is the benchmark hour of 10 am.
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      How many ants are in the basket at 1 pm?
+    \end{problem}
+
+    \begin{solution}
+      Since there are 5 ants at 10 am (which is $t = 0$), the number of
+      ants at 1 pm ($t = 3$) is
+      \begin{align*}
+        5 + \int_0^3 100 e^{-0.2t}\,dt &= 5 + \left( -500
+          e^{-0.2t} \Big|_0^3 \right) \\
+        &= \boxed{5 - 500 e^{-0.6} + 500}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      How many ants are in the basket $x$ hours after 10 am?
+    \end{problem}
+
+    \begin{solution}
+      Using exactly the same idea as in the previous part, the number of
+      ants $x$ hours after 10 am is
+      \begin{align*}
+        5 + \int_0^x 100 e^{-0.2t}\,dt &= 5 + \left( -500
+          e^{-0.2t} \Big|_0^x \right) \\
+        &= \boxed{5 - 500 e^{-0.2 x} + 500}
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\pspace{\newpage}
+
+\item 
+
+  Suppose $g$ is a mysterious function, and the only thing you know
+  about it is that $\displaystyle \int_0^{12} g(x)\,dx = \pi$.  For each
+  of the following integrals, decide whether you have enough information
+  to evaluate the integral; if so, evaluate it.
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\stretch{0.3}]
+        $\displaystyle \int_0^{12} g(3x)\,dx$
+      \end{problem}
+
+      \begin{solution}
+        There is \fbox{not enough information}.  (As you can see in the
+        next part, substituting $u = 3x$ doesn't help.)  We can understand
+        why graphically; suppose $g$ looks like this.  The only
+        information we're given is that the green area is $\pi$:
+        \begin{center}
+          \begin{tikzpicture}[declare
+            function={f(\x)=(\x<=4*pi)*(\x/1.2^\x+1.5)+
+              (\x>4*pi)*(0.5*(5.542254215512511 +
+              abs(sin(deg(0.5*\x)))));}]
+            \begin{axis}[ymin=0, xtick={12}, ytick=\empty, width=2.5in,
+              height=1.5in, clip=false]
+              \addplot+[domain=0:12, plusarea] { f(x) } \closedcycle; %
+              \addplot+[domain=0:12*pi, samples=121] { f(x) } node[right]
+              {$y = g(x)$}; %
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+        The graph of $g(3x)$ is stretched horizontally to be $\frac{1}{3}$
+        as wide, so here's how we picture $\displaystyle \int_0^{12}
+        g(3x)$:
+        \begin{center}
+          \begin{tikzpicture}[declare
+            function={f(\x)=(\x<=4*pi)*(\x/1.2^\x+1.5)+
+              (\x>4*pi)*(0.5*(5.542254215512511 +
+              abs(sin(deg(0.5*\x)))));}]
+            \begin{axis}[ymin=0, xtick={12}, ytick=\empty, width=2.5in,
+              height=1.5in, clip=false]
+              \addplot+[domain=0:12, fillregion] { f(3*x) }
+              \closedcycle; %
+              \addplot+[domain=0:12*pi, samples=181] { f(3*x) }
+              node[right] {$y = g(3x)$}; %
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+        But there's no way for us to find this area because we can't
+        express it simply in terms of the green area above, which is the
+        only area we know.
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.3}]
+        $\displaystyle \int_0^4 g(3x)\,dx$
+      \end{problem}
+
+      \begin{solution}
+        We can evaluate this by substituting \sub{$u = 3x$}; then, $du =
+        3\,dx$, so \subd{$\frac{du}{3} = dx$}.  Since $x$ goes from $0$ to
+        $4$, $u = 3x$ goes from $0$ to $12$; thus,
+        \begin{align*}
+          \int_0^{4} g(\sub{3x})\,\subd{dx} &= \int_0^{12} g
+          (\sub{u})\,\subd{\frac{du}{3}} \\
+          &= \frac{1}{3} \int_0^{12} g(u)\,du \\
+          &= \boxed{\frac{\pi}{3}}
+        \end{align*}
+        This should also make sense graphically; the graph of $g(3x)$ is
+        obtained by stretching the graph of $g(x)$ horizontally by a
+        factor of $\frac{1}{3}$:
+        \begin{center}
+          \begin{tikzpicture}[declare
+            function={f(\x)=(\x<=4*pi)*(\x/1.2^\x+1.5)+
+              (\x>4*pi)*(0.5*(5.542254215512511 +
+              abs(sin(deg(0.5*\x)))));}]
+            \begin{axis}[ymin=0, xtick={12}, ytick=\empty, width=2.5in,
+              height=1.5in, clip=false]
+              \addplot+[domain=0:12, plusarea] { f(x) } \closedcycle; %
+              \addplot+[domain=0:12*pi, samples=121] { f(x) } node[right]
+              {$y = g(x)$}; %
+            \end{axis}
+          \end{tikzpicture}
+          \hspace{0.5in}
+          \begin{tikzpicture}[declare
+            function={f(\x)=(\x<=4*pi)*(\x/1.2^\x+1.5)+
+              (\x>4*pi)*(0.5*(5.542254215512511 +
+              abs(sin(deg(0.5*\x)))));}]
+            \begin{axis}[ymin=0, xtick={4}, ytick=\empty, width=2.5in,
+              height=1.5in, clip=false]
+              \addplot+[domain=0:4, fillregion] { f(3*x) } \closedcycle; %
+              \addplot+[domain=0:12*pi, samples=181] { f(3*x) }
+              node[right] {$y = g(3x)$}; %
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+        Therefore, the area under $g(3x)$ from $x = 0$ to $x = 4$ should
+        be $\frac{1}{3}$ as large as the area under $g(x)$ from $x = 0$ to
+        $x = 12$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.3}]
+        $\displaystyle \int_0^{144} g(x^2)\,dx$
+      \end{problem}
+
+      \begin{solution}
+        There is \fbox{not enough information}.  (If you try substituting
+        $u = x^2$, you instead end up with the integral in
+        {{{{{{\#6}}(d)}} on {the worksheet ``Integration by Substitution''}}}.)
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.3}]
+        $\displaystyle \int_0^{2 \sqrt{3}} x g(x^2)\,dx$
+      \end{problem}
+
+      \begin{solution}
+        We can evaluate this using the substitution \sub{$u = x^2$}; then,
+        $du = 2x\,dx$, so \subd{$\frac{du}{2} = x\,dx$}.  As $x$ goes from
+        $0$ to $2 \sqrt{3}$, $u = x^2$ goes from $0^2 = 0$ to $\left(2
+          \sqrt{3} \right)^2 = 12$:
+        \begin{align*}
+          \int_0^{2 \sqrt{3}} \subd{x} g(\sub{x^2})\,\subd{dx} &=
+          \int_0^{12} g(\sub{u}) \subd{\frac{du}{2}} \\
+          &= \frac{1}{2} \int_0^{12}
+          g(u)\,du \\
+          &= \boxed{\frac{\pi}{2}}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\stretch{0.3}]
+        $\displaystyle \int_0^{144} x g(x^2)\,dx$
+      \end{problem}
+
+      \begin{solution}
+        There is \fbox{not enough information}.
+      \end{solution}
+
+    \end{enumerate}
+    \probonly{}
+
+\end{enumerate}
+
+\end{document}

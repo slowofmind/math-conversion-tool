@@ -1,0 +1,391 @@
+%% File: handout.sty
+%% -----------------
+%% Provides a package handout, which can either be called as
+%% \usepackage{handout} or \usepackage[sols]{handout}.  The package
+%% defines two environments, problem and solution.  When called as
+%% \usepackage{handout}, the solution environments will not be displayed.
+%% When called as \usepackage[sols]{handout}, the solutions will be
+%% displayed.  Also, the problems will be displayed in a different font,
+%% namely \problemfont.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{handout}
+\RequirePackage{verbatim}
+
+
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage{bm}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable}
+\providecommand{\currentbgcolor}{}
+\renewcommand{\currentbgcolor}{white}
+
+\usepackage{enumitem}
+\setlist{parsep=8pt}
+
+\newcommand\problemfont{\fontshape{it}}
+\newcommand\solutionfont{}
+\newcommand\tffont{}
+\definecolor{tikzcolor}{rgb}{0,0,0}
+\definecolor{problemtikzcolor}{rgb}{0,0,0}
+
+\provideboolean{handout@showsols}
+\setboolean{handout@showsols}{false}
+
+% create the solution environment, which is really just verbatim's
+% comment environment 
+\let\solution=\comment
+\let\endsolution=\endcomment
+
+% same thing for grading
+\let\grading=\comment
+\let\endgrading=\endcomment
+
+% and for workshop notes
+\let\workshop=\comment
+\let\endworkshop=\endcomment
+
+% and for workshop plan
+\let\wsplan=\comment
+\let\endwsplan=\endcomment
+
+% same thing for notes
+\newcommand{\note}[1]{}
+
+% learningCheck
+\newenvironment{learningCheck}{}{}
+\newenvironment{learningCheckMC}{}{}
+\newenvironment{learningCheckEssay}{}{}
+\let\choices=\comment
+\let\endchoices=\endcomment
+
+\let\problem=\comment
+\newcommand{\probspace}{}
+\newlength{\problemspace}
+
+% If blah is a string, \firstChar{blah} gives its first character. If
+% blah is a command, it gives the command name as a string.
+\def\@firstchar#1#2\EndMark{\string#1}
+\newcommand{\firstChar}[1]{\@firstchar#1\EndMark}
+
+\newcommand{\probspaceFirstChar}{Null}
+\renewenvironment{problem}[1][0pt]{%
+  \renewcommand{\probspace}{#1}%
+  \renewcommand{\probspaceFirstChar}{\firstChar{#1}}%
+}{%
+  \pspace{\probspace}%
+}
+\let\nstretch=\stretch
+\newcommand{\pspace}[1]{%
+  % if \probspaceFirstChar is undefined (because \pspace was called
+  % directly), define it
+  \ifthenelse{\equal{\probspaceFirstChar}{Null}}%
+  {\renewcommand{\probspaceFirstChar}{\firstChar{#1}}}%
+  {}%
+  % If the command is \vfill or \newpage, insert that
+  % directly. Otherwise, see whether the command is \nstretch
+  \ifthenelse{\equal{\probspaceFirstChar}{\firstChar{\vfill}}\OR\equal{\probspaceFirstChar}{\firstChar{\newpage}}}%
+  {#1}%
+  {\ifthenelse{\equal{\probspaceFirstChar}{\firstChar{\nstretch}}}%
+    {\vspace{#1}\newpage}%
+    {\vspace{#1}}}%
+  \renewcommand{\probspaceFirstChar}{Null}%
+}
+\newcommand\pspacestar[1]{\probonly{\vspace*{#1}}}
+
+\newenvironment{problemonly}{}{}
+\newcommand{\htitle}[1]{\begin{center} \Large\textbf{#1} \end{center}}
+\newcommand{\stitle}[1]{}
+\newcommand{\probonly}[1]{#1}
+\newcommand{\solonly}[1]{}
+%% \newcommand{\answer}[1]{\solonly{{\fontshape{n}\textbf{#1}}}}
+\newcommand{\answer}[1]{#1}
+\newcommand{\answeronly}[1]{}
+\newlength{\framemargin}
+\usepackage{framed}
+\renewenvironment{framed}{
+  \setlength{\framemargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\framemargin
+  %% \advance\width\framemargin
+  \def\FrameCommand{\hspace{\framemargin}\fbox}%
+  \advance\linewidth\framemargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+  %% \MakeFramed {\advance\linewidth-\width \FrameRestore}%
+}
+{\endMakeFramed}
+
+\newcommand{\continueproblem}[1]{%
+  \probonly{\begin{framed}%
+      #1%
+    \end{framed}%
+  }%
+}
+
+\newenvironment{warmup}{}{\probonly{\hrule}}
+
+% for fill in the blank things: arguments are width of the blank and the answer
+\newcommand{\@fitbans}{}
+\newcommand{\@fitbblank}{}
+%% \newcommand{\fitb}[2]{%
+%%   \ifmmode%
+%%   \renewcommand{\@fitbans}{$\bm{#2}$}%
+%%   \else%
+%%   \renewcommand{\@fitbans}{\textbf{#2}}%
+%%   \fi%
+%%   \underline{\parbox[t]{#1}{\probonly{\ }\solonly{\@fitbans}}}%
+%% }
+\newcommand{\fitb}[3][\ ]{%
+  \ifmmode%
+  \renewcommand{\@fitbans}{$\bm{#3}$}%
+  \renewcommand{\@fitbblank}{$#1$}%
+  \else%
+  \renewcommand{\@fitbans}{\textbf{#3}}%
+  \renewcommand{\@fitbblank}{#1}%
+  \fi%
+  \underline{\parbox[t]{#2}{\probonly{\@fitbblank}\solonly{\@fitbans}}}%
+}
+\newcommand{\fitbox}[3][\ ]{%
+  \ifmmode%
+  \renewcommand{\@fitbans}{$\bm{#3}$}%
+  \renewcommand{\@fitbblank}{$#1$}%
+  \else%
+  \renewcommand{\@fitbans}{\textbf{#3}}%
+  \renewcommand{\@fitbblank}{#1}%
+  \fi%
+  \fbox{\parbox[t]{#2}{\probonly{\@fitbblank}\solonly{\@fitbans}}}%
+}
+% fill in the blank with answer centered
+\newcommand{\cfitb}[3][\ ]{%
+  \ifmmode%
+  \renewcommand{\@fitbans}{\centering$\bm{#3}$}%
+  \renewcommand{\@fitbblank}{$#1$}%
+  \else%
+  \renewcommand{\@fitbans}{\centering\textbf{#3}}%
+  \renewcommand{\@fitbblank}{#1}%
+  \fi%
+  \underline{\parbox[t]{#2}{\probonly{\@fitbblank}\solonly{\@fitbans}}}%
+}
+\newcommand{\cfitbox}[3][\ ]{%
+  \ifmmode%
+  \renewcommand{\@fitbans}{\centering$\bm{#3}$}%
+  \renewcommand{\@fitbblank}{$#1$}%
+  \else%
+  \renewcommand{\@fitbans}{\centering\textbf{#3}}%
+  \renewcommand{\@fitbblank}{#1}%
+  \fi%
+  \fbox{\parbox[t]{#2}{\probonly{\@fitbblank}\solonly{\@fitbans}}}%
+}
+\let\mfitb\fitb
+
+\let\solutiononly=\comment
+\let\endsolutiononly=\endcomment
+
+% allow circling of items
+\usepackage{fancybox}
+
+\provideboolean{doCircle}
+\setboolean{doCircle}{false}
+\cornersize{1}
+
+\newcommand{\circleitem}{\setboolean{doCircle}{true}\item\setboolean{doCircle}{false}}
+\newcommand{\plainitem}{\setboolean{doCircle}{false}\item}
+
+\newcommand{\maybecircle}[2][\boolean{doCircle}]{\probonly{#2}\solonly{\ifthenelse{#1}{\ifmmode\ovalbox{$\displaystyle #2$}\else\ovalbox{#2}\fi\hspace{-\fboxrule}\hspace{-\fboxsep}}{#2}}}
+\usepackage[nointegrals]{wasysym}
+\provideboolean{doBubble}
+\setboolean{doBubble}{false}
+\newcommand{\maybebubble}[1][\boolean{doBubble}]{{\Large\probonly{$\Circle$}\solonly{\ifthenelse{#1}{$\CIRCLE$}{$\Circle$}}}}
+%\newcommand{\maybebubble}[1][\boolean{doBubble}]{\Large\probonly{$\Circle$}\solonly{\ifthenelse{#1}{$\CIRCLE$}\else{$\Circle$}\fi}}
+
+% multiple choice
+\newenvironment{mc}[1]{%
+  \underline{\parbox[t]{0.5in}%
+    {\centering\probonly{\ }{\solonly{\textbf{#1}}}}}
+  \hspace{6pt} \begin{minipage}[t]{\linewidth-47pt} \setlength{\parskip}{8pt}}
+  {\end{minipage}\bigskip}
+
+% true-false
+\def\c@encoding{\f@encoding}% save current encoding in \c@encoding
+\def\c@family{\f@family}%
+\def\c@series{\f@series}%
+\def\c@shape{\f@shape}%
+\tffont\selectfont
+\newlength{\@twidth}
+\settowidth{\@twidth}{True}
+\newlength{\@fwidth}
+\settowidth{\@fwidth}{False}
+\usefont{\c@encoding}{\c@family}{\c@series}{\c@shape}\selectfont%
+\provideboolean{answerTrue}
+\newcommand{\tfheading}{
+  \def\c@encoding{\f@encoding}% save current encoding in \c@encoding
+  \def\c@family{\f@family}%
+  \def\c@series{\f@series}%
+  \def\c@shape{\f@shape}%
+  \tffont\selectfont%
+  \item[] True\hspace{0.1in}False}
+  
+\newenvironment{tf}[1]{%
+  \ifthenelse%
+  {\(\equal{\firstChar{#1}}{\firstChar{T}}\)\OR\(\equal{\firstChar{#1}}{\firstChar{t}}\)}%
+  {\setboolean{answerTrue}{true}}%
+  {\setboolean{answerTrue}{false}}%
+  \parbox[t]{\@twidth}{\centering\maybebubble[\boolean{answerTrue}]}\hspace{0.1in}\parbox[t]{\@fwidth}{\centering\maybebubble[\NOT\boolean{answerTrue}]}\hspace{0.1in}%
+  \def\c@encoding{\f@encoding}% save current encoding in \c@encoding
+  \def\c@family{\f@family}%
+  \def\c@series{\f@series}%
+  \def\c@shape{\f@shape}%
+  \solonly{\tffont\selectfont}% change font  
+  \begin{minipage}[t]{\linewidth-\@twidth-\@fwidth-15pt} \setlength{\parskip}{8pt}}%  
+  {\end{minipage}%
+  \usefont{\c@encoding}{\c@family}{\c@series}{\c@shape}\selectfont%
+  \bigskip}
+
+% if the nospace option is used, don't show problem space
+\DeclareOption{nospace}{%
+  \renewenvironment{problem}[1][0pt]{}{}
+  \renewcommand{\pspace}[1]{}
+  \renewcommand{\pspacestar}[1]{}
+  \renewcommand{\continueproblem}[1]{}
+  \PassOptionsToPackage{\CurrentOption}{exam}
+}
+
+% if the option sols is used, display problems in italicized font and
+% display solutions
+\DeclareOption{sols}{%
+  \renewenvironment{problem}[1][0in]%
+  {\def\c@encoding{\f@encoding}% save current encoding in \c@encoding
+    \def\c@family{\f@family}%
+    \def\c@series{\f@series}%
+    \def\c@shape{\f@shape}%
+    \problemfont\selectfont% change font
+    \colorlet{tikzcolor}{problemtikzcolor}% change TikZ color
+  }%
+  {\usefont{\c@encoding}{\c@family}{\c@series}{\c@shape}\selectfont}% restore original shape
+  %
+  \renewenvironment{solution}{\def\c@encoding{\f@encoding}% save current encoding in \c@encoding
+    \def\c@family{\f@family}%
+    \def\c@series{\f@series}%
+    \def\c@shape{\f@shape}%
+    \solutionfont\selectfont% change font
+    \textbf{Solution.}}%
+  {\usefont{\c@encoding}{\c@family}{\c@series}{\c@shape}\selectfont}% restore original shape
+  \let\problemonly=\comment
+  \let\endproblemonly=\endcomment
+  \renewcommand{\pspace}[1]{}
+  \renewenvironment{solutiononly}{}{}
+  \renewcommand{\probonly}[1]{}
+  \renewcommand{\solonly}[1]{#1}
+  \let\learningCheck=\comment
+  \let\endlearningCheck=\endcomment
+  \makeatletter
+  \setboolean{handout@showsols}{true}
+  \makeatother  
+}
+
+% if the option showprobonly is used, probonly stuff will be displayed 
+\DeclareOption{showprobonly}{%
+  \renewenvironment{problemonly}{}{}
+  \renewcommand{\probonly}[1]{#1}
+}
+
+% if the solsonly option is used, no problems will be displayed
+\DeclareOption{solsonly}{%
+  \let\problem=\comment
+  \let\endproblem=\endcomment
+  \let\problemonly=\comment
+  \let\endproblemonly=\endcomment
+  \renewcommand{\pspace}[1]{}
+  \renewenvironment{solutiononly}{}{}
+  \renewcommand{\probonly}[1]{}
+  \renewcommand{\solonly}[1]{#1}
+  \renewenvironment{solution}{}{}
+  \renewcommand{\htitle}[1]{}
+  \renewcommand{\stitle}[1]{\begin{center} \large\textbf{#1} \end{center}}
+}
+
+\DeclareOption{grading}{%
+  \newsavebox{\gradingbox}
+  \definecolor{shadecolor}{rgb}{0.6,0.8,1}
+  \renewenvironment{grading}{%
+    \textcolor{\currentbgcolor}{a}
+    
+    \vspace*{-19pt}
+    \tcolorbox[colback=shadecolor, sharp corners, frame empty, colframe=shadecolor, size=fbox, %parbox=false,
+    breakable]\renewcommand{\currentbgcolor}{shadecolor}%
+    \setlength{\parskip}{8pt}\textbf{Grading Notes.} \ignorespaces}%
+  {\endtcolorbox\renewcommand{\currentbgcolor}{white}}%  
+  \PassOptionsToPackage{\CurrentOption}{exam}
+}
+
+\DeclareOption{wsplan}{%
+  \newsavebox{\wsplanbox}
+  \definecolor{wsplanshadecolor}{rgb}{0.9,0.9,0.9}
+  \makeatletter%
+  \renewenvironment{wsplan}{%
+    \leavevmode%
+    \begin{lrbox}{\wsplanbox}\begin{minipage}[t]{\linewidth-2\fboxsep}%
+        \setlength{\parskip}{8pt}%
+        \ignorespaces}%
+      {\end{minipage}\end{lrbox}%
+    \colorbox{wsplanshadecolor}{\usebox{\wsplanbox}}%
+  }%
+  \makeatother%
+}
+
+\newcommand{\workshopnote}{Problem Session Notes.}
+\DeclareOption{workshop}{%
+  \renewenvironment{workshop}{%    
+    \textcolor{\currentbgcolor}{a}
+    
+    \vspace*{-19pt}
+    \tcolorbox[colback=yellow, sharp corners, frame empty,
+    colframe=yellow, size=fbox, parbox=false,
+    breakable]\renewcommand{\currentbgcolor}{yellow}%
+    \textbf{\workshopnote}\ifthenelse{\equal{\workshopnote}{}}{}{ }\ignorespaces}%
+  {\endtcolorbox\renewcommand{\currentbgcolor}{white}}%  
+}
+
+\renewcommand{\sfdefault}{cmbr}
+\DeclareOption{notes}{%
+  \DeclareMathVersion{notes}
+  \SetSymbolFont{operators}{notes}{OT1}{cmbr}{m}{n}
+  \SetSymbolFont{letters}{notes}{OML}{cmbrm}{m}{it}
+  \SetSymbolFont{boldletters}{notes}{OML}{cmbr}{bx}{it}
+  \SetSymbolFont{symbols}{notes}{OMS}{cmbrs}{m}{n}
+  \SetMathAlphabet{\mathit}{notes}{OT1}{cmbr}{m}{sl}
+  \SetMathAlphabet{\mathbf}{notes}{OT1}{cmbr}{bx}{n}
+  \SetMathAlphabet{\mathtt}{notes}{OT1}{cmtl}{m}{n}
+  \newlength{\notewidth}
+  \renewcommand{\note}[1]{\setlength{\notewidth}{\linewidth}%
+    \addtolength{\notewidth}{-7pt}%
+    \fbox{\begin{minipage}[t]{\notewidth} \setlength{\parskip}{8pt} \renewcommand{\familydefault}{\sfdefault}\sffamily\mathversion{notes} #1 \end{minipage}}}
+}
+
+
+
+\let\Example=\comment
+\renewenvironment{Example}
+{\refstepcounter{equation}\normalfont\normalsize\textbf{Example \theequation.}}
+{\exend}
+\renewcommand{\theequation}{\arabic{equation}}
+
+\makeatletter
+
+% \shortintertext is like \intertext{...} but for very short comments 
+\def\shortintertext#1{%
+  \ifvmode\else\\\@empty\fi
+  \noalign{%
+    \penalty\postdisplaypenalty% \vskip\belowdisplayskip
+    \vbox{\normalbaselines
+      \ifdim\linewidth=\columnwidth
+      \else \parshape\@ne \@totalleftmargin \linewidth
+      \fi
+      \noindent#1\par}%
+    \penalty\predisplaypenalty% \vskip\abovedisplayskip%
+  }%
+}
+\makeatother
+
+\ProcessOptions\relax
+\endinput

@@ -1,0 +1,338 @@
+\documentclass[12pt,letterpaper]{article}
+
+\input{worksheet-setup.tex}
+
+\usepackage{logicpuzzle} %Class 01
+\usepackage{skak} % for chess! %Class 02
+\usetikzlibrary{arrows} %Class 08, 17, 18
+\usepackage{wrapfig}    %Class 08, 17, 18
+
+%Class 14, 15, 16, 17, 18
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+        \hskip -\arraycolsep
+        \let\@ifnextchar\new@ifnextchar
+        \array{#1}}
+\makeatother
+
+\def\env@matrix{\hskip -\arraycolsep
+        \let\@ifnextchar\new@ifnextchar
+        \array{*\c@MaxMatrixCols c}}
+%End Class 14, 15,16...
+
+\usepackage{amsfonts,amsmath} % Class 29,30
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert} % Class 30
+
+
+\newcommand{\coursenum}{22a}
+
+
+
+
+
+
+
+
+\usepackage{fancyhdr}
+\lhead{}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math 22a}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+
+\title{\Huge \textbf{Math 22a Coursepack}}
+\date{}
+
+\begin{document}
+
+
+\pagenumbering{gobble}
+
+\maketitle
+
+
+%\begin{center}
+%\parbox{6.3in}{\textbf{\Large 
+%\begin{framed}
+%  There are blank pages and spaces between the questions so that you can do your work and take notes in this book.
+%\end{framed}
+%}}
+%\end{center}
+
+
+
+%\vfill
+
+\centerline{\Large Fall 2024}
+
+\vfill
+\centerline{\textcopyright{} \emph{Harvard Math 22a}}
+
+
+\pagebreak
+
+\null
+
+
+\centerline{\large\textbf{A note on how to use this coursepack:}  }
+This coursepack is intended to be brought to each class. There are blank pages and spaces between the questions so that you can do your work and take notes in this book.
+
+This coursepack is designed to be used in parallel with two textbooks, with the following notation used to refer to each book throughout.
+
+{\large \textbf{Notation:}}
+
+\begin{itemize}
+\item[\Large$\vec\S$]
+\emph{Linear Algebra and its applications}, by David C. Lay, with Stephan R. Lay and Judi J. MacDonald, 5th edition.  Sections from this book will be indicated with the notation $\vec{\S}$, so for example $\vec{\S}$1.1 refers to Section 1.1: Systems of Linear Equations in this book.
+
+\item[\Large\framebox{\S}]
+\emph{The book of proof} by Richard Hammack, 3rd edition.  Sections from this book will be referred to with the notation \framebox{\S}, so for example \framebox{\S}1.1 refers to Section 1.1: Introduction to Sets in this book. 
+\end{itemize}
+
+\vfill
+
+{\footnotesize
+\today\\
+Printed for the Fall 2024 Semester\\
+Harvard University Mathematics Department\\
+All rights reserved
+}
+
+
+\pagebreak 
+
+\pagenumbering{arabic}
+\thispagestyle{empty}
+\tableofcontents
+
+\null\newpage
+
+\section*{Index of Theorems for Math 22a}
+
+\chead{\Large\textbf{Index of Theorems}}%
+
+\null\newpage
+\null\newpage
+\null\newpage
+\null\newpage
+\null\newpage
+
+
+\include{01-linear-systems/01-puzzles-systems_nohead.tex}
+\null\pagebreak 
+
+%TODO Starting with class 12, make sure the theorem numbers match the most current version of the textbook
+
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{02-proof-methods/02-raisin-games_nohead}
+\null\pagebreak 
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{02-proof-methods/02-proof_basics_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{03-row-echelon-vector-equations/03-row-echelon-vector-equations_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{04-matrix-equations/04-matrix-equations_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{05-proofs-sets/05-the_joy_of_sets_nohead}
+\null\pagebreak 
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{05-proofs-sets/05-proof-methods_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{06-homogeneous-systems/06-homogeneous-systems_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{07-linear-ind/07-linear-ind_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{08-SkippedInClass-DoRemote-more-sets/08-more-sets_nohead.tex}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{09-functions-relations/09-relations_nohead}
+\null\pagebreak 
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{09-functions-relations/09-functions_nohead}
+\null\pagebreak 
+
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{10-induction/10-induction-and-strong_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{11-linear-transformations/11-linear-transformations_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{12-linear-transformations-matrix/12-linear-transformations-mat_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{13-matrix-ops/13-mat-mult_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{14-inverses/14-inverses_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{15-characterize-inverses-determinants/15-determinants_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{16-intro-to-determinants/16-determinant-properties_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{17-determinant-properties/17-determinants-geometry_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{18-vector spaces/18-vector-spaces_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{19-null-col-spaces/19-null-col-spaces_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{20-linear-ind/20-lin-ind_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{21-coordinates/21-coordinates_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{22-dimension-rank/22-dimension-rank_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{23-change-coordinates/23-change-coordinates_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{24-eigenvalues/24-family-weekend-puzzle_nohead}
+\null\pagebreak 
+\include{24-eigenvalues/24-eigenvalues_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{25-eigenvector-properties/25-eigenvectors_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{26-diagonalization/26-diagonalization_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{27-diagonalization-again/27-diag-again_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{28-complex eigenvalues/28-complex-eigenvalues_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{29-differential-equations/29-differential-equations_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{30-dot-products/30-dot-products_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{31-orthogonal-bases/31-orthogonal-bases_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{32-orthogonalization-Gram-Schmidt/32-orthogonalization_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{33-least-squares/33-least-squares_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{34-inner-product-spaces-fourier/34-inner-products_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{35-Diagonalization-of-symmetric-matrices/35-diagonalization-of-symetric_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{36-Quadratic-forms-and-Optimization/36-Quadratic-forms-and-Optimization_nohead}
+\null\pagebreak 
+
+\setcounter{problemnumber}{0}%
+\setcounter{defn}{0}%
+\include{37-Principal-component-analysis/37-Principal-component-analysis_nohead}
+
+\chead{\Large\textbf{Additional notes}}%
+
+\null\pagebreak 
+\null\pagebreak 
+
+\null\pagebreak 
+\null\pagebreak 
+
+\chead{}%
+\thispagestyle{empty}
+\null\pagebreak 
+
+
+%\include{01. Visualizing Functions of Two Variables/worksheet01-nohead.tex}
+%\null\pagebreak 
+
+
+\end{document}

@@ -1,0 +1,520 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{pifont}
+
+\usepackage{marginnote}
+\usepackage[colorinlistoftodos]{todonotes}
+\renewcommand{\marginpar}{\marginnote}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols, grading, workshop]{handout}
+
+\providecommand{\check}{}
+\renewcommand{\check}{\ifmmode{\text{ \ding{51} }}\else{\ding{51} }\fi}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\newcommand{\highlight}[1]{\boldmath\hl{\textbf{#1}}\unboldmath}
+
+\newcommand{\goal}[1]{\textbf{\textcolor{skyblue}{#1}}}
+
+\newcommand{\psrnewpage}{\newpage}
+\newcommand{\psreflection}[2][]{
+
+  \ifthenelse{\not\equal{#1}{nocite}}{
+    \begin{enumerate}[resume]
+    \item
+      \begin{problem}[1in]
+        Please cite any help you got on this problem set:
+        \begin{itemize}[nosep]
+        \item If you worked with other students, please list their names here.
+        \item If you used resources other than those on our Canvas site, please list them here.
+        \end{itemize}
+      \end{problem}
+
+    \end{enumerate}
+  }
+
+  \probonly{%
+    #2
+
+    \psrnewpage
+
+    \emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!
+    \begin{itemize}
+    \item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!
+
+      \vspace{1.5in}
+
+    \item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.
+
+      \vspace{1.5in}
+
+    \item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!
+
+      \vfill
+    \end{itemize}      
+  }
+}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 26 - Problem-Solving Day}
+\end{center}
+
+\begin{enumerate}
+\item  \begin{grading}
+    8.5 points:
+    \begin{itemize}[nosep]
+    \item 1 for stating the goal
+    \item 1 for drawing and labeling a picture
+    \item 1 for a formula for the printed area that's consistent with the variables they defined
+    \item 1 for correctly using the fact that the poster is 200 square inches to get the printed area in terms of 1 variable
+    \item 2 for correctly finding the critical point
+    \item 2 for justifying that the critical point is a global max
+    \item 0.5 for answering the question (giving the largest possible area)
+    \end{itemize}
+  \end{grading}
+
+  \begin{problem}[\newpage]
+    You need to make a poster for a poster session. The organizers of the session insist that your poster has to be 200 square inches, but you can't print on the entire 200 square inches. Instead, you must leave 1 inch of white space on the left, right, and top of the printed area and 3 inches of white space below the printed area. What's the largest possible printed area you can have on your poster?
+
+    (Remember the guidelines for presenting your work in such problems. If you've forgotten, look back at \href{https://people.math.harvard.edu/~jjchen/mathma/docs/homework/PS21.html}{Problem Set 21}.)
+  \end{problem}
+
+  \begin{solution}
+    \highlight{Goal:} Maximize the printed area. 
+
+    \highlight{Define variables:} Let's draw some possible poster
+    sizes, including the margins. 
+    On the first picture, we have labeled the dimensions of the poster with $x$ and $y$.  \vspace{. in} \\
+      \begin{tikzpicture} [xscale=.25,yscale=.25]
+        \draw[-][ultra thick] (0,0) -- (0,20); 
+        \draw[-][ultra thick] (0,0) -- (10,0);
+        \draw[-][ultra thick] (10,20) -- (0,20);  
+        \draw[-][ultra thick] (10,0) -- (10,20);
+        % 
+        \draw[-][ultra thick,black] (1,3) -- (1,19); 
+        \draw[-][ultra thick,black] (1,3) -- (9 ,3);
+        \draw[-][ultra thick,black] (9,19) -- (1,19);  
+        \draw[-][ultra thick,black] (9,3) -- (9,19);
+        \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick,black] (-.2,0) -- (-.2,20); 
+        \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick,black] (0,20.2) -- (10,20.20); 
+        % \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick]
+        % (-1.1,1) -- (-1.1,3); 
+        % \draw[-][ultra thick,black] (-1,1) -- (-1,3);
+        \draw (-1.75,10) node {\large{$y$}};
+        \draw (5,21.75) node {\large{$x$}};
+        % \draw (-.5,.4) node {$w$};
+      \end{tikzpicture} \hfill 
+      \begin{tikzpicture} [xscale=.25,yscale=.25]
+        \draw[-][ultra thick] (0,0) -- (0,14.14); 
+        \draw[-][ultra thick] (0,0) -- (14.14,0);
+        \draw[-][ultra thick] (14.14,14.14) -- (0,14.14);  
+        \draw[-][ultra thick] (14.14,0) -- (14.14,14.14);
+        % 
+        \draw[-][ultra thick,black] (1,3) -- (1,13.14); 
+        \draw[-][ultra thick,black] (1,3) -- (13.14 ,3);
+        \draw[-][ultra thick,black] (13.14,13.14) -- (1,13.14);  
+        \draw[-][ultra thick,black] (13.14,3) -- (13.14,13.14);
+        % \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick] (0,.85) -- (-1,.85); 
+        % \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick]
+        % (-1.1,1) -- (-1.1,3); 
+        % \draw[-][ultra thick,black] (-1,1) -- (-1,3);
+        % \draw (1,2) node {barn};
+        % \draw (-1.6,2) node {$l$};
+        % \draw (-.5,.4) node {$w$};
+      \end{tikzpicture} 
+      \hfill
+      \begin{tikzpicture} [xscale=.25,yscale=.25]
+        \draw[-][ultra thick] (0,0) -- (0,10); 
+        \draw[-][ultra thick] (0,0) -- (20,0);
+        \draw[-][ultra thick] (20,10) -- (0,10);  
+        \draw[-][ultra thick] (20,0) -- (20,10);
+        % 
+        \draw[-][ultra thick,black] (1,3) -- (1,9); 
+        \draw[-][ultra thick,black] (1,3) -- (19 ,3);
+        \draw[-][ultra thick,black] (19,9) -- (1,9);  
+        \draw[-][ultra thick,black] (19,3) -- (19,9);
+        % \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick]
+        % (0,.85) -- (-1,.85); 
+        % \draw [decoration={brace,amplitude=0.5em},decorate,ultra thick]
+        % (-1.1,1) -- (-1.1,3); 
+        % \draw[-][ultra thick,black] (-1,1) -- (-1,3);
+        % \draw (1,2) node {barn};
+        % \draw (-1.6,2) node {$l$};
+        % \draw (-.5,.4) node {$w$};
+      \end{tikzpicture}
+    
+    \highlight{Formula for goal:} The area of the printed region is 
+      $$A = (x-2)(y-4)$$
+      To write this as a function of just one variable, we need to \highlight{relate the
+      variables using information from the problem.} We're told that the poster has to have an area of 200 square inches. 
+      $$xy=200$$
+      $$ x = \frac{200}{y}$$
+      We can use this to find the area of the printed region as a function of one variable.
+      $$A(y) = \left( \frac{200}{y} -2\right ) (y-4) = 200 -2y -\frac{800}{y} +8$$ 
+      Considering the margins, the smallest possible value for $y$ is $4$ inches, and
+      the smallest possible value for $x$ is $2$ inches. This means that the domain of
+      the function is $4 \leq y \leq 100$, or $[4, 100]$.
+
+      \highlight{Critical points:}
+      Now we find the critical points. $A'(y)$ is undefined when $y=0$, but this
+      isn't in the domain.
+      \begin{align*}
+      A'(y) &=-2 +\frac{800}{y^2} \\
+      0 &= -2 +\frac{800}{y^2} \\
+      2y^2 &= 800 \\
+      y^2 &= 400 \\
+      y &= 20 \\
+      \end{align*}
+      The only critical point is $y=20$.
+
+      \highlight{Global maximum:} To find the global maximum, we can compare
+      the value of $A(y)$ at the critical point and at the endpoints.
+      \begin{align*}
+      A(4) &= 0  \\
+      A(100) &= 0 \\
+      A(20) &= 128
+      \end{align*}
+      This means that the global max occurs at $y=20$. 
+
+      \highlight{Answer the question:} The largest possible printed area is $128$
+      square inches.
+  \end{solution} 
+
+\item \label{e^-x/x}
+
+  Let $f(x) = \dfrac{e^{-x}}{x}$.
+
+  \begin{enumerate}
+  \item \label{e^-x/x-discontinuities}
+
+    \begin{grading}
+      2.5 points: 1 for $\displaystyle \lim_{x \to 0^+} f(x)$, 1 for $\displaystyle \lim_{x \to 0^-} f(x)$, and 0.5 for identifying that there's a vertical asymptote at $x = 0$
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Find and classify all discontinuities of $f$. Justify your classifications using limits. If a limit does not exist, find both one-sided limits.
+    \end{problem}
+
+    \begin{solution}
+      Since this function is given by a single formula and its domain is $(-\infty, 0) \cup
+      (0, \infty)$, its only discontinuity is at $x=0$. To classify the discontinuity,
+      we need to think about $\lim\limits_{x \to 0} f(x)$.
+
+      First, direct substitution gives $\frac{1}{0}$, which indicates we likely have a
+      vertical asymptote at $x=0$ and should inspect the one-sided limits. As $x$
+      approaches $0$ from the left, the numerator is positive and the denominator is
+      negative, so $\lim\limits_{x \to 0^-} \frac{e^{-x}}{x} = -\infty$. As $x$
+      approaches $0$ from the right, the numerator is positive and the denominator
+      is also positive, so $\lim\limits_{x \to 0^+} \frac{e^{-x}}{x} = \infty$.
+
+      Since the one-sided limits are $\pm \infty$, this confirms that $f$ has a vertical
+      asymptote at $x=0$.
+    \end{solution}
+
+  \item \label{e^-x/x-limit-to-infinity}
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\stretch{0.5}]
+      Find $\displaystyle \lim_{x \to \infty} f(x)$. 
+    \end{problem}
+
+    \begin{solution}
+      As $x$ goes to infinity, the numerator of $\frac{e^{-x}}{x}$ approaches zero
+      and the denominator goes to infinity, so $\lim\limits_{x\to\infty}f(x)=0$.
+    \end{solution}
+
+  \item \label{e^-x/x-increasing-decreasing}
+
+    \begin{grading}
+      5 points:
+      \begin{itemize}[nosep]
+      \item 1 for calculating $f'(x)$ correctly
+      \item 1 for solving $f'(x) = 0$ correctly
+      \item 1 for realizing $x = 0$ also needs to go on the sign chart because $f'(x)$ is undefined at $x = 0$
+      \item 1 for testing the regions correctly
+      \item 1 for a conclusion that's consistent with their sign chart. Note that here it isn't right to say that $f$ is decreasing on $(-1, \infty)$ because of the vertical asymptote at $x = 0$. If they write that, please deduct 0.5. 
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\nstretch{1.5}]
+      Where is $f$ increasing? Where is $f$ decreasing?
+    \end{problem}
+
+    \begin{solution}
+      We need to make a sign chart for $f'(x)$. To find $f'(x)$, we use the Quotient Rule:
+      \begin{align*}
+        f'(x) &= \frac{d}{dx}\!\left(\frac{e^{-x}}{x}\right) \\
+        &= \frac{(-e^{-x})(x) - (e^{-x})(1)}{x^2} \\
+        &= \frac{-e^{-x}(x+1)}{x^2}
+      \end{align*}
+      We can see that $f'(x)$ is undefined when $x=0$ and is zero when $x=-1$. Testing
+      values gives us the following sign chart.
+      \begin{center}
+        \begin{tikzpicture}
+          \draw[<->] (-3,0) -- (3, 0);
+          \node[left] at (-3,0) {$f'(x)$};
+          \draw[shift={(-1,0)},color=black] (0pt,3pt) -- (0pt,-3pt) node[below] {$-1$};
+          \draw[shift={(1,0)},color=black] (0pt,3pt) -- (0pt,-3pt) node[below] {$0$};
+          \node[circle, fill=black, inner sep=2pt] at (-1,0) {};
+          \node[circle, draw=black, fill=white, inner sep=2pt] at (1,0) {};
+          \node[above] at (-2,0) {$+$};
+          \node[above] at (0,0) {$-$};
+          \node[above] at (2,0) {$-$};
+        \end{tikzpicture}
+      \end{center}
+      Based on the sign chart, $f$ is increasing on $(-\infty, -1)$, and
+      decreasing on $(-1, 0)$ and $(0, \infty)$.
+      
+    \end{solution}
+
+  \item \label{e^-x/x-max}
+
+    \begin{grading}
+      2 points
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Does $f$ have a global maximum on $(-\infty, 0)$? If so, what's the global maximum value (the $y$-value), and where is it achieved (at what $x$)? If not, why not? How about a global minimum?
+    \end{problem}
+
+    \begin{solution}
+      On $(-\infty, 0)$, there is no global minimum because 
+      $\lim\limits_{x\to 0^-}f(x)=-\infty$. The global maximum occurs at $x=-1$,
+      and the maximum value is $f(-1)=-e$.
+    \end{solution}
+
+  \item \label{e^-x/x-limit-to-minus-infinity}
+
+    \begin{grading}
+      2 points: 0.5 for the choice, 1.5 for the justification.
+
+      Note: it isn't enough for students to just say that $f$ is increasing on $(-\infty, -1)$, as $f$ could still tend toward a horizontal asymptote as $x \to -\infty$. If this is all they say for their justification, please deduct 1 point. 
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      One of the following is the value of $\displaystyle \lim_{x \to -\infty} f(x)$. Which one? Explain how you know.
+      \[ \infty \qquad 1 \qquad 0 \qquad {-1} \qquad {-\infty}\]
+      \emph{Hint:} We don't know enough to calculate $\displaystyle \lim_{x \to -\infty} f(x)$ directly (why not?), but you should be able to use what you've done so far in this problem to eliminate all but 1 choice.
+    \end{problem}
+
+    \begin{solution}
+      Since we just determined that the global maximum value of $f$ on $(-\infty, 0)$ is
+      $-e$, we know that
+      $\lim\limits_{x \to -\infty} f(x)$ must be less than $-e$. This eliminates
+      all of the choices except $-\infty$.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      4 points:
+      \begin{itemize}[nosep]
+      \item 1 for being consistent with their limits in \ref{e^-x/x-discontinuities}
+      \item 0.5 for being consistent with their limit in \ref{e^-x/x-limit-to-infinity}
+      \item 1 for being consistent with where they said $f$ is increasing and decreasing
+      \item 1 for being consistent with their answer to \ref{e^-x/x-max}. (In particular, the highest point on $(0, \infty)$ should be under the $x$-axis.)
+      \item 0.5 for being consistent with their limit in \ref{e^-x/x-limit-to-minus-infinity} 
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\nstretch{1.25}]
+      Sketch a graph of $f$ that's consistent with everything you've done. (You need not show the concavity accurately.) 
+    \end{problem}
+
+    \begin{solution}
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[restrict y to domain=-7:7, ytick={-2.7}, xtick={-1},
+            yticklabel={$-e$}, samples=300]
+            \addplot[domain=-3:3] {e^(-x)/x};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      2 points
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Does $f$ have a global maximum on $[-2, 2]$? If so, what's the global maximum value (the $y$-value), and where is it achieved (at what $x$)? If not, why not? How about a global minimum?
+    \end{problem}
+
+    \begin{solution}
+      On $[-2, 2]$, $f$ does not have a global minimum or a global maximum. We know
+      this because $\lim\limits_{x \to 0^-} f(x) = -\infty$ 
+      and $\lim\limits_{x \to 0^+} f(x) = \infty$.
+    \end{solution}
+
+  \end{enumerate}
+
+  \begin{problemonly}
+    \check Is everything you've done in this problem consistent? 
+  \end{problemonly}
+
+\item  
+  \begin{grading}
+    4.5 points:
+    \begin{itemize}[nosep]
+    \item 1.5 for a correct description of the transformations
+    \item 1 for a correct graph
+    \item 0.5 for labeling the horizontal asymptote correctly
+    \item 0.5 for finding and labeling the $y$-intercept (and having it below the $x$-axis)
+    \item 1 for finding and labeling the $x$-intercept (if they find it but forget to label it, deduct 0.25)
+    \end{itemize}
+  \end{grading}
+
+  \begin{problem}[\nstretch{1.5}]
+    Let $f(x) = \dfrac{1}{24} - \dfrac{2^x}{3}$. Sketch the graph of $f$, and explain how it's related to the graph of $g(x) = 2^x$. That is, if you start with the graph of $g(x) = 2^x$, what graph transformations could you do to get the graph of $f(x)$? Find and label all asymptotes and intercepts. 
+  \end{problem}
+
+  \begin{solution}
+    Starting with the graph of $y=2^x$, first we scale vertically by a factor of
+    $\frac{1}{3}$ and reflect across the $x$-axis, then we shift up by $\frac{1}{24}$
+    units. The horizontal asymptote is $y=\frac{1}{24}$, and the $y$-intercept
+    is at $y=\frac{1}{24}-\frac{1}{3}=-\frac{7}{24}$. To find the $x$-intercept,
+    we set $f(x)=0$ and solve for $x$.
+    \begin{align*}
+      \frac{1}{24} - \frac{2^x}{3} &= 0 \\
+      \frac{1}{24} &= \frac{2^x}{3} \\
+      \frac{1}{8} &= 2^x \\
+      x &= -3
+    \end{align*}
+    The graph looks like this.
+    \begin{center}
+      \begin{tikzpicture}
+        \begin{axis}[xtick={-3}, ytick={-7/24}, yticklabels={$-\frac{7}{24}$}, 
+        extra y ticks={1/24}, extra y tick labels={$\frac{1}{24}$}]
+          \addplot[domain=-5:2] {(1/24)-(2^x/3)};
+        \end{axis}
+      \end{tikzpicture}
+    \end{center}
+  \end{solution}
+
+\end{enumerate}
+\psreflection{}
+\end{document}

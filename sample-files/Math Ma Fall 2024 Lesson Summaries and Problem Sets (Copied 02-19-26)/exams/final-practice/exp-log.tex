@@ -1,0 +1,277 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{pifont}
+
+\usepackage{soul}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\usepackage{amsthm}
+
+% make URLs print in the same font
+\usepackage{url}
+\urlstyle{same}
+
+\usepackage{pifont}
+\def\exend{\hfill\ding{118}}
+
+%\makeatletter\@addtoreset{equation}{section}\makeatother
+%\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+
+\newtheoremstyle{theorem}% name
+{8pt}%      Space above
+{0pt}%      Space below
+{\itshape}%         Body font
+{}%         Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{.}%        Punctuation after thm head
+{.5em}%     Space after thm head: " " = normal interword space;
+                                %       \newline = linebreak
+{}%         Thm head spec (can be left empty, meaning `normal')
+
+\theoremstyle{theorem}
+
+\let\Theorem\undefined
+\newtheorem{Theorem}[equation]{Theorem}
+\let\Definition\undefined
+\newtheorem{Definition}[equation]{Definition}
+\let\Summary\undefined
+\newtheorem{Summary}[equation]{Summary}
+\let\Conjecture\undefined
+\newtheorem{Conjecture}[equation]{Conjecture}
+\let\Fact\undefined
+\newtheorem{Fact}[equation]{Fact}
+
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\makeatletter
+\def\@seccntformat#1{\@ifundefined{#1@cntformat}%
+   {\csname the#1\endcsname\quad}%       default
+   {\csname #1@cntformat\endcsname}}%    enable individual control
+\newcommand\section@cntformat{}
+\makeatother
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+  \htitle{Exponentials \& Logs Practice Session}
+
+\begin{enumerate}
+
+\item \emph{The basics}
+
+  \begin{enumerate}
+  \item
+    \textbf{The Definition of Logarithms.} $\log_b x$ is\ldots
+
+    \pspace{0.35in}
+
+    Saying $y = \log_b x$ is equivalent to what exponential equation?  
+
+    \pspace{0.35in}
+
+  \item Make up a few examples;
+
+    $\log_{10} \left( \fitb{0.5in}{} \right)= \fitb{0.5in}{}$ \qquad $\displaystyle \log_{10} \left( \fitb{0.5in}{} \right) = \fitb{0.5in}{}$ \qquad $\displaystyle \log_{10} \left( \fitb{0.5in}{} \right) = \fitb{0.5in}{}$
+
+    \pspace{0.35in}
+
+  \item
+    \begin{problem}[0.35in]
+      What does $\ln A$ mean?
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill]
+      Write down the exponent rules.
+    \end{problem}
+
+  \item
+    \begin{problem}[\nstretch{0.75}]
+      Write down the log rules.
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill]
+      On a single set of axes, sketch graphs of $e^x$, $3^x$, $\ln x$, and $\log_3 x$.
+    \end{problem}
+
+  \item
+    \begin{problem}[\stretch{0.5}]
+      $b^x$ and $\log_b x$ are inverse functions. Write down two identities that this fact implies.
+    \end{problem}
+
+  \item $\dfrac{d}{dx} (e^{kx}) = $ \hfill $\dfrac{d}{dx} (b^x) = $ \hfill $\dfrac{d}{dx} (\ln x) = $ \hfill $\dfrac{d}{dx} (\log_b x) = $ \hfill \ 
+
+    \pspace{\nstretch{0.5}}
+
+  \end{enumerate}
+
+\item Find the critical points of:
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      $f(x) = 3^{2x + 1} \cdot 4^{x - 2} - \dfrac{x}{\ln 2}$
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      $g(x) = \dfrac{\ln(3x^5)}{2} - e^{2 \ln x}$
+    \end{problem}
+
+  \end{enumerate}
+
+\item
+  Anna and Beatrice are studying two different radioactive substances; both are decaying exponentially. 
+  \begin{itemize}[nosep]
+  \item Anna's substance currently has a mass of 10 g, and it has a half life of 50 days.
+  \item Beatrice's substance currently has a mass of 8 g, and it decays by 10\% every 10 days. 
+  \end{itemize}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Your classmate has forgotten what ``half life'' means. Explain it to them. 
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill]
+      After 50 days, will Beatrice's substance have decayed by exactly 50\%, more than 50\%, or less than 50\%? How do you know?
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill]
+      Does Anna's substance or Beatrice's substance have a longer half life? How do you know?
+    \end{problem}
+
+  \item
+    \begin{problem}[\nstretch{2.5}]
+      Find the half-life of Beatrice's substance. 
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill]
+      Anna's substance currently has a mass of 10 g. How quickly is its mass changing with respect to time (right now)? Please give an instantaneous rate of change, and include units. 
+    \end{problem}
+
+  \item
+    \begin{problem}[\nstretch{2}]
+      Is there a time when Anna's substance and Beatrice's substance have the same mass? If so, find that time; if not, why not? 
+    \end{problem}
+
+  \end{enumerate}
+
+\item % based on data from  https://ecos.fws.gov/ecp/report/species-listings-by-year-totals
+
+  Over the past few decades, the number of endangered species in the U.S. has been growing. A reasonable model for the number of endangered species in the U.S. $t$ years after 1990 is $f(t) = 1000 \log_7 (t + 5) - 200$.
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      According to the model, was the number of endangered species in the U.S. in 1990 greater than or less than 300? 
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill]
+      Sketch a graph of $f(t)$. Please label any asymptotes, and label 1 point on the graph with exact integer coordinates. 
+    \end{problem}
+
+  \item
+    \begin{problem}[\nstretch{0.25}]
+      Do you think the model gives a good estimate of the number of endangered species in 1985? 
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill]
+      According to the model, will the number of endangered species ever be 1800? If so, when? 
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Imagine that, in another country, the number of endangered species is modeled by $g(t) = 1000 \log_7 (t + 47) - 1200$. Is there a time when the U.S. and this other country have the same number of endangered species? If so, when?
+    \end{problem}
+
+  \end{enumerate}
+
+\end{enumerate}
+
+\end{document}

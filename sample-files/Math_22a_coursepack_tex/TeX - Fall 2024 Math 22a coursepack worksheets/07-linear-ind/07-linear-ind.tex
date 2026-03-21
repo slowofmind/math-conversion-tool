@@ -1,0 +1,167 @@
+\documentclass[12pt,letterpaper]{article}
+
+
+
+\input{../worksheet-setup.tex}
+
+
+\chead{\Large\textbf{Linear Independence,  $\vec\S$1.7}}% 
+
+\begin{document}
+\thispagestyle{fancy}
+
+Recall from last class:
+
+\begin{itemize}
+
+\item A linear system is called {\bf homogeneous} if it can be written as $A\vec{x}=\vec{0}$ where $A$ is an $m \times n$ matrix, $\vec{x} \in \mathbb{R}^n$, and $\vec{0}$ is the vector of $m$ zeros. 
+\item {\bf Theorem:} If $A\vec{x} =\vec{b}$ is consistent for a given $\vec{b}$, and $\vec{p}$ is a solution, then the solution set of $A\vec{x}=\vec{b}$ is the set of vectors of the form $\vec{p}+\vec{v}_h$ where $\vec{v}_h$ is a solution of $A\vec{x} =\vec{0}$.
+\end{itemize}
+
+\newpage
+
+\begin{defn}
+A set of vectors $\{ \vec{v}_1, \dots, \vec{v}_p\}$ in $\mathbb{R}^n$ is said to be {\bf linearly independent} if $$x_1 \vec{v}_1 +x_2 \vec{v}_2 +\dots +x_p \vec{v}_p = \vec{0}$$ has only the trivial solution. The set is called {\bf linearly dependent} if the equation has non-trivial solutions and the equation is called the {\bf dependence relation}.
+\end{defn}
+
+\begin{enumerate}
+
+\Problem Let $\vec{v}_1=\begin{bmatrix} 1\\2\\3\\ \end{bmatrix}$, $\vec{v}_2=\begin{bmatrix} 4\\5\\6\\ \end{bmatrix}$, and $\vec{v}_3=\begin{bmatrix} 2\\1\\0\\ \end{bmatrix}$. Is $\{ \vec{v}_1, \vec{v}_2,\vec{v}_3 \}$ linearly independent?
+
+\vfill
+
+\vfill
+
+\vfill
+
+Let $A= [\vec{a}_1 \; \dots \; \vec{a}_n ]$, then $\{ \vec{a}_1 \; \dots \; \vec{a}_n \}$ are linearly independent if and only if $A \vec{x} = \vec{0}$ has only the trivial solution.
+
+\Problem Is a set with only one vector always linearly independent?
+
+\vfill
+
+\Problem If $\vec{0} \in \{ \vec{v}_1, \dots, \vec{v}_p \}$, then is the set linearly dependent?
+
+\vfill
+
+\Problem If $\vec{0} \in \text{Span}\{ \vec{v}_1, \dots, \vec{v}_p \}$, then the vectors are linearly independent?
+
+\vfill
+
+\newpage
+
+\Problem Let $\vec{v}_1=\begin{bmatrix} 1\\2\\ \end{bmatrix}$, $\vec{v}_2=\begin{bmatrix} 3\\4\\ \end{bmatrix}$, and $\vec{v}_3=\begin{bmatrix} 5\\6\\ \end{bmatrix}$. Are the vectors linearly independent?
+
+\vfill
+
+{\bf Theorem 7:} A set $S=\{ \vec{v}_1, \dots, \vec{v}_p \}$ of two or more vectors is linearly dependent if and only if one of the vectors of $S$ is a linearly combination of the others.
+
+Moreover if $\vec{v}_1\neq \vec{0}$, then some $\vec{v}_j$ for $j>1$ is a linear combination of $\vec{v}_1, \dots, \vec{v}_{j-1}$.
+
+\Problem Prove Theorem 7.
+
+\vfill
+
+\newpage
+
+\Problem Let $\vec{u}=\begin{bmatrix} 1\\ 0\\ 1\\ \end{bmatrix}$ and $\vec{v} = \begin{bmatrix} 2 \\ 0 \\ 8\\ \end{bmatrix}$
+\Part Describe $\text{Span}\{\vec{u}, \vec{v}\}$
+
+\vfill
+
+\Part Prove $\vec{w} \in \text{Span}\{\vec{u}, \vec{v}\}$ if and only if $\{ \vec{u}, \vec{v}, \vec{w} \}$ is linearly dependent.
+
+\vfill
+\vfill
+
+{\bf Theorem 8:} Any set $\{ \vec{v}_1, \dots, \vec{v}_p \}$ in $\mathbb{R}^n$ is linearly dependent if $p>n$.
+
+\Problem Prove the theorem.
+
+\vfill
+\vfill
+\vfill 
+\end{enumerate}
+
+% sols start below
+%\end{document}
+
+\newpage
+\chead{\Large\textbf{Linear Independence -- Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+  \Answer In order to determine if the vectors are linearly independent, we need to solve the vector equation $c_1 \vec{v}_1+c_2 \vec{v}_2+c_3 \vec{v}_3=\vec{0}$. We instead solve the corresponding augmented matrix. Row-reducing the augmented matrix, we get
+  $$\begin{amatrix}{3}
+  1 & 4 & 2 & 0\\
+  2 & 5 & 1 & 0\\
+  3 & 6 & 0 & 0\\
+  \end{amatrix}\sim
+  \begin{amatrix}{3}
+  1 & 0 & -2 & 0\\
+0 & 1 & 1 & 0\\
+0 & 0 & 0 & 0\\  
+\end{amatrix}.$$
+Thus we get $c_1-2c_3=0$ and $c_2+c_3=0$, and hence the solution set is given by $$\left\{ \vec{c} \in \mathbb{R}^3 : c_1=2c_3, c_2=-c_3\right\}=
+\left\{ \begin{bmatrix}
+2c_3\\
+-c_3\\
+c_3\\
+\end{bmatrix} : c_3 \in \mathbb{R} \right\}=
+\left\{ c_3 \begin{bmatrix}
+2\\
+-1\\
+1\\
+\end{bmatrix} : c_3 \in \mathbb{R} \right\}=\text{Span}\left\{\begin{bmatrix}
+2\\
+-1\\
+1\\
+\end{bmatrix} \right\}.$$
+Thus the vector equation has non-trivial solutions, and the vectors are linearly dependent. From the solution set we can see how the vectors are related to one another using a dependence relation. In this case, a dependence relation is $$2\vec{v}_1-\vec{v}_2+\vec{v}_3=\vec{0}.$$
+
+\Answer No. Since the vector equation $c \cdot \vec{0}= \vec{0}$ has non-trivial solutions, we get $\vec{0}$ is linearly dependent as a single vector. On the other hand, if $\vec{v}$ is any non-zero vector, then it is linearly independent. 
+
+\Answer Yes. We prove the claim. Since $\vec{0} \in \{ \vec{v}_1, \dots, \vec{v}_p \}$, we know $\vec{v}_k=\vec{0}$ for some $k$. Thus $$0 \cdot \vec{v}_1+ \dots + 0 \cdot \vec{v}_{k-1}+1\cdot \vec{v}_k+ 0\cdot \vec{v}_{k+1}+\dots +0\cdot \vec{v}_p =\vec{0},$$ which gives a non-trivial solution to $x_1\vec{v}_1+\dots +x_n \vec{v}_p=\vec{0}$. Thus the vectors are linearly dependent.
+
+\Answer No. $\vec{v} \in \text{Span}\{ \vec{v}_1, \dots, \vec{v}_p \}$ whether or not the vectors are linearly independent.
+
+\Answer Form the augmented matrix and row-reduce to get 
+  $$\begin{amatrix}{3}
+1 & 3 & 5 & 0\\
+2 & 4 & 6 & 0\\
+\end{amatrix}\sim
+\begin{amatrix}{3}
+1 & 0 & -1 & 0\\
+0 & 1 & 2 & 0\\  
+\end{amatrix}.$$
+Thus the vector equation has non-trivial solutions, and the vectors are linearly dependent. 
+\Answer
+\begin{proof}
+$(\implies)$. Suppose $S$ is linearly dependent. By definition of linear dependence, there exists $c_1,\dots, c_p$, not all zero, such that $$c_1\vec{v}_1+\dots+ c_p \vec{v}_p =\vec{0}.$$ Since not all $c_k$ are zero, we know there exists some $c_k\neq0$. We solve the vector equation for $\vec{v}_k$ to get $$\vec{v}_k=-\frac{c_1}{c_k}\vec{v}_1-\dots--\frac{c_{k-1}}{c_k}\vec{v}_{k-1}-\frac{c_{k+1}}{c_k}\vec{v}_{k+1}-\dots -\frac{c_p}{c_k}\vec{v}_p.$$ Thus $\vec{v}_k$ can be written as a linear combination of the other vectors.
+
+$(\impliedby)$. Suppose one of the vectors can be written as a linear combination of the others. We can assume $\vec{v}_p$ can be written in terms of the others (if not we can reorder the vectors). Thus there exists $c_1,\dots, c_{p-1}$ such that $$\vec{v}_p=c_1 \vec{v}_1 +\dots+ c_{p-1} \vec{v}_{p-1}.$$ Rearranging we get $$\vec{0}=c_1 \vec{v}_1 +\dots+ c_{p-1} \vec{v}_{p-1}-\vec{v}_p.$$ Thus we have a non-trivial solution to $x_1 \vec{v}_1 +\dots+ x_{p} \vec{v}_{p}=\vec{0}$, and thus the vectors are linearly dependent.
+\end{proof}
+
+\Answer 
+\Part In this problem we have $\text{Span}\{\vec{u}, \vec{v}\}$ is the $xz$-plane in $\mathbb{R}^3$.
+\Part 
+\begin{proof}
+$(\implies)$. Suppose $\vec{w} \in \text{Span}\{ \vec{u}, \vec{v}\}$, then $\vec{w}$ can be written as a linear combination of $\vec{u}$ and $\vec{v}$. Thus, by Theorem 7, we get $\{\vec{u},\vec{v},\vec{w}\}$ is linearly dependent.
+
+$(\impliedby)$. Since $\vec{u}\neq 0$ and $\vec{v}$ is not parallel with $\vec{u}$, we can use Theorem 7 to conclude that $\vec{w}$ is a linear combination of $\vec{u}$ and $\vec{v}$, and hence $\vec{w}$ is in the span of $\vec{u}$ and $\vec{v}$.
+\end{proof}
+\Answer
+\begin{proof}
+Let $A=[\vec{v}_1 \; \dots \; \vec{v}_p]$ with $\vec{v}\in \mathbb{R}^n$ and $p>n$. Thus $A\vec{x}=\vec{0}$ gives a linear system of equations with $n$ equations and $p$ variables. Thus we can have at most $n$ pivots. Since $p>n$, we have at least one non-pivot column, and hence we have a free variable. Thus $A\vec{x}=\vec{0}$ has non-trivial solutions, and thus the columns are linearly dependent. 
+\end{proof}
+\end{enumerate}
+
+\end{document}
+
+
+%%% Local ables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

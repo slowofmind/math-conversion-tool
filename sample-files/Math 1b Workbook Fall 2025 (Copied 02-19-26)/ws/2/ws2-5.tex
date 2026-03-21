@@ -1,0 +1,375 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws2-5}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptertwo}
+}{}
+
+\section{Nth Term Test for Divergence, Integral Comparison Test, and p-series} \label{ws2-5}
+
+\begin{framed}
+\centerline{\textbf{Lesson Goals}}
+
+You should be able to:
+\begin{itemize}
+\item State the Nth Term Test for Divergence, as well as understand when it can be applied and when it is inconclusive
+\item Use the Integral Comparison Test to determine if a given series converges or diverges, and draw a sketch to demonstrate the comparison
+\item Determine the convergence or divergence of a $p$-series
+\end{itemize}
+\end{framed}
+
+
+ \begin{enumerate}
+     
+
+    
+    \item 
+  %  \note{This is straight from Problem Set 15, \#6; it's just here so that students will have the question in front of them.}
+    Suppose you know that the series $\displaystyle \sum_{k=1}^\infty a_k$
+    converges.  Let $s_n = a_1 + a_2 + \cdots + a_n$, the $n$-th partial
+    sum.  For each of the following, determine whether the statement must
+    be true, must be false, or could be either true or false.
+    \begin{enumerate}
+      \item \begin{problem}[\vfill]
+          $\displaystyle \lim_{n \to \infty} a_n = 0$.
+      \end{problem}
+
+      
+       \begin{solution}
+  We can think of each term $a_k$ (after the first) as a difference of
+  two successive partial sums.  That is, the $n$-th term $a_n$ is
+  equal to $s_n - s_{n-1}$.
+
+  To say that $\displaystyle \sum_{k=1}^\infty a_k$ converges means
+  (by definition) that the limit $\displaystyle \lim_{n \to \infty}
+  s_n$ exists.  That is, eventually, the partial sums must be getting
+  closer together, so the difference between successive partial sums
+  must be tending toward 0.  This means that the terms must also be getting closer to 0. Therefore, the statement is \fbox{true}.
+  \end{solution}
+
+      \item \begin{problem}[\vfill]
+      $\displaystyle \lim_{n \to \infty} s_n = 0$.
+      \end{problem}
+          
+    \begin{solution}
+  The statement \fbox{could be true or could be false}.  By
+  definition, since the series converges, $\displaystyle \lim_{n \to
+  \infty} s_n$ is its sum.  
+
+ We've already seen examples where the statement
+  is false; for instance, we found that the infinite sum $1+\frac12 +\frac14 +\frac18 +\cdots$
+  converged, but its sum was 2, not 0.
+
+  On the other hand, there certainly are convergent series whose sum
+  is 0; the simplest example is $0 + 0 + 0 + \cdots$. 
+  \end{solution}
+
+      \item \begin{problem}[\vfill]
+      $\displaystyle \sum_{k=5}^\infty a_k$ converges.
+      \end{problem}
+    \end{enumerate}
+
+
+   \begin{solution}
+  The statement is \fbox{true}.  Essentially, the question is asking
+  whether leaving off the first four terms of a series affects
+  convergence.  Intuitively, we know that the ``important part'' of
+  the series is the tail, not the beginning, so leaving off the first
+  four terms should not matter.
+
+  To look at it more mathematically, consider the partial sums of the
+  original series $a_1 + a_2 + a_3 + \cdots$; they are:
+  \begin{align*}
+  s_1 &= a_1 \\
+  s_2 &= a_1 + a_2 \\
+  s_3 &= a_1 + a_2 + a_3 \\
+  s_4 &= a_1 + a_2 + a_3 + a_4 \\
+  s_5 &= a_1 + a_2 + a_3 + a_4 + a_5 \\
+  s_6 &= a_1 + a_2 + a_3 + a_4 + a_5 + a_6 \\
+  & \eqdots
+  \end{align*}
+  Now, let's look at the partial sums of the new series $a_5 + a_6 +
+  a_7 + \cdots$.  Let's say $t_n$ is the sum of the first $n$ terms of
+  the new series $a_5 + a_6 + a_7 + \cdots$.  Then:
+  \begin{align*}
+  t_1 &= a_5 \\
+  t_2 &= a_5 + a_6 \\
+  t_3 &= a_5 + a_6 + a_7 \\
+  & \eqdots
+  \end{align*}
+  We can see that $t_1 = s_5 - (a_1 + a_2 + a_3 + a_4)$, $t_2 = s_6 -
+  (a_1 + a_2 + a_3 + a_4)$, and so on.  But $a_1 + a_2 + a_3 + a_4$ is
+  just a fixed number, which we can call $A$.  That is, each partial
+  sum of the new series is a partial sum of the original series minus
+  $A$.  Thus, when we take the limit of partial sums of the new
+  series, it's the same as taking the limit of partial sums of the old
+  series minus $A$.  Since the partial sums of the original series had
+  a limit, the partial sums of the new series must have a limit as
+  well.      
+  \end{solution}
+
+
+    \item 
+    %\note{This is straight from Problem Set 15, \#7; it's just here so that   students will have the question in front of them.}
+
+    \begin{problem}[\vfill]
+    Suppose $a_1, a_2, \ldots$ are numbers and $\displaystyle \lim_{k \to
+    \infty} a_k = 0$.  Does it necessarily follow that the infinite
+    series $\displaystyle \sum_{k=1}^\infty a_k$ converges?
+    \end{problem}
+
+\begin{solution}
+\fbox{No.}  See Problem Set 16 \#2 and \#4 for counterexamples of series whose individual terms approach 0, but do not converge.
+\end{solution}
+
+\pspace{\newpage}
+
+\begin{framed}
+\centerline{\textbf{The Nth Term Test for Divergence}}
+Let $\displaystyle \sum_{k=1}^\infty a_k$ be any series. If $\displaystyle \lim_{n\to\infty} a_n \neq 0$, then the series must \uline{diverge}. In words, if the individual terms of a series do not approach 0, the series diverges.
+
+\textcolor{red}{\uline{Warning \#1}: If $\displaystyle \lim_{n\to\infty} a_n = 0$, \uline{the test is inconclusive!} In other words, if the individual terms of the series approach 0, the series could converge or diverge!}
+
+\textcolor{red}{\uline{Warning \#2}: The Nth Term Test for Divergence can \uline{never} be used to conclude that a given series converges! It can only be used to conclude that a series \uline{diverges}.}
+\end{framed}
+
+
+    
+  \item 
+    
+  
+    %\note{On homework, they computed partial sums of the harmonic series and    were asked whether the series seemed to converge.  So, they should have opinions about whether it converges, although they may not be able to back them up.}
+
+    The series $\displaystyle \sum_{k = 1}^\infty \frac{1}{k} = 1 +
+    \frac{1}{2} + \frac{1}{3} + \frac{1}{4} + \cdots$ is known as the
+    \uline{harmonic series}.
+\begin{enumerate}
+
+  
+      \item \begin{problem}[\vfill]
+      What does the Nth Term Test for Divergence tell you about the harmonic series?
+      \end{problem}
+
+      \begin{solution}
+      \fbox{Nothing!}  $\displaystyle \lim_{k \to \infty} \frac{1}{k} = 0$, so
+      the Nth Term Test for Divergence gives no information.
+      \end{solution}
+
+     \item 
+    \begin{problem}[\vfill\vfill]
+ Do you think that the series $\displaystyle \sum_{k=1}^\infty \frac{1}{k}$ converges or
+    diverges? Why? How can you demonstrate this?
+    %We have already seen that the harmonic series $\displaystyle
+  %  \sum_{k=1}^\infty \frac{1}{k}$ diverges.  (We showed this by comparing
+  % to another series.)  How can you show this by comparing to an improper
+    %integral? 
+    \end{problem}
+
+    \begin{solution}
+    In the following picture, the area in the boxes is $\displaystyle
+    \frac{1}{1} + \frac{1}{2} + \frac{1}{3} + \cdots$.
+    \begin{center}
+    \includegraphics[width=2in]{ws/images/p-series-p=1}
+    \end{center}
+    Let's focus on the domain $x > 1$ (that is, we'll look at the part of
+    the picture to the right of $x = 1$).  The boxes are all above the
+    curve, so $\displaystyle \frac{1}{1} + \frac{1}{2} + \frac{1}{3} +
+    \cdots > \int_1^\infty \frac{1}{x}~dx$.  Since we know the improper
+    integral $\displaystyle \int_1^\infty \frac{1}{x}~dx$ diverges (it's
+    the $p$-integral with $p = 1$, and we know that $p$-integrals with $p
+    \leq 1$ diverge), the series $\displaystyle \frac{1}{1} + \frac{1}{2}
+    + \frac{1}{3} + \cdots$ must diverge as well.
+    \end{solution}
+    
+
+    \end{enumerate}
+\pspace{\newpage}
+    
+    \item 
+        \begin{enumerate}
+          \item
+ \begin{problem}[\vfill]
+ What does the Nth Term Test for Divergence say about the series $\displaystyle \sum_{k=1}^\infty \frac{1}{k^2}=1+\frac14 +\frac19 + \frac{1}{16}+ \cdots$?
+ \end{problem}
+ 
+ \begin{solution}
+Since the terms of the series $\displaystyle \sum_{k=1}^\infty \frac{1}{k^2}$ approach 0, the Nth Term Test for Divergence is \fbox{inconclusive!} In other words, we cannot determine the convergence or divergence of this series using the Nth Term Test.
+ \end{solution}
+ 
+ \item\
+    \begin{problem}[\vfill\vfill]
+    Do you think that the series $\displaystyle \sum_{k=1}^\infty \frac{1}{k^2}$ converges or
+    diverges? Compare the series to an improper integral to justify your conclusion. Draw a sketch that demonstrates how you are comparing the series to the improper integral.
+    \end{problem}
+
+    \begin{solution}
+    The series should remind us of the convergent $p$-integral $\displaystyle \int_1^{\infty} \frac{1}{x^2}~dx$. So. it makes sense to believe that the series \fbox{converges}, which we can show by comparing to an improper
+    integral.  Let's look at the following picture.
+    \begin{center}
+    \includegraphics[width=2in]{ws/images/p-series-p=2}
+    \end{center}
+    The total area in the boxes is $\frac{1}{1^2} + \frac{1}{2^2} +
+    \frac{1}{3^2} + \cdots$.\footnote{To see this, look at each box
+    individually.  The first box (furthest to the left) has height
+    $\frac{1}{1^2}$ (because its height is the height of the curve $y =
+    \frac{1}{x^2}$ when $x = 1$) and width 1, so it has area
+    $\frac{1}{1^2}$.  The second box has height $\frac{1}{2^2}$ and
+    width 1, so it has area $\frac{1}{2^2}$.  The pattern continues this
+    way forever.}  However, we are going to focus only on the region to
+    the right of $x = 1$.  Since the boxes all lie under the curve $y =
+    \frac{1}{x^2}$, it's clearly true that
+    \begin{align}
+    \textrm{total area in the boxes to the right of $x = 1$} &<
+    \textrm{total area under the curve to the right of $x = 1$}
+    \nonumber \\
+    \intertext{We can rewrite this in symbols as}
+    \frac{1}{2^2} + \frac{1}{3^2} + \frac{1}{4^2} + \cdots &<
+    \int_1^\infty \frac{1}{x^2}~dx
+    \end{align}
+    (Notice that, to come up with this inequality, we compared two areas
+    on the \textbf{same domain}; in this case, that domain was everything
+    to the right of $x = 1$.
+    Because we were comparing on the same domain, we could formulate an
+    unambiguous inequality simply by looking at whether the curve was
+    higher or lower than the boxes.)
+
+
+    We know that $\displaystyle \int_1^\infty \frac{1}{x^2}~dx$ converges
+    (it's the $p$-integral with $p = 2$, and $p$-integrals with $p > 1$
+    all converge), so the inequality (1)
+    implies that the series $\displaystyle \frac{1}{2^2} + \frac{1}{3^2} +
+    \frac{1}{4^2} + \cdots$ must converge.  (It's important here that
+    we're working with a series whose terms are all positive and a
+    function that's entirely positive.\footnote{This is really a
+    consequence of the Increasing Partial Sums Theorem (see p. 965 of the textbook).  Since
+    $\displaystyle \frac{1}{2^2} + \frac{1}{3^2} + \frac{1}{4^2} +
+    \cdots$ has all positive terms, we know that its partial sums are
+    increasing.  Either the partial sums increase without bound (in
+    which case the series diverges) or the partial sums remain bounded
+    (in which case the series converges.)  The inequality
+    (1) tells us that the partial sums are
+    bounded by the finite number $\displaystyle \int_1^\infty
+    \frac{1}{x^2}~dx$, so the series must converge.})
+    Since beginning terms don't affect convergence, this means that
+    $\displaystyle \frac{1}{1^2} + \frac{1}{2^2} + \frac{1}{3^2} +
+    \frac{1}{4^2} + \cdots$ must converge as well.
+    \end{solution}
+    \end{enumerate}
+
+ 
+    \pspace{\newpage} 
+
+    
+ \begin{framed}
+\centerline{\textbf{The Integral Comparison Test }}
+Let $f(x)$ be a positive, continuous, and decreasing function on the interval $[a, \infty)$, and suppose $\displaystyle \sum_{k=a}^{\infty} b_k$ is a series such that $f(k)=b_k$.  
+
+\begin{itemize}
+\item If $\displaystyle \int_a^{\infty} f(x)~dx$ converges, then the series $\displaystyle \sum_{k=a}^{\infty} b_k$ \uline{converges} as well.
+
+\item If $\displaystyle \int_a^{\infty} f(x)~dx$ diverges, then the series $\displaystyle \sum_{k=a}^{\infty} b_k$ \uline{diverges} as well.
+
+\end{itemize}
+
+\end{framed}
+
+
+\item \begin{problem}[3in]
+Determine if $\displaystyle \sum_{k=3}^\infty \frac{2}{k\ln(k^3)}$ converges or diverges.
+\end{problem}
+
+\begin{solution}
+We will compare the series above with the improper integral $\int_3^\infty \frac{2}{x\ln(x^3)} ~dx$.
+This improper integral diverges, as it can be shown with a direct computation and the substitution $u = \ln (x^3)$ (so $du = (3/x)~dx$).
+\begin{align*}
+   \int_3^\infty \frac{2}{x\ln(x^2)} ~dx & = \lim_{b\to \infty}\int_3^b \frac{2}{x\ln(x^3)} ~dx \\ 
+   & = \lim_{b\to \infty}\int_{x=3}^{x=b} \frac{2}{3u} ~du = \lim_{b\to \infty}\left.\frac{2}{3} \ln(\ln x^3)\right|_3^b \\
+   & = \lim_{b\to \infty} \frac{2}{3} (\ln(\ln b^3) - \ln(\ln 3^3))= \infty
+\end{align*}
+
+Consequently, by the integral test, the series $\sum_3^\infty \frac{2}{k\ln(k^2)}$ must also diverge
+\end{solution}
+
+
+
+    \item 
+    \begin{problem}[\vfill]
+    For what values of $p$ is the \uline{$p$-series} $\displaystyle
+    \sum_{k=1}^\infty \frac{1}{k^p}$ convergent?  For what values of $p$
+    is it divergent? Why?
+    \end{problem}
+
+    \probonly{\textbf{From now on, you may simply cite the result of this
+    problem.  When you do so, be sure to identify the value of $p$ you
+    are considering, and what the $p$-value means for the convergence/divergence of the series.}}
+
+    \begin{solution}
+    First, if $p \leq 0$, then $\displaystyle \lim_{k \to \infty}
+    \frac{1}{k^p} \neq 0$, so we can use the Nth Term Test for Divergence to conclude
+    that $\sum \frac{1}{k^p}$ diverges.  So, let's focus on the case $p >
+    0$.  In this case, the function $\frac{1}{x^p}$ decreases as $x$
+    increases, so we have pictures that look like this:
+    \begin{center}
+    \includegraphics[width=2in]{ws/images/p-series-lower}
+    \hspace{0.25in}
+    \includegraphics[width=2in]{ws/images/p-series-upper}
+    \end{center}
+    The pictures show two ways of visualizing the series $\frac{1}{1^p} +
+    \frac{1}{2^p} + \frac{1}{3^p} + \cdots$ together with the curve $y =
+    \frac{1}{x^p}$.  In each picture, let's focus on the region to the
+    right of $x = 1$; that is, we'll look at the domain $x > 1$.
+    
+    In the left picture, the area in boxes to the right of $x = 1$ is
+    $\frac{1}{2^p} + \frac{1}{3^p} + \frac{1}{4^p} + \cdots$.  This area
+    is clearly less than the area under the curve to the right of $x = 1$,
+    so
+    \begin{equation}
+    \frac{1}{2^p} +
+    \frac{1}{3^p} + \frac{1}{4^p} + \cdots < \int_1^\infty
+    \frac{1}{x^p}~dx
+    \end{equation}
+    In the right picture, the area in boxes to the right of $x = 1$ is
+    clearly greater than the area under the curve to the right of $x = 1$,
+    so
+    \begin{equation}
+    \int_1^\infty
+    \frac{1}{x^p}~dx < \frac{1}{1^p} + \frac{1}{2^p} + \frac{1}{3^p}
+    + \cdots
+    \end{equation}
+    We can put these two inequalities together:
+    \[ \frac{1}{2^p} + \frac{1}{3^p} + \frac{1}{4^p} + \cdots <
+    \int_1^\infty \frac{1}{x^p}~dx < \frac{1}{1^p} + \frac{1}{2^p} +
+    \frac{1}{3^p} + \cdots.\]
+    The ``trick'' in this is that one inequality is useful when the
+    integral converges, and one is useful when the integral diverges.
+    \begin{itemize}
+      \item \textbf{When \bm{$p > 1$}:} We know that, when $p > 1$, the
+      $p$-integral $\displaystyle \int_1^\infty \frac{1}{x^p}~dx$
+      converges.  Then, (2) shows that
+      $\displaystyle \frac{1}{2^p} + \frac{1}{3^p} + \cdots$ is less than
+      something finite, so the series $\displaystyle \sum_{k=2}^\infty
+      \frac{1}{k^p}$ converges.  Since beginning terms don't affect
+      convergence, the series $\displaystyle \sum_{k=1}^\infty
+      \frac{1}{k^p}$ also converges.
+
+      \item \textbf{When \bm{$0 < p \leq 1$}:} When $p \leq 1$, the improper
+      integral $\displaystyle \int_1^\infty \frac{1}{x^p}~dx$ diverges.
+      Then, (3) shows that $\displaystyle
+      \frac{1}{1^p} + \frac{1}{2^p} + \frac{1}{3^p} + \cdots$ is greater
+      than something infinite, so the series $\displaystyle
+      \sum_{k=1}^\infty \frac{1}{k^p}$ diverges.
+    \end{itemize}
+    So, the $p$-series $\displaystyle \sum_{k=1}^\infty \frac{1}{k^p}$
+    converges when $p > 1$ and diverges when $p \leq 1$.
+    \end{solution}
+  
+
+
+    
+
+  \end{enumerate}
+
+\end{document}

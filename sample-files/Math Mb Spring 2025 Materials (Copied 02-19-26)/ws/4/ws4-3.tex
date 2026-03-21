@@ -1,0 +1,598 @@
+\PassOptionsToPackage{sols}{handout}
+\documentclass[main]{subfiles}
+\setcounterrefbeforedot{chapter}{m-ws4-3}
+\setcounterrefafterdot{section}{m-ws4-3}
+\addtocounter{section}{-1}
+\usepackage{solutions}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterfour}
+}{}
+
+\section{More Indeterminate Forms} \label{ws4-3}
+
+\begin{problemonly}
+    \begin{framed}
+
+\textbf{Key Ideas}:
+
+\begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+
+\item You should understand why $0 \cdot \infty$ and $1^\infty$ are
+  indeterminate forms and be able to evaluate limits of this form by
+  rewriting them so that you can apply L'H\^opital's Rule.
+
+\item You should be comfortable determining whether forms such as $\infty
+  - \infty$ are indeterminate.
+
+\end{itemize}
+\end{framed}
+\end{problemonly}
+
+Recall from last class:
+
+\begin{enumerate}
+
+\item Evaluate the limits below.
+\begin{multicols}{3}
+\begin{enumerate}
+
+
+
+  \item $\lim\limits_{x\to\infty} \left(\frac{1}{2}\right)^x\solonly{=0}$
+
+  \item $\lim\limits_{x\to\infty} (0.99999999)^x\solonly{=0}$
+
+  \item $\lim\limits_{x\to\infty} (1.0000001)^x\solonly{=\infty}$
+
+\end{enumerate}
+\end{multicols}
+
+\begin{solution}
+\begin{enumerate}
+
+  \item This limit is zero because the base of the exponent is between $0$ and $1$,
+    so this is exponential decay. As $x$ increases, $x=1$, $2$, $3$, \dots , we
+    multiply by $\frac{1}{2}$ over and over, and so $\left(\frac{1}{2}\right)^x$
+    becomes smaller and smaller, closer and closer to $0$.
+
+  \item This limit is zero because the base of the exponent is between $0$ and $1$,
+    so this is exponential decay. As $x$ increases, $x=1$, $2$, $3$, \dots , we
+    multiply by $0.99999999$ over and over, and so $(0.99999999)^x$
+    becomes smaller and smaller, closer and closer to $0$, albeit more slowly than
+    $\left(\frac{1}{2}\right)^x$.
+
+  \item This limit is $\infty$ because the base of the exponent is greater than
+    $1$, so this is exponential growth. As $x$ increases, $x=1$, $2$, $3$, \dots ,
+    we multiply by $1.0000001$ over and over, and so $(1.0000001)^x$
+    becomes larger and larger, growing without bound.
+
+\end{enumerate}
+\end{solution}
+
+\pspace{\stretch{0.5}}
+
+\item
+\begin{problem}[\stretch{0.5}]
+  Consider the limit $\lim\limits_{x\to\infty} (1+\frac{1}{x})^x$. Can you 
+  look at this and easily determine the value?
+\end{problem}
+
+\begin{solution}
+  This limit is not as easily deduced as the previous ones. On the one hand, we 
+  have numbers greater than $1$ being raised to larger and larger powers. This
+  suggests that the limit could be $\infty$. On the other hand, as $x$ increases,
+  $x=1$, $2$, $3$, \dots , we multiply by numbers that are closer and closer to
+  $1$, which means $(1+\frac{1}{x})^x$ grows more and more slowly and may
+  eventually approach some fixed number.
+  
+\end{solution}
+
+\item
+  %\note{I'll explain why I chose to use $x$ instead of $n$: because $n$ is discrete, and L'Hôpital's Rule involves derivatives.}
+  
+  Let's evaluate $y=\lim\limits_{x\to\infty} \left(1+\frac{1}{x}\right)^x$.
+  \emph{Note: This is an indeterminate form ``$1^{\infty}$'', so we want to
+  try to use L'Hôpital's Rule. But the first step will be to bring down the
+  exponent.}
+
+  \begin{enumerate}[topsep=0pt]
+    \item 
+    \begin{problem}
+      Take the natural log of both sides to bring down the exponent.
+    \end{problem}
+
+    \begin{solution}
+    \begin{align*}
+        \ln y &= \ln \left[\lim_{x\to\infty} \left(1+\frac{1}{x}\right)^x\right] \\
+        \ln y &= \lim_{x\to\infty} \ln \left(1+\frac{1}{x}\right)^x \\
+        \ln y &= \lim_{x\to\infty} x \ln\left(1+\frac{1}{x}\right)
+    \end{align*}
+    \end{solution}
+
+    \pspace{\stretch{0.5}}
+
+    \item
+    \begin{problem}
+      Why is the right-hand side of the form ``$\infty \cdot 0$''?
+    \end{problem}
+
+    \begin{solution}
+      As $x$ approaches infinity, $\left(1+\frac{1}{x}\right) \to 1$,
+      and since $\ln(1) = 0$, 
+      $\ln  \left(1+\frac{1}{x}\right) \to 0$.
+    \end{solution}
+
+    \pspace{\stretch{0.5}}
+
+    \item
+    \begin{problem}
+      Rewrite the right-hand side so the product is expressed as an equivalent
+      quotient. Is the resulting expression of the form ``$\frac{\infty}{\infty}$''
+      or ``$\frac{0}{0}$''? Which one?
+    \end{problem}
+
+
+    \begin{solution}
+      There are two ways to rewrite the product as a quotient. Since we are
+      going to be using L'Hôpital's Rule, the way which will create less work
+      for us is 
+        \[\lim_{x\to\infty} x \ln\left(1+\frac{1}{x}\right) = 
+        \lim_{x\to\infty} \frac{\ln\left(1+\frac{1}{x}\right)}{\frac{1}{x}}\]
+      and this is of the form ``$\frac{0}{0}$''.
+    \end{solution}
+
+    \pspace{\stretch{1}}
+
+    \item
+    \begin{problem}
+      Apply L'Hôpital's Rule to evaluate the limit.
+    \end{problem}
+
+    \begin{solution}
+    First, let's find the derivative of $\ln\left(1+\frac{1}{x}\right)$ using
+    the Chain Rule.
+
+
+
+    $$\frac{d}{dx}\Big[\ln\Big(1 + \frac{1}{x}\Big)\Big] = \frac{1}{1+\frac{1}{x}} \cdot \frac{-1}{x^2}$$
+    Now, we can apply L'Hôpital's Rule:
+      \begin{align*}
+        \lim_{x\to\infty} \frac{\ln\left(1+\frac{1}{x}\right)}{\frac{1}{x}}
+        &\lheq \lim_{x\to\infty} 
+        \frac{\frac{1}{1+\frac{1}{x}} \cdot \frac{-1}{x^2}}{\frac{-1}{x^2}} \\
+        &\nolheq \lim_{x\to\infty} \frac{1}{1+\frac{1}{x}} \\
+        &\nolheq \boxed{1}
+      \end{align*}
+    \end{solution}
+
+    \pspace{\stretch{1.5}}
+    \pspace{\newpage}
+    
+    \item
+    \begin{problem}
+      Go back and solve the equation you got in part (a) for $y$. 
+    \end{problem}
+
+    \begin{solution}
+      We now know that $\lim\limits_{x\to\infty} x\ln\left(1+\frac{1}{x}\right)=1$,
+      so we can solve for $y$:
+      \begin{align*}
+        \ln y &= \lim\limits_{x\to\infty} x\ln\left(1+\frac{1}{x}\right) \\
+        &= 1 \\
+        \shortintertext{Switching to exponential form,}
+        y &= e^1 \\
+        &= \boxed{e.}
+      \end{align*}
+    \end{solution}
+
+    \pspace{\stretch{0.5}}
+    
+    \begin{center}
+    \fbox{$\lim\limits_{x\to\infty} \left(1+\dfrac{1}{x}\right)^x = 
+      \cfitb[\vphantom{\dfrac{0}{0}}]{24pt}{e}$}
+    \end{center}
+  \end{enumerate}
+
+
+  This particular limit (and $e$!) comes up in a variety of settings. One is particularly applicable and we saw in Math Ma. Recall from our work with compound interest last semester: 
+
+  \begin{framed}
+      The amount of of money in an account after $t$ years is
+      $$M(t) = M_0\Big(1+ \frac{r}{n}\Big)^{nt}$$
+      where 
+      \begin{itemize}
+        \item $M(t)$ is the amount of money in the account after $t$ years
+        \item $M_0$ is the original amount of money
+        \item $r$ is the annual interest rate
+        \item $n$ is the number of compounding periods per year
+
+      \end{itemize}
+  \end{framed}
+
+
+  \item  Luis puts $\$1000$ in a bank account with a nominal yearly interest rate of
+    $100\%$ and makes no further deposits or withdrawals.
+    
+    \emph{Historical note: Inflation rates in 2021-2022 in the U.S. have felt high
+    at around $7\%$ per year, but they were much higher in other parts of the
+    world. In Zimbabwe, inflation was $269\%$, in Lebanon, $162\%$, in Venezuela,
+    $156\%$\footnote{The worst case of hyperinflation was in Hungary with an
+    inflation rate of $350\%$ per DAY in July 1946, according to \href{https://moneyweek.com/329219/10-july-1946-hungary-suffers-the-worlds-worst-hyperinflation}{MoneyWeek (10 July 2014)}.}.
+    Given that, it is not unreasonable to posit a bank in another country
+    with an interest rate of $100\%$.}
+
+    \begin{enumerate}[topsep=0pt]
+      \item 
+      \begin{problem}
+      If interest is compounded annually, how much will he have a year later?
+      \end{problem}
+
+      \begin{solution}
+        If interest is compounded annually, then Luis will 
+        have \fbox{$1000(1+1) = 2000$ dollars.}
+      \end{solution}
+
+      \pspace{\stretch{1}}
+
+      \item 
+      \begin{problem}
+      What if interest is compounded monthly?
+      \end{problem}
+
+      \begin{solution}
+        If interest is compounded monthly, then the account value will be 
+        multiplied by $1+\frac{1}{12}$ every month. At the end of the year, Luis 
+        will have
+        \fbox{$1000\left(1+\frac{1}{12}\right)^{12}=2613.04$ dollars.}
+      \end{solution}
+
+      \pspace{\stretch{1}}
+      \pspace{\newpage}
+
+      \item 
+      \begin{problem}
+      What if interest is compounded daily?
+      \end{problem}
+
+      \begin{solution}
+        If interest is compounded daily, then the account value will be multiplied
+        by $1+\frac{1}{365}$ every day. At the end of the year, Luis will have
+        \fbox{$1000\left(1+\frac{1}{356}\right)^{365}=2714.57$ dollars.}
+      \end{solution}
+
+      \pspace{\stretch{0.5}}
+
+      \item 
+      \begin{problem}
+      Hourly?
+      \end{problem}
+
+      \begin{solution}
+        There are $24 \cdot 365 = 8760$ hours in a year. At the end of the year, 
+        Luis will have
+        \fbox{$1000\left(1+\frac{1}{8760}\right)^{8760}=2718.13$ dollars.}
+      \end{solution}
+
+      \pspace{\stretch{0.5}}
+      
+
+      \item 
+      \begin{problem}
+      Continuously?
+      \end{problem}
+
+      \pspace{\stretch{0.5}}
+
+      \begin{solution}
+        We can express this as a limit:
+        \fbox{$\lim\limits_{n \to \infty} 1000\left(1+\frac{1}{n}\right)^n = 1000e$
+        dollars.}
+      \end{solution}
+      
+    \end{enumerate}
+
+We originally defined $e$ as the unique base of an exponential function whose derivative at $0$ (and thus, slope of the line tangent to the graph at $0$) was 1, so it is somewhat remarkable that this value comes up in such a different setting!
+
+There are a few different techniques we can use for evaluating limits of the form ``$1^{\infty}$'' which we will explore in this next problem.
+
+\item
+\note{There are 3 different approaches one may take.
+\begin{enumerate}[label={\arabic*},topsep=0pt]
+
+\item Use substitution and reduce to $\lim_{x\to\infty} (1+\frac{1}{x})^x$.
+\item Rewrite $(1+h)^{1/h}$ as $e^\text{something}$.
+\item Call the limit $y$. Take the natural log of both sides and solve for $y$.
+
+\end{enumerate}}
+
+
+
+\begin{problem}
+  Find $\lim\limits_{h \to 0^+} (1+h)^{1/h}$.
+\end{problem}
+
+\begin{solution}
+
+  \textbf{Method 1 (Substitution):} 
+  Let's use the substitution $h=\frac{1}{x}$, or
+  $x = \frac{1}{h}$. As $h$ approaches zero from the right, $x=\frac{1}{h}$ will
+  approach infinity. Thus, we have
+  \[
+  \lim_{h \to 0^+} (1+h)^{1/h} = \lim_{x\to\infty} \left(1+\frac{1}{x}\right)^x
+  = \boxed{e.}
+  \]
+
+  \textbf{Method 2 (Rewrite as $e^\text{something}$):}
+  We can rewrite
+      \begin{align*}
+        (1 + h)^{1/h} &= e^{\textstyle \ln \left[ (1 + h)^{1/h}
+            \right]} \\ 
+        \intertext{Using log rules, we can simplify the exponent:}
+        &= e^{\raisebox{3pt}{$\frac{1}{h} \ln (1 + h)$}}
+      \end{align*}
+  We want to now evaluate $\lim\limits_{h \to 0^+} \frac{1}{h}
+  \ln (1 + h)$, which we can rewrite as $\lim\limits_{h \to
+    0^+} \frac{\ln(1 + h)}{h}$.  This is a $\frac{0}{0}$ limit, so we
+  can use L'Hôpital's Rule:
+  \[ \lim_{h \to 0^+} \frac{\ln(1 + h)}{h} \lheq \lim_{h \to 0^+}
+  \frac{\quad \frac{1}{1 + h} \quad}{1} = 1.\]
+  We rewrote $\displaystyle
+  \lim_{h \to 0^+} (1 + h)^{1/h} = \lim_{h \to 0^+}
+  e^{\raisebox{3pt}{$\frac{1}{h} \ln (1 + h)$}}$; as $h \to 0^+$, the
+  exponent $\frac{1}{h} \ln (1 + h)$ approaches 1, so the entire
+  expression $ e^{\raisebox{3pt}{$\frac{1}{h} \ln (1 + h)$}}$
+  approaches $e^1 = \boxed{e.}$
+
+  \textbf{Method 3 (Take the natural log):}
+  Let's call the limit $y$ and take the natural log of both sides:
+  \begin{align*}
+    \ln y &= \ln\left[\lim_{h \to 0^+} (1+h)^{1/h}\right]
+    \intertext{Since $\ln(x)$ is continuous,}
+    \ln y &= \lim_{h \to 0^+} \ln(1+h)^{1/h}
+    \intertext{Using log rules, we can simplify to}
+    \ln y &= \lim_{h \to 0^+} \frac{1}{h}\ln(1+h)
+  \end{align*}
+  As in Method 2, we can use L'Hôpital's Rule to find that the limit on the
+  right-hand side is equal to $1$. Now, we can solve for $y$:
+  \begin{align*}
+    \ln y &= \lim_{h \to 0^+} \frac{1}{h}\ln(1+h) \\
+    &= 1 \\
+    y &= \boxed{e.}
+  \end{align*}
+\end{solution}
+
+\pspace{\nstretch{1}}
+
+
+\item 
+
+  Evaluate the following limits.  It is up to you to decide on an
+  appropriate method. 
+
+  \begin{enumerate}
+
+  \item
+
+    \note{If you blindly apply L'Hôpital's Rule here, you don't really
+      make any progress.  This is to emphasize the need for flexibility when
+      dealing with limits. }
+
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to (\pi/2)^-} \frac{\tan x}{\sec x}$
+    \end{problem}
+
+    \begin{solution}
+      This is an $\frac{\infty}{\infty}$ limit, so we can apply
+      L'Hôpital's Rule:
+      \begin{align*}
+        \lim_{x \to (\pi/2)^-} \frac{\tan x}{\sec x} & \lheq \lim_{x \to
+          (\pi/2)^-} \frac{\sec^2 x}{\sec x \tan x} \\
+        & \nolheq \lim_{x \to (\pi/2)^-} \frac{\sec x}{\tan x} \\
+        \intertext{This is again an $\frac{\infty}{\infty}$ limit, so we can
+          apply L'Hôpital's Rule again:}
+        & \lheq \lim_{x \to (\pi/2)^-} \frac{\sec x \tan x}{\sec^2 x} \\
+        & \nolheq \lim_{x \to (\pi/2)^-} \frac{\tan x}{\sec x} 
+      \end{align*}
+      If you take a step back, you see that we really aren't getting
+      anywhere.  It's time to try another strategy!
+
+      If we go back to the original limit, we see that we can rewrite it in
+      terms of $\sin x$ and $\cos x$:
+      \begin{align*}
+        \lim_{x \to (\pi/2)^-} \frac{\tan x}{\sec x} &= \lim_{x \to
+          (\pi/2)^-} \frac{\quad \frac{\sin x}{\cos x} \quad}{\frac{1}{\cos
+            x}} \\
+        &= \lim_{x \to (\pi/2)^-} \sin x \\
+        &= \boxed{1}
+      \end{align*}
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+        $\displaystyle\lim_{x\to0^+} (\cos x)^{1/x^2}\vphantom{\frac{1}{1}}$
+      \end{problem}
+
+      \begin{solution} 
+        As $x \to 0^+$, $\cos x \to 1$ and $\frac{1}{x^2} \to \infty$, so
+        this is a $1^\infty$ limit.  Therefore, we should rewrite it so
+        that we can apply L'Hôpital's Rule:
+        \begin{align} 
+          (\cos x)^{1/x^2} &= e^{\raisebox{3pt}{$\ln \left[ (\cos
+                x)^{1/x^2} \right]$}} \nonumber \\
+          &= e^{\raisebox{4pt}{$\frac{1}{x^2} \ln (\cos
+              x)$}} \label{eq:limit-1-to-the-inf-1}
+        \end{align}
+        Now, let's focus on what happens to the exponent
+        in the last expression as $x \to 0^+$:
+        \begin{align*}
+          \lim_{x \to 0^+} \frac{1}{x^2} \ln
+          (\cos x) & \nolheq \lim_{x \to 0^+} \frac{\ln (\cos x)}{x^2} \\
+          \shortintertext{This is a $\frac{0}{0}$ limit:}
+          & \lheq \lim_{x \to 0^+} \frac{\frac{1}{\cos x} \cdot (-\sin
+            x)}{2x} \\
+          \intertext{This is still a $\frac{0}{0}$ limit; let's
+            rewrite it before we apply L'Hôpital's Rule again:}
+          & \nolheq \lim_{x \to 0^+} \frac{- \tan x}{2x} \\
+          & \lheq \lim_{x \to 0^+} \frac{- \sec^2 x}{2} \\
+          &= - \frac{1}{2}
+        \end{align*}
+        Remember that this was only the limit of the exponent in
+        \eqref{eq:limit-1-to-the-inf-1}, so the limit we want is
+        $\boxed{e^{-1/2}}$.
+      \end{solution}
+
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to -\infty} x e^x$
+    \end{problem}
+
+    \begin{solution}
+    As $x \to -\infty$, $e^x \to 0$, so this is a $0 \cdot \infty$
+    limit, and we should rewrite it so that we can use L'Hôpital's
+    Rule:
+    \begin{align*}
+      \lim_{x \to -\infty} x e^x & \nolheq \lim_{x \to -\infty}
+      \frac{x}{e^{-x}} \\
+      & \lheq \lim_{x \to -\infty} \frac{1}{-e^{-x}} \\
+      & \nolheq \boxed{0}
+    \end{align*}
+  \end{solution}
+
+  \pspace{\newpage}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to (\pi / 2)^-} \sec 7x \cos 3x$
+    \end{problem}
+
+    \begin{solution}
+      As $x \to (\pi/2)^-$, $\sec 7x \to -\infty$ and $\cos 3x \to 0$, so
+      this is a $0 \cdot \infty$ limit.  We can rewrite it so that we can
+      use L'Hôpital's Rule:
+      \begin{align*}
+        \lim_{x \to (\pi / 2)^-} \sec 7x \cos 3x & \nolheq \lim_{x \to
+          (\pi / 2)^-} \frac{\cos 3x}{ \cos 7x} \\
+        & \lheq \lim_{x \to (\pi / 2)^-} \frac{-3\sin 3x}{ -7\sin 7x} \\
+        \intertext{As $x \to (\pi/2)^-$, $\sin (3x) \to \sin \left(
+            \frac{3 \pi}{2} \right) = -1$ and $\sin(7x) \to \sin \left(
+            \frac{7 \pi}{2} \right) = -1$, so this limit is equal to } %
+        & \nolheq \boxed{\frac{3}{7}}
+      \end{align*}
+    \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to \infty} \frac{1.01^x + x^{1000}}{e^x +
+          x^{3}}$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        We only need to consider the fastest growing terms in the
+        numerator and denominator:
+        \[ \lim_{x \to \infty} \frac{1.01^x + x^{1000}}{e^x + x^3} =
+        \lim_{x \to \infty} \frac{1.01^x}{e^x} = \lim_{x \to \infty}
+        \left( \frac{1.01}{e} \right)^x = \boxed{0}\] since
+        $\frac{1.01}{e} < 1$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to -\infty} \frac{1.01^x + x^{1000}}{e^x +
+          x^{3}}$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        As in {{{{\#6}}(e)}}, we only
+        need to consider the fastest growing terms in the numerator and
+        denominator.  However, they are different this time because
+        $1.01^x$ and $e^x$ both tend to 0 as $x \to -\infty$.  So, 
+        \[ \lim_{x \to -\infty} \frac{1.01^x + x^{1000}}{e^x + x^3} =
+        \lim_{x \to -\infty} \frac{x^{1000}}{x^3} = \lim_{x \to -\infty}
+        x^{997} = \boxed{-\infty}. \]
+      \end{solution}
+
+\end{enumerate}
+
+
+\textit{These last two problems serve as a quick summary some of the big ideas from this week.}
+
+\item L'Hôpital's Rule can be applied only when a limit is of one of the
+ following two indeterminate forms: 
+ \cfitb[\vphantom{$\dfrac00$}]{0.5in}{$\mquote{0/0}$} and 
+ \cfitb[\vphantom{$\dfrac00$}]{0.5in}{$\mquote{\infty/\infty}$}. 
+ However, these are not the only forms that are indeterminate. 
+ 
+ Which of the following are indeterminate?
+ 
+    \hfill \probonly{$\mquote{\dfrac{0}{0}}$}
+           \solonly{\fbox{$\mquote{\dfrac{0}{0}}$}}
+    \hfill $\mquote{\dfrac{0}{\infty}}$
+    \hfill \probonly{$\mquote{\dfrac{\infty}{\infty}}$}
+           \solonly{\fbox{$\mquote{\dfrac{\infty}{\infty}}$}}
+    \hfill $\mquote{\dfrac{\infty}{0}}$
+    \hfill $\mquote{\infty\cdot\infty}$
+    \hfill \probonly{$\mquote{0\cdot\infty}$}
+           \solonly{\fbox{$\mquote{0\cdot\infty}$}}
+    \hfill $\mquote{0-0}$
+    \hfill \probonly{$\mquote{\infty-\infty}$}
+           \solonly{\fbox{$\mquote{\infty-\infty}$}}
+    \hfill \null
+
+\begin{solution}
+    We've seen many examples of the first three indeterminate forms:
+    $\mquote{\dfrac{0}{0}}$, $\mquote{\dfrac{\infty}{\infty}}$, and
+    $\mquote{0\cdot\infty}$. If you aren't sure why 
+    $\mquote{\infty-\infty}$ is indeterminate, think about these examples.
+    \begin{itemize}
+        \item $\lim\limits_{x\to\infty} \left(x^2-x\right)=\infty$,
+        \item $\lim\limits_{x\to\infty} \left[(x+1)-x\right] = 1$,
+        \item $\lim\limits_{x\to\infty} \left(x-x\right)=0$.
+    \end{itemize}
+    The remaining forms are all determinate:
+    \begin{itemize}
+        \item A $\mquote{\dfrac{0}{\infty}}$ limit evaluates to $0$.
+        \item A $\mquote{\dfrac{\infty}{0}}$ limit is $\pm\infty$ or DNE, depending
+            on the sign of the denominator as it approaches $0$.
+        \item A $\mquote{\infty\cdot\infty}$ limit evaluates to $\infty$.
+        \item A $\mquote{0-0}$ limit evaluates to $0$. 
+    \end{itemize}
+\end{solution}
+             
+\item We saw that limits of the form   $\mquote{1^\infty}$ are indeterminate. There are other exponential indeterminate forms. When faced with an expression of the form $\displaystyle{f(x)}^{g(x)}$, a productive approach when in doubt is to give the expression a name, say $y = \displaystyle {f(x)}^{g(x)}$ and take the logs of both sides. This strategy can be useful whether or not the original exponential expression was indeterminate, but if the resulting expression is indeterminate you can be sure the initial one was as well.
+
+Which one of the following is NOT indeterminate?
+
+    \hfill $\mquote{0^0}$
+    \hfill \probonly{$\mquote{1^0}$}
+           \solonly{\xcancel{$\mquote{1^0}$}}
+    \hfill $\mquote{\infty^0}$
+    \hfill $\mquote{1^\infty}$
+    \hfill \null
+
+\begin{solution}
+    We saw why $\mquote{1^\infty}$ is indeterminate in class. For the other forms,
+    we can check if they remain indeterminate after we bring down the exponent
+    by taking logs. (We can
+    assume that $f(x)$ always non-negative, since $b^x$ is not well-defined when
+    $b$ is negative.)
+    \begin{itemize}
+        \item $\mquote{0^0}$: Taking the natural log gives $\mquote{0\cdot\ln(0)}$.
+        Remember that as $x\to0^+$, $\ln x \to -\infty$, so this means that we have
+        a limit of the form $\mquote{0 \cdot -\infty}$, which is indeterminate.
+
+        \item $\mquote{1^0}$: Taking the natural log gives $\mquote{0\cdot\ln(1)}$.
+        This means we have a limit of the form $\mquote{0\cdot0}$, which is zero.
+
+        \item $\mquote{\infty^0}$: Taking the natural log gives 
+        $\mquote{0\cdot\ln(\infty)}$. As $x\to\infty$, $\ln x \to \infty$, so we
+        have a limit of the form $\mquote{0 \cdot \infty}$, which is indeterminate.
+    \end{itemize}
+\end{solution}
+
+\end{enumerate}
+
+\end{document}

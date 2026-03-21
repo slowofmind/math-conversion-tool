@@ -1,0 +1,12 @@
+\ProvidesPackage{solutions}
+
+\solonly{
+\makepagestyle{solutions}
+\makeevenfoot{solutions}{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}{\thepage}{\footnotesize\textcopyright{} \emph{Harvard Math Mb}}
+\makeoddfoot{solutions}{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}{\thepage}{\footnotesize\textcopyright{} \emph{Harvard Math Mb}}
+\pagestyle{solutions}
+}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterone}
+}{}

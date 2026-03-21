@@ -1,0 +1,12 @@
+reset
+set terminal postscript eps enhanced color font 'Helvetica,32'
+set xlabel "S"
+set ylabel "I"
+set xrange [0:25]
+set yrange [0:10]
+set xtics (0,5,10,15,20,25)
+set ytics (0,5,10)
+unset key
+set output "SIR-trajectory.eps"
+set samples 5000
+plot 10*log(x) - x + 25 - 10*log(20) with lines lw 6 lt 1 lc rgbcolor "#ff0000"

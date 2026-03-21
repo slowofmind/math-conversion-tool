@@ -1,0 +1,662 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 24 - The Fundamental Theorem of Calculus, Part 1}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+For help with these problems, you may wish to read pp. 757-758 in Gottlieb.
+
+\begin{enumerate}[topsep=0pt]
+\item
+
+\begin{grading}
+10 points: 2/2/3/3
+\end{grading}
+
+  The rate that water is entering/leaving a tank is given by $f(t)=60-3t$
+  gallons/minute where $t$ is measured in minutes past noon.
+  Let $A(x)=\displaystyle\int_0^x f(t)\,dt$. 
+
+  \begin{enumerate}[topsep=0pt]
+
+  \item
+    \begin{problem}[\vfill]
+      Interpret $A (x)$ in words in the context of this problem, for $x\ge 0$.
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      $\displaystyle A(x) = \int_0^x f(t)\,dt$ is the net change in the
+      amount of water in the tank between noon and $x$ minutes after
+      noon.  In other words, it is (amount of water in the tank $x$
+      minutes after noon) $-$ (amount of water in the tank at noon).
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      For what values of $x$ is $A(x)$ increasing?
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      $A(x)$ is increasing when $A'(x) = f(x) = 60 - 3x$ is positive,
+      which happens for $\boxed{x < 20}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      At what time is the water level in the tank the same as it was at
+      noon? At this time, what is the value of $A(x)$?
+    \end{problem}
+
+    \begin{solution} 
+      We are looking for a time $x$ when the net change in amount of water
+      from noon to $x$ is 0; that is, we want $\displaystyle \int_0^x
+      f(t)\,dt = 0$.  Graphically, we want to find the value of $x$ so
+      that the signed area under $f(t)$ from $t = 0$ to $t = x$ is 0: 
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[ytick={60}, width=3in, height=2in, xtick={20, 40},
+            xticklabels={20, $x$}]
+            \addplot+[domain=0:20, plusarea] {60-3*x} \closedcycle;
+            \addplot+[domain=20:40, minusarea] {60-3*x} \closedcycle;
+            \addplot+[domain=-10:50, black] {60-3*x};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      By symmetry, we can see that $x = 40$, which corresponds to
+      \fbox{12:40 pm}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      If the water tank has $30,000$ gallons of water at noon, how much
+      does it have at 1 pm?  (Be careful with units!)
+    \end{problem}
+
+    \begin{solution}
+      The net change in the amount of water from noon ($t = 0$) to 1 pm
+      ($t = 60$) is $\displaystyle \int_{0}^{60} f(t)\,dt$.  We can
+      picture this graphically as the following signed area:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[ytick={60}, width=3in, height=2in, xtick={0,20,60}]
+            \addplot+[domain=0:20, plusarea] {60-3*x} \closedcycle;
+            \addplot+[domain=20:60, minusarea] {60-3*x} \closedcycle;
+            \addplot+[domain=-10:80, black] {60-3*x};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      Since $f(0) = 60$ and $f(60) = -120$, we can find the area of
+      the green triangle, $\frac{1}{2}(20)(60)$, and subtract the area
+      of the red triangle, $\frac{1}{2}(40)(120)$, to get
+      $\displaystyle \int_{0}^{60} f(t)\,dt = -1800$.
+      Therefore, the net change in the amount of water from noon
+      to 1 pm is $-1800$ gallons.  Since there were $30000$ gallons of
+      water at noon, the amount of water at 1 pm was $30000 - 1800 =
+      \boxed{28200 \text{ gallons}}$. 
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+\begin{grading}
+20 points: 1/2/2/3/3/5/4/0. Part (h) should not be graded for any credit.
+\end{grading}
+
+  Let $f$ be the quadratic function whose graph is shown below.
+  Let $A(x)=\displaystyle \int_2^x f(t)\,dt$.
+
+  \begin{tikzpicture}
+    \begin{axis}[xtick={-1, 1, 3}, ytick={-4}, width=2.25in]
+      \addplot+[domain=-2.1:4.1]{(x-1)^2-4};
+    \end{axis}
+  \end{tikzpicture}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Evaluate $A(2)$. 
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      $\displaystyle A(2) = \int_2^2 f(t) \, dt = 0$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Is $A(3)$ positive, negative, or zero?  Explain how you know. 
+    \end{problem}
+
+    \begin{solution} 
+      $A(3) = \displaystyle \int_2^3 f(t)\,dt$, which we can visualize
+      as the signed area under $f(t)$ from $t = 2$ to $t = 3$.  This
+      signed area is \fbox{negative} since $f < 0$ on $(2, 3)$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Is $A(1)$ positive, negative, or zero?  Explain how you know.
+    \end{problem}
+
+    \begin{solution}
+      $A(1) = \displaystyle \int_2^1 f(t)\,dt = -\int_1^2 f(t)\,dt$.
+      The integral $\displaystyle \int_1^2 f(t)\,dt$ can be visualized as
+      the signed area under $f(t)$ from $t = 1$ to $t = 2$, and this
+      signed area is negative.  Therefore, $A(1)$ is \fbox{positive}. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      For what values of $x$ is $A(x)$ increasing?  
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      $A$ is increasing when $A'$ is positive; by FTOC 1, $A' =
+      f$, and this is positive on \fbox{$(-\infty, -1)$ and $(3,
+        \infty)$}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      For what values of $x$ is $A(x)$ concave up?
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      $A$ is concave up when $A''$ is positive; by FTOC 1, $A'' =
+      f'$, which is positive when $f$ is increasing. This happens on
+      \fbox{$(1, \infty)$}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\nstretch{2}]
+      Sketch a rough graph of $A(x)$ on the interval $[-2, 4]$. 
+      \emph{Make sure it agrees with parts (a)-(e)!}
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      We've seen that $A$ has an $x$-intercept at $x = 2$, and it's
+      increasing on $(-\infty, -1)$, decreasing on $(-1, 3)$, and
+      increasing on $(3, \infty)$.  Also, it's concave down on $(-\infty,
+      1)$ and concave up on $(1, \infty)$.  Thus, its graph looks like
+      this:     
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick={-1, 1, 2, 3}, ytick={0}, width=2.25in, ymax=22]
+            \addplot+[domain=-2.1:4.1]{(1/3) * (x - 1)^3 - 4 * (x - 1) +
+              (11/3)};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{2}]
+
+    Let $B(x)=\displaystyle\int_3^x f(t)\,dt$. 
+    Sketch a rough graph of $B(x)$.
+    (\emph{Hint:} What do you
+      know about how $B(x)$ relates to 
+      $A(x)$?  What is $B(3)$?
+      You may want to look back at
+      {{{Problem Set 23}, {{\#6}}}}.)
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      As we saw in {{{Problem Set 23}, {{\#6}}}},
+        $B(x)$ and $A(x)$ differ by a constant.
+        Graphically, that means the graph of $B(x)$
+        is a vertical
+        shift of the graph of $A(x)$.  Since $B(3) =
+        \displaystyle \int_3^3 f(t)\,dt = 0$, we must shift the graph of
+        $A$ vertically until it crosses the $x$-axis at $x = 3$ to
+        get the graph of $A$: 
+    \begin{center}
+      \begin{tikzpicture}
+        \begin{axis}[xtick={-1, 1, 2, 3}, ytick={0}, width=2.25in,
+          ymin=-2, ymax=22, clip=false]
+          \addplot+[domain=-2.1:4.1]{(1/3) * (x - 1)^3 - 4 * (x - 1) +
+            (11/3)} node[right]{$A$};
+          \addplot+[domain=-2.1:4.1]{(1/3) * (x - 1)^3 - 4 * (x - 1) +
+            (16/3)} node[above right]{$B$};
+        \end{axis}
+      \end{tikzpicture}
+    \end{center}
+    \end{solution}
+
+  \item
+    \begin{problem}
+      Check your answers using the Area Function applet at
+      \url{https://www.geogebra.org/m/cjdwbanv}.  The formula for
+      $f$ is $f(t) = (t - 1)^2 - 4$, which is already entered in the
+      applet.
+
+      To see $A$, just drag the red dot labeled $x$ around; the purple
+      graph on the right is $A$.
+
+      To see $B(x)$, first change $a$ in the
+      applet to be $3$, and then drag $x$ around again.
+    \end{problem}
+
+  % \item
+  %   \begin{problem}
+  %     Suppose that $f(t)$ represents the rate, in students per minute, at
+  %     which students are entering or leaving Annenberg $t$ minutes after 8
+  %     am one morning.  If there are 10 students in Annenberg at 8:03 am,
+  %     sketch the graph of $S(t)$, the number of students in Annenberg $t$
+  %     minutes after 8 am. 
+  %   \end{problem}
+
+  %   \begin{solution}
+  %     At $t = 3$, there are $10$ students in Annenberg.  Therefore, the
+  %     number of students in Annenberg $t$ minutes after 8 am is
+  %     $\displaystyle 10 + \int_3^t f(u)\,du$.  That is, $S(t) = 10 + {}_3
+  %     A(t)$.  Therefore, to graph $S(t)$, we just shift the graph of
+  %     ${}_3 A(t)$ up by 10 units:
+  %     \begin{center}
+  %       \begin{tikzpicture}
+  %         \begin{axis}[xtick={-1, 1, 2, 3}, ytick=\empty, width=2.25in,
+  %           ymin=-2, ymax=22, clip=false]
+  %           \addplot+[domain=-2.1:4.1]{(1/3) * (x - 1)^3 - 4 * (x - 1) +
+  %             (11/3)} node[right]{$A$};
+  %           \addplot+[domain=-2.1:4.1]{(1/3) * (x - 1)^3 - 4 * (x - 1) +
+  %             (16/3)} node[above right]{$B$};
+  %           \addplot+[domain=-2.1:4.1] {x^3/3 - x^2 - 3*x + 19} node[right]{$S$};
+  %           \addplot+[closed, red] coordinates { (3, 10) }
+  %           node[above] { $(3, 10)$ };
+  %         \end{axis}
+  %       \end{tikzpicture}
+  %     \end{center}
+  %   \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+\begin{grading}
+7 points: 1/2/4. For part (c), they need to explain why they're able to eliminate the wrong answers, and not just why the correct answer works!
+\end{grading}
+
+    Laura is trying to find a formula for the area function 
+    $A(x)=\displaystyle\int_1^x f(t)\,dt$,
+    where $f(t) = \dfrac{2t}{t^2 + 1}$.
+
+  \begin{enumerate}[topsep=0pt]
+  \item
+    \begin{problem}[\vfill]
+      What is $A(1)$? That is, what is 
+      $\displaystyle\int_1^1 f(t)\,dt$? 
+    \end{problem}
+
+    \begin{solution}
+      $\displaystyle A(1) = \int_1^1 f(t)\,dt = \boxed{0}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      What is $A'(x)$? That is, what is
+      $\displaystyle \frac{d}{dx}\left[\int_1^x f(t)\,dt\right]$? Your answer should be a function of $x$!
+    \end{problem}
+
+    \begin{solution}
+      By FTOC 1, $A'(x) = f(x) = \dfrac{2x}{x^2 + 1}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      One of the following is a formula for $A(x)$; which one?
+      (\emph{Note:} You are \textbf{not} expected to be able to directly
+      find a formula for $A(x)$; however, given what you found in the
+      previous parts of this problem, you should be able to eliminate all
+      but one of the choices below.)
+      
+        \begin{enumerate}[label=\protect{\maybecircle{\Alph*.}}]
+        \plainitem $\ln (x^2 + 1)$ $\vphantom{\dfrac{1}{1}}$
+        \circleitem $\ln (x^2 + 1) - \ln 2$ $\vphantom{\dfrac{1}{1}}$
+        \plainitem $\dfrac{2 (1 - x^2)}{(x^2 + 1)^2}$
+        \plainitem $2x \arctan x$ $\vphantom{\dfrac{1}{1}}$
+        \end{enumerate}
+      
+      Explain your reasoning.
+    \end{problem}
+
+    \begin{solution}
+      We know two things about $A(x)$: its derivative is
+      $\dfrac{2x}{x^2 + 1}$, and it has an $x$-intercept at $x = 1$.  Only
+      (A) and (B) have derivative $\dfrac{2x}{x^2 + 1}$; of those two,
+      only \fbox{(B)} has an $x$-intercept at $x = 1$.
+    \end{solution}
+
+  \end{enumerate}
+
+\item
+% 23.2.2
+
+\begin{grading}
+8 points: 2 for each part.
+\end{grading}
+
+  Here is the graph of a function $f(t)$. 
+  \begin{center}
+    \begin{tikzpicture}[scale=0.8]
+      \begin{axis}[ xscale=0.8, xmin=-3, xmax=3, xtick=\empty, yscale=0.4,
+        ymin=-0.9, ymax=0.9, ytick=\empty]
+        \addplot+[no marks,black, thick,domain=-3:3,unbounded coords=jump,samples=101]{2*x/(1+x^2)^2};
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      One of the following graphs is the graph of
+      $\displaystyle F(x) = \int_0^x f(t) \,dt$; which one? Explain.
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      $F'(x) = f(x)$ by
+        FTOC 1.  In particular,
+      since $f$ is negative on $(-\infty, 0)$ and positive on $(0,
+      \infty)$, $F$ is decreasing on $(-\infty, 0)$ and increasing on $(0,
+      \infty)$.  This only matches (D) and (E).
+
+      Since $\displaystyle F(0) = \int_0^0 f(t)\,dt = 0$, the graph of $F$
+      must be \fbox{(D).}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      One of the following graphs is the graph of $\displaystyle G(x) =
+      \int_2^x f(t) \,dt$; which one? Explain.
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      $G(x)$ differs
+        from $F(x)$ by a constant (by
+        {{{Problem Set 23}, {{\#6}}}}).  The only vertical shift
+      of $F$ is \fbox{(E).}
+
+      (Also, notice that $G(2) = \displaystyle \int_2^2 f(t)\,dt = 0$.)
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      One of the following graphs is the graph of $\displaystyle H(x) =
+      \int_x^2 f(t)\,dt$; which one?  Explain.
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      We can write $H(x) = \displaystyle \int_x^2 f(t)\,dt = - \int_2^x
+      f(t)\,dt = - G(x)$.  So, to get the graph of $H$, we can flip the
+      graph of $G$ over the $x$-axis, which gives us graph \fbox{(F).} 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      One of the following graphs is the graph of $\displaystyle K(x) =
+      \int_2^3 f(t)\,dt$; which one?  Explain.
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      $K(x)$ is a positive constant, so its graph is \fbox{(J).}
+    \end{solution}
+
+  \end{enumerate}
+\end{enumerate}
+
+  Choices:
+  
+    \pgfplotsset{
+      cycle list={blue},
+      every axis/.style={
+        xmin=-3.5,
+        xmax=3.5,
+        xtick=\empty,
+        ymin=-0.9,
+        ymax=0.9,
+        ytick=\empty,
+        enlarge y limits=0.04,
+         ylabel style={at={(axis description cs:0,0.75)},anchor=east,
+         rotate=-90},
+         width=1.8in,
+         height=1.3in
+      },
+    }
+    \begin{tikzpicture}
+    \begin{groupplot}[group style={group size=4 by 3,vertical sep=12pt}]
+      \nextgroupplot[ylabel=(A)]
+          \addplot+{2*x^2/(x^2+1)^2};
+
+      \nextgroupplot[ytick={0.3}, yticklabels={2},ylabel=(B)]
+          \addplot+{2*x^2/(x^2+1)^2 + 0.3};
+          
+      \nextgroupplot[ytick={-0.3}, yticklabels={$-2$},ylabel=(C)]
+          \addplot+{-2*x^2/(x^2+1)^2 - 0.3};
+
+      \nextgroupplot[ylabel=(D)]
+          \addplot+[domain=-3.5:3.5]{x^2/(1+x^2)};
+
+      \nextgroupplot[xtick={-2,2},ylabel=(E)]
+          \addplot+[domain=-3.5:3.5]{1/5-1/(1+x^2)};
+
+      \nextgroupplot[xtick={-2,2},ylabel=(F)]
+          \addplot+[domain=-3.5:3.5]{-1/5+1/(1+x^2)};
+
+      \nextgroupplot[ylabel=(G)]
+          \addplot+[domain=-3.5:3.5]{atan(x)/90 - 3*x/(5+15*x^2)};
+
+      \nextgroupplot[ytick={0.3}, yticklabels={2},ylabel=(H)]
+          \addplot+[domain=-3.5:3.5]{atan(x)/90 - 3*x/(5+15*x^2)+0.3};
+
+      \nextgroupplot[xtick={2},ylabel=(I)]
+          \addplot+[domain=-3.5:3.5]{atan(x-2)/90 - 3*(x-2)/(5+15*(x-2)^2)};
+
+      \nextgroupplot[ylabel=(J)]
+          \addplot+{0.45};
+
+      \nextgroupplot[ylabel=(K)]
+          \addplot+{-0.45};    
+    \end{groupplot}
+    \end{tikzpicture}
+
+\pspace{\newpage}
+
+% Practice for Final
+% \item ({Problem Set 23}, {{\#5}})
+
+%  (close to 21.3.14)
+% \begin{problem}
+%     A sewage gutter is to be constructed from a rectangular piece of sheet
+%     metal 6 feet wide by folding up a 2-foot strip on each side by equal
+%     angles.  Let $\theta$ be the angle between the sides and the vertical,
+%     as shown in the figure below.  What should $\theta$ be so that the
+%     gutter will carry the maximum amount of water?  (Be sure to justify
+%     that your value of $\theta$ actually maximizes the amount of water
+%     carried.)
+
+%     \begin{tikzpicture}[x=2cm, y=2cm]
+%       \pgfmathsetmacro{\angle}{40}
+
+%       \draw ({90+\angle}: 1) -- node[anchor=north east]{2} (0, 0) -- (1,
+%       0) -- node[anchor=north west]{2} +({90-\angle}:1); %
+%       \draw[dashed] (0, 0) -- (0, 1/3); %
+%       \draw[dashed] (1, 0) -- (1, 1/3); %
+%       \draw (0, 8pt) arc[radius=8pt, start angle=90, end
+%       angle={90+\angle}]; %
+%       \draw (1, 8pt) arc[radius=8pt, start angle=90, end
+%       angle={90-\angle}]; %
+%       \draw ({90+\angle/2}:12pt) node{$\theta$};
+%       \draw ($(1, 0) + ({90-\angle/2}:12pt)$) node{$\theta$};
+%     \end{tikzpicture}
+%   \end{problem}
+
+%   \begin{solution}
+%     \ideas{We start by identifying our goal.}
+
+%     \highlight{\textbf{Goal:} Maximize the amount of water the gutter can
+%       carry, which is accomplished by maximizing the cross-sectional area
+%       of the gutter.}
+
+%     \ideas{Next, we write a formula for the thing we're trying to maximize
+%       (cross-sectional area).  To do this, we'll need to define some
+%       variables.}
+
+%     \highlight{\textbf{Define variables:} Let $A$ be the cross-sectional
+%       area of the gutter and $x, y$ be as labeled in the picture below.}
+
+%     \begin{center}
+%       \begin{tikzpicture}[x=2cm, y=2cm]
+%         \pgfmathsetmacro{\angle}{40}
+
+%         \draw ({90+\angle}: 1) -- node[anchor=north east]{2} (0, 0) --
+%         node[below]{2} (1, 0) -- node[anchor=north west]{2}
+%         +({90-\angle}:1) -- cycle; %
+%         \draw[dashed] (0, 0) -- node[right]{$y$} (0, {cos(\angle)}); %
+%         \draw[dashed] (1, 0) -- (1, {cos(\angle)}); %
+%         \draw[decorate, decoration={brace}, yshift=2pt] ({90+\angle}:1) --
+%         node[above, yshift=2pt]{$x$} (0, {cos(\angle)}); %
+%         \draw (0, 8pt) arc[radius=8pt, start angle=90, end
+%         angle={90+\angle}]; %
+%         \draw ({90+\angle/2}:12pt) node{$\theta$};
+%       \end{tikzpicture}
+%     \end{center}
+%     We can see that the area of the trapezoid can be broken up into two
+%     triangles (of width $x$ and height $y$) and a rectangle (of width $2$
+%     and height $y$).
+
+%     \highlight{\textbf{Formula for thing we're trying to maximize:} $A = 2
+%       \left( \frac{1}{2} x y \right) + 2 y = xy + 2y$}
+
+%     \ideas{Next, we want to express $A$ as a function of just one
+%       variable.  To do this, we must get $x$ and $y$ in terms of a single
+%       variable.}  Since we're ultimately looking for $\theta$, let's
+%     express $x$ and $y$ in terms of $\theta$.  Looking at the right
+%     triangles in our picture, we see $\cos \theta = \frac{y}{2}$ and $\sin
+%     \theta = \frac{x}{2}$, so $y = 2 \cos \theta$ and $x = 2 \sin \theta$.
+%     Plugging this into our formula for $A$, we get $A$ in terms of just
+%     $\theta$: $A(\theta) = 4 \sin \theta \cos \theta + 4 \cos \theta$.
+
+%     \ideas{Now, maximize!}  In our scenario, the relevant values of
+%     $\theta$ are between $0$ and $\frac{\pi}{2}$, so we need to maximize
+%     $A(\theta)$ on $\left[ 0, \frac{\pi}{2} \right]$.  We first find the
+%     derivative of $A(\theta)$:
+%     \begin{align*}
+%       A'(\theta) = 4 \cos^2 \theta - 4 \sin^2 \theta - 4 \sin \theta
+%     \end{align*}
+%     This is never undefined, and it's 0 when 
+%     \begin{align*}
+%       4 \cos^2 \theta - 4 \sin^2 \theta - 4 \sin \theta &= 0 \\
+%       \shortintertext{Dividing through by 4,}
+%       \cos^2 \theta - \sin^2 \theta - \sin \theta &= 0 \\
+%       \intertext{By the Pythagorean Identity, $\sin^2 \theta + \cos^2
+%         \theta = 1$, so $\cos^2 \theta = 1 - \sin^2 \theta$:}
+%       1 - 2 \sin^2 \theta - \sin \theta &= 0 \\
+%       \intertext{Now that the entire equation is in terms of $\sin
+%         \theta$, let's substitute $u = \sin \theta$:}
+%       1 - 2 u^2 - u &= 0 \\
+%       - (2u^2 + u - 1) &= 0 \\
+%       - (2u - 1)(u + 1) &= 0 \\
+%       u & = \frac{1}{2}, -1 \\
+%       \sin \theta &= \frac{1}{2}, -1 
+%     \end{align*}
+%     On $\left[ 0, \frac{\pi}{2} \right]$, the only solution is $\theta =
+%     \frac{\pi}{6}$.  
+
+%     \ideas{But wait, we're not done yet!  We still need to determine
+%       whether this is the absolute maximum.}  Since our domain is a closed
+%     interval, we can plug $\theta = \frac{\pi}{6}$, along with the
+%     endpoints of the interval, into $A(\theta) = 4 \sin \theta \cos \theta
+%     + 4 \cos \theta$ to see which gives us the highest value:
+%     \begin{align*}
+%       A(0) &= 4 \\
+%       A \left( \frac{\pi}{6} \right) &= 4 \left( \frac{1}{2} \right)
+%       \left( \frac{\sqrt{3}}{2} \right) + 4 \left( \frac{\sqrt{3}}{2}
+%       \right) = \sqrt{3} + 2 \sqrt{3} = 3 \sqrt{3} \\
+%       A \left( \frac{\pi}{2} \right) &= 0 
+%     \end{align*}
+%     So, the absolute maximum occurs when $\theta =
+%     \boxed{\frac{\pi}{6}}$.     
+%   \end{solution}
+
+\begin{enumerate}[resume]
+
+\item 
+
+\begin{grading}
+5 points: 1/4
+\end{grading}
+
+{\bf Reflect Back.} 
+
+  \begin{enumerate}
+  \item
+\begin{problem}[\vfill]
+      The area function 
+      $A(x)=\displaystyle\int_a^x f(t)\,dt$ always has at least one $x$-intercept:
+      at what $x$-value?
+    \end{problem}
+
+    \begin{solution}
+      $A(x)$ has an $x$-intercept at $x = \boxed{a}$ because $
+      A(a) = \displaystyle \int_a^a f(t)\,dt = 0$.
+    \end{solution}
+
+  \item
+Last semester, you learned
+    that the behavior of a function $F(x)$ is very much related to the
+    behavior of its derivative.  Fill in the table below.  (If you know
+    $F(x)$ has the property in the first column, what does that tell you
+    about $F'$?)
+
+    \begin{center}
+      \renewcommand{\arraystretch}{2}
+      \begin{tabular}{| p{1.25in} | p{1.25in} |}
+        \hline
+        \multicolumn{1}{|c|}{$F(x)$} & \multicolumn{1}{c|}{$F'(x)$} \\
+        \hline\hline
+        increasing & \solonly{\textbf{positive}}\\
+        \hline
+        decreasing & \solonly{\textbf{negative}} \\
+        \hline
+        concave up & \solonly{\textbf{increasing}} \\
+        \hline
+        concave down & \solonly{\textbf{decreasing}} \\
+        \hline
+      \end{tabular}      
+    \end{center}
+
+    \begin{problem}
+      If $F(x) = A(x)$, what is $F'(x)$?
+    \end{problem}
+
+    \begin{solution}
+      $F'(x)=f(x)$.
+    \end{solution}
+    
+      \emph{Your table now tells you how the properties of $A$ relate
+        to properties of $f$.}
+
+        \pspace{\vfill}
+  \end{enumerate}
+\end{enumerate}
+
+\psreflection{
+For next class, read \S 23.3, 24.1.
+}
+\end{document}

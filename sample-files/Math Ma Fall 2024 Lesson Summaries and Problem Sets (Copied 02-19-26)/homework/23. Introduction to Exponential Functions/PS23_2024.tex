@@ -1,0 +1,593 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{pifont}
+
+\usepackage{soul}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols, workshop, grading]{handout}
+
+\providecommand{\check}{}
+\renewcommand{\check}{\ifmmode{\text{ \ding{51} }}\else{\ding{51} }\fi}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\makeatletter
+
+% underline links               
+\let\@href=\href
+\renewcommand{\href}[2]{\@href{#1}{\ul{#2}}}
+
+\newdimen\SOUL@dimen %new
+\def\SOUL@ulunderline#1{{%
+    \setbox\z@\hbox{#1}%
+    % \dimen@=\wd\z@
+    \SOUL@dimen=\wd\z@ %new
+    \dimen@i=\SOUL@uloverlap
+    \advance\SOUL@dimen2\dimen@i %\dimen@ exchanged too
+    \rlap{%
+      \null
+      \kern-\dimen@i
+      % \SOUL@ulcolor{\SOUL@ulleaders\hskip\dimen@}%
+      \SOUL@ulcolor{\SOUL@ulleaders\hskip\SOUL@dimen}% new
+    }%
+    \unhcopy\z@
+  }}
+
+\newcommand\calculator{
+  \begin{tikzpicture}[x=0.15ex, y=0.15ex, baseline=1.5pt]
+    \begin{scope}[thick]
+      \draw (0, 0) -- (10, 0) -- (10, 14) -- (0, 14) -- cycle;
+      \foreach \x in {10/3, 20/3}
+      {
+        \draw (\x, 0) -- (\x, 10);
+      }
+      \foreach \y in {10/3, 20/3, 10}
+      {
+        \draw (0, \y) -- (10, \y);
+      }
+    \end{scope}
+  \end{tikzpicture}
+}
+\newcommand{\calcitem}{\refstepcounter{enum\romannumeral\@enumdepth}%
+\item[\calculator \csname labelenum\romannumeral\@enumdepth\endcsname]}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\newcommand{\highlight}[1]{\boldmath\hl{\textbf{#1}}\unboldmath}
+
+\newcommand{\goal}[1]{\textbf{\textcolor{skyblue}{#1}}}
+
+\newcommand{\doedfinity}[2][\newpage]{
+  \begin{problem}[#1]
+    Do the Edfinity assignment ``Problem Set #2''.
+
+    We encourage you to write down any scratch work here, as well as
+    things you want your future self to remember. Nothing you write
+    here will be graded; it's just for you!
+  \end{problem}
+}
+
+\newcommand{\psrnewpage}{\newpage}
+\newcommand{\psreflection}[2][]{
+
+  \ifthenelse{\not\equal{#1}{nocite}}{
+    \begin{enumerate}[resume]
+    \item
+      \begin{problem}[1in]
+        Please cite any help you got on this problem set:
+        \begin{itemize}[nosep]
+        \item If you worked with other students, please list their names here.
+        \item If you used resources other than those on our Canvas site, please list them here.
+        \end{itemize}
+      \end{problem}
+
+    \end{enumerate}
+  }
+
+  \probonly{%
+    #2
+
+    \psrnewpage
+
+    \emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!
+    \begin{itemize}
+    \item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!
+
+      \vspace{1.5in}
+
+    \item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.
+
+      \vspace{1.5in}
+
+    \item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!
+
+      \vfill
+    \end{itemize}      
+  }
+}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 23 - Introduction to Exponential Functions}
+\end{center}
+
+\begin{enumerate}
+\item  \note{
+    \begin{itemize}[nosep]
+    \item Match the 7 basic functions, plus $b^x$ with $b > 1$ and $b^x$ with $b < 1$, to graphs.      
+    \item Evaluate something like $\left( \frac{1}{4} \right)^x$ at a few values of $x$.
+    \item Find $\displaystyle \lim_{x \to \pm \infty} b^x$ and say how they depend on $b$.
+    \item Match shifts/stretches of $2^x$ to graphs. 
+    \item Translate between ``increasing/decreasing by some percent'' and ``being multiplied by some factor''.
+    \item Write functions for a quantity increasing / decreasing by a fixed percent per year. 
+    \item Practice with exponent rules
+    \end{itemize}
+  }
+
+  \doedfinity{23}  
+
+\item \label{google-tac}
+
+  In fall 2023, Google was in the middle of a \href{https://www.vox.com/technology/2023/9/11/23864514/google-search-antitrust-trial}{big antitrust trial}. One focus was Google's ``traffic acquisition costs'', which are payments they make to drive traffic to Google. For example, Google pays Apple to be the default search engine on iPhones.
+
+  % https://ycharts.com/indicators/alphabet_inc_googl_traffic_acquisition_costs
+  In 2014, Google had traffic acquisition costs of \$13.5 billion. Since then, their traffic acquisition costs have grown by about 17\% per year.
+
+  \begin{enumerate}
+  \item
+
+    \begin{grading}
+      1.5 points: 0.5 for having a formula that's equal to 13.5 when $t = 0$, 1 for having $1.17^t$
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Write a formula that gives Google's traffic acquisition costs, in billions of dollars, $t$ years after 2014. 
+    \end{problem}
+
+    \begin{solution}
+      Growing by $17\%$ per year is equivalent to multiplying by $1.17$ each
+      year. Google's traffic acquisition costs in 2014 were $\$13.5$ billion,
+      so \fbox{$C(t)=13.5(1.17)^t$}.
+    \end{solution}
+
+  \calcitem
+
+    \begin{grading}
+      1.5 points: 1 for knowing to plug $t = 10$ into their answer from (a) and 0.5 for giving appropriate units
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      If the trend of growing by 17\% per year continues, how much will Google spend on traffic acquisition costs in 2024? Give an exact answer, and use a calculator or \href{https://www.wolframalpha.com}{WolframAlpha} to give a decimal approximation. Be sure to include units with your answer.
+    \end{problem}
+
+    \begin{solution}
+      \fbox{$C(10) = 13.5(1.17)^{10}$ billion dollars 
+      $\approx 64.9$ billion dollars}.
+    \end{solution}
+
+  \calcitem
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      What is the percent increase in Google's traffic acquisition costs between 2014 and 2024? Write down the formula you use to find this, and use a calculator or \href{https://www.wolframalpha.com}{WolframAlpha} to give a decimal approximation.
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        \text{percent change} &= \frac{\text{final value} - \text{initial value}}
+        {\text{initial value}} \\
+        &= \frac{C(10)-C(0)}{C(0)} \\
+        &= \frac{13.5(1.17)^{10} - 13.5}{13.5} \\
+        &= (1.17)^{10} -1 \\
+        &\approx 381\%
+      \end{align*}
+    \end{solution}
+
+  \item 
+
+    \begin{grading}
+      1.5 points. This is exploratory, so students get full credit for any thoughtful answer. 
+    \end{grading}
+
+    \begin{problem}[\nstretch{1.25}]
+      (Exploratory) Your friend says, ``If Google's traffic acquisition costs increase by 17\% per year, they should increase by 170\% in the 10 years between 2014 and 2024.'' But your answer to (c) shows this isn't right! Can you explain why your friend's thinking is incorrect? 
+    \end{problem}
+
+    \begin{solution}
+      Each year, Google's traffic acquisition costs increase by $17\%$
+      \textbf{compared to the previous year.} The increase from 2015 to
+      2016 is more than a $17\%$ increase \textbf{compared to 2014},
+      because the costs in 2015 were more than the costs in 2014.
+    \end{solution}
+
+  \end{enumerate}
+
+\item \label{lallemand}
+
+  \href{https://www.lallemand.com/}{Lallemand} is a company that manufactures yeast for bakeries (including Wonder Bread).\probonly{\footnote{The information in this problem comes from \emph{52 Loaves} by William Alexander.}} Each week, they start with 6 test tubes of yeast, a tiny total of about 0.00005 pounds of yeast. The amount of yeast doubles every 4 hours.
+  \begin{enumerate}
+  \item
+
+    \begin{grading}
+      2 points  
+    \end{grading}
+
+    \begin{problem}
+      We'd like to write a formula for the number of pounds of yeast $t$ hours after the start of the week. As we did in class, a good strategy is to start by making a table. We know Lallemand starts with 0.00005 pounds of yeast, and we know what happens every 4 hours, so we'll make a table where the entries are 4 hours apart. Fill in the table below. Leave your answers in the form $0.00005$ times something. (This will make (b) easier.) 
+    \end{problem}
+
+    {
+      \renewcommand{\arraystretch}{1.5}
+      \begin{tabular}{c | c}
+        $t$ & pounds of yeast $t$ hours after the start of the week \\
+        \hline
+        0 & \solonly{$0.00005$} \\
+        4 & \solonly{$0.00005 (2) = 0.001$} \\
+        8 & \solonly{$0.00005 (2)^2 = 0.002$} \\
+        12 & \solonly{$0.00005 (2)^3 = 0.004$} 
+      \end{tabular}
+    }
+
+  \item
+
+    \begin{grading}
+      2 points: 1 for having $0.00005 \cdot 2^{\text{something}}$, 1 for having $t / 4$ in the exponent
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Using your table, write a formula that gives the number of pounds of yeast $t$ hours after the start of the week.
+    \end{problem}
+
+    \begin{solution}
+      Each line of the table has the form $0.00005 \cdot 2^{\text{something}}$, and the exponent of 2 is exactly $\frac{t}{4}$. So, the formula is $\boxed{0.00005 (2)^{t / 4}}$.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      \check Check that plugging $t = 12$ into your formula gives a result that agrees with your table in (a).   
+    \end{problem}
+
+  \calcitem
+
+    \begin{grading}
+      1.5 points: 1 for having the correct exponent of 2, 0.5 for having correct units
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      After 6 days of growing yeast, Lallemand packages it up to sell. How much yeast do they have at this point? Give an exact answer (that can be expressed using exponents), and then use a calculator or \href{https://www.wolframalpha.com}{WolframAlpha} to get a decimal approximation. Include units with your answer.
+    \end{problem}
+
+    \begin{solution}
+      $6$ days is $144$ hours, so Lallemand will have
+      $0.00005(2)^{144/4}$ pounds of yeast, or approximately $3.44$ million
+      pounds of yeast.
+    \end{solution}
+
+    \probonly{\emph{Crazy, huh?}}
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+\item As we continue studying exponential functions, exponent algebra will be more and more important. Here's some practice with that.
+
+  \begin{enumerate}
+
+  \item
+
+    \begin{grading}
+      2 points:
+      \begin{itemize}[nosep]
+      \item 0.5 for knowing $\left( \dfrac{x}{y} \right)^n = \dfrac{x^n}{y^n}$
+      \item 0.5 for correctly dividing by $\dfrac{x^n}{y^n}$
+      \item 0.5 for correctly combining powers of $x$
+      \item 0.5 for correctly combining powers of $y$
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\stretch{1.5}]
+      Simplify 
+      $\dfrac{x^{n+1}y^{2n}}{\left(\dfrac{x}{y}\right)^n}$; you should be able to rewrite it so there are no fractions left. 
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        \frac{x^{n+1}y^{2n}}{\left(\dfrac{x}{y}\right)^n} &=
+        \frac{x^{n+1}y^{2n}}{\dfrac{x^n}{y^n}} \\
+        &= (x^{n+1}y^{2n}) \left(\frac{y^n}{x^n}\right) \\
+        &= \left(\frac{x^{n+1}}{x^n}\right) (y^{2n}y^n) \\
+        &= x y^{3n}
+      \end{align*}
+    \end{solution}
+
+  \item Factor $b^x$ out of the following expressions; please show your work. Part i is done as an example. 
+
+    \begin{enumerate}
+    \item
+
+      \begin{grading}
+        Nothing to grade here
+      \end{grading}
+
+      \begin{problem}
+        $a^x b^x + b^x$
+      \end{problem}
+
+      \textbf{Solution.} $a^x b^x + b^x = b^x (a^x + 1)$
+
+    \item
+
+      \begin{grading}
+        1 point
+      \end{grading}
+
+      \begin{problem}[\stretch{0.5}]
+        $b^{x+y}+b^x$
+      \end{problem}
+
+      \begin{solution}
+        $b^x(b^y+1)$
+      \end{solution}
+
+    \item
+
+      \begin{grading}
+        1.5 points: 0.75 for each term in the sum $5b^x + ab$
+      \end{grading}
+
+      \begin{problem}[\stretch{0.5}]
+        $5b^{2x}+ab^{x+1}$
+      \end{problem}
+
+      \begin{solution}
+        $b^x(5b^x+ab)$
+      \end{solution}
+
+    \item
+
+      \begin{grading}
+        2 points: 1 for each term in the sum $a^x b^x + a^{-x}$
+      \end{grading}
+
+      \begin{problem}[\vfill]
+        $(ab^2)^x + \left(\dfrac{a}{b}\right)^{-x}$
+      \end{problem}
+
+      \begin{solution}
+        $(ab^2)^x + \left(\dfrac{a}{b}\right)^{-x} = a^xb^{2x} + 
+        \dfrac{a^{-x}}{b^{-x}} = 
+        a^xb^{2x}+a^{-x}b^{x} = \boxed{b^x(a^xb^x+a^{-x})}$
+      \end{solution}
+
+      % \item % 9.2.14
+      %   $b^{3x}-(2b)^{-1+2x}$
+      % \item % 9.2.15
+      %   $\sqrt{a}b^x-a\sqrt{b^{3x}}$
+
+    \item
+
+      \begin{grading}
+        2 points: 1 for each term in the difference $3^x - 2ab^{x/2}$
+      \end{grading}
+
+      \begin{problem}[\vfill]
+        $(3b)^x - a \sqrt{4 b^{3x}}$
+      \end{problem}
+
+      \begin{solution}
+        $(3b)^x - a \sqrt{4 b^{3x}} = 3^x b^x - a(4 b^{3x})^{1/2} 
+        = 3^x b^x - 2a b^{3x/2} = 
+        \boxed{b^x (3^x - 2ab^{x/2})} $
+      \end{solution}
+
+    \end{enumerate}
+
+    \begin{problemonly}
+      \check You can check each answer by multiplying it out to make sure you really get back the original expression.
+    \end{problemonly}
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+\item % 10.3.16
+
+  \begin{grading}
+    13 points:
+    \begin{itemize}[nosep]
+    \item 1 for stating the goal
+    \item 1 for drawing and labeling a picture
+    \item 3 for having a correct formula for the cost:
+      \begin{itemize}[nosep]
+      \item 1 for breaking the cost as 20 (area of top) + 10 (area of bottom + area of sides)
+      \item 1 for a correct formula for the area of the top and bottom
+      \item 1 for a correct formula for the area of the sides
+      \end{itemize}
+    \item 1 for correctly using the fact that one side of the bottom is twice as long as the other
+    \item 2 for correctly using the fact that the volume is 108 to get the cost in terms of 1 variable
+    \item 2 for finding critical points of their cost function
+    \item 2 for justifying that the critical point is a global min. They can use the First Derivative Test, Second Derivative Test, or end behavior. If they use the FDT or SDT, technically they should say there's only one critical point. Otherwise, they've only shown it's a local max / min, not a global one. If they omit this, please give them feedback and deduct 0.01 (just so they know there's some feedback). 
+    \item 1 for answering the question (that is, giving both dimensions)
+    \end{itemize}
+  \end{grading}
+
+  \begin{problem}[\newpage]
+    A company would like to sell Maine blueberries in boxes. The bottom of each box will be a rectangle where one side is twice as long as the other side, and each box will have a volume of 108 in$^3$. The top will be made of see-through plastic that costs 20 cents/in$^2$, and the sides and bottom will be made of cardboard that costs 10 cents/in$^2$. What dimensions should the box be to minimize the cost of the material for the box?
+
+    (Remember the guidelines for presenting your work in such problems. If you've forgotten, look back at \href{https://canvas.harvard.edu/files/21097693/download?download_frd=1}{Problem Set 22}.) 
+  \end{problem}
+
+  \begin{solution}
+    \highlight{Goal:} Minimize \goal{cost}.
+
+    \highlight{Define variables:}
+    Let's draw a picture to help us.
+    
+    \begin{center}
+      \begin{tikzpicture}[x=1.75cm, y=0.5cm]
+        \draw (0, 0) -- node[below]{$2\ell$} (1, 0) -- node[anchor=north
+        west]{$\ell$} (1.5, 0.5) -- node[right]{$h$} (1.5, 2.5) -- (0.5,
+        2.5) -- (0, 2) -- (0, 0); %
+        \draw (0, 2) -- (1, 2) -- (1.5, 2.5); \draw (1, 0) -- (1, 2);
+      \end{tikzpicture}
+    \end{center}
+    In words, the total cost is
+      \begin{align*}
+        \text{total cost} &= \text{cost of top} + \text{cost of bottom and sides} \\
+        &= (\text{price per unit area of plastic})(\text{area of top}) \\
+        &\hspace{1em} + 
+        (\text{price per unit area of cardboard})(\text{area of bottom and sides})
+      \end{align*}
+    The area of the top is $2\ell^2$, and the area of the bottom is the same.
+    The area of the sides is $2(2\ell h) + 2(\ell h)$.
+    If we call the total cost $C$, then
+    \begin{align*}
+      C &= 20(2\ell^2) + 10[2\ell^2 + 2(2\ell h) + 2(\ell h)] \\
+      &= 60 \ell^2 + 60 \ell h
+    \end{align*}      
+      To write this as a function of just one variable, we
+      need to \highlight{relate the variables using information from
+      the problem.} We know that the total volume of each box is 108 cubic
+      inches, so
+    \begin{align*}
+      2\ell^2h &= 108 \\
+      h &= \frac{54}{\ell^2}
+    \end{align*}
+    Substituting this into our formula for the cost, we obtain
+    \[C(\ell) = 60 \ell^2 + 60 \ell\left(\frac{54}{\ell^2}\right)
+    = 60\left(\ell^2 + \frac{54}{\ell}\right).\]
+    Since there are no bounds for $\ell$ or for any of the other lengths
+    of the box given in the problem, we can determine that the domain is
+    $0 < \ell$ or $(0, \infty)$. We cannot have $\ell=0$, since then
+    the volume of the box would be zero.
+
+    \highlight{Critical points:}
+    Now let's find the critical points of this function on the domain.
+    Using the Power Rule, we know that $C'(\ell) = 60(2\ell - \frac{54}{\ell^2})$,
+    so
+    \begin{align*}
+      60\left(2\ell - \frac{54}{\ell^2}\right) &= 0 \\
+      2\ell - \frac{54}{\ell^2} &= 0 \\
+      \frac{2\ell^3 - 54}{\ell^3} &= 0 \\
+      2\ell^3 -54 &= 0 \\
+      2\ell^3 &= 54 \\
+      \ell^3 &= 27 \\
+      \ell &= 3
+    \end{align*}
+    $C'(\ell)$ is undefined at $\ell = 0$,  but that's not in the domain,
+    so the only critical point is $\ell = 3$.
+
+    \highlight{Global minimum:} 
+    Since there's only one critical point, if we can show that
+    it's a local minimum, then it will be the global minimum. Let's use the
+    Second Derivative Test. $C''(\ell) = 60(2 + \frac{108}{\ell^3})$, 
+    so $C''(3)$ will be positive, and therefore there is a global minimum 
+    at $\ell=3$.
+
+    We could've also determined this by comparing the value of $C(3)$ with
+    the end behavior.
+    \begin{align*}
+      C(3) = 60\left(3^2 + \frac{54}{3}\right) &= 1620 \\
+      \lim_{\ell \to 0^+} C(\ell) &= \infty \\
+      \lim_{\ell \to \infty} C(\ell)  &= \infty
+    \end{align*}
+    Since $C(3)$ is the lowest of these values, it is the global minimum value.
+
+    \highlight{Answer the question:} When $\ell = 3$, the corresponding
+    value of $h$ is $h=\frac{54}{3^2}=6$. So, to minimize the cost,
+    the box should be
+    \fbox{$3$ inches wide, $6$ inches long, and $6$ inches tall}.
+  \end{solution}
+
+
+
+\end{enumerate}
+\psreflection{For next class, read \S 9.3.}
+\end{document}

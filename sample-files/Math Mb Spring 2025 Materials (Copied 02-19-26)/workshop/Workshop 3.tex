@@ -1,0 +1,532 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[workshop]{handout}
+\renewcommand{\workshopnote}{CA Notes.} 
+\usepackage{lipsum}
+ \usepackage{microtype}
+ \usepackage{vwcol}
+\begin{document}
+
+\htitle{Workshop 3: Trigonometry Review}
+\begin{workshop}
+\newline
+    The goals of Workshop 3 are for students to
+    \begin{itemize}
+        \item compute the tangent, secant, cosecant, and cotagent of familiar angles
+        \item use right triangles and the unit circle to compute trigonometric values 
+        \item sketch graphs of sinusoidal and other trigonometric functions
+        \item solve word problems involving right triangles
+        \item think about trigonometric identities
+        \item model periodic behavior with sinusoidal functions
+    \end{itemize}
+    
+    Other notes:
+    \begin{itemize}
+        \item In \#1, you may need to remind students how the other trigonometric functions relate to sine and cosine. They should 
+    \end{itemize}
+        
+  
+\end{workshop}
+
+\begin{enumerate}
+
+\item Evaluate the following. A blank unit circle is provided for your convenience.
+ \begin{multicols}{2}
+
+ 
+\begin{enumerate}
+\item $\sec( \frac{5\pi}{6})$
+\solonly{\textcolor{red}{$=-\dfrac{2\sqrt{3}}{3}$}}
+\vspace{.7cm}
+\item $\csc ( \frac{5\pi}{3})$
+\solonly{\textcolor{red}{$=-\frac{2\sqrt{3}}{3}$}}
+\vspace{.7cm}
+\item $\cot( \frac{7\pi}{4})$
+\solonly{\textcolor{red}{$=-1$}}
+\vspace{.7cm}
+\item $\csc(-\frac{\pi}{6})$
+\solonly{\textcolor{red}{$=-2$}}
+\vspace{.7cm}
+\item $\tan(-\frac{2\pi}{3})$
+\solonly{\textcolor{red}{$=\sqrt{3}$}}
+\vspace{.7cm}
+\item $\tan (\frac{11\pi}{6})$
+\solonly{\textcolor{red}{$=-\frac{\sqrt{3}}{3}$}}
+\phantom{This text will be invisible}
+
+
+\end{enumerate}
+\columnbreak
+
+
+\phantom{This text will be invisible}
+\phantom{This text will be invisible}
+\phantom{This text will be invisible}
+
+    \begin{center}
+    \resizebox {0.5\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle; 
+    }
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle; 
+    }
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle; 
+    }
+  \end{scope}
+  \end{tikzpicture}
+  }
+\end{center}
+
+\end{multicols}
+
+\item
+\begin{problem}
+    We are told that $\sin A = -\frac{1}{6}$ and $\cos A<0$. Evaluate the following. Draw a right triangle \textbf{on the unit circle} to help you.
+\end{problem}
+
+\begin{multicols}{2}
+\begin{enumerate}
+    \item 
+    \begin{problem}
+        $\cos A$
+    \end{problem}
+    \pspace{1in}
+
+    \begin{solution}
+        Since $\sin^2 A + \cos^2 A = 1$, we can determine that $\cos^2 A = 1-\sin^2 A = \frac{35}{36}$. This means that \fbox{$\cos A = -\frac{\sqrt{35}}{6}$.}
+    \end{solution}
+
+    \item
+    \begin{problem}
+        $\sin(-A)$
+    \end{problem}
+    \pspace{1in}
+
+    \begin{solution}
+        We know that $\sin(-A)=-\sin(A)$, so \fbox{$\sin(-A)=\frac{1}{6}$.}
+    \end{solution}
+
+    \item 
+    \begin{problem}
+        $\cos(-A)$
+    \end{problem}
+    
+        \begin{solution}
+        We know that $\cos(-A)=\cos(A)$, so \fbox{$\cos(-A)=-\frac{\sqrt{35}}{6}$.}
+    \end{solution}
+
+    \columnbreak
+
+    \item 
+    \begin{problem}
+        $\tan A$
+    \end{problem}
+        \pspace{1in}
+
+    \begin{solution}
+        $\tan A=\frac{\sin A}{\cos A} = \frac{-1/6}{-\sqrt{35}/6}=\fbox{$\frac{1}{\sqrt{35}}$.}$
+    \end{solution}
+
+    \item 
+    \begin{problem}
+        $\csc A$
+    \end{problem}
+        \pspace{1in}
+
+    \begin{solution}
+        $\csc A=\frac{1}{\sin A} = \frac{1}{-1/6}=\fbox{$-6$.}$
+    \end{solution}
+
+        \item 
+    \begin{problem}
+        $\sec A$
+    \end{problem}
+
+        \begin{solution}
+        $\sec A=\frac{1}{\cos A} = \frac{1}{-\sqrt{35}/6}=\fbox{$\frac{-6}{\sqrt{35}}$.}$
+    \end{solution}
+\end{enumerate}
+\end{multicols}
+\newpage
+
+\item 
+\begin{problem}
+Sketch the graph of $y=1+\frac{1}{2}\sin(3t)$.
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    \begin{itemize}
+        \item Amplitude $=\frac{1}{2}$
+        \item Midline: $y=1$
+        \item Period $=\frac{2\pi}{3}$
+    \end{itemize}
+    \begin{center}
+        \begin{tikzpicture}
+    \begin{axis}[
+        domain=0:2*pi,
+        samples=100, 
+        xlabel={$t$},
+        ylabel={$y$},
+        xtick={0, pi/3, 2*pi/3, pi, 4*pi/3, 5*pi/3, 2*pi}, % Custom x-axis ticks
+        xticklabels={$0$, $\frac{\pi}{3}$, $\frac{2\pi}{3}$, $\pi$, $\frac{4\pi}{3}$, $\frac{5\pi}{3}$, $2\pi$}, % Labels for x ticks
+        ytick={0, 0.5, 1, 1.5, 2},
+        ymin=0, ymax=1.9,
+        grid=major,
+        height=2in
+    ]
+        \addplot[very thick] {1 + 0.5 * sin(deg(3*x))};
+        \addplot[dashed] {1};
+    \end{axis}
+\end{tikzpicture}
+    \end{center}
+\end{solution}
+
+\item 
+\begin{problem}
+Sketch the graph of $y=5-7\cos(\frac{\pi}{8}t)$.
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    \begin{itemize}
+        \item Amplitude $=7$
+        \item Midline: $y=5$
+        \item Period $=16$
+    \end{itemize}
+    \begin{center}
+        \begin{tikzpicture}
+    \begin{axis}[
+        domain=0:32,
+        samples=100, 
+        xlabel={$t$},
+        ylabel={$y$},
+        xtick={0, 8, ..., 32},
+        ymin=-2.5, ymax=12.5,
+        grid=major,
+        height=2in
+    ]
+        \addplot[very thick] {5 - 7 * sin(deg(x*pi/8))};
+        \addplot[dashed] {5};
+    \end{axis}
+\end{tikzpicture}
+    \end{center}
+\end{solution}
+
+\item 
+\begin{problem}
+Sketch the graph of $y=-\tan(\frac{x}{2})$.
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    \begin{itemize}
+        \item Period $=2\pi$
+    \end{itemize}
+    \begin{center}
+        \begin{tikzpicture}
+    \begin{axis}[
+        domain=-2*pi:2*pi,
+        samples=200, 
+        xlabel={$t$},
+        ylabel={$y$},
+        xtick={-2*pi, -3*pi/2, -pi, -pi/2, 0, pi/2, pi, 3*pi/2, 2*pi}, 
+        xticklabels={$-2\pi$, $-\frac{3\pi}{2}$, $-\pi$, $-\frac{\pi}{2}$, $0$, $\frac{\pi}{2}$, $\pi$, $\frac{3\pi}{2}$, $2\pi$},
+        restrict y to domain=-20:20,
+        ymin=-10, ymax=10,
+        grid=major,
+        height=2in
+    ]
+        \addplot[very thick] {-tan(deg(x/2))};
+        \draw[dashed] (-pi,-10) -- (-pi,10);
+        \draw[dashed] (pi,-10) -- (pi,10);
+    \end{axis}
+\end{tikzpicture}
+    \end{center}
+\end{solution}
+
+
+
+\newpage
+
+\item
+\begin{problem}
+    How long should an escalator be if it is to make an angle of \ang{33} with the floor and carry people a vertical distance of 21 feet between floors? Give an exact answer in terms of trigonometric functions and use a calculator to find a decimal value.
+\end{problem}
+\pspace{\stretch{1}}
+
+\begin{solution}
+A diagram of the situation is shown below.
+
+    \begin{tikzpicture}
+    % Nodes for the right triangle
+    \coordinate (A) at (0, 0); % Bottom-left corner
+    \coordinate (B) at (4, 0); % Bottom-right corner
+    \coordinate (C) at (4, 3); % Top-right corner, adjust for illustration
+
+    % Draw the triangle
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+
+    % Right angle marker
+    \draw (3.8, 0) -- (3.8, 0.2) -- (4, 0.2);
+
+    \node[above right] at (4, 1.5) {21 ft};
+    \node[above left] at (2, 1.5) {$\ell$};
+
+    % Angle
+    \draw (0.5, 0) arc[start angle=0, end angle=33, radius=0.6];
+    \node at (0.8, 0.25) {\ang{33}};
+
+\end{tikzpicture}
+
+We know the side opposite the \ang{33} angle, and we want the length of the hypotenuse, so we can solve using sine.
+
+\begin{align*}
+    \sin \ang{33} &= \frac{21\text{ ft}}{\ell} \\
+    \ell &= \frac{21 \text{ ft}}{\sin \ang{33}} \\
+    & \approx 38.6 \text{ ft}
+\end{align*}
+\end{solution}
+
+
+\item
+\begin{problem}
+    A surveyor is standing on top of a low-rise apartment building. She sets up her instruments 65 feet above the ground to point at a skyscraper in the distance. The angle of elevation to the top of the skyscraper is \ang{27}, and the angle of depression to the bottom of the skyscraper is \ang{1.3}. How tall is the skyscraper? Give an exact answer in terms of trigonometric functions and use a calculator to find a decimal value.
+\end{problem}
+\pspace{\stretch{2}}
+
+\begin{solution}
+A diagram of the situation is shown below (not to scale.)
+
+\begin{tikzpicture}[scale=0.7]
+    % Define coordinates
+    \coordinate (Surveyor) at (0, 1);
+    \coordinate (Top) at (7, 9.5); % Top of the skyscraper
+    \coordinate (Bottom) at (7, 0); % Bottom of the skyscraper
+    \coordinate (Ground) at (0, 0); % Ground level
+
+    % Draw the building and lines
+    \draw[thick] (Surveyor) -- (Top) -- (Bottom) -- cycle;
+    \draw[dashed] (Surveyor) -- (7, 1);
+
+    % Angles
+    \node at (0.8, 1.3) {\ang{27}};
+    \node at (3.5, 0.8) {\ang{1.3}};
+
+    % Labels
+    \node[left] at (Surveyor) {Surveyor};
+
+    % Heights
+    \draw[<->] (7.2, 0) -- (7.2, 1);
+    \node[right] at (7.2, 0.5) {65 ft};
+
+\end{tikzpicture}
+
+We can first find the horizontal length in the bottom right triangle:
+
+\begin{align*}
+    \tan \ang{1.3} &= \frac{65\text{ ft}}{x} \\
+    x &= \frac{65 \text{ ft}}{\tan \ang{1.3}}
+\end{align*}
+
+
+Then we can determine the missing vertical length:
+
+\begin{align*}
+    \tan \ang{27} &= \frac{y}{x} \\
+    y &= x\tan \ang{27} \\
+    &= \left(\frac{65 \text{ ft}}{\tan \ang{1.3}}\right) \tan \ang{27} \\
+    & \approx 1459 \text{ ft}
+\end{align*}
+\end{solution}
+    
+
+\pspace{\newpage}
+
+\item Using a special camera, a device measures the angle of elevation from the ground to the top of a building. At Point A, the device's camera has an angle of elevation of $\frac{\pi}{4}$ radians. The device is moved 100 meters closer to the building to Point B, and its camera has an angle of elevation of $\frac{\pi}{3}$ radians. How tall is the building, and what is the ground distance between Point B and the building? Provide exact answers. (Assume the device has negligible height.)
+
+\pspace{\stretch{1}}
+
+\begin{solution}
+
+      We're looking for the height of the building; let's call that $h$.
+      There are two right triangles in the picture that we can take
+      advantage of, ACD and BCD. We know that angle CAD is $\frac{\pi}{4}$ and
+      angle CBD is $\frac{\pi}{3}$. Since the angle measurements are taken
+      $100$ feet apart, length AB is $100$ feet.
+      Let's name the other horizontal distance that might be
+      useful; let $x$ be the length of BD.
+      \begin{center}
+        \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+          \coordinate (ground) at (0, -0.4); %
+          \coordinate (A) at (0, 0); %
+          \coordinate (F) at (0.5, 0); %
+          \coordinate (G) at (2.5, 0); %
+          \coordinate (B) at (1, 0); %
+          \coordinate (C) at (4, 2); %
+           \coordinate (H) at (4, 1); %
+          \coordinate (D) at (4, 0);
+          \draw[ ] (A) node[below left] {$A$} -- 
+          (C) node[above] {$C$} -- (D) node[below left] {$D$} -- (F) node[below] {$100$} -- (G) node[below] {$x$} (H) node[right] {$h$}; %
+          \draw[ ] (B) node[below right] {$B$} -- (C) -- (D); %
+          \draw[] (A) -- (D);
+          \draw (C |- A) -- (C); %
+          \draw pic[draw=black, "{$\frac{\pi}{4}$}", angle radius = 20, angle eccentricity = 1.5] {angle=D--A--C};
+          \draw pic[draw=black, "{$\frac{\pi}{3}$}", angle radius = 20, angle eccentricity = 1.5] {angle=D--B--C};
+          
+          
+          
+         
+        \end{tikzpicture}
+      \end{center}
+      From triangle BCD, we can relate our variables with the equation
+       $\tan \left(\frac{\pi}{3}\right) = \frac{h}{x}$.
+      From triangle ACD,
+      $\tan \left(\frac{\pi}{4}\right) = \frac{h}{x + 100}$.
+      We can rewrite the equations as
+      \begin{align*}
+        x \tan \left(\frac{\pi}{3}\right) &= h \\
+        (x + 100) \tan \left(\frac{\pi}{4}\right) &= h
+        \end{align*}
+        We can simplify the system of equations as
+      \begin{align*}
+        x \sqrt{3} &= h \\
+        x + 100 &= h
+        \end{align*}
+    Since both of the equations above are equal to $h$, let's set them equal to each other and solve for $x$.
+    \begin{align*}
+        x \sqrt{3} &= x + 100 \\
+        x \sqrt{3} -x &= 100 \\
+        x (\sqrt{3} -1) &= 100 \\
+        x &= \dfrac{100}{\sqrt{3} -1}
+        \end{align*}
+   
+Plugging $x= \dfrac{100}{\sqrt{3} -1}$ into either equation above equal to $h$ will yield the height of the building:
+\begin{center}
+    $\dfrac{100\sqrt{3}}{\sqrt{3} -1}= h$ \hspace{1cm} or \hspace{1cm} $\dfrac{100}{\sqrt{3} -1} + 100 = h$ 
+\end{center}
+(These two representations of $h$ look quite different but are the same value!)
+\end{solution}
+
+\item 
+\begin{problem}
+What are some of the trigonometric identities that you know? Brainstorm as many as you can. Think about symmetries on the unit circle, graph transformations, the Pythagorean theorem, etc., and rearrangements of familiar identities.
+\end{problem}
+\pspace{\stretch{0.5}}
+
+\begin{solution}
+Odd and even identities:
+    \begin{itemize}
+        \item $\sin(-x)=-\sin(x)$
+        \item $\cos(-x)=\cos(x)$
+        \item $\tan(-x)=-\tan(x)$
+    \end{itemize}
+
+Graph translations:
+\begin{itemize}
+    \item $\sin(x+\frac{\pi}{2})=\cos(x)$
+    \item $\cos(x-\frac{\pi}{2})=\sin(x)$
+\end{itemize}
+
+Symmetries on the unit circle:
+\begin{itemize}
+    \item $\sin(x+\pi) = -\sin(x)$
+    \item $\cos(x+\pi)=-\cos(x)$
+    \item $\sin(x+2\pi) = \sin(x)$
+    \item $\cos(x+2\pi) = \cos(x)$
+    \item $\tan(x+\pi) = \tan(x)$
+\end{itemize}
+
+Pythagorean identities:
+\begin{itemize}
+    \item $\sin^2 x + \cos^2 x =1$
+    \item $\tan ^2 x + 1 = \sec^2 x$
+    \item $1 + \cot^2x = \csc^2 x$
+\end{itemize}
+
+Common \textbf{non-identities}:
+\begin{itemize}
+    \item $\sin(A+B) \neq \sin A + \sin B$
+    \item $\cos(A+B) \neq \cos A + \cos B$
+    \item $\sin(AB) \neq \sin A  \sin B$
+    \item $\cos(AB) \neq \cos A  \cos B$
+\end{itemize}
+
+\end{solution}
+
+\newpage
+
+\item  When the heart beat \textbf{begins,} blood pressure typically \underline{rises} from 80 mmHg (\textit{diastolic} blood pressure) to 120mmHg (\textit{systolic} blood pressure). When the heart beat \textbf{finishes}, blood pressure \underline{drops} from 120mmHg to 80mmHg as the heart's ventricles refill with blood. Assume that blood pressure is roughly sinusoidal with respect to time.
+\begin{enumerate}
+\item A patient has one heart beat (and therefore one blood pressure cycle) every $\frac{6}{7}$ seconds. How many heartbeats take place in 6 seconds?
+
+\begin{solution}
+    Let's translate the information we are given into rates with units.``One heartbeat every $\frac{6}{7}$ seconds'' can be written as $\dfrac{1\text{ heartbeat}}{\frac{6}{7}\text{ seconds}}$. Now, let's multiply this by $6$ seconds:
+    \begin{center}
+        $\dfrac{1\text{ heartbeat}}{\frac{6}{7}\text{ seconds}} \cdot  \dfrac{6\text{ seconds}}{1}=\dfrac{6}{\frac{6}{7}}$ heartbeats $=$ \fbox{$7$ heartbeats}
+    \end{center}
+    
+\end{solution}
+\vfill
+\item A patient has a systolic pressure of 120 mmHg and a diastolic pressure of 80 mmHg. Sketch a graph of $P(t)$, the patient's blood pressure, on the interval $[0, 6]$, assuming that the heart \textbf{begins} to beat at $t=0$ seconds. (How can part (a) help?) 
+
+\begin{solution}
+    \begin{center}
+      \begin{tikzpicture}
+        \begin{axis}[xtick={0,6}, ytick={80, 120}]
+          \addplot+[domain=0:6] {-20*cos(deg(7*pi/3*x))+100};
+        \end{axis}
+      \end{tikzpicture}
+    \end{center}
+\end{solution}
+\vfill\vfill\item What are the midline, amplitude, and period of $P(t)$?
+\begin{solution}
+According to answer to part (b), $P(t)$ seems to oscillate about the horizontal line $y=100$. We define the amplitude as the distance between the balance line and the peak or trough of the sinusoid; in this case, because $P(t)$ oscillates between 80 and 120, the amplitude is 20. We were told in the problem statement that the period is $\frac{6}{7}$, but remember that the ``B" value in our model for sinusoids, $y=A\sin{Bx}+D$ and $y=A\cos{Bx}+D$, takes the form $B=\frac{2\pi}{\text{period}}$.
+\end{solution}
+\vfill
+\item Use your answers to part (c) to write a sinusoidal model for $P(t)$, and briefly explain how you chose sine or cosine in your model. 
+
+\begin{solution}
+We use a negative cosine model here because, according to the problem, $t=0$ corresponds to the beginning of the heartbeat, or when blood pressure is at its minimum and increasing. (That's to say, the graph of $-\cos{x}$ achieves its minimum at $(0,-1)$ and increases on $0<x<\pi$.) Thus, our model is \fbox{$P(t)=-20\cos{\left(\dfrac{7\pi}{3}x\right)}+100$}.    
+\end{solution}
+\vfill
+\end{enumerate}
+\newpage
+
+\end{enumerate}
+
+\end{document}
+Workshop 

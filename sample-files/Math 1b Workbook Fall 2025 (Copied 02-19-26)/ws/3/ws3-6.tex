@@ -1,0 +1,265 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws3-6}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterthree}
+}{}
+
+\section{Second Order Differential Equations I} \label{ws3-6}
+
+\begin{framed}
+\centerline{\textbf{Lesson Goals}}
+
+You should be able to:
+\begin{itemize}
+\item Determine when a second-order differential equation with constant coefficients models the motion of an oscillating spring, with and without friction
+\item Identify and solve the characteristic equation for a second-order differential equation, and use it to find the general solution to second-order differential equations
+\item Compare and connect the intuitive physical behavior of spring motion with second-order differential equations and their solutions
+\end{itemize}
+\end{framed}
+
+\begin{framed}
+Second order differential equations of the form $x'' + bx' +cx = 0$ can model mass-spring systems with damping, provided that $b \geq 0$ and $c > 0$. In that case, the term $cx$ represents an elastic force (spring) and the term $bx'$ represents damping (friction).
+\end{framed}
+
+\begin{enumerate}
+
+
+
+
+  \item 
+  \note{This problem is just here to serve as good motivation for why we might look for solutions of the form $e^{rt}$ in the next problem.}
+  \begin{enumerate}
+  
+  \item
+  \begin{problem}[\vfill]
+    Can you guess any solutions of $x'' - x = 0$?  (It may help to think
+    of the equation as $x'' = x$.)  Guess as many solutions as you can,
+    and check that your guesses are correct.
+  \end{problem}
+
+  \begin{solution}
+  The general solution is $C_1 e^t + C_2 e^{-t}$.
+  \end{solution}  
+  
+  \item 
+  \begin{problem}[\vfill]
+  Can you guess any solutions of $x'' - 4x = 0$?  (It may help to think
+  of the equation as $x'' = 4x$.)  Guess as many solutions as you can,
+  and check that your guesses are correct.
+  \end{problem}
+
+  \begin{solution}
+  The general solution is $C_1 e^{2t} + C_2 e^{-2t}$.
+  \end{solution}  
+
+\end{enumerate}
+
+\pspace{\newpage}
+
+  \item 
+  In this problem, we'll look at the differential equation $x'' + 3x' + 2x
+  = 0$. Based on our observations from the previous problem, we suspect that this second-order differential equation may have solutions of the form $x(t)=e^{rt}$, where $r$ is a constant.
+  \begin{enumerate}
+    \item
+    \note{By the end of this problem, students should be introduced to the terminology ``characteristic equation", as it appears again on their problem set.}
+    
+    \begin{problem}[3in]
+    Suppose that $x(t) = e^{rt}$ is a solution to the differential equation $x'' + 3x' + 2x
+  = 0$, where $r$ is a constant. What are the possible values of $r$? (There are two values of $r$ that should work.)
+    \end{problem}
+
+    \begin{solution}
+    Our strategy is simply to plug $x(t) = e^{rt}$ into the differential
+    equation and then to try to solve for $r$.  Let's differentiate:
+    \begin{align*}
+    x &= e^{rt} \\
+    x' &= r e^{rt} \\
+    x'' &= r^2 e^{rt}
+    \end{align*}
+    So, the differential equation $x'' + 3x' + 2x = 0$ becomes $r^2
+    e^{rt} + 3 r e^{rt} + 2 e^{rt} = 0$, or $(r^2 + 3r + 2) e^{rt} =
+    0$.  Since $e^{rt}$ can never be 0 ($e$ raised to any power is
+    positive), it must be the case that $r^2 + 3r + 2 = 0$.  This
+    equation is called the \uline{characteristic equation} of the
+    differential equation.
+
+    We can factor the characteristic equation as $(r + 1) (r + 2) = 0$,
+    so $r = -1$ or $r = -2$.  Therefore, the solutions of the form $x(t)
+    = e^{rt}$ are \fbox{$e^{-t}$ and $e^{-2t}$}.
+    \end{solution}
+
+    \item
+    \begin{problem}[4in]
+    Let $f(t)=e^{r_1 t}$ and $g(t)=e^{r_2 t}$, where $r_1$ and $r_2$ are the values of $r$ that you found in
+    {{\#3}(a)}.  Show that $x(t)= C_1
+    f(t) + C_2 g(t)$ is also a solution of $x'' + 3x' + 2x = 0$. 
+    \end{problem}
+
+    \begin{solution}
+    We are asked to show that $C_1 e^{-t} + C_2 e^{-2t}$ is a solution
+    of $x'' + 3x' + 2x = 0$.  As usual, to show that something is a
+    solution, we simply plug it into the differential equation.  If
+    $x(t) = C_1 e^{-t} + C_2 e^{-2t}$, then
+    \begin{align*}
+    x'(t) &= - C_1 e^{-t} - 2 C_2 e^{-2t} \\
+    x''(t) &= C_1 e^{-t} + 4 C_2 e^{-2t}
+    \end{align*}
+    Therefore,
+    \begin{align*}
+    x'' + 3x' + 2x &= (C_1 e^{-t} + 4 C_2 e^{-2t}) + 3 (- C_1 e^{-t} -
+    2 C_2 e^{-2t}) + 2 (C_1 e^{-t} + C_2 e^{-2t}) \\
+    &= C_1 (e^{-t} - 3 e^{-t} + 2 e^{-t}) + C_2 (4 e^{-2t} - 6 e^{-2t}
+    + 2 e^{-2t}) \\
+    &= 0
+    \end{align*}
+    This shows that $C_1 e^{-t} + C_2 e^{-2t}$ really \textit{is} a
+    solution of $x'' + 3x' + 2x = 0$. 
+    \end{solution}
+\pspace{\newpage}
+    \item
+    %\note{I like to discuss determinism again here.}
+    
+    \begin{problem}[1in]
+    The differential equation $x'' + 3x' + 2x = 0$ models a mass-spring
+    system.  Explain, on purely physical grounds, why there
+    are infinitely many solutions satisfying the initial condition $x(0)
+    = 3$.  
+    \end{problem}
+
+    \begin{solution}
+    We learned that $x'' + bx' + cx = 0$ models a spring if $b \geq 0$
+    and $c > 0$, so $x'' + 3x' + 2x = 0$ is an example of a differential
+    equation which models a spring.
+
+    It makes sense that there are infinitely many solutions satisfying
+    the initial condition $x(0) = 3$; after all, in terms of a spring,
+    this initial condition is saying that the spring starts out being
+    stretched by 3 units.  However, the way it moves will depend on what
+    its initial velocity is.  
+    \end{solution}
+
+    \item
+    \begin{problem}[3.5in]
+    On the other hand, there should be exactly one solution of $x'' + 3x' + 2x = 0$ satisfying the initial conditions $x(0) = 3$ and $x'(0) = -2$.  What is this solution?
+    \end{problem}
+
+    \begin{solution}
+    If we specify a spring's initial position and initial velocity, then
+    we can describe the spring's motion exactly.  (That is, if you
+    repeatedly pull the spring out to the same initial position and let
+    it go with the same initial velocity, it should move exactly the
+    same way every time.)  
+
+    To find the solution satisfying the initial conditions $x(0) = 3$
+    and $x'(0) = -2$, we use the fact that the general solution is $x(t)
+    = C_1 e^{-t} + C_2 e^{-2t}$.  We can plug in the initial conditions
+    to solve for $C_1$ and $C_2$.  The initial condition $x(0) = 3$
+    tells us that $C_1 + C_2 = 3$.  To use the initial condition $x'(0)
+    = -2$, we first need to figure out $x'(t)$.  If we differentiate
+    $x(t) = C_1 e^{-t} + C_2 e^{-2t}$, we find that $x'(t) = - C_1
+    e^{-t} - 2 C_2 e^{-2t}$, so $x'(0) = - C_1 - 2 C_2$.  So, we have
+    two equations:
+    \begin{align*}
+    3 &= C_1 + C_2 \\
+    -2 &= - C_1 - 2 C_2
+    \end{align*}
+    If we add these equations together, we find that $1 = - C_2$, so
+    $C_2 = -1$.  Plugging this into either equation, we find that $C_1 =
+    4$.  So, the solution we are looking for is $\boxed{x(t) = 4e^{-t} -
+    e^{-2t}}$. 
+    \end{solution}
+    
+    \item
+    \begin{problem}[1in]
+    Based on your reasoning above, do you think $x(t)=C_1 f(t) + C_2 g(t)$
+    from
+    {{\#3}(b)}
+    is the most general solution, or should there be even more
+    solutions?  Explain.
+    \end{problem}
+
+    \begin{solution}
+    The general solution is $\boxed{C_1 e^{-t} + C_2 e^{-2t}}$.  As
+    we've argued, specifying two initial conditions (the initial
+    position and initial velocity) should determine a unique solution.
+    Therefore, it makes sense for our general solution to have two
+    unknowns ($C_1$ and $C_2$).
+    \end{solution}
+ \end{enumerate} 
+ 
+ 
+ 
+ 
+ \probonly{\newpage}
+ 
+
+
+\begin{framed}
+When working with differential equations of the form $x'' + bx' +cx = 0$, if $f(t)$ and $g(t)$ are solutions...
+ \begin{itemize}
+    \item Fact 1: ...then $x(t) = C_1 f(t) + C_2 g(t)$ is also a solution to $x'' + bx' + cx =0$.
+
+    \item Fact 2: Moreover, if $f$ and $g$ are not constant multiples of one another, then $x(t) = C_1 f(t) + C_2 g(t)$ is the general solution to $x'' + bx' + cx =0$. 
+    \end{itemize}
+\end{framed}
+
+  \item 
+  \note{Straightforward practice just to make sure they understand the
+  lessons of the previous problem.}
+  
+  \begin{problem}[2in]
+Find the general solution to the differential equation $x'' + 2x' - 15x = 0$. Could this equation model the motion of an oscillating spring?
+  \end{problem}
+
+  \begin{solution}
+  The characteristic equation for $x'' + 2x' - 15x = 0$ is $r^2 + 2r - 15
+  = 0$, which factors as $(r + 5) (r - 3) = 0$.  The roots of the
+  characteristic equation are $r = -5$ and $r = 3$.
+
+  Since the characteristic equation has two distinct roots, the general
+  solution of the differential equation is $x(t) = \boxed{C_1 e^{-5t} +
+  C_2 e^{3t}}$.
+  
+ This differential equation could not model the motion of an oscillating spring, because the spring coefficient (i.e., the coefficient of $x$) in the equation is negative. This is not possible for an actual spring, because it would suggest that the force exerted by the tension in the spring is pushing the spring \textit{away} from its equilibrium position. See the solution to problem \#1(c).
+  \end{solution}
+
+
+  \item 
+  \note{This problem is to introduce them to the repeated root case.  In
+  the past, some students have simply wanted to say that the general
+  solution is $C_1 e^{-2t}$ or $C_1 e^{-2t} + C_2 e^{-2t}$.  
+It's important to make sure they
+  understand why $C_1 e^{-2t} + C_2 e^{-2t}$ cannot be the most general
+  solution.  They will further explore this scenario on the homework.}
+
+\begin{enumerate}
+    \item \begin{problem}[2 in]
+  What solutions to $x'' + 4x' + 4x = 0$ can you find from the characteristic equation?
+  \end{problem}
+
+  \begin{solution}
+  The characteristic equation is $r^2 + 4r + 4 = 0$, or $(r + 2)^2 = 0$.
+  So, $r = -2$ is a repeated root; this tells us that $Ce^{-2t}$ is a
+  solution, but it doesn't quite give us the most general solution.
+  \end{solution}
+
+ \item 
+ \begin{problem}[2in]
+Show that $x(t) = t e^{-2t}$ is also solution to the differential equation $x'' + 4x' + 4x = 0$.
+What is the general solution to this differential equation?
+ \end{problem}
+ 
+ \begin{solution}
+  It is straight forward to show that $x(t) = t e^{-2t}$ satisfies the differential equation. By Fact 1 and part a, $C_1e^{-2t}+C_2te^{-2t}$ is a solution to the differential equation. Also since $te^{-2t}$ is not a constant multiple of $e^{-2t}$ then $C_1e^{-2t}+C_2te^{-2t}$ must be the general solution.
+  \end{solution}
+\end{enumerate}  
+  
+
+\end{enumerate}
+
+
+\end{document}

@@ -1,0 +1,713 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws1-4}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterone}
+}{}
+
+\section{Volumes of Revolution} \label{ws1-4}
+
+
+\begin{framed}
+\textbf{Lesson Goals:}
+\begin{itemize}
+\item You should be able to apply our general slicing strategy to find volumes of revolution.
+\item You should be able to identify the best slicing direction for a given region, as well as the resulting shape (disk, washer, or cylindrical shell) when a rectangular slice is rotated about a given line.
+\item You should be able to express the volume of a rotated rectangular slice of a region, and thus express a volume of revolution as a definite integral.
+\end{itemize}
+\end{framed}
+
+\begin{enumerate}
+
+   \item 
+  \note{The common mistakes here come from skipping steps and trying to
+  write down the integral directly instead of actually thinking about
+  what happens to the $k$-th slice.  For instance, some students may get
+  confused about whether the answer to (a) is $\displaystyle \pi \left(
+  \int \sin x~dx \right)^2$ or $\displaystyle \pi \int (\sin x)^2~dx$;
+  this usually happens because they haven't written down what happens
+  for the $k$-th slice or haven't drawn a generic $k$-th slice on the 2D picture.}
+  
+Consider the area under one loop of the curve $y=3\sin(x)$.
+  
+\begin{center}
+\resizebox{0.25\textwidth}{!}{
+\begin{tikzpicture}
+\begin{axis}[
+unit vector ratio*=1 1 1,
+            xlabel=$x$,
+            ylabel=$y$,
+            ytick={1, 2, 3},
+            xtick=3.14, xticklabels={$\pi$}, ymax=4]     
+\addplot[name path=F,domain={0:pi}] {3*sin((deg(x))} ;
+\addplot[name path=G,domain={-0.5:4}, ultra thin] {0};
+\addplot[pattern=north west lines,  color=cyan, fill opacity=0.5]fill between[of=F and G, soft clip={domain=0:pi}]
+;
+\end{axis}
+\end{tikzpicture}
+}
+\end{center}
+
+ % \includegraphics[width=2in]{images/volume-sine-loop}
+
+
+\begin{enumerate}
+    \item If you rotate this area about the $x$-axis, you will get a \textit{solid of revolution}. (Can you visualize what it would look like?) We would like to find its volume.
+
+\begin{enumerate}
+
+\item
+\begin{problem}[1.25in]
+When you rotate a typical $k$-th slice about the $x$-axis, what shape do you get? Approximate the volume of this shape. As usual, draw and label the $k$-th slice on the $xy$-plane, and be sure to define all notation used.
+\end{problem}
+
+\begin{solution}
+First, we need to decide which way we want to slice the region, vertically or horizontally. In this case, it makes more sense to slice the region vertically, since it will be much easier to define the dimensions of our $k$-th rectangle. Thus, we slice the interval $[0,\pi]$ along the $x$-axis into $n$ slices, with $x_0=0$ and $x_n=\pi$. Then, we take a typical $k$-th vertical slice within our region at an $x$-value $x_k=k\Delta x$, where $\Delta x = \frac{\pi}{n}$ is the width of the slice. 
+
+\begin{center}
+\resizebox{0.3\textwidth}{!}{
+\begin{tikzpicture}
+\begin{axis}[
+unit vector ratio*=1 1 1,
+            xlabel=$x$,
+            ylabel=$y$,
+            ytick={1, 2, 3},
+            xtick={2.4, 3.14}, xticklabels={$x_k$, $\pi$}]     
+\addplot[name path=F,domain={0:pi}] {3*sin((deg(x))} ;
+\addplot[name path=G,domain={-0.5:4}, ultra thin] {0};
+\addplot[name path=H,domain={2:2.4}] {3*sin((deg(2.4))};
+\addplot[pattern=north west lines,  color=cyan, fill opacity=0.5]fill between[of=F and G, soft clip={domain=0:pi}];
+   \pgfplotsinvokeforeach{0,0.4,...,2.8}{
+            \draw (#1,0) -- (#1,{3*sin((deg(#1))});
+          }
+\addplot+[domain=2:2.4, shaderegion, fill=yellow](2,0) -- (2.4,0) -- (2.4,{3*sin((deg(2.4))})node[anchor=west]{$\left(x_k,3\sin(x_k)\right)$}  -- (2,{3*sin((deg(2.4))}) -- (2,0);
+\end{axis}
+
+\end{tikzpicture}
+}
+\end{center}
+
+If we rotate the yellow $k$-th slice about the $x$-axis, the resulting shape will be a \boxed{\text{disk}} whose thickness is $\Delta x$ and whose radius is given by $3\sin(x_k)$. The volume of a disk is given by the formula $V=\pi r^2 \times (\text{thickness})$. Thus, the volume of this $k$-th disk is $\boxed{V_k=\pi (3\sin(x_k))^2\Delta x}$.
+\end{solution}
+
+
+\item
+\begin{problem}[0.75in]
+Write a Riemann sum that approximates the volume of the full solid of revolution.
+\end{problem}
+
+\begin{solution}
+To approximate the volume of the full solid of revolution, we take the volume of the $k$-th disk found in the previous part, and sum over all slices from $k=1$ to $k=n$. This gives us the Riemann sum $\boxed{\sum_{k=1}^n \pi (3\sin(x_k))^2\Delta x}$.
+
+\end{solution}
+
+\item
+\begin{problem}[1in]
+By taking an appropriate limit, find the exact volume of the full solid of revolution. You may leave your answer as a definite integral.
+\end{problem}
+
+
+\begin{solution}
+To find the exact volume of the full solid of revolution, we take the limit of the previous Riemann sum as the number of slices approaches infinity. Thus,
+
+$$\text{Exact volume} = \lim_{n \to \infty} \sum_{k=1}^n \pi (3\sin(x_k))^2\Delta x = \boxed{\int_0^{\pi} \pi (3\sin(x))^2\ dx}$$
+
+Note: We can evaluate this integral using the trigonometric identity $\sin^2(x)=\frac{1}{2}(1-\cos(2x))$. If we do, we'll get an exact volume of $\frac{9\pi^2}{2}$, which is approximately $44.41$.
+
+\end{solution}
+
+\end{enumerate}
+
+
+
+\probonly{\newpage}
+
+ \item Once again, here is the area under one loop of $y=3\sin(x)$:
+    
+    \begin{center}
+\resizebox{0.3\textwidth}{!}{
+\begin{tikzpicture}
+\begin{axis}[
+unit vector ratio*=1 1 1,
+            xlabel=$x$,
+            ylabel=$y$,
+            ytick={1, 2, 3},
+            xtick=3.14, xticklabels={$\pi$}, ymax=4]     
+\addplot[name path=F,domain={0:pi}] {3*sin((deg(x))} ;
+\addplot[name path=G,domain={-0.5:4}, ultra thin] {0};
+\addplot[pattern=north west lines,  color=cyan, fill opacity=0.5]fill between[of=F and G, soft clip={domain=0:pi}]
+;
+\end{axis}
+\end{tikzpicture}
+}
+\end{center}
+
+    Suppose instead that you rotate the same region about the horizontal line $y = 4$. This will give you a different solid of revolution. (Can you visualize it?)
+    
+\begin{enumerate}
+
+\item
+\begin{problem}[2.7in]
+When you rotate a typical $k$-th slice about the line $y = 4$, what shape do you get? Approximate the volume of this shape. As usual, draw and label the $k$-th slice on the $xy$-plane, and be sure to define all notation used.
+\end{problem}
+
+\begin{solution}
+
+Again, we must first decide in which direction we want to slice the original area. For the same reason as in part 1(a), we will slice the region vertically. So just as before, we take a typical $k$-th slice at a point $x_k$ in the interval $[0,\pi]$, and we define $\Delta x = \frac{\pi}{n}$ and $x_k=k\Delta x$. The only difference is that we must now rotate the $k$-th slice around the line $y=4$.
+
+\begin{center}
+\resizebox{0.3\textwidth}{!}{
+\begin{tikzpicture}
+\begin{axis}[
+unit vector ratio*=1 1 1,
+            xlabel=$x$,
+            ylabel=$y$,
+            ytick={1, 2, 3, 4, 5},
+            xtick={2.4, 3.14}, xticklabels={$x_k$, $\pi$}, xmin=-1, xmax=5, ymax=5]     
+\addplot[name path=F,domain={0:pi}] {3*sin((deg(x))};
+\addplot[name path=G,domain={-0.5:4}, ultra thin] {0};
+\addplot[name path=H,domain={2:2.4}] {3*sin((deg(2.4))};
+\addplot[pattern=north west lines,  color=cyan, fill opacity=0.5]fill between[of=F and G, soft clip={domain=0:pi}]
+;
+   \pgfplotsinvokeforeach{0,0.4,...,2.8}{
+            \draw (#1,0) -- (#1,{3*sin((deg(#1))});
+          }
+\addplot+[domain=2:2.4, shaderegion, fill=yellow](2,0) -- (2.4,0) -- (2.4,{3*sin((deg(2.4))})node[anchor=west]{$\left(x_k,3\sin(x_k)\right)$}  -- (2,{3*sin((deg(2.4))}) -- (2,0);
+\draw[dashed] (-1,4) to (5,4);
+\draw[dashed] (2.4, {3*sin((deg(2.4))}) to (2.4, 4);
+\draw[dashed] (2,{3*sin((deg(2))}) to (2,4);
+\node at (3.8,3){$r_k=4-3\sin(x_k)$};
+\end{axis}
+
+\end{tikzpicture}
+}
+\end{center}
+
+If we rotate the yellow $k$-th slice about the line $y=4$, the resulting shape will be a disk with a hole in the middle, commonly known as a $\boxed{\text{washer}}$ or a $\boxed{\text{CD}}$. The outer radius $R_k$ of the entire washer is measured from the center line of rotation ($y=4$) to the outer edge of the slice ($y=0$), and thus has a length of 4. The inner radius of the washer (the radius of the hole in the middle) is measured from the center line of rotation ($y=4$) to the inner edge of the slice ($y=3\sin(x_k)$). So, the inner radius is given by $r_k=(\text{larger $y$-value})-(\text{smaller $y$-value})=4-3\sin(x_k)$. The thickness of both the outer disk and the hole in the middle is $\Delta x$.
+
+To find the volume of this washer $V_k$, we take the volume of the entire outer disk (defined by $R_k$) minus the volume of the hole in the middle (defined by $r_k$). So the volume of the $k$-th washer is given by:
+
+\begin{align*}
+V_k &= (\text{volume of entire outer disk})-(\text{volume of hole in the middle})\\
+ &= (\pi(R_k)^2\Delta x) - (\pi(r_k)^2\Delta x)\\
+  &= (\pi(4)^2\Delta x) - (\pi(4-3\sin(x_k))^2\Delta x)\\
+  &=\pi\left(16-(4-3\sin(x_k))^2\right)\Delta x\\
+  &=\boxed{\pi\left(24\sin(x_k)-9\sin^2(x_k)\right) \Delta x}
+\end{align*}
+
+
+\end{solution}
+
+
+\item
+\begin{problem}[1.2in]
+Write a Riemann sum that approximates the volume of the full solid of revolution.
+\end{problem}
+
+\begin{solution}
+As before, we use the volume of the $k$-th washer, and sum over all slices from $k=1$ to $n$. This gives the Riemann sum approximation $$\boxed{\sum_{k=1}^n \pi\left(24\sin(x_k)-9\sin^2(x_k)\right) \Delta x}$$
+\end{solution}
+
+\item
+\begin{problem}[1.2in]
+By taking an appropriate limit, find the exact volume of the full solid of revolution. You may leave your answer as a definite integral.
+\end{problem}
+
+\begin{solution}
+To find the exact volume of the full solid of revolution, we take the limit of the previous Riemann sum as the number of slices approaches infinity. Thus,
+
+$$\text{Exact volume} = \lim_{n \to \infty} \sum_{k=1}^n \pi\left(24\sin(x_k)-9\sin^2(x_k)\right) \Delta x = \boxed{\int_0^{\pi} \pi\left(24\sin(x)-9\sin^2(x)\right) dx}$$
+
+Note: We can evaluate this integral using the same identity from 1(a), part iii. Its exact value is $48\pi - \frac{9\pi^2}{2}$, which is approximately $106.38$. 
+\end{solution}
+
+
+\end{enumerate}
+
+ 
+ \pspace{\newpage}
+ 
+ 
+
+\item One more time, here is the area under one loop of $y=3\sin(x)$:
+    
+    \begin{center}
+\resizebox{0.3\textwidth}{!}{
+\begin{tikzpicture}
+\begin{axis}[
+unit vector ratio*=1 1 1,
+            xlabel=$x$,
+            ylabel=$y$,
+            ytick={1, 2, 3},
+            xtick=3.14, xticklabels={$\pi$}, ymax=4]     
+\addplot[name path=F,domain={0:pi}] {3*sin((deg(x))} ;
+\addplot[name path=G,domain={-0.5:4}, ultra thin] {0};
+\addplot[pattern=north west lines,  color=cyan, fill opacity=0.5]fill between[of=F and G, soft clip={domain=0:pi}]
+;
+\end{axis}
+\end{tikzpicture}
+}
+\end{center}
+
+    
+    \note{Students often really \textbf{want} to use horizontal slices
+    here because they are afraid of cylindrical shells.
+
+    One question worth asking here is about symmetry: can they just
+    rotate the portion between $x = 0$ and $x = \frac{\pi}{2}$ and then
+    double that?}
+    
+Now suppose that you rotate the same region about the vertical line $x = 4$. This will give you a third solid of revolution. (Can you visualize it?)
+
+\begin{enumerate}
+
+\item
+\begin{problem}[2.7in]
+When you rotate a typical $k$-th slice about the line $x = 4$, what shape do you get? Approximate the volume of this shape. As usual, draw and label the $k$-th slice on the $xy$-plane, and be sure to define all notation used.
+ \end{problem}
+
+\begin{solution}
+Once again, we want to use vertical slices here, because our region has not changed, only the line about which we rotate the region. So we define $\Delta x = \frac{\pi}{n}$ and $x_k = k\Delta x$, so that $x_0=0$ and $x_n=\pi$, and draw our typical $k$-th slice vertically.
+
+\begin{center}
+\resizebox{0.3\textwidth}{!}{
+\begin{tikzpicture}
+\begin{axis}[
+unit vector ratio*=1 1 1,
+            xlabel=$x$,
+            ylabel=$y$,
+            ytick={1, 2, 3},
+            xtick={2.4, 3.14, 4}, xticklabels={$x_k$, $\pi$, 4}, xmax=5, ymax=4]     
+\addplot[name path=F,domain={0:pi}] {3*sin((deg(x))} ;
+\addplot[name path=G,domain={-0.5:4}, ultra thin] {0};
+\addplot[name path=H,domain={2:2.4}] {3*sin((deg(2.4))};
+\addplot[pattern=north west lines,  color=cyan, fill opacity=0.5]fill between[of=F and G, soft clip={domain=0:pi}]
+;
+   \pgfplotsinvokeforeach{0,0.4,...,2.8}{
+            \draw (#1,0) -- (#1,{3*sin((deg(#1))});
+          }
+\addplot+[domain=2:2.4, shaderegion, fill=yellow](2,0) -- (2.4,0) -- (2.4,{3*sin((deg(2.4))}) -- (2,{3*sin((deg(2.4))}) -- (2,0);
+\draw[dashed] (4,0) to (4,4);
+\draw[dashed] (2.4,{3*sin((deg(2.4))}) to (4,{3*sin((deg(2.4))});
+\node at (3.1,2.2){\tiny$r_k=4-x_k$};
+\end{axis}
+
+\end{tikzpicture}
+}
+\end{center}
+
+When we rotate the yellow $k$-th slice about the line $x=4$, the resulting solid will be a $\boxed{\text{cylindrical shell}}$ or $\boxed{\text{paper towel tube}}$. We can approximate its volume by ``unrolling" it, giving us roughly a rectangular prism whose length is approximately the circumference of the shell, whose width is given by the thickness of the $k$-th slice (which is $\Delta x$), and whose height is the height of the $k$-th slice (which is $3\sin(x_k)$). As noted in the picture above, the radius $r_k$ of the shell is the length from the center line of rotation ($x=4$) to the inner edge of the tube ($x=x_k$); thus, $r_k=(\text{larger $x$-value})-(\text{smaller $x$-value})=4-x_k$. 
+
+Therefore, we can approximate the volume of the $k$-th shell as follows:
+
+\begin{align*}
+V_k & \approx \text{length}\times\text{height} \times \text{width}\\
+& \approx \text{circumference}\times \text{height}\times\text{thickness}\\
+& \approx (2\pi r_k)(3\sin(x_k))\Delta x\\
+& \approx 2\pi(4-x_k)(3\sin(x_k))\Delta x\\
+& \approx \boxed{6\pi(4-x_k)(\sin(x_k))\Delta x}\\
+\end{align*}
+
+Notice that we are still expressing the volume of the $k$-th slice entirely in terms of $x_k$ and $\Delta x$, so that we may use a Riemann sum later on. Also note that we could have expressed the radius of the shell as $4-x_{k-1}$ if we decided to measure the radius from the center line to the \textit{outer} edge of the shell. But again, it is more convenient for our Riemann sum notation to use $x_k$. As the number of slices increases, the slices get thinner and $x_k$ and $x_{k-1}$ become infinitely close together, so it doesn't matter which value we use.
+
+\end{solution}
+
+\item
+\begin{problem}[1.2in]
+Write a Riemann sum that approximates the volume of the full solid of revolution.
+\end{problem}
+
+\begin{solution}
+The approximate volume of the full solid is given by $$\boxed{\sum_{k=1}^n 6\pi(4-x_k)(\sin(x_k))\Delta x}$$
+
+\end{solution}
+
+\item
+\begin{problem}[1.2in]
+By taking an appropriate limit, find the exact volume of the full solid of revolution. You may leave your answer as a definite integral.
+\end{problem}
+
+\begin{solution}
+$$\text{Exact volume} = \lim_{n \to \infty}\sum_{k=1}^n 6\pi(4-x_k)(\sin(x_k))\Delta x = \boxed{\int_0^\pi 6\pi(4-x)(\sin(x))\ dx}$$
+
+Notice that the bounds of the definite integral are still $x=0$ and $x=\pi$, as opposed to $x=0$ and $x= 4$, or $x=0$ and $x=8$. This is because the bounds of integration are always defined to be $a$ and $b$, where $a=x_0=0$ and $b=x_n=\pi$. Another way to think about this is to remember that we only sliced the region from $x=0$ to $x=\pi$, so our $x$-values should only range between those two numbers.
+
+Also, the integral above can be evaluated by distributing $\sin(x)$, splitting the integral into two integrals, and using integration by parts on the second integral. By doing so, we get an exact volume of $6\pi(8-\pi)$, which is approximately 91.58.
+
+\end{solution}
+
+\end{enumerate}
+\end{enumerate}
+
+  
+  \pspace{\newpage}
+  
+  %%% Stepan's New Problem %%%
+\item
+
+  
+Let $\mathcal{R}$ be the region enclosed by the lines $y=1$, $y=3$, $x=-1$ and the curve $y=x^2$ shown below.
+
+      \begin{tikzpicture}
+        \begin{axis}[xtick={-2,-1, 1,2}, ytick={1,2,3,4}, width=3in,
+          axis equal=true,xmin=-2,xmax=2,ymin=0,ymax=4]
+        \end{axis}
+      \end{tikzpicture}
+
+   \begin{enumerate}
+  
+  
+    
+    \item
+    \begin{problem}[1.3in]
+    Write an integral giving the volume generated when $\mathcal{R}$ is
+    rotated about the line $y = 4$. Demonstrate your slicing method fully. You need not evaluate your
+    integral.
+    \end{problem}
+    
+    \begin{solution}
+    As always, we should first decide whether we want to use vertical or
+    horizontal slices.  In this case, if we use vertical slices, we will
+    have to split the region up into where $x < 1$ and $x > 1$ because the slices will have different descriptions.
+    (In the left region, vertical slices would go from $y = 1$ to $y =
+    3$; in the right region, they would go from $y = x^2$ to $y = 3$.)
+
+    Let's use horizontal slices instead.  This means we'll slice the
+    interval $[1, 3]$ on the $y$-axis into $n$ pieces of equal
+    thickness $\Delta y = \frac{2}{n}$, and we'll label $y_0 = 1, y_1,
+    \ldots, y_n = 3$ as usual (so $y_k = 1 + k \Delta y$).  Then we
+    focus on the $k$-th slice:
+    
+      \begin{tikzpicture}
+        \begin{axis}[xtick={-1}, ytick={1,1.8,3,4}, width=3in,
+          axis equal=true,xmin=-2,xmax=2,ymin=0,ymax=4,yticklabels={1,{$y_k$},3,{4}}]
+          \addplot+[domain=1:1.732, shaderegion]{x^2} -- (-1, 3) -- (-1,1) -- (1,1);
+         \pgfplotsinvokeforeach{1,1.2,...,3}{
+            \draw (-1,#1) -- ({sqrt(#1)},#1);
+          }
+          \addplot+[domain=sqrt(1.6):sqrt(1.8), shaderegion, fill=yellow]{x^2} -- (-1, 1.8) -- (-1,1.6) -- cycle;
+          \draw[dashed] (-2,4) -- (2,4);
+        \end{axis}
+         
+      \end{tikzpicture}
+      
+    Since the variable we're slicing is $y$, we really want to write
+    everything in terms of $y$.  The curve $y = x^2$ can be rewritten
+    as $x = \sqrt y$, so the top right endpoint of this slice is $(\sqrt{y_k},
+    y_k)$.  The top left endpoint is on the line $x = -1$, so its
+    coordinate is just $(-1, y_k)$.
+    
+    \begin{tikzpicture}
+        \begin{axis}[xtick={-1}, ytick={1,1.8,3,4}, width=3in,
+          axis equal=true,xmin=-2,xmax=2,ymin=0,ymax=4,yticklabels={1,{$y_k$},3,{4}}]
+          \addplot+[domain=1:1.732, shaderegion]{x^2} -- (-1, 3) -- (-1,1) -- (1,1);
+          \addplot+[domain=sqrt(1.6):sqrt(1.8), shaderegion, fill=yellow]{x^2}node[anchor= west]{$\left(\sqrt{y_k},y_k\right)$} -- (-1, 1.8)node[anchor= east]{$(-1,y_k)$} -- (-1,1.6) -- cycle;
+          \draw[dashed] (-2,4) -- (2,4);
+
+        \end{axis}
+         
+      \end{tikzpicture}
+      
+    When we rotate the $k$-th slice about the line $y = 4$, we get
+    (approximately) a toilet paper tube or cylindrical shell of radius
+    $4 - y_k$, length $\sqrt{y_k} - (-1) = \sqrt{y_k} + 1$, and thickness
+    $\Delta y$.  Therefore,
+    \[ \boxed{\textrm{volume of $k$-th slice rotated} \approx 2 \pi (4 -
+    y_k) (\sqrt{y_k} + 1) \Delta y}\] Summing over all slices and taking
+    the limit as $n \to \infty$, we find that the volume is given by the
+    integral $\displaystyle \int_{1}^3 2 \pi (4 -
+    y) \left(\sqrt{y} + 1\right)~dy$.
+    \end{solution}
+
+
+    \item
+    \begin{problem}[1.3in]
+    Write an integral giving the volume generated when $\mathcal{R}$ is
+    rotated about the line $x=-2$. Demonstrate your slicing method fully. You need not evaluate your
+    integral.
+    \end{problem}
+    
+    \begin{solution}
+    For the same reason as in the previous part, we'll use horizontal
+    slices; these are labeled exactly the same way: 
+    
+    \begin{tikzpicture}
+        \begin{axis}[xtick={-2,-1}, ytick={1,1.8,3}, width=3in,
+          axis equal=true,xmin=-2,xmax=2,ymin=0,ymax=4,yticklabels={1,{$y_k$},3}]
+          \addplot+[domain=1:1.732, shaderegion]{x^2} -- (-1, 3) -- (-1,1) -- (1,1);
+          \addplot+[domain=sqrt(1.6):sqrt(1.8), fill=yellow]{x^2}node[anchor= west]{$\left(\sqrt{y_k},y_k\right)$} -- (-1, 1.8)node[anchor= east]{$(-1,y_k)$} -- (-1,1.6) -- cycle;
+          \draw[dashed] (-2,0) -- (-2,4);
+        \end{axis}
+         
+      \end{tikzpicture}
+    
+    When we rotate this slice about the line $x = -2$, we get
+    (approximately) a washer (or CD/DVD) of inner radius $-1 - (-2) = 1$,
+    outer radius $\sqrt{y_k}-(-2)=\sqrt{y_k}+2$, and thickness $\Delta y$.  Therefore,
+    \[ \boxed{\textrm{volume of $k$-th slice rotated} \approx \left[ \pi
+    \cdot \left(\sqrt{y_k}+2\right)^2 - \pi \left(1 \right)^2 \right] \Delta y}\]
+    Summing over all slices and taking the limit as $n \to \infty$, we
+    find that the volume is given by the integral \fbox{$\displaystyle
+    \int_{1}^3 \left[ \pi\cdot \left(\sqrt{y}+2\right)^2 - \pi \right]~dy$}. 
+    \end{solution}
+
+
+\end{enumerate}
+
+%%% End of Stepan's New Problem %%%
+  
+
+
+
+
+\newpage
+  \item 
+  Let $\mathcal{R}$ be the region
+  enclosed by the $x$-axis and the graphs of $x = -1$, $y = -2$, and $y =
+  \ln x$.
+  
+\begin{center}
+  \includegraphics[width=2in]{ws/images/volume-ln-horizontal-region}
+\end{center}
+
+  \begin{enumerate}
+    \item
+    
+    \note{Sometimes students want to say that the radius is $2 + y_k$
+    because they look at the picture and see $y_k$ as distance to the
+    $x$-axis, forgetting that it's negative.}
+    
+    \begin{problem}[2.8in]
+    Write an integral giving the volume generated when $\mathcal{R}$ is
+    rotated about the line $y = 2$.  (You need not evaluate your
+    integral.)
+    \end{problem}
+   
+
+    \begin{solution}
+    As always, we should first decide whether we want to use vertical or
+    horizontal slices.  In this case, if we use vertical slices, we will
+    have to split the region up into where $x < \frac{1}{e^2}$ and $x >
+    \frac{1}{e^2}$ because the slices will have different descriptions.
+    (In the left region, vertical slices would go from $y = -2$ to $y =
+    0$; in the right region, they would go from $y = \ln x$ to $y = 0$.)
+
+    Let's use horizontal slices instead.  This means we'll slice the
+    interval $[-2, 0]$ on the $y$-axis into $n$ pieces of equal
+    thickness $\Delta y = \frac{2}{n}$, and we'll label $y_0 = -2, y_1,
+    \ldots, y_n = 0$ as usual (so $y_k = -2 + k \Delta y$).  Then we
+    focus on the $k$-th slice:
+    \begin{center}
+    \includegraphics[width=2in]{ws/images/volume-ln-horizontal-slices2-unlabeled}
+    \end{center}
+    Since the variable we're slicing is $y$, we really want to write
+    everything in terms of $y$.  The curve $y = \ln x$ can be rewritten
+    as $x = e^y$, so the top right endpoint of this slice is $(e^{y_k},
+    y_k)$.  The top left endpoint is on the line $x = -1$, so its
+    coordinate is just $(-1, y_k)$.
+    \begin{center}
+    \includegraphics[width=2in]{ws/images/volume-ln-horizontal-slices2}
+    \end{center}
+    When we rotate the $k$-th slice about the line $y = 2$, we get
+    (approximately) a toilet paper tube or cylindrical shell of radius
+    $2 - y_k$, length $e^{y_k} - (-1) = e^{y_k} + 1$, and thickness
+    $\Delta y$.  Therefore,
+    \[ \boxed{\textrm{volume of $k$-th slice rotated} \approx 2 \pi (2 -
+    y_k) (e^{y_k} + 1) \Delta y}\] Summing over all slices and taking
+    the limit as $n \to \infty$, we find that the volume is given by the
+    integral $\displaystyle \int_{-2}^0 2 \pi (2 - y) (e^y + 1)~dy$.
+        \end{solution}
+       
+    
+
+       \item
+     \begin{problem}[2.8in]
+    Write an integral giving the volume generated when $\mathcal{R}$ is
+    rotated about the line $x = 2$.  (You need not evaluate your
+    integral.)
+    \end{problem}
+
+    \begin{solution}
+     For the same reason as in the previous part, we'll use horizontal
+    slices; these are labeled exactly the same way: 
+    \begin{center}
+    \includegraphics[width=2in]{ws/images/volume-ln-horizontal-slices1-labeled}
+    \end{center}
+    When we rotate this slice about the line $y = 2$, we get
+    (approximately) a washer (or CD) of outer radius $2 - (-1) = 3$,
+    inner radius $2 - e^{y_k}$, and thickness $\Delta y$.  Therefore,
+    \[ \boxed{\textrm{volume of $k$-th slice rotated} \approx \left[ \pi
+    \cdot 3^2 - \pi \left(2 - e^{y_k} \right)^2 \right] \Delta y}\]
+    Summing over all slices and taking the limit as $n \to \infty$, we
+    find that the volume is given by the integral \fbox{$\displaystyle
+    \int_{-2}^0 \left[ \pi \cdot 3^2 - \pi \left(2 - e^y \right)^2
+    \right]~dy$}. 
+    \end{solution}
+
+
+  \end{enumerate}
+
+\pspace{\newpage}
+
+
+   \item 
+  \begin{problem}[0.4in]
+  How might you describe a bagel as a solid of revolution?  (That is,
+  what sort of region would you rotate, and what line would you rotate
+  it about?)
+  \end{problem}
+  \pspace{\vfill}
+
+  \begin{solution}
+  We can get a bagel by rotating the region inside a circle around a
+  line, something like this (rotate the circle around the dotted line):
+  \begin{center}
+  \includegraphics[width=1.5in]{ws/images/bagel1}
+  \end{center}
+  \end{solution}
+
+  \item 
+  \begin{problem}[4in]
+  Let $\mathcal{R}$ be the region enclosed by the circle of radius 3
+  centered at the origin.  Using vertical slices, find the volume
+  generated when $\mathcal{R}$ is rotated about the line $x = 4$.
+  (Please evaluate your integral.)
+
+  \textit{Note:} It is also possible to find the volume using horizontal
+  slices, and you might want to try that for extra practice.
+  \end{problem}
+
+  \note{You can have a lot of fun with the bagel. Suppose you rotated just the right hand side; would that give half the answer, or more, or less?  Why?  What about if you chopped the bagel along the disk and uncurled it -- is the volume of the (rough) cylinder the same as the answer in \#4?}
+
+  \begin{solution}
+  We slice the interval $[-3, 3]$ into $n$ pieces of equal width $\Delta
+  x$, label $x_0 = -3, \ldots, x_n = 3$ as usual, and focus on the $k$-th
+  slice. 
+  \begin{center}
+  \includegraphics[width=2in]{ws/images/bagel2-slice}
+  \end{center}
+  The equation of the circle is $x^2 + y^2 = 9$, or $y = \pm \sqrt{9 -
+  x^2}$.  $y = \sqrt{9 - x^2}$ is the equation of the top half of the
+  circle, and $y = -\sqrt{9 - x^2}$ is the equation of the bottom half
+  of the circle.
+
+  Rotating the $k$-th slice gives (approximately) a paper towel tube
+  with thickness $\Delta x$, radius $4 - x_k$, and height $2 \sqrt{9 -
+  x_k^2}$.  So,
+  \[ \textrm{volume of $k$-th slice rotated} \approx 2 \pi (4 - x_k)
+  \left(2 \sqrt{9 - x_k^2} \right) \Delta x = 4 \pi (4 - x_k) \sqrt{9 -
+  x_k^2} \Delta x.\] Summing over all slices and taking the limit as
+  $n \to \infty$, the volume is given by the integral $\displaystyle
+  \int_{-3}^3 4 \pi (4 - x) \sqrt{9 - x^2}~dx$.  To evaluate this
+  integral, let's first multiply it out a little:
+  \[ \int_{-3}^3 4 \pi (4 - x) \sqrt{9 - x^2}~dx = 16 \pi \int_{-3}^3
+  \sqrt{9 - x^2}~dx - 4 \pi \int_{-3}^3 x \sqrt{9 - x^2}~dx.\] Now, we
+  have two integrals to evaluate.  Notice that $y = \sqrt{9 - x^2}$ is
+  just the graph of the top half of the circle in our picture, so
+  $\displaystyle \int_{-3}^3 \sqrt{9 - x^2}$ is the area of the top half
+  of the circle.  We know that a circle of radius 3 has area $9 \pi$, so
+  $\displaystyle \int_{-3}^3 \sqrt{9 - x^2}~dx = \frac{9 \pi}{2}$.
+
+  The second integral $\displaystyle \int_{-3}^3 x \sqrt{9 - x^2}~dx$
+  is actually even simpler: the integrand is an odd function, and the
+  interval of integration is symmetric about 0, so the integral is
+  equal to 0.  Alternatively, this integral can be done using
+  substitution.  
+
+  So, our final answer is $16 \pi \cdot \frac{9 \pi}{2} = \boxed{72
+  \pi^2}$.
+  \end{solution}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+% \item  \label{density-muffin}
+  
+%   \begin{problem}
+%     We can model a muffin as a solid of revolution, obtained by rotating
+%     the following region about the $y$-axis.  Due to a poor recipe, the
+%     chocolate chips in our muffin tend to sink to the bottom.  The amount
+%     of chocolate in the muffin is given by $\rho(y) = 5 - y$ grams per
+%     cubic inch, where $y$ represents the distance to the bottom of the
+%     muffin.  Find the total amount of chocolate in the muffin.
+
+%     \includegraphics[width=1.75in]{ws/images/density-muffin-1}
+%   \end{problem}
+
+%   \begin{solution}
+%     Note that, in the picture, $y$ does indeed represent distance to the
+%     bottom of the muffin.  Since the chocolate density varies with the
+%     distance to the bottom of the muffin, we must slice parallel to the
+%     bottom of the muffin.  Each slice is approximately a disk.  Here are
+%     two representative slices:
+%     \begin{center}
+%       \includegraphics[width=2in]{ws/images/density-muffin-2}
+%     \end{center}
+%     Notice that these two slices have different descriptions: the top one
+%     should be described using the curve $y = 3 - \frac{x^2}{4}$, while the
+%     bottom one should be described using the curve $y = 2x - 2$.  So, we
+%     should really consider the top and bottom parts of the muffin
+%     separately.
+
+%     Let's first focus on the bottom part of the muffin, which we get by
+%     rotating the following region about the $y$-axis: 
+%     \begin{center}
+%       \includegraphics[width=2in]{ws/images/density-muffin-bottom}
+%     \end{center}
+%     As we said, we will use horizontal slices, so we slice the interval
+%     $[0, 2]$ (on the $y$-axis) into $n$ pieces of equal height $\Delta
+%     y$.  We label $y_0 = 0, \ldots, y_n = 2$ as usual and focus on the
+%     $k$-th slice:
+%     \begin{center}
+%       \includegraphics[width=2in]{ws/images/density-muffin-bottom-slice}
+%     \end{center}
+%     The equation of the line $y = 2x - 2$ can be rewritten as $x = \frac{y
+%       + 2}{2}$.  If we rotate the $k$-th slice of this region, we get a
+%     slice that is approximately a disk of radius $\frac{y_k + 2}{2}$ and
+%     thickness $\Delta y$, so the volume of the $k$-th slice of the muffin
+%     bottom is approximately $\pi \left( \frac{y_k + 2}{2} \right)^2 \Delta
+%     y$.  The density of chocolate in this slice is approximately
+%     $\rho(y_k)$, so the amount of chocolate in this slice is approximately
+%     $\rho(y_k) \cdot \pi \left( \frac{y_k + 2}{2} \right)^2 \Delta y = \pi
+%     \left( \frac{y_k + 2}{2} \right)^2 \rho(y_k) \Delta y$.  Adding these
+%     up and taking the limit gives us the integral $\displaystyle \int_0^2
+%     \pi \left( \frac{y + 2}{2} \right)^2 \rho(y)~dy$ for the amount of
+%     chocolate in the bottom part of the muffin.
+
+%     To deal with the top part of the muffin, we use exactly the same
+%     reasoning.  We get the top part of the muffin by rotating this region:
+%     \begin{center}
+%       \includegraphics[width=2in]{ws/images/density-muffin-top}
+%     \end{center}
+%     We need to solve $y = 3 - \frac{x^2}{4}$ for $x$:
+%     \begin{align*}
+%       y & = 3 - \frac{x^2}{4} \\
+%       \frac{x^2}{4} & = 3 - y \\
+%       x^2 & = 4 (3 - y) \\
+%       x & = 2 \sqrt{3 - y}
+%     \end{align*}
+%     So, the $k$-th slice is approximately a disk of radius $2 \sqrt{3 -
+%       y_k}$ and thickness $\Delta y$, which means its volume is
+%     approximately $\pi (2 \sqrt{3 - y_k})^2 \Delta y = 4 \pi (3 - y_k)
+%     \Delta y$.  Therefore, the amount of chocolate in this slice is
+%     approximately $4 \pi (3 - y_k) \rho(y_k) \Delta y$.  Adding these up
+%     and taking the limit gives us the integral $\displaystyle \int_2^3 4
+%     \pi (3 - y) \rho(y)~dy$ for the amount of chocolate in the top part
+%     of the muffin.
+
+%     So, the total amount of chocolate in the muffin is
+%     \fbox{$\displaystyle \int_0^2 \pi \left( \frac{y + 2}{2} \right)^2
+%       \rho(y)~dy + \int_2^3 4 \pi (3 - y) \rho(y)~dy$.}
+%   \end{solution}
+  
+  
+ \end{enumerate}
+
+\end{document}

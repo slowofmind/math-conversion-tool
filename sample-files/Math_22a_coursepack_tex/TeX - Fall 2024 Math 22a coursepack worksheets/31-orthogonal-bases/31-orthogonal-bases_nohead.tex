@@ -1,0 +1,183 @@
+%\documentclass[12pt,letterpaper]{article}
+
+
+
+%\input{../worksheet-setup.tex}
+%\usetikzlibrary{arrows}
+%\usepackage{wrapfig}
+%\usepackage{amsfonts,amsmath}
+
+%\makeatletter
+%\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+%	\hskip -\arraycolsep
+%	\let\@ifnextchar\new@ifnextchar
+%	\array{#1}}
+%\makeatother
+%
+%\def\env@matrix{\hskip -\arraycolsep
+%	\let\@ifnextchar\new@ifnextchar
+%	\array{*\c@MaxMatrixCols c}}
+%
+%\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\section{{Orthogonal Sets, $\vec\S$6.2, 6.3}}% 
+\chead{\Large\textbf{Orthogonal Sets, $\vec\S$6.2, 6.3}}% 
+
+%\begin{document}
+\thispagestyle{fancy}
+
+Recall from last class:
+
+\begin{itemize}
+\item Let $u, v \in \mathbb{R}^n$, then the {\bf dot product} of $u$ and $v$ is given by $$u \cdot v= u^{T}v=u_1 v_1+\dots+ u_n v_n.$$
+\item {\bf Theorem 6.1:} Let $u, v, w \in \mathbb{R}^n$ and $c\in \mathbb{R}$.
+\begin{enumerate}
+	\item $$ u \cdot v = v \cdot u.$$
+	\item $$(u+v)\cdot w= u \cdot w+ v \cdot w.$$
+	\item $$(cu)\cdot v = c(u\cdot v)= u \cdot (cv).$$
+	\item $u \cdot u \geq 0$ and $u \cdot u =0$ if and only if $u=0$.
+\end{enumerate}
+\item  The {\bf length} or {\bf norm} of the vector $v$ is a non-negative scalar, denoted by $\norm{v}$, and defined by $$\norm{v}= \sqrt{v\cdot v}.$$
+\item We define the {\bf distance} between $u$ and $v$ by $$\text{dist}(u,v)=\norm{u-v}.$$
+\item The vectors $u$ and $v$ are {\bf orthogonal} if $u\cdot v=0$.
+\item {\bf Theorem 6.2:} The vectors $u$ and $v$ are orthongal if and only if $$\norm{u}^2+\norm{v}^2=\norm{u+v}^2.$$
+\item The set $$W^{\perp} =\{ z \in \mathbb{R}^n: z \cdot w=0 \text{ for all } w \in W\}$$ is called the {\bf orthogonal complement} of $W$.
+\item Note: $x \in W^{\perp}$ if and only if $x$ is orthogonal to each vector in a set that spans $W$. Also $W^{\perp}$ is a subspace of $\mathbb{R}^n$.
+\item We can use the dot product to find the angles between vectors; namely $$u\cdot v = \norm{u} \norm{v} \cos \theta.$$
+\item 	A set of vectors $\{ u_1, \dots, u_p\}$ in $\mathbb{R}^n$ is {\bf orthogonal} if $u_k \cdot u_j=0$ for all $j\neq k$.
+\item {\bf Theorem 6.3} Let $A$ be an $m\times n$ matrix, then $$(\text{Row}(A))^{\perp} = \text{Null}(A) \text{ and } (\text{Col}(A))^{\perp}= \text{Null}(A^{T}).$$
+\item
+{\bf Theorem 6.4:} If $S=\{ u_1, \dots, u_p\}$ is an orthogonal set of non-zero vectors in $\mathbb{R}^n$, then $S$ is linearly independent and hence a basis for $\text{Span} \; S$.
+\end{itemize}
+
+\newpage
+
+\begin{defn} An {\bf orthogonal basis} for a subspace $W$ of $\mathbb{R}^n$ is a basis for $W$ that is also an orthogonal set.
+\end{defn}
+
+{\bf Theorem 6.5:} Let $\{u_1, \dots,u_p\}$ be an orthogonal basis for a subspace $W$ of $\mathbb{R}^n$. For each $y\in W$, then $$y=c_1 u_1+\dots+c_p u_p$$ where $$c_j=\frac{y\cdot u_j}{u_j \cdot u_j}.$$
+
+\begin{enumerate}
+
+\Problem Prove the Theorem.
+
+
+
+
+
+\vfill
+
+
+\Problem Let $u_1=\begin{bmatrix} 2\\ -3\\ \end{bmatrix}$ and $u_2= \begin{bmatrix} 6\\4\\ \end{bmatrix}$ and $x=\begin{bmatrix} 9\\ -7\\ \end{bmatrix}$. Find $x$ in the $\{u_1, u_2\}$-coordinates.
+
+\vfill
+
+
+\newpage
+
+\begin{defn} Let $u$ be a non-zero vector in $\mathbb{R}^n$ and let $v$ be a vector in $\mathbb{R}^n$, then the {\bf orthogonal projection} of $v$ onto $u$, denoted by $\text{proj}_{u}{v}$, is given by $$\text{proj}_{u}{v}=\frac{v\cdot u}{u \cdot u} u$$ Let $L=\text{Span}\{ u\}$, then we also write $\text{proj}_{L}{v}$ for the orthogonal projection of $v$ onto the line defined by the span of $u$; namely $$\text{proj}_{L}{v}=\text{proj}_{u}{v}.$$
+\end{defn}
+
+\Problem Let $u=\begin{bmatrix} 2\\ 2\\ \end{bmatrix}$ and $y= \begin{bmatrix} 1\\4\\ \end{bmatrix}$. Find the orthogonal projection of $y$ onto $u$.
+
+\vfill
+
+{\bf Note:} Theorem 6.5 says that $$y=\text{proj}_{u_1}{y}+\text{proj}_{u_2}{y}+\dots+ \text{proj}_{u_p}{y}.$$
+
+\begin{defn} A set $\{u_1, \dots, u_p\}$ is {\bf orthonormal} if it is orthogonal and $\norm{u_k}=1$ for all $k$.
+\end{defn}
+
+{\bf Theorem 6.6:} An $m\times n$ matrix $U$ has orthonormal columns if and only if $U^{T}U=I_n$.
+
+\Problem Prove the Theorem.
+
+\vfill
+
+\newpage
+
+{\bf Theorem 6.7:} Let $U$ be an $m\times n$ matrix with orthonormal columns. Let $x,y \in \mathbb{R}^n$. Then
+\begin{enumerate}
+\item $\norm{Ux}=\norm{x}$.
+\item $(Ux)\cdot (Uy) = x \cdot y$.
+\item $(Ux) \cdot (Uy)=0$ if and only if $x \cdot y=0$.
+\end{enumerate}
+\Problem Prove the theorem.
+
+\vfill
+
+\begin{defn} An {\bf orthogonal matrix} $U$ is a square matrix so that $U^{-1}=U^{T}$. 
+\end{defn}
+
+{\bf Note:} An $n \times n$ matrix $U$ is orthogonal if and only if the columns of $U$ are orthonormal.
+
+\Problem Suppose $U$ is an orthogonal matrix.
+\begin{enumerate}
+\item  What can you say about the eigenvalues of $U$?
+
+\vfill
+
+\item What is the determinant of $U$?
+
+\vfill
+
+\end{enumerate}
+
+\newpage
+
+
+
+\end{enumerate}
+
+\begin{comment}
+\newpage
+\chead{\Large\textbf{Orthogonal Sets -- Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+\Answer
+\begin{proof} Suppose $y= c_1 u_1+\dots c_pu_p$. Now take the dot product of both sides with $u_k$ to get $$y\cdot u_k = (c_1 u_1+\dots +c_p u_p)\cdot u_k.$$ Using the orthogonality of $u_1, \dots, u_p$, we can simplify the right hand side to get $$y \cdot u_k= c_k u_k \cdot u_k.$$ Therefore $$c_k=\frac{y \cdot u_k}{u_k\cdot u_k}.$$
+\end{proof}
+\Answer In order to find $x$ in the $u_1, u_2$ coordinates, we need to find scalars $c_1, c_2$ such that $$x=c_1 u_1+ c_2 u_2.$$ Notice that $u_1\cdot u_2=0$, and hence we can use the previous theorem to conclude $$c_1=\frac{x\cdot u_1}{u_1\cdot u_1}= \frac{39}{13}=3,$$ and $$c_2=\frac{x\cdot u_2}{u_2\cdot u_2}= \frac{26}{52}=\frac{1}{2}.$$ Thus $[x]_{\{u_1,u_1\}}=\begin{bmatrix} 3\\ \frac{1}{2}\\ \end{bmatrix}$.
+ 
+\Answer The orthogonal projection of $y$ onto $u$ is given by $$\text{proj}_{u}{y}=\frac{y \cdot u}{u \cdot u} u= \frac{10}{8}u=\begin{bmatrix}\frac{5}{2}\\[0.5em] \frac{5}{2}\\ \end{bmatrix}.$$
+
+\Answer
+
+\begin{proof}
+	Let $U=[u_1, \dots, u_n]$, then $$U^{T}U=\begin{bmatrix} u_1^{T}\\ \vdots\\ u_n^{T} \end{bmatrix} \begin{bmatrix} u_1 & \dots & u_n\\ \end{bmatrix}=\begin{bmatrix}
+	u_1^{T}u_1 & u_1^{T}u_2 & \dots & u_1^{T}u_n\\
+	u_2^{T}u_1 & u_2^{T}u_2 & \dots & u_2^{T}u_n\\
+	\vdots     &            & \ddots& \\
+	u_n^{T}u_1 & u_n^{T}u_2 & \dots & u_n^{T}u_n\\ \end{bmatrix}=\begin{bmatrix}
+	u_1 \cdot u_1 & u_1 \cdot u_2 & \dots & u_1 \cdot u_n\\
+	u_2 \cdot u_1 & u_2 \cdot u_2 & \dots & u_2 \cdot u_n\\
+	\vdots     &            & \ddots& \\
+	u_n \cdot u_1 & u_n \cdot u_2 & \dots & u_n \cdot u_n\\ \end{bmatrix}.$$ Thus $U^{T}U=I_n$ if and only if $u_k \cdot u_j =0$ for all $k \neq j$ and $u_k \cdot u_k =1$. Thus $U^{T}U=I_n$ if and only if the columns of $U$ are orthonormal. 
+\end{proof}
+\Answer 
+\begin{proof} Let $U$ be an $m\times n$ matrix with orthonormal columns. We prove (b) first.
+	
+{\bf (b).} By the previous theorem we know that $U^{T}U=I_n$. Now using the definition of the dot product and properties of the transpose of a matrix, we get  $$(Ux)\cdot (Uy)= (Ux)^{T}Uy = x^{T}U^{T} Uy =x^{T}y= x \cdot y.$$
+
+{\bf (a).} By definition of the norm, $\norm{Ux}^2 = (Ux)\cdot (Ux)$. From part (a), we get $\norm{Ux}^2 = x \cdot x =\norm{x}^2$. Taking square roots, we get the result.
+
+{\bf (c).} From part (b), $x \cdot y=0$ if and only if $(Ux)\cdot (Uy)=0$.
+\end{proof}
+\Answer
+\begin{enumerate}
+	\item Suppose $\lambda$ is an eigenvalue of an orthogonal matrix $U$. Since orthogonal matrices have orthonormal columns, we know that $U^{T}U=I_n$. Thus $$\norm{x}=\norm{U x}=\norm{\lambda x} =|\lambda| \norm{x}.$$ Hence we get $|\lambda|=1$.
+	\item Using the multiplicativity of the determinant we get $$1=\det{I_n} = \det{U^T U}=\det{U^{T}}\det{U}= (\det{U})^2.$$ Thus $\det{U}=1$ or $\det{U}=-1$.
+\end{enumerate}
+\end{enumerate}  
+
+\end{comment}
+
+%\end{document}
+
+
+%%% Local ables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

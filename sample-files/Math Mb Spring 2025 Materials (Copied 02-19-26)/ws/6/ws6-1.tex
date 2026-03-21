@@ -1,0 +1,642 @@
+\PassOptionsToPackage{sols}{handout}
+\documentclass[main]{subfiles}
+\setcounterrefbeforedot{chapter}{m-ws6-1}
+\setcounterrefafterdot{section}{m-ws6-1}
+\addtocounter{section}{-1}
+\usepackage{solutions}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptersix}
+}{}
+
+\section{Integration by Substitution} \label{ws6-1}
+
+\begin{problemonly}
+    \begin{framed}
+
+\textbf{Key Ideas}:
+
+\begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+
+\item You should be comfortable with integration by substitution as a
+  way of ``undoing'' the Chain Rule.
+
+\item You should begin to develop flexibility in figuring out ``what to
+  pick for $u$.''  There is a lot of trial and error involved in this,
+  so don't feel discouraged if your first guesses don't work out: that's
+  normal!  With practice, you will develop stronger intuition about what
+  to pick.
+
+\item You should be comfortable using integration by substitution on
+  both definite and indefinite integrals, and you should use appropriate
+  notation when dealing with the endpoints of definite integrals.
+
+\item You should keep in mind that you can always check whether you've
+  correctly found an antiderivative $F$ of a function $f$ by
+  differentiating $F$.
+
+\item You should be able to use substitution to evaluate $\displaystyle
+  \int \tan x \,dx$.
+
+\end{itemize}
+\end{framed}
+\end{problemonly}
+
+\begin{framed}
+  \textbf{Some basic antiderivatives.} Here are some of the most basic
+  antiderivatives you should know.
+\begin{enumerate}[topsep=0pt]
+      
+    \item If $n \neq -1$, $\displaystyle \int u^n\,du = \fitb{1.5in}{\frac{1}{n
+        + 1} u^{n + 1} + C}$
+
+    \item $\displaystyle \int \frac{1}{u}\,du = \fitb{1.5in}{\ln |u| + C}$
+
+    \item $\displaystyle \int \sin u\,du = \fitb{1.5in}{-\cos u + C}$
+
+    \item $\displaystyle \int \cos u\,du = \fitb{1.5in}{\sin u + C}$
+
+    \item $\displaystyle \int e^u\,du = \fitb{1.5in}{e^u + C}$
+
+    \item $\displaystyle \int \frac{1}{1 + u^2}\,du = \fitb{1.5in}{\arctan u +
+      C}$
+\end{enumerate}
+  
+\end{framed}
+
+\begin{enumerate}
+\item 
+  \textbf{Warm-up.}  Can you evaluate the following? Which one can you
+  \ul{not} evaluate?
+  \probonly{}
+    \begin{enumerate}
+
+    \item
+      \note{This is basic practice, as well something we might look back
+        at in {{{{\#3}}(e)}}.}
+
+      \begin{problem}[\vfill]
+        $\displaystyle \int_1^4 \frac{1}{3} \sqrt{u}\,du$
+      \end{problem}
+
+      \begin{solution}
+        An antiderivative of $\sqrt{u} = u^{1/2}$ is $\frac{2}{3}
+        u^{3/2}$, so
+        \begin{align*}
+          \int_1^4 \frac{1}{3} \sqrt{u}\,du &= \left. \frac{1}{3} \cdot
+            \frac{2}{3} u^{3/2} \right|_1^4 \\
+          &= \frac{2}{9} \cdot 4^{3/2} - \frac{2}{9} \cdot 1^{3/2} \\
+          &= \frac{2}{9} \cdot 8 - \frac{2}{9} \cdot 1 \\
+          &= \boxed{\frac{14}{9}}
+        \end{align*}
+      \end{solution}
+
+    \item
+
+      \note{I want them to see here that, although we need to take the
+        Chain Rule into account when we're thinking of an antiderivative
+        of $\cos(3x)$, it's pretty easy to do that.}
+
+      \begin{problem}[\vfill]
+        $\displaystyle \int \cos (3x)\,dx$
+      \end{problem}
+
+      \begin{solution}
+        You might guess that $\sin(3x)$ is involved in an antiderivative
+        of $\cos(3x)$.  The derivative of $\sin(3x)$ is $3 \cos(3x)$, so
+        the derivative of $\frac{1}{3} \sin(3x)$ is $\cos(3x)$.
+        Therefore, $\displaystyle \int \cos(3x)\,dx = \boxed{\frac{1}{3}
+          \sin(3x) + C}$. 
+      \end{solution}
+
+    \item
+      \note{I'll let them know that this integral actually can't be done.} 
+
+      \begin{problem}[\vfill]
+        $\displaystyle \int \cos(x^2)\,dx$
+      \end{problem}
+
+      \begin{solution}
+        There is no way to write down this indefinite integral!  It turns
+        out that $\cos(x^2)$ is an example of a function whose
+        antiderivatives cannot be expressed as a finite sum of familiar
+        functions (like exponentials, logs, trig functions, etc.).  This
+        doesn't mean that $\cos(x^2)$ doesn't have antiderivatives (FTOC 1
+        guarantees that it does!), but we can't write down any sort of
+        nice formula for those antiderivatives.
+      \end{solution}
+
+    \end{enumerate}    
+  \probonly{}
+
+  \pspace{\newpage}
+
+\item 
+  \note{I will use this to try to motivate the method of substitution; we
+    know that the second statement follows from the first by the Chain
+    Rule, so it is reasonable to say $u = x^2$ and $du = 2x\,dx$ to
+    ``match up'' the pieces of the two integrals.}
+
+  Fill in the blank in each statement:
+
+  \begin{enumerate}
+  \item
+    \begin{problem}
+      $\displaystyle \int \cos(u)\, du = \fitb{1.25in}{\sin(u) + C}$
+    \end{problem}
+
+    \begin{solution}
+      The derivative of $\sin(u)$ is $\cos u$.
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $\displaystyle \int \cos(x^2) \cdot 2x\, dx =
+      \fitb{1.25in}{\sin(x^2) + C}$ because $\dfrac{d}{dx} \sin(x^2) = 
+      \fitb{1.25in}{\cos(x^2) \cdot 2x}$
+    \end{problem}
+
+    \begin{solution}
+      By the Chain Rule, the derivative of $\sin(x^2)$ is $\cos(x^2) \cdot
+      2x$.
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+  \note{In this first group of problems, letting $u$ be the inside of the
+    composition works every time. I plan to do \#3a,b,c,d as a whole class.
+    I'll have the six integrals at the top of the page in a box on the board
+    and ask students ``Which of these is the underlying structure of the
+    integral we're facing?'' I'll use colored chalk to write\\
+    \null\quad Let $u=$\\
+    \null\quad Then $du=$}
+
+  Evaluate the following integrals using substitution.
+
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int e^{\sin x} \cos x\,dx$
+    \end{problem}
+
+    \begin{solution}
+      It looks like a good substitution is \sub{$u = \sin x$}, since $\sin
+      x$ is the inner function in the composition $e^{\sin x}$, and we
+      also see \subd{$du = \cos x\,dx$} in the integral.  Then,
+      \begin{align*}
+        \int e^{\sub{\sin x}} \subd{\cos x\,dx} &= \int e^\sub{u}\,\subd{du} \\
+        &= e^u + C \\
+        &= e^{\sin x} + C
+      \end{align*}
+      \checkmark\
+        Remember that you can always check your answer by differentiating
+        it! 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int \sin x \cos^5 x\,dx$
+    \end{problem}
+
+    \begin{solution}
+      It looks like a good substitution is \sub{$u = \cos x$} because it's
+      the inner function in the composition $\cos^5 x$, and we see something related to $du=-\sin x\,dx$ in the integral, namely
+      \subd{$-du = \sin x\,dx$}.
+      \begin{align*}
+        \int \sin x \cos^5 x\,dx & = \int (\subd{\sin x}) (\sub{\cos
+          x})^5\,\subd{dx} \\ 
+        &= \int \sub{u}^5 (\subd{-du}) \\
+        &= - \int u^5\,du \\
+        & = - \frac{1}{6} u^6 + C \\
+        & = \boxed{- \frac{1}{6} \cos^6 x + C}
+      \end{align*}
+    \end{solution}
+
+  \item
+
+    \note{This is the first definite integral, and we'll talk about 2 ways
+      to deal with the endpoints: one is to ignore them, find the
+      indefinite integral as usual, and then plug the endpoints into that.
+      The other is to change the endpoints to be in terms of $u$.}
+
+    \begin{problem}[\nstretch{2}]
+      $\displaystyle \int_0^{\pi/2} \sin x \cos^5 x \, dx$
+    \end{problem}
+
+    \begin{solution}
+    There are two ways to approach this. One is to use
+    the general antiderivative of $\sin x \cos^5 x$ that we just found,
+      $-\frac{1}{6}\cos^6 x +C$. With this, we can find
+      \begin{align*}
+          \int_0^{\pi/2} \sin x \cos^5 x \,dx &= 
+          \left. -\frac{1}{6}\cos^6 x\right|_0^{\pi/2} \\
+          &= -\frac{1}{6}\cos^6\left(\frac{\pi}{2}\right) - 
+          \left(-\frac{1}{6}\cos^6(0)\right) \\
+          &= \boxed{\frac{1}{6}}
+      \end{align*}
+      Another way is to use the same substitution as before, \sub{$u = \cos x$}
+      and \subd{$du = - \sin x\,dx$}, but to also rewrite the bounds in
+      terms of $u$. When $x=0$, $u=\cos(0)=1$. When $x=\pi/2$,
+      $u=\cos(\pi/2)=0$. 
+      \begin{align*}
+        \int_0^{\pi/2} \sin x \cos^5 x\,dx 
+        & = \int_{x=0}^{x=\pi/2} (\subd{-\sin x}) (\sub{\cos
+          x})^5\,\subd{dx} \\ 
+        &= \int_{u=1}^{u=0} \sub{u}^5 (\subd{-du}) \\
+        &= - \int_1^0 u^5\,du \\
+        &= \int_0^1 u^5\,du\\
+        &= \left.\frac{1}{6} u^6\right|_0^1 \\
+        &= \boxed{\frac{1}{6}}
+      \end{align*}
+    \end{solution}
+
+  \item 
+    \begin{problem}[\vfill]
+      $\displaystyle \int_1^2 \frac{x}{x^2+5}\,dx$
+    \end{problem}
+
+    \begin{solution}
+        It looks like a good substitution is \sub{$u = x^2+5$} because it's
+      the inner function in the composition $\dfrac{1}{x^2+5}$, and we can
+      get \subd{$du = 2x\,dx$} in the integral by multiplying by 
+      $\frac{1}{2}\cdot2$. The new bounds will be from $u=6$ to $u=9$.
+      \begin{align*}
+          \int_1^2 \frac{x}{x^2+5}\,dx &= 
+          \frac{1}{2}\int_{x=1}^{x=2} 
+          \frac{\subd{2x}}{\sub{x^2+5}}\,\subd{dx} \\
+          &= \frac{1}{2}\int_{u=6}^{u=9} \frac{1}{\sub{u}}\,\subd{du} \\
+          &= \frac{1}{2} \left[\ln|u|\right]_6^9 \\
+          &= \boxed{\frac{1}{2}(\ln 9 - \ln 6)}\\
+      \end{align*}
+    \end{solution}
+
+  \item
+    
+
+    \begin{problem}[\vfill]
+      $\displaystyle \int \frac{\sin (\ln x)}{5x}\,dx$
+    \end{problem}
+
+    \begin{solution} % originally by Henry Shin, modified by Janet
+      It looks like a good substitution is \sub{$u = \ln x$}, since it's
+      the inner function in the composition $\sin(\ln x)$, and we also see
+      \subd{$du = \frac{1}{x}\,dx$} in the integral.  So,
+      \begin{align*}
+        \int \frac{\sin (\sub{\ln x})}{5\subd{x}}\,\subd{dx} 
+        & =  \int \frac{\sin \sub{u}}{5} \,\subd{du} \\
+        & =  -\frac{1}{5} \cos u + C \\
+        &= \boxed{-\frac{1}{5} \cos(\ln x) +C}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \note{Occasionally students want to rewrite this as $\displaystyle
+      \int_1^4 \frac{1}{3} \sqrt{u}\,du$; they know in their head that $x$
+      goes from $1$ to $4$, and they get the right answer at the end, so
+      they don't really see why we object to them writing $\displaystyle
+      x^2 \sqrt{1 + x^3}\,dx = \int_1^4 \frac{1}{3} \sqrt{u}\,du$.  Have
+      them look back at {{{{\#1}}(a)}} to see that
+      $\displaystyle \int_1^4 \frac{1}{3} \sqrt{u}\,du$ has its own
+      meaning, and that although what they write may make sense to them,
+      it wouldn't make sense to anyone else.}
+
+    \begin{problem}[\vfill]
+      $\displaystyle \int_1^4 x^2 \sqrt{1 + x^3}\,dx$
+    \end{problem}
+
+    \begin{solution}
+      It looks like a good substitution is \sub{$u = 1 + x^3$} since it's
+      the inner function in the composition $\sqrt{1 + x^3}$, and we also
+      see something related to $du = 3x^2\,dx$, namely \subd{$\frac{1}{3}
+        du = x^2\,dx$}.  When $x = 1$, $u = 1 + 1^3 = 2$; when $x = 4$, $u
+      = 1 + 4^3 = 65$.  So,
+      \begin{align*}
+        \int_1^4 \subd{x^2} \sqrt{\sub{1 + x^3}}\,\subd{dx} &=
+        \int_2^{65} \sqrt{\sub{u}} \cdot \subd{\frac{1}{3}\, du} \\
+        &= \frac{1}{3} \int_2^{65} u^{1/2}\,du \\
+        & = \left. \frac{2}{9} u^{3/2} \right|_2^{65} \\
+        & = \boxed{\frac{2}{9} \left( 65^{3/2} - 2^{3/2} \right)}
+      \end{align*}
+      \emph{Note on notation:} If you prefer not to change the bounds
+      of the integral to be in terms of $u$, your first line should
+      instead read      
+      \[ \int_1^4 {x^2} \sqrt{{1 + x^3}}\,{dx} =
+      \int_{{\color{red}x=\color{black}1}}^{\color{red}x=\color{black}4}
+      \sqrt{u} \cdot {\frac{1}{3}\, du}.\] It is \color{red}\textbf{not}
+      \color{black} correct to write \[ \int_1^4 {x^2} \sqrt{{1 +
+          x^3}}\,{dx} = \int_1^4 \sqrt{u} \cdot {\frac{1}{3}\, du}.\]
+      After all, we saw in {{{{\#1}}(a)}} that $\displaystyle
+      \int_1^4 \sqrt{u} \cdot {\frac{1}{3}\, du}$ is equal to
+      $\dfrac{14}{9}$, and we've just seen that $\displaystyle \int_1^4
+      {x^2} \sqrt{{1 + x^3}}\,{dx} \neq \frac{14}{9}$.
+    \end{solution}
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+\item 
+  \emph{Examples where substitution is useful even though there isn't an
+    obvious composition.}
+
+  \begin{enumerate}
+  \item
+
+    \note{This exact (classic) problem reappears on their homework. Don't
+      mention this to them! We want them to learn to recognize it on their
+      own.}
+
+    \begin{problem}[\vfill]
+      $\displaystyle \int \tan x\,dx$
+    \end{problem}
+
+    \begin{solution}
+      Let's first rewrite $\tan x$ as $\displaystyle \frac{\sin x}{\cos
+        x}$, so that we are trying to evaluate $\displaystyle \int
+      \frac{\sin x}{\cos x}\,dx$.  It looks like \sub{$u = \cos x$} is a
+      promising substitution because we also see something related to
+      $du = - \sin x\,dx$, namely \subd{$-du = \sin x\,dx$}:
+      \begin{align*}
+        \int \frac{\subd{\sin x}}{\sub{\cos x}}\,\subd{dx} &= \int
+        \frac{1}{\sub{u}} \left( \subd{-du} \right) \\
+        &= - \int \frac{1}{u}\,du \\
+        &= - \ln |u| + C \\
+        &= \boxed{- \ln |\cos x| + C}
+      \end{align*}
+    \end{solution}
+
+  \item
+
+    \begin{problem}[\vfill]
+      $\displaystyle \int_{1/e}^{e^3} \frac{4 \ln x}{x}\,dx$
+    \end{problem}
+
+    \begin{solution}
+      It looks like \sub{$u = \ln x$} is a promising substitution because
+      we also see \subd{$du = \frac{1}{x}\,dx$} in the integral:
+      \begin{align*}
+        \int_{1/e}^{e^3} \frac{4 \sub{\,\ln x}}{\subd{x}}\,\subd{dx} &=
+        \int_{-1}^3 
+        4\sub{u}\,\subd{du} \\ 
+        &= 2u^2 \Big|_{-1}^3 \\
+        &= 2 \cdot 3^2 - 2 \cdot (-1)^2 \\
+        &= \boxed{16}
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+  \begin{problem}[\vfill]
+    One of the following integrals can easily be evaluated using
+    substitution.  Which one?  Evaluate it.
+    
+      \begin{enumerate}
+      \item $\displaystyle \int e^{-x^2}\,dx$
+      \item $\displaystyle \int xe^{-x^2}\,dx$
+      \end{enumerate}
+    
+  \end{problem}
+
+  \begin{solution}
+    Both integrals involve a composition with \sub{$u = -x^2$} as the
+    inner function, but only the second integral has something related to
+    $du = - 2x\,dx$, namely \subd{$-\frac{du}{2} = x\,dx$}.  That's the
+    one we can easily evaluate with substitution: 
+    \begin{align*}
+      \int \subd{x}e^{\sub{-x^2}}\,dx &= \int e^\sub{u} \left( \subd{-
+          \frac{du}{2}} \right) \\
+      &= - \frac{1}{2} \int e^u\,du \\
+      &= - \frac{1}{2} e^u + C \\
+      &= \boxed{- \frac{1}{2} e^{-x^2} + C}
+    \end{align*}
+    The other indefinite integral, $\displaystyle \int e^{-x^2}\,dx$,
+    cannot be easily evaluated using substitution.  In fact, like in
+    {{{{\#1}}(c)}}, the antiderivatives of
+    $e^{-x^2}$ cannot be expressed as a finite sum of familiar functions
+    (like exponentials, logs, trig functions, etc.), so $\displaystyle
+    \int e^{-x^2}\,dx$ cannot  be easily evaluated with any method!
+  \end{solution}
+
+% \item 
+%   \note{I don't expect to get to this problem; it's just here as a
+%     challenge for any student who can race through the rest of the
+%     worksheet to get here.} 
+
+%   Suppose $g$ is a mysterious function, and the only thing you
+%   know about it is that $\displaystyle \int_0^{12} g(x)\,dx = \pi$.  For
+%   each of the following integrals, decide whether you have enough
+%   information to evaluate the integral; if so, evaluate it. 
+%   \probonly{}
+%     \begin{enumerate}
+%     \item
+%       \begin{problem}
+%         $\displaystyle \int_0^{12} g(3x)\,dx$
+%       \end{problem}
+
+%       \begin{solution}
+%         There is \fbox{not enough information}.  (As you can see in the
+%         next part, substituting $u = 3x$ doesn't help.)  We can understand
+%         why graphically; suppose $g$ looks like this.  The only
+%         information we're given is that the green area is $\pi$:
+%         \begin{center}
+%           \begin{tikzpicture}[declare
+%             function={f(\x)=(\x<=4*pi)*(\x/1.2^\x+1.5)+
+%               (\x>4*pi)*(0.5*(5.542254215512511 + abs(sin(deg(0.5*\x)))));}]
+%             \begin{axis}[ymin=0, xtick={12}, ytick=\empty, width=2.5in,
+%               height=1.5in, clip=false] 
+%               \addplot+[domain=0:12, plusarea] { f(x) } \closedcycle; %
+%               \addplot+[domain=0:12*pi, samples=121] { f(x) }
+%               node[right] {$y = g(x)$}; %
+%             \end{axis}
+%           \end{tikzpicture}
+%         \end{center}
+%         The graph of $g(3x)$ is stretched horizontally to be $\frac{1}{3}$
+%         as wide, so here's how we picture $\displaystyle \int_0^{12}
+%         g(3x)$:
+%         \begin{center}
+%           \begin{tikzpicture}[declare
+%             function={f(\x)=(\x<=4*pi)*(\x/1.2^\x+1.5)+
+%               (\x>4*pi)*(0.5*(5.542254215512511 + abs(sin(deg(0.5*\x)))));}]
+%             \begin{axis}[ymin=0, xtick={12}, ytick=\empty, width=2.5in,
+%               height=1.5in, clip=false] 
+%               \addplot+[domain=0:12, fillregion] { f(3*x) } \closedcycle; %
+%               \addplot+[domain=0:12*pi, samples=121] { f(3*x) }
+%               node[right] {$y = g(3x)$}; %
+%             \end{axis}
+%           \end{tikzpicture}
+%         \end{center}
+%         But there's no way for us to find this area because we can't
+%         express it simply in terms of the green area above, which is the
+%         only area we know. 
+%       \end{solution}
+
+%     \item
+%       \begin{problem}
+%         $\displaystyle \int_0^4 g(3x)\,dx$
+%       \end{problem}
+
+%       \begin{solution}
+%         We can evaluate this by substituting \sub{$u = 3x$}; then, $du =
+%         3\,dx$, so \subd{$\frac{du}{3} = dx$}.  Since $x$ goes from $0$ to
+%         $4$, $u = 3x$ goes from $0$ to $12$; thus,
+%         \begin{align*}
+%           \int_0^{4} g(\sub{3x})\,\subd{dx} &= \int_0^{12} g
+%           (\sub{u})\,\subd{\frac{du}{3}} \\
+%           &= \frac{1}{3} \int_0^{12} g(u)\,du \\
+%           &= \boxed{\frac{\pi}{3}}
+%         \end{align*}
+%         This should also make sense graphically; the graph of $g(3x)$ is
+%         obtained by stretching the graph of $g(x)$ horizontally by a
+%         factor of $\frac{1}{3}$:
+%         \begin{center}
+%           \begin{tikzpicture}[declare
+%             function={f(\x)=(\x<=4*pi)*(\x/1.2^\x+1.5)+
+%               (\x>4*pi)*(0.5*(5.542254215512511 + abs(sin(deg(0.5*\x)))));}]
+%             \begin{axis}[ymin=0, xtick={12}, ytick=\empty, width=2.5in,
+%               height=1.5in, clip=false] 
+%               \addplot+[domain=0:12, plusarea] { f(x) } \closedcycle; %
+%               \addplot+[domain=0:12*pi, samples=121] { f(x) }
+%               node[right] {$y = g(x)$}; %
+%             \end{axis}
+%           \end{tikzpicture}
+%           \hspace{0.5in}
+%           \begin{tikzpicture}[declare
+%             function={f(\x)=(\x<=4*pi)*(\x/1.2^\x+1.5)+
+%               (\x>4*pi)*(0.5*(5.542254215512511 + abs(sin(deg(0.5*\x)))));}]
+%             \begin{axis}[ymin=0, xtick={4}, ytick=\empty, width=2.5in,
+%               height=1.5in, clip=false] 
+%               \addplot+[domain=0:4, fillregion] { f(3*x) } \closedcycle; %
+%               \addplot+[domain=0:12*pi, samples=121] { f(3*x) }
+%               node[right] {$y = g(3x)$}; %
+%             \end{axis}
+%           \end{tikzpicture}
+%         \end{center}
+%         Therefore, the area under $g(3x)$ from $x = 0$ to $x = 4$ should
+%         be $\frac{1}{3}$ as large as the area under $g(x)$ from $x = 0$ to
+%         $x = 12$. 
+%       \end{solution}
+
+%     \item
+%       \begin{problem}
+%         $\displaystyle \int_0^{144} g(x^2)\,dx$
+%       \end{problem}
+
+%       \begin{solution}
+%         There is \fbox{not enough information}.  (If you try substituting
+%         $u = x^2$, you instead end up with the integral in
+%         {{{{\#6}}(d)}}.) 
+%       \end{solution}
+
+%     \item
+%       \begin{problem}
+%         $\displaystyle \int_0^{2 \sqrt{3}} x g(x^2)\,dx$
+%       \end{problem}
+
+%       \begin{solution}
+%         We can evaluate this using the substitution \sub{$u = x^2$}; then,
+%         $du = 2x\,dx$, so \subd{$\frac{du}{2} = x\,dx$}.  As $x$ goes from
+%         $0$ to $2 \sqrt{3}$, $u = x^2$ goes from $0^2 = 0$ to $\left(2
+%         \sqrt{3} \right)^2 = 12$:
+%         \begin{align*}
+%           \int_0^{2 \sqrt{3}} \subd{x} g(\sub{x^2})\,\subd{dx} &=
+%           \int_0^{12} g(\sub{u}) \subd{\frac{du}{2}} \\
+%           &= \frac{1}{2} \int_0^{12}
+%           g(u)\,du \\
+%           &= \boxed{\frac{\pi}{2}}
+%         \end{align*}
+%       \end{solution}
+
+%     \item
+%       \begin{problem}
+%         $\displaystyle \int_0^{144} x g(x^2)\,dx$
+%       \end{problem}      
+
+%       \begin{solution}
+%         There is \fbox{not enough information}.
+%       \end{solution}
+
+%     \end{enumerate}
+%     \probonly{}
+
+%   \pspace{\vfill}
+
+\item  \note{Just additional practice}  
+
+  Evaluate the following integrals. 
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int_0^1 \sqrt{5x + 4}\,dx$
+    \end{problem}
+
+    \begin{solution}
+      It looks like \sub{$u = 5x + 4$} is a good substitution since it's
+      the inner function in the composition $\sqrt{5x + 4}$.  Then, $du =
+      5\,dx$, so \subd{$\frac{du}{5} = dx$}.  As $x$ goes from $0$ to $1$,
+      $u = 5x + 4$ goes from $u = 5 \cdot 0 + 4 = 4$ to $5 \cdot 1 + 4 =
+      9$:
+      \begin{align*}
+        \int_0^1 \sqrt{\sub{5x + 4}}\,\subd{dx} &= \int_4^9
+        \sqrt{\sub{u}}\,\subd{\frac{du}{5}} \\
+        &= \frac{1}{5} \int_4^9 u^{1/2}\,du \\
+        &= \left. \frac{1}{5} \cdot \frac{2}{3} u^{3/2} \right|_4^9 \\
+        &= \frac{2}{15} \left( 9^{3/2} - 4^{3/2} \right) \\
+        &= \frac{2}{15} (27 - 8) \\
+        &= \boxed{\frac{38}{15}}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int \frac{e^x}{\sqrt{2e^x + 5}}\,dx$
+    \end{problem}
+
+    \begin{solution} % originally by Henry Shin, modified by Janet
+      It looks like \sub{$u = 2e^x + 5$} is a good substitution since it's
+      the inner function in the composition $\sqrt{2e^x + 5}$, and we also
+      see something related to $du = 2 e^x\,dx$ in the integral, namely
+      \subd{$\frac{du}{2} = e^x\,dx$}: 
+      \begin{align*}
+        \int \frac{\subd{e^x}}{\sqrt{\sub{2e^x + 5}}}\,\subd{dx} & =
+        \int \frac{1}{\sqrt{\sub{u}}} \cdot \subd{\frac{du}{2}} \\
+        & = \int \frac{1}{2} u^{-1/2}\,du \\
+        & =  u^{1/2} + C \\
+        & = \boxed{\sqrt{2e^x + 5} + C}
+      \end{align*}
+    \end{solution}
+
+  % \item
+  %   \begin{problem}[\stretch{2}]
+  %     $\displaystyle \int \frac{x+1}{\sqrt[3]{3x^2 + 6x + 5}}\,dx$        
+  %   \end{problem}
+
+  %   \begin{solution}
+  %     It may not be entirely clear what to substitute here, but a
+  %     reasonable first try is \sub{$u = 3x^2 + 6x + 5$}, since it's the
+  %     inner function in the composition $\sqrt[3]{3x^2 + 6x + 5}$.  With
+  %     this choice, $du = (6x + 6)\,dx = 6(x + 1)\,dx$, which looks
+  %     promising since we see something related to this, namely
+  %     \subd{$(x+1)\,dx = \frac{1}{6}\,du$}.  Then,
+  %     \begin{align*}
+  %       \int \frac{\subd{x + 1}}{\sqrt[3]{\sub{3x^2 + 6x +
+  %             5}}}\,\subd{dx} &= \int 
+  %       \frac{1}{\sqrt[3]{\sub{u}}}\,\subd{\frac{du}{6}} \\
+  %       &= \frac{1}{6} \int u^{-1/3}\,du \\
+  %       &= \frac{1}{6} \cdot \frac{3}{2} u^{2/3} + C \\
+  %       &= \frac{1}{4} u^{2/3} + C \\
+  %       &= \boxed{\frac{1}{4} (3x^2 + 6x + 5)^{2/3} + C}
+  %     \end{align*}
+  %   \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+
+\end{document}

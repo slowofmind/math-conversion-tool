@@ -1,0 +1,329 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{soul}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+\usepackage[notref,notcite]{showkeys}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols,notes,workshop,grading]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\begin{center}
+  \Large\textsc{Exam 2 Learning Objectives}
+\end{center}
+
+\begin{enumerate}
+\item \textbf{Introduction to Functions} %% 1
+\begin{itemize}
+
+\item Explain what a \emph{function} is, and distinguish between functions and non-functions.
+
+\item Identify the \emph{independent variable}, \emph{dependent variable}, \emph{domain}, and \emph{range} of a function.
+
+\item Explain how slope graphically represents a rate of change.
+
+\item Reason about whether a function is \emph{increasing} or \emph{decreasing}, as well as whether it's \emph{concave up}, \emph{concave down}, or \emph{linear}.
+
+\end{itemize}
+
+\item \textbf{A Library of Basic Functions and Properties} %% 2
+\begin{itemize}
+\item Sketch and recognize graphs of $y = mx + b$, $y = x^2$, $y = x^3$, $y = \frac{1}{x}$, $y = \frac{1}{x^2}$, $y = |x|$, and $y = \sqrt{x}$.
+
+\item Understand the following characteristics of a function graphically: positive / negative, increasing / decreasing, intercepts, asymptotes, continuity, concavity, even / odd.
+
+\item Algebraically determine whether a function is even, odd, or neither.
+
+\item Explain what it means to say a function is increasing / decreasing \emph{without bound}, as opposed to having an \emph{upper bound} or \emph{lower bound}.
+
+\item Recognize when the graph of a function given algebraically has a hole and construct algebraic examples of functions whose graphs have holes.
+
+\end{itemize}
+
+\item \textbf{More on Functions, Average Rates of Change} %% 3
+\begin{itemize}
+
+\item Write and interpret expressions in function notation.
+
+\item Compute an average rate of change, interpret it in the context of a situation, and represent it graphically.
+
+\item Explain the difference between average speed, average velocity, instantaneous speed, and instantaneous velocity.
+
+\item Explain how concavity can be characterized in terms of secant line segments.
+
+\end{itemize}
+
+\item \textbf{Transforming Functions} %% 4
+\begin{itemize}
+\item Sketch $y = a f(bx) + c$, $y = a f(x + b) + c$, and $y = |f(x)|$
+  from a graph of $y = f(x)$.
+
+\end{itemize}
+
+\item \textbf{Linear and Piecewise Linear Functions} %% 5
+\begin{itemize} 
+\item Write the equation of a line given 2 points or 1 point and the
+  slope, and decide whether slope-intercept form ($y = mx + b$) or
+  point-slope form is more useful. 
+
+\item Use linear and piecewise linear equations to model various
+  phenomena.
+
+\item Interpret the slope in linear and piecewise linear functions, 
+  and graph the ``slope function'' $f'(x)$ of a piecewise linear
+  function $f(x)$.  
+
+\end{itemize}
+
+\item \textbf{Function Composition, Modeling with Functions} %% 6
+\begin{itemize}
+\item Explain how composition of functions models situations where there is a chain of dependency among variables.
+
+\item Compute compositions of functions.
+
+\item Model situations systematically: identify your goal, define variables and express your goal in terms of those variables, and then look for relationships among your variables.
+
+\item Communicate your modeling process clearly. 
+\end{itemize}
+
+\end{enumerate}
+
+\begin{enumerate}[start=8, topsep=0pt]
+\item \textbf{Approximating with Secant Lines} %% 8
+\begin{itemize}
+\item Decide where the graph of a function is or isn't locally linear.
+
+\item Use secant lines to approximate function values.
+
+\item Determine whether a secant line approximation is too high or too low, or if there isn't enough information to be sure.
+
+\end{itemize}
+
+\item \textbf{Definition and Interpretation of the Derivative} %% 9
+\begin{itemize}
+\item State the definition of the derivative, explain where it comes from, and use it to calculate derivatives.
+
+\item Interpret the derivative in context and represent it graphically.
+
+\item Find the tangent line to the graph of $f(x)$ at $x = a$. 
+
+\item Use tangent lines to approximate function values, and determine whether such an approximation is too high or too low, or if there isn't enough information to be sure.
+\end{itemize}
+
+\item \textbf{The Derivative Function} %% 10
+\begin{itemize}
+\item Use the limit definition to compute the derivative function
+  $f'$.
+
+\item Determine whether a function is \emph{differentiable}, both
+  graphically and algebraically, and give examples of functions that
+  are differentiable and non-differentiable.
+
+\item Sketch a rough graph of $f'$ when you have the graph of $f$. 
+
+\end{itemize}
+
+\item \textbf{Functions and their Derivatives} %% 11
+\begin{itemize}
+
+\item Explain how concavity can be characterized in terms of tangent lines.
+
+\item Explain what $f'$ and $f''$ tell us about the graph of $f$. (For example, if $f'$ is positive, what does that say about $f$? If $f'$ is increasing, what does that say about $f$?)
+
+\item Explain how displacement, velocity, and acceleration are related in terms of derivatives.
+
+\end{itemize}
+
+\item \textbf{Using Derivatives to Graph Functions} %% 12
+\begin{itemize}
+
+\item Use the first derivative to determine where a function is
+  increasing or decreasing and to find \emph{turning points}.
+
+\item Use the second derivative to determine where a function is
+  concave up or concave down and to find \emph{inflection points}. 
+
+\item Put the above information together to sketch a reasonable graph
+  of a function.
+
+\item Develop the habit of checking for consistency when putting several pieces of information together. 
+\end{itemize}
+
+\item \textbf{Limits} %% 13
+\begin{itemize}
+\item Calculate two-sided and one-sided limits of functions given algebraically or graphically, and understand why such a limit might not exist.
+
+\item Recognize when we need to factor and cancel to calculate a limit (for example, with $\displaystyle \lim_{x \to 2} \frac{x^2 - 4}{x - 2}$).
+
+\item Explain precisely what we mean when we write $\displaystyle \lim_{x \to a} f(x) = \infty$ or $\displaystyle \lim_{x \to a} f(x) = -\infty$. In particular, you should understand that, in both of these cases, $\displaystyle \lim_{x \to a} f(x)$ does not exist, but that saying $\displaystyle \lim_{x \to a} f(x) = \infty$ or $\displaystyle \lim_{x \to a} f(x) = -\infty$ gives more information than just saying ``$\displaystyle \lim_{x \to a} f(x)$ does not exist'' does.
+
+\item Use algebraic methods to determine whether a limit is $\pm \infty$.
+
+\end{itemize}
+
+\item \textbf{More on Limits} %% 14
+\begin{itemize}
+\item Evaluate $\displaystyle \lim_{x \to \infty} f(x)$ and $\displaystyle \lim_{x \to -\infty} f(x)$ and interpret such limits graphically.
+
+\item Find the horizontal asymptotes of a function $f(x)$ if given an algebraic formula for $f(x)$. 
+\end{itemize}
+\end{enumerate}
+
+\begin{enumerate}[start=16, topsep=0pt]
+\item \textbf{Continuity} %% 16
+\begin{itemize}
+\item Explain the idea of continuity, both intuitively and precisely using the limit definition.
+
+\item Use limits to classify discontinuities as \emph{removable discontinuities}, \emph{jump discontinuities}, or \emph{vertical asymptotes}, and describe what each type of discontinuity looks like graphically.
+
+\item Explain what relationships there are between whether a function is continuous at $a$ and whether it's differentiable at $a$.
+
+\item Take discontinuities into account when constructing a sign chart for a function. 
+\end{itemize}
+
+\item \textbf{3 Differentiation Rules} %% 17
+\begin{itemize}
+\item Explain why the Power Rule is true for positive integer exponents.
+
+\item Explain why the Constant Multiple Rule and Sum Rule are true.
+
+\item Use the Power Rule, Constant Multiple Rule, and Sum Rule, and recognize when they do and do not apply.
+
+\end{itemize}
+
+\item \textbf{More Differentiation Rules, Tangent Line Approximation} %% 18
+\begin{itemize}
+\item Explain why the Product and Quotient Rule are true, and use them (together with the rules we've learned before) to differentiate functions.
+
+\item Identify functions that can and can't be differentiated using just the rules we've learned so far.
+
+\item Use secant lines and tangent lines to approximate values like $\sqrt{22}$, and use concavity to determine whether your approximations are upper or lower bounds. 
+
+\end{itemize}
+
+\item \textbf{Maxima and Minima of Functions} %% 19
+\begin{itemize}
+
+\item Explain the difference between a \emph{local minimum / maximum} and a \emph{global (or absolute) minimum / maximum}.
+
+\item Find the local extrema of a function by first finding \emph{critical points} and then using the First Derivative Test or Second Derivative Test.
+
+\item Explain why the First and Second Derivative Tests work.
+
+\end{itemize}
+
+\item \textbf{Finding Global Extrema} %% 20
+\begin{itemize}
+\item Explain what the Extreme Value Theorem says.
+
+\item Determine whether a given function has global extrema on a given domain and, if so, find the global extrema.
+
+\end{itemize}
+
+\item \textbf{Optimization} %% 21
+\begin{itemize}
+\item Set up and solve optimization problems using calculus.
+
+\item Justify that your solution is optimal using appropriate techniques from calculus.
+
+\end{itemize}
+
+\item \textbf{Introduction to Exponential Functions} %% 22
+\begin{itemize}
+\item Model quantities that have a constant percent change (per unit of input). 
+
+\item Graph $b^x$ for different values of $b$ (and be able to combine this with what we know about altering functions to graph functions involving $b^x$).
+
+\item Apply exponent rules. 
+\end{itemize}
+
+\item \textbf{Applications of Exponentials} %% 23
+\begin{itemize}
+\item Model constant percent change over different intervals (like ``decreases by 30\% every 12 hours'' or ``triples every 4 days''), including compound interest.
+
+\item Explain what \emph{half-life} means, and model phenomena that have a half-life. 
+
+\item Reason about how an exponential function grows or decays over different time intervals. (For example, if a quantity grows by 10\% every year, will it grow by exactly 20\%, more than 20\%, or less than 20\% in 2 years?)
+
+\end{itemize}
+\end{enumerate}
+\end{document}

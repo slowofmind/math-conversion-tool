@@ -1,0 +1,339 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws1-6}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterone}
+}{}
+
+\section{Numerical Integration} \label{ws1-6}
+\begin{framed}
+\textbf{Lesson Goals:}
+\begin{itemize}[parsep=0pt]
+\item You should be able to approximate the value of a definite integral by finding, left-hand, right-hand, trapezoidal, and midpoint/midpoint tangent Riemann sums with $n$ slices, $L_n$, $R_n$, $T_n$, and $M_n$. You should also be able to draw these approximations, and determine when these approximations are overestimates or underestimates of the integral's value.
+\item You should be able to explain the relationships between $L_n$, $R_n$, $T_n$, and $M_n$.
+\end{itemize}
+\end{framed}
+
+\note{The theme for the day is: we know how to approximate, and we even saw at the end of last class how many $n$ we 
+need to get the accuracy we desire, but this $n$ is sometimes very high.  We wonder if it's possible to do better 
+with a different approximation.  Some students will have seen at least $T_n$ before, and $M_n$ is sort of natural 
+for them too.}
+
+
+
+\begin{framed}
+   \begin{multicols}{2}
+   \begin{itemize}[itemsep=6em]
+       \item $L_n$
+    
+       \item $R_n$
+       \vspace*{6em}
+       \columnbreak
+       \item $T_n$
+       
+       \item $M_n$
+    \vspace*{6em}
+   \end{itemize}
+   \end{multicols}
+\end{framed}
+
+\begin{enumerate} 
+\item  
+  \begin{problem}[\vfill]
+  Let  $\displaystyle I=   \int_a^b f(t) ~dt$, and suppose we approximate 
+  the integral by $R_{n}$ and $L_{n}$. What can you say about the order of $I$, $R_n$ and $L_n$ in each of the following 
+  cases? (Please draw pictures!)
+ 
+   \begin{multicols}{2}
+      \begin{enumerate}[itemsep=11em]
+    \item if $f$ is increasing and concave up on $[a, b]$
+ 
+
+      \item if $f$ is increasing and concave down on $[a, b]$
+    
+\columnbreak
+
+      \item if $f$ is decreasing and concave up on $[a, b]$
+    
+
+
+      \item if $f$ is decreasing and concave down on $[a,b]$
+      
+   \end{enumerate}
+     \end{multicols}
+    \end{problem}
+    
+      \begin{solution}
+      \,
+      
+      \begin{tabular}{p{3in}p{3in}}
+        The left hand sum is an underestimate for the integral 
+        of the increasing function below.  For the k$^{th}$
+        rectangle, we approximate its height by $f(x_{k-1})$,
+        which is less than or equal to every value of the 
+        function on the k$^{th}$ interval.
+        \begin{center}
+        \includegraphics[width=2in]{ws/images/IncreasingLHSum} 
+        \end{center}&
+        
+        The right-hand sum is an overestimate for the integral 
+        of the increasing function below.  For the k$^{th}$ 
+        rectangle, we approximate its height by $f(x_k)$, 
+        which is greater than or equal to every value of the
+        function on the k$^{th}$ interval.
+        \begin{center}
+        \includegraphics[width=2in]{ws/images/IncreasingRHSum} 
+        \end{center}
+        \end{tabular}
+        
+        Based on the pictures and arguments above, we find that $L_n \leq I \leq R_n$ for an
+        increasing function.  Notice that even though the pictures above show a concave down function, the arguments above did not rely on the concavity of the function at all. (In other words, the same argument could have been made for an increasing, concave up function.)  Thus, for both parts (a) and (b), the ordering should be $\boxed{L_n \leq I \leq R_n}$.
+        
+        We can use an almost identical argument with a decreasing function to show that the ordering for parts (c) and (d) should be $\boxed{R_n \leq I \leq L_n}$.
+      \end{solution}
+
+
+\pspace{\newpage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\note{Introduce the midpoint rule approximation $M_{n}$.  It's helpful to
+point out how the trapezoidal rule involves averaging $f(x_{k-1})$ and $f(x_k)$,
+whereas the midpoint rule involves averaging $x_{k-1}$ and $x_{k}$.}
+
+
+\item 
+  \begin{problem}[3in]
+    Consider the integral $\displaystyle \int_{-\pi/2}^{\pi/2} \cos(x)~dx$.  Write
+    out the midpoint approximation $M_{4}$, showing  
+    all terms in the sum.  There is no need to simplify your answer.
+  \end{problem}
+
+  \begin{solution}
+    Computing $M_4$ requires us to slice $[-\pi/2, \pi/2]$ into four subintervals
+    of length $\Delta x = \pi/4$.  Let
+    $$
+      x_0 = -\frac{\pi}{2}, \qquad
+      x_1 = -\frac{\pi}{4}, \qquad
+      x_2 = 0, \qquad
+      x_3 = \frac{\pi}{4}, \qquad
+      x_4 = \frac{\pi}{2},
+    $$
+    and let $f(x) = \cos(x)$.    
+    
+
+    The midpoint sum $M_{4}$ does not involve computing $f(x) = \cos(x)$ at the
+    endpoints of the subintervals---only at the midpoints of the subintervals:
+    $$
+      \begin{aligned}
+      M_{4} & = f \left( \frac{x_0 + x_1}{2} \right) \Delta x +
+                f \left( \frac{x_1 + x_2}{2} \right) \Delta x +
+                f \left( \frac{x_2 + x_3}{2} \right) \Delta x +
+                f \left( \frac{x_3 + x_4}{2} \right) \Delta x \\
+            & = [ \cos (-3 \pi/8)  + \cos(- \pi/8)  +
+                \cos(\pi/8)  + \cos(3 \pi/8) ] \Delta x.
+      \end{aligned}
+    $$
+
+    The figure below indicates that $T_{4}$ is an {\em underestimate} of the
+    true integral.  The reason for this is that $f$ is concave down throughout
+    the domain of integration---you can check this by looking at the sign of
+    the second derivative of $f$.  The ``upper" edge of each trapezoid in the
+    figure is a secant line segment and, when the graph of a function is concave
+    down, secant line segments lie below the graph.
+
+    \begin{center}
+      \includegraphics[width=2in]{ws/images/cosine_T4_approximation.png}
+    \end{center}
+
+
+  \end{solution}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+   \item % 26.1.11       
+   \begin{problem}[.45in]
+   \parbox[t]{4in}{Measurements of the width of a pond are taken every 20 yards along its length. The measurements are: 0 yards, 60 yards, 50 yards, 70 yards, 50 yards, and 30 yards. Approximate the surface area of the pond using the Trapezoidal rule.}
+   \parbox[t]{1.5in}{\vspace{0in}    \includegraphics{ws/images/go26p11} }
+
+    \end{problem}
+
+    \begin{solution}
+    We can take the left hand edge to be our $x_0$, and the right hand edge
+    to be $x_5$, and the $x_k$s in between to be the other measurement points.
+   [This is fairly common: the reason we need to be able to do numerical integration is exactly because we often 
+   don't have perfect information: just a few data points!]  (We'll ignore the little slice at the end, since it doesn't seem too big.)  Let $f(x_k)$ be the width of the pond at the k$^{th}$ measurement point.  Then using the formula from the previous problem, we get that the area of the pond is approximately:
+
+ \begin{align*}
+   &\phantom{= }\left(\frac{1}{2}\right) \Big{[} f(x_0) + 
+   2f(x_1) + 2f(x_2)  +\cdots +2f(x_{3}) + 2f(x_{4})+ f(x_5) \Big{]} \Delta x \\
+    &= \left(\frac{1}{2}\right)\Big{[} 0+ 2(60) + 2(50) + 2(70) + 2(50) + 30 \Big{]} 20 \\
+   &=  4900 \mbox{  square ft}
+   \end{align*}
+   \end{solution}
+
+\vfill
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+  \pspace{\newpage}
+   \item \begin{problem}
+ Suppose we want to approximate
+  $\displaystyle{\int_a^b f(x) ~ dx}$ using the \textit{trapezoidal rule} $T_n$.
+  We partition $[a,b]$ into $n$ equal pieces each
+  of length $\Delta x$, let $x_k = a + k\Delta x$
+  for $k = 0, 1, \dots, n$, and draw $n$ trapezoids by connecting the points $(x_k, f(x_k))$ and $(x_{k-1}, f(x_{k-1}))$ with a straight line for each $k$.
+  Use a picture of a single slice to explain geometrically why the trapezoidal rule is the average of the left and right-hand approximations. That is, $T_n=\frac{L_n + R_n}{2}$. %\textit{Hint: notice that the area of a trapezoid with parallel bases $b_1$ and $b_2$ and height $h$ is given by $\frac{1}{2}(b_1+b_2)h$}.
+  \end{problem}
+  
+  
+  \begin{solution}
+  Consider one subinterval, on which we look at a left-hand rectangle, a right-hand rectangle, and a trapezoid. 
+    \begin{center}
+  \includegraphics{ws/images/trapezoid-geometric-average}
+  \end{center}
+  
+  The left-hand rectangle is AEFD, while the right-hand rectangle is ABCD. Notice that the area of trapezoid AECD is the area of rectangle ABCD plus triangle BEC. Also notice that the area of trapezoid AECD is the area of rectangle AEFD minus triangle EFC. Since triangles BEC and EFC have the same area, the trapezoid's area is exactly between the left and right rectangles, i.e., the average of the two.
+  
+  Since this geometric argument will hold true on any subinterval, the trapezoidal rule gives the average of the left and right-hand approximations.
+  \end{solution}
+
+
+ 
+\vfill
+
+\note{Because of the picture in this problem, I'll sometimes refer to the midpoint rule
+      as the ``midpoint tangent rule''.  This picture will help us set up comparison of
+      the midpoint and trapezoidal rules (by comparing trapezoids to trapezoids, as
+      opposed to rectangles to trapezoids).}  
+
+ 
+
+  \item
+  \begin{problem}[1.1in]
+  In the image below (from Gottlieb, page 810), you can see two ways to use the midpoint of the slice from $x_{i}$ to $x_{i+1}$ to approximate the area in that slice.
+  Does the rectangle $M$, whose height is $f\left(\frac{x_{i}+x_{i+1}}{2}\right)$ (left image) have the same, more or less area as the trapezoid whose top is the tangent line to $f$ at the midpoint (right image)?
+
+  \begin{center}
+  \includegraphics[width=3in]{ws/images/midpoint-tangent-rectangle}    
+  \end{center}
+  
+  \end{problem}
+
+  \begin{solution}
+  See page 810 of Gottlieb's textbook for a complete explanation. The areas are equal, by comparing the 
+  congruent triangles.
+  \begin{center}
+  \includegraphics[width=5in]{ws/images/midpoint-tangent-rectangle-solution}    
+  \end{center}
+  \end{solution}
+\vfill
+\pspace{\newpage}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\item  
+  \begin{problem}[2.2in]
+  Let $\displaystyle I=   \int_a^b f(t) ~dt$, and suppose we approximate the integral by $T_{n}$ and $M_{n}$. What can you say about the order of $I$, $T_n$ and $M_n$ in each of the following cases? (Please draw pictures!)
+   \begin{enumerate}
+    \probonly{\begin{multicols}{2}}
+    \item 
+    \begin{problem}[1.2in]
+    if $f$ is increasing and concave up on $[a, b]$
+    \end{problem}
+
+      \item 
+      \begin{problem}[1.2in]
+      if $f$ is increasing and concave down on $[a, b]$
+      \end{problem}
+
+
+      \item 
+      \begin{problem}[2.2in]
+      if $f$ is decreasing and concave up on $[a, b]$
+      \end{problem}
+
+
+      \item
+      \begin{problem}[2.2in]
+      if $f$ is decreasing and concave down on $[a,b]$
+      \end{problem}
+
+      \probonly{\end{multicols}}
+      \end{enumerate}
+
+      \begin{solution}
+      \,
+      
+      \begin{tabular}{p{3in}p{3in}}
+        The trapezoid sum is an underestimate for the integral 
+        of the concave down function below.  For the k$^{th}$
+        trapezoid, the function is above the line formed by $f(x_{k-1})$ and $f(x_k)$. Notice, this is the same as observing the secant line is below the curve for a concave down function.
+        \begin{center}
+        \includegraphics[width=1in]{ws/images/Tn concave down.png} 
+        \end{center}&
+        
+        The Midpoint sum is an overestimate for the integral 
+        of the concave down function below. The trapezoid formed by the midpoint tangent line is above the function, as the tangent line of a concave function is above the curve.
+        \begin{center}
+        \includegraphics[width=1in]{ws/images/Mn concave down.png} 
+        \end{center}
+        \end{tabular}
+        
+        Based on the pictures and arguments above, we find that $T_n \leq I \leq M_n$ for a
+        concave down function.  Notice that even though the pictures above show an increasing function, the arguments above did not rely on this at all (In other words, the same argument could have been made for a decreasing, concave down function.)  Thus, for both parts (b) and (d), the ordering should be $\boxed{T_n \leq I \leq M_n}$.
+        
+        We can use an almost identical argument with a concave up function to show that the ordering for parts (a) and (c) should be $\boxed{M_n \leq I \leq T_n}$.
+      \end{solution}
+\end{problem}
+\pspace{\newpage}
+
+
+\item
+    Let $I=\displaystyle\int_0^{10} e^{-x^2}$. This integral does not have an elementary antiderivative. Using $n=10$ slices, we can approximate the value of $I$. Doing so, we see that $$R_{10}=0.38631860$$
+        $$L_{10}=1.386318$$
+    \begin{enumerate}
+        \item\begin{problem}[\vfill] Write an expression that gives the amount of error in approximating $I$ with $L_{10}$.\end{problem}
+
+       \begin{solution}
+           $I-L_{10}$ gives the difference between the integral and our approximation. In order to focus solely on the size of the error, we will express the error as $|I-L_{10}|.$ 
+       \end{solution}
+        \item \begin{problem}[\vfill]
+            Explain why we cannot find an exact value for this expression.
+        \end{problem}
+        
+        \begin{solution}
+            We cannot find the exact error because we do not know what $I$ is. Therefore we can't know exactly how far off our approximation is.
+        \end{solution}
+            
+       
+        \item \begin{problem}[\vfill]
+            Can you find an upper bound of the error in approximating $I$ with $L_{10}$?
+        \end{problem}
+        
+        \begin{solution}
+            $L_{10}-R_{10}\approx1$ is an upper bound of the error because we know $L_{10}$ is an over-approximation and $R_{10}$ is an under-approximation since the function is decreasing on the interval. Thus, the error must be less than their difference.
+        \end{solution}
+        
+        \item \begin{problem}[\vfill]
+            How could you improve your approximation with the given information?
+        \end{problem}
+        
+       \begin{solution}
+           We could average $R_{10}$ and $L_{10}$ to approximate $I$ with $T_{10}$ which in general should be a better approximation.
+       \end{solution}
+    \end{enumerate}
+
+
+
+
+
+\end{enumerate}
+
+
+ \end{document}

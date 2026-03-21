@@ -1,0 +1,506 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 5 - Logarithmic Differentiation}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{grading}
+\begin{enumerate}
+    \item 12 points
+    \item 10 points
+    \item 5 points
+    \item 20 points
+    \item 3 points
+\end{enumerate}
+Total: 50 points
+\end{grading}
+
+
+% \begin{problemonly}
+%   Technically, you should only use logarithmic differentiation on positive
+%   functions, since you can only take the log of a positive quantity.  The
+%   functions on this homework are all positive, so you can use logarithmic
+%   differentation without fear!
+% \end{problemonly}
+
+\begin{enumerate}[topsep=0pt]
+\item
+
+\begin{grading}
+12 points. 4 points for each part.
+\end{grading}
+
+ You may find examples 17.2 and
+  17.3 in Gottlieb helpful for the following
+  problems.
+
+ You need not simplify your
+  answers.
+  \begin{enumerate}
+
+  \item % 17.2.1(b)
+    \begin{problem}[\vfill]
+      If $f(x) =5(x^2+1)^x$, find $f'(x)$.
+    \end{problem}
+
+    \begin{solution}
+      Since the base and exponent of $(x^2 + 1)^x$ both depend on $x$, we
+      need logarithmic differentiation.  You can do logarithmic
+      differentiation on just $(x^2 + 1)^x$, or you can do it on $f(x) = 5
+      (x^2 + 1)^x$; here, we'll do the latter:
+      \begin{align*}
+        f(x) &= 5(x^2 + 1)^x \\
+        \intertext{Take the natural log of both sides and simplify the
+          right side:}
+        \ln f(x) &= \ln [5 (x^2 + 1)^x] \\
+        &= \ln 5 + \ln \left[ (x^2 + 1)^x \right] \\
+        &= \ln 5 + x \ln (x^2 + 1) \\
+        \intertext{Differentiate both sides with respect to $x$:}
+        \frac{1}{f(x)} f'(x) &= 0 + \frac{d}{dx}
+        \left(\fcolorbox{green}{white}{$\displaystyle x$}\cdot
+          \fcolorbox{green}{white}{$\displaystyle \ln\left(x^
+              { 2} + 1\right)$}\right) \\
+        &= x\cdot \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle
+            \ln\left(\fcolorbox{blue}{white}{$\displaystyle x^ { 2} +
+                1$}\right)$}\right)+ \ln\left(x^ { 2} + 1\right) \\
+        &= x\cdot \frac{1}{x^ { 2} + 1}\cdot 2
+        x+ \ln\left(x^ { 2} + 1\right) \\
+        &= \frac{2x^2}{x^2 + 1} + \ln\left(x^ { 2} + 1\right) \\
+        \shortintertext{Solve for $f'(x)$:} f'(x) &= f(x) \left(
+          \frac{2x^2}{x^2 + 1} + \ln\left(x^ { 2} + 1\right) \right) \\
+        &= \boxed{5(x^2 + 1)^x \left( \frac{2x^2}{x^2 + 1} + \ln\left(x^ {
+                2} + 1\right) \right)}
+      \end{align*}
+    \end{solution}
+
+  \item % 17.2.3(b)
+    \begin{problem}[\vfill\newpage]
+      If $y = \dfrac{2^t}{t^{2t}}$, find
+      $\dfrac{dy}{dt}$.
+    \end{problem}
+
+    \begin{solution}
+      We need logarithmic differentiation to differentiate $t^{2t}$, so we
+      might as well use it on $y$ (since we'll be able to use log rules to
+      simplify $\ln y$.  As always, we start with the given equation:
+      \begin{align*}
+        y &= \frac{2^t}{t^{2t}} \\
+        \intertext{Take the natural log of both sides and simplify the
+          right side:}
+        \ln y &= \ln \left( \frac{2^t}{t^{2t}} \right) \\
+        &= \ln (2^t) - \ln (t^{2t}) \\
+        &= t \ln 2 - 2t \ln t \\
+        \intertext{Differentiate both sides with respect to $t$:}
+        \frac{1}{y} \frac{dy}{dt} &=
+        \ln 2-2\cdot \frac{d}{dt} \left(\fcolorbox{green}{white}{$\displaystyle  t$}\cdot \fcolorbox{green}{white}{$\displaystyle  \ln t$}\right) \\
+        &= \ln 2 -2 \left(t\cdot \frac{1}{t}+ \ln t\right) \\
+        &= \ln 2 - 2 - 2 \ln t \\
+        \shortintertext{Solve for $\frac{dy}{dt}$:}
+        \frac{dy}{dt} &= \boxed{\frac{2^t}{t^{2t}} \left( \ln 2 - 2 - 2
+            \ln t \right)}
+      \end{align*}    
+    \end{solution}
+
+  \item % 17.2.4(b), modified
+    \begin{problem}[\vfill]
+      If $y = \displaystyle\frac{xe^{5x}}{(3x+1)^2 \sqrt{x-2}}$, find
+      $\dfrac{dy}{dx}$ using logarithmic differentiation.
+    \end{problem}
+
+    \begin{solution}
+      We start with the given equation:
+      \begin{align*}
+        y &= \frac{xe^{5x}}{(3x+1)^2 \sqrt{x-2}} \\
+        \intertext{Take the natural log of both sides and simplify the
+          right side:}
+        \ln y &= \ln \left( \frac{xe^{5x}}{(3x+1)^2 \sqrt{x-2}} \right) \\
+        &= \ln \left( x e^{5x} \right) - \ln \left[ (3x+1)^2 \sqrt{x-2}
+        \right] \\
+        &= \ln x + \ln \left( e^{5x} \right) - \ln \left[ (3x + 1)^2
+        \right] - \ln \sqrt{x - 2} \\
+        &= \ln x + 5x - 2 \ln (3x + 1) - \frac{1}{2} \ln (x - 2)  \\
+        \intertext{Differentiate both sides with respect to $x$:}
+        \frac{1}{y} \frac{dy}{dx} &= \frac{1}{x} + 5 - \frac{2}{3x + 1}
+        \cdot 3 - \frac{1}{2} \cdot \frac{1}{x - 2} \cdot 1 \\
+        &= \frac{1}{x} + 5 - \frac{6}{3x + 1} - \frac{1}{2 (x - 2)} \\
+        \shortintertext{Solve for $\frac{dy}{dx}$:} \frac{dy}{dx} &=
+        \boxed{\frac{xe^{5x}}{(3x+1)^2 \sqrt{x-2}} \left( \frac{1}{x} + 5
+            - \frac{6}{3x + 1} - \frac{1}{2 (x - 2)} \right)}
+      \end{align*}
+    \end{solution}
+  \end{enumerate}
+
+
+
+
+
+\item
+
+\begin{grading}
+10 points. 5 points for each part.
+\end{grading}
+
+Find $f'(x)$. You need not simplify your answers.  You will
+  need to use logarithmic differentiation on a part of the formula for $f(x)$, not the entire expression.
+  You may find it useful to give that part a name, like $g(x)$ or $z$,
+  then work on finding $g'(x)$ or $\frac{dz}{dx}$ separately. (Why does it
+  not work to use logarithmic differentiation on the entire formula?)
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill\newpage]
+      $f(x) =x(2x^3 +1)^x +5$
+    \end{problem}
+
+    \begin{solution}
+      It won't work to do logarithmic differentiation directly on $f$
+      because we can't simplify the natural log of a sum.  But the piece
+      of $f$ that we really need logarithmic differentiation for is the
+      first one, so let's give that a name.  If we say $g(x) = x(2x^3
+      +1)^x$, then $f(x) = g(x) + 5$, so $f'(x) = g'(x) + 0$.  We'll use
+      logarithmic differentiation to find $g'(x)$:
+      \begin{align*}
+        g(x) &= x (2x^3 + 1)^x \\
+        \intertext{Take the natural log of both sides and simplify the
+          right side:}
+        \ln g(x) &= \ln \left[ x (2x^3 + 1)^x \right] \\
+        &= \ln x + \ln \left[ (2x^3 + 1)^x \right] \\
+        &= \ln x + x \ln \left( 2x^3 + 1 \right) \\
+        \intertext{Differentiate both sides with respect to $x$:}
+        \frac{1}{g(x)} g'(x) &= \frac{1}{x}+ \left(x\cdot \frac{d}{dx}
+          \left(\fcolorbox{red}{white}{$\displaystyle
+              \ln\left(\fcolorbox{blue}{white}{$\displaystyle 2 x^ { 3} +
+                  1$}\right)$}\right)+ \ln\left(2 x^ { 3} +
+            1\right)\right) \\
+        &= \frac{1}{x}+ \left(x\cdot \frac{1}{2 x^ { 3} + 1}\cdot 6 x^ {
+            2} + \ln\left(2 x^ { 3} +
+            1\right)\right) \\
+        &= \frac{1}{x}+ \frac{6x^3}{2 x^ { 3} + 1} + \ln\left(2 x^ { 3} +
+          1\right) \\
+        \shortintertext{Solve for $g'(x)$:}
+        g'(x) &= x (2x^3 + 1)^x \left( \frac{1}{x}+ \frac{6x^3}{2 x^ { 3}
+            + 1} + \ln\left(2 x^ { 3} + 
+            1\right) \right) 
+      \end{align*}
+      Finally, remember that we already said that $f'(x) = g'(x)$, so
+      \[f'(x) = \boxed{x (2x^3 + 1)^x \left( \frac{1}{x}+ \frac{6x^3}{2 x^
+            { 3} + 1} + \ln\left(2 x^ { 3} + 1\right) \right)}.\]
+    \end{solution}
+
+  \item
+\begin{problem}[\vfill]
+      $f(x) = 3\cdot 2^x +2\cdot x^3 +3\cdot x^{2x+3}$
+    \end{problem}
+
+    \begin{solution}
+      The term we need logarithmic differentiation for is $3 \cdot x^{2x +
+        3}$ (or just $x^{2x + 3}$), so let $g(x) = x^{2x + 3}$.  Then,
+      $f(x) = 3 \cdot 2^x + 2 \cdot x^3 + 3 \cdot g(x)$, so
+      \begin{equation}
+f'(x) = 3 \cdot 2^x \ln 2 + 6x^2 + 3 g'(x)
+      \end{equation}
+      We'll use logarithmic differentiation to find $g'(x)$:
+      \begin{align*}
+        g(x) &= x^{2x+3} \\
+        \intertext{Take the natural log of both sides and simplify the
+          right side:}
+        \ln g(x) &= \ln \left( x^{2x + 3} \right) \\
+        &= (2x + 3) \ln x \\
+        \intertext{Differentiate both sides with respect to $x$:}
+        \frac{1}{g(x)} g'(x) &= \frac{d}{dx}
+        \left(\fcolorbox{green}{white}{$\displaystyle \left(2 x+
+              3\right)$}\cdot
+          \fcolorbox{green}{white}{$\displaystyle  \ln x$}\right) \\
+        &= (2 x+ 3)\cdot \frac{1}{x}+ 2 \ln x \\
+        \shortintertext{Solve for $g'(x)$:} g'(x) &= x^{2x + 3} \left[ (2
+          x+ 3)\cdot \frac{1}{x}+ 2 \ln x \right]
+      \end{align*}
+      Then, by (1), $f'(x) = \boxed{3 \cdot 2^x
+        \ln 2 + 6x^2 + 3 x^{2x + 3} \left[ (2 x+ 3)\cdot \frac{1}{x}+ 2
+          \ln x \right]}$.      
+    \end{solution}
+  \end{enumerate}
+
+
+
+
+\item 
+
+\begin{grading}
+5 points. Students will need to set the function equal to some variable in order to take the log of both sides of an equation.
+\end{grading}
+
+% 17.2.7
+  \begin{problem}[\vfill]
+    Come up with a differentiation rule (like the Product Rule) for $\diff*{\!\left[f(x)^{g(x)}\right]}{x}$. Your formula should give the derivative in terms of $f(x)$, $f'(x)$, $g(x)$, and $g'(x)$.
+  \end{problem}
+
+  \begin{solution}
+    As usual, we should start by giving a name to the thing we're trying
+    to differentiate using logarithmic differentiation; let's call it
+    $h(x)$: 
+    \begin{align*}
+      h(x) &= f(x)^{g(x)} \\
+      \intertext{Take $\ln$ of both sides:}
+      \ln h(x) &= \ln \left( f(x)^{g(x)} \right) \\
+      &= g(x) \ln f(x) \\
+      \intertext{Differentiate both sides:}
+      \frac{h'(x)}{h(x)} &= g(x) \frac{f'(x)}{f(x)} + g'(x) \ln f(x) \\
+      \intertext{Solve for $h'(x)$:}
+      h'(x) &= h(x) \left[ g(x) \frac{f'(x)}{f(x)} + g'(x) \ln f(x)
+      \right] \\
+      &= f(x)^{g(x)} \left[ g(x) \frac{f'(x)}{f(x)} + g'(x) \ln f(x)
+      \right] 
+    \end{align*}
+  \end{solution}
+
+
+\pspace{\newpage}
+
+\item 
+
+\begin{grading}
+ 20 points. Points are distributed to parts (a)-(g) as follows:\\
+ 4/4/2/2/4/2/2
+\end{grading}
+
+In this problem, you'll look at the function $f(x) = x^{\ln x}$ on
+  its natural domain $(0, \infty)$.
+  \begin{enumerate}
+  \item
+    \begin{problem}[\stretch{1}]
+      Find $f'(x)$.
+    \end{problem}
+
+    \begin{solution}
+      \ideas{Since the base and exponent both depend on $x$, we should use
+        logarithmic differentiation.}  We start with the given equation:
+      \begin{align*}
+        f(x) &= x^{\ln x} \\
+        \intertext{Take the natural log of both sides and simplify the
+          right side:}
+        \ln f(x) &= \ln \left( x^{\ln x} \right) \\
+        &= (\ln x)(\ln x) \\
+        &= (\ln x)^2 \\
+        \intertext{Differentiate both sides with respect to $x$:}
+        \frac{1}{f(x)} f'(x) &= 2 (\ln x) \frac{1}{x} \\
+        \shortintertext{Solve for $f'(x)$:}
+        f'(x) &= x^{\ln x} \cdot \frac{2 \ln x}{x} 
+      \end{align*}
+    \end{solution}
+
+  \item
+\begin{problem}[\stretch{1}]
+      On what intervals is $f(x)$ increasing?  On what intervals is it
+      decreasing?
+    \end{problem}
+
+    \begin{solution}
+      \ideas{To answer this, let's make a sign chart for $f'$.}
+
+      First, we'll find where $f'$ is 0 or undefined.  On $(0, \infty)$,
+      $f'(x) = x^{\ln x} \cdot \frac{2 \ln x}{x}$ is always defined.
+      Since $x^{\ln x}$ is always positive, $f'(x) = 0$ when $\ln x = 0$,
+      which happens at $x = 1$.  Testing points gives us this sign chart:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis y line=none, x axis line style={-}, xtick={0,1}, xmin=-1.5, xmax = 2, ymin=-2, ymax = 2, height=1in, width=3in, clip=false]
+            \addplot+[domain=-1.5:2]{0};
+            \draw (-1.5,1.5) node[right] {$f$};
+            \draw (axis cs: -1.5, -1.5) node[right] {sign of $f'$};
+            \draw (axis cs: 0.5, -1.5) node{$-$};
+            \draw (axis cs: 1.5, -1.5) node{$+$};
+            \draw[->] (0,1.5) -- (0.9,0.5);
+            \draw[->] ( 0.9,0.5) -- (1.1,0.5);
+            \draw[->] (1.1,0.5) -- (2,1.5);
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      So, \fbox{$f(x)$ is decreasing on $(0, 1)$ and increasing on $(1,
+        \infty)$}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{0.2}]
+      What is $\displaystyle \lim_{x \to \infty} x^{\ln x}$?
+
+      \probonly{\emph{Hint: If $x$ is a large positive number, what is $\ln x$?  What about $x^{\ln x}$? What will happen as $x$ increases without bound?}}
+    \end{problem}
+
+    \begin{solution}
+      As $x \to \infty$, $\ln x \to \infty$.  So, when $x$ is very large,
+      $x^{\ln x}$ involves raising a big number to a big number, which
+      gives a big result.  So, the limit is $\boxed{\infty}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{0.2}]
+      What is $\displaystyle \lim_{x \to 0^+} x^{\ln x}$?
+
+      \probonly{\emph{Hint: What happens if $x$ is a positive number very close to $0$, like $x = 0.00001$?  What will happen as $x$ continues to approach $0$?}}
+    \end{problem}
+
+    \begin{solution}
+      As $x \to 0^+$, $\ln x \to -\infty$, so when $x$ is close to 0,
+      $x^{\ln x}$ involves raising a tiny positive number to a very
+      negative power; the result is a big positive number.  So,
+      $\displaystyle \lim_{x \to 0^+} x^{\ln x} = \boxed{\infty}$.
+    \end{solution}
+
+\pspace{\newpage}
+
+  \item
+    \begin{problem}[\stretch{1}]
+      Sketch a rough graph of $f(x)$.  Your graph should accurately show
+      where $f(x)$ is increasing and decreasing and reflect the limits you
+      have found, but you need not show the concavity accurately.
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      Here is the graph:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[restrict y to domain=0:10, ymax=4, xtick={1}, ytick={1},height=6cm]
+            \addplot+[domain=0:5, blue] {e^((ln(x))^2)};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      The key features your graph should have are that it's decreasing on
+      $(0, 1)$, increasing on $(1, \infty)$, and that both $\displaystyle
+      \lim_{x \to 0^+} f(x)$ and $\displaystyle \lim_{x \to \infty} f(x)$
+      are $\infty$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Does the graph of $f(x)$ have an global minimum on the interval $\left[
+        \frac{1}{e^2}, e \right]$?  If so, where?  (Give both the $x$- and
+      $y$-coordinate.)
+    \end{problem}
+
+    \begin{solution}
+      From our sign chart in {{{{\#4}}(b)}}, we can see
+      that the global minimum of $f$ on $\left[
+        \frac{1}{e^2}, e \right]$ must happen at $x = 1$.  The
+      corresponding $y$-coordinate is $f(1) = 1^{\ln 1} = 1^0 = 1$, so the
+      global minimum point is $\boxed{(1, 1)}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Does the graph of $f(x)$ have an global maximum on the interval $\left[
+        \frac{1}{e^2}, e \right]$?  If so, where?  (Give both the $x$- and
+      $y$-coordinate.)
+    \end{problem}
+
+    \begin{solution} % Jason Bland
+      $f$ must have an global maximum on $\left[ \frac{1}{e^2}, e
+      \right]$ by the Extreme Value Theorem: we're dealing with a
+      continuous function on a closed interval.  From our sign chart in
+      {{{{\#4}}(b)}}, we can see that the maximum must
+      occur at an endpoint.  To decide which, we just evaluate $f$ at both
+      enedpoints: $f(e) = e^1 = e$ while $f(\frac{1}{e^2}) =
+      (\frac{1}{e^2})^{-2} = e^4$, and $e^4$ is larger. So the maximum is
+      at the point $\boxed{\left( \frac{1}{e^2}, e^4 \right)}$.
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+\begin{grading}
+3 points. 1 point for identifying B as the best strategy, 1 point for identifying C as possible, and 1 point for identifying A as unworkable. 
+\end{grading}
+
+ \textbf{Reflect Back.}
+
+  \begin{problem}[\stretch{1}]
+    To differentiate $y =10 (x^2 + 7)^{\pi} +
+    \displaystyle \frac{ \sqrt 2(2x^2 + 3)^{5}}{3} + 
+    \frac{x^8(3x^2+2)^{4x}}{x^2+1}$, which of the following would be the most efficient strategy?
+    Which would work, but would take some energy?  Which is totally unworkable?
+    \begin{enumerate}[label=\protect\maybecircle{\Alph*.}]
+    \item Take the natural log of both sides and use logarithmic
+      differentiation.
+    \item Differentiate the
+      first term using the Chain Rule.  For the second term,
+      first pull out $\frac{\sqrt 2}{3}$ as a constant, and then
+      differentiate $(2x^2 + 3)^{5}$ using the Chain Rule.
+      Then differentiate the third term using logarithmic differentiation.
+    \item Differentiate each of
+      the three terms using logarithmic differentiation.
+    \end{enumerate}
+  \end{problem}
+
+  \begin{solution}
+    (A) would not work; we can't simplify the natural log of a sum.  (B) and (C)
+    both work, but (B) is a bit more efficient.
+  \end{solution}
+
+\pspace{\newpage}
+
+\item 
+\begin{problem}
+    We are going to start our unit on trigonometry next class. To prepare, let's review some of the geometric properties of circles.
+
+    In the United States, small pizzas are usually 10 inches in diameter, and medium pizzas are usually 12 inches in diameter.
+\end{problem}
+
+\begin{enumerate}
+    \item 
+    \begin{problem}
+    Your friend buys pizzas just to eat the crusts. How much crust (in inches) is on a small pizza? A medium pizza?
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        The length of crust is the circumference of a circle. We know that $C=2\pi r$, where $r$ is the radius of the circle.
+        \begin{itemize}
+            \item A small pizza (radius of 5 inches) has $10\pi$ inches of crust.
+            \item A medium pizza (radius of 6 inches) has $12\pi$ inches of crust.
+        \end{itemize}
+    \end{solution}
+
+    \item 
+    \begin{problem}
+    Suppose we slice the pizzas into six equal slices. How many slices of a medium pizza would give the same amount of crust as an entire small pizza?
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        If we slice a medium pizza into six equal slices, then each slice will have $2\pi$ inches of crust. 5 of these slices would give the same amount of crust as an entire small pizza.
+    \end{solution}
+
+    \item 
+    \begin{problem}
+        Your local pizzeria offers a 6-inch-diameter pizza at half the price of a medium pizza. Do you think this is a fair deal? Would your friend think this is a fair deal? Explain your reasoning.
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        A 6-inch diameter pizza has a circumference of $6\pi$ inches and an area of $9\pi$ square inches. A medium pizza (12-inch diameter) has a circumference of $12\pi$ inches and an area of $36\pi$ square inches. If we care about the total amount of pizza we're getting and not just the crust, then this isn't a good deal, because we are getting a fourth as much pizza for half the cost. If we only care about the crust, like our friend, then we might say this is a fair deal, because we are getting half as much crust for half the cost.
+    \end{solution}
+\end{enumerate}
+
+\end{enumerate}
+
+\psreflection{
+
+}
+
+\end{document}

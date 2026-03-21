@@ -1,0 +1,284 @@
+%Generated with ChatGPT from CliffTaubes's Notes
+\documentclass[12pt,letterpaper]{article}
+\usepackage{amsmath, amssymb, amsthm}
+
+\input{../worksheet-setup.tex}
+
+
+
+
+\chead{\large\textbf{Symmetric Matrices and the Spectral Theorem, $\vec\S$7.1}}
+
+\begin{document}
+\thispagestyle{fancy}
+
+Recall from previously:
+
+\begin{itemize}
+\item[(a)] Definition of \textbf{inner product space}
+\begin{enumerate}
+    \item A function on $V \times V$: $\langle u, v \rangle$
+    \item This is symmetric, linear in both $u$ and $v$.
+    \item $\langle u, u \rangle > 0$ if $u \neq 0$.
+\end{enumerate}
+
+\item[(b)] \textbf{Examples}
+\begin{enumerate}
+    \item $\mathbb{R}^n$ and its subspaces with $\langle , \rangle = $ dot product.
+    \item Polynomials of degree $n$ and evaluation at $n+1$ or more points:
+    \[
+    \langle P, Q \rangle = P(t_0)Q(t_0) + \cdots + P(t_n)Q(t_n).
+    \]
+    With regards to $\langle P, P \rangle > 0$, a polynomial that vanishes at $n+1$ points is identically zero since it has at most $n$ roots.
+    \item Continuous functions on $[a, b]$ with inner product
+    $
+    \langle f, g \rangle = \int_a^b f(t)g(t) \, dt.
+    $
+\end{enumerate}
+
+\item[(c)] \textbf{Length, distance, and orthogonality}
+\begin{enumerate}
+    \item $\text{dist}(u, v) = \|u - v\|.$
+    \item Length of $u$ is $\|u\|.$
+    \item $v$ is said to be orthogonal to $u$ if $\langle v,u \rangle = 0.$
+    \item Orthogonal complements of subspaces.
+    \item Orthogonal projection as before.
+\end{enumerate}
+
+\item[(d)] \textbf{Gram-Schmidt}.
+This is the same as before for finite or countably infinite bases.
+
+\item[(e)] \textbf{Best approximation}.
+If $W \subset V$ is a subspace with an orthogonal basis:
+\begin{enumerate}
+    \item Orthogonal projection of $u$ onto a subspace $W \subset V$ with an orthogonal basis is as before:
+    \[
+    \text{proj}_W(u) = c_1v_1 + \cdots + c_kv_k,    
+    \quad \mbox{ where} \quad c_k = \frac{\langle v_k,u \rangle}{\|v_k\|^2}.\]
+    \item $\text{proj}_W(u)$ is the closest vector in $W$ to $u$ (it minimizes the function $v \mapsto \|u - v\|^2$ for $v \in W$).
+\end{enumerate}
+
+\item[(f)] \textbf{Inequalities}
+\begin{enumerate}
+    \item Cauchy-Schwarz inequality: \qquad
+    $
+    |\langle u, v \rangle| \leq \|u\| \|v\|.
+    $
+    \item Triangle inequality:
+    \qquad $    \|u - v\| \leq \|u\| + \|v\|.
+    $
+    \item Angle between $u$ and $v$: 
+    \qquad $
+    \langle u, v \rangle = \|u\| \|v\| \cos(\theta).
+    $
+\end{enumerate}
+\end{itemize}
+
+\begin{defn}
+An $n \times n$ matrix $A$ is said to be symmetric when $A^T = A.$
+\end{defn}
+
+\begin{enumerate}
+
+\Problem True or false: A diagonal matrix is symmetric.
+\vspace{1in}
+
+
+
+\Problem
+Prove the following theorem using the outline below.
+
+\textbf{Transpose Theorem:}
+If $u$ and $v$ are vectors in $\mathbb{R}^n$ and $A$ is an $n \times n$ matrix, then $u \cdot (Av) = (A^Tu) \cdot v.$
+
+\begin{enumerate}
+    \item[a)] Take a basis $E_{ij}$ for $n \times n$ matrices with $E_{ij}$ having all entries zero except for the $i,j$ entry which is $1.$ Verify the theorem for $E_{ij}.$\vfill
+    \item[b)] Since the equation $u \cdot (Av) - (A^Tu) \cdot v = 0$ is a linear equation for the components of $A$ for any fixed choice of $u$ and $v$, it is sufficient to verify the equation for each basis element $E_{ij}.$ (Justify this statement!)\vfill
+\end{enumerate}
+
+\newpage
+
+
+\Problem True or false: An orthogonally diagonalizable matrix is symmetric, where orthogonally diagonalizable is defined as follows:
+
+\begin{defn}
+An $n \times n$ matrix $A$ is said to be orthogonally diagonalizable if there is a diagonal matrix $D$ and orthogonal matrix $P$ with $P^T = P^{-1}$ such that $A = PDP^{-1}.$
+\end{defn}
+
+
+\vfill
+
+
+\textbf{Theorem}:
+A matrix is orthogonally diagonalizable if and only if it is symmetric.
+\begin{enumerate}
+    \item[a)] Thus, $A$ has $n$ real eigenvalues counting multiplicity.
+    \item[b)] The eigenvectors form a complete, orthogonal basis.
+\end{enumerate}
+\vfill
+
+
+\Problem Find the eigenvalues and then an orthonormal basis of eigenvectors for each of the matrices below:
+\begin{enumerate}
+    \item[a)] 
+    $
+    \begin{pmatrix}
+    a & b \\
+    b & c
+    \end{pmatrix}
+    $\vfill
+    \item[b)] 
+    $
+    \begin{pmatrix}
+    1 & 0 & 1 \\
+    0 & -1 & 0 \\
+    1 & 0 & 1
+    \end{pmatrix}
+    $\vfill
+    \item[c)] 
+    $
+    \begin{pmatrix}
+    1 & 0 & 1 \\
+    0 & -1 & 0 \\
+    1 & 0 & -1
+    \end{pmatrix}
+   $\vfill
+\end{enumerate}
+
+
+\newpage
+
+\Problem True or false: If $A$ is any given $m \times n$ matrix, then $A^TA$ is a symmetric, $n \times n$ matrix.
+\vfill
+
+\Problem
+True or false: If $A$ is any given $m \times n$ matrix, then the eigenvalues of $A^TA$ are the same as those of $AA^T.$
+\vfill
+
+\Problem
+Let $A$ denote the $3 \times 1$ matrix
+$
+\begin{pmatrix}
+1 \\
+2 \\
+3
+\end{pmatrix}.
+$
+\begin{enumerate}
+    \item[a)] Find the eigenvalues of $A^TA.$\vfill
+    \item[b)] Find the eigenvalues of $AA^T.$
+\end{enumerate}
+
+\vfill
+
+\newpage
+\Problem
+Let $u_1$ and $u_2$ denote vectors in $\mathbb{R}^3.$ Let $A = u_1u_1^T + u_2u_2^T.$
+
+\begin{enumerate}
+    \item[a)] True or false: The matrix $A$ always has $0$ for one of its eigenvalues.\vfill
+    \item[b)] True or false: The eigenvalue $0$ has multiplicity $1$ if and only if $u_1$ and $u_2$ are not linearly independent.\vfill
+\end{enumerate}
+
+\Problem \textbf{Spectral theorem}
+Let $A$ be a symmetric matrix. Fix an orthonormal basis $\{v_k\}_{k=1,\dots,n}$ of eigenvectors. Then
+\[
+A = \lambda_1 v_1v_1^T + \cdots + \lambda_nv_nv_n^T.
+\]
+
+Let $A$ and $\{v_1, \dots, v_n\}$ be as described in the spectral theorem. What is the matrix $A$ when written using this basis?
+\vfill
+
+\end{enumerate}
+
+\begin{comment}
+%TODO
+% -Format the below and check the answers
+
+\newpage
+\chead{\Large\textbf{Symmetric matrices and spectral theorem - Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+
+
+\section*{1. True}
+Since the transpose flips entries across the diagonal, any matrix $A$ has the same diagonal elements as its transpose.
+
+\section*{2.}
+\begin{enumerate}
+    \item[a)] $u \cdot (E_{ij} v) = u_iv_j.$ Meanwhile $E_{ij}^T = E_{ji}$ and so $(E_{ji}u) \cdot v = v_ju_i.$
+    \item[b)] Since $v \cdot (A + A^T)u = v \cdot (Au + A^Tu)$ by linearity of matrix multiplication. Meanwhile, $v \cdot (Au + A^Tu) = v \cdot Au + v \cdot A^Tu$ by linearity of the dot product with respect to either the left-hand vector or the right-hand vector.
+\end{enumerate}
+
+\section*{3. True}
+If $A = UDU^{-1}$ and $U$ is orthogonal, then $A = UDUT$ and its transpose is thus $(U^T)^T D U^T$, which is $A$ since $(U^T)^T = U$ and $D^T = D$ and $U^T = U^{-1}.$
+
+\section*{4.}
+\begin{enumerate}
+    \item[a)] Eigenvalues are $\lambda = \frac{1}{2} (a + c) \pm \frac{1}{2} \sqrt{(a - c)^2 + 4b^2}.$ Whichever version of $\lambda$, a corresponding eigenvector is $v = \begin{pmatrix} b \\ \lambda - a \end{pmatrix}.$
+    \item[b)] Eigenvalues are $-1, 0, 2$ since the characteristic polynomial is $\lambda(1 + \lambda)(2 - \lambda).$ The corresponding eigenvectors are:
+    \[
+    \begin{pmatrix}
+    0 \\
+    1 \\
+    0
+    \end{pmatrix},
+    \begin{pmatrix}
+    1 \\
+    0 \\
+    -1
+    \end{pmatrix},
+    \begin{pmatrix}
+    1 \\
+    0 \\
+    1
+    \end{pmatrix}.
+    \]
+    \item[c)] Eigenvalues are $-1, -\sqrt{2},$ and $\sqrt{2}$ since the characteristic polynomial is $(1 + \lambda)(2 - \lambda^2).$ The corresponding eigenvectors are:
+    \[
+    \begin{pmatrix}
+    0 \\
+    1 \\
+    0
+    \end{pmatrix},
+    \begin{pmatrix}
+    1 \\
+    0 \\
+    -1 - \sqrt{2}
+    \end{pmatrix},
+    \begin{pmatrix}
+    1 \\
+    0 \\
+    -1 + \sqrt{2}
+    \end{pmatrix}.
+    \]
+\end{enumerate}
+
+\section*{5. True}
+Because $(A^TA)^T = A^T(A^T)^T = A^TA.$
+
+\section*{6. False}
+See the answer to \#7 on this worksheet. But it is true if $A$ is a square matrix. For example, similar matrices have the same eigenvalues; and if $A$ is invertible, then $A^TA$ is similar to $AA^T$ because $A^{-1}(AA^T)A = A^TA.$
+
+\section*{7.}
+\begin{enumerate}
+    \item[a)] $A^TA$ is the $1 \times 1$ matrix with entry $14.$
+    \item[b)] $AA^T = \begin{pmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \\ 3 & 6 & 9 \end{pmatrix}$ which has eigenvalues $0$ (with multiplicity 2) and $14.$
+\end{enumerate}
+
+\section*{8.}
+\begin{enumerate}
+    \item[a)] True, and an eigenvector with eigenvalue $0$ is any non-zero vector orthogonal to the span of $u_1$ and $u_2.$
+    \item[b)] If $u_1$ and $u_2$ are linearly independent, then the orthogonal complement to their span has dimension 1. If they are not linearly independent, then it has dimension 2.
+\end{enumerate}
+
+\section*{9.}
+The matrix $A$ is the diagonal matrix with the eigenvalues $\lambda_1, \dots, \lambda_n$ on the diagonal.
+
+\end{comment}
+
+\end{document}
+
+

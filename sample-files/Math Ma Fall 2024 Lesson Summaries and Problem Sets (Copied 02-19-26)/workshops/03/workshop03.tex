@@ -1,0 +1,442 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage{handout}
+\renewcommand{\workshopnote}{CA Notes.}    
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\makeatletter
+
+\newdimen\SOUL@dimen %new
+\def\SOUL@ulunderline#1{{%
+    \setbox\z@\hbox{#1}%
+    % \dimen@=\wd\z@
+    \SOUL@dimen=\wd\z@ %new
+    \dimen@i=\SOUL@uloverlap
+    \advance\SOUL@dimen2\dimen@i %\dimen@ exchanged too
+    \rlap{%
+      \null
+      \kern-\dimen@i
+      % \SOUL@ulcolor{\SOUL@ulleaders\hskip\dimen@}%
+      \SOUL@ulcolor{\SOUL@ulleaders\hskip\SOUL@dimen}% new
+    }%
+    \unhcopy\z@
+  }}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+\definecolor{hotpink}{rgb}{1, 0, 0.5}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\htitle{Workshop 3}
+
+\begin{workshop}
+  Start the workshop with the slide presentation about the testing effect. Basically, taking a test on material has been shown (in many studies, not just this one highlighted in these slides) to lead to more durable learning than just restudying material.
+
+  At Slide 5, give students 5-10 minutes to do the self-test on the last page of this workshop. At some point, stop them and have them do the reflection questions and then turn the self-test in. You don't need to grade these, but if you notice a student who's particularly worrying, please make a note of that with your attendance (in Google Sheets, go to the Insert menu, and select Note).
+
+  Then, talk through Slides 6 - 8. The point here isn't that students must do their homework this way, but to encourage them to think about how they can use the homework for long-term learning (as opposed to just trying to get it done). 
+
+  After that, have students work on the rest of the workshop problems.
+\end{workshop}
+
+\begin{enumerate}
+\item  \label{|h|/h}
+
+  \begin{workshop}
+    As the problem says, we'll be using this function tomorrow, so do check that students end up with the right graph.
+  \end{workshop}
+
+  Let $g(h) = \dfrac{|h|}{h}$. (This function will be important tomorrow!)
+
+  \begin{enumerate}
+  \item
+
+    \begin{problem}[0.25in]
+      What's the domain of $g$?
+    \end{problem}
+
+    \begin{solution}
+      The domain of $g$ is all non-zero $h$, which we also write as
+      $(-\infty, 0) \cup (0, \infty)$.
+    \end{solution}
+
+  \item
+
+    \begin{problem}[0.25in]
+      If $h > 0$, what's a simpler formula for $g(h)$?
+    \end{problem}
+
+    \begin{solution}
+      When $h > 0$, $|h| = h$, so $g(h) = \dfrac{|h|}{h} = \dfrac{h}{h} = 1$.
+    \end{solution}
+
+    \begin{problem}[0.25in]
+      If $h < 0$, what's a simpler formula for $g(h)$?
+    \end{problem}
+
+    \begin{solution}
+      When $h < 0$, $|h| = -h$, so $f(h) = \dfrac{|h|}{h} = \dfrac{-h}{h} = -1$.
+    \end{solution}
+
+  \item
+
+    \begin{problem}[\vfill]
+      Sketch the graph of $g$. 
+    \end{problem}
+
+    \begin{solution}
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[ytick={-1, 1}, xtick=\empty]
+            \addplot+[domain=0:5] {1};
+            \addplot+[domain=-5:0] {-1};
+            \addplot[open] coordinates{(0,1) (0,-1)};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}      
+    \end{solution}
+  \end{enumerate}  
+
+\item  \label{derivative-def-recap}
+
+  \begin{workshop}
+    This is to help students really interpret the notation in the definition of the derivative. It's also an opportunity to help students understand that the variable we use in a limit is a ``dummy'' variable. For example, $\displaystyle \lim_{h \to 0} \dfrac{f(a + h) - f(a)}{h}$ is the same as $\displaystyle \lim_{\Delta x \to 0} \dfrac{f(a + \Delta x) - f(a)}{\Delta x}$ and $\displaystyle \lim_{\diamondsuit \to 0} \dfrac{f(a + \diamondsuit) - f(a)}{\diamondsuit}$.
+
+    If students are bothered by the notation $\Delta x$, reassure them that it's a variable just like $h$ is.
+  \end{workshop}
+
+  In each part, you're given two pictures of a graph $y = f(x)$; write formulas for the indicated slopes, using limits for the slopes of tangent lines.
+
+  \begin{enumerate}
+  \item \
+
+    \vspace{-12pt}
+
+    \begin{tabular}{p{2.65in} c p{2.65in}}
+      \begin{tikzpicture}[declare function={f(\x)=-13/16 + (59*\x)/8 - (15*\x^2)/4 + \x^3/2;}]
+        \begin{axis}[xtick={0.7, 1.9}, xticklabels={$a$, $s$}, ytick=\empty, clip=false, width=2.85in]
+          \addplot+[domain=0:3] {f(x)} node[below]{$y = f(x)$}; %
+          \addplot+[closed] coordinates {(0.7, {f(0.7)})} node[anchor=south east]{$P$}; \addplot+[closed] coordinates { (1.9, {f(1.9)})} node[anchor=south west]{$Q$}; %
+          \draw[thin, dashed] (0.7, 0) -- (0.7, {f(0.7)}); %
+          \draw[thin, dashed] (1.9, 0) -- (1.9, {f(1.9)}); %
+          \draw[skyblue, very thick, shorten >= -18pt, shorten <= -18pt] (0.7, {f(0.7)}) -- (1.9, {f(1.9)});
+        \end{axis}
+      \end{tikzpicture}
+      & \hspace{0.25in} & 
+      \begin{tikzpicture}[declare function={f(\x)=-13/16 + (59*\x)/8 - (15*\x^2)/4 + \x^3/2;}]
+        \begin{axis}[xtick={0.7}, xticklabels={$a$}, ytick=\empty, clip=false, width=2.85in]
+          \addplot+[domain=0:3] {f(x)} node[below]{$y = f(x)$}; %
+          \addplot+[closed] coordinates {(0.7, {f(0.7)})} node[anchor=south east]{$P$}; \addplot+[closed] coordinates { (1.9, {f(1.9)})} node[anchor=south west]{$Q$}; %
+          \addplot+[closed] coordinates { (1.3, {f(1.3)})} node[above, yshift=1pt]{$Q$}; %
+          \draw[skyblue, thick, shorten >= -18pt, shorten <= -18pt] (0.7, {f(0.7)}) -- (1.9, {f(1.9)}); %
+          \draw[skyblue, thick, shorten >= -18pt, shorten <= -18pt] (0.7, {f(0.7)}) -- (1.3, {f(1.3)}); %
+          \draw[hotpink, very thick, shorten >= -18pt, shorten <= -18pt] ($(0.7, {f(0.7)}) - 0.25*(1, 2.86)$) -- ($(0.7, {f(0.7)}) + 0.25*(1, 2.86)$); %
+          \draw[->, shorten >= 6pt, yshift=4pt, purple] (1.9, {f(1.9)}) to[bend right=18] (1.3, {f(1.3)}); %
+          \draw[->, yshift=4pt, purple] (1.3, {f(1.3)}) to[bend right=18] (1, {f(1)}); %
+          \draw[thin, dashed] (0.7, 0) -- (0.7, {f(0.7)}); %
+        \end{axis}
+      \end{tikzpicture} \\
+      The slope of the secant line between $P$ and $Q$ is: && As we move $Q$ toward $P$, the slopes of the secant lines approach the slope of the tangent line. Therefore, the slope of the tangent line at $P$ is:
+    \end{tabular}
+
+    \pspace{0.75in}
+
+    \pspace{\newpage}
+
+  \item\
+
+    \vspace{-12pt}
+
+    \begin{tabular}{p{2.65in} c p{2.65in}}
+      \begin{tikzpicture}[declare function={f(\x)=-13/16 + (59*\x)/8 - (15*\x^2)/4 + \x^3/2;}]
+        \begin{axis}[xtick={0.7}, xticklabels={$a$}, ytick=\empty, clip=false, width=2.85in]
+          \addplot+[domain=0:3] {f(x)} node[below]{$y = f(x)$}; %
+          \addplot+[closed] coordinates {(0.7, {f(0.7)})} node[anchor=south east]{$P$}; \addplot+[closed] coordinates { (1.9, {f(1.9)})} node[anchor=south west]{$Q$}; %
+          \draw[thin, dashed] (0.7, 0) -- (0.7, {f(0.7)}); %
+          \draw[thin, dashed] (1.9, 0) -- (1.9, {f(1.9)}); %
+          \draw[skyblue, very thick, shorten >= -18pt, shorten <= -18pt] (0.7, {f(0.7)}) -- (1.9, {f(1.9)});%
+          \draw[|-|, yshift=-12pt] (0.7, 0) -- node[below]{$\Delta x$}(1.9, 0);
+        \end{axis}
+      \end{tikzpicture}
+      & \hspace{0.25in} & 
+      \begin{tikzpicture}[declare function={f(\x)=-13/16 + (59*\x)/8 - (15*\x^2)/4 + \x^3/2;}]
+        \begin{axis}[xtick={0.7}, xticklabels={$a$}, ytick=\empty, clip=false, width=2.85in]
+          \addplot+[domain=0:3] {f(x)} node[below]{$y = f(x)$}; %
+          \addplot+[closed] coordinates {(0.7, {f(0.7)})} node[anchor=south east]{$P$}; \addplot+[closed] coordinates { (1.9, {f(1.9)})} node[anchor=south west]{$Q$}; %
+          \addplot+[closed] coordinates { (1.3, {f(1.3)})} node[above, yshift=1pt]{$Q$}; %
+          \draw[skyblue, thick, shorten >= -18pt, shorten <= -18pt] (0.7, {f(0.7)}) -- (1.9, {f(1.9)}); %
+          \draw[skyblue, thick, shorten >= -18pt, shorten <= -18pt] (0.7, {f(0.7)}) -- (1.3, {f(1.3)}); %
+          \draw[hotpink, very thick, shorten >= -18pt, shorten <= -18pt] ($(0.7, {f(0.7)}) - 0.25*(1, 2.86)$) -- ($(0.7, {f(0.7)}) + 0.25*(1, 2.86)$); %
+          \draw[->, shorten >= 6pt, yshift=4pt, purple] (1.9, {f(1.9)}) to[bend right=18] (1.3, {f(1.3)}); %
+          \draw[->, yshift=4pt, purple] (1.3, {f(1.3)}) to[bend right=18] (1, {f(1)}); %
+          \draw[thin, dashed] (0.7, 0) -- (0.7, {f(0.7)}); %                    
+        \end{axis}
+      \end{tikzpicture} \\
+      The slope of the secant line between $P$ and $Q$ is: && As we move $Q$ toward $P$, the slopes of the secant lines approach the slope of the tangent line. Therefore, the slope of the tangent line at $P$ is:
+    \end{tabular}
+  \end{enumerate}
+
+  \pspace{0.75in}
+
+\item  Samantha recently wrote an app and started selling it on the App Store. Let $D(t)$ be the number of downloads her app has in the first $t$ days after she puts it on the App Store.
+
+  Suppose $D(20) = 2000$ and $D'(20) = 150$.
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Interpret the two facts $D(20) = 2000$ and $D'(20) = 150$ in words; include units.
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Using just the two facts we have, we can make a reasonable approximation of which two of the following quantities? 
+      \begin{center}
+        $D(19)$ \hspace{1in} $D(22)$ \hspace{1in} $D(155)$
+      \end{center}
+      Approximate those two, and explain why it isn't reasonable to approximate the other quantity. 
+    \end{problem}
+
+  \end{enumerate}
+
+\item  \label{workshop-interpret-and-visualize-derivative} Let $P(t)$ be the population of the world $t$ years after January 1, 2000.
+
+  \begin{enumerate}
+  \item \label{workshop-interpret-and-visualize-derivative-interpret}
+
+    Interpret the following quantities (in terms of population and time); include units in your answers.
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \frac{P(5) - P(2)}{3}$
+      \end{problem}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \rightarrow 5} \frac{P(x) -P(5)}{x-5}$
+      \end{problem}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{h\rightarrow 0}\frac{P(2+h) - P(2)}{h}$
+      \end{problem}
+
+    \end{enumerate}
+
+  \item
+    \begin{problem}[\nstretch{2}]
+      If you had a graph of $P(t)$, how would you visualize the 3 quantities in \ref{workshop-interpret-and-visualize-derivative-interpret} on that graph?  
+    \end{problem}
+
+  \end{enumerate}
+
+\item 
+  Let $g(x) = \dfrac{1}{x^2 + 1}$.
+  \begin{enumerate}
+  \item
+    \begin{problem}[0.5in]
+      Is $g$ even, odd, or neither? 
+    \end{problem}
+
+  \item
+
+    \begin{workshop}
+      We don't expect them to know the graph of $\dfrac{1}{x^2 + 1}$, but here they can just use the fact that it's even.
+    \end{workshop}
+
+    \begin{problem}
+      One of the following is the graph of $g$; which one?
+
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty, width=2in, height=1.5in] 
+            \addplot+[domain=-4:4] {1.5^x}; 
+          \end{axis}
+        \end{tikzpicture}
+        \qquad
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty, width=2in, height=1.5in] 
+            \addplot+[domain=-4:4] {x/(x^2 + 1)}; 
+          \end{axis}
+        \end{tikzpicture}
+        \qquad
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty, width=2in, height=1.5in] 
+            \addplot+[domain=-4:4] {1/(x^2 + 1)}; 
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{problem}
+
+  \item
+    \begin{problem}[\stretch{3}]
+      Use the definition of the derivative to calculate $g'(2)$. 
+    \end{problem}
+
+  \item
+
+    \begin{workshop}
+      We can see from the picture that $g'(0) = 0$, and we can use symmetry to find $g'(-22)$.
+    \end{workshop}
+
+    \begin{problem}[\stretch{0.35}]
+      Looking at the graph, you should now be able to find $g'$ at two additional values. Do that.
+    \end{problem}
+  \end{enumerate}
+
+\end{enumerate}
+\pspace{\newpage}
+
+\thispagestyle{empty}
+
+\probonly{
+  \begin{tabular}{| p{4in} | p{\linewidth-4.35in} |}
+    \hline
+    \vspace{-4pt}\textbf{Name:} & \vspace{-4pt}\textbf{Student ID:} \\[0.4in]        
+    \hline
+  \end{tabular}
+
+  \htitle{Test yourself!}
+
+  \begin{enumerate}[start=1]
+
+  \item
+    \begin{problem}[\vfill]
+      Use a secant line to approximate $\sqrt{30}$.
+
+      \emph{(Your work here won't be graded, except that it counts toward your workshop participation grade. This is really just a chance for you to test yourself.)}
+    \end{problem}
+
+  \item
+    \begin{problem}[0.25in]
+      How confident do you feel about your work on this problem? Circle one of the emojis, or write down a few words:
+
+      \quad \includegraphics[height=12pt]{images/smiling-face-with-sunglasses} \quad \includegraphics[height=12pt]{images/neutral-face} \quad \includegraphics[height=12pt]{images/grimacing-face}
+    \end{problem}
+
+  \item
+    \begin{problem}[\stretch{0.2}]
+      This problem was from \href{https://canvas.harvard.edu/courses/138327/files/20704978?wrap=1}{Problem Set 8}, which you turned in yesterday. Are you happy with how well you were able to solve it today? If not, what changes might you like to make in how you approach your homework? 
+    \end{problem}
+
+  \end{enumerate}
+}
+
+\end{document}

@@ -1,0 +1,816 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 28 - More Integration by Substitution}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{grading}
+  \begin{enumerate}
+    \item 12 points
+    \item 24 points
+    \item 15 points
+    \item 15 points (extra credit)
+    \item 10 points
+    \item 6 points
+\end{enumerate}
+Total: 67 points. (82 points possible with extra credit) 
+\end{grading}
+
+\begin{enumerate}
+\item 
+
+\begin{grading}
+12 points. 4/4/4  
+\end{grading}
+
+ For help with these problems, read pp. 798-802 in Gottlieb. Find the integral using substitution.
+
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle\int \frac{3x}{x+5}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        Let's substitute \sub{$u = x + 5$}, so that the denominator will
+        be simple; then, \subd{$du = dx$}.  The integral also has an $x$
+        in it, and we can solve the substitution equation $u = x + 1$ to
+        find that \sube{$u - 5 = x$}:
+        \begin{align*}
+          \int \frac{3\sube{x}}{\sub{x + 5}}\,\subd{dx} &= \int
+          \frac{3(\sube{u - 5})}{\sub{u}}\,\subd{du} \\
+          &= 3\int \left( 1 - \frac{5}{u} \right) du \\
+          &= 3(u - 5\ln |u|) + C \\
+          &= 3u - 15\ln |u| + C \\
+          &= \boxed{3(x + 5) - 15\ln |x + 5| + C}
+        \end{align*}
+        (This can also be written as $3x - 15\ln |x + 5| + C$.)
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle\int x\sqrt{3x+5}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        Let's substitute \sub{$u = 3x + 5$}; then, $du = 3\,dx$, so
+        \subd{$\frac{du}{3} = dx$}.  Also, we can express $x$ in terms of
+        $u$ as \sube{$\frac{u - 5}{3} = x$}:
+        \begin{align*}
+          \int \sube{x} \sqrt{\sub{3x + 5}}\,\subd{dx} &= \int
+          \sube{\frac{u - 5}{3}} \sqrt{\sub{u}}\,\subd{\frac{du}{3}} \\
+          &= \frac{1}{9} \int (u - 5) \sqrt{u}\,du \\
+          &= \frac{1}{9} \int \left( u^{3/2} - 5 u^{1/2} \right) du \\
+          &= \frac{1}{9} \left( \frac{2}{5} u^{5/2} - 5 \cdot \frac{2}{3}
+            u^{3/2} \right) + C \\
+          &= \boxed{\frac{1}{9} \left[ \frac{2}{5} (3x + 5)^{5/2} -
+              \frac{10}{3} (3x + 5)^{3/2} \right] + C }
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \int \frac{2t^2}{\sqrt{2t+6}}\,dt$
+      \end{problem}
+
+      \begin{solution} 
+        It looks like a reasonable substitution is \sub{$u = 2t + 6$};
+        then, \subd{$du = 2\,dt$}.  Also, we can express $t$ in terms of
+        $u$ as \sube{$t = \frac{u - 6}{2}$}:
+        \begin{align*}
+          \int \frac{\subd{2}\sube{t}^2}{\sqrt{\sub{2t+6}}}\,\subd{dt} &=
+          \int \frac{\left( \sube{\frac{u - 6}{2}} \right)^2}
+          {\sqrt{\sub{u}}}\,\subd{du} \\
+          &= \frac{1}{4} \int \frac{(u - 6)^2}{\sqrt{u}}\,du \\
+          &= \frac{1}{4} \int \frac{u^2 - 12u + 36}{\sqrt{u}}\,du \\
+          &= \frac{1}{4} \int \left( u^{3/2} - 12 u^{1/2} + 36 u^{-1/2}
+          \right) du \\
+          &= \frac{1}{4} \left[ \frac{2}{5} u^{5/2} - 12 \cdot \frac{2}{3}
+            u^{3/2} + 72 u^{1/2} \right] + C \\
+          &= \boxed{\frac{1}{4} \left[ \frac{2}{5} (2t + 6)^{5/2} -
+              8 (2t + 6)^{3/2} + 72 (2t + 6)^{1/2} \right] + C} \\
+        \end{align*}
+      \end{solution}
+    \end{enumerate}    
+    
+\pspace{-12pt}
+
+\item 
+
+\begin{grading}
+24 points. 3 for each part.  
+\end{grading}
+
+  Find the following indefinite integrals.  (Although these look
+  similar, they require very different approaches!  Not all require
+  substitution.) 
+
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{10}{x} \,dx$
+      \end{problem}
+
+      \begin{solution}
+        This is a constant multiple of one you should just recognize:
+        $\boxed{10\ln |x| + C}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{10}{3x+1} \,dx$
+      \end{problem}
+
+      \begin{solution}
+        You can use substitution on this (substitute $u = 3x + 1$), or you
+        might also feel comfortable just playing around to get
+        $\boxed{\frac{10}{3} \ln |3x+1| + C}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{10}{(x+1)^2}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        For this one, let's substitute \sub{$u = x + 1$}; then, \subd{$du
+          = dx$}, and
+        \begin{align*}
+          \int \frac{10}{(\sub{x+1})^2}\,\subd{dx} &= \int
+          \frac{10}{\sub{u}^2}\,\subd{du} \\
+          &= 10\int u^{-2}\,du \\
+          &= -10 u^{-1} + C \\
+          &= \boxed{-\frac{10}{x+1} + C}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \int \frac{1}{x^2 +1} \,dx$
+      \end{problem}
+
+      \begin{solution}
+        This is one you should just recognize: $\boxed{\arctan x + C}$. 
+      \end{solution}
+
+    \item
+\begin{problem}[\vfill]
+        $\displaystyle \int \frac{x}{x^2 +1} \,dx$
+      \end{problem}
+
+      \begin{solution}
+        Let's substitute \sub{$u = x^2 + 1$}; then, $du = 2x\,dx$, so
+        \subd{$\frac{du}{2} = x \,dx$}:
+        \begin{align*}
+          \int \frac{\subd{x}}{\sub{x^2 +1}} \,\subd{dx} &= \int
+          \frac{1}{\sub{u}}\,\subd{\frac{du}{2}} \\
+          &= \frac{1}{2} \ln |u| + C \\
+          &= \boxed{\frac{1}{2} \ln \left| x^2 + 1 \right| + C}
+        \end{align*}
+        (Note that, since $x^2 + 1$ is always positive, the absolute value
+        signs are unnecessary; we could also write the answer as
+        $\displaystyle \frac{1}{2} \ln \left( x^2 + 1 \right) + C$.)
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{x^2 +1}{x} \,dx$
+      \end{problem}
+
+      \begin{solution}
+        We can use algebra to rewrite the integrand:
+        \begin{align*}
+          \int \frac{x^2 + 1}{x}\,dx &= \int \left( \frac{x^2}{x} +
+            \frac{1}{x} \right) dx \\
+          &= \int \left( x + \frac{1}{x} \right) dx \\
+          &= \boxed{\frac{x^2}{2} + \ln |x| + C}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{x}{(x^2+1)^2}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        Let's substitute \sub{$u = x^2 + 1$}; then, $du = 2x\,dx$, so
+        \subd{$\frac{du}{2} = x\,dx$}:
+        \begin{align*}
+          \int \frac{\subd{x}}{(\sub{x^2+1})^2}\,\subd{dx} &= \int
+          \frac{1}{\sub{u}^2}\,\subd{\frac{du}{2}} \\
+          &= \frac{1}{2} \int u^{-2}\,du \\
+          &= - \frac{1}{2} u^{-1} + C \\
+          &= \boxed{- \frac{1}{2 (x^2 + 1)} + C}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \int \frac{x}{(x+ 1)^2}\,dx$ % added
+      \end{problem}
+
+      \begin{solution}
+        Let's substitute \sub{$u = x + 1$}; then, \subd{$du = dx$}.  Also,
+        we can write $x$ in terms of $u$ as \sube{$u - 1 = x$}:
+        \begin{align*}
+          \int \frac{\sube{x}}{(\sub{x+ 1})^2}\,\subd{dx} &= \int
+          \frac{\sube{u - 1}}{\sub{u}^2}\,\subd{du} \\ 
+          &= \int \left( \frac{1}{u} - u^{-2} \right) du \\
+          &= \ln |u| + u^{-1} + C \\
+          &= \boxed{\ln |x + 1| + \frac{1}{x + 1} + C}
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}
+
+\pspace{-12pt}
+
+\item
+
+\begin{grading}
+15 points. 3 for each 
+\end{grading}
+
+ Find or evaluate the following integrals.
+
+  \probonly{}
+    \begin{enumerate}[topsep=0pt]
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle\int_0^{\ln 3} \frac{e^w}{e^w+1}\,dw$
+      \end{problem}
+
+      \begin{solution}
+        Let's substitute \sub{$u = e^w + 1$}; then, \subd{$du =
+          e^w\,dw$}.  As $w$ goes from $0$ to $\ln 3$, $u = e^w + 1$ goes
+        from $e^0 + 1 = 2$ to $e^{\ln 3} + 1 = 4$:
+        \begin{align*}
+          \int_0^{\ln 3} \frac{\subd{e^w}}{\sub{e^w+1}}\,\subd{dw} &=
+          \int_2^4 \frac{1}{\sub{u}}\,\subd{du} \\
+          &= \ln |u| \Big|_2^4 \\
+          &= \boxed{\ln 4 - \ln 2} \\
+          \shortintertext{This can be simplified a little bit:}
+          &= \ln \left( \frac{4}{2} \right) \\
+          &= \boxed{\ln 2}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle\int_0^{\ln 3} \frac{e^w}{e^{2w}+1}\,dw$
+      \end{problem}
+
+      \begin{solution}
+        One thing to try might be to substitute $u = e^{2w}$, but it ends
+        up not working so well because we don't see $du = 2 e^{2w}$ in the
+        integral.  Instead, it's helpful to substitute \sub{$u = e^w$};
+        then, \subd{$du = e^w\,dw$}.  As $w$ goes from $0$ to $\ln 3$, $u
+        = e^w$ goes from $e^0 = 1$ to $e^{\ln 3} = 3$:
+        \begin{align*}
+          \int_0^{\ln 3} \frac{e^w}{e^{2w}+1}\,dw &= \int_0^{\ln 3}
+          \frac{\subd{e^w}}{\left( \sub{e^w} \right)^2 + 1}\,\subd{dw} \\
+          &= \int_1^3 \frac{1}{\sub{u}^2 + 1}\,\subd{du} \\
+          &= \arctan u \Big|_1^3 \\
+          &= \boxed{\arctan(3) - \frac{\pi}{4}}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int_{\pi/6}^{7 \pi/4} \sin^3 t\cos t\,dt$
+      \end{problem}
+
+      \begin{solution}
+        A good substitution to try is \sub{$u = \sin t$}, since it's the
+        inner function in the composition $\sin^3 t$, and we also see
+        \subd{$du = \cos t\,dt$} in the integral.  As $t$ goes from
+        $\frac{\pi}{6}$ to $\frac{7 \pi}{4}$, $u = \sin t$ goes from $\sin
+        \left( \frac{\pi}{6} \right) = \frac{1}{2}$ to $\sin \left(
+          \frac{7 \pi}{4} \right) = - \frac{1}{\sqrt{2}}$.
+        \begin{align*}
+          \int_{\pi/6}^{7 \pi/4} (\sub{\sin t})^3 \cos t\,dt &=
+          \int_{1/2}^{-1/\sqrt{2}} \sub{u}^3\, \subd{du} \\
+          &= \left. \frac{1}{4} u^4 \right|_{1/2}^{-1/\sqrt{2}} \\
+          &= \frac{1}{4} \left[ \left( - \frac{1}{\sqrt{2}} \right)^4 -
+            \left( \frac{1}{2} \right)^4 \right] \\
+          &= \frac{1}{4} \left( \frac{1}{4} - \frac{1}{16}
+          \right) \\
+          &= \boxed{\frac{3}{64}}
+        \end{align*}
+      \end{solution}
+
+    \item 
+
+      \begin{problem}[\stretch{0.7}]
+       $\displaystyle \int x e^{-x^2}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        A good substitution to try is \sub{$u = -x^2$}, since it's the inner
+        function in the composition $e^{-x^2}$, and we also see something
+        related to $du = -2x\,dx$ in the integral, namely
+        \subd{$-\frac{du}{2} = x\,dx$}.
+        \begin{align*}
+          \int \subd{x} e^{\sub{-x^2}}\,\subd{dx} &= \int e^{\sub{u}} \left(
+            \subd{-\frac{du}{2}} \right) \\
+          &= - \frac{1}{2} \int e^u\,du \\
+          &= - \frac{1}{2} e^u + C \\
+          &= \boxed{- \frac{1}{2} e^{-x^2} + C}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \int_0^1 t^2 \sin (\pi t^3)\,dt$
+      \end{problem}
+
+      \begin{solution}
+        A good substitution to try is \sub{$u = \pi t^3$}, since that's the
+        inner function in the composition $\sin \left( \pi t^3 \right)$, and
+        we also see something related to $du = 3 \pi t^2\,dt$ in the
+        integral, namely \subd{$\frac{du}{3 \pi} = t^2\,dt$}.  As $t$ goes
+        from $0$ to $1$, $u = \pi t^3$ goes from $\pi \cdot 0^3 = 0$ to $\pi
+        \cdot 1^3 = \pi$.
+        \begin{align*}
+          \int_0^1 \subd{t^2} \sin \left(\sub{\pi t^3} \right)\,\subd{dt} &=
+          \int_0^\pi \sin \sub{u} \left( \subd{\frac{du}{3 \pi}} \right) \\
+          &= \frac{1}{3 \pi} \int_0^\pi \sin u\,du \\
+          &= \left. - \frac{1}{3 \pi} \cos u \right|_0^\pi \\
+          &= - \frac{1}{3 \pi} \left( -1 - 1 \right) \\
+          &= \boxed{\frac{2}{3 \pi}}
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}    
+    \probonly{}
+
+\item 
+
+\begin{grading}
+15 points. 5 for each
+\end{grading}
+
+Find or evaluate the following.
+  (Some hints are at the end of this problem set if you get stuck.)
+
+    \begin{enumerate}
+      \item
+\begin{problem}[\vfill]
+        $\displaystyle \int \frac{2x + 5}{x^2 + 1}\,dx$
+      \end{problem}
+
+      \begin{solution} 
+        As in {{{{\#3}}(b)}} on the worksheet, we can rewrite this
+        integral as a sum of two integrals and work on the two integrals
+        separately.
+        \begin{equation} \label{eq:substitution-split-into-two-2}
+\int
+          \frac{2x+5}{x^2+1}\,dx = \int \frac{2x}{x^2+1}\,dx + \int
+          \frac{5}{x^2+1}\,dx
+        \end{equation}
+        The second one is an integral you should just recognize:
+        $\displaystyle \int \frac{5}{x^2+1}\,dx = 5 \arctan x + C$.
+        The first integral is one you can do by substitution;
+          you essentially did it already in {{{{\#2}}(e)}};
+          using that result, $\displaystyle \int \frac{2x}{x^2 +1} \,dx =
+          \ln \left| x^2 + 1 \right| + C$.
+
+        Putting this together with
+        \eqref{eq:substitution-split-into-two-2}, $\displaystyle \int
+        \frac{2x+5}{x^2+1}\,dx = \boxed{\ln \left| x^2 + 1 \right| + 5
+          \arctan x + C}$.  (Note that, since $x^2 + 1$ is always
+        positive, the absolute value signs aren't actually necessary
+        here.)
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{e^{2x}}{e^{2x} + 4 e^x +4}\,dx$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        It's not obvious what to substitute here: $u = e^{2x} + 4 e^x + 4$
+        doesn't look that promising because we don't see $du = (2 e^{2x} +
+        4 e^x)\,dx$ in the integral.  A simpler substitution to try is
+        \sub{$u = e^x$}, just because all the terms in this integral can
+        be rewritten in terms of $e^x$.  Then, \subd{$du = e^x\,dx$}.  We
+        can use exponent rules to rewrite the integrand:
+        \begin{align*}
+          \int \frac{e^{2x}}{e^{2x} + 4 e^x +4}\,dx &= \int
+          \frac{\sub{e^x} \cdot \subd{e^x}}{\left( \sub{e^x} \right)^2 + 4
+            \sub{e^x} + 4}\,\subd{dx} \\
+          &= \int \frac{\sub{u}}{\sub{u}^2 + 4 \sub{u} + 4}\, \subd{du}
+          \shortintertext{Notice that we can factor the denominator:} &=
+          \int \frac{u}{(u + 2)^2}\,du \intertext{Now, it looks helpful to
+            substitute \sub{$v = u + 2$}.  Then, \subd{$dv = du$}, and we
+            can rewrite $u$ in terms of $v$ as \sube{$u = v - 2$}.  So,
+            the integral we're looking at is}
+          &= \int \frac{\sube{u}}{(\sub{u + 2})^2}\, \subd{du} \\
+          &= \int \frac{\sube{v - 2}}{\sub{v}^2}\, \subd{dv} \\
+          &= \int \left( \frac{1}{v} - 2 v^{-2} \right) dv \\
+          &= \ln |v| + 2 v^{-1} + C \\
+          &= \ln \left| u + 2 \right| + \frac{2}{u + 2} + C \\
+          &= \boxed{\ln \left| e^x + 2 \right| + \frac{2}{e^x + 2} + C}
+        \end{align*}
+        (Note that, since $e^x + 2$ is always positive, the absolute
+        value in our final answer isn't necessary.)
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \int_\pi^{2 \pi} \frac{\cos^2 x \sin x}{\cos x +
+          3}\,dx$
+      \end{problem}
+
+      \begin{solution} 
+        It looks like \sub{$u = \cos x$} is a promising substitution, for
+        several reasons: it's the inner function in the composition
+        $\cos^2 x$; we see something related to $du = - \sin x\,dx$,
+        namely \subd{$-du = \sin x\,dx$}; and the rest of the integral
+        (the denominator) also involves $\cos x$.  As $x$ goes from $\pi$
+        to $2 \pi$, $u = \cos x$ goes from $\cos(\pi) = -1$ to $\cos(2
+        \pi) = 1$.
+        \begin{align*}
+          \int_\pi^{2 \pi} \frac{(\sub{\cos x})^2 \subd{\sin x}}{\sub{\cos
+              x} + 3}\,\subd{dx} &= \int_{-1}^1 \frac{\sub{u}^2}{\sub{u} +
+            3}\,
+          (\subd{-du}) \\
+          \intertext{Now, it looks like it would be helpful to substitute
+            \sub{$v = u + 3$}.  With this substitution, \subd{$dv = du$}
+            and \sube{$v - 3 = u$}.  As $u$ goes from $-1$ to $1$, $v = u
+            + 3$ goes from $-1 + 3 = 2$ to $1 + 3 = 4$.} %
+          &= - \int_{-1}^1 \frac{\sube{u}^2}{\sub{u + 3}}\,\subd{du} \\
+          &= - \int_2^4 \frac{(\sube{v - 3})^2}{\sub{v}}\,\subd{dv} \\
+          &= - \int_2^4 \frac{v^2 - 6v + 9}{v}\,dv \\
+          &= - \int_2^4 \left( v - 6 + \frac{9}{v} \right) dv \\
+          &= \left. - \left( \frac{v^2}{2} - 6v + 9 \ln |v| \right)
+          \right|_2^4 \\
+          &= - \left( - 16 + 9 \ln 4 \right) + \left( -10 + 9 \ln 2
+          \right) \\
+          &= \boxed{6 - 9 \ln 4 + 9 \ln 2} \\
+          \intertext{This can be simplified a little more:}
+          &= {6 - 9 (\ln 4 - \ln 2)} \\
+          &= 6 - 9 \ln \frac{4}{2} \\
+          &= \boxed{6 - 9 \ln 2}
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}
+
+% \item 
+
+% \begin{grading}
+% 10 points. 2/3/3/2
+% \end{grading}
+
+%  \emph{In a few classes, we'll be using Riemann sums (that is, left- and
+%     right-hand sums) again.  This problem is intended to help you review
+%     Riemann sums and the associated notation.  (Most of this problem is
+%     reading, with just little details for you to fill in.)}
+
+%   Suppose we have a function $f$, and we'd like to calculate
+%   $\displaystyle \int_3^8 f(x)\,dx$ using the definition of the integral
+%   as a limit of right-hand sums.  We'll start by trying to write a formula
+%   for $R_n$, the right-hand sum with $n$ rectangles.
+
+%   \begin{tikzpicture}[declare function={f(\x)=2*sin(deg(\x+1))+\x/3+4;}] 
+%     \begin{groupplot}[group style={group size=2 by 1}]
+%     \nextgroupplot[ymin=0, hide y axis, xtick={3, 8}, width=3in, height=1.8in,
+%       cycle list=black, clip=false]
+%       \addplot+[domain=3:8, fill=white!95!black] {f(x)} \closedcycle; %
+%       \addplot+[domain=2:9] {f(x)} node[right] {$f$}; %
+%       \nextgroupplot[ymin=0, hide y axis, xtick={3, 3.625, ..., 8.01},
+%         xticklabels={$x_0$, $x_1$, $x_2$, $\cdots$, , , , , $x_n$}, 
+%         width=3in, height=1.8in, disabledatascaling, cycle list=black,
+%         clip=false] 
+%         \addplot+[domain=3:8, fill=white!95!black] {f(x)} \closedcycle; %
+%         \addplot+[domain=2:9] {f(x)} node[right]{$f$}; %
+%         \addplot+[vertslices] coordinates { (3, {f(3)}) (29/8,
+%           {f(29/8)}) (17/4, {f(17/4)}) (39/8, {f(39/8)}) (11/2, {f(11/2)})
+%           (49/8, {f(49/8)}) (27/4, {f(27/4)}) (59/8, {f(59/8)}) (8,
+%           {f(8)}) }; %
+%         \begin{scope}[font=\footnotesize, inner sep=0pt]
+%           \draw (3, 0) node[yshift=-13pt, rotate=90] {$=$}; %
+%           \draw (8, 0) node[yshift=-13pt, rotate=90] {$=$}; %
+%           \draw (3, 0) node[below, yshift=-18pt] {$3$}; %
+%           \draw (8, 0) node[below, yshift=-18pt] {$8$}; %
+%         \end{scope}
+%     \end{groupplot}
+%   \end{tikzpicture}
+
+%   \begin{enumerate}[topsep=0pt]
+%   \item The first step is to \textbf{slice} the region into $n$ pieces of
+%     equal thickness $\Delta x$, and we label $x_0 = 3, x_1, x_2, \ldots,
+%     x_n = 8$ as usual.
+
+%     \begin{enumerate}[topsep=0pt]
+%     \item
+%       \begin{problem}[\vfill]
+%         Express $\Delta x$ in terms of $n$.
+%       \end{problem}
+
+%       \begin{solution}
+%         $\Delta x = \dfrac{8 - 3}{n}$.
+%       \end{solution}
+
+%     \item
+%       \begin{problem}[\vfill]
+%         Express $x_k$ in terms of $\Delta x$.  (If you're puzzled, first
+%         think about how you would express $x_1$ as $x_0 + \Delta x$. 
+%         What about $x_2$? $x_3$? Then consider how you would express
+%         $x_{37}$,
+%         assuming there are at least $37$ slices.)
+%       \end{problem}
+
+%       \begin{solution}
+%         $x_k = 3 + k \Delta x$.  (For example, $x_1 = 3 + \Delta x$ and
+%         $x_2 = 3 + 2 \Delta x$.) 
+%       \end{solution}
+
+%     \end{enumerate}
+
+%   \item
+%     \begin{problem}[\vfill\newpage]
+%       We then \textbf{approximate} each slice as a rectangle.  Remember
+%       that we had decided to do a right-hand sum, so the rectangles look
+%       like this. On each interval, we represent the height on that interval
+%       as approximately the height on the right hand endpoint of the interval.
+
+%       \begin{tikzpicture}[declare function={f(\x)=2*sin(deg(\x+1))+\x/3+4;}] 
+%         \begin{axis}[ymin=0, hide y axis, xtick={3, 3.625, ..., 8.01},
+%           xticklabels={$x_0$, $x_1$, $x_2$, $\cdots$, , , , , $x_n$}, 
+%           width=3in, height=1.8in, disabledatascaling, cycle list=black,
+%           clip=false] 
+%           \addplot+[domain=3:8, fill=white!95!black] {f(x)} \closedcycle; %
+%           \addplot+[domain=2:9] {f(x)} node[right]{$f$}; %
+%         \addplot+[vertslices] coordinates { (3, {f(3)}) (29/8,
+%           {f(29/8)}) (17/4, {f(17/4)}) (39/8, {f(39/8)}) (11/2, {f(11/2)})
+%           (49/8, {f(49/8)}) (27/4, {f(27/4)}) (59/8, {f(59/8)}) (8,
+%           {f(8)}) }; %
+%           \begin{scope}[font=\footnotesize, inner sep=0pt]
+%             \draw (3, 0) node[yshift=-13pt, rotate=90] {$=$}; %
+%             \draw (8, 0) node[yshift=-13pt, rotate=90] {$=$}; %
+%             \draw (3, 0) node[below, yshift=-18pt] {$3$}; %
+%             \draw (8, 0) node[below, yshift=-18pt] {$8$}; %
+%           \end{scope}
+%           \addplot+[ybar interval, fill=cyan, fill opacity=0.25,
+%           draw=blue] coordinates { (3, {f(29/8)}) (29/8, {f(17/4)}) (17/4,
+%             {f(39/8)}) (39/8, {f(11/2)}) (11/2, {f(49/8)}) (49/8,
+%             {f(27/4)}) (27/4, {f(59/8)}) (59/8, {f(8)}) (8, {f(8)}) };
+%         \end{axis}
+%       \end{tikzpicture}
+
+%       What is the area of the 1st rectangle? The 2nd rectangle?
+%       What is the area of the $k$-th rectangle?  Express your answer in
+%       terms of $\Delta x$ and $x_k$ or $x_{k-1}$ as appropriate.  (If you're
+%       puzzled, first think about how you would express the area of the
+%       $37$th rectangle, assuming there are at least $37$ slices.)
+%     \end{problem}
+
+%     \begin{solution}
+%       The area of the $k$-th rectangle is $f(x_k) \Delta x$.  (For
+%       example, the area of the first rectangle is $f(x_1) \Delta x$, and
+%       the area of the second rectangle is $f(x_2) \Delta x$.)
+%     \end{solution}
+
+%   \item
+%     \begin{problem}[\vfill]
+%       Finally, we \textbf{sum} the areas of all the rectangles to get
+%       $R_n$.  Write a formula for $R_n$; express your answer once in
+%       $\sum$ notation and once without $\sum$ notation.
+%     \end{problem}
+
+%     \begin{solution}
+%       The area of the first rectangle is $f(x_1) \Delta x$, the area of
+%       the second rectangle is $f(x_2) \Delta x$, and so on.  So, $R_n =
+%       f(x_1) \Delta x + f(x_2) \Delta x + f(x_3) \Delta x + \cdots +
+%       f(x_n) \Delta x = \displaystyle \sum_{k=1}^n f(x_k) \Delta x$. 
+%     \end{solution}
+
+%   \item
+%     \begin{problem}[\vfill]
+%       Finally, we \textbf{take a limit} to get the exact value of
+%       $\displaystyle \int_3^8 f(x)\,dx$.  What limit do we take?  (That
+%       is, we let which variable approach what?)
+%     \end{problem}
+
+%     \begin{solution}
+%       We want to take the limit as $n \to \infty$. 
+%     \end{solution}
+
+%   \end{enumerate}
+
+% \item ({Problem Set 29}, {{\#5}})
+
+%  In this problem, you'll evaluate $\displaystyle \int_0^{2}
+%   \arctan x\,dx$.  Since we don't know an antiderivative of $\arctan x$,
+%   we'll use a strategy we've seen before: visualize the integral as the 
+%   area of a region and slice the region horizontally.
+%   \begin{enumerate}
+
+%   \item
+%     \begin{problem}
+%       If you slice the region horizontally, write a Riemann sum (with $n$
+%       terms) that approximates the area of the region.
+%     \end{problem}
+
+%     \begin{solution}
+%       This is very similar to
+%         {{{Problem Set 27}, {{\#5}}}}.    
+
+%       We can visualize $\displaystyle \int_0^{2} \arctan x\,dx$ as
+%       the area under $y = \arctan x$ from $x = 0$ to $x =
+%       2$:
+%       \begin{center}
+%         \begin{tikzpicture}
+%           \begin{axis}[xtick={2}, xticklabels={$2$},
+%             ytick={1.107}, yticklabels={$\arctan 2$}, clip=false,
+%             width=3in, height=2in]
+%             \addplot+[domain=0:2, fillregion] {rad(atan(x))} \closedcycle; %
+%             \addplot+[domain=-3:3] {rad(atan(x))} node[above] {$y = \arctan
+%               x$};
+%           \end{axis}
+%         \end{tikzpicture}
+%       \end{center}
+%       (We've labeled $\arctan 2$ on the $y$-axis, as that's the highest
+%       point in the region.)  We're going to slice horizontally, which
+%       means we're slicing the interval $\left[ 0, \arctan 2 \right]$ on
+%       the $y$-axis into $n$ slices of equal height $\Delta y$.  We'll
+%       label $y_0 = 0, \ldots, y_n = \arctan 2$ as usual and focus on the
+%       $k$-th slice, which we approximate by a rectangle:
+%       \begin{center}
+%         \begin{tikzpicture}
+%           \begin{axis}[xtick={2}, xticklabels={$2$},
+%             ytick={1.107, 0.698}, yticklabels={$\arctan 2
+%               $, $y_k$}, axis
+%             on top, disabledatascaling, clip=false, width=3in, height=2in]
+%             \addplot+[domain=0:2, fillregion] {rad(atan(x))} \closedcycle;
+%             \addplot[horizslices] coordinates {
+%               ({2}, 0.) ({2}, 0.1383935897242613) ({2}, 0.2767871794485226)
+%               ({2}, 0.4151807691727839) ({2}, 0.5535743588970452) ({2},
+%               0.6919679486213065) ({2}, 0.8303615383455678) ({2},
+%               0.9687551280698291) ({2}, 0.9687551280698291) };
+%             \addplot+[domain=0:2, fill=white, draw=none]
+%             {rad(atan(x))} -- (0, {pi/3}) -- (0, 0);
+%             \addplot+[domain=-3:3] {rad(atan(x))}
+%             node[above] {$y = \arctan x$};
+%             \draw[fill=cyan, draw=blue, fill opacity=0.75] ({2},
+%             0.5535743588970452) -- ({tan(deg(0.6919679486213065)},
+%             0.5535743588970452) -- ({tan(deg(0.6919679486213065)},
+%             0.6919679486213065) -- (2, 0.6919679486213065) -- cycle;
+%             \draw[dashed] (0, 0.6919679486213065) --
+%             ({tan(deg(0.6919679486213065)}, 0.6919679486213065);
+%           \end{axis}
+%         \end{tikzpicture}
+%       \end{center}
+%       This rectangle's height is $\Delta y$, and its width is (right
+%       $x$-value) $-$ (left $x$-value).  The right $x$-value is $2$; since $y
+%       = \arctan x$ can be rewritten as $x = \tan y$, the left $x$-value is
+%       $\tan (y_k)$.  Therefore,
+%       \[ \text{area of $k$-th slice} \approx \left( 2 - \tan y_k \right)
+%       \Delta y.\] Summing the areas of all the slices, the area of the
+%       region is approximately $\boxed{\sum_{k=1}^n \left( 2 - \tan y_k
+%         \right) \Delta y}$. 
+%     \end{solution}
+
+%   \item
+%     \begin{problem}
+%       Write a definite integral that gives the exact area, and evaluate
+%       it. 
+%     \end{problem}
+
+%     \begin{solution}
+%       Taking the limit as $n \to \infty$ of our Riemann sum, the exact
+%       area is
+%       \begin{align*}
+%         \boxed{\int_0^{\arctan 2} \left( 2 - \tan y \right) dy} &=
+%         \int_0^{\arctan 2} 2\,dy - \int_0^{\arctan 2} \tan y\,dy \\
+%         &= 2y \Big|_0^{\arctan 2} - \int_0^{\arctan 2} \frac{\sin y}{\cos
+%           y}\,dy \\
+%         \intertext{For the remaining integral, we can substitute $u = \cos
+%           y$; then, $du = - \sin y\,dy$, so $-du = \sin y\,dy$.  As $y$ goes
+%           from $0$ to $\arctan 2$, $u = \cos y$ goes from $\cos 0 = 1$ to
+%           $\cos(\arctan 2) = \frac{1}{\sqrt{5}}$\footnotemark:} % 
+%         &= 2 \arctan 2 - \int_{1}^{1/\sqrt{5}} \frac{1}{u} (-du) \\
+%         &= 2 \arctan 2 + \left( \ln u \Big|_1^{1 / \sqrt{5}} \right) \\
+%         &= 2 \arctan 2 + \ln \left( \frac{1}{\sqrt{5}} \right) - 0 \\
+%         \intertext{We can make this look a little nicer by rewriting
+%           $\ln \left( \frac{1}{\sqrt{5}} \right) = \ln \left( 5^{-1/2}
+%           \right) = -\frac{1}{2} \ln 5$:} % 
+%         &= \boxed{2 \arctan 2 - \frac{\ln 5}{2}}
+%       \end{align*}
+%       \footnotetext{Remember from {{{Problem Set 12}, {{{{\#1}}(c)}}}}
+%           that our strategy for simplifying expressions like this was to
+%           picture $\arctan 2$ as an angle in a right triangle in order to
+%           find its cosine value.}
+%     \end{solution}
+
+%   \end{enumerate}
+
+\item 
+
+\begin{grading}
+6 points. 
+\end{grading}
+
+\begin{problem}
+    \textbf{Reflect Back.}  As you've seen in our study of integration,
+    evaluating integrals requires flexibility.  There are 6 integrals below.  Match them with a reasonable
+    first step. (Use each exactly
+    once.)
+
+\begin{minipage}[t]{1.5in}
+      \begin{enumerate}
+      \item $\displaystyle \int_{-2}^0 \sqrt{4 - x^2}\,dx$
+
+      \item $\displaystyle \int_{-2}^0 x \sqrt{4 - x^2}\,dx$
+
+      \item $\displaystyle \int_3^5 \frac{x - 2}{x^2 + 1}\,dx$
+
+      \item $\displaystyle \int_3^5 \frac{x + 2}{\sqrt{x - 2}}\,dx$
+
+      \item $\displaystyle \int_2^{-1} \frac{e^x}{e^{-x}}\,dx$
+
+      \item $\displaystyle \int_2^{-1} \frac{\cos (e^{-x})}{e^x}\,dx$
+      \end{enumerate}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{3in}
+\vspace{6pt}
+      \begin{enumerate}[label=(\arabic*)]
+      \item Substitute $u = x - 2$
+      \vspace{16pt}
+      \item Substitute $u = 4 - x^2$
+      \vspace{15pt}
+      \item Substitute $u = e^{-x}$
+      \vspace{14pt}
+      \item Split the integrand into a sum or difference of two fractions
+      \vspace{2pt}
+      \item Use exponent rules to simplify the integrand
+        \vspace{1pt}
+      \item Visualize the definite integral as a signed area and use
+        geometry to evaluate it
+      \end{enumerate}
+\end{minipage}
+  \end{problem}
+  \pspace{\vfill}
+
+  \begin{solution} % Jason Bland
+    \begin{enumerate}
+    \item Use (6). The integral can be visualized as the area of a
+      quarter-circle. 
+
+    \item Use (2):  $du = - 2x\,dx$, so $-\frac{du}{2} = x\,dx$. 
+
+    \item Use (4): $\displaystyle \frac{x - 2}{x^2 + 1} = \frac{x}{x^2 +
+        1} - \frac{2}{x^2 + 1}$.  (This is like
+      {{{{\#4}}(a)}}.) 
+
+    \item Use (1), and then solve for $x$ in terms of $u$.
+
+    \item Use (5). The integrand can be simplified to be just just
+      $e^{2x}$.
+
+    \item Use (3). This integral can be rewritten as $\displaystyle \int
+      e^{-x} \cos (e^{-x})\,dx$, and if we substitute $u = e^{-x}$, then
+      $du = - e^{-x}\,dx$. 
+    \end{enumerate}
+  \end{solution}
+
+\end{enumerate}
+
+\psreflection{
+Optional reading for next class is \S 29.1 in Gottlieb.
+  \hrule
+
+  Here are a few hints for {{\#4}}: 
+  \begin{enumerate}[label=(\alph*)]
+  \item Split the integrand into a sum of two fractions to get two
+    integrals.  You can evaluate one of these directly; for the other,
+    make a substitution.
+  \item Depending on how you do this, you may need to use substitution
+    more than once: that's okay!  Substitution helps you to see simplify
+    an integral, and some integrals are complicated enough that it's
+    easiest to simplify in layers.
+
+  \end{enumerate}
+}
+
+\end{document}

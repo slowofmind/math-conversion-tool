@@ -1,0 +1,641 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[workshop]{handout}
+\renewcommand{\workshopnote}{CA Notes.} 
+\usepackage{lipsum}
+ \usepackage{microtype}
+ \usepackage{vwcol}
+
+\begin{document}
+\htitle{Workshop 11: Slicing to Solve Density Problems, Intro to Differential Equations}
+\begin{workshop}
+    Welcome to the last workshop of the semester: Workshop 11! The goals for this workshop are for students to:
+    \begin{itemize}
+    \item use slicing and some geometry to solve density problems with circles and cones.
+    \item review the highlights of our introduction to differential equations:
+    \begin{itemize}
+        \item A differential equation is an equation that involves an unknown function and one or more of its derivatives.
+        \item A solution to a differential equation is a function that makes the differential equation true.
+        \item In words, the statement $\frac{dP}{dt}=ky$ means that the rate of change of $P$ is proportional to the function $P$ itself by some proportionality constant $k$.
+        \item For our purposes, we can check if a function solves a differential equation by (1) taking the derivative of the function and (2) plugging in the original function into the provided differential equation, and seeing if these two quantities match.
+    \end{itemize}
+    \end{itemize}
+\end{workshop}
+\begin{enumerate}
+
+\item
+ 
+  City Hall is located in the center of a city. The Financial District is the region within a $3$ km radius of City Hall, and the Residential District is the
+  region between $3$ and $9$ km from City Hall.  The population density in
+  the Residential District varies with $x$, the distance (in km) from the
+  Financial District, and is given by $\rho(x) = 150 e^{ 0.01x}$ people
+  per square kilometer.  We'd like to find the number of people living in
+  the Residential District.
+
+  \begin {enumerate}
+
+  \item
+    \begin{workshop}
+      They may find it hard to understand what $x$ means here, since we've
+      never done a problem quite like this.  You may need to clarify that
+      ``distance to the Financial District'' means ``distance to the
+      closest point in the Financial District'', so all points on the
+      border of the Financial District have $x = 0$. 
+    \end{workshop}
+
+    \begin{problem}
+       Make a sketch of the situation
+      that shows the meaning of $x$.  Where is the population the most
+      dense?  How dense is it there?  Where is the population the least
+      dense?  How dense is it there? 
+    \end{problem}
+
+    \begin{solution}
+      Here's a sketch (the dot in the middle is City Hall, and the gray
+      area is the Residential District; the white area in the middle is the
+      Financial District).  
+      \begin{center}
+        \begin{tikzpicture}[rotate=30]
+          \begin{axis}[xmin=0, xmax=10, ymin=0, ymax=0, clip=false, x=0.2cm,
+            y=0.2cm, hide y axis, xtick={3.2, 9.1},
+            xticklabels={0, 6}]
+            \draw[fill=lightgray, fill opacity=0.5] (0, 0) circle (9);
+            \draw[fill=white] (0, 0) circle (3);
+            \filldraw[black] (0, 0) circle(1.5pt);
+            
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      The population is most dense at the outer edge of the Residential
+      District; the density there is $\rho(6) = 150 e^{0.06}$ people per
+      square km.  The population is least dense where the Financial
+      District meets the Residential District; the density there is $\rho(0) =
+      150$ people per square km.
+    \end{solution}
+\pspace{\vfill}
+
+  \item
+    \begin{workshop}
+      The notational convention we use is that we always call the number 
+      of slices $n$.  When they write about the $k$-th slice, they should
+      be writing in terms of $x_k$ and $\Delta x$.  One thing they will
+      probably be especially uncomfortable with is the fact that the
+      radius of the $k$-th slice is $x_k + 3$, not $x_k$.
+
+      If students wonder about how to find the area of the $k$-th slice,
+      the idea we taught them in class is to imagine unrolling the ring to
+      get something close to a rectangle with thickness $\Delta x$ and
+      width equal to the circumference of the ring.
+    \end{workshop}
+
+    \begin{problem}
+      In your sketch above, slice the Residential District such that the slices have approximately constant population density. Approximate the number
+      of people living in the $k$-th slice.
+    \end{problem}
+
+    \begin{solution}
+
+            \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[x=0.007in, y=0.007in, xmin=0, xmax=115,
+              ymin=-100, ymax=100, axis on top=true, clip=false, hide y
+              axis, xtick={37.6, 75, 100}, xticklabels={$x_0$, $x_k$, $x_n$},
+              xlabel=$x$, tick label style={fill=none}]      
+              \draw[fill=yellow, draw=none] (0, 0) circle(87.5); %
+              \draw[fill=white, draw=none] (0, 0) circle (75); %
+              \pgfplotsforeachungrouped \x in {37.5, 50, 62.5, 75, ..., 100.1}
+              {
+                \edef\temp{
+                  \noexpand\draw (0, 0) circle(\x);
+                }
+                \temp
+              }         
+            \end{axis}
+          \end{tikzpicture}
+        \end{center}
+      Slice the Residential District into concentric circles; the number of people in the $k$-th slice is
+      $\approx \rho(x_k) \cdot 2 \pi (x_k + 3) \Delta x$.
+    \end{solution}
+\pspace{\vfill}
+  \item
+    \begin{workshop}
+      This is always $\displaystyle \sum_{k=1}^n$ of whatever their
+      approximation for the $k$-th slice was.
+    \end{workshop}
+
+    \begin{problem}
+      Write a Riemann sum that approximates the number of people
+      living in the Residential District.
+    \end{problem}
+
+    \begin{solution}
+      $\displaystyle \sum_{k=1}^n \rho(x_k) \cdot 2 \pi (x_k + 3) \Delta
+      x$. 
+    \end{solution}
+    \pspace{\vfill}
+    \pspace{\newpage}
+    
+  \item
+    \begin{problem}
+      Write but do not evaluate a definite integral that gives the exact number of people living in the
+      Residential District.
+    \end{problem}
+
+    \begin{solution}
+      $\displaystyle \int_0^6 \rho(x) \cdot 2 \pi (x + 3)\,dx$. 
+    \end{solution}
+\pspace{\vfill}
+  \item
+
+    \begin{workshop}
+      If we split the Residential Zone into two rings, one with the people
+      living within 6 km of City Hall and one with the people living more
+      than 6 km away, the inner ring has both a lower population density
+      and a smaller area.
+    \end{workshop}
+
+    \begin{problem}
+      Consider the number of people who live within 6 km of City Hall.  Is
+      this less than, greater than, or equal to half the number of people
+      living in the Residential District?  How can you answer this question
+      without any computation?
+    \end{problem}
+
+    \begin{solution}
+      \fbox{Less than.} Fewer people live in between $3$ km and $6$ km of City Hall than in between the $6$ km and $9$ km of City Hall. Both the area and the population density between $6$ km and $9$ km of City Hall are greater than the area and the population density between $3$ km and $6$ km of City Hall.
+    \end{solution}
+\pspace{\vfill}
+  \item
+    \begin{problem}
+      Write but do not evaluate a definite integral that gives the number of people who live within 6
+      km of City Hall.  
+    \end{problem}
+
+    \begin{solution}
+      $\displaystyle \int_0^3 \rho(x) \cdot 2 \pi (x + 3)\,dx$. 
+    \end{solution}
+
+  \end{enumerate}
+  \pspace{\vfill}
+\pspace{\newpage}
+\item 
+
+  \begin{workshop}
+    They should have done a problem exactly like this in class; the only
+    reason it's here is to reinforce the idea that you don't always slice
+    a circular region into rings.
+  \end{workshop}
+
+  \begin{problem}
+    A circular pond has a radius of 20 yards.  A bridge runs
+    along a diameter of the pond where tourists stand and feed the fish.  Therefore, the density of fish in
+    the pond depends on the distance from the bridge.  The
+    density of fish in the pond at a point $x$ yards from the bridge is
+    given by $\rho(x) = 40 - x$ fish per square yard.  Write but do not evaluate a definite integral that gives the number of
+    fish in the pond.
+  \end{problem}
+  
+
+\begin{solution}
+       
+      As usual, we want to slice the region so that the density in each
+      slice is approximately constant.  In this case, density varies with
+      distance to the bridge, so we'll need to slice parallel to the bridge.
+      Let's visualize the bridge running vertically through the center of
+      the pond:
+      \begin{center}
+        \begin{tikzpicture}
+          \draw (0, 0) circle (1);
+          \draw[blue, thick] (0, -1) -- (0, 1);
+        \end{tikzpicture}
+      \end{center}
+      By symmetry, the left and right halves of the pond have the same
+      amount of fish, so we can just focus on the right half of the pond.
+      In fact, symmetry tells us that, if we cut the pond both
+      horizontally and vertically through the center, each quarter has the
+      same amount of fish, so let's just focus on the top right quadrant
+      of the pond.  Remembering that $x$ measures the distance from the
+      bridge, here is a picture of the quarter pond with the $x$-axis:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xmin=0, xmax=110, ymin=0, ymax=100, x=0.012in,
+            y=0.012in, hide y axis, axis x line=bottom, clip=false,
+            xlabel=$x$, xtick={0, 100}, xticklabels={0, 20}]  
+            \begin{scope}[yshift=8pt]
+              \draw (0, 0) -- (100, 0) arc[radius=100, start angle=0, end
+              angle=90]; %
+              \draw[blue, thick] (0, 0) -- (0, 100);
+            \end{scope}
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      Slicing parallel to the bridge means slicing the interval $[0, 20]$;
+      as usual, we'll slice into $n$ pieces of equal thickness $\Delta x$
+      and label the values where we sliced as $x_0 = 0, x_1, \ldots, x_n =
+      20$.  Let's focus on the $k$-th slice:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xmin=0, xmax=22, ymin=0, ymax=20, x=0.06in,
+            y=0.06in, hide y axis, axis x line=bottom, clip=false,
+            xlabel=$x$, xtick={0, 2.5, 5, ..., 20.1},
+            xticklabels={$x_0$,,,,$x_k$,,,,$x_n$}] 
+            \begin{scope}[yshift=8pt]
+            \addplot+[domain=7.5:10, fill=cyan, draw=none,yshift=-8pt]
+              {sqrt(20^2-x^2)} -- (10, 0) -- (7.5, 0);
+              \draw (0, 0) -- (20, 0) arc[radius=20, start angle=0, end
+              angle=90]; %
+              \draw[blue, thick] (0, 0) -- (0, 20);
+              \pgfplotsforeachungrouped \x in {2.5, 5, ..., 19.9}
+              {
+                \edef\temp{
+                  \noexpand\draw (\x, 0) -- (\x, {sqrt(20^2-\x^2)});
+                }
+                \temp
+              }              
+            \end{scope}
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      The number of fish in the $k$-th slice is approximately $(\text{fish density
+        in $k$-th slice})(\text{area of $k$-th slice})$.  The fish
+      density in the $k$-th slice is approximately $\rho(x_k)$.  To
+      approximate the area of the $k$-th slice, we can approximate the
+      slice as a rectangle of width $\Delta x$.  However, we still need to
+      express its height in terms of $x_k$.  The key is to use the shape
+      of the pond: it's part of a circle, so we need to use the radius.
+      If we draw in the radius (shown in red) below, then we can express
+      the height $h_k$ in terms of $x_k$:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xmin=0, xmax=22, ymin=0, ymax=20, x=0.06in,
+            y=0.06in, hide y axis, axis x line=bottom, clip=false,
+            xlabel=$x$, xtick=\empty, hide x axis] 
+            \begin{scope}[yshift=8pt]
+              \addplot+[domain=7.5:10, fill=cyan, draw=none,yshift=-8pt]
+              {sqrt(20^2-\x^2)} -- (10, 0) -- (7.5, 0); %
+              \draw (7.5, 0) -- (7.5, {sqrt(20^2-7.5^2)}); %
+              \draw (10, 0) -- node[right, inner sep=1pt] {$h_k$} (10,
+              {sqrt(20^2-10^2)}); %
+              \draw (0, 0) -- (20, 0) arc[radius=20, start angle=0, end
+              angle=90]; %
+              \draw[blue, thick] (0, 0) -- (0, 20); %
+              \draw[decorate, decoration={brace, mirror}, yshift=-2pt] (0,
+              0) -- node[yshift=-2pt, below] {$x_k$} (10, 0); %
+              \draw[red, thick] (0, 0) -- (10, {sqrt(20^2-10^2)}); %
+            \end{scope}
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      We now see a right triangle in the picture: the hypotenuse is the
+      radius of the pond, which is 100; the two legs have length $x_k$
+      and $h_k$.  Therefore, by the Pythagorean Theorem, $x_k^2 + h_k^2 =
+      20^2$, so $h_k = \sqrt{20^2 - x_k^2}$.  So, we can approximate the
+      area of this slice as $h_k \Delta x = \sqrt{20^2 - x_k^2}\Delta x$.
+      Therefore,
+      \[ \text{number of fish in $k$-th slice} \approx \rho(x_k) \cdot \sqrt{20^2
+        - x_k^2} \Delta x.\]
+      Summing over all slices and taking the limit as the number of slices
+      $\to \infty$, the number of fish in one quarter of the pond is
+      $\displaystyle \int_0^{20} \rho(x) \cdot \sqrt{20^2 - x^2}\,dx$.
+      Therefore, the total number of fish in the pond is
+      \begin{align*}
+        \boxed{4 \int_0^{20} \rho(x) \cdot \sqrt{20^2 - x^2}\,dx} &= 4
+        \int_0^{100} (40 - x) \sqrt{20^2 - x^2}\,dx 
+      \end{align*}
+    \end{solution}
+
+  \newpage 
+
+ 
+\item
+\begin{workshop}
+    Students should have seen a very similar example of slicing a cone in class yesterday, but it nonetheless might be challenging for students. Highlights to include in the write-up for this question is how to approximate the volume of the $k$th slice (a.k.a. the $k$th disk) as the volume of a cylinder, and how to relate the height and radius of the cone using similar triangle geometry.
+\end{workshop}
+\begin{problem}
+  A cone is 28 inches tall and has a radius of 4 inches at
+  the top.  It is filled with layers of different types of
+  fruit purees with varying densities.  The density of puree is given
+  by $\rho(x)$ ounces per cubic inch, where $x$ is the height from the
+  bottom (tip) of the cone. 
+  
+  Write a general Riemann sum that approximates the weight of fruit puree in the cone. Be sure to use proper summation notation and draw and label the dimensions of a typical slice. Then, write but do not evaluate a definite integral that gives the exact weight of fruit puree in the cone.
+    \end{problem}
+
+    \begin{solution}
+    First, let's make sure we understand the meaning of $x$ in this
+    problem.  Since $x$ represents distance from the bottom tip of the cone, $x = 0$ is at
+    the bottom tip of the cone and $x = 28$ at the top.
+
+    As always, the key in density problems is to slice so that the density
+    within each slice is approximately constant.  This allows us to
+    reasonably approximate the amount (of puree, in this case) in each
+    slice by multiplying the density within the slice by the volume of the
+    slice.  Since the density varies with height, we will slice the cone
+    parallel to the top face of the cone.  This amounts to slicing the interval $[0, 8]$
+    (on the $x$-axis).  As usual, we'll focus on the $k$-th slice (the
+    whole slice is shown to the left):
+    \begin{center}
+      \begin{tikzpicture}[x=0.5cm, y=0.5cm]
+
+        \begin{axis}[xmin=-4, xmax=4.5, ymin=0, ymax=8, clip=false, hide
+          x axis, axis y line=right, x=0.5cm, y=0.5cm, ytick={0, 0.7, ...,
+            7.01}, yticklabels={$x_0 = 0$,,,,,,$x_k$,,,,$x_n = 28$}]
+            \coordinate (right) at (4, 7);
+            \coordinate (left) at (-4, 7);
+            \coordinate (tip) at (0, 0);
+          \draw[fill=yellow, draw=none] (2, 3.5) arc[x radius=2,
+          y radius=0.5, start angle=0, end angle=-180] -- (-2.4, 4.2)
+          arc[x radius=2.4, y radius=0.6, start angle=180, end
+          angle=360] -- cycle; %
+          \draw (right) arc[x radius=4, y radius=1, start angle=0, end
+          angle=180]; %
+          \draw (right) -- (tip) -- (left); %
+          \draw (4.5, 8) node[above] {$x$}; %
+          \pgfplotsforeachungrouped \y in {0, 0.7, ..., 7.01} {
+            \pgfmathsetmacro{\x}{4/7*\y} %
+            \edef\temp{%
+              \noexpand\draw (\x, \y) arc[x radius=\x, y radius={\x/4},
+              start angle=0, end angle=-180];
+            }              
+            \temp
+          }
+          \draw [->,decorate, decoration={snake,amplitude=.4mm,segment
+            length=2mm,post length=1mm}]  (-2.5, 3.75) -- (-5.5, 3.75);
+          \begin{scope}[xshift=-4cm]
+            \draw[fill=yellow, draw=none] (2, 3.5) arc[x radius=2, y
+            radius=0.5, start angle=0, end angle=-180] -- (-2.4, 4.2)
+            arc[x radius=2.4, y radius=0.6, start angle=180, end
+            angle=360] -- cycle; %
+            \draw[fill=yellow, draw=none] (2.4, 4.2) arc[x radius=2.4, y
+            radius=0.6, start angle=0, end angle=360]; %
+            \draw (2.4, 4.2) arc[x radius=2.4, y radius=0.6, start
+            angle=0, end angle=360] -- (2, 3.5) arc[x radius=2, y
+            radius=0.5, start angle=0, end angle=-180] -- (-2.4, 4.2); %
+          \end{scope}
+        \end{axis}
+      \end{tikzpicture}
+    \end{center}
+    The $k$-th slice looks approximately like a disk of thickness $\Delta
+    x$, so we can approximate its volume as $\pi (\text{radius})^2 \Delta
+    x$.  However, we must express the radius in terms of $x_k$; we can do
+    this using similar triangles.  Let's call the radius we want $r_k$: 
+    \begin{center}
+      \begin{tikzpicture}[x=0.5cm, y=0.5cm]
+        
+
+        \begin{axis}[xmin=-4, xmax=4.5, ymin=0, ymax=8, clip=false, hide
+          x axis, axis y line=right, x=0.5cm, y=0.5cm, ytick={0, 0.7, ...,
+            7.01}, yticklabels={$x_0 = 0$,,,,,,$x_k$,,,,$x_n = 8$}]
+            \coordinate (right) at (4, 7);
+        \coordinate (left) at (-4, 7);
+        \coordinate (tip) at (0, 0);
+          \draw[fill=yellow, draw=none] (2, 3.5) arc[x radius=2,
+          y radius=0.5, start angle=0, end angle=-180] -- (-2.4, 4.2)
+          arc[x radius=2.4, y radius=0.6, start angle=180, end
+          angle=360] -- cycle; %
+          \draw (right) arc[x radius=4, y radius=1, start angle=0, end
+          angle=360]; %
+          \draw (right) -- (tip) -- (left); %
+          \draw (4.5, 8) node[above] {$x$}; %
+          \draw[dashed] (2.4, 4.2) arc[x radius=2.4, y radius=0.6, start
+          angle=0, end angle=180]; % 
+          \pgfplotsforeachungrouped \y in {3.5, 4.2} {
+            \pgfmathsetmacro{\x}{4/7*\y} %
+            \edef\temp{%
+              \noexpand\draw (\x, \y) arc[x radius=\x, y radius={\x/4},
+              start angle=0, end angle=-180];
+            }              
+            \temp
+          }
+          \draw[red] (tip) -- ($0.5*(right)+0.5*(left)$) -- (right) --
+          cycle;
+          \draw[red] (0, 4.2) -- node[above, inner sep=0.5pt] {$r_k$}
+          (2.4, 4.2); 
+        \end{axis}
+      \end{tikzpicture}
+    \end{center}
+    The larger triangle in the picture has height 28 and width 4; the
+    smaller triangle has height $x_k$ and width $r_k$.  So, $\frac{4}{28} =
+    \frac{r_k}{x_k}$, which means $r_k = \frac{4}{28} x_k = \frac{1}{7}
+    x_k$.  Therefore,
+    \begin{align*}
+      \text{volume of $k$-th slice} &\approx \pi \left( \frac{1}{7} x_k
+      \right)^2 \Delta x \\
+      & = \frac{\pi}{49} x_k^2 \Delta x \text{ cubic inches} \\
+      \text{density of fruit puree in $k$-th slice} & \approx \rho(x_k)
+      \text{ ounces per cubic inch}\\
+      \text{amount of fruit puree in $k$-th slice} & \approx \rho(x_k) \cdot 
+      \frac{\pi}{49} x_k^2 \Delta x \\
+      & = \frac{\pi}{49} x_k^2 \rho(x_k)
+      \Delta x \text{ ounces}
+    \end{align*}
+    Summing over all slices, the amount of puree in the cup is
+    approximately $\displaystyle \sum_{k=1}^n \frac{\pi}{49} x_k^2
+    \rho(x_k) \Delta x$.  Taking the limit as $n \to \infty$, the amount
+    of puree in the cone is exactly \fbox{$\displaystyle \int_0^{28} \frac{
+        \pi}{49} x^2 \rho(x)\,dx$}.
+  
+\end{solution}
+
+  
+\pspace{\newpage}
+\begin{workshop}
+    The purpose of this question is to solidify the idea that a solution to a differential equation is a function. By the end of our second class on differential equations, students should be well acquainted with the differential equations listed in \#4c and \#4d; questions \#4a and \#4b are meant to remind students that we already know how to solve differential equations that are written exclusively in terms of $x$ using our integration skills!
+\end{workshop}
+\item
+Find the general solution to each differential equation. Report the solutions in the form $y=f(x)$.
+\begin{framed}
+    A solution to a differential equation is a \underline{function} that ``solves" the differential equation, or makes the differential equation true. The \underline{general} solution to a differential equation involves an arbitrary constant $C$ that captures the family of functions that are solutions to the differential equation. 
+\end{framed}
+\begin{enumerate} 
+\begin{multicols}{2}
+    \item $ \dfrac{dy}{dx}=x$
+    
+    \begin{solution}
+        $y=\dfrac{1}{2}x^2+C$
+    \end{solution}
+      \pspace{0.5in}
+    \item $ \dfrac{dy}{dx}=kx$
+    
+    \begin{solution}
+        $y=\dfrac{k}{2}x^2+C$
+    \end{solution}
+   \pspace{0.5in}
+    \item $ \dfrac{dy}{dx}=y$
+
+    \begin{solution}
+        $y=Ce^x$
+    \end{solution}
+   \pspace{0.5in}
+    \item $ \dfrac{dy}{dx}=ky$
+
+    \begin{solution}
+        $y=Ce^{kx}$
+    \end{solution}
+   \pspace{0.5in}
+    \end{multicols}
+      \pspace{0.5in}
+\end{enumerate}
+\begin{workshop}
+Students completed a very similar problem in class, and this is meant as a review/revisit problem that acquaints them with the differential equation type $\dfrac{dy}{dx}=ky$.
+\end{workshop}
+\item  
+
+ The rate at which a population grows is proportional to its size. 
+  \begin{enumerate}
+  \item
+    \begin{problem}
+      If $P(t)$ is the population size at time $t$, write a differential
+      equation that describes the situation.      
+    \end{problem}
+\pspace{\vfill}
+  \begin{framed}
+     {$A$ is proportional to $B$} translates mathematically to $A = kB$ for $k$ a constant.
+  \end{framed}
+    \begin{solution}
+      We can translate the information we're given into an equation: 
+      \[ \underbrace{\text{The rate at which the population
+          grows}}_{\frac{dP}{dt}} \text{ } \underbrace{\text{is
+          proportional to}}_{{} = k \text{ times}} \text{ }
+      \underbrace{\text{the population size}}_{P}.\] That is,
+      $\boxed{\frac{dP}{dt} = k P}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}
+      When the population is 800, it grows at a rate of 100 individuals per hour. Incorporate this into
+      your differential equation.
+    \end{problem}
+
+    \begin{solution}
+      We are told that, when $P = 800$, $\frac{dP}{dt} = 100$.  Plugging
+      this into our differential equation $\frac{dP}{dt} = kP$, $100 = 800
+      k$, so $k = \dfrac{1}{8}$.  Therefore, our differential equation becomes
+      $\boxed{\frac{dP}{dt} = \dfrac{1}{8} P}$.
+    \end{solution}
+    \pspace{\vfill}
+\item
+    \begin{problem}
+      Does it take more than an hour, less than an hour, or exactly one
+      hour for the population to grow from 800 to 900?  Explain
+      how you know.
+    \end{problem}
+
+    \begin{solution}
+      We were told that, when the colony has a population of 800 bacteria,
+      the colony is growing at an instantaneous rate of 100 bacteria per
+      hour.  As the colony grows, its rate of growth also grows (because
+      its rate of growth is proportional to the size of the colony).
+      Thus, the colony will immediately start growing faster than 100
+      bacteria per hour, so it will take \fbox{less than one hour} for the
+      population to grow to 900.
+    \end{solution}
+ 
+ \pspace{\vfill}
+
+\item
+    \begin{problem}
+    
+    If the initial population is 400, find a
+      formula for $P(t)$. 
+    \end{problem}
+
+    \begin{solution}
+      The general solution to the differential equation $\frac{dP}{dt} =
+      \frac{1}{8} P$ is $P(t) = C e^{\frac{1}{8} t}$.  Knowing the initial population is
+      400 says that $P(0) = 400$, so $C e^{\frac{1}{8} (0)} = 400$, which tells us
+      that $C = 400$.  So, $P(t) = \boxed{400 e^{\frac{1}{8} t}}$.
+    \end{solution}
+    \pspace{\vfill}
+  \item
+    \begin{problem}
+      How long does it take the population to double in size?
+    \end{problem}
+
+    \begin{solution}
+      Since the population starts out with 400 bacteria, we're looking for
+      the time at which the population reaches 800 bacteria.  Since the
+      population at time $t$ is $400 e^{\frac{1}{8} t}$, we solve
+      \begin{align*}
+        400 e^{0.2 t} &= 800 \\
+        e^{\frac{1}{8} t} &= 2 \\
+        \frac{1}{8} t &= \ln 2 \\
+        t &= 8 \ln 2
+      \end{align*}
+      So, it takes $\boxed{8 \ln 2}$ hours for the population to double
+      (this is about $5.55$ hours). 
+    \end{solution}
+    \pspace{\vfill}
+  \end{enumerate}
+  \pspace{\newpage}
+  \begin{workshop}
+      The purpose of this question is to remind students that, while we have not yet learned the methods to solve most types of differential equations, we can check a proposed solution to differential equations, in part, by differentiating that solution.
+  \end{workshop}
+  \item 
+  \begin{enumerate}
+      \item Verify that $y=2e^{-x}+x-1$ is a solution to the differential equation $\frac{dy}{dx}=x-y$. 
+      
+      \begin{solution}
+          Given the formula for $y$, 
+          \begin{align*}
+              \frac{dy}{dx}&=\fbox{$-2e^{-x}+1$}.
+          \end{align*}
+          We also know that $\frac{dy}{dx}=x-y$. Plugging in $y$, 
+          \begin{align*}
+            \frac{dy}{dx}&=x-(2e^{-x}+x-1)\\&=x-2e^{-x}-x+1\\&=\fbox{$-2e^{-x}+1$}
+          \end{align*}.
+      \end{solution}
+      \pspace{\vfill}
+      \item Verify that $y=\dfrac{1}{1-x}$ is a solution to the differential equation $\frac{dy}{dx}=y^2$. 
+      
+      \begin{solution}
+          Let's rewrite $y=\dfrac{1}{1-x}$ as $y=(1-x)^{-1}$.
+          Given this formula for $y$, 
+          \begin{align*}
+              \frac{dy}{dx}&=\left[-(1-x)^{-2}\right]\cdot(-1)\\&=(1-x)^{-2}\\&=\dfrac{1}{(1-x)^2}\\&=\fbox{$\left(\dfrac{1}{1-x}\right)^2$}.
+          \end{align*}
+          We also know that $\frac{dy}{dx}=y^2$. Plugging in $y$, 
+          \begin{align*}
+            \frac{dy}{dx}&=\fbox{$\left(\dfrac{1}{1-x}\right)^2$}
+          \end{align*}.
+      \end{solution}
+      \pspace{\vfill}
+      \item Verify that $y=e^{3x}-\dfrac{1}{2}e^x$ is a solution to the differential equation $\frac{dy}{dx}=3y+e^x$.
+
+      \begin{solution}
+      Given the formula for $y$,
+      \begin{align*}
+              \frac{dy}{dx}=\fbox{$3e^{3x}-\dfrac{1}{2}e^x$}.
+          \end{align*}
+          We also know that $\frac{dy}{dx}=3y+e^x$. Plugging in $y$, 
+          \begin{align*}
+            \frac{dy}{dx}&=3(e^{3x}-\dfrac{1}{2}e^x)+e^x \\ &= 3e^{3x}-\dfrac{3}{2}e^x+e^x\\&=\fbox{$3e^{3x}-\dfrac{1}{2}e^x$}
+          \end{align*}.
+      \end{solution}
+      \pspace{\vfill}
+      \item Verify that $y=e^x+\dfrac{1}{2}\sin x-\dfrac{1}{2}\cos x$ is a solution to the differential equation $\frac{dy}{dx}=\cos x + y$. 
+      
+      \begin{solution}
+      Given the formula for $y$,
+      \begin{align*}
+              \frac{dy}{dx}=\fbox{$e^x+\dfrac{1}{2}\cos x+\dfrac{1}{2}\sin x$}.
+          \end{align*}
+          We also know that $\frac{dy}{dx}=\cos x + y$. Plugging in $y$, 
+          \begin{align*}
+            \frac{dy}{dx}&=\cos x + (e^x+\dfrac{1}{2}\sin x-\dfrac{1}{2}\cos x)  \\ &=\fbox{$e^x+\dfrac{1}{2}\sin x+\dfrac{1}{2}\cos x$}
+          \end{align*}.
+      \end{solution}
+      \pspace{\vfill}
+  \end{enumerate}
+ \end{enumerate}
+\end{document}

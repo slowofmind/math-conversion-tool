@@ -1,0 +1,179 @@
+%\documentclass[12pt,letterpaper]{article}
+
+%\input{../worksheet-setup.tex}
+
+\chead{\Large\textbf{Proofs \& Counterexamples, \fbox\S 4,  5,  9}}% 
+
+%\begin{document}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+  \Problem Prove or give a counterexample to each of the following
+  ``existential statements''. 
+  \begin{enumerate}
+    \Part  There exists a prime number $p$ with $90<p<105$. 
+    \vfill
+
+    \Part There exists a real number $r$ with $r^2+2r+2\le 0$.
+    \vfill
+
+    \Part There exists a sequence of 100 consecutive composite numbers.
+    \vfill
+  \end{enumerate}
+
+  \Problem Prove or give a counterexample to each of the following
+  ``universal statements''.
+  \begin{enumerate}
+    \Part For every real number $r$, $r^2 + 2r+1\ge0$. 
+    \vfill
+
+    \Part For all positive integers $n$, the number $\frac{n(n+1)}{2}$ is an integer.
+    \vfill
+
+    \Part Every prime number is odd.
+    \vfill
+  \end{enumerate}
+
+\end{enumerate}
+\newpage
+
+Prove or give a counterexample to each of the following statements.
+\begin{enumerate}
+  \Problem Let $a$ and $b$ be integers. If $a\,\Big{|}\,b$, then
+  $a\,\Big{|}\,3b^3-4b^2+18b+2a$.  
+  \vfill
+
+  \Problem Let $m$ and $n$ be integers.  If $m$ and $n$ have different
+  parity, then their sum is odd.  
+  \vfill
+
+  \Problem Let $x$ be a real number.  If $x^2+3x<0$, then $x<0$.
+  \vfill
+
+  \Problem (Careful!) Let $a$ and $b$ be integers.  If $a^2(b^2-2b)$
+  is odd, then $a$ and $b$ must both be odd.
+
+  \vfill
+\end{enumerate}
+
+
+%\end{document}
+\begin{comment}
+
+\newpage
+\chead{\Large\textbf{Proofs \& Counterexamples -- Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+  \Answer
+  \begin{enumerate}
+    \Part True. Take $p=97$ (or 101, 103).
+
+    \Part This is false, since $r^2+2r+2 = (r^2+2r+1)+1 = (r+1)^2+1
+    \ge 1$.
+
+    \Part This is true, but how can we find it? The simplest thing
+    would be to find a number $N$ where $N$, $N+1$, $N+2$, and so on
+    are divisible, in turn, by $2$, $3$, $4$, and so on.  (Notice that
+    we skipped $1$ -- \emph{every}\ number is divisible by $1$.)
+    Maybe instead we should find a number $N$ so that $N+2$ is
+    divisible by $2$, $N+3$ is divisible by $3$, and so on up to
+    $N+101$ is divisible by $101$ (so $2$ through $101$ give $100$
+    numbers). In general we want $N+k$ to be divisible by $k$ for all
+    $k$ from $2$ through $101$.  This gives us our answer: just take
+    $N$ to be a number that is divisible by every number from $2$
+    through $101$.  The easiest number (although certainly not the
+    smallest) with this property is $N=101!$.  So the numbers
+    \begin{equation*}
+      101!+2,\ 
+      101!+3,\ 
+      101!+4,\ 
+      \cdots,\ 
+      101!+101
+    \end{equation*}
+    are all composite.
+  \end{enumerate}
+
+  \Answer
+  \begin{enumerate}
+    \Part This is true, since $r^2+2r+1 = (r+1)^2 \ge 0$.
+
+    \Part This is true, and we'll prove it in a number of ways:
+    \begin{itemize}
+    \item Directly. If $n$ is even, then $n=2k$ for some positive
+      integer $k$ and $\frac{n(n+1)}{2} = k(2k+1)$ is an integer.  If
+      $n$ is odd, then $n=2k-1$ for some positive integer $k$ and
+      $\frac{n(n+1)}{2} = (2k-1)k$ is an integer.
+
+    \item One fact we'll see in the next few days is that
+      \begin{equation*}
+        1 + 2 + \cdots + n = \frac{n(n+1)}{2}.
+      \end{equation*}
+      Written more succinctly, this is $\displaystyle\sum_{k=1}^{n} k
+      = \frac{n(n+1)}{2}$.  Thus this number is the sum of the first
+      $n$ integers, and so must be an integer itself.
+
+    \item Another fact we'll see in the coming days is that
+      $\frac{n(n+1)}{2}$ can also be written as $\binom{n+1}{2}$
+      (read ``$n+1$ choose $2$'' and called a \emph{binomial
+        coefficient}).  This is perhaps easiest to describe as
+      \emph{the number of ways to pick a set of $2$ objects from a
+        collection of $n+1$ different objects}.  This ``number of
+      ways'' is clearly an integer. 
+
+    \end{itemize}
+
+
+
+    \Part Well, no: $p=2$ is prime and even.
+
+  \end{enumerate}
+
+  \Answer We provide a direct proof.  If $a\,\big|\,b$, then $b=ka$
+  for some integer $k$.  Then
+  \begin{equation*}
+    3b^3 - 4b^2 + 18 b  + 2a
+    = 3k^3 a^3 - 4k^2a^2 + 18ka + 2a
+    = \left( 3k^3a^2 - 4k^2a + 18k + 2 \right) a.
+  \end{equation*}
+  That is, $a\,\big|\,\left(3b^3-4b^2+18b+2a\right)$.
+
+  \Answer If $m$ is even and $n$ is odd, then we can write $m=2k$ and
+  $n=2\ell+1$ for integers $k$ and $\ell$. Thus $m+n = 2(k+\ell)+1$ is
+  odd.  
+  \medskip
+
+  What if $m$ were odd and $n$ even?  Then the argument would be
+  exactly the same, except with the roles of $m$ and $n$ reversed.
+  Usually we don't repeat the same argument, but instead note that it
+  doesn't really matter (for the argument) which one is even and which
+  is odd.  We typically begin our proof with something like ``Without
+  loss of generality, assume $m$ is even and $n$ is odd.''  This means
+  that we could have assumed the opposite parities, but it doesn't
+  really matter and the proof is the same.
+
+  \Answer We instead prove the contrapositive, which is equivalent: If
+  $x\ge0$, then $x^2+3x\ge 0$.  This statement is nearly obvious: both
+  $x^2$ and $3x$ are non-negative, so their sum is as well: $x^2+3x\ge
+  0$. 
+
+  \Answer We'll prove the contrapositive: \emph{if at least one of $a$
+    or $b$ is even, then $a^2(b^2-2b)$ is even}.  There are two cases:
+  If $a$ is even, then $a = 2k$ and $a^2(b^2-2b) = 2\left[
+    2k^2(b^2-2b) \right]$ is even.  If $b$ is even, then $b=2m$ and
+  $a^2(b^2-2b) = a^2(4m^2 - 4m) = 2\left[ a^2(2m^2-2m) \right]$ is
+  even.  Of course, it could be the case that both $a$ and $b$ are
+  even, so we could use either argument.
+
+\end{enumerate}
+
+\end{comment}
+%\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% tex-master: t
+%%% end: 

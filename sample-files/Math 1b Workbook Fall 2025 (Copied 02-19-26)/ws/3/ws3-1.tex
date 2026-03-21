@@ -1,0 +1,519 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws3-1}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterthree}
+}{}
+
+\section{Intro to Differential Equations} \label{ws3-1}
+
+\begin{framed}
+\centerline{\textbf{Lesson Goals}}
+
+You should be able to:
+\begin{itemize}
+\item Model situations involving rates of change with an appropriate first-order differential equation and initial condition
+\item Determine whether a given function is a solution to a first-order differential equation
+\item Explain what is meant by the general solution to a differential equation, and find the general solution to the differential equation $\frac{dy}{dt}=ky$.
+\end{itemize}
+\end{framed}
+
+\begin{enumerate}
+    
+\item A derivative gives an instantaneous rate of change. Sometimes we know something about the rate at which a quantity is changing, even if we don't know the quantity itself.
+For each scenario below, write a differential equation that models the situation.  Include initial
+conditions if the information is given.
+\begin{enumerate}
+%\begin{enumerate}%[resume]
+\item  \label{diffeq-model-practice-1}
+  \begin{problem}[\vfill]
+    The population of a certain country increases at a rate proportional
+    to the population size.  Let $P(t)$ be the function that gives the population after $t$ years.
+  \end{problem}
+
+  \begin{solution}
+    The rate of change is $\frac{dP}{dt}$, and we also know that the rate
+    of change is proportional to $P$, so it's $kP$ for some $k$.  (We know
+    $k$ must be positive because the population is increasing.)  So,
+    \fbox{$\frac{dP}{dt} = kP$}. An appropriate initial condition could be $\boxed{P(0)=1}$. 
+  \end{solution}
+
+\item  \label{diffeq-model-practice-3}
+  
+  \note{Students often have trouble putting all of the information
+    together.  The first principle they need to recognize is that the rate
+    of change is (rate in) minus (rate out).  Some students will want the
+    rate in to involve $t$ somehow.  For instance, one common mistake it
+    to say the rate in is $0.75t$; it helps to emphasize the units for $0.75$ versus the units for  $0.75t$...only one of these have the correct units for a rate of change.  It may also help to emphasize that the rate is a constant rate,
+    so should not depend on $t$.}
+  
+  \begin{problem}[\vfill]
+    Ferdinand is trying to fill a cylindrical bucket from a faucet.  Unfortunately, he
+    doesn't realize that there is a small hole in the bottom of the
+    bucket.  Water flows in to the bucket from the faucet at a constant
+    rate of 7.5 liters per minute, and it flows out of the hole at a rate
+    proportional to the square root 
+    of the volume $W(t)$ of water already in the bucket.
+  \end{problem}
+
+  \begin{solution}
+    The rate of change of water volume in the bucket (over time) is
+    $\frac{dW}{dt}$, which is equal to (rate of water coming in) minus
+    (rate of water coming out).  The rate of water coming in is 7.5 liters
+    per minute.  The
+    rate of water going out is $k \sqrt{W(t)}$ where $k$ is a positive constant.
+    So, \fbox{$\frac{dW}{dt} = 7.5 - k \sqrt{W}$}. An appropriate initial condition could be $\boxed{W(0)=0}$.
+  \end{solution}
+
+\item  
+  \begin{problem}[\vfill]
+     A patient is getting an intravenous medication at a rate of $I$ mg/hr. He 
+     is metabolizing the drug at a rate proportional to the amount in his 
+     bloodstream. Let $M = M(t)$ be the amount in the bloodstream at time $t$.   
+  \end{problem}
+
+
+  \begin{solution}
+    The rate of change of $M(t)$ is equal to the (rate of medication coming in)
+    minus the (rate of medication leaving).  The rate of medication coming in
+    is a constant, namely $I$ mg/hr.  The rate of medication going out is
+    $k M$, where $k$ is a positive constant.  Therefore,
+    \fbox{$\frac{dM}{dt} = I - kM$}, where $k$ is a positive constant. An appropriate initial condition could be $\boxed{M(0)=0}$.
+  \end{solution}
+
+\item  
+  \begin{problem}[\vfill]
+    A rumor spreads around Cambridge, which has a population of $108,000$.  The
+    rate of change of the number of people who have heard the rumor is proportional
+    to the product of the number of people who have heard the rumor and the number
+    of people who have not heard the rumor. Let $R(t)$ be the number of people in Cambridge who've heard the rumor at time $t$.
+  \end{problem}
+
+  \begin{solution}
+    If $R(t)$ denotes the number of people who have heard the rumor at time $t$, then
+    $108000 - R(t)$ people have not heard the rumor at time $t$.  Therefore,
+    \fbox{$\frac{dR}{dt} = k R (108000 - R)$}, where $k$ is a positive constant. An appropriate initial condition could be $\boxed{R(0)=1}$.
+  \end{solution}
+\end{enumerate}
+
+\pspace{\newpage}
+
+
+Problems 2, 3, and 4 are about solutions to differential equations.
+
+
+\item  \label{diffeq-sol-check-1}
+
+  \note{Help students with how to ``read'' this differential equation: the
+  fact that $\frac{dy}{dt}$ appears means that we are looking for $y$,
+  which is a function of $t$. This is also the best place to emphasize the method of checking a potential solution by ``plugging" the candidate function into the left and right-hand sides separately.}
+  
+  \begin{problem}[2in]
+    Which of the following is a solution to $\frac{dy}{dt} = y$? (In each case, $C$ is a constant.)    
+    \begin{enumerate}[label=\protect\maybecircle{\roman*.}]
+    \plainitem $y = \frac{t^2}{2} + C$.
+    \plainitem $y = e^t + C$.
+    \circleitem $y = Ce^t$.
+    \end{enumerate}
+  \end{problem}
+
+  \begin{solution}
+    Let's look at each choice.
+
+    If $y = \frac{t^2}{2} + C$, then $\frac{dy}{dt} = t$, which is not
+    equal to $y$.  
+    
+    If $y = e^t + C$, then $\frac{dy}{dt} = e^t$, which is not equal to
+    $y$ (unless $C = 0$).
+
+    If $y = Ce^t$, then $\frac{dy}{dt} = Ce^t = y$, so this is the correct
+    choice. 
+  \end{solution}  
+
+\item 
+
+  \note{Some students may try to say that $\frac{5}{2} y^2$ is a solution.
+    Make sure these students understand what we mean by solving a
+    differential equation and why their answer is nonsense.  It is
+    helpful to have them say the differential equation in words: we're
+    looking for a function of $t$ whose derivative is 5 times the
+    function.}
+  
+  \begin{problem}[2in]
+    Give two solutions to $\frac{dy}{dt} = 5y$. What is the general
+    solution?
+  \end{problem}
+
+  \begin{solution}
+    The general solution is \fbox{$C e^{5t}$}.  Two specific solutions are
+    $e^{5t}$ (when $C = 1$) and $-e^{5t}$ (when $C = -1$).
+  \end{solution}
+
+\item  \label{diffeq-sol-guess-1}
+  \begin{problem}[2in]
+    Give two solutions to $\frac{dy}{dt} = 5t$.  What is the general
+    solution?
+  \end{problem}
+
+  \begin{solution}
+    We actually know how to solve this already: the equation says we are
+    looking for a function of $t$ whose derivative is $5t$.  That is, we
+    want antiderivatives of $5t$, and we know that the general
+    antiderivative is \fbox{$\frac{5}{2} t^2 + C$}.  Two specific
+    solutions are $\frac{5}{2} t^2$ and $\frac{5}{2} t^2 - 1$.
+  \end{solution}
+
+
+ % \note{Students often try to solve partway to write an equation for
+  %  $s'(t)$ instead of just writing the equation for $s''(t)$.  It's
+    %worthwhile to note that we have two initial conditions here and that
+    %this has to do with the fact that our differential equation involves a
+    %second derivative.}
+  
+\pspace{\newpage}
+
+
+
+\item  \label{moneybags-continuous-compounding-deposit-solution} 
+
+  \note{Students often have a little trouble with this at first; what
+    happens is that they don't really plug the function into both sides of
+    the differential equation.}
+  
+  \begin{problem}[1in]
+    Which of the following is the solution of $\displaystyle \frac{dM}{dt}
+    = 0.06M + 600$ satisfying $M(0) = 1000$?
+    \begin{enumerate}[label=\protect\maybecircle{\roman*.},ref=\roman*]
+    \plainitem $M(t) = 1000 e^{0.06 t} + 600t$
+    \circleitem \label{moneybags-continuous-compounding-deposit-solution-right-choice}
+      $M(t) = 11,000 e^{0.06 t} - 10,000$ 
+    \plainitem $M(t) = (1000 + 600 t) e^{0.06 t}$
+    \end{enumerate}
+  \end{problem}
+
+  \begin{solution}
+    To answer this, we can simply check each choice and see whether it
+    satisfies $\frac{dM}{dt} = 0.06 M + 600$ and $M(0) = 1000$. We do this by first taking each choice, and evaluating the left-hand side (LHS) and the right-hand side (RHS) of the differential equation separately to see if they are equal. (You can think of this as ``plugging" each choice of M(t) into the differential equation $[M(t)]'=0.06(M(t))+600$ and checking if it makes the equation work.)
+
+    \begin{enumerate}[label=\roman*.]
+    \item If $M(t) = 1000 e^{0.06 t} + 600 t$, then
+      \begin{align*}
+        \text{LHS: } &\frac{dM}{dt} = 0.06 \left( 1000 e^{0.06 t} \right) + 600 \\
+        \text{RHS: }&0.06 M + 600 = 0.06 \left( 1000 e^{0.06 t} + 600 t \right) + 600
+      \end{align*}
+      Therefore, $\frac{dM}{dt} \neq 0.06 M + 600$, so this is not the
+      correct choice.\footnote{Note that what we are doing is plugging our
+        guess, $M(t) = 1000 e^{0.06 t} + 600 t$, in to both sides of the
+        differential equation to see if the equation holds.  If this seems
+        strange, here's an analogy: suppose we were interested in the
+        equation $t + \sin t = t^2$.  This is not an equation that we know
+        how to solve by hand, but it's easy to check whether a given value
+        of $t$ satisfies the equation.  For instance, if we want to know
+        whether $\pi$ is a solution, we just see what happens when we plug
+        $t = \pi$ in to both sides: is $\pi + \sin \pi = \pi^2$?  No, so
+        $\pi$ is not a solution.}
+
+    \item If $M(t) = 11,000 e^{0.06 t} - 10,000$, then
+      \begin{align*}
+        \text{LHS: }&\frac{dM}{dt} = 0.06 \cdot 11,000 e^{0.06 t} \\
+        \text{RHS: }&0.06 M + 600  = 0.06 \left( 11,000 e^{0.06 t} - 10,000 \right) +
+        600 = 0.06 \cdot 11,000 e^{0.06 t}
+      \end{align*}
+      So, in this case, $\frac{dM}{dt} = 0.06 M + 600$.  Moreover, $M(0) =
+      11,000 - 10,000 = 1,000$.  So, this is the correct choice.
+
+    \item If $M(t) = (1000 + 600 t) e^{0.06 t}$, then
+      \begin{align*}
+        \text{LHS: }&\frac{dM}{dt} = 0.06 (1000 + 600 t) e^{0.06 t} + 600 e^{0.06 t} \\
+        \text{RHS: }&0.06 M + 600 = 0.06 (1000 + 600 t) e^{0.06 t} + 600
+      \end{align*}
+      These are not equal, so this is not the correct choice.
+
+      In fact, since we've already figured out that
+      \ref{moneybags-continuous-compounding-deposit-solution-right-choice}.
+      is the right choice, we can be sure that this is not correct.  After
+      all, this is the initial value problem we came up with in
+      \ref{moneybags-continuous-compounding-deposit}, so the solution
+      represents the amount of money at time $t$ in the scenario of
+      \ref{moneybags-continuous-compounding-deposit}.  There can only be
+      one function that gives the amount of money at time $t$, and we know
+      that choice
+      \ref{moneybags-continuous-compounding-deposit-solution-right-choice}.
+      is it. 
+    \end{enumerate}
+  \end{solution}
+  
+
+  
+
+\item Salmon is a species of fish that lives in the ocean but migrates upriver to fresh water breeding grounds to breed.  Let $S(t)$ denote the number of salmon in a particular river at time $t$ days after the start of the breeding season. 
+At the beginning of the breeding season, there are no salmon in the river, but there are $10$ thousand other fish which don't migrate.
+Each day of the season, $200$ salmon swim into the river from the ocean.  Those salmon mix evenly with the other fish in the river. Suppose that fish are evenly mixed and the opportunity for each species to be caught is proportional to the total amount of this species.  A population of bears catch fish from the river at a rate of $100$ each day. 
+\begin{enumerate}
+ \item 
+\begin{problem}[2in]
+Which differential equation models the number of salmon in the river at time $t$?
+ \begin{enumerate}
+  \begin{multicols}{2}
+    \item   $S'(t) = 200t - 100\frac{S(t)}{10000+100t}$\\[24pt]
+    \item   $S'(t) = 200  - 100\frac{S(t)}{10000-200t}$
+    \item   $S'(t) = 200 - 100\frac{S(t)}{10000 + 100t}$ \\[24pt]
+
+    \item   $S'(t) = 200t - 100\frac{S(t)}{10000-200t}$
+     \end{multicols}
+  \end{enumerate}
+\end{problem}
+
+\begin{solution}
+    The correct choice is \fbox{iii.}
+\end{solution}
+
+ 
+ 
+  \bigskip
+  
+\item 
+\begin{problem}
+Write a reasonable initial condition for the scenario in part (a).
+\end{problem}
+
+\begin{solution}
+  $\boxed{S(0)=0}$
+\end{solution}
+\end{enumerate}
+
+
+\pspace{\newpage}
+
+ \item In this problem, we will model the amount of money in a bank account with compound interest.
+  \begin{enumerate}
+   \item  \label{moneybags-compound-annually}
+
+   \note{Here, I'll talk a bit about how the money really isn't a
+     continuous function of time.  (They often object later, when we're
+     talking about things like ``continuous withdrawing'' which obviously
+     doesn't happen; I'd like them to understand that even our most basic
+     models are usually modeling something that's really discrete.)}
+  
+   \begin{problem}[1in]
+     Bilbo Baggins decides to open a bank account with an opening deposit
+     of \$1000.  Suppose that the account earns a nominal annual interest
+     rate of 6\%, compounded annually.%\footnote{For economists, there are       two uses of the phrase ``nominal interest rate''; one use emphasizes that we are to ignore the rate of inflation (by contrast, the ``\textit{real} interest rate'' takes the rate of inflation into account).  We're using the term ``nominal'' in the other sense, which will be easier to understand a bit later.}  
+     Assuming Bilbo Baggins completely ignores the account after he opens it (so he
+     doesn't make any deposits or withdrawals), how much money does the
+     account have $t$ years after Bilbo Baggins opens it?  Can you graph
+     his money vs. time?
+   \end{problem}
+
+   \begin{solution}
+     At the end of each year, he earns 6\% interest, which has the effect
+     of multiplying his balance by $1 + 0.06$.  Therefore, after $t$ years,
+     Bilbo Baggins has $1000 (1 + 0.06)^t$.  Here is a graph of the
+     function $M(t) = 1000 (1 + 0.06)^t$:
+     \begin{center}
+ \includegraphics[width=1.25in]{ws/images/moneybags-compound-annually-continuous}
+     \end{center}
+     However, this isn't really an accurate graph of his money vs. time
+     because of the way interest is credited.  A bank typically credits
+     interest at a set time, say at the end of the year.  This means that,
+     halfway through the first year, Bilbo Baggins still only has \$1000
+     because no interest has been credited.  It is not until he's had the
+     account for a whole year that the interest gets credited.  So, a more
+     accurate graph would look something like:
+     \begin{center}
+       \includegraphics[width=1.25in]{ws/images/moneybags-compound-annually}
+     \end{center}
+     We typically use the continuous model $M(t) = 1000 (1 + 0.06)^t$ even
+     though the real situation is not continuous.
+   \end{solution}
+
+ \item  \label{moneybags-compound-monthly}
+
+   \note{Once they've done this problem, we can explain the term ``nominal
+     annual interest rate'' better --- in this example, he earns slightly
+     more than 6\% on his investment over the course of the year because of
+     compounding.}
+
+   \begin{problem}[1in]
+     Suppose that Bilbo Baggins had instead deposited his money in a bank
+     that offered monthly compounding (but everything else was the same).
+     That is, the bank has 12 compounding periods a year.  How much money
+     would the account have after $t$ years?
+   \end{problem}
+
+   \begin{solution}
+     Monthly compounding with a nominal annual interest rate of 6\% means
+     that, each month, the account earns $\frac{1}{12} \cdot 6$\%
+     interest.  So, each month, the value of the account is multiplied by
+    $1 + \frac{0.06}{12}$.  After $t$ years, $12t$ months have passed, so
+     the account will have $\boxed{1000 \left( 1 + \frac{0.06}{12}
+       \right)^{12t}}$ dollars.
+
+     Notice that, after one year, Bilbo Baggins has $1000 \left(1 +
+       \frac{0.06}{12} \right)^{12} = 1061.68$ dollars.  So, he's earned
+     slightly more than 6\% interest over the course of the year.  Saying
+     that the ``nominal annual interest rate'' is 6\% distinguishes this
+     rate from the actual interest he earns over the course of the year.
+
+     Again, the money would not really be a continuous function of time,
+     since the interest would only be credited at the end of each month. 
+   \end{solution}
+
+ \item  \label{moneybags-compound-continuously} 
+   \begin{problem}[1in]
+     Continuous compounding is defined to be the limit as $n \to \infty$ of
+     having $n$ compounding periods a year.  If Bilbo Baggins had used a
+     bank with continuous compounding, how much money would he have after
+     $t$ years? You may use the fact that $\displaystyle \lim_{n \to \infty} \left( 1 + \frac{r}{n} \right)^n = e^r$.
+   \end{problem}
+
+   \begin{solution}
+     With $n$ compounding periods per year, Bilbo Baggins has $1000 \left(1
+       + \frac{0.06}{n} \right)^{nt}$ dollars after $t$ years.  Taking the
+     limit as $n \to \infty$, he would have $\boxed{\displaystyle \lim_{n \to
+       \infty} 1000 \left(1 + \frac{0.06}{n} \right)^{nt}}$ dollars.  
+      
+       It can
+     be shown (see \ref{e-limit}) that $\displaystyle \lim_{n \to \infty}
+     \left(1 + \frac{0.06}{n} \right)^n = e^{0.06}$. So, Bilbo Baggins
+     would have $\boxed{1000 e^{0.06 t}}$ dollars after $t$ years.
+   \end{solution}
+
+ \item  \label{moneybags-compound-continuously-diffeq}
+
+%   \note{This is the first problem in which they encounter a differential     equation.  I like to read the differential equation as saying, ``The     instantaneous rate of change of money in the account is (interest rate)(amount of money).''}
+  
+   \begin{problem}[0.75in]
+     In the situation of the previous problem, we say that Bilbo Baggins
+     gets a ``6\% nominal annual interest rate, compounded continuously.''
+     If we are modeling his money $M(t)$ as a continuous function, what is
+     the relationship between $\frac{dM}{dt}$ and $M$?
+   \end{problem}
+
+   \begin{solution}
+     We had said that $M(t) = 1000 e^{0.06 t}$.  Then, $\frac{dM}{dt} =
+     1000 (0.06) e^{0.06 t}$, which is just $0.06 M(t)$. That is,
+     $\boxed{\frac{dM}{dt} = 0.06 M}$.
+
+     We can interpret this as say, ``At any time, the rate at which money
+     is growing is equal to 0.06 times the amount of money.''  In other
+     words, the rate at which money grows in this model is simply the
+     nominal annual interest rate multiplied by the amount of money. 
+   \end{solution}
+ \end{enumerate}
+
+
+
+ \item 
+   \label{moneybags-continuous-compounding-deposit}
+
+   \note{This is the first one where it's much easier to write a
+     differential equation than to solve directly.  Students may initially
+     think that the amount of money at time $t$ is simply $1000 e^{0.06 t}
+     + 600t$, so make sure they understand why this isn't correct (it
+     doesn't account for interest on the deposits).  Distinguish between
+     the differential equation and the initial condition.  Also let them
+     know that there is only one function $M(t)$ that solves the
+     differential equation and initial condition (this should be
+     intuitively obvious based on the situation).  You might follow this up
+     by doing \ref{moneybags-continuous-compounding-deposit-solution} to
+     illustrate that, although it's not so easy to solve this differential
+     equation, it's straightforward to check whether a given function is a
+     solution.  It's also worth pointing out that the right function ($M(t)
+     = 11,000 e^{0.06 t} - 10,000$) is probably not something they could
+     have guessed without first writing down the differential equation.} 
+    
+   \begin{problem}[1in]
+     \$1000 is deposited in a bank account.  The account has a nominal
+     annual interest rate of 6\%, compounded continuously.  Money is being
+     deposited continuously at a rate of \$600 per year.\footnote{In
+       reality, you cannot deposit money continuously, but it's convenient
+       to use a continuous model.}  How could you model this situation with a differential equation?
+   \end{problem}
+
+   \begin{solution}
+     Let's have $M = M(t)$ be the amount of money in the account at time
+     $t$, where $t$ is measured in years and $t = 0$ represents the time of
+     the initial deposit.  Then, $\frac{dM}{dt}$ represents the rate of
+     change of money (with respect to time).
+
+     We know that (rate of change of money) = (rate at which money
+     increases due to interest) + (rate at which money increases due to
+     deposits).  From problem 5(d), we know that the money increases due to interest at the rate $0.06M$.
+     The money increases due to deposits at the constant rate of $600$
+     dollars per year.  So, the differential equation is
+     $\boxed{\frac{dM}{dt} = 0.06M + 600}$.  The fact that \$1000 is
+     deposited at time $t = 0$ gives the initial condition $\boxed{M(0) =
+       1000}$.
+    
+     We don't yet know a systematic way of finding $M(t)$, but see
+     \ref{moneybags-continuous-compounding-deposit-solution}: the function
+     $M(t)$ is actually $M(t) = 11,000 e^{0.06 t} - 10,000$ which is
+     probably \textit{not} something you would have guessed directly from
+     the scenario!
+   \end{solution}
+
+
+  
+  % \item  \label{e-limit}
+  % \begin{problem}
+  %   Show that, if $r$ is any constant, then $\displaystyle \lim_{n \to
+  %     \infty} \left( 1 + \frac{r}{n} \right)^n = e^r$.
+  % \end{problem}
+
+  % \begin{solution}
+  %   Let $b_n = \left( 1 + \frac{r}{n} \right)^n$.  We are interested in
+  %   $\displaystyle \lim_{n \to \infty} b_n$, but let's instead start by
+  %   looking at $\ln b_n$:\footnote{As $n \to \infty$, $1 + \frac{r}{n} \to
+  %     1$ and $n \to \infty$, so we would say that $\displaystyle \lim_{n
+  %       \to \infty} \left( 1 + \frac{r}{n} \right)^n$ is a ``$1^\infty$
+  %     type of limit.''  Looking at a logarithm of such a limit is a common
+  %     technique because it ``converts'' the exponentiation to a product.}
+  %   \begin{align*}
+  %     \ln b_n &= \ln \left[ \left( 1 + \frac{r}{n} \right)^n \right] \\
+  %     &= n \ln \left( 1 + \frac{r}{n} \right) \\
+  %     \intertext{It will be convenient for us to rewrite this as:}
+  %     &= \frac{\ln \left( 1 + \frac{r}{n} \right)}{1/n}
+  %   \end{align*}
+  %   Let's take a look at the limit
+  %   \[ \lim_{n \to \infty} (\ln b_n) = \lim_{n \to \infty} \frac{\ln
+  %     \left( 1 + \frac{r}{n} \right)}{1/n}.\] Both the numerator and
+  %   denominator tend to 0 here, so one way to evaluate this limit is to
+  %   use L'Hospital's Rule.  Another (sneaky!) way to evaluate this limit
+  %   is using the limit definition of the derivative; this is what we'll
+  %   do.\footnote{As you read this, the steps may look rather unmotivated
+  %     to you.  That's okay; this isn't something that is easy to come up
+  %     with on your own, but it's a neat argument worth understanding!}  As
+  %   $n \to \infty$, $\displaystyle \frac{r}{n} \to 0$.  Let's write $h =
+  %   \frac{r}{n}$.  Then, we can rewrite the previous equation as
+  %   \begin{align*}
+  %     \lim_{n \to \infty} (\ln b_n) &= \lim_{h \to 0} \frac{\ln (1 +
+  %       h)}{h/r} \\
+  %     &= r \lim_{h \to 0} \frac{\ln (1 + h)}{h} \\
+  %     &= r \lim_{h \to 0} \frac{\ln(1 + h) - \ln (1)}{h} \qquad \text{ (since
+  %       $\ln 1 = 0$)} \\
+  %     \intertext{This limit can be interpreted as a derivative;
+  %       specifically, it is the derivative of $\ln x$ at $x =
+  %       1$.\footnotemark { } So, this whole thing is equal to }
+  %     &= r \cdot (\textrm{the derivative of $\ln x$ at $x = 1$}) \\
+  %     &= r \cdot \left( \frac{1}{x} \textrm{ evaluated at $x = 1$} \right) \\
+  %     &= r
+  %   \end{align*}
+  %   \footnotetext{Remember that the limit definition of the derivative is
+  %     that $\displaystyle f'(a) = \lim_{h \to 0} \frac{f(a + h) -
+  %       f(a)}{h}$.}  So, as $n \to \infty$, $\ln b_n \to r$.  Therefore,
+  %   $b_n \to e^r$.
+  % \end{solution}
+
+
+
+\end{enumerate}
+
+
+
+
+
+\end{document}

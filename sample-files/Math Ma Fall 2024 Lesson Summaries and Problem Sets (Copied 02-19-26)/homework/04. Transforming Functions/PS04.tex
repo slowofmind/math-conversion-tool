@@ -1,0 +1,624 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{marginnote}
+\usepackage[colorinlistoftodos]{todonotes}
+\renewcommand{\marginpar}{\marginnote}
+
+\usepackage{soul}
+\usepackage[normalem]{ulem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\pgfplotsset{gridgraph/.style={clip=false, axis line style={shorten
+      >=-8pt}, xlabel style={xshift=8pt}, ylabel style={yshift=8pt},
+    enlargelimits=false, grid=major, tick style={black}}} 
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[grading, sols, workshop]{handout}
+\renewcommand{\workshopnote}{CA Notes.}    
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\makeatletter
+
+% underline links               
+\let\@href=\href
+\renewcommand{\href}[2]{\@href{#1}{\ul{#2}}}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+\definecolor{hotpink}{rgb}{1, 0, 0.5}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\newcounter{imagecounter}
+\newcounter{columncounter}
+\newenvironment{imagetable}[3][]{%
+  \setcounter{imagecounter}{0}
+  \setcounter{columncounter}{#2}
+  \addtocounter{columncounter}{-1}
+  \newcolumntype{i}{>{\raisebox{-1ex-\height}{\makebox[1em]{\hfill\stepcounter{imagecounter}(#3{imagecounter})}}\hspace{4pt}\begin{minipage}[t]{\linewidth/#2-1em-\tabcolsep*3}\arraybackslash\vspace{0pt}}l<{\end{minipage}}}
+\begin{tabular}{i*{\value{columncounter}}{#1i}}}
+{\end{tabular}}  
+
+\newcommand{\doedfinity}[2][\newpage]{
+  \begin{problem}[#1]
+    Do the Edfinity assignment ``Problem Set #2''.
+
+    We encourage you to write down any scratch work here, as well as
+    things you want your future self to remember. Nothing you write
+    here will be graded; it's just for you!
+  \end{problem}
+}
+
+\newcommand{\psreflection}[2][]{
+
+  \ifthenelse{\not\equal{#1}{nocite}}{
+    \begin{enumerate}[resume]
+    \item
+      \begin{problem}[1in]
+        Please cite any help you got on this problem set:
+        \begin{itemize}[nosep]
+        \item If you worked with other students, please list their names here.
+        \item If you used resources other than those on our Canvas site, please list them here.
+        \end{itemize}
+      \end{problem}
+
+    \end{enumerate}
+  }
+
+  \probonly{%
+    #2
+
+    \newpage
+
+    \emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!
+    \begin{itemize}
+    \item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!
+
+      \vspace{1.5in}
+
+    \item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.
+
+      \vspace{1.5in}
+
+    \item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!
+
+      \vfill
+    \end{itemize}      
+  }
+}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 4 - Transforming Functions}
+\end{center}
+
+\begin{enumerate}
+\item  \note{
+    \begin{itemize}[nosep]
+    \item Algebra: exponents
+    \item Horizontal shift, vertical stretch of $|x|$
+    \item Combining transformations for an abstract function and $x^3$
+    \end{itemize}
+  }
+
+  \doedfinity{4}
+
+\item  % 3.4.1 changed
+
+  Suppose we have a mysterious function $f$, and the only thing we know about it is that its zeros (also known as roots or $x$-intercepts) are at $x = -4$, $2$, and $8$. What are the zeros of the functions below? Do each problem \textbf{\emph{both} geometrically and algebraically}. (a) is done for you as an example.
+
+  \begin{grading}
+    3 points per part: 1 for having the correct zeros, 1 for geometric justification, 1 for algebraic justification 
+  \end{grading}
+
+  \begin{enumerate}
+  \item
+
+    \begin{grading}
+      Nothing to grade here
+    \end{grading}
+
+    \begin{problem}
+      $ Q(x) = f\left(\frac{x}{2}\right)$
+    \end{problem}
+
+    \textbf{Solution.}
+
+    \textbf{Geometrically:} The graph of $Q(x)$ is the graph of $f(x)$ stretched horizontally by a factor of 2, so the zeros will be twice as far from the $y$-axis as they used to be. So, the zeros of $Q$ will be at $x = -8 , 4, 16$.
+
+    \textbf{Algebraically:} We can check that $-8, 4, 16$ really are zeros of $Q$ by plugging them into $Q$:
+    \begin{itemize}
+    \item $Q(-8) = f \left(\frac{-8}{2} \right) = f(-4)$, and we know that $f(-4)= 0$ because $-4$ is a zero of $f$.
+
+    \item $Q(4) = f \left(\frac{4}{2} \right) = f(2)$, and we know that $f(2)= 0$ because 2 is a zero of $f$.
+
+    \item $Q(16) = f \left(\frac{16}{2} \right) = f(8) = 0$, and we know that $f(8)= 0$ because 8 is a zero of $f$.
+    \end{itemize}
+    So, $Q(-8)$, $Q(4)$, and $Q(16)$ are all equal to 0. 
+
+  \item
+    \begin{problem}[\vfill]
+      $g(x) = -f(x-3)$
+    \end{problem}
+
+    \begin{solution}\
+
+      \textbf{Geometrically:} We know that the graph of $g(x)$ is the same as the graph of $f(x)$, but shifted to the right three units and flipped vertically. The shift will cause the zeros to shift to the right three units, and the vertical flip won't affect them. So, the zeros are $-1$, $5$, and $11$.
+
+      \textbf{Algebraically:} 
+      \begin{itemize}
+      \item $g (-1 ) =  -f(-1-3) =-f(-4)=0$
+      \item $g (5 ) = -f(5-3) = -f(2) =0$
+      \item $g (11 ) = -f(11-3) =-f(8) =0$
+      \end{itemize} 
+    \end{solution} 
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      $j(x) = 5 f(-2x)$
+    \end{problem}
+
+    \begin{solution}\
+
+      \textbf{Geometrically:} We know that the graph of $j(x)$ is the result of taking the graph of $f(x)$, flipping it over the $y$-axis, stretching horizontally by a factor of $\frac{1}{2}$, and stretching vertically by a factor of 5. The flip over the $y$-axis will cause the zeros to also flip about the $y$-axis; the horizontal stretch will make each zero $\frac{1}{2}$ as far from the $y$-axis as it used to be; the vertical stretch doesn't affect the zeros. So, the new zeros are $2, -1, -4$.
+
+      \textbf{Algebraically:} 
+      \begin{itemize} 
+      \item $j(2 ) = 5f(- 4) =0$
+      \item $j (-1) =5f(2)=0$
+      \item $j (-4 ) = 5f(8) =0$
+      \end{itemize}      
+    \end{solution} 
+  \end{enumerate}
+
+\item \label{given-graph-sketch-alteration-1} 
+
+  Each part below shows a graph $y = f(x)$. (For parts \ref{given-graph-sketch-alteration-1a} - \ref{given-graph-sketch-alteration-1c}, the given $f$ is the same.) You're also given a new function; sketch its graph (on the same axes as the given graph of $f$).
+
+  \begin{grading}
+    For \ref{given-graph-sketch-alteration-1a} - \ref{given-graph-sketch-alteration-1c}, 3 points per part:
+    \begin{itemize}[nosep]
+    \item 2 points for having the 4 ``corners'' of the graph go to the right spots (0.5 per corner)
+    \item 1 point for the $x$-intercepts ending up in the right place
+    \end{itemize}
+    If none of these are right but they have the right type of transformation (like, some sort of horizontal flip and stretch for (a)), give them 1.
+  \end{grading}
+
+  \begin{enumerate}
+
+  \item \label{given-graph-sketch-alteration-1a}
+
+    \begin{problem}
+      $g(x) = f \left( - \dfrac{x}{2} \right)$
+    \end{problem}
+
+    \begin{tikzpicture}[declare function={f(\x)=and(-2 <= \x, \x <= 1)*(4)
+        +and(4 < \x, \x <= 6)*(2*(-5 + \x))
+        +and(1 < \x, \x <= 4)*(6 - 2*\x);}]
+      \begin{axis}[xtick={-13, -12, ..., 13}, ytick={-9, -8, ..., 9}, gridgraph, axis equal image, xmin=-13, xmax=13, ymin=-8, ymax=8, width=6in]
+        \addplot+[domain=-2:6, samples=9] {f(x)}; %
+        \addplot+[closed] coordinates { (-2, {f(-2)}) (6, {f(6)}) }; %
+        \solonly{%
+          \addplot+[domain=-12:4, skyblue, samples=9, very thick] {f(-x/2)}; %
+          \addplot+[closed, skyblue] coordinates { (-12, {f(6)}) (4, {f(-2)}) }; % 
+        }
+      \end{axis}
+    \end{tikzpicture}      
+
+  \item
+
+    \begin{problem}
+      $h(x) = - \dfrac{f(x)}{2}$
+    \end{problem}
+
+    \begin{tikzpicture}[declare function={f(\x)=and(-2 <= \x, \x <= 1)*(4)
+        +and(4 < \x, \x <= 6)*(2*(-5 + \x))
+        +and(1 < \x, \x <= 4)*(6 - 2*\x);}]
+      \begin{axis}[xtick={-13, -12, ..., 13}, ytick={-9, -8, ..., 9}, gridgraph, axis equal image, xmin=-13, xmax=13, ymin=-8, ymax=8, width=6in]
+        \addplot+[domain=-2:6, samples=9] {f(x)}; %
+        \addplot+[closed] coordinates { (-2, {f(-2)}) (6, {f(6)}) }; %
+        \begin{solonly}
+          \addplot[domain=-2:6, skyblue, samples=9, very thick]{-f(x)/2};
+          \addplot[closed, skyblue] coordinates {(-2, {-f(-2)/2}) (6, {-f(6)/2})};
+        \end{solonly}
+      \end{axis}
+    \end{tikzpicture}      
+
+  \item \label{given-graph-sketch-alteration-1c}
+
+    \begin{problem}
+      $j(x) = -\dfrac{f(x - 3)}{2} + 1$
+    \end{problem}
+
+    \begin{tikzpicture}[declare function={f(\x)=and(-2 <= \x, \x <= 1)*(4)
+        +and(4 < \x, \x <= 6)*(2*(-5 + \x))
+        +and(1 < \x, \x <= 4)*(6 - 2*\x);}]
+      \begin{axis}[xtick={-13, -12, ..., 13}, ytick={-9, -8, ..., 9}, gridgraph, axis equal image, xmin=-13, xmax=13, ymin=-8, ymax=8, width=6in]
+        \addplot+[domain=-2:6, samples=9] {f(x)}; %
+        \addplot+[closed] coordinates { (-2, {f(-2)}) (6, {f(6)}) }; %
+        \begin{solonly}
+          \addplot[domain=1:9, skyblue, samples=9, very thick]{-f(x-3)/2+1};
+          \addplot[closed, skyblue] coordinates {(1, {-f(-2)/2+1}) (9, {-f(6)/2+1})};
+        \end{solonly}
+      \end{axis}
+    \end{tikzpicture}      
+
+  \item
+
+    \begin{grading}
+      2 points: 1 for having endpoints in the right places, 1 for having the right $x$-intercept. If neither of these are correct, but it looks like they tried to do a vertical stretch, give 0.5 points. 
+    \end{grading}
+
+    \begin{problem}
+      $k(x) = 2 f(x)$
+    \end{problem}
+
+    \begin{tikzpicture}
+      \begin{axis}[xmin=0, ymin=-4.5, ymax=4.5, xmax=8.5, xtick={1, 2, ..., 8}, ytick={-4, -3, ..., 4}, width=3.5in]
+        \addplot+[domain={1/4}:4] {ln(x)/ln(2)};
+        \addplot+[closed] coordinates {(1/4, -2) (4, 2) }; 
+        \begin{solonly}
+          \addplot[domain=0.25:4, skyblue] {2*ln(x)/ln(2)};
+          \addplot[closed, skyblue] coordinates {(1/4, -4) (4, 4)};
+        \end{solonly}
+      \end{axis}
+    \end{tikzpicture}
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+\item  
+
+  Graph the functions below by starting with the graph of a familiar function and applying appropriate shifts, reflections, and stretches. Label all $x$- and $y$-intercepts and asymptotes. Use exact values, not numerical approximations, and show your work / explain how you found the values you labeled.
+
+  \begin{enumerate}
+
+  \item \label{graph-shifted-parabola}
+
+    \begin{grading}
+      4 points:
+      \begin{itemize}[nosep]
+      \item 1 for having an upward parabola
+      \item 1.5 for having the vertex in the right place (so having done the correct shifts) and labeling it; if they forget to label it, deduct 0.5.
+      \item 1.5 for correctly finding and labeling the $x$-intercepts. (If the intercepts are labeled but there is no work / explanation of how they found them, deduct 1.)
+      \end{itemize}
+
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      $y = (x-1)^2 - 4$. In addition to labeling any intercepts and asymptotes, label the lowest point on the graph with its coordinates. (The shape of this graph is called a \uline{parabola}, and the lowest point is called the \uline{vertex}.)
+    \end{problem}
+
+    \begin{solution}
+      Starting with the graph of $y=x^2$, we shift 1 unit to the right and 4 units down.
+      
+      To find the $y$-intercept, we set $x$ equal to zero and solve for $y$: $y=(0-1)^2-4=-3$. 
+      To find the $x$-intercepts, we set $y$ equal to zero and solve for $x$:
+      \begin{align*}
+          0 &= (x-1)^2-4 \\
+          &= x^2 - 2x -3 \\
+          &= (x-3)(x+1) \\
+          &\therefore\, x=-1,\,3.
+      \end{align*}
+      
+
+      \begin{tikzpicture}
+        \begin{axis}[xtick distance=1, ytick distance=1]
+            \addplot[domain=-2:4]{(x-1)^2-4};
+            \addplot[closed] coordinates {(-1,0) (0,-3) (1,-4) (3,0)};
+            \node[below] at (1,-4) {$(1, -4)$};
+        \end{axis}
+      \end{tikzpicture}
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      2 points:
+      \begin{itemize}[nosep]
+      \item 1 for correctly graphing the absolute value of their answer to \ref{graph-shifted-parabola}
+      \item 0.5 for labeling the $x$-intercepts and having them in the sample place as in \ref{graph-shifted-parabola}
+      \item 0.5 for labeling the $y$-intercept (and having correctly negated the $y$-coordinate from the $y$-intercept in \ref{graph-shifted-parabola})
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      $y = \left| (x - 1)^2 - 4 \right|$
+    \end{problem}
+
+    \begin{solution}
+      This function is the absolute value of the function in part (a). The portion of the
+      graph of $y=(x-1)^2-4$ that was below the $x$-axis will be flipped above the $x$-axis. This
+      means that the $y$-intercept will now be $3$, but the $x$-intercepts will stay the same,
+      $-1$ and $3$.
+
+      \begin{tikzpicture}
+        \begin{axis}[xtick distance=1, ytick distance=1]
+            \addplot[domain=-2:4]{abs((x-1)^2-4)};
+            \addplot[closed] coordinates {(-1,0) (0,3) (1,4) (3,0)};
+            \node[above] at (1,4) {$(1, 4)$};
+        \end{axis}
+      \end{tikzpicture}
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      5 points:
+      \begin{itemize}[nosep]
+      \item 1 point for the correct general shape (a vertical flip of $\frac{1}{x}$)
+      \item 2 for shifting correctly and labeling the resulting asymptotes correctly
+      \item 1.5 for finding and labeling the $x$-intercept (if the $x$-intercept is labeled but there is no work / explanation, deduct 1)
+      \item 0.5 for labeling the $y$-intercept
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\vfill\newpage]
+      $y = - \dfrac{1}{x + 5} - 3$      
+    \end{problem}
+
+    \begin{solution}
+      Starting with the graph of $y=\frac{1}{x}$, we shift to the left by 5 units, reflect
+      over the $x$-axis, then shift down by 3 units. This means that the horizontal asymptote
+      will be $y=-3$, and the vertical asymptote will be $x=-5$.
+
+      To find the $y$-intercept, we set $x$ equal to zero and solve for $y$: $y=-\dfrac{1}{0+5}-3
+      = -\frac{16}{5}$. To find the $x$-intercept, we set $y$ equal to zero and solve for $x$:
+      \begin{align*}
+        0 &= -\frac{1}{x+5} -3 \\
+        3 &= -\frac{1}{x+5} \\
+        3(x+5) &= -1 \\
+        x+5 &= -\frac{1}{3} \\
+        x &= -\frac{16}{3}.
+      \end{align*}
+
+      \begin{tikzpicture}
+        \begin{axis}[restrict y to domain=-7:6, xtick={-5}, ytick={-3}]
+          \addplot[domain=-7:0.5,samples=300]{-1/(x+5)-3};
+          \draw[dashed] (-7,-3) -- (0.5,-3);
+          \draw[dashed] (-5,-7) -- (-5, 6);
+          \addplot[closed] coordinates {({-16/3},0) (0,-3.2)};
+          \node[above left] at ({-16/3},0) {$(-\frac{16}{3},0)$};
+          \node[below left] at (0,-3.2) {$(0, -\frac{16}{5})$};
+        \end{axis}
+      \end{tikzpicture}
+    \end{solution}
+
+  \end{enumerate}
+
+\item \label{titmus} 
+
+  In the 2021 Tokyo Olympics, swimmer Ariarne Titmus won the 200 meter women's freestyle race. An Olympic pool is 50 meters long, so this race involves swimming 4 lengths of the pool (2 laps). \href{https://www.nbcolympics.com/videos/ariarne-titmus-closes-dramatic-200-free-win-ledecky-5th}{Here's a video of the race} and \href{https://www.nytimes.com/interactive/2021/07/31/sports/olympics/katie-ledecky-swimming-free-olympics.html?unlocked_article_code=mPtDY_a64w4QEtJSpDe4GEUEVJr5AsdCx0eWZvI53MhLtmdrRRPqKySn5kItFlZOI1_ynx5u0pnP7Xf64XTZL6eLRwelpNaycLae8FBcqhFvXVwT2zkksfeFD1iYxTtHz5oXpYGTtBrgz3EPom5j_5zMJjckpK1YxSIMFzzfNEP3BTqNiAec8Oah4Hkh70wNQKYopR7tGxJ3AEPZIIBRRgrgVW-EE9uUUzUTxwNzjvfQMC0BGi-dokI-ISTPWSWEpsPO24Wlvd0DXZ3U4gEUHbmPrsO7_X8VIXFyaYdY-dQdqi5eBeAploeOt6k7_kZoMp93xsjtixW3ahD2R4RGOWJSBjLD8wL6Y70ScWHUg_0777DFy_c9185mubWp8X0uxNe7JP29&smid=url-share}{an animation} (click the Play button right before the 400-Meter Freestyle section).
+
+  \begin{enumerate}
+  \item
+
+    \begin{grading}
+      1.5 points: 0.5 for the choice, 1 for the explanation 
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      One of these graphs shows Titmus's velocity in the race as a function of time. Which one? How do you know?
+
+      \begin{imagetable}{3}{\Alph}
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty, width=2.15in]
+            \addplot[sharp plot] file {data/titmus-position.txt};
+          \end{axis}
+        \end{tikzpicture}
+        & 
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty, width=2.15in]
+            \addplot[sharp plot] file {data/titmus-velocity.txt};
+          \end{axis}
+        \end{tikzpicture}
+        &
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty, width=2.15in]
+            \addplot[sharp plot] file {data/titmus-distance.txt};
+          \end{axis}
+        \end{tikzpicture}
+      \end{imagetable}
+    \end{problem}
+
+    \begin{solution}
+      Since Titmus had to change direction 3 times, her velocity should change sign (from positive to negative or vice versa) 3 times. Only \fbox{(B)} does this. 
+    \end{solution}
+
+  \item \label{titmus-acceleration}
+
+    \begin{workshop}
+      If students aren't sure about average acceleration, have them
+      look back at {{{{\#6}}(f)}} on \href{https://people.math.harvard.edu/~jjchen/mathma/docs/worksheets/worksheet03-sols.html}{the worksheet ``More on Functions, Average Rates of Change''}. 
+    \end{workshop}
+
+    \begin{grading}
+      2 points: 1 for marking correct times, 1 for explaining how to visualize the average acceleration
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      On the graph you picked, mark an example of times $a$ and $b$ for which Titmus's average acceleration on $[a, b]$ was negative, and explain how to visualize that average acceleration on the graph.
+    \end{problem}
+
+    \begin{solution}
+      Since average acceleration is the average rate of change of velocity, we're just looking for an interval $[a, b]$ where the average rate of change of graph (B) is negative. This is true as long as the average velocity at time $b$ is lower than the average velocity at time $a$. Here's one example; the average acceleration is the slope of the secant line between times $a$ and $b$ (shown in pink).
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick={20.09, 41.01}, xticklabels={$a$, $b$}, ytick=\empty]
+            \addplot[sharp plot] file {data/titmus-velocity.txt};%
+            \addplot+[hotpink, sharp plot] coordinates { (20.09, 1.68129) (41.01, -1.41975) }; % 
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \item
+
+    \begin{workshop}
+      If students aren't sure about the relationship between velocity
+      and speed, have them look back at
+      {{{{\#6}}(e)}} on \href{https://people.math.harvard.edu/~jjchen/mathma/docs/worksheets/worksheet03-sols.html}{the worksheet ``More on Functions, Average Rates of Change''}. 
+    \end{workshop}
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\nstretch{2}]
+      Sketch a rough graph of Titmus's speed as a function of time. 
+    \end{problem}
+
+    \begin{solution}
+      Titmus's speed at any moment is the absolute value of her velocity:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick=\empty, ytick=\empty, width=2.15in, ymin=-5]
+            \addplot[sharp plot] file {data/titmus-speed.txt};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+  \begin{grading}
+    2 points per problem (so 10 points total), graded for completion:
+    \begin{itemize}[nosep]
+    \item 1.5 for either a genuine attempt at the problem or, if they're stuck, writing down the ideas they think the problem is related
+    \item 0.5 for doing the short reflection for the problem
+    \end{itemize}
+  \end{grading}
+
+  \begin{problem}
+    Complete Practice Mini-Exam 1, and upload your work to the Gradescope assignment ``Practice Mini-Exam 1''. See more detailed instructions on the first page of the practice exam. 
+  \end{problem}
+
+\item  
+  \begin{grading}
+    Nothing to turn in.
+  \end{grading}
+
+  \begin{problem}
+    If you haven't already, please talk with someone at the MQC or office hours, or get together with at least one other student outside of class sometime soon. As a reminder, we'll ask you to write a little about your experience doing this on Problem Set 6 (due Wednesday 9/20) and to share in class, so that you can hear from your peers about what different resources are like.
+
+    (You don't need to submit anything now.)
+  \end{problem}
+
+\end{enumerate}
+\psreflection{For next class, read \S 4.2, 4.3, Example 4.7 of \S 4.4.}
+\end{document}

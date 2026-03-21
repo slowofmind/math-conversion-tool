@@ -1,0 +1,179 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{exam}
+\RequirePackage{handout}
+\RequirePackage{enumitem}
+\RequirePackage{pifont}
+
+\setenumerate[1]{ref=\#\arabic*}
+
+\newcounter{totalpoints}
+\newcounter{pointsection}
+
+% whether to show subtotal in multi-part exams
+\newboolean{showSubtotal}
+\setboolean{showSubtotal}{true}
+
+% set this counter to something if you want a new points section to be
+% automatically started after some number of entries.
+\usepackage{multicol}
+\newcounter{pointAutoSection}
+\setcounter{pointAutoSection}{-1}
+\newcounter{pointAutoSectionInternalCounter}
+\setcounter{pointAutoSectionInternalCounter}{0}
+
+\newcommand{\pointsection}[2][2]{%
+  \addtocounter{pointsection}{1}%  
+  \ifthenelse{\value{pointsection}>1}{%
+    \ifthenelse{\boolean{showSubtotal}}{
+      \addtocontents{lop}{\protect\hline}%
+      \addtocontents{lop}{Total & \arabic{totalpoints} & \\}%
+      \addtocontents{lop}{\protect\hline}%
+      \setcounter{totalpoints}{0}
+    }{}
+    \addtocontents{lop}{\protect\end{tabular}}
+    \addtocontents{lop}{\protect\end{center}}%
+    \addtocontents{lop}{\protect\vfill}%  
+    \addtocontents{lop}{\protect\columnbreak}%  
+    \addtocontents{lop}{\protect\begin{center}}%
+    \addtocontents{lop}{\textbf{#2}}
+    \addtocontents{lop}{\protect\end{center}}%
+    \addtocontents{lop}{\protect\renewcommand{\protect\arraystretch}{1.5}}%
+    \addtocontents{lop}{\protect\begin{center}}%
+      \addtocontents{lop}{\protect\begin{tabular}{| c | c | c |}}%
+        \addtocontents{lop}{\protect\hline}%
+        \addtocontents{lop}{Problem & Points & Score \\}%
+        \addtocontents{lop}{\protect\hline \protect\hline}%
+  }{% first startsection
+    \addtocontents{lop}{\protect\begin{multicols}{#1}}%
+    \addtocontents{lop}{\protect\raggedcolumns}
+    \addtocontents{lop}{\protect\begin{center}}%
+    \addtocontents{lop}{\textbf{#2}}
+    \addtocontents{lop}{\protect\end{center}}%
+  }
+}
+
+\newcommand{\finishexam}{%
+  \addtocontents{lop}{\protect\hline}%
+  \addtocontents{lop}{Total & \arabic{totalpoints} & \\}%
+  \addtocontents{lop}{\protect\hline}%
+  \addtocontents{lop}{\protect\end{tabular}}
+  \addtocontents{lop}{\protect\end{center}}%
+\ifthenelse{\value{pointsection}>1}{%
+  \addtocontents{lop}{\protect\end{multicols}}
+}{}
+}
+
+\def\listofproblems{%
+  \probonly{
+  \@mkboth{List of Problems}{List of Problems}%
+  \@starttoc{lop}%
+  \addtocontents{lop}{\protect\renewcommand{\protect\arraystretch}{1.5}}%
+  \addtocontents{lop}{\protect\begin{center}}%
+  \addtocontents{lop}{\protect\begin{tabular}{| c | c | c |}}%
+  \addtocontents{lop}{\protect\hline}%
+  \addtocontents{lop}{Problem & Points & Score \\}%
+  \addtocontents{lop}{\protect\hline \protect\hline}%
+  \newpage
+  }
+}
+
+\newcommand{\showpoints}[1]{\probonly{#1}}
+\DeclareOption{nopoints}{%
+  \renewcommand{\showpoints}[1]{}%
+}
+
+\newcommand{\points}[2][0]{%
+  \addtocounter{pointAutoSectionInternalCounter}{1}  
+  \ifthenelse{\equal{#1}{EC}}{
+    \addtocontents{lop}{\arabic{enumi} & Extra credit & \\ \protect\hline}%
+    \ifthenelse{\equal{#2}{1}}{\showpoints{(\emph{Extra credit}, maximum 1 point)}}{\showpoints{(\emph{Extra credit}, maximum #2 points)}}%
+  }
+  {
+    \addtocontents{lop}{\arabic{enumi} & #2 & \\ \protect\hline}%
+    \addtocounter{totalpoints}{#2}%
+    \ifthenelse{\equal{\value{pointAutoSectionInternalCounter}}{\value{pointAutoSection}}}
+    {\pointsection{}\setcounter{pointAutoSectionInternalCounter}{0}}
+    {}%
+    \ifthenelse{\equal{#2}{1}}
+    {\showpoints{(1 point)}}
+    {\showpoints{(#2 points)}}%
+  }
+}
+
+\renewcommand{\title}[1]{%
+  \begin{center}%
+    \Large\textsc{#1}
+  \end{center}%
+}
+
+\newcommand{\instructions}[2]{%
+  \ifthenelse{\equal{#2}{}}
+  {
+    \probonly{
+      \thispagestyle{empty}
+
+      \begin{tabular}{| p{4in} | p{\linewidth-4.35in} |}
+        \hline
+        \vspace{-4pt}\textbf{Name:} & \vspace{-4pt}\textbf{Student ID:} \\[0.4in]        
+        \hline
+      \end{tabular}
+
+      \emph{As a member of Harvard College, I pledge that I will not
+        give or receive assistance on this exam.}
+
+      \bigskip
+      
+      \hfill Signature: \fitb{3in}{}
+
+      \input{#1}
+      \normalsize
+    }
+  } % else
+  {
+    \probonly{
+      \thispagestyle{empty}
+      \begin{tabular}{l l}
+        \input{#1}
+        
+        &
+
+        \begin{minipage}[t]{2.65in}
+
+          \smallskip
+          
+          \textbf{Name:}
+
+          \fbox{
+            \begin{minipage}[t]{2.45in}
+              \hspace{2.4in}
+              \vspace{0.35in}
+            \end{minipage}
+          }
+          
+          \bigskip
+          
+          \textbf{Please circle your section:}
+          
+          \normalsize
+
+          \input{#2}
+          
+        \end{minipage}
+      \end{tabular}
+    }
+  }  
+}
+
+\DeclareOption{nospace}{%
+  \renewcommand{\listofproblems}{}
+  \renewcommand{\instructions}[2]{}
+}
+
+\definecolor{gradingColor}{rgb}{0,0.6,0}
+
+\DeclareOption{grading}{%
+  \renewenvironment{grading}{\color{gradingColor}\textbf{Grading Notes.}}{\color{black}}%
+}
+
+\ProcessOptions
+\endinput

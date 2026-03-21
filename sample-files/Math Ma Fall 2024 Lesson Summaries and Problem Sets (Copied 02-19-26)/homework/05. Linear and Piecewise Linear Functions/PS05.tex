@@ -1,0 +1,594 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{pifont}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols, grading, workshop]{handout}
+
+\providecommand{\check}{}
+\renewcommand{\check}{\ifmmode{\text{ \ding{51} }}\else{\ding{51} }\fi}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\newcommand{\doedfinity}[2][\newpage]{
+  \begin{problem}[#1]
+    Do the Edfinity assignment ``Problem Set #2''.
+
+    We encourage you to write down any scratch work here, as well as
+    things you want your future self to remember. Nothing you write
+    here will be graded; it's just for you!
+  \end{problem}
+}
+
+\newcommand{\psreflection}[2][]{
+
+  \ifthenelse{\not\equal{#1}{nocite}}{
+    \begin{enumerate}[resume]
+    \item
+      \begin{problem}[1in]
+        Please cite any help you got on this problem set:
+        \begin{itemize}[nosep]
+        \item If you worked with other students, please list their names here.
+        \item If you used resources other than those on our Canvas site, please list them here.
+        \end{itemize}
+      \end{problem}
+
+    \end{enumerate}
+  }
+
+  \probonly{%
+    #2
+
+    \newpage
+
+    \emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!
+    \begin{itemize}
+    \item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!
+
+      \vspace{1.5in}
+
+    \item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.
+
+      \vspace{1.5in}
+
+    \item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!
+
+      \vfill
+    \end{itemize}      
+  }
+}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 5 - Linear and Piecewise Linear Functions}
+\end{center}
+
+\begin{enumerate}
+\item 
+
+  \note{
+    \begin{itemize}[nosep]
+    \item Algebra: solving equations (without fractions or square roots or anything messy like that)
+    \item Slope-intercept and point-slope form
+    \item Basic word problem about a linear situation (primary goal is to practice translating words into math)
+    \item Practice with graph transformations (graphical)
+    \end{itemize}
+  }
+
+  \doedfinity{5}
+
+\item 
+
+  In each part, find an equation for the line described; you need not simplify. We know how to write lines in slope-intercept form and in point-slope form; use whichever is easier. 
+
+  \begin{grading}
+    1.5 points per part: 1 for finding the slope and 0.5 for the equation. If they correctly use slope-intercept form, deduct 0.01 and let them know point-slope is more straightforward. (The 0.01 deduction is just so they'll see you've left them feedback.) 
+  \end{grading}
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      The line parallel to $3x-4y=7$ that passes through the point $(\sqrt{3}, \sqrt{2})$.
+    \end{problem}
+
+    \begin{solution} 
+      We are given a point on the line so it would be easy to find the equation of the line if we knew the slope. We do know it is parallel to $3x-4y =7$. If we put  $3x-4y =7$ into slope intercept form, we can read off the slope of that line. $$4y = 3x-7$$ 
+      $$ y = \frac{3}{4}x -\frac{7}{4}$$ 
+      The slope of the line we want is $\frac{3}{4}$.
+      $$ \boxed{y - \sqrt{2} = \frac{3}{4} (x- \sqrt{3})}$$
+    \end{solution}
+
+  \item
+    \begin{problem}[\nstretch{0.75}]
+      The line $\mathcal{L}$ shown below. (Express your answer
+      in terms of $f$, $a$, and $b$.)
+
+      \begin{tikzpicture}[declare function={f(\x)=cos(deg(sqrt(\x))) + 1.5;}]
+        \begin{axis}[ytick=\empty, xtick={3, 14}, xticklabels={$a$, 
+            $b$}, ymin=0, clip=false, width=2.5in]
+          \addplot+[domain=0:30] {f(x)}
+          node[right]{$y = f(x)$}; %
+          \draw[dashed] (3, 0) -- (3, {f(3)}); %
+          \draw[dashed] (14, 0) -- (14, {f(14)}); %
+          \addplot+[closed] coordinates {(3, {f(3)}) (14, {f(14)})}; %
+          \draw[shorten >= -0.5in, shorten <=-0.5in] (3, {f(3)}) --
+          (14, {f(14)}) node[pos=1.6, right]{$\mathcal{L}$}; % 
+        \end{axis}
+      \end{tikzpicture}
+    \end{problem}
+
+    \begin{solution}
+      We can write down the coordinates of two points on the line: $(a, f(a))$ and $(b, f(b))$.
+      We can write down the equation of the line in point-slope form as
+      \[\boxed{y-f(a)=\frac{f(b)-f(a)}{b-a}(x-a).}\]
+    \end{solution}
+
+  \end{enumerate}
+
+\item % 4.3.1
+
+  A photocopying shop spends \$6000 per month on fixed costs such as
+  rent and paying their employees. In addition, it costs them \$0.01
+  per page they copy. They charge customers \$0.07 per page.
+
+  \emph{Note:} If you aren't familiar with the difference between \emph{revenue} and \emph{profit}, please read the first paragraph of Example 3.1 on pg. 101 of \href{https://people.math.harvard.edu/~jjchen/mathma/docs/handouts/Gottlieb.html}{Gottlieb}.
+
+  \begin{enumerate}
+
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Write a formula for $R(x)$, the shop's monthly revenue from
+      making $x$ copies in a month.
+    \end{problem}
+
+    \begin{solution} 
+      $\boxed{R(x) = .07 x}$ 
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Write a formula for $C(x)$, the shop's monthly costs from making
+      $x$ copies in a month.
+    \end{problem}
+
+    \begin{solution} 
+      $\boxed{ C(x) = 6000+.01x}$
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}    
+
+    \begin{problem}[\vfill]
+      Write a formula for $P(x)$, the shop's monthly profit (or loss
+      if negative) from making $x$ copies. (Profit = revenue $-$
+      costs.) 
+    \end{problem}
+
+    \begin{solution} 
+      $P(x) = R(x) - C(x) = .07x - (6000 +.01x) = \boxed{.06x -6000}$. 
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\nstretch{3}]
+      How many copies must they make per month in order to break even?
+      (Breaking even means that the profit is zero; the total costs
+      and total revenue are equal.)
+    \end{problem}
+
+    \begin{solution} 
+      Breaking even means that the profit is zero.
+      \begin{align*}
+        P(x) &= 0 \\
+        .06x -6000 &= 0 \\
+        .06x &= 6000 \\
+        x &= 100000
+      \end{align*}
+      So the shop must produce 100000 photocopies to break even.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      4 points:
+      \begin{itemize}[nosep]
+      \item 0.5 for $R(x)$ going through the origin
+      \item 0.5 for $C(x)$ having a positive $y$-intercept
+      \item 0.5 for $P(x)$ having a negative $y$-intercept
+      \item 0.5 for $R(x)$ having a positive slope
+      \item 0.5 for $C(x)$ having a positive slope that's less steep than that of $R(x)$
+      \item 0.5 for $P(x)$ having a positive slope that's between that of $C$ and $R$
+      \item 0.5 for $P(x)$ crossing the $x$-axis at the labeled break-even point
+      \item 0.5 for $R(x)$ and $C(x)$ intersecting at the labeled break-even point 
+      \end{itemize}
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Sketch the graphs of $C(x), R(x)$, and $P(x)$ on the same set of axes and label the break-even point.
+    \end{problem}    
+
+    \begin{solution}
+      The break-even point 100000 is where $P(x) = 0$, as well as where $R(x)$ and $C(x)$ intersect.
+
+      \begin{tikzpicture} 
+        \begin{axis}[disabledatascaling=false, clip=false, xtick={100000}, ytick={-6000, 6000}, xticklabel style={/pgf/number format/fixed}]
+          \addplot+[domain=0:200000, red] {.06*x-6000} node[right]{$P(x)$}; %
+          \addplot+[domain=0:200000, green] {.07*x} node[right]{$R(x)$}; %
+          \addplot+[domain=0:200000, blue] {.01*x+6000} node[right]{$C(x)$}; %
+        \end{axis}
+      \end{tikzpicture} 
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      2 points: 1 for the formula, 1 for the units.
+    \end{grading}
+
+    \begin{problem}[\stretch{0.35}]
+      Find a formula for $A(x)$, the shop's average cost per copy if
+      they make $x$ copies in a month. Include units in your answer. 
+    \end{problem}
+
+    \begin{solution} 
+      The average cost per copy is
+      $\dfrac{\text{total costs}}{\text{\# of copies}} = \dfrac{C(x)
+      }{x} = \boxed{\frac{.01x +6000}{x} \text{ dollars per copy}}$.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      2 points: 1 for the graph, 1 for the explanation
+    \end{grading}
+
+    \begin{problem}[\vfill\newpage]
+      Sketch the graph of $A(x)$, and explain how you got it. 
+    \end{problem}
+
+    \begin{solution}
+      $A(x) = \dfrac{.01x +6000}{x} = .01 + \dfrac{6000}{x}$, so we
+      can get this graph by starting with $y = \dfrac{1}{x}$, 
+      stretching vertically by a factor of 6000, and moving up by
+      $0.01$:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[disabledatascaling=false, xmin=0, xtick=\empty, 
+            ytick=\empty, ymax=3]
+            \addplot+[domain=0:20000, restrict y to domain=0:5] {0.01
+              + 6000/x};            
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      (This graph has a horizontal asymptote at $y = 0.01$, not $y =
+      0$.) 
+    \end{solution}
+
+  \end{enumerate}
+
+\item % 4.4.13
+  The math department wants to buy mugs for its faculty and staff. They look up a mug company's website and find that the company charges the following:
+  \begin{itemize}[nosep]
+  \item For the first $20$ mugs, the cost is \$7 per mug; for the next $50$ mugs, the cost is \$6 per mug; for all mugs after that, the cost is \$5 per mug.
+  \item Shipping costs \$10, no matter how many mugs are ordered. 
+  \end{itemize}
+  Let $N(x)$ be the cost of ordering $x$ mugs. Although $N(x)$ is a discrete function, we'll model it as a continuous one. 
+
+  \begin{enumerate}
+
+  \item
+
+    \begin{grading}
+      2.5 points: 1 point for something piecewise linear, 1 point for
+      the slopes decreasing, 0.5 for labeling the $y$-intercept. If they start the graph at $x = 1$ (and therefore don't have a $y$-intercept), don't deduct since this is also a reasonable interpretation of the problem. 
+    \end{grading} 
+
+    \begin{problem}[\vfill]
+      Sketch a graph of $N(x)$, labeling intercepts and any other significant values on the axes.
+    \end{problem}    
+
+    \begin{solution}
+      This graph is piecewise linear; we've used different colors to show the different pieces to make them more clear.
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[ytick={10,150,450}, xtick={20, 70}]
+            \addplot+[domain=0:20, red] {10+7*x}; %
+            \addplot+[domain=20:70, green] {150+6*(x-20)}; %
+            \addplot+[domain=70:85, blue] {450+5*(x-70)}; %
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \item
+
+    \begin{grading} 
+      4 points: 1 for the formula for each piece, plus 1 point for specifying appropriate domains for each piece.
+
+      Of course, students might simplify $150 + 6 (x - 20)$ to $6x + 30$ and $450 + 5 (x - 70)$ to $5x + 100$. Also, they might differ on where they put $\leq$ or $<$ in their descriptions of what $x$ each piece applies to (like they might say the first piece is $0 \leq x < 20$ and the second piece is $20 \leq x \leq 70$). Again, it's okay if their domain starts at $x = 1$. 
+    \end{grading} 
+
+    \begin{problem}[\vfill\newpage]
+      Find a formula for $N(x)$. Be sure to communicate your reasoning clearly. 
+    \end{problem}
+
+    \begin{solution} 
+      \[
+        N(x) = \begin{cases}              
+          10+7x& \text{if $0 \leq x \leq 20$ }\\
+          150+6(x-20) & \text{if $20 < x \leq 70$}\\
+          450+5(x-70) & \text{if $70 < x$}
+        \end{cases}
+      \]
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      3 points: 1.5 for each example. If both examples they pick are with $\leq 20$ mugs, deduct 1 point, since that really isn't so useful.
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      \check Do two concrete examples to check that your formula for $N(x)$ is correct. That is, pick two specific numbers of mugs, explain how much it would cost to order that many mugs, and check that your results agree with your formula for $N(x)$. (Pick examples that will help you verify your formula!) 
+    \end{problem}
+
+    \begin{solution}
+      The cost of ordering 21 mugs should be \$156, since the first 20 mugs are \$7 each, plus
+      one mug at \$6 per mug, plus \$10 for shipping. This matches with the formula, since
+      $N(21)=156$. 
+
+      The cost of ordering 71 mugs should be \$455, since the first 20 mugs are \$7 each, the
+      next 50 mugs are \$6 each, plus one mug at \$5 per mug, plus \$10 for shipping. This matches
+      with the formula, since $N(71)=455$. 
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      2.5 points: 0.5 for knowing to solve $N(x) = 420$, 1 for correctly figuring out which piece of the formula for $N(x)$ is relevant, 1 for solving correctly. 
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      If the department has \$420 to spend on mugs, how many can they buy? Make sure to explain your reasoning. 
+    \end{problem}
+
+    \begin{solution}
+      We can determine the number of mugs they can buy by solving the equation $N(x)=420$.
+      Based on the graph, this will occur when $x$ is between 20 and 70, so we should use
+      the corresponding piece of the piecewise formula.
+      \begin{align*}
+        150+6(x-20) &= 420 \\
+        6(x-20) &= 270 \\
+        x-20 &= 45 \\
+        x &= 65
+      \end{align*}
+      Assuming all costs have been accounted for, the math department can buy 65 mugs for \$420.
+    \end{solution}
+
+  \item 
+
+    \begin{grading} 
+      4 points: 1 point for each horizontal piece, 1 point for having $N'(20)$ and $N'(70)$ undefined. (At this point in the semester, we're not picky about whether $N'(0)$ is defined.)
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      Sketch the graph of the ``slope function'' $N'(x)$, which gives the slope at every point on the graph of $N$. Make sure your graph shows clearly where $N'$ is undefined.
+    \end{problem}
+
+    \begin{solution}
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick={20, 70}, ytick={5, 6, 7}, ymin=0]
+            \addplot+[domain=0:20] {7}; %
+            \addplot+[domain=20:70] {6}; %
+            \addplot+[domain=70:100] {5}; %
+            \addplot+[open] coordinates { (0, 7) (20, 7) (20, 6) (70, 6) (70, 5) }; % 
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \item 
+
+    \begin{grading} 
+      2 points, 1 for the practical meaning and 1 for the units. There is some fuzziness here that comes from the fact that we're using a continuous model, so something like $N'(19.5)$ doesn't really fit the interpretation below. So, it's fine as long as they've captured the general idea that $N'(x)$ represents the cost per additional mug. 
+    \end{grading} 
+
+    \begin{problem}[0.75in]
+      What is the practical meaning of $N'(x)$? Include units in your answer.
+    \end{problem}
+
+    \begin{solution}
+      $N'(x)$ can be thought of as the cost for buying an additional mug if you were already buying $x$ mugs. Its units are dollars per mug. 
+    \end{solution}
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+\item \textbf{Reflect Back} (to last class). A few weeks or months from now, the rules for shifting and stretching graphs may be hazy in your mind, but you can reconstruct them easily. Reconstructing math knowledge in this way is an important skill! Nobody can remember everything forever; mathematicians constantly reconstruct past knowledge.
+
+  Suppose you and a friend have forgotten whether replacing $x$ by
+  $x+3$ shifts the graph of $f$ right or left.
+
+  \begin{grading}
+    1 point per part
+  \end{grading}
+
+  \begin{enumerate}
+  \item
+
+    \begin{problem}[\vfill]
+      You decide you'll experiment with the example $f(x) = x^2$.
+      Without working out the graph of $f(x + 3)$ in detail, how would
+      you decide whether the graph moved left or right? What's the
+      simplest thing for you to look at to make this decision?
+    \end{problem}
+
+    \begin{solution}
+      You could look at where the $x$-intercept is: $(x + 3)^2$ has
+      $x$-intercept $-3$, so $y = (x + 3)^2$ is 3 units to the left of
+      $y = x^2$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Your friend decides to experiment with the example $f(x) =
+      \dfrac{1}{x}$. What's the simplest thing for your friend to look
+      at to help her decide whether $f(x + 3)$ is a shift to the left
+      or to the right? 
+    \end{problem}
+
+    \begin{solution}
+      Your friend could think about the vertical asymptote. The
+      vertical asymptote for $y = \dfrac{1}{x}$ is at $x = 0$, while
+      the vertical asymptote for $y = \dfrac{1}{x + 3}$ is at $x = -3$.
+      So, again, $y = \dfrac{1}{x + 3}$ is 3 units to the left of
+      $y = \dfrac{1}{x}$.
+    \end{solution}
+  \end{enumerate}
+
+\item 
+
+  \begin{problem}
+    We'll post solutions to Practice Mini-Exam 1 on the morning of Sunday 9/17, so check your work then. And we strongly encourage you to do more practice exams. (In a past semester of Math M, we surveyed students about how they prepared for an exam. The thing that correlated most strongly with their exam grades was how many practice exams they did!) 
+
+    (There's nothing to turn in for this problem.) 
+  \end{problem}
+
+\end{enumerate}
+\psreflection{For next class, read \S 3.2, 1.3.}
+\end{document}

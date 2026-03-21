@@ -1,0 +1,594 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 27 - Integration by Substitution}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{grading}
+  \begin{enumerate}
+    \item 10 points
+    \item 5 points
+    \item 10 points
+    \item 8 points
+    \item 12 points
+    \item 5 points
+\end{enumerate}
+Total: 50 points.
+  
+
+  \textbf{One note:} Please be strict with students about using correct notation
+  when dealing with the endpoints in definite integrals.  For instance,
+  they can write $\displaystyle \int_2^3 2x \sin(x^2)\,dx = \int_4^9 \sin
+  u\,du$, or they can write $\displaystyle \int_2^3 2x \sin (x^2)\,dx =
+  \int_{{\color{red}x=\color{black}2}}^{{\color{red}x=\color{black}3}}
+  \sin u\,du$, but writing $\displaystyle \int_2^3 2x \sin(x^2)\,dx =
+  \int_2^3 \sin u\,du$ is incorrect, and you should take off a little bit
+  (like half a point) every time this happens, so that students get used
+  to the idea that we care about this.
+
+  They can also choose to solve the indefinite integral first with substitution, and then plug in the bounds at the end. We want to discourage this though, because students tend to forget the bounds.
+\end{grading}
+
+For help with these problems, read pp. 787-796 in Gottlieb.
+% If you'd like a little extra practice, Exercise 25.2 on
+%   page 796 gives you some hints without giving all of the details.  You
+%   can also try any problems from the workbook that you didn't get
+%   to in class (solutions are posted on the course website).
+
+\begin{enumerate}
+\item 
+
+\begin{grading}
+10 points: 2/3/2/3.
+\end{grading}
+
+
+
+
+  Find or evaluate the following integrals using the given substitution.  Write a sentence or two explaining why the given substitution is a good choice. 
+  
+  Then, check your answers to {{{{\#1}}(a)}} and
+  {{{{\#1}}(c)}} by differentiating them.
+
+  \begin{enumerate}[topsep=0pt]
+  \item
+\begin{problem}[\vfill]
+      $\displaystyle \int x \sin (x^2)\,dx$. Let $u = x^2$, 
+      $du = \fitb{1in}{2x\,dx}$.
+    \end{problem}
+
+    \begin{solution}
+      \sub{$u = x^2$} is a good substitution since $x^2$ is the inner
+      function in the composition $\sin(x^2)$, and we see something
+      related to $du = 2x\,dx$ in the integral, namely
+      \subd{$\frac{1}{2}\,du = x\,dx$}.  Then,
+      \begin{align*}
+        \int \subd{x} \sin(\sub{x^2})\, \subd{dx} &= \int \sin(\sub{u}) \cdot
+        \subd{\tfrac{1}{2}\ du} \\
+        &= - \frac{1}{2} \cos u + C \\
+        &= \boxed{- \frac{1}{2} \cos(x^2) + C}
+      \end{align*}
+      Let's check:
+      \begin{align*}
+        \frac{d}{dx} \left(-\frac{1}{2}\cdot \fcolorbox{red}{white}{$\displaystyle
+            \cos \left(\fcolorbox{blue}{white}{$\displaystyle x^ {2}
+                $}\right)$} + C \right)  
+        = {} & -\frac{1}{2}\cdot \left(-\sin \left(x^ {2} \right)\cdot
+          2 x\right) \\
+        = {} & x \sin(x^2) \checkmark
+      \end{align*}
+    \end{solution}
+
+  \item
+
+    \note{If they forget to change the endpoints here and plug in
+      $x$-endpoints for $u$, they'll get something undefined.  So, that
+      will hopefully get them to think a little more about what's going
+      on.} 
+
+    \begin{problem}[\vfill]
+      $\displaystyle \int_0^1 \frac{1}{(4x + 1)^3}\,dx$. Let $u =
+      4x + 1$; $du=\fitb{1in}{4\,dx}$.
+    \end{problem}
+
+    \begin{solution}
+      \sub{$u = 4x + 1$} is a good substitution since $4x + 1$ is the
+      inner function in the composition $(4x + 1)^3$.  With this
+      substitution, $du = 4\,dx$, so \subd{$\frac{1}{4}\, du = dx$}.
+      Since $x$ goes from $0$ to $1$, $u = 4x + 1$ goes from $4(0) + 1 =
+      1$ to $4(1) + 1 = 5$, so we can rewrite the original integral as
+      \begin{align*}
+        \int_0^1 \frac{1}{(\sub{4x + 1})^3}\,\subd{dx} &= \int_1^5
+        \frac{1}{\sub{u}^3} \cdot \subd{\frac{1}{4}\, du} \\
+        &= \frac{1}{4} \int_1^5 u^{-3}\, du \\
+        &= \frac{1}{4} \left( \left. - \frac{1}{2} u^{-2} \right|_1^5
+        \right) \\
+        &= \left. - \frac{1}{8} \cdot \frac{1}{u^2} \right|_1^5 \\
+        &= - \frac{1}{8} \left( \frac{1}{25} - 1 \right) \\
+        &= - \frac{1}{8} \left( - \frac{24}{25} \right) \\
+        &= \boxed{\frac{3}{25}}
+      \end{align*}
+      \emph{Note on notation:} If you prefer not to change the bounds
+      of the integral to be in terms of $u$, your first line should
+      instead read
+      \[ \int_0^1 \frac{1}{({4x + 1})^3}\,{dx} = \int_{x=0}^{x=1}
+      \frac{1}{u^3} \cdot \frac{1}{4}\, du.\] It is
+      \color{red}\textbf{not} \color{black} correct to write
+      \[ \int_0^1 \frac{1}{({4x + 1})^3}\,{dx} = \int_0^1
+      \frac{1}{u^3} \cdot \frac{1}{4}\, du.\]
+      (The latter notation says that $u$ is going from $0$ to $1$, which
+      is not true.)
+    \end{solution}
+
+
+  \item
+\begin{problem}[\vfill]
+      $\displaystyle \int \frac{x}{x^2 + 9}\,dx$. Let $u = x^2 +
+      9$; $du=\fitb{1in}{2x\,dx}$. 
+    \end{problem}
+
+    \begin{solution}
+      \sub{$u = x^2 + 9$} looks like a reasonable substitution since it's
+      in the denominator and we see something related to $du = 2x\,dx$ in
+      the integral, namely \subd{$\frac{1}{2}\,du = x\,dx$}.  Then,
+      \begin{align*}
+        \int \frac{\subd{x}}{\sub{x^2 + 9}}\,\subd{dx} &= \int
+        \frac{1}{u} \left( \frac{1}{2}\,du \right) \\
+        &= \frac{1}{2} \int \frac{1}{u}\,du \\
+        &= \frac{1}{2} \ln |u| + C \\
+        &= \boxed{\frac{1}{2} \ln |x^2 + 9| + C}
+      \end{align*}
+      Let's check.  First, notice that $x^2 + 9$ is always positive,
+      so $|x^2 + 9|$ is the same as $x^2 + 9$.  Therefore, another way
+      of writing our answer is $\frac{1}{2} \ln (x^2 + 9) + C$:
+      \[ \frac{d}{dx} \left(\frac{1}{2}
+        \fcolorbox{red}{white}{$\displaystyle
+          \ln\left(\fcolorbox{blue}{white}{$\displaystyle x^ { 2} +
+              9$}\right)$}\right) = \frac{1}{2} \cdot \frac{1}{x^ { 2} +
+        9}\cdot 2 x = \frac{x}{x^2 + 9} \checkmark\]
+    \end{solution}
+
+    \pspace{\newpage}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int_0^{\ln 4} e^{x} \sqrt{3 e^x+13}\,dx$.
+      Let $u = 3 e^x+13$; $du=\fitb{1in}{3e^x\,dx}$.
+    \end{problem}
+
+    \begin{solution}
+      \sub{$u = 3 e^x + 1$} looks like a good substitution since it's the
+      inner function in the composition $\sqrt{3 e^x + 13}$, and we see
+      something related to $du = 3 e^x\,dx$ in the integral, namely
+      \subd{$\frac{du}{3} = e^x\,dx$}.  Since $x$ goes from $0$ to $\ln
+      4$, $u$ goes from $3 e^0 + 13 = 16$ to $3 e^{\ln 4} + 13 = 3 \cdot 4
+      + 13 = 25$:
+      \begin{align*}
+        \int_0^{\ln 4} \subd{e^x} \sqrt{\sub{3 e^x + 13}}\,\subd{dx} &=
+        \int_{16}^{25} \sqrt{\sub{u}}\, \subd{\frac{du}{3}} \\
+        &= \frac{1}{3} \int_{16}^{25} u^{1/2}\,du \\
+        &= \left. \frac{1}{3} \cdot \frac{2}{3} u^{3/2} \right|_1^4 \\
+        &= \frac{2}{9} \cdot 25^{3/2} - \frac{2}{9} \cdot 16^{3/2} \\
+        &= \frac{2}{9} \cdot 5^3 - \frac{2}{9} \cdot 4^3 \\
+        &= \boxed{\frac{122}{9}}
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+\begin{grading}
+10 points. 5 for each part
+\end{grading}
+
+ In one of the following integrals, the substitution $u = e^{2x} + 1$
+    works well; in the other, the substitution $u = e^x$ does (it's up to
+    you to decide which is which).  Find both indefinite integrals, and check
+    your answers by differentiating them.
+
+      \begin{enumerate}
+      \item
+        \begin{problem}[\vfill]
+          $\displaystyle \int \frac{2 e^{x}}{e^{2x} + 1}\,dx$
+        \end{problem}
+
+        \begin{solution} % Jason Bland
+          Here, it works well to substitute \sub{$u = e^x$}, since we
+          also see \subd{$du = e^x \, dx$} in the integral.  Note that
+          $e^{2x}$ can be rewritten as $e^x \cdot e^x$, or $(e^x)^2$: 
+          \begin{align*}
+            \int \frac{2 \subd{e^x}}{(\sub{e^x})^2 + 1} \, \subd{dx} &=
+            \int \frac{2}{\sub{u}^2 + 1} \, \subd{du} \\ 
+            &= 2 \arctan u + C \\
+            &= \boxed{2 \arctan(e^x) + C}
+          \end{align*}
+          Let's check:
+          \[ \frac{d}{dx} \left(2 \fcolorbox{red}{white}{$\displaystyle
+              \arctan\left(\fcolorbox{blue}{white}{$\displaystyle e^ {
+                    x} $}\right)$}\right) 
+          = \frac{2}{\left(e^ { x} \right)^2+1}\cdot e^ { x} \checkmark\]
+        \end{solution}
+
+      \item
+        \begin{problem}[\vfill]
+          $\displaystyle \int \frac{e^{2x}}{e^{2x} + 1}\,dx$
+        \end{problem}
+
+        \begin{solution} % Jason Bland
+          Here, it works better to substitute \sub{$u = e^{2x} + 1$}
+          because we see something related to $du = 2e^{2x} \, dx$ in
+          the integral, namely \subd{$\frac{du}{2} = e^{2x} \, dx$}. So,
+          \begin{align*}
+            \int \frac{\subd{e^{2x}}}{\sub{e^{2x} + 1}} \, \subd{dx} &=
+            \int \frac{1}{\sub{u}} \cdot \subd{\frac{du}{2}} \\
+            &= \frac{1}{2} \int \frac{1}{u} \, du \\
+            &= \frac{1}{2} \ln |u| + C \\
+            &= \boxed{\frac{1}{2} \ln \left|e^{2x} + 1 \right| + C}
+          \end{align*}
+          Note that $e^{2x} + 1$ is always positive, so we can also
+          rewrite this as simply $\frac{1}{2} \ln \left|e^{2x} + 1
+          \right| + C$.  Let's check that this is right by
+          differentiating it:
+          \[ \frac{d}{dx} \left(\frac{1}{2}
+            \fcolorbox{red}{white}{$\displaystyle
+              \ln\left(\fcolorbox{blue}{white}{$\displaystyle e^ { 2 x}
+                  + 1$}\right)$}\right) = \frac{1}{2}\cdot \frac{1}{e^ {
+              2 x} + 1}\cdot 2 e^{2x} = \frac{e^{2x}}{e^{2x} + 1}
+          \checkmark\]
+        \end{solution}
+
+      \end{enumerate}
+
+      \pspace{\newpage}
+
+\item 
+
+\begin{grading}
+5 points: 2/2/1.
+\end{grading}
+
+ Consider the integral $\displaystyle \int \cos x \sin x\,dx$.
+
+    \begin{enumerate}[topsep=0pt]
+
+    \item
+      \begin{problem}[\vfill]
+        Using the substitution $u=\sin x$, show that $\displaystyle \int
+        \cos x \sin x\,dx=\frac{1}{2} \sin^2x +C$.
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        With \sub{$u = \sin x$}, we have \subd{$du = \cos x \, dx$}, so
+        \begin{align*}
+          \int \subd{\cos x} \, \sub{\sin x} \, \subd{dx} &= \int
+          \sub{u} \, \subd{du} \\ 
+          &= \frac{1}{2} u^2 + C \\
+          &= \frac{1}{2} \sin^2 x + C
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        Using the substitution $u=\cos x$, show that $\displaystyle \int
+        \cos x \sin x\,dx=-\frac{1}{2} \cos^2x +C$.
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        Using \sub{$u = \cos x$}, we have $du = -\sin x \, dx$, so
+        \subd{$\sin x \, dx = -du$}. Therefore,
+        \begin{align*}
+          \int \sub{\cos x}\, \subd{\sin x \, dx} &= \int \sub{u} \,
+          \subd{(-du)} \\
+          &= - \int u\,du \\
+          &= -\frac{1}{2} u^2 + C \\
+          &= -\frac{1}{2} \cos^2 x + C
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        Show that, although these answers look different, they are
+        really equivalent. \\ \emph{Hint: use the Pythagorean Identity.} 
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        Remember that $\sin^2 x + \cos^2 x = 1$, so we can rewrite
+        $\cos^2 x = 1 - \sin^2 x$.  Then,
+        \[ -\frac{1}{2} \cos^2 x + C = -\frac{1}{2} (1 - \sin^2 x) + C =
+        \frac{1}{2} \sin^2 x + \left( - \frac{1}{2} + C \right),\] so we
+        see that $\displaystyle - \frac{1}{2} \cos^2 x + C$ is the same
+        as $\dfrac{1}{2} \sin^2 x + \text{a constant}$.
+      \end{solution}
+
+    \end{enumerate}
+
+
+
+\item 
+
+\begin{grading}
+8 points. 2 for each part.
+\end{grading}
+
+ Find the following indefinite integrals.  (It may
+  take you a few tries to pick a useful $u$; that's normal when you're
+  first learning substitution!)
+
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{1}{\sqrt{2x+1}}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        It looks like a good substitution is \sub{$u = 2x + 1$}, since $2x
+        + 1$ is the inner function in the composition $\sqrt{2x + 1}$.
+        With this substitution, $du = 2\,dx$, so \subd{$\frac{1}{2}\,du =
+          dx$}.  Then,
+        \begin{align*}
+          \int \frac{1}{\sqrt{\sub{2x+1}}}\,\subd{dx} &= \int
+          \frac{1}{\sqrt{u}} \cdot \subd{\frac{1}{2}\,du} \\
+          &= \frac{1}{2} \int u^{-1/2}\,du \\
+          &= u^{1/2} + C \\
+          &= \boxed{\sqrt{2x + 1} + C}
+        \end{align*}
+      \end{solution}
+
+      \pspace{\newpage}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{1}{2x+1}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        There's no composition here, but it could be helpful to substitute
+        for the denominator, so let's try \sub{$u = 2x + 1$}.  With this
+        substitution, $du = 2\,dx$, so \subd{$\frac{1}{2}\,du = dx$}.
+        Then,
+        \begin{align*}
+          \int \frac{1}{\sub{2x+1}}\,\subd{dx} &= \int \frac{1}{\sub{u}}
+          \cdot \subd{\frac{1}{2}\,du} \\
+          &= \frac{1}{2} \ln |u| + C \\
+          &= \boxed{\frac{1}{2} \ln |2x + 1| + C}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int x \sqrt{2x^2+1}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        It looks like a good substitution is \sub{$u = 2x^2 + 1$}, since
+        $2x^2 + 1$ is the inner function in the composition $\sqrt{2x +
+          1}$, and we see something related to $du = 4x\,dx$ in the
+        integral, namely $\subd{\frac{du}{4} = x\,dx}$:
+        \begin{align*}
+          \int \subd{x} \sqrt{\sub{2x^2+1}}\,\subd{dx} &= \int
+          \sqrt{\sub{u}} \subd{\frac{du}{4}} \\
+          &= \frac{1}{4} \int u^{1/2}\,du \\
+          &= \frac{1}{4} \cdot \frac{2}{3} u^{3/2} + C \\
+          &= \boxed{\frac{1}{6} (2x^2 + 1)^{3/2} + C}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \frac{x}{\sqrt{2x^2+1}}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        It looks like a good substitution is \sub{$u = 2x^2 + 1$}, since
+        $2x^2 + 1$ is the inner function in the composition $\sqrt{2x +
+          1}$, and we see something related to $du = 4x\,dx$ in the
+        integral, namely $\subd{\frac{du}{4} = x\,dx}$:
+        \begin{align*}
+          \int \frac{\subd{x}}{\sqrt{\sub{2x^2 + 1}}}\,\subd{dx} &= \int
+          \frac{1}{\sqrt{\sub{u}}} \cdot \subd{\frac{du}{4}} \\
+          &= \frac{1}{4} \int u^{-1/2}\,du \\
+          &= \frac{1}{4} \cdot 2 u^{1/2} + C \\
+          &= \boxed{\frac{1}{2} \sqrt{2x^2 + 1} + C}
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}    
+  \probonly{}
+
+\pspace{\newpage}
+
+\item 
+
+\begin{grading}
+12 points. 3 for each part.
+\end{grading}
+
+ Find or evaluate the following
+  integrals.  (Again, don't get discouraged if your first choice of $u$
+  doesn't work out; with practice, you'll get better at picking $u$.)
+
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int_{1/4}^1 \frac{\cos \left( \sqrt{x}
+          \right)}{\sqrt{x}}\,dx$
+      \end{problem}
+
+      \begin{solution} % Jason Bland
+        A promising substitution is \sub{$u = \sqrt{x}$}, since it's the
+        inner function in the composition $\cos \left( \sqrt{x} \right)$.
+        Then, $du = \frac{1}{2} x^{-1/2}\,dx = \frac{1}{2\sqrt{x}}\,dx$,
+        which is good because we see something related to this in the
+        integral: \subd{$\frac{1}{\sqrt{x}} \, dx = 2 \, du$}.  As $x$
+        goes from $\frac{1}{4}$ to $1$, $u = \sqrt{x}$ goes from
+        $\sqrt{\frac{1}{4}} = \frac{1}{2}$ to $\sqrt{1} = 1$.  So,
+        \begin{align*}
+          \int_{1/4}^1 \frac{\cos (\sub{\sqrt{x}})}{\subd{\sqrt{x}}} \,
+          \subd{dx}
+          &= \int_{1/2}^1 \cos \sub{u} \cdot \subd{2\,du} \\
+          &= 2 \int_{1/2}^1 \cos u \, du \\ 
+          &= 2 \sin u \Big|_{1/2}^1 \\
+          &= \boxed{2 \sin 1 - 2 \sin \frac{1}{2}}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int \sqrt{\cos x}\sin x \,dx$
+      \end{problem}
+
+      \begin{solution}
+        It looks like a good substitution is \sub{$u = \cos x$}, since
+        $\cos x$ is the inner function in the composition $\sqrt{\cos x}$;
+        in addition, we see something related to $du = - \sin x\,dx$ in
+        the integral, namely \subd{$-du = \sin x\,dx$}.  Then,
+        \begin{align*}
+          \int \sqrt{\cos x}\sin x \,dx &= \int \sqrt{\sub{u}}
+          \left(\subd{-du} \right) \\
+          &= - \int u^{1/2}\,du \\
+          &= - \frac{2}{3} u^{3/2} + C \\
+          &= \boxed{- \frac{2}{3} \left( \cos x \right)^{3/2} + C}
+        \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \int \tan x\,dx$
+      \end{problem}
+
+      \begin{solution}
+        Let's first rewrite $\tan x$ as $\displaystyle \frac{\sin x}{\cos
+        x}$, so that we are trying to evaluate $\displaystyle \int
+      \frac{\sin x}{\cos x}\,dx$.  It looks like \sub{$u = \cos x$} is a
+      promising substitution because we also see something related to
+      $du = - \sin x\,dx$, namely \subd{$-du = \sin x\,dx$}:
+      \begin{align*}
+        \int \frac{\subd{\sin x}}{\sub{\cos x}}\,\subd{dx} &= \int
+        \frac{1}{\sub{u}} \left( \subd{-du} \right) \\
+        &= - \int \frac{1}{u}\,du \\
+        &= - \ln |u| + C \\
+        &= \boxed{- \ln |\cos x| + C}
+      \end{align*}
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \int_0^{\ln 5} \frac{3e^x}{\sqrt{e^x +4}}\, dx$
+      \end{problem}
+
+      \begin{solution}
+        It looks like a good substitution is \sub{$u = e^x+4$}, since $e^x
+        + 4$ is the inner function in the composition $\sqrt{e^x + 4}$; in
+        addition, we see \subd{$du = e^x\,dx$} in the integral.  As $x$
+        goes from $0$ to $\ln 5$, $u = e^x + 4$ goes from $e^0 + 4 = 5$ to
+        $e^{\ln 5} + 4 = 9$:
+        \begin{align*}
+          \int_0^{\ln 5} \frac{3 \subd{e^x}}{\sqrt{\sub{e^x +4}}}\,
+          \subd{dx} &= \int_5^9 \frac{3}{\sqrt{\sub{u}}}\,\subd{du} \\
+          &= \int_5^9 3 u^{-1/2}\,du \\
+          &= \left. 6 u^{1/2} \right|_5^9 \\
+          &= \boxed{18 - 6 \sqrt{5}}
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}      
+  \probonly{}
+
+\item 
+
+\begin{grading}
+5 points.
+\end{grading}
+
+ \textbf{Reflect Back.} 
+
+  Four of the five following integrals turn into a constant multiple of $\displaystyle \int
+  \sqrt{u}\,du$ with an appropriate substitution. Which ones? What is the substitution?
+  \begin{center}
+    \emph{Example:} Substituting $u = \sin x$ in $\displaystyle \int 2
+    \sqrt{\sin x} \cdot \cos x\,dx$ gives $\displaystyle \int 2
+    \sqrt{u}\,du$.
+  \end{center}
+
+  \probonly{}
+    \begin{enumerate}
+    \item
+      \begin{problem}
+        $\displaystyle \int \frac{\sqrt{\ln x}}{x}\,dx$      
+      \end{problem}
+
+      \begin{solution}
+        Substituting $u=\ln x$ gives $\displaystyle\int \sqrt{\ln x} \cdot
+        \frac{1}{x}\,dx = \int \sqrt{u}\,du$.
+      \end{solution}
+
+    \item 
+      \begin{problem}
+        $\displaystyle \int \sqrt{\tan x} \cdot \sec^2 x\,dx$
+      \end{problem}
+
+      \begin{solution}
+        Substituting $u = \tan x$ gives $\displaystyle \int \sqrt{\tan x}
+        \cdot \sec^2 x\,dx = \int \sqrt{u}\,du$.
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \int e^x \sqrt{e^{2x} + 1}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        No such substitution exists.  (You might try to substitute $u =
+        e^{2x} + 1$, but then $du = 2 e^{2x}\,dx$.)
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \int e^{2x} \sqrt{e^{2x} + 1}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        Substituting $u = e^{2x} + 1$ gives $\displaystyle \int e^{2x}
+        \sqrt{e^{2x} + 1}\,dx = \int \frac{1}{2} \sqrt{u}\,du$.
+      \end{solution}
+
+    \item
+      \begin{problem}
+        $\displaystyle \int \sqrt{3x + 1}\,dx$
+      \end{problem}
+
+      \begin{solution}
+        Substituting $u = 3x + 1$ gives $\displaystyle \int \sqrt{3x +
+          1}\,dx = \int \frac{1}{3} \sqrt{u}\,du$.
+      \end{solution}
+
+    \end{enumerate}    
+    \probonly{}
+
+\end{enumerate}
+
+\spaceonly{\psreflection{
+Optional reading for next class is \S 25.3 in Gottlieb.
+}}
+
+\end{document}

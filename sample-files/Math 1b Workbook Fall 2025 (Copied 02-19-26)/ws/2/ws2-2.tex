@@ -1,0 +1,404 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws2-2}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptertwo}
+}{}
+
+\section{Taylor Approximations II} \label{ws2-2}
+
+\begin{framed}
+\centerline{\textbf{Lesson Goals}}
+
+You should be able to:
+\begin{itemize}
+\item Find the degree $n$ Taylor polynomial of a given function $f(x)$ centered at $x=c$, using the Taylor coefficient formula
+\item Use a degree $n$ Taylor polynomial to approximate a specific function value, by identifying an appropriate function $f(x)$ and center $c$
+\item Obtain information about a function's behavior near the center from the Taylor coefficients.
+\item Express basic sums of terms in both $\sum$ notation and $\cdots$ notation
+\end{itemize}
+\end{framed}
+
+\begin{enumerate}
+
+
+  \item 
+ The goal of Taylor approximation is to approximate a function $f(x)$ with an $n$th degree polynomial $P_n(x)$. To do so, we first pick a center value $x=c$ and decide on a degree $n$. Then, the polynomial will look like:
+  $$\boxed{P_n(x)=a_0+a_1(x-c)+a_2(x-c)^2+ \cdots + a_{n-1}(x-c)^{n-1}+a_n(x-c)^n}$$
+  where $a_0, a_1, a_2, ..., a_n$ are numerical coefficients to be found.
+  
+  To make the polynomial a good approximation of $f(x)$, we want its derivatives at $x=c$ to match the derivatives of $f$ at $x=c$. That is, we want all of the following equations to be true:
+  \begin{align*}
+  P_n(c) &= f(c)\\
+  P_n'(c) &= f'(c)\\
+  p_n''(c) &= f''(c)\\
+  &~~\vdots \\
+  p_n^{(n)}(c)&=f^{(n)}(c)
+  \end{align*}
+  Using these equations, we can solve for the coefficients $a_0, a_1, a_2, ..., a_n$ in general. 
+  
+For each part below, let $P_n(x)=a_0+a_1(x-c)+a_2(x-c)^2+ a_3(x-c)^3+a_4(x-c)^4+\cdots +a_n(x-c)^n$.
+  
+ \begin{enumerate}
+ \item 
+ \begin{problem}[\vfill]
+ Find $P_n'(x)$, $P_n''(x)$, $P_n^{(3)}(x)$, and $P_n^{(4)}(x)$, the first four derivatives of $P_n(x)$. Write your answers in $\cdots$ notation. Don't simplify the coefficients! (Remember that $a_k$, $c$, and $n$ are all constants.)
+ \end{problem}
+ 
+ 
+ \begin{solution}
+ \begin{align*}
+ P_n'(x) &=a_1 + 2a_2(x-c)+3a_3(x-c)^2+4a_4(x-c)^3+\cdots + n\cdot a_n(x-c)^{n-1}\\
+ P_n''(x) &= 2a_2 + 3\cdot 2a_3(x-c)+4\cdot 3(x-c)^2+\cdots + n\cdot (n-1) \cdot a_n(x-c)^{n-2}\\
+P_n^{(3)}(x) &= 3\cdot 2a_3+4\cdot 3\cdot 2a_4(x-c)+\cdots + n\cdot (n-1) \cdot (n-2)\cdot a_n(x-c)^{n-3}\\
+P_n^{(4)}(x) &= 4\cdot 3\cdot 2a_4+\cdots + n\cdot (n-1) \cdot (n-2)\cdot (n-3)\cdot a_n(x-c)^{n-4}
+ \end{align*}
+ \end{solution}
+ 
+ 
+
+ \pspace{\newpage}
+
+ 
+ \item 
+ \begin{problem}[1in]
+ Use the equation for $P_n(x)$, along with your results from part (a), to find $P_n(c)$, $P_n'(c)$, $P_n''(c)$, $P_n^{(3)}(c)$, and $P_n^{(4)}(c)$. 
+ \end{problem}
+ 
+ 
+ \begin{solution}
+ Plugging $c$ in for $x$ in our previous equations from part (a), we get:
+ \begin{align*}
+ P_n(c)&=a_0\\
+ P_n'(c)&=a_1\\
+ P_n''(c)&=2a_2\\
+ P_n^{(3)}(c)&=3\cdot2a_3\\
+ P_n^{(4)}(c)&=4\cdot 3\cdot 2a_4
+ \end{align*}
+ \end{solution}
+ 
+ 
+  Recall that $P_n(x)=a_0+a_1(x-c)+a_2(x-c)^2+ a_3(x-c)^3+a_4(x-c)^4+\cdots +a_n(x-c)^n$.
+ \item 
+ \begin{problem}[1.5in]
+ Using your results from part (b), along with the equations
+   \begin{align*}
+  P_n(c) &= f(c)\\
+  P_n'(c) &= f'(c)\\
+  P_n''(c) &= f''(c)\\
+  P_n^{(3)}(c)&=f^{(3)}(c)\\
+  P_n^{(4)}(c)&=f^{(4)}(c)
+  \end{align*}
+  express $a_0$, $a_1$, $a_2$, $a_3$, and $a_4$ in terms of $f$. 
+ \end{problem}
+ 
+ \begin{solution}
+ By plugging in our results from part (b) into the equations above, we get:
+ 
+  \begin{align*}
+  P_n(c) = f(c) &\Longrightarrow \boxed{a_0=f(c)}\\
+  P_n'(c) = f'(c)&\Longrightarrow \boxed{a_1=f'(c)}\\
+  P_n''(c) = f''(c)&\Longrightarrow 2a_2=f''(c) \Longrightarrow \boxed{a_2=\frac{f''(c)}{2}}\\
+  P_n^{(3)}(c)=f^{(3)}(c) &\Longrightarrow 3\cdot2a_3=f^{(3)}(c) \Longrightarrow \boxed{a_3=\frac{f^{(3)}(c)}{3\cdot 2}}\\
+  P_n^{(4)}(c)=f^{(4)}(c) &\Longrightarrow 4\cdot 3\cdot 2a_4=f^{(4)}(c)\Longrightarrow \boxed{a_4=\frac{f^{(4)}(c)}{4\cdot3\cdot 2}}
+  \end{align*}
+   Notice that we are purposefully leaving the denominators unsimplified in order to help us see a pattern.
+ \end{solution}
+ 
+    
+  \item
+  \begin{problem}[1in]
+  Do you see a pattern? Can you write down a formula for $a_k$ (the coefficient of the $k$th degree term in the polynomial) in terms of $f^{(k)}(c)$?
+  \end{problem}
+  
+  \begin{solution}
+  Based on the pattern above, we see that the coefficient of the $k$th degree term for the Taylor polynomial is given by:
+  $$\boxed{a_k = \frac{f^{(k)}(c)}{k!}}$$
+  where $f^{(k)}(c)$ is the $k$th derivative of $f$ at $x=c$, and $k!=k\cdot (k-1)\cdot (k-2)\cdot~\cdots~\cdot 3\cdot 2 \cdot 1$. Note that we define $0!=1$, as it allows our formula to work for all $k$ values, including 0.
+  
+Notice that this formula is consistent with what we found in the previous parts. For example, $a_2=\frac{f^{(2)}(c)}{2!}=\frac{f''(c)}{2}$, $a_1=\frac{f^{(1)}(c)}{1!}=\frac{f'(c)}{1}=f'(c)$ and $a_0=\frac{f^{(0)}(c)}{0!}=\frac{f(c)}{1}=f(c)$. 
+  
+The boxed equation above is extremely important for you to know! It allows you to find the missing coefficients of the Taylor polynomial for a given function $f$, without needing to repeat the process we did in parts (a)-(c). From this point on, whenever you're asked to find the Taylor polynomial of a function, you can (and should!) use this formula without proof to find the coefficients, instead of setting derivatives equal to each other.
+  \end{solution}
+
+  \end{enumerate}
+
+  
+  
+
+  
+  
+  
+
+  
+  
+  \item 
+  \note{Practice using the formula from {\#1}.  Students often get very confused by coefficients that are 0. It's
+important to discuss why the odd coefficients are all 0 for $\cos x$. Make sure they also
+  understand why the 15th degree polynomial for $\cos x$ ends with a degree 14 term. (A good question to ask here is ``what would the degree 14 polynomial for $\cos x$ be? What about the degree 13 polynomial?".) Also, emphasize that the number of terms in the polynomial is NOT the same thing as the degree of the polynomial.}
+
+  \begin{problem}[2.25in]
+  Find the degree $15$ Taylor polynomial approximation for $f(x) = \cos
+  x$ centered at $0$.
+  \end{problem}
+
+  \begin{solution}
+  The degree 15 Taylor polynomial approximation is $P_{15}(x) = a_0 +
+  a_1 x + a_2 x^2 + \cdots + a_{15} x^{15}$, where $a_k =
+  \frac{f^{(k)}(0)}{k!}$.  So, to find these coefficients, we need to
+  compute derivatives of $f(x) = \cos x$:
+  \[ \begin{array}{rcl c rcl}
+  f(x) & = & \cos x & \Rightarrow & f(0) & = & 1 \\
+  f'(x) & = & -\sin x & \Rightarrow & f'(0) & = & 0 \\
+  f''(x) & = & -\cos x & \Rightarrow & f''(0) & = & -1 \\
+  f'''(x) & = & \sin x & \Rightarrow & f'''(0) & = & 0
+  \end{array}\]
+  After this, the derivatives repeat in this pattern forever.  So,
+  \begin{align*}
+  a_0 &=\frac{f^{(0)}(0)}{0!}=\frac{1}{1}=1 \\
+  a_1 &=\frac{f^{(1)}(0)}{1!}=\frac{0}{1}=0 \\
+  a_2 &=\frac{f^{(2)}(0)}{2!}=\frac{-1}{2}= -\frac{1}{2!} \\
+  a_3 &= \frac{f^{(3)}(0)}{3!}=\frac{0}{3!}=0 \\
+  a_4 &= \frac{f^{(4)}(0)}{4!}=\frac{1}{4!} \\
+  a_5 &= \frac{f^{(5)}(0)}{5!}=\frac{0}{5!}=0 \\
+  &~~~~~~~~~\eqdots\\
+   a_14 &= \frac{f^{(14)}(0)}{14!}=\frac{-1}{14!}=-\frac{1}{14!}\\
+   a_15 &= \frac{f^{(15)}(0)}{15!}=\frac{0}{15!}=0\\
+  \end{align*}
+  Thus, 
+  \begin{align*}
+  P_{15}(x) &=a_0+a_1x+a_2x^2+a_3x^3+a_4x^4+\cdots + a_{14}x^{14} + a_{15}x^{15}\\
+  &=1+(0)x+\left(-\frac{1}{2!}\right)x^2+(0)x^3+\left(\frac{1}{4!}\right)x^4+(0)x^5+\cdots + \left(-\frac{1}{14!}\right)x^{14}+(0)x^{15}\\
+  &= \boxed{1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \frac{x^6}{6!} + \frac{x^8}{8!} - \frac{x^{10}}{10!} +\frac{x^{12}}{12!} -\frac{x^{14}}{14!}}
+  \end{align*}  
+  Observe that we still refer to this polynomial as the degree 15 Taylor polynomial approximation, even though a 15th degree term does not appear in the polynomial (since its coefficient was 0). If we wanted the degree 14 Taylor polynomial approximation of $\cos x$ centered at 0, it would also be given by the same boxed polynomial above.
+  
+  Also note that although this is the degree 15 Taylor polynomial, it only has 8 terms (since the other 7 terms had coefficients of 0). This indicates that the \textit{degree} of a polynomial is different than the \textit{number of terms} in a polynomial.
+  \end{solution}
+
+   \pspace{\newpage}
+  
+  \item 
+  Rewrite the following sums in $\cdots$
+  notation.  (This means: Write down at least the first 3 terms $+ \cdots
+  + $ the last term.)
+
+  \begin{enumerate}
+    \item
+
+    \note{This shows them how to put a sum involving even numbers into
+    sigma notation.  (It's worthwhile to point this out explicitly.)}
+    
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{k=1}^{100} \frac{1}{2k}$
+    \end{problem}
+
+    \begin{solution}
+    $\displaystyle \frac{1}{2} + \frac{1}{4} + \frac{1}{6} + \cdots +
+    \frac{1}{198} + \frac{1}{200}$
+    \end{solution}
+
+    \item
+
+    \note{This shows them how to put a sum whose terms alternate in sign
+    into sigma notation.  I also like to ask how we would ``reverse''
+    the signs (to write $\displaystyle \frac{1}{3} - \frac{1}{4} +
+    \frac{1}{5} - \cdots + \frac{1}{15}$ instead).  If they can see that
+    they simply need to multiply what they have by $-1$, then it's easy
+    for them to get to changing $(-1)^k$ to $(-1)^{k+1}$.  I
+    emphasize that, when we want to write terms that alternate in sign,
+    we always use either $(-1)^k$ or $(-1)^{k+1}$.}
+    
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{k=3}^{15} \frac{(-1)^k}{k}$
+    \end{problem}
+
+    \begin{solution}
+    $\displaystyle -\frac{1}{3} + \frac{1}{4} - \frac{1}{5} + \cdots -
+    \frac{1}{15}$
+    \end{solution}
+
+    \item
+
+    \note{This shows them how to put odd numbers into sigma notation.}
+    
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{k=0}^{25} \frac{x^{2k + 1}}{k + 1}$
+    \end{problem}
+
+    \begin{solution}
+    $\displaystyle x + \frac{x^3}{2} + \frac{x^5}{3} + \frac{x^7}{4} +
+    \cdots + \frac{x^{51}}{26}$
+    \end{solution}
+
+    \item
+    
+    \note{This is the same sum as the previous one.  Students sometimes
+    try to give the index of summation a particular meaning, so I use
+    this to point out that $k$ doesn't really mean anything on its own.}
+    
+    \begin{problem}[\vfill]
+    $\displaystyle \sum_{k=1}^{26} \frac{x^{2k - 1}}{k}$
+    \end{problem}
+
+    \begin{solution}
+    $\displaystyle x + \frac{x^3}{2} + \frac{x^5}{3} + \frac{x^7}{4} +
+    \cdots + \frac{x^{51}}{26}$
+    \end{solution}
+    
+  \end{enumerate}
+
+
+
+
+
+  \item 
+  Rewrite the following sums in sigma notation.
+  \begin{enumerate}
+    \item
+    \begin{problem}[0.5in]
+    $\displaystyle \frac{1}{3^3} + \frac{1}{4^3} + \frac{1}{5^3} +
+    \frac{1}{6^3} + \cdots + \frac{1}{100^3}$
+    \end{problem}
+
+    \begin{solution}
+    One possible solution is $\displaystyle \sum_{k=3}^{100}
+    \frac{1}{k^3}$.  There are many possible solutions, depending on
+    what you start $k$ at.  For instance, another valid answer is
+    $\displaystyle \sum_{k=0}^{97} \frac{1}{(k + 3)^3}$
+    \end{solution}
+
+    \item
+
+    \note{Help students with a strategy here.  I usually have them start
+    by ignoring the fact that the terms alternate in sign.  We see that
+    we're doing the square root of even numbers, so we start with
+    $\sqrt{2k}$.  Then we figure out the starting and ending values of
+    $k$, and finally we decide whether we should use $(-1)^k$ or
+    $(-1)^{k+1}$ to make the terms alternate as we like (I emphasize
+    that they should just check the first $k$-value to see which
+    works).} 
+    
+    \begin{problem}[0.5in]
+    $\displaystyle \sqrt{2} - \sqrt{4} + \sqrt{6} - \sqrt{8} + \sqrt{10}
+    - \cdots - \sqrt{120}$
+    \end{problem}
+
+    \begin{solution}
+    $\displaystyle \sum_{k=1}^{60} (-1)^{k + 1} \sqrt{2k}$ is a possible
+    solution.
+    \end{solution}
+
+    \item
+    \begin{problem}[0.5in]
+    $\displaystyle 1 + x^3 + x^6 + x^9 + x^{12} + x^{15} + \cdots +
+    x^{30}$
+    \end{problem}
+
+    \begin{solution}
+    $\displaystyle \sum_{k=0}^{10} x^{3k}$ is a possible solution.
+    \end{solution}
+
+    \item
+    \begin{problem}[0.5in]
+    $x - x^3 + x^5 - x^7 + x^9 - \cdots + x^{101}$
+    \end{problem}
+
+    \begin{solution}
+    $\displaystyle \sum_{k=0}^{50} (-1)^k x^{2k + 1}$ and $\displaystyle
+    \sum_{k=1}^{51} (-1)^{k + 1} x^{2k - 1}$ are two possible solutions.
+    \end{solution}
+    
+    \item
+    \begin{problem}[0.5in]
+    $\displaystyle x - \frac{x^3}{2} + \frac{x^5}{3} - \frac{x^7}{4} +
+    \cdots - \frac{x^{31}}{16}$
+    \end{problem}
+    
+    \begin{solution}
+    $\displaystyle \sum_{k=0}^{15} (-1)^k \frac{x^{2k + 1}}{k + 1}$ and
+    $\displaystyle \sum_{k=1}^{16} (-1)^{k + 1} \frac{x^{2k - 1}}{k}$
+    are two possible solutions.
+    \end{solution}
+  \end{enumerate}
+
+\pspace{\newpage}
+
+  \item 
+  \begin{enumerate}
+    \item 
+    \begin{problem}[1in]
+    Rewrite the degree 15 Taylor polynomial for $\cos(x)$ centered at 0 in
+    sigma notation.
+    \end{problem}
+    
+    \begin{solution}
+    $\displaystyle \sum_{k=0}^7 (-1)^k \frac{x^{2k}}{(2k)!}$ is one
+    possibility. 
+    \end{solution}
+
+    \item
+    \begin{problem}[1.5in]
+    Find the degree 25 Taylor polynomial approximation for $f(x) = \cos
+    x$ centered at 0.  Write it in both sigma and $\cdots$ notation.
+    \end{problem}
+
+    \begin{solution}
+    We already found the pattern for the coefficients in
+    {\#2}; we just need to add all the terms
+    up to degree 25 instead of 15.  Since we want degree 25, the last
+    term will be $\frac{x^{24}}{24!}$, which corresponds to $k = 12$
+    (the coefficient of the $x^{25}$ term is 0).  So, the degree 25
+    Taylor polynomial approximation is \fbox{$\displaystyle
+    \sum_{k=0}^{12} (-1)^k \frac{x^{2k}}{(2k)!} = 1 - \frac{x^2}{2!} +
+    \frac{x^4}{4!} - \cdots + \frac{x^{24}}{24!}$}.
+    \end{solution}
+
+    \item
+
+    \note{If you want to use Mathematica to look at this, be aware that
+    Mathematica considers all decimals to have very low precision.
+    You'll get better results if you enter 0.1 as the fraction 1/10 than
+    if you just put in 0.1.}
+    
+    \begin{problem}[1.5in]
+    Use the degree 25 Taylor polynomial approximation to get an
+    approximation for $\cos 0.1$. You may leave your answer as a sum of fractions.
+    \end{problem}
+
+    \begin{solution}
+    We simply plug $x = 0.1$ into our degree 25 Taylor polynomial
+    approximation to get \fbox{$\displaystyle \sum_{k=0}^{12} (-1)^k
+    \frac{0.1^{2k}}{(2k)!} = 1 - \frac{0.1^2}{2!} + \frac{0.1^4}{4!} -
+    \cdots + \frac{0.1^{24}}{24!}$}.
+
+    (If you add this up, you get
+    $\frac{617348744064667103320115839788837194165430184801}{620448401733239439
+    360000000000000000000000000000}$, which differs from $\cos 0.1$ by
+    about $2.5 \times 10^{-53}$ --- not bad!)
+    \end{solution}
+  \end{enumerate}
+
+  \begin{framed}
+The \textbf{Taylor series} of $f(x)$ centered at $x=c$ is given by:
+$$\sum_{k=0}^{\infty} a_k(x-c)^k =a_0+a_1(x-c)+a_2(x-c)^2+ \cdots$$
+where $$a_k=\frac{f^{(k)}(c)}{k!}$$
+\end{framed}
+\begin{framed}
+  \centerline{\textbf{The Main Questions of the Series Unit}}
+  We hope that, by using a ``polynomial of infinite degree,'' we end up with
+  something that is not just an approximation for our function but is
+  actually equal to the function. In order to know if/when this is actually true, we need to answer two main questions:
+  \begin{enumerate}
+  \item \textbf{For which functions $f$ and for which inputs $x$ does the Taylor series of $f(x)$ centered at $c$ actually add up to anything meaningful?} For example, does the Taylor series for $\sin x$, given by $x - \frac{x^3}{3!} + \frac{x^5}{5!} - \cdots$, even have a defined value when $x=1$? When $x=-1$? When $x=100$?
+  \item \textbf{For which functions $f$ and for which inputs $x$ does the Taylor series of $f(x)$ centered at $c$ actually add up \textit{specifically to} $f(x)$?} For example, perhaps the Taylor series $x - \frac{x^3}{3!} + \frac{x^5}{5!} - \cdots$ has a defined value when $x=100$, but is \textit{not} actually equal to $\sin(100)$. (In this case, our Taylor series for $\sin x$ wouldn't be very useful!)
+  \end{enumerate}
+  \end{framed}
+
+\end{enumerate}
+
+
+\end{document}

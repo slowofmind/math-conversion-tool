@@ -1,0 +1,390 @@
+\documentclass{article}
+
+\textwidth=7in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=-.21in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{mathtools, amssymb}
+\usepackage{ifthen}
+\renewcommand{\arraystretch}{1.5}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt}
+\usepackage{tzplot}
+\usepackage{xcolor}
+\usepackage[pdftex]{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=blue,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+
+\usepackage{graphicx}
+\usepackage{svg}
+
+\graphicspath{ {./images/} }
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+\usepackage{icomma}
+\usepackage{diffcoeff}
+\usepackage[per-mode=symbol]{siunitx}
+
+\usepackage{pgfplots}
+\usepackage{tikz}
+    \usetikzlibrary{ % enables the snake paths
+      decorations.pathmorphing,%
+      % enables bigger arrows
+      decorations.markings,%
+      decorations.pathreplacing,%
+      decorations.text,%
+      calc,%
+      patterns,%
+      shapes.geometric,%
+      arrows,
+      decorations.shapes,
+      positioning,
+      plotmarks, angles, quotes,
+      pgfplots.groupplots}
+
+\pgfplotscreateplotcyclelist{mycolor}{%
+  black, blue, red, green!70!black,magenta,
+  purple, cyan, orange
+}
+\pgfplotsset{
+  cycle list name=mycolor,
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },
+  tick label style = {font=\footnotesize, fill=white, inner sep=0pt},
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=300,
+  minor tick length=0,
+  grid style = {dotted,black},
+  scatter/classes={
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  holdot/.style={color=black,fill=white,only marks,mark=*},
+  soldot/.style={color=black,fill=black,only marks,mark=*},
+  rholdot/.style={color=red,fill=white,only marks,mark=*},
+  rsoldot/.style={color=red,fill=black,only marks,mark=*},
+  compat=1.13
+}
+
+\usepackage{pifont}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\usepackage{tcolorbox}
+\newenvironment{feedback}{%
+  \begin{tcolorbox}[colframe=skyblue, colback=skyblue!10!white]
+  }{\end{tcolorbox}}
+
+\usepackage{soul}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\newlength{\tipmargin}
+\makeatletter
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+\def\exend{\hfill\ding{118}}
+\@ifundefined{Example}{}{}
+\renewenvironment{Example}
+{\refstepcounter{equation}\normalfont\normalsize\textbf{Example \theequation.}}
+{\exend}
+\renewcommand{\theequation}{\arabic{equation}}
+
+\renewenvironment{framed}{
+  \setlength{\tipmargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\tipmargin
+  \def\FrameCommand{\hspace{\tipmargin}\fbox}%
+  \advance\linewidth\tipmargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+}
+{\endMakeFramed}
+
+\makeatother
+
+
+
+\begin{document}
+
+
+\noindent
+{\large \mbox{} \hfill \bf Name:\underline{\hspace{3in}}}\\
+
+{\large \mbox{} \hfill \bf HUID:\underline{\hspace{3in}}}\\
+{\mbox{} \hfill \it (Please write your name neatly in print.)}\\
+
+
+ 
+\medskip
+ 
+\noindent
+{\large\bf
+Exam 2 \\ Math Ma/Ma5 - Fall 2024}
+\noindent
+
+
+{\Large
+\begin{center}\textbf{Directions---Please read carefully!} \end{center}}
+
+
+
+
+This assessment is subject to the Harvard College Honor Code. No calculators or any other aids are permitted on this exam.  Please write as neatly as possible, as answers that can't be read can't be graded and thus can't receive credit. To receive full credit, you must show relevant working
+and include units when appropriate. You have 120 minutes to complete this exam.   \\
+
+There are some back pages of scratch paper. You may ask for additional scratch paper if you would like to have some extra space to work on the problems, but we will not consider the scratch papers as part of your submission. Only this packet will be scanned and graded, so make sure to include all relevant work in the space provided for each question. 
+
+\begin{center}\textbf{Good luck!}\end{center}
+
+
+
+
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+      \textbf{Problem Number}   & \textbf{Points}  \\
+             \hline \hline
+                Problem 1   &   \\
+            \hline
+                 Problem 2 &   \\
+        \hline 
+                Problem 3 &   \\
+        \hline 
+                Problem 4 &   \\
+        \hline 
+                Problem 5 &   \\
+        \hline 
+         Problem 6 &   \\
+        \hline 
+         Problem 7 &   \\
+        \hline 
+    
+               
+               
+         \textbf{Total} &   \\
+         \hline 
+    \end{tabular}\\
+\vspace{0.5in}
+\emph{As a member of Harvard College, I pledge that I will not give or receive assistance on this exam.}\\
+\vspace{0.5in}{\large \mbox{} \hfill \bf Signature:\underline{\hspace{3in}}}\\
+
+\newpage
+
+\begin{enumerate}
+
+  \item An epidemic is spreading through an island, and the number of cases is growing exponentially. At the start of the epidemic there were 10 cases and the total number of cases triples every 14 days. 
+    \begin{enumerate}
+        \item \begin{problem}[\vfill]Write a formula for $E(t)$, the total number of cases $t$ days after the start of the epidemic.
+        \end{problem}
+        \item \begin{problem}[\vfill]What is the percent increase in the total number of cases between days 5 and 19? Explain how you know in 1-2 sentences. 
+        \end{problem}
+        \item \begin{problem}[\vfill]What is the daily percent increase in the total number of cases? (You may leave your answer in unsimplified form.)
+        \end{problem}
+        
+    \end{enumerate}
+\newpage 
+\item Marta is watching a bacteria  sample exponentially \textbf{decrease} in size. At 3:00 p.m., there are 2000 micrograms of bacteria, and the sample is decreasing in size at a rate of 500 micrograms/hour. %Once the rate of change of the size of bacteria is only 100 micrograms/hour, Marta will get bored and leave. 
+    \begin{enumerate}
+        \item \begin{problem}[\vfill]How large is the sample of bacteria when the sample is decreasing at a rate of 100 micrograms/hour?
+        \end{problem}
+        \item \begin{problem}Which of the following functions could describe the amount of bacteria in micrograms at time $t$ hours after 3:00pm? (select one)
+        \end{problem}
+        \begin{enumerate}
+            \item  $500 e^{4t}$
+            \item  $2000 e^{-4t}$
+            \item  $2000 e^{0.25t}$
+            \item  $500 e^{-4t}$
+            \item  $2000 e^{-0.25t}$
+        \end{enumerate}
+%        \item \begin{problem}[\vfill]Which of the functions in part b) could describe the size of a bacteria sample that is {\bf increasing} exponentially in size?  List all possibilities. Explain your answer in 1-2 sentences.
+        %\end{problem}
+        \vfill
+    \newpage
+\item  Marta is working on understanding the derivative of an exponential decay function and has come up with the following graphs of $f(x)=\displaystyle \left(\frac12\right)^x$ and $f'(x)$. In the graph below, $f(x)$ is the solid curve and $f'(x)$ is the dashed curve. \\
+    \begin{tikzpicture}
+  \tzaxes(-2,-4)(5,4){$x$}{$y$}
+\tzfn[blue,thick]{0.5^\x}[-2:4]{$f(x)$}[ar]
+\tzfn[blue,dashed]{0.5*0.5^\x}[-2:4]node below {$f'(x)$}[ar]
+%\tzfn'[red,thick]{(\x)^2}[-1:2]{$f^{-1}(x)$}[ar]
+\end{tikzpicture}\\
+   Image description: There are labeled x and y axes. The function $f(x)$ is positive, concave up, and decreasing to 0. This is the typical graph of an exponential decay function. $f'(x)$ is drawn in a dashed line and it is also postive, concave up, and decreasing and is an exponential decay function. Every y-value in $f'(x)$ is half the y-value for $f(x)$.
+    
+    Marta's graph of $f'(x)$ is incorrect. Explain why in 1-2 sentences, then describe the features of a possible graph of $f'(x)$. 
+    \vfill
+\end{enumerate}
+
+\newpage
+\item  Let $\displaystyle f(x) = \frac{1}{3^x - 9}\cdot \frac{1}{3^x + 3}$
+    \begin{enumerate}
+        \item \begin{problem}[\vfill]Find all values of $x$ on $(-\infty, \infty)$ where $f(x)$ is not continuous and classify each point of discontinuity as a removable discontinuity, jump discontinuity, or vertical asymptote by computing appropriate limits.
+        \end{problem}
+        \item \begin{problem}[\vfill]Find $\displaystyle \lim_{x \to \infty} f(x)$.
+        \end{problem}
+        \item \begin{problem}[\vfill]Find $\displaystyle \lim_{x \to -\infty} f(x)$.
+        \end{problem}
+       
+    \end{enumerate}
+
+\newpage
+\item Consider the function $f(x)=x^3-6x^2+18$
+    \begin{enumerate}
+        \item \begin{problem}[\vfill]Identify the critical points of $f(x)$.
+        \end{problem}
+        \item \begin{problem}[\vfill]On what interval(s) is $f$ increasing?
+        On what interval(s) is $f$ decreasing? Please show your work fully.
+        \end{problem}
+        
+        \item \begin{problem}[\vfill]Classify the critical points as local maxima or local minima, given your work in the previous parts of this problem.
+        \end{problem}
+
+        \newpage
+        \item \begin{problem}[\vfill]Does $f(x)$ have any global minima or maxima on the interval $[-15, -3]$? If so, where (at what $x$-values)? Support your answer in 1-2 sentences.
+        \end{problem}
+        \item \begin{problem}[\vfill]Does $f(x)$ have any global maxima or minima on $(-\infty, \infty)$? If so, where (at what $x$-values)? Support your answer in 1-2 sentences.
+        \end{problem}
+       
+    \end{enumerate}
+\newpage
+\item 
+
+\begin{problem}
+    
+Ming Li is publishing a poetry book and is trying to figure out the page size. 
+\begin{multicols}{2}
+     \begin{itemize}
+         \item Each page consists of a rectangular text body (where the text is) with margins on each side: the top, bottom, and outer margins are all $1$ inch, and the inner margin by the spine of the book (called the gutter) is $2$ inches so there's room for the binding. \\
+
+          
+         \item The area of the text body needs to be $24$ square inches.
+         
+         \item Image description: There is an outer rectangle representing the page and an inner shaded rectangle representing the text body. We have drawn arrows spanning the margins on each side. The lefthand margin is larger and the top, bottom, and righthand margins are all the same size. Two variables are defined and labeled in the diagram. $w$ is the bottom of the shaded rectangle and $l$ labels the left side of the shaded rectangle. This means $l$ and $w$ are the length and width of the text body in inches. \\
+
+         \begin{tikzpicture}
+
+	\draw (0,0) -- (6,0) -- (6,7) -- (0,7) -- (0,0);
+ \fill[blue!20!white, draw=black] (2,1) rectangle (5,6) ;
+ \draw[thin,<->] (0.1,3.5)  -- (1.95,3.5)  ;
+ \draw[thin,<->] (5.1,3.5) -- (5.9,3.5);
+ \draw[thin,<->] (3.5,6.9)  -- (3.5,6.1);
+ \draw[thin,<->] (3.5,0.9) -- (3.5,0.1);
+ \node[above =10pt of {(3.5,0.7)}] {$w$};
+ \node[right =10pt of {(1.7,3.5)}] {$l$};
+
+\end{tikzpicture} 
+\end{itemize}
+\end{multicols}
+          He wants to minimize the total area of the page to save on  cost. 
+          What should the dimensions of the page (length and width) be in order to achieve this? \\
+
+         
+         For full credit on this problem, please show your work fully and make sure to highlight the following:
+
+  \begin{itemize}[nosep]
+  \item State your goal.
+  \item Given the diagram, clearly define your variables and label any constants.
+  \item Communicate your thought process, one step at a time. Write down how you find and classify the global extrema, justifying that it is global extrema and not just a local max/min. 
+  \item Be sure to answer the original question, asking for the dimensions of the page!
+  \end{itemize}
+
+\end{problem}
+\newpage
+
+\item 
+In this problem, you'll use a tangent line approximation to approximate $\sqrt{17}$.
+    \begin{enumerate}
+        \item \begin{problem}
+            What function will you use to approximate $\sqrt{17}$?
+        \end{problem}
+        \vspace{1in}
+        \item \begin{problem}Describe the graph of the function you chose. 
+
+        
+
+
+        \end{problem}
+
+          \newpage
+        \item \begin{problem}Approximate $\sqrt{17}$ using a tangent line approximation. 
+        \end{problem}
+\vfill
+       
+        \item Is your approximation an upper bound or a lower bound for the actual value of $\sqrt{17}$? Explain in 1-2 sentences, and you may discuss how this tangent line relates to the graph you described in (b) to explain. 
+
+        \vfill
+       % \item If you were to use the same tangent line to approximate $\sqrt{14}$, would this approximation be more accurate or less accurate than your approximation of $\sqrt{17}$?  Explain briefly in 1-2 sentences.
+       % \vfill
+    \end{enumerate}
+\newpage
+\item In each part, either describe how to sketch a function $f$ with the given properties, or say that no such function exists and explain why in 1-2 sentences. Make sure any description clearly meets the given conditions.
+    \begin{enumerate}
+    \item $f$ is defined on $[-2,2]$, and has no global maximum or global minimum.\\
+   \vfill
+
+        
+    \item $f$ is defined on $[-2,2]$, has a global maximum at $x=0$, and has no global minimum.\\
+   \vfill
+     \newpage
+     \item $f$ is continuous on $(-\infty, \infty)$ and $\displaystyle{\lim_{x\to -1^+} f(x) \neq \lim_{x\to-1^-} f(x)}$. \\
+     \vfill
+
+        \item $f$ has the domain $(-2,2)$, is continuous on its domain and differentiable everywhere on its domain except at $x=1$. \\
+        
+       \vfill
+       
+    \end{enumerate}
+\end{enumerate}
+
+
+
+\newpage
+\emph{This page left blank for scratch work. It will not be graded.}
+
+\newpage
+
+\emph{This page left blank for scratch work. It will not be graded.}
+
+
+\end{document}

@@ -1,0 +1,729 @@
+\documentclass{article}
+
+\textwidth=7in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=-.21in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{mathtools, amssymb}
+\usepackage{ifthen}
+\renewcommand{\arraystretch}{1.5}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt}
+
+\usepackage{xcolor}
+\usepackage[pdftex]{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=blue,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+
+\usepackage{graphicx}
+\usepackage{svg}
+
+\graphicspath{ {./images/} }
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+\usepackage{icomma}
+\usepackage{diffcoeff}
+\usepackage[per-mode=symbol]{siunitx}
+
+\usepackage{pgfplots}
+\usepackage{tikz}
+    \usetikzlibrary{ % enables the snake paths
+      decorations.pathmorphing,%
+      % enables bigger arrows
+      decorations.markings,%
+      decorations.pathreplacing,%
+      decorations.text,%
+      calc,%
+      patterns,%
+      shapes.geometric,%
+      arrows,
+      decorations.shapes,
+      positioning,
+      plotmarks, angles, quotes,
+      pgfplots.groupplots}
+
+\pgfplotscreateplotcyclelist{mycolor}{%
+  black, blue, red, green!70!black,magenta,
+  purple, cyan, orange
+}
+\pgfplotsset{
+  cycle list name=mycolor,
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },
+  tick label style = {font=\footnotesize, fill=white, inner sep=0pt},
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=300,
+  minor tick length=0,
+  grid style = {dotted,black},
+  scatter/classes={
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  holdot/.style={color=black,fill=white,only marks,mark=*},
+  soldot/.style={color=black,fill=black,only marks,mark=*},
+  rholdot/.style={color=red,fill=white,only marks,mark=*},
+  rsoldot/.style={color=red,fill=black,only marks,mark=*},
+  compat=1.13
+}
+
+\usepackage{pifont}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\usepackage{tcolorbox}
+\newenvironment{feedback}{%
+  \begin{tcolorbox}[colframe=skyblue, colback=skyblue!10!white]
+  }{\end{tcolorbox}}
+
+\usepackage{soul}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\newlength{\tipmargin}
+\makeatletter
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+\def\exend{\hfill\ding{118}}
+\@ifundefined{Example}{}{}
+\renewenvironment{Example}
+{\refstepcounter{equation}\normalfont\normalsize\textbf{Example \theequation.}}
+{\exend}
+\renewcommand{\theequation}{\arabic{equation}}
+
+\renewenvironment{framed}{
+  \setlength{\tipmargin}{\textwidth-\linewidth}
+  \advance\@totalleftmargin-\tipmargin
+  \def\FrameCommand{\hspace{\tipmargin}\fbox}%
+  \advance\linewidth\tipmargin
+  \MakeFramed {\advance\hsize-\width \FrameRestore}%
+}
+{\endMakeFramed}
+
+\makeatother
+
+
+
+\begin{document}
+
+
+\noindent
+{\large \mbox{} \hfill \bf Name:\underline{\hspace{3in}}}\\
+
+{\large \mbox{} \hfill \bf HUID:\underline{\hspace{3in}}}\\
+{\mbox{} \hfill \it (Please write your name neatly in print.)}\\
+
+
+ 
+\medskip
+ 
+\noindent
+{\large\bf
+Mini-Exam \\ Math Ma/Ma5 - Fall 2024}
+\noindent
+
+
+{\Large
+\begin{center}\textbf{Directions---Please read carefully!} \end{center}}
+
+
+
+This assessment is subject to the Harvard College Honor Code. No calculators or any other aids are permitted on this mini-exam.  Please write as neatly as possible, \textbf{as answers that can't be read can't be graded and thus can't receive credit}. You have 75 minutes to complete this mini-exam.   \\
+
+There is a back page of scratch paper. You may ask for additional scratch paper if you would like to have some extra space to work on the problems, but we will not consider the scratch papers as part of your submission. Only this packet will be scanned and graded, so make sure to include all relevant work in the space provided for each question. 
+
+\begin{center}\textbf{Good luck!}\end{center}
+
+
+
+
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+      \textbf{Problem Number}   & \textbf{Points}  \\
+             \hline \hline
+                Problem 1   &   \\
+            \hline
+                 Problem 2 &   \\
+        \hline 
+                Problem 3 &   \\
+        \hline 
+                Problem 4 &   \\
+        \hline 
+                Problem 5 &   \\
+        \hline 
+                Problem 6 &   \\        
+        \hline 
+                Problem 7 & \\
+        \hline
+         \textbf{Total} &   \\
+         \hline 
+    \end{tabular}\\
+\vspace{0.5in}
+\emph{As a member of Harvard College, I pledge that I will not give or receive assistance on this exam.}\\
+\vspace{0.5in}{\large \mbox{} \hfill \bf Signature:\underline{\hspace{3in}}}\\
+
+\newpage
+
+\begin{enumerate}
+
+\item The function $f$ is defined by $f(x)=\dfrac{x-5}{x^3-5x^2}$.
+
+    \begin{enumerate}
+        \item 
+        \begin{problem}[\vfill] What is the domain of $f$? Write your answer in terms of interval notation.
+        \end{problem}
+
+\begin{solution}
+    Domain: $(- \infty, 0) \cup (0, 5) \cup (5, \infty)$
+\end{solution}
+        
+        \item 
+        \begin{problem} Sketch the graph of $f$, and explain briefly how you arrived at your sketch. (1-2 sentences.)
+        
+        \end{problem}
+
+\begin{solution}
+    Note first that there is a common factor of $x^2$ in the denominator, so then $f(x)$ can be rewritten as:
+    $$f(x) = \dfrac{x-5}{x^2(x-5)}$$
+
+    This shows us that the graph of $f(x)$ will look just like the graph of $\dfrac{1}{x^2}$, just with a hole at $x=5$.
+
+    \begin{tikzpicture}
+      \begin{axis}[xmin=-8, xmax=8, ymin=-8, ymax=8, ytick={-8, -6, ..., 8} , grid=both, y label style={rotate=-90},
+      xtick={-8, -6, ..., 8}, xlabel=$x$, ylabel=$y$,  minor tick num=1,
+      ]
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -8:8, color = black]{1/x^2};
+    \addplot+[holdot] coordinates {(5,1/25)};
+    \end{axis}
+        \end{tikzpicture}
+    
+\end{solution}
+        
+       \begin{problemonly}
+      \begin{tikzpicture}
+    \begin{axis}[xtick=\empty, ytick=\empty, ymin=-2, ymax=2,
+      xmin=-4.25, xmax=4.25]
+    \end{axis}
+  \end{tikzpicture}
+  \vspace{1.5in}
+       \end{problemonly}
+        
+        
+        \item 
+        \begin{problem}[\vfill \newpage]
+            Is $f$ a continuous function? Explain why or why not (1 sentence).
+        \end{problem}
+
+    \begin{solution}
+        The function $f(x)$ is not a continuous function, as it is undefined at $x=0$ and $x=5$. 
+    \end{solution}
+        
+    \end{enumerate}
+   
+    \item Algebra
+        \begin{enumerate}
+            \item 
+            \begin{problem}[\vfill]Simplify the expression $\dfrac{r - 4}{r + 2} + \dfrac{2r^2}{r^2 - 4}$. Your final answer should be one fraction with like terms combined. 
+            \end{problem}
+
+            \begin{solution}
+                \begin{align*}
+                    \dfrac{r-4}{r+2} + \dfrac{2r^2}{r^2-4} \\
+                 &  =  \dfrac{r-4}{r+2} + \dfrac{2r^2}{(r-2)(r+2)} \\
+                  & = \dfrac{r-4}{r+2} \Big(\dfrac{r-2}{r-2}\Big) + \dfrac{2r^2}{(r+2)(r-2)} \\
+                 &  = \dfrac{r^2-6r + 8}{(r+2)(r-2)} + \dfrac{2r^2}{(r+2)(r-2)} \\
+                 & = \dfrac{3r^2-6r+8}{(r+2)(r-2)}\\
+                \end{align*}
+            \end{solution}
+
+            \item 
+            \begin{problem}[\vfill]Solve the following equation for $s$. You do not need to simplify your answer.\\
+            $\displaystyle \dfrac{4s}{a+\dfrac{s}{q^2}}=2$
+            \end{problem}
+
+            \begin{solution}
+                
+                \begin{align*}
+               & \displaystyle \dfrac{4s}{a+\dfrac{s}{q^2}}=2 \\
+                   & 4s = 2(a + \frac{s}{q^2}) \\
+                & 4s = 2a + \frac{2s}{q^2} \\
+                & 4sq^2 = 2aq^2 + 2s \\
+                & 4sq^2 - 2s = 2aq^2 \\
+                & s(4q^2 - 2) = 2aq^2 \\
+                & s = \dfrac{2aq^2}{4q^2 - 2}\\
+                \end{align*}
+            \end{solution}
+            
+            \begin{problemonly}
+                \newpage
+            \end{problemonly}
+            \item 
+            \begin{problem} Simplify the following. Your final answer should not have any negative exponents or fractions within fractions. All like terms should be combined.
+            \end{problem}
+                    \begin{enumerate}
+                        \item 
+                        \begin{problem} 
+                        $\dfrac{a^3 b^{-2} a^2}{a b^5 c}$
+
+                        \vspace{1.5in}
+                        \end{problem}
+                
+                        \begin{solution}
+                            $\dfrac{a^3 b^{-2} a^2}{a b^5 c} = \dfrac{a^3 \cdot a^2}{a \cdot b^5 \cdot b^2 \cdot c} = \dfrac{a^5}{ab^7c} = \dfrac{a^4}{b^7 c}$
+                        \end{solution}
+                        
+                        \item 
+                        \begin{problem}[\vfill] $\dfrac{\dfrac{1}{3+b}-\dfrac{1}{3}}{b}$
+                        \end{problem}
+
+                        
+                \begin{solution}
+                    \begin{align*}
+                        & = \dfrac{\dfrac{1}{3+b} \Big( \dfrac{3}{3}\Big) -\dfrac{1}{3} \Big(\dfrac{3+b}{3+b}\Big)}{b} \\
+                        & = \dfrac{\dfrac{3}{9+3b}-\dfrac{3+b}{9+3b}}{b} \\
+                        & = \dfrac{\dfrac{-b}{9+3b}}{b} \\
+                        & = \dfrac{-b}{9 + 3b} \cdot \dfrac{1}{b} = -\dfrac{1}{9+3b} \\
+                    \end{align*}
+                \end{solution}
+                         
+                    \end{enumerate}
+               \item In this problem, $a$ and $b$ are two real numbers. Determine whether the expressions below are equal to $a-b$ for all possible values of $a$ and $b$.
+               
+               Circle YES if, for all possible values of $a$ and $b$, the given expression is equal to $a-b$ . \\
+               Circle NO if, for some values of $a$ and $b$, the given expression is not equal to $a-b$ .
+
+    
+  \begin{enumerate}
+      \item[] YES\;\;\;\;\;\;\;NO\;\;\;\;\;\;\;$-(b-a)$
+      \item[] YES\;\;\;\;\;\;\;NO\;\;\;\;\;\;\;$|a-b|$
+      \item[] YES\;\;\;\;\;\;\;NO\;\;\;\;\;\;\;$(3+a)-(3+b)$
+      \item[] YES\;\;\;\;\;\;\;NO\;\;\;\;\;\;\;$(3a)-(3b)$
+      \item[] YES\;\;\;\;\;\;\;NO\;\;\;\;\;\;\;$\dfrac{3a-b}{3}$
+
+\end{enumerate}
+
+      \begin{solution}
+      \begin{enumerate}
+      \item[] \fbox{YES}\;\;\;\;\;\;\;NO\;\;\;\;\;\;\;$-(b-a) = -b+a = a-b$ 
+      \item[] YES\;\;\;\;\;\;\;\fbox{NO}\;\;\;\;\;\;\;$|a-b|$ (for example, consider if $a=2$ and $b=3$)
+      \item[] \fbox{YES}\;\;\;\;\;\;\;NO\;\;\;\;\;\;\;$(3+a)-(3+b)= 3+a - 3 - b = a - b$
+      \item[] YES\;\;\;\;\;\;\;\fbox{NO}\;\;\;\;\;\;\;$(3a)-(3b) = 3(a-b) \neq a - b$
+      \item[] YES\;\;\;\;\;\;\;\fbox{NO}\;\;\;\;\;\;\;$\dfrac{3a-b}{3}$ (for example, consider $a=3$ and $b=1$).
+
+\end{enumerate}
+          
+      \end{solution}
+            \end{enumerate}
+            \begin{problemonly}
+            \newpage
+            \end{problemonly}
+        \item 
+        \begin{problem}[\vfill]
+            The formula for the function $f$ is $f(x)=\dfrac{x^4}{3+x}$. Is $f$ even, odd, or neither? Show work to justify your answer.
+        \end{problem}
+       
+    \begin{solution}
+        We need to evaluate $f(-x)$ to make this determination. Doing so, we see: 
+        $$f(-x) = \dfrac{(-x)^4}{3 + (-x)} = \dfrac{x^4}{3-x}$$
+        Since this is not equal to our original function $f(x)$, nor equal to $-f(x)$, we conclude that this is \textbf{neither} even nor odd.
+    \end{solution}
+            
+            
+            \item Match each of the functions below to its graph.
+
+    \begin{tikzpicture}
+    \begin{groupplot}[
+        group style = {group size=3 by 2},
+        grid = none,
+        xtick=\empty,
+        ytick=\empty,
+        width = 2.4 in,
+        xmin=-5, xmax=5, ymin=-5, ymax=5,
+        restrict y to domain=-20:20]
+
+    
+    \nextgroupplot[title=(A)]
+        \addplot[draw=none] coordinates {(0,0)};
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -5:5, color = black]{2/(x+2)};
+       \addplot +[dashed,color=black]
+    coordinates {(-2, -10) (-2, 10)};
+
+   
+            
+\nextgroupplot[title=(B)]
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -5:5, color = black]{abs(1/x)};
+
+    \nextgroupplot[title=(C)]
+        \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -5:5, color = black]{2/(x-2)};
+  \addplot +[dashed,color=black]
+    coordinates {(2, -10) (2, 10)};
+
+    \nextgroupplot[title=(D)]
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -5:5, color = black]{1/(x-3)+1};
+    \addplot[dashed, color=black] coordinates {(-10, 1) (10, 1)};
+    \addplot +[dashed,color=black]
+    coordinates {(3, -10) (3, 10)};
+
+    \nextgroupplot[title=(E)]
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -5:5, color = black]{(-2/x)-1};
+    \addplot[dashed, color=black] coordinates {(-10, -1) (10, -1)};
+
+    \nextgroupplot[title=(F)]
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -5:5, color = black]{-2*(1/x-1)};
+    \addplot[dashed, color=black] coordinates {(-10, 2) (10, 2)};
+    
+    
+    \end{groupplot}
+\end{tikzpicture}
+
+\begin{enumerate}
+\vspace{1cm}
+\begin{multicols}{2}
+\item[(i)] \fitb{0.5in}{}\hspace{0.1in} $f(x)=\dfrac{2}{x-2}$
+\vspace{0.7in}
+%\item \fitb{0.5in}{} \hspace{0.1in} $f(x)=\dfrac{2}{x+2}$
+%\vspace{0.7in}
+\item[(ii)] \fitb{0.5in}{} \hspace{0.1in} $f(x)=-2\left(\dfrac{1}{x}-1\right)$
+%\columnbreak
+\vspace{0.7in}
+%\item \fitb{0.5in}{} \hspace{0.1in} $f(x)=\dfrac{-2}{x}-1$
+%\vspace{0.7in}
+\item[(iii)] \fitb{0.5in}{} \hspace{0.1in} $f(x)=\bigg|\dfrac{1}{x}\bigg|$
+\vspace{0.7in}
+\item[(iv)] \fitb{0.5in}{} \hspace{0.1in} $f(x)=\dfrac{1}{x-3}+1$
+\vspace{0.7in}
+\end{multicols}
+\end{enumerate}
+
+\begin{solution}
+    Function (i) matches with graph (C), function (ii) matches with graph (F), function (iii) matches with graph (B), and function (iv) matches with (D).
+\end{solution}
+
+\begin{problemonly}
+    \newpage
+\end{problemonly}
+\item 
+        Oprah and Gayle are on a cross country road trip, and information about their afternoon drive one day is graphed below. Let $f(t)$ represent the distance in miles they have traveled as a function of $t$, the number of hours after noon that day. \\
+        
+        \begin{tikzpicture}
+    \begin{axis}[xmin=0, xmax=3, ytick={10, 20, ..., 70} , grid=both, y label style={rotate=-90},
+      minor
+      xtick={0.5, 1, ..., 3}, minor ytick={5, 10, ..., 65}, ymax=70, xlabel=$t$, ylabel=$f(t)$, 
+      ]
+      
+      \addplot+[sharp plot, black, very thick] coordinates {(0, 0) (0.5, 20)}; %
+       \addplot+[sharp plot, black, very thick] coordinates {(0.5, 20) (1, 50)}; %
+        \addplot+[sharp plot, black, very thick] coordinates {(1, 50) (2.5, 50)}; %
+        \addplot+[sharp plot, black, very thick] coordinates {(2.5,50) (3,65)}; %
+     
+    \end{axis}
+  \end{tikzpicture}
+
+  \begin{enumerate}
+      \item 
+      \begin{problem}[\vfill]How far have Oprah and Gayle traveled by the end of the first hour? Include units.
+      \end{problem}
+      \begin{solution}
+          50 miles (this is $f(1)$ on the graph).
+      \end{solution}
+      \item 
+      \begin{problem}[\vfill]What is their average speed for the time period shown in the graph? Include units.
+      \end{problem}
+      \begin{solution}
+          Their average speed is $\dfrac{65}{3}$ miles/hour
+      \end{solution}
+      \item 
+      \begin{problem}[\vfill]Explain (in 1 sentence) how to visualize the average speed you computed in (b). Illustrate it on the graph.
+      \end{problem}
+        \begin{solution}
+            The average speed on the graph is represented by the slope of the line connecting the points $(0,0)$ and $(3, 65)$. It is drawn in blue on the graph below.
+
+                \begin{tikzpicture}
+    \begin{axis}[xmin=0, xmax=3, ytick={10, 20, ..., 70} , grid=both, y label style={rotate=-90},
+      minor
+      xtick={0.5, 1, ..., 3}, minor ytick={5, 10, ..., 65}, ymax=70, xlabel=$t$, ylabel=$f(t)$, 
+      ]
+      
+      \addplot+[sharp plot, black, very thick] coordinates {(0, 0) (0.5, 20)}; %
+       \addplot+[sharp plot, black, very thick] coordinates {(0.5, 20) (1, 50)}; %
+        \addplot+[sharp plot, black, very thick] coordinates {(1, 50) (2.5, 50)}; %
+        \addplot+[sharp plot, black, very thick] coordinates {(2.5,50) (3,65)}; %
+        \addplot+[sharp plot, blue, very thick] coordinates {(0,0) (3, 65)}; %      
+    \end{axis}
+  \end{tikzpicture}
+        \end{solution}
+      
+      \item 
+      \begin{problem}Represent the following quantities using {\bf function notation}.
+      \end{problem}
+      \begin{enumerate}
+          \item Distance traveled at 12:30pm
+          
+          \begin{solution}
+              $f(0.5)$
+          \end{solution}
+          \vfill
+          \item Distance traveled from 12:30pm to 2:30pm
+         
+          \begin{solution}
+              $f(2.5) - f(0.5)$
+          \end{solution}
+          \vfill
+          \item Average speed from 12:30pm to 2:30pm
+          
+          \begin{solution}
+              $\dfrac{f(2.5) - f(0.5)}{2.5-0.5}$
+          \end{solution}
+          \vfill
+      \end{enumerate}
+      \begin{problemonly}
+          \newpage
+      \end{problemonly}
+      \end{enumerate}
+      The graph of $f$ is reproduced here to help you answer part (e).
+
+       \begin{tikzpicture}
+    \begin{axis}[xmin=0, xmax=3, ytick={10, 20, ..., 70} , grid=both, y label style={rotate=-90},
+      minor
+      xtick={0.5, 1, ..., 3}, minor ytick={5, 10, ..., 65}, ymax=70, xlabel=$t$, ylabel=$f(t)$, 
+      ]
+      
+      \addplot+[sharp plot, black, very thick] coordinates {(0, 0) (0.5, 20)}; %
+       \addplot+[sharp plot, black, very thick] coordinates {(0.5, 20) (1, 50)}; %
+        \addplot+[sharp plot, black, very thick] coordinates {(1, 50) (2.5, 50)}; %
+        \addplot+[sharp plot, black, very thick] coordinates {(2.5,50) (3,65)}; %
+     
+    \end{axis}
+  \end{tikzpicture}
+  \begin{enumerate}[resume]
+      \item Put the following quantities in increasing order. Explain your decisions in 1-2 sentences. \\
+      \begin{itemize}
+          \item A. average speed from 12:00pm to 12:30pm, 
+          \item B. average speed from 12:30pm to 1:00pm, 
+          \item C. average speed from 2:30pm to 3:00pm.
+          \end{itemize}
+  \end{enumerate}
+  \vspace{.25in}
+\begin{center}
+  $\underline{\makebox[1in]{}}\quad < \quad \underline{\makebox[1in]{}}\quad < \quad \underline{\makebox[1in]{}}$
+  \end{center}
+
+  \begin{solution}
+      $C < A < B$. Note that the average speed is represented by the slopes of the lines connecting the points at different intervals (for example, the average speed from 12:00pm to 12:30pm is the same as the slope of the line segment from $(0,0)$ to $(0.5, 20)$ on the graph above.
+  \end{solution}
+
+  \begin{problemonly}
+      \newpage
+  \end{problemonly}
+
+  \item     Consider the function $f$ whose graph is shown below. 
+\begin{multicols}{2}
+    % \includegraphics[scale=0.18]{Mini-exam Tranformations Graph DRAFT.png}
+
+    \begin{tikzpicture}
+    \begin{axis}[xmin=-8, xmax=8, ymin=-8, ymax=8, ytick={-8, -6, ..., 8} , grid=both, y label style={rotate=-90},
+      xtick={-8, -6, ..., 8}, xlabel=$x$, ylabel=$y$,  minor tick num=1,
+      ]
+      \addplot[domain = -3:1, line width = 1.2pt, color = black]{-((x+1)^2)+2};
+  \addplot +[line width = 1.2pt,color=black]
+    coordinates {(1,-2) (3,2)};
+  \addplot +[line width = 1.2pt,color=black]
+    coordinates {(3,2) (6,2)};
+    \addplot+[
+        only marks, 
+        mark=*, color=black,
+        line width=0pt
+    ] coordinates {(-3,-2) (-1,2) (1,-2) (3,2) (6,2)};
+    \end{axis}
+    \end{tikzpicture}
+    
+    \begin{enumerate}
+        \item Determine the domain and range of $f$. You may use either inequalities or interval notation.
+        
+       \vspace{0.5cm}
+        
+            Domain: \underline{\makebox[2in]{}}\\
+            \vspace{0.25in}
+            Range: \underline{\makebox[2in]{}}
+       \end{enumerate}
+       \end{multicols}
+    \begin{solution}
+    
+          Domain: \underline{\makebox[2in]{$[-3, 6]$ or $-3 \leq x \leq 6$}}\\
+            \vspace{0.25in}
+            Range: \underline{\makebox[2in]{$[-2, 2]$ or $-2 \leq f(x) \leq 2$}}
+    \end{solution}
+       \begin{enumerate}
+       
+        \item[(b)] Sketch the graph of the function $g$, defined as  $g(x)=2f(-x)-3$. Clearly mark the points on the graph of $g$ that correspond to the marked points on the graph of $f$. There are additional axes at the bottom of the page for you to do work. \textbf{Sketch your final answer on the axes to the left of part (c).}
+        
+ \begin{multicols}{2}
+ Final Answer:\\
+   \begin{tikzpicture}
+    \begin{axis}[xmin=-8, xmax=8, ymin=-8, ymax=8, ytick={-8, -6, ..., 8} , grid=both, y label style={rotate=-90},
+      xtick={-8, -6, ..., 8}, xlabel=$x$, ylabel=$y$,  minor tick num=1,
+      ]
+    \end{axis}
+  \end{tikzpicture}
+  
+        \item[(c)] Determine the domain and range of $g$. You may use either inequalities or interval notation.
+        \vspace{0.5cm}
+        
+            Domain: \underline{\makebox[2in]{}}\\
+            \vspace{0.25in}
+            Range: \underline{\makebox[2in]{}}
+
+
+        \end{multicols}
+    \end{enumerate}
+
+\vspace{-12pt}
+\rule{6.5in}{0.4pt}
+
+You may do work on the axes below. \textbf{Sketch your final answer on the axes to the left of part (c).}
+\vspace{-12pt}
+\begin{multicols}{2}
+        \begin{tikzpicture}
+    \begin{axis}[xmin=-8, xmax=8, ymin=-8, ymax=8, ytick={-8, -6, ..., 8} , grid=both, y label style={rotate=-90},
+      xtick={-8, -6, ..., 8}, xlabel=$x$, ylabel=$y$, minor tick num=1,
+      ]
+    \end{axis}
+  \end{tikzpicture}
+  
+  \columnbreak
+  
+   \begin{tikzpicture}
+    \begin{axis}[xmin=-8, xmax=8, ymin=-8, ymax=8, ytick={-8, -6, ..., 8} , grid=both, y label style={rotate=-90},
+      xtick={-8, -6, ..., 8}, xlabel=$x$, ylabel=$y$, minor tick num=1,
+      ]
+    \end{axis}
+  \end{tikzpicture}
+\end{multicols}
+
+    \begin{solution}
+
+        \begin{tikzpicture}
+    \begin{axis}[xmin=-8, xmax=8, ymin=-8, ymax=8, ytick={-8, -6, ..., 8} , grid=both, y label style={rotate=-90},
+      xtick={-8, -6, ..., 8}, xlabel=$x$, ylabel=$y$,  minor tick num=1,
+      ]
+    \addplot[line width = 1.2pt, color = black] 
+      coordinates {(-6, 1) (-3,1)};
+  \addplot +[line width = 1.2pt,color=black]
+    coordinates {(-3, 1) (-1,-7)};
+     \addplot[domain = -1:3, line width = 1.2pt, color = black]{2*(-(x-1)^2)+1};
+    \addplot+[
+        only marks, 
+        mark=*, color=black,
+        line width=0pt
+    ] coordinates {(-6,1) (-3,1) (-1,-7) (1,1) (3,-7)};
+    \end{axis}
+    \end{tikzpicture}
+    
+          Domain: \underline{\makebox[2in]{$[-6, 3]$ or $-6 \leq x \leq 3$}}\\
+            \vspace{0.25in}
+            Range: \underline{\makebox[2in]{$[-7, 1]$ or $-7 \leq f(x) \leq 1$}}
+    \end{solution} 
+    
+
+\item Give the \textbf{formula} of a function that has the listed properties. 
+
+\emph{Note: While we encourage you to be creative, each of these can be answered by starting with a parent function from our library of functions: $y=x$, $y=x^2$, $y=x^3$, $y=\frac{1}{x}$, $y=\frac{1}{x^2}$, $y=|x|$, $y=\sqrt{x}$.}
+\begin{enumerate}
+    \item  
+    \begin{problem}[\vfill]
+    $h$ is increasing on $(-\infty, \infty)$
+    \vspace{8pt}
+    
+    $h(x)=$ \fitb{2in}{}
+    \end{problem}
+    
+    \begin{solution}
+        One potential choice of $h(x)$ is that $h(x)=x$
+    \end{solution}
+    
+   \item 
+   \begin{problem}[\vfill]
+   $f$ is concave down on $(-\infty, 1)$ and concave up on $(1, \infty)$
+    \vspace{8pt}
+       
+    $f(x)=$ \fitb{2in}{}
+    \end{problem}
+
+       \begin{solution}
+        One potential choice of $f(x)$ is that $f(x)=(x-1)^3$
+    \end{solution}
+    
+    \item 
+    \begin{problem}[\vfill] $g$ is positive (greater than 0) everywhere it is defined.
+    \vspace{8pt}
+    
+    $g(x)=$ \fitb{2in}{}
+    \end{problem}
+
+       \begin{solution}
+        One potential choice of $g(x)$ is that $g(x)=x^2+1$
+    \end{solution}
+    
+\end{enumerate}
+
+
+\newpage
+\emph{This page left blank for scratch work. It will not be graded.}
+\end{enumerate}
+
+
+\end{document}

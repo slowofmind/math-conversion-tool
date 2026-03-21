@@ -1,0 +1,294 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws1-3}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterone}
+}{}
+
+\section{Area and Volume} \label{ws1-3}
+
+
+\begin{framed}
+\textbf{Lesson Goals:}
+\begin{itemize}
+\item You should be able to sketch regions in the $xy$-plane bounded by basic curves, and find the bounds of the region.
+\item You should be able to use our general slicing strategy (\textit{Slice} $\rightarrow$ \textit{Approximate} $\rightarrow$ \textit{Sum} $\rightarrow$ \textit{Limit}) to write and evaluate a definite integral that gives the area bounded by basic curves in the $xy$-plane.
+\item You should be able to decide whether to slice a region vertically or horizontally to find its area most easily and efficiently, based on the geometry of the region and the resulting integral(s).
+\item You should be able to evaluate challenging definite integrals by interpreting them as areas and finding them via slicing.
+\item You should be able to extend our general slicing strategy for computing volumes when the volume of each slice is simple.
+\end{itemize}
+\end{framed}
+
+\begin{enumerate}
+
+\item \label{area0}
+  \begin{problem}[\vfill]
+        Let $\mathcal{R}$ be the region enclosed by the curves $y = x^2 - 1$
+  and $y = x + 1$. Find the area of this region using our slicing strategy.
+  \end{problem}
+
+
+    \begin{solution}
+      To find the $x$-coordinates of the points of intersection, we solve
+      $x^2 - 1 = x + 1$:
+      \begin{align*}
+        x^2 - 1 &= x + 1 \\
+        x^2 - x - 2 & = 0 \\
+        (x - 2)(x + 1) & = 0 \\
+        x &= -1, 2
+      \end{align*}
+      So, the points of intersection are \fbox{$(-1, 0)$ and $(2, 3)$}.
+      (To find the $y$-coordinate, we plug the $x$-coordinate into $y =
+      x^2 - 1$ or $y = x + 1$.) 
+ 
+      The region has width 3 (from $x = -1$ to $x = 2$), and we're
+      dividing it into $n$ pieces, so $\Delta x = \frac{3}{n}$.
+
+      $x_k$ is $k$ ``slice widths'' to the right of $x_0$, so $x_k = x_0 +
+      k \Delta x$.  We know that $x_0 = -1$, so $\boxed{x_k = -1 + k
+        \Delta x}$.  (Notice that then $x_n = -1 + n \Delta x = -1 + n
+      \cdot \frac{3}{n} = 2$, which matches our picture.)
+  
+
+
+      We are approximating the area of the $k$-th slice by pretending that
+      the slice is really the rectangle shown in the picture below.  The width
+      of the rectangle is the same as the width of the slice, which is
+      $\Delta x$.
+
+      The rectangle shares the same right side as the slice, so let's
+      figure out the coordinates of the top and bottom points of the
+      right side of the slice (the blue points in the following picture).
+      \begin{center}
+        \includegraphics[width=1.5in]{ws/images/area0-slice-approximate-points.pdf}
+      \end{center}      
+      We know that the right end of the slice
+      has $x = x_k$.  The bottom of the slice is the curve $y = x^2 -
+      1$, so the $y$-coordinate of the bottom blue point is $x_k^2 - 1$.
+      That is, the bottom blue point has coordinates $(x_k, x_k^2 - 1)$.
+      Similarly, the top blue point has coordinates $(x_k, x_k + 1)$.  The
+      height of the rectangle is simply the $y$-coordinate of the top blue
+      point minus the $y$-coordinate of the bottom blue point, or $(x_k +
+      1) - (x_k^2 - 1)$.
+
+      So, the area of the rectangle is $\boxed{[(x_k + 1) - (x_k^2 - 1)]
+        \Delta x}$. 
+  
+      To get the approximate area of the whole region, we sum the
+      approximate areas of all of the slices.  Therefore, the approximate
+      area of the region is
+      \[ \boxed{[(x_1 + 1) - (x_1^2 - 1)] \Delta x + [(x_2 + 1) - (x_2^2 -
+        1)] \Delta x + \cdots + [(x_n + 1) - (x_n^2 - 1)] \Delta x}\] This
+      can also be written in summation notation as $\displaystyle
+      \boxed{\sum_{k=1}^n [(x_k + 1) - (x_k^2 - 1)] \Delta x}$.
+    
+        We can take the appropriate limit of the previous sum and the resulting integral is $$\displaystyle\int_{-1}^2[(x+1)-(x^2-1)]\,dx$$
+    \end{solution}
+
+\pspace{\newpage}
+\item  \label{area-ln-horizontal}
+
+  
+  \begin{problem}[\vfill]
+    Find the area under the curve $y = \ln x$ from $x = 1$ to $x = e$.
+  \end{problem}
+
+  \begin{solution}
+    Here is the area we are interested in:
+    \begin{center}
+      \includegraphics[height=1in]{ws/images/area-ln-horizontal}
+    \end{center}
+
+    We know that this area is $\displaystyle \int_1^e \ln x~dx$, but that
+    integral is a little hard to compute (you may not know how to do it
+    yet, which is fine --- we'll talk about it next week).  Let's try
+    another strategy.
+
+    Let's \textbf{slice} the region into \textit{horizontal} strips of
+    equal height $\Delta y$ (so we slice the interval $[0, 1]$ on the
+    $y$-axis), label $y_0 = 0, \ldots, y_n = 1$ as usual, and focus on the
+    $k$-th slice.
+    \begin{center}
+      \includegraphics[height=1in]{ws/images/area-ln-horizontal-slice}
+    \end{center}
+    The curve is $y = \ln x$, which we can also think of as $x = e^y$.
+    We can \textbf{approximate} the slice by a rectangle (shown in
+    purple):    
+    \begin{center}
+      \includegraphics[height=1in]{ws/images/area-ln-horizontal-approximating-rectangle}
+    \end{center}
+    Since the curve is $x = e^y$, the top left point of the rectangle has
+    coordinates $\left( e^{y_k}, y_k \right)$.  The top right point has
+    coordinates $(e, y_k)$.  Therefore, the width of the rectangle is $e -
+    e^{y_k}$.  The rectangle has height $\Delta y$, so its area is $(e -
+    e^{y_k}) \Delta y$.  So, we've shown that the area of the $k$-th slice
+    is approximately $(e - e^{y_k}) \Delta y$.  \textbf{Summing} over all
+    slices and \textbf{taking the limit} as the number of slices tends to
+    infinity, we find that the area is $\displaystyle \lim_{n \to \infty}
+    \sum_{k=1}^n (e - e^{y_k}) \Delta y$, which is equal to the integral
+    $\displaystyle \int_0^1 (e - e^y)~dy$.  We can easily evaluate this
+    integral; it is equal to $\displaystyle ey - e^y \Big|_0^1 = (e - e) -
+    (0 - 1) = \boxed{1}$.
+  \end{solution}
+
+%\probonly{\newpage}
+
+\item  \label{area-3curves-3}
+
+  \note{If students get this quickly, encourage them to also think about
+    what happens if they slice ``the other way'' (they should be able to
+    slice either horizontally or vertically).  Also, if students just
+    write down an integral directly, ask them how they sliced and what's
+    happening with the $k$-th slice.}
+  
+  \begin{problem}[\vfill]
+    Find the area enclosed by $y = -2x$, $y = x^3$, and $y = 1$.
+  \end{problem}
+
+  \begin{solution}
+    Let's draw a picture so we can see what area we're talking about.  If
+    we graph $y = -2x$, $y = x^3$, and $y = 1$, we see that the area we're
+    talking about is this:
+    \begin{center}
+      \includegraphics[width=1.5in]{ws/images/area-3curves-3-region}
+    \end{center}
+    As always, the first step is to \textbf{slice}.  We can either slice
+    horizontally or vertically: 
+    \begin{center}
+      \includegraphics[width=1.5in]{ws/images/area-3curves-3-hslice}
+      \hspace{1in}
+      \includegraphics[width=1.5in]{ws/images/area-3curves-3-vslice}
+    \end{center}
+    Notice that, if we use vertical slices, there are two ``types'' of
+    slices --- slices to the left of the $x$-axis go between the curves $y
+    = -2x$ and $y = 1$ while slices to the right of the $x$-axis go
+    between $y = x^3$ and $y = 1$.  This means we need to consider these
+    two areas separately.
+    
+    If we use horizontal slices, then all of the slices have the same
+    description: the left side is on $y = -2x$ (or $x = -y/2$), and the
+    right side is on $y = x^3$ (or $x = y^{1/3}$).  So, using horizontal
+    slices is slightly more efficient.  If we slice $[0, 1]$ into $n$
+    pieces and label $y_0 = 0, \ldots, y_n = 1$ as usual, then we can
+    \textbf{approximate} the area of the $k$-th slice as $\left(y_k^{1/3}
+      + \frac{y_k}{2} \right) \Delta y$.  \textbf{Summing} and
+    \textbf{taking the limit} as $n \to \infty$ gives us $\displaystyle
+    \lim_{n \to \infty} \sum_{k=1}^n \left( y_k^{1/3} + \frac{y_k}{2}
+    \right) \Delta y$, or $\displaystyle \int_0^1 \left( y^{1/3} +
+      \frac{y}{2} \right)~dy = \left. \frac{3}{4} y^{4/3} + \frac{1}{4}
+      y^2 \right|_0^1 = \boxed{1}$.
+
+    \textit{Note:} If you use vertical slices, the correct sum of
+    integrals is $\displaystyle \int_{-1/2}^0 (1 + 2x)~dx + \int_0^1 (1 -
+    x^3)~dx$.
+  \end{solution}
+  
+  %\probonly{\newpage}
+
+\pspace{\newpage}
+
+
+\item \label{area-arcsin-arccos}
+ 
+
+  True or false.  Explain your reasoning thoroughly in each.
+  
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \int_0^1 \arccos x~dx = \int_0^{\pi / 2} \cos y~dy$.
+    \end{problem}
+
+    \begin{solution}
+      This is \fbox{true}.  One way to see this is simply to evaluate the
+      two integrals.
+
+      Alternatively, we can interpret $\displaystyle \int_0^1 \arccos
+      x~dx$ as the area under $y = \arccos x$ from $x = 0$ to $x = 1$,
+      which is the area of the following region:
+      \begin{center}
+        \includegraphics[width=1.5in]{ws/images/area-arcsin-arccos-arccos}
+      \end{center}
+      Suppose we instead decided to find the area by slicing horizontally
+      (as you did in Problem Set 3, {\#3}).  Then, we'd slice the interval
+      $\left[0, \frac{\pi}{2} \right]$ (on the $y$-axis) into $n$ pieces
+      of equal thickness $\Delta y$ and label $y_0 = 0, \ldots, y_n =
+      \frac{\pi}{2}$.
+      \begin{center}
+        \includegraphics[width=1.5in]{ws/images/area-arcsin-arccos-arccos-hslices}
+      \end{center}
+      Now, the $k$-th slice has height $\Delta y$ and approximate width
+      $\cos y_k$ (since the curve is $y = \arccos x$, or $x = \cos y$), so
+      the area of the $k$-th slice is approximately $\cos y_k \Delta y$.
+      Summing over all slices and taking the limit as $n \to \infty$, the
+      area is indeed given by $\displaystyle \int_0^{\pi / 2} \cos y~dy$. 
+    \end{solution}
+  
+  \item \note{This seems to be a somewhat common mistake that happens when
+      students don't draw a picture.}
+
+    \begin{problem}[\vfill]
+      $\displaystyle \int_0^1 \arcsin x~dx = \int_0^{\pi / 2} \sin y~dy$.
+    \end{problem}
+
+    \begin{solution}
+      This is \fbox{false}.  We can use the same reasoning as in the
+      previous part to see that $\displaystyle \int_0^1 \arcsin x~dx$ is
+      the blue region in the following picture (the area under $y =
+      \arcsin x$ from $x = 0$ to $x = 1$), while $\displaystyle
+      \int_0^{\pi / 2} \sin y~dy$ is the area of the purple region:
+      \begin{center}
+        \includegraphics[width=1.5in]{ws/images/area-arcsin-arccos-arcsin}
+      \end{center}
+      The two regions clearly have different areas, so the statement is
+      false. 
+    \end{solution}
+
+  \end{enumerate}
+\pspace{\newpage}
+\item
+
+\note{Just so that they have one problem about volumes which is not about solids of revolution, similarly to what they have on the PSet.}
+
+\begin{problem}
+    Use slicing to obtain the volume of a square pyramid with height 5 and base with sides of length 2. You can verify your answer is correct by using the formula for the volume of a pyramid.
+\end{problem}
+\probonly{\vfill}
+\begin{solution}
+    We will call $x$ the vertical distance measured perpendicularly from the base of the pyramid, as indicated in the picture below:
+
+\begin{center}
+      \includegraphics[width=1.5in]{ws/images/Solid_Pyramid_noslice.png}
+\end{center}
+
+We will \textbf{slice} the pyramid parallel to the base, since we know that shape is a square. Let us define $\Delta x = 5/n$ and $x_k = k \Delta x$, so that $x_0 = 0, x_n = 5$. A generic $k$-th slice is indicated in the picture below:
+
+\begin{center}
+      \includegraphics[width=1.5in]{ws/images/Solid_Pyramid_slice.png}
+\end{center}
+
+We now \textbf{approximate} the volume of the slice as the volume of a box with height $\Delta x$ and a square base with side length $l_k$. That means the volume of the slice is approximately $(l_k)^2 \Delta x$. To find $l_k$ we can use proportions on the side triangle of the pyramid, as indicated by the figure
+
+\begin{center}
+      \includegraphics[width=1.5in]{ws/images/Solid_Pyramid_slice_front.png}
+\end{center}
+
+We obtain the following relation:
+\[\frac{5-x_k}{l_k} = \frac{5}{2}\]
+It follows that $l_k = \frac{2}{5}(5-x_k)$ and the volume of the $k$-th slice is approximately $\frac{4}{25}(5-x_k)^2 \Delta x$. 
+
+\textbf{Summing} over all slices we get the approximate volume for the pyramid
+$\displaystyle \sum_{k=1}^n\frac{4}{25}(5-x_k)^2 \Delta x$ and \textbf{taking the limit} as the number of slices tend to infinity we get the exact volume of the pyramid, given by the integral
+\[\int_0^5 \frac{4}{25}(5-x)^2 \,dx \]
+We can solve this integral by substitution, making $u = 5-x$, so that 
+\[\int_0^5 \frac{4}{25}(5-x)^2 \,dx = -\int_{5}^0 \frac{4}{25}u^2 \,du = \frac{4}{3\cdot 25} \left.u^3\right|_0^5 = \frac{4\times 5}{3} \]
+Which matches the result of the formula for the volume of the pyramid as $\frac{(\text{Area of the base})(\text{Height})}{3}$.
+    
+\end{solution}
+
+\end{enumerate}
+\end{document}

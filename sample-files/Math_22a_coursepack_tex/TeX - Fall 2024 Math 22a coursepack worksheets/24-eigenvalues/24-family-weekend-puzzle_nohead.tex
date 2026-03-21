@@ -1,0 +1,91 @@
+%\documentclass[12pt,letterpaper]{article}
+
+
+
+%\input{../worksheet-setup.tex}
+%\usetikzlibrary{arrows}
+%\usepackage{wrapfig}
+%
+%\makeatletter
+%\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+%	\hskip -\arraycolsep
+%	\let\@ifnextchar\new@ifnextchar
+%	\array{#1}}
+%\makeatother
+%
+%\def\env@matrix{\hskip -\arraycolsep
+%	\let\@ifnextchar\new@ifnextchar
+%	\array{*\c@MaxMatrixCols c}}
+
+\section{{A Sequence of Weekend Puzzles,} and
+{Eigenvalues and Eigenvectors, $\vec\S$ 5.4}}% 
+
+\chead{\Large\textbf{A Sequence of Weekend Puzzles:}} 
+%and \Large\textbf{Eigenvalues and Eigenvectors, $\vec\S$ 5.4}}% 
+
+
+%\begin{document}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+\item The Math 22 team has an idea to raise funds for next year. We are going to buy 8-inch by 8-inch gold sheets, and we will cut and rearrange the sheet as shown in the figures below. We will then sell the resulting 5-inch by 13-inch sheet (with the same thickness). Please analyze our plan.
+
+\begin{minipage}{.4\textwidth} %
+\begin{tikzpicture}[scale=0.25]
+\draw[step=1cm,gray,thin] (0,0) grid (8,8);
+\draw[line width=1mm] (0,0) -- (8,0) -- (8,8) -- (0,8) -- (0,0);
+\draw[line width=1mm] (0,8) -- (8,5);
+\draw[line width=1mm] (0,5) -- (8,5);
+\draw[line width=1mm] (3,0) -- (5,5);
+\end{tikzpicture}
+\end{minipage} %
+\begin{minipage}{.4\textwidth} %
+\begin{tikzpicture}[scale=0.25]
+\draw[step=1cm,gray,thin] (0,0) grid (13,5);
+\draw[line width=1mm] (0,0) -- (13,0) -- (13,5) -- (0,5) -- (0,0);
+\draw[line width=1mm] (0,5) -- (13,0);
+%\draw[line width=1mm] (5,3) -- (13,0);
+\draw[line width=1mm] (5,3.1) -- (5,0);
+\draw[line width=1mm] (8,5) -- (8,1.9);
+%\draw[line width=1mm] (0,5) -- (8,2);
+%\draw[line width=1mm] (13,0) -- (8,2);
+\end{tikzpicture}
+
+\end{minipage}
+\item Suppose instead we take 8 in by 21 in sheets and rearrange them to 13 by 13 sheets with the following cuts:
+
+\begin{minipage}{.4\textwidth} %
+\begin{tikzpicture}[scale=0.25]
+\draw[step=1cm,gray,thin] (0,0) grid (21,8);
+\draw[line width=1mm] (0,0) -- (21,0) -- (21,8) -- (0,8) -- (0,0);
+\draw[line width=1mm] (0,8) -- (21,0);
+%\draw[line width=1mm] (5,3) -- (13,0);
+\draw[line width=1mm] (8,5.1) -- (8,0);
+\draw[line width=1mm] (13,8) -- (13,2.9);
+%\draw[line width=1mm] (0,5) -- (8,2);
+%\draw[line width=1mm] (13,0) -- (8,2);
+\end{tikzpicture}
+\end{minipage} %
+\begin{minipage}{.4\textwidth} %
+\begin{tikzpicture}[scale=0.25]
+\draw[step=1cm,gray,thin] (0,0) grid (13,13);
+\draw[line width=1mm] (0,0) -- (13,0) -- (13,13) -- (0,13) -- (0,0);
+\draw[line width=1mm] (0,13) -- (13,8);
+\draw[line width=1mm] (0,8) -- (13,8);
+\draw[line width=1mm] (5,0) -- (8,8);
+\end{tikzpicture}
+\end{minipage}
+\item How could we rearrange a 21 by 21 square to get an ``extra square"?
+\item What about larger squares?
+\end{enumerate}
+
+
+
+
+%\end{document}
+
+
+%%% Local ables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

@@ -1,0 +1,1562 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[]{handout}
+\renewcommand{\workshopnote}{CA Notes.} 
+\usepackage{lipsum}
+ \usepackage{microtype}
+ \usepackage{vwcol}
+\begin{document}
+
+\htitle{Workshop 2: Unit Circle and Right Triangle Trigonometry}
+\begin{workshop}
+\newline
+    The goals of Workshop 2 are for students to
+    \begin{itemize}
+        \item label all 16 familiar points on the unit circle, and know how to derive them if they forget.
+        \item compute the sine and cosine of familiar angles in the first quadrant of the unit circle. 
+        \item orient themselves to angle measurements on the unit circle in multiples of $\frac{\pi}{2}$, $\frac{\pi}{3}$, $\frac{\pi}{4}$, and $\frac{\pi}{6}$. 
+        \item compute the sine and cosine of angles that lie outside of the first quadrant of the unit circle with symmetry and visualizing multiples of $\frac{\pi}{2}$, $\frac{\pi}{3}$, $\frac{\pi}{4}$, and $\frac{\pi}{6}$ as sectors on the unit circle.
+        \item compute trigonometric values of acute angles using ratios of side lengths of right triangles.
+        \item appreciate the interconnectedness of unit circle trigonometry and right triangle trigonometry.
+    \end{itemize}
+    
+    Other notes:
+    \begin{itemize}
+        \item  Students will likely work through these problems at a variable pace depending on their comfort with and prior familiarity with trigonometry. For this reason, there are more problems than usual on this worksheet for fast finishers. There is no expectation to complete the entire worksheet in workshop, and students will likely have some extra practice problems as well.
+        \item Because of the highly visual nature of these problems, I would strongly recommend having students work in groups at the boards on \#1 and \#3, encouraging new unit circles for each sub-question for clarity. You might consider asking each group to check in with you after reaching certain stages (i.e., after \#1d and \#3d) as opposed to collecting the class to debrief these questions, because they are highly procedural. 
+        \item Instead, you might choose to collect the class to discuss your careful thought process behind how you would calculate an answer to one or two parts of \#4, being sure to lay out how you would locate an angle like $\frac{5\pi}{3}$ and how to appropriately use symmetry with the first quadrant to compute something like $\sin \left(\frac{5\pi}{3}\right)$.
+        \item If time permits, the class might benefit from (a) some reinforcement on evaluating quantities like $\sin(\theta + \pi)$ or $\sin(\pi-\theta)$ using a unit circle as a visual aid and/or (b) making convenient choices for representing $\sin \theta = \dfrac{3}{5}$ with integer side lengths on a right triangle.
+    \end{itemize}
+        
+  
+\end{workshop}
+
+\begin{enumerate}
+ \item Let's practice how to derive familiar points on the unit circle.
+
+ 
+ 
+ 
+     
+ \begin{workshop}
+     Students may be unsure how to compute the side lengths of this triangle. In this case, you can ask them to recall what they know must be true about the two unknown side lengths of the triangle given the fact it is a right isosceles triangle. Once they recognize that the legs have the same length, they can give them a name like $x$ and use the Pythagorean Theorem to solve for $x$.
+ \end{workshop}
+\begin{enumerate}
+\begin{problem} 
+     \item Below is a right isosceles triangle with a hypotenuse of 1 unit. First, solve for the length of its legs. Then, overlay the triangle onto the unit circle to plot 4 points. An example is done for you.
+\end{problem}
+     
+\probonly{
+\begin{multicols}{2}
+\phantom
+\newline
+\newline
+
+
+
+ \begin{tikzpicture}[x=3.5cm, y=3.5cm]
+        \draw (0, 0) -- (1, 0) -- (1, 1); 
+        \draw (1, 1) -- node[anchor=south east]{$1$}
+        (0, 0); %
+        \draw (8pt, 0) arc[radius=8pt, start angle=0, end angle=45]
+        node[anchor=180]{$\frac{\pi}{4}$}; %
+        \draw ($(1, 1) - (0, 8pt)$) arc[radius=8pt, start angle=270, end
+        angle=225] node[anchor=100]{$\frac{\pi}{4}$};
+      \end{tikzpicture}
+
+
+   \begin{tikzpicture}
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+
+    \foreach \A in {135,225,315} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+      \filldraw[radius=2pt] (\rtheta{1}{45}) circle;
+      \draw[dotted] (O) -- (\rtheta{1}{\A});
+      \draw[dashed] (O) -- node[anchor=south east]{$1$}(\rtheta{1}{45});}
+
+    \draw[dotted] (\rtheta{1}{135}) -- (\rtheta{1}{225});
+    \draw[dotted] (\rtheta{1}{315}) -- (\rtheta{0.71}{0});
+    \draw[dashed] (\rtheta{0.71}{0}) -- (\rtheta{1}{45});
+
+    \node[above right] at (\rtheta{1}{45})  {$(\frac{1}{\sqrt2},\frac{1}{\sqrt2})$};
+    
+  \end{scope}
+  \end{tikzpicture}
+
+ 
+  
+\end{multicols}
+}
+
+\begin{solution}
+ Start out by giving the legs (which are of equal length) a name like $x$. Using the Pythagorean Theorem, $x^2+x^2=1^2$. Solving for $x$, each leg has length $\frac{1}{\sqrt{2}}$.
+    
+    \begin{multicols}{2}
+\phantom
+\newline
+\newline
+
+
+
+ \begin{tikzpicture}[x=3.5cm, y=3.5cm]
+        \draw (0, 0) -- node[anchor=north west][color=red]{$\frac{1}{\sqrt{2}}$} (1, 0) -- node[anchor=north west][color=red]{$\frac{1}{\sqrt{2}}$}(1, 1); 
+        \draw (1, 1) -- node[anchor=south east]{$1$}
+        (0, 0); %
+        \draw (8pt, 0) arc[radius=8pt, start angle=0, end angle=45]
+        node[anchor=180]{$\frac{\pi}{4}$}; %
+        \draw ($(1, 1) - (0, 8pt)$) arc[radius=8pt, start angle=270, end
+        angle=225] node[anchor=100]{$\frac{\pi}{4}$};
+      \end{tikzpicture}
+
+
+   \begin{tikzpicture}
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+
+  
+    
+    \foreach \A in {135,225,315} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+      \filldraw[radius=2pt] (\rtheta{1}{45}) circle;
+      \draw[dotted] (O) -- (\rtheta{1}{\A});
+      \draw[dashed] (O) -- node[anchor=south east]{$1$}(\rtheta{1}{45});}
+
+    \draw[dotted] (\rtheta{1}{135}) --
+    (\rtheta{1}{225});
+    \draw[dotted] (\rtheta{1}{315}) -- (\rtheta{0.71}{0});
+
+    \draw[dashed] (\rtheta{0.71}{0}) -- (\rtheta{1}{45});
+
+    \node[below right, red] at (\rtheta{1}{315}) {$(\frac{1}{\sqrt{2}},\frac{-1}{\sqrt{2}})$};
+    \node[left, color=red] at (\rtheta{1}{225}) {$(\frac{-1}{\sqrt2},\frac{-1}{\sqrt2})$};
+    \node[above left, color=red] at (\rtheta{1}{135}) {$(\frac{-1}{\sqrt2},\frac{1}{\sqrt2})$};
+    \node[above right, color=red] at (\rtheta{1}{45}) {$(\frac{1}{\sqrt2},\frac{1}{\sqrt2})$};
+  \end{scope}
+  \end{tikzpicture}
+
+ 
+  
+\end{multicols}
+    
+    
+\end{solution}
+ \vfill 
+ \begin{problem}
+ \item Below is an equilateral triangle with side length 1 that has been bisected (cut in half) vertically into two right triangles. Solve for the lengths of the legs of the triangle outlined in black. Then, overlay the triangle onto the unit circle to plot 4 more points.
+ \end{problem}
+ \probonly{
+\begin{multicols}{2}
+\phantom
+\newline
+\newline
+ \begin{tikzpicture}[x=2.5cm, y=2.5cm]
+        \draw (0, 0) -- node[below]{} (1, 0) -- node[pos=0.3,
+        right, 
+        inner sep=0.5pt]{} (1, {sqrt(3)});
+        \draw (1, {sqrt(3)}) --
+        node[anchor=south east]{1} (0, 0); %
+        \draw[dotted] (1, {sqrt(3)}) -- (2, 0) -- (1, 0); %
+        \draw (8pt, 0) arc[radius=8pt, start angle=0, end angle=60]
+        node[anchor=180]{$\frac{\pi}{3}$}; %
+        \draw ($(1, {sqrt(3)}) - (0, 8pt)$) arc[radius=8pt, start
+        angle=270, end angle=240] node[anchor=95]{$\frac{\pi}{6}$}; %
+      \end{tikzpicture} 
+
+    \begin{tikzpicture}
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    
+    \foreach \A in {120,240,300} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+      \filldraw[radius=2pt] (\rtheta{1}{60}) circle;
+      \draw[dotted] (O) -- (\rtheta{1}{\A});
+      \draw[dashed] (O) -- node[anchor=south east]{$1$}(\rtheta{1}{60});
+    }
+
+    \draw[dotted]
+    (\rtheta{1}{120}) -- (\rtheta{1}{240});
+    \draw[dotted]
+    (\rtheta{1}{300}) -- (\rtheta{0.5}{0});
+    
+\draw[dashed] (\rtheta{0.5}{0}) -- (\rtheta{1}{60});
+    
+  \end{scope}
+  
+  \end{tikzpicture}
+  \end{multicols}
+  }
+  
+  
+  \begin{solution}
+  The horizontal leg of this triangle has length $\frac{1}{2}$. Solve for the other leg with Pythagorean Theorem.
+      
+      \begin{multicols}{2}
+\phantom
+\newline
+\newline
+ \begin{tikzpicture}[x=2.5cm, y=2.5cm]
+        \draw (0, 0) -- node[below][color=red]{$\frac{1}{2}$} (1, 0) -- node[pos=0.3,
+        right, 
+        inner sep=0.5pt][color=red]{$\frac{\sqrt{3}}{2}$} (1, {sqrt(3)});
+        \draw (1, {sqrt(3)}) --
+        node[anchor= east]{1} (0, 0); %
+        \draw[dotted] (1, {sqrt(3)}) -- (2, 0) -- (1, 0); %
+        \draw (8pt, 0) arc[radius=8pt, start angle=0, end angle=60]
+        node[anchor=180]{$\frac{\pi}{3}$}; %
+        \draw ($(1, {sqrt(3)}) - (0, 8pt)$) arc[radius=8pt, start
+        angle=270, end angle=240] node[anchor=95]{$\frac{\pi}{6}$}; %
+      \end{tikzpicture} 
+
+    \begin{tikzpicture}
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  \solonly{
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {120,240,300} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+      \filldraw[radius=2pt] (\rtheta{1}{60}) circle;
+      \draw[dotted] (O) -- (\rtheta{1}{\A});
+      \draw[dashed] (O) -- node[anchor=south east]{$1$}(\rtheta{1}{60});
+    }
+
+    \draw[dotted]
+    (\rtheta{1}{120}) -- (\rtheta{1}{240});
+    \draw[dotted]
+    (\rtheta{1}{300}) -- (\rtheta{0.5}{0});
+    
+\draw[dashed] (\rtheta{0.5}{0}) -- (\rtheta{1}{60});
+
+    \node[above right, red] at  (\rtheta{1}{60}) {$P(\frac{\pi}{3})=(\frac{1}{2},\frac{\sqrt{3}}{2})$};
+    \node[above left, red] at (\rtheta{1}{120}){$P(\frac{2\pi}{3})=(\frac{-1}{2},\frac{\sqrt{3}}{2})$};
+    \node[below left, red] at (\rtheta{1}{240}) {$P(\frac{4\pi}{3})=(\frac{-1}{2},\frac{-\sqrt{3}}{2})$};
+    \node[below right, red] at (\rtheta{1}{300}) {$P(\frac{5\pi}{3})=(\frac{1}{2},\frac{-\sqrt{3}}{2})$};
+    
+  \end{scope}
+  }
+  \end{tikzpicture}
+  \end{multicols}
+  \end{solution}
+  
+  \newpage
+\begin{problem}\item The triangle from part (b) was rotated, reflected, and reproduced below. Fill in the side lengths of the black triangle and overlay it onto the unit circle to plot 4 more points.
+\end{problem}
+\probonly{
+\begin{multicols}{2}
+\phantom
+\newline
+\newline
+ \begin{tikzpicture}[x=2.5cm, y=2.5cm]
+        \draw (0, 1) -- node[below]{} ({sqrt(3)}, 1) -- node[pos=0.3,
+        right, 
+        inner sep=0.5pt]{} ({sqrt(3)}, 2) --
+        node[anchor=south east]{1} (0, 1); %
+        \draw[dotted] ({sqrt(3)}, 1) -- ({sqrt(3)}, 0) -- (0, 1); %
+        \draw (0.2,1) arc[radius=8pt, start angle=0, end angle=45]
+        node[anchor=180]{\hspace{0.1cm}$\frac{\pi}{6}$}; %
+        \draw ({sqrt(3)}, 1.85) arc[radius=8pt, start
+        angle=270, end angle=195] node[anchor=78]{$\frac{\pi}{3}$}; %
+      \end{tikzpicture} 
+
+    \begin{tikzpicture}
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+ 
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    
+    
+    \foreach \A in {150, 210, 330} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+      \draw[dotted] (O) -- (\rtheta{1}{\A});
+      \filldraw[radius=2pt] (\rtheta{1}{30}) circle;
+      \draw[dashed] (O) -- node[anchor=south east]{$1$}(\rtheta{1}{30});
+    }
+    
+    \draw[dotted] (\rtheta{1}{150}) --
+    (\rtheta{1}{210});
+    \draw[dotted] (\rtheta{1}{330}) -- (\rtheta{0.87}{0}) ;
+    \draw[dashed] (\rtheta{1}{30}) -- (\rtheta{0.87}{0}) ;
+    
+  \end{scope}
+  
+  \end{tikzpicture}
+  \end{multicols}
+  }
+
+  \begin{solution}
+      
+\begin{multicols}{2}
+\phantom
+\newline
+\newline
+ \begin{tikzpicture}[x=2.5cm, y=2.5cm]
+        \draw (0, 1) -- node[below][color=red]{$\frac{\sqrt{3}}{2}$} ({sqrt(3)}, 1) -- node[right][color=red]{$\frac{1}{2}$} ({sqrt(3)}, 2) --
+        node[anchor=south east]{1} (0, 1); %
+        \draw[dotted] ({sqrt(3)}, 1) -- ({sqrt(3)}, 0) -- (0, 1); %
+        \draw (0.2,1) arc[radius=8pt, start angle=0, end angle=45]
+        node[anchor=180]{\hspace{0.1cm}$\frac{\pi}{6}$}; %
+        \draw ({sqrt(3)}, 1.85) arc[radius=8pt, start
+        angle=270, end angle=195] node[anchor=78]{$\frac{\pi}{3}$}; %
+      \end{tikzpicture} 
+
+    \begin{tikzpicture}
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  \solonly{
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    
+    
+    \foreach \A in {150, 210, 330} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+      \draw[dotted] (O) -- (\rtheta{1}{\A});
+      \filldraw[radius=2pt] (\rtheta{1}{30}) circle;
+      \draw[dashed] (O) -- node[anchor=south east]{$1$}(\rtheta{1}{30});
+    }
+    
+    \draw[dotted] (\rtheta{1}{150}) -- (\rtheta{1}{210});
+    \draw[dotted] (\rtheta{1}{330}) -- (\rtheta{0.87}{0}) ;
+    \draw[dashed] (\rtheta{1}{30}) -- (\rtheta{0.87}{0}) ;
+    
+    \path 
+    (\rtheta{1}{30}) node[right] [color=red] {$(\frac{\sqrt{3}}{2},\frac{1}{2})$} 
+    (\rtheta{1}{150}) node[left] [color=red] {$(\frac{-\sqrt{3}}{2},\frac{1}{2})$}  
+    (\rtheta{1}{210}) node[left] [color=red] {$(\frac{-\sqrt{3}}{2},\frac{-1}{2})$}
+    (\rtheta{1}{330}) node[below] [color=red] {$(\frac{\sqrt{3}}{2},\frac{-1}{2})$} ;
+    
+  \end{scope}
+  }
+  \end{tikzpicture}
+  \end{multicols}
+  
+  \end{solution}
+  \
+  
+  \begin{problem}
+  \item Plot all 16 familiar points and their corresponding angles on the unit circle below. (Can you fill in the points without looking at your previous work?)
+  \end{problem}
+  \newline
+  \probonly{
+  \begin{center}
+      
+  
+  \resizebox {0.6\textwidth} {!} {
+      \begin{tikzpicture}
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    
+    
+    
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+  \end{center}
+  }
+  
+  \end{enumerate}
+
+  \begin{solution}
+
+    
+
+   \solonly{
+  
+  \begin{center}
+  \begin{tikzpicture}
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xtick=\empty, ytick=\empty,
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    
+
+    \path (\rtheta{1}{30}) node[right][color=red] {$(\frac{\sqrt3}{2},\frac12)$}
+    (\rtheta{1}{60}) node[above right][color=red] {$(\frac12,\frac{\sqrt3}{2})$}
+    (\rtheta{1}{120}) node[above left][color=red] {$(-\frac12,\frac{\sqrt3}{2})$}
+    (\rtheta{1}{150}) node[left][color=red] {$(-\frac{\sqrt3}{2},\frac12)$}
+    (\rtheta{1}{210}) node[left][color=red] {$(-\frac{\sqrt3}{2},{-\frac12})$}
+    (\rtheta{1}{240}) node[below left][color=red] {$(-\frac12,{-\frac{\sqrt3}{2}})$}
+    (\rtheta{1}{300}) node[below right][color=red] {$(\frac12,{-\frac{\sqrt3}{2}})$}
+    (\rtheta{1}{330}) node[right][color=red] {$(\frac{\sqrt3}{2},{-\frac12})$};
+
+
+    \path (\rtheta{1}{30}) node[below left][color=red] {$\frac{\pi}{6}$}
+    (\rtheta{1}{60}) node[below left][color=red] {$\frac{\pi}{3}$}
+    (\rtheta{1}{120}) node[below right][color=red] {$\frac{2\pi}{3}$}
+    (\rtheta{1}{150}) node[below right][color=red] {$\frac{5\pi}{6}$}
+    (\rtheta{1}{210}) node[above right][color=red] {$\frac{7\pi}{6}$}
+    (\rtheta{1}{240}) node[above right][color=red] {$\frac{4\pi}{3}$}
+    (\rtheta{1}{300}) node[above left][color=red] {$\frac{5\pi}{3}$}
+    (\rtheta{1}{330}) node[above left][color=red] {$\frac{11\pi}{6}$};
+
+    \foreach \A in {45,135,225,315} {
+      \filldraw[radius=2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    
+
+    \path (\rtheta{1}{45}) node[right][color=red] {$(\frac{1}{\sqrt2},\frac{1}{\sqrt2})$}
+    (\rtheta{1}{135}) node[above left][color=red] {$(-\frac{1}{\sqrt2},\frac{1}{\sqrt2})$}
+    (\rtheta{1}{225}) node[below left][color=red] {$(-\frac{1}{\sqrt2},{-\frac{1}{\sqrt2}})$}
+    (\rtheta{1}{315}) node[below right][color=red] {$(\frac{1}{\sqrt2},{-\frac{1}{\sqrt2}})$}
+    (\rtheta{1}{90}) node[above=0.2cm][color=red] {$(0,1)$}
+    (\rtheta{1}{270}) node[below=0.4cm][color=red] {$(0,-1)$}
+    (\rtheta{1}{180}) node[left=0.8cm][color=red] {$(-1,0)$}
+    (\rtheta{1}{0}) node[right=0.8cm][color=red] {$(1,0)$};
+
+    
+    \path (\rtheta{1}{45}) node[below left][color=red] {$\frac{\pi}{4}$}
+    (\rtheta{1}{135}) node[below right][color=red] {$\frac{3\pi}{4}$}
+    (\rtheta{1}{225}) node[above right][color=red] {$\frac{5\pi}{4}$}
+    (\rtheta{1}{315}) node[above left][color=red] {$\frac{7\pi}{4}$}
+    (\rtheta{1}{90}) node[below right][color=red] {$\frac{\pi}{2}$}
+    (\rtheta{1}{270}) node[above left][color=red] {$\frac{3\pi}{2}$}
+    (\rtheta{1}{180}) node[above right][color=red] {$\pi$}
+    (\rtheta{1}{0}) node[below left][color=red] {$0, 2\pi$};
+     
+   
+    
+  \end{scope}
+ 
+  \end{tikzpicture}
+    \end{center}
+  
+
+}
+  \end{solution}
+  
+  
+
+
+  
+\newpage
+
+  \item  Often times it is helpful to have a good grasp on the first quadrant of the unit circle, so you can use symmetry to find coordinates in different quadrants of the unit circle. Evaluate the following, using your work from \#1d if needed.
+\begin{multicols}{2}
+\begin{enumerate}
+\item $\sin \left( \dfrac{\pi}{6}\right)$
+\solonly{\textcolor{red}{$=\dfrac{1}{2}$}}
+\vspace{1cm}
+\item $\sin \left( \dfrac{\pi}{3}\right)$
+\solonly{\textcolor{red}{$=\dfrac{\sqrt{3}}{2}$}}
+\vspace{1cm}
+\item $\sin \left( \dfrac{\pi}{4}\right)$
+\solonly{\textcolor{red}{$=\dfrac{1}{\sqrt{2}}$}}
+\vspace{1cm}
+
+
+\columnbreak
+\item $\cos \left( \dfrac{\pi}{6}\right)$
+\solonly{\textcolor{red}{$=\dfrac{\sqrt{3}}{2}$}}
+\vspace{1cm}
+\item $\cos \left( \dfrac{\pi}{3}\right)$
+\solonly{\textcolor{red}{$=\dfrac{1}{2}$}}
+\vspace{1cm}
+\item $\cos \left( \dfrac{\pi}{4}\right)$
+\solonly{\textcolor{red}{$=\dfrac{1}{\sqrt{2}}$}}
+\vspace{1cm}
+% \columnbreak
+% \item $\tan \left( \dfrac{\pi}{6}\right)$
+% \solonly{\textcolor{red}{$=\dfrac{1}{\sqrt{3}}$}}
+% \vspace{1cm}
+% \item $\tan \left( \dfrac{\pi}{3}\right)$
+% \solonly{\textcolor{red}{=$\sqrt{3}$}}
+% \vspace{1cm}
+% \item $\tan \left( \dfrac{\pi}{4}\right)$
+% \solonly{\textcolor{red}{$=1$}}
+% \vspace{1cm}
+
+\end{enumerate}
+
+\end{multicols}
+\vfill 
+\begin{framed}
+    \underline{Note}: Using your answers above, you could also evaluate quantities like $\cos \left( \frac{11\pi}{6}\right)$ or $\sin \left( \frac{4\pi}{3}\right)$, by taking advantage of the symmetry of the unit circle. However, it can sometimes be a challenge to recall where angles outside of the first quadrant like $\frac{11\pi}{6}$, $\frac{4\pi}{3}$, and $\frac{7\pi}{4}$ lie on the unit circle. We will address this challenge in the question below with some helpful visual aids.
+\end{framed}
+
+\begin{problem}
+    \item Below are four blank unit circles with the positions of familiar points plotted.
+\end{problem}
+\begin{enumerate}
+\begin{problem}
+\item Label the unit circle with angle measurements in increments of $\frac{\pi}{2}$, like $0$, $\frac{\pi}{2}$, $\frac{2\pi}{2}$, $\frac{3\pi}{2}$, etc., until you reach one full revolution of the unit circle. Simplify after if possible.
+\end{problem}
+\probonly{
+\begin{center}
+    \resizebox {0.65\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    
+    
+    
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+  \end{center}
+  }
+  \begin{solution}
+  \begin{center}
+    \resizebox {0.6\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  axis line style = white,
+  xtick=\empty, ytick=\empty,
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \path 
+  
+    (\rtheta{1}{90}) node[above] [color=red] {$\frac{\pi}{2}$}
+   
+    (\rtheta{1}{180}) node[left] [color=red] {$\frac{2\pi}{2}$}
+   
+    (\rtheta{1}{-90}) node[below] [color=red] {$\frac{3\pi}{2}$}
+    
+    (\rtheta{1}{0}) node[right] [color=red] {$0$,$\frac{4\pi}{2}$};
+
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{0});
+    
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{90});
+    
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{180});
+    
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{270});
+  
+
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+  \end{center}    
+  \end{solution}
+  
+\newpage
+
+  \begin{problem}
+\item Label the unit circle with angle measurements in increments of $\frac{\pi}{3}$, like $0$, $\frac{\pi}{3}$, $\frac{2\pi}{3}$, $\frac{3\pi}{3}$, etc., until you reach one full revolution of the unit circle. Simplify after if possible.
+\end{problem}
+
+\probonly{
+\begin{center}
+    \resizebox {0.65\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    
+    
+    
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+  \end{center}
+  }
+  
+  \begin{solution}
+  \begin{center}
+    \resizebox {0.6\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  axis line style = white,
+  xtick=\empty, ytick=\empty,
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \path 
+    
+    (\rtheta{1}{60}) node[above] [color=red] {$\frac{\pi}{3}$}
+   
+    (\rtheta{1}{120}) node[above] [color=red] {$\frac{2\pi}{3}$}
+   
+    (\rtheta{1}{180}) node[left] [color=red] {$\frac{3\pi}{3}$}
+
+    (\rtheta{1}{-60}) node[below] [color=red] {$\frac{5\pi}{3}$}
+  
+    (\rtheta{1}{-120}) node[below] [color=red] {$\frac{4\pi}{3}$}
+   
+    (\rtheta{1}{0}) node[right] [color=red] {$0$,$\frac{6\pi}{3}$};
+
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{0});
+     
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{60});
+  
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{120});
+   
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{180});
+ 
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{240});
+ 
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{300});
+    
+
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+  \end{center}    
+  \end{solution}
+  
+
+\begin{problem}
+\item Label the unit circle with angle measurements in increments of $\frac{\pi}{4}$, like $0$, $\frac{\pi}{4}$, $\frac{2\pi}{4}$, $\frac{3\pi}{4}$, etc., until you reach one full revolution of the unit circle. Simplify after if possible.
+\end{problem}
+\probonly{
+\begin{center}
+    \resizebox {0.65\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    
+    
+    
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+  \end{center}
+  }
+  \begin{solution}
+  \begin{center}
+    \resizebox {0.6\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  axis line style = white,
+  xtick=\empty, ytick=\empty,
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \path 
+    (\rtheta{1}{0}) node[right] [color=red] {0, $\frac{8\pi}{4}$}
+    (\rtheta{1}{45}) node[above] [color=red] {$\frac{\pi}{4}$}
+    (\rtheta{1}{90}) node[above] [color=red] {$\frac{2\pi}{4}$}
+    (\rtheta{1}{135}) node[above] [color=red] {$\frac{3\pi}{4}$}
+    (\rtheta{1}{180}) node[left] [color=red] {$\frac{4\pi}{4}$}
+    (\rtheta{1}{-135}) node[below] [color=red] {$\frac{5\pi}{4}$}
+    (\rtheta{1}{-90}) node[below] [color=red] {$\frac{6\pi}{4}$}
+    (\rtheta{1}{-45}) node[right] [color=red] {$\frac{7\pi}{4}$}
+   ;
+
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{0});
+     \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{45});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{90});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{135});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{180});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{-135});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{-90});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{-45});
+
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+  \end{center}    
+  \end{solution}
+  \newpage
+\begin{problem}
+\item Label the unit circle with angle measurements in increments of $\frac{\pi}{6}$, like $0$, $\frac{\pi}{6}$, $\frac{2\pi}{6}$, $\frac{3\pi}{6}$, etc., until you reach one full revolution of the unit circle. Simplify after if possible.
+\end{problem}
+\probonly{
+\begin{center}
+    \resizebox {0.65\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    
+    
+    
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+  \end{center}
+  }
+  \begin{solution}
+  \begin{center}
+    \resizebox {0.6\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  axis line style = white,
+  xtick=\empty, ytick=\empty,
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \path 
+    (\rtheta{1}{30}) node[right] [color=red] {$\frac{\pi}{6}$}
+    (\rtheta{1}{60}) node[above] [color=red] {$\frac{2\pi}{6}$}
+    (\rtheta{1}{90}) node[above] [color=red] {$\frac{3\pi}{6}$}
+    (\rtheta{1}{120}) node[above] [color=red] {$\frac{4\pi}{6}$}
+    (\rtheta{1}{150}) node[left] [color=red] {$\frac{5\pi}{6}$}
+    (\rtheta{1}{180}) node[left] [color=red] {$\frac{6\pi}{6}$}
+    (\rtheta{1}{-30}) node[right] [color=red] {$\frac{11\pi}{6}$}
+    (\rtheta{1}{-60}) node[below] [color=red] {$\frac{10\pi}{6}$}
+    (\rtheta{1}{-90}) node[below] [color=red] {$\frac{9\pi}{6}$}
+    (\rtheta{1}{-120}) node[below] [color=red] {$\frac{8\pi}{6}$}
+    (\rtheta{1}{-150}) node[left] [color=red] {$\frac{7\pi}{6}$}
+    (\rtheta{1}{0}) node[right] [color=red] {$0$,$\frac{12\pi}{6}$};
+
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{0});
+     \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{30});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{60});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{90});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{120});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{150});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{180});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{210});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{240});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{270});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{300});
+    \draw[dashed][color=red] (\rtheta{0}{0}) --
+    (\rtheta{1}{330});
+
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+  \end{center}    
+  \end{solution}
+\end{enumerate}
+
+\item Now that you are more oriented to the unit circle beyond the first quadrant, evaluate the following quantities. A blank unit circle is provided below to annotate any symmetry for convenience.
+ \begin{multicols}{2}
+
+ 
+\begin{enumerate}
+\item $\cos \left( \dfrac{5\pi}{6}\right)$
+\solonly{\textcolor{red}{$=-\dfrac{\sqrt{3}}{2}$}}
+\vspace{.7cm}
+\item $\sin \left( \dfrac{5\pi}{3}\right)$
+\solonly{\textcolor{red}{$=-\dfrac{\sqrt{3}}{2}$}}
+\vspace{.7cm}
+\item $\cos \left( \dfrac{7\pi}{4}\right)$
+\solonly{\textcolor{red}{$=\dfrac{1}{\sqrt{2}}$}}
+\vspace{.7cm}
+\item $\sin \left(-\dfrac{\pi}{6}\right)$
+\solonly{\textcolor{red}{$=-\dfrac{1}{2}$}}
+\vspace{.7cm}
+\item $\cos \left(-\dfrac{2\pi}{3}\right)$
+\solonly{\textcolor{red}{$=-\dfrac{1}{2}$}}
+% \vspace{.7cm}
+% \item $\tan \left( \dfrac{11\pi}{6}\right)$
+% \solonly{\textcolor{red}{$=-\dfrac{1}{\sqrt{3}}$}}
+\phantom{This text will be invisible}
+
+
+\end{enumerate}
+\columnbreak
+
+
+\phantom{This text will be invisible}
+\phantom{This text will be invisible}
+\phantom{This text will be invisible}
+
+    \begin{center}
+    \resizebox {0.5\textwidth} {!} {
+      \begin{tikzpicture}
+      
+  \begin{axis}[
+  xmin=-1.1, xmax=1.1,
+  ymin=-1.1, ymax=1.1,
+  xlabel=$x$, ylabel=$y$,
+  xtick={1,-1}, ytick={1,-1},
+  x tick label style={xshift=6pt},
+  y tick label style={yshift=-6pt},
+  axis equal = true
+  ]
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (Y) at (0,1);
+  \addplot[domain=0:360, data cs=polar] (x,1);
+  \end{axis}
+  
+  
+  \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+  
+    \foreach \A in {0,90,180,270} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+    }
+    
+    \foreach \A in {30, 150, 210, 330} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    \foreach \A in {45, 135, 225, 315} {
+      \filldraw[radius=1.2pt] (\rtheta{1}{\A}) circle;
+      
+    }
+    
+    
+    \foreach \A in {60,120,240,300} {
+      \filldraw[radius=1pt] (\rtheta{1}{\A}) circle;
+      
+    }
+
+    
+    
+    
+  \end{scope}
+  
+  \end{tikzpicture}
+  }
+\end{center}
+
+\end{multicols}
+
+
+
+
+
+
+\item Which of the following quantities is not equal to the others?
+\probonly{
+\begin{center}
+    $\theta - \pi$ \hspace{1.5cm} $\theta + (-\pi)$ \hspace{1.5cm}
+    $-\pi + \theta$ \hspace{1.5cm}
+    $\pi - \theta$
+\end{center}
+}
+\solonly{\begin{center}
+    $\theta - \pi$ \hspace{1cm} $\theta + (-\pi)$ \hspace{1cm}
+    $-\pi + \theta$ \hspace{1cm}
+    \textcolor{red}{$\pi - \theta$}
+\end{center}}
+
+\pspace{\newpage}
+
+\begin{problem}\item Suppose $\sin \theta = \dfrac{3}{5}$ and $ 0 < \theta < \dfrac{\pi}{2}$.
+\end{problem}
+\probonly{
+\begin{multicols}{2}
+    
+
+
+\begin{center}
+\phantom{This text will be invisible}
+  \begin{tikzpicture}
+    \begin{axis}[xmin=-1.2,xmax=1.2,ymin=-1.2,ymax=1.2,
+    width=3in, unit vector ratio*={1 1},
+    xtick={-1,1}, ytick={-1,1},clip=false,
+    x tick label style = {xshift = 6pt},
+    y tick label style = {yshift = 6pt},
+    width=2.5in]
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (4/5,3/5);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \draw (O) -- (B) node[above right]
+    {$\displaystyle \left( \cos\theta, \frac{3}{5} \right)$};
+    \draw pic[draw=black, angle radius=10, "$\theta$",
+    angle eccentricity = 1.8] {angle=A--O--B};
+    \filldraw[radius=2pt] (B) circle;
+    \end{axis}
+  \end{tikzpicture}
+  \end{center}
+  \columnbreak
+  \phantom{This text will be invisible}
+\phantom{This text will be invisible}
+\phantom{This text will be invisible}
+  \begin{center}
+       \begin{tikzpicture}[x=5cm, y=5cm]
+   \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (4/5,3/5);
+        \draw (0, 0) -- node[below]{} (4/5, 0) -- node[right]{} (4/5, 3/5) --
+        node[anchor= east]{} (0, 0);
+        \draw pic[draw=black, angle radius=20, "$\theta$",
+    angle eccentricity = 1.3] {angle=A--O--B};
+        \end{tikzpicture}
+  \end{center}
+  
+
+\end{multicols}
+}
+\begin{solution}
+    \begin{multicols}{2}
+    
+
+
+\begin{center}
+\phantom{This text will be invisible}
+  \begin{tikzpicture}
+    \begin{axis}[xmin=-1.2,xmax=1.2,ymin=-1.2,ymax=1.2,
+    width=3in, unit vector ratio*={1 1},
+    xtick={-1,1}, ytick={-1,1},clip=false,
+    x tick label style = {xshift = 6pt},
+    y tick label style = {yshift = 6pt}]
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (4/5,3/5);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \draw (O) -- (B) node[above right]
+    {$\displaystyle \left( \cos\theta, \frac{3}{5} \right)$};
+    \draw pic[draw=black, angle radius=10, "$\theta$",
+    angle eccentricity = 1.8] {angle=A--O--B};
+    \filldraw[radius=2pt] (B) circle;
+    \end{axis}
+  \end{tikzpicture}
+  \end{center}
+  \columnbreak
+  \phantom{This text will be invisible}
+\phantom{This text will be invisible}
+\phantom{This text will be invisible}
+  \begin{center}
+       \begin{tikzpicture}[x=5cm, y=5cm]
+   \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (B) at (4/5,3/5);
+        \draw (0, 0) -- node[below][color=red]{4} (4/5, 0) -- node[right][color=red]{3} (4/5, 3/5) --
+        node[anchor= east][color=red]{5} (0, 0);
+        \draw pic[draw=black, angle radius=20, "$\theta$",
+    angle eccentricity = 1.3] {angle=A--O--B};
+        \end{tikzpicture}
+  \end{center}
+  
+
+\end{multicols}
+\end{solution}
+\begin{enumerate}
+\item Evaluate the following quantities using the unit circle.
+\begin{enumerate}
+\begin{multicols}{2}
+    \item $\sin(\theta + \pi)$
+    \solonly{\textcolor{red}{$=-\dfrac{3}{5}$}}
+     \pspace{1.2cm}
+    \item $\sin(-\theta)$
+    \solonly{\textcolor{red}{$=-\dfrac{3}{5}$}}
+    \pspace{1.2cm}
+    \item $\sin(\pi - \theta)$
+    \solonly{\textcolor{red}{$=\dfrac{3}{5}$}}
+    \pspace{1.2cm}
+    \item $\sin(\theta + 2\pi)$
+    \solonly{\textcolor{red}{$=\dfrac{3}{5}$}}
+    \pspace{1.2cm}
+\end{multicols}
+\end{enumerate}
+\vspace{1.2cm}
+
+\item 
+\begin{workshop}
+    There are an infinite number of possible answers, some more convenient than others.
+\end{workshop}
+On the right triangle above, fill in integer side lengths such that $\sin \theta = \dfrac{3}{5}$. 
+\vspace{2pt}
+
+\begin{framed}
+Here are the six trigonometric ratios of the sides of a right triangle. Let's look at them.
+\begin{minipage}[t]{2in}\vspace{0pt}
+\includegraphics[]{tikz/2-2/2-2-right-triangle.pdf}
+\end{minipage}
+\hspace{12pt}
+\begin{minipage}[t]{3in}\vspace{-6pt}
+    \[\sin\theta = \dfrac{\text{opp}}{\text{hyp}} \qquad \cos\theta = \dfrac{\text{adj}}{\text{hyp}} \qquad \tan\theta = \dfrac{\text{opp}}{\text{adj}}\]
+    \[\csc\theta = \dfrac{\text{hyp}}{\text{opp}} \qquad \sec\theta = \dfrac{\text{hyp}}{\text{adj}} \qquad \cot\theta = \dfrac{\text{adj}}{\text{opp}}\]
+\end{minipage}
+\vspace{-0.3in}
+\end{framed}
+\item Evaluate the following quantities using the right triangle.
+\begin{workshop}
+Students have not yet practiced evaluating the trig functions besides sine and cosine in class, so be prepared to help them.
+\end{workshop}
+\begin{enumerate}
+\vspace{-8pt}
+\begin{multicols}{2}
+    \item $\cos\theta$
+    \solonly{\textcolor{red}{$=\dfrac{4}{5}$}}
+    \pspace{1.2cm}
+    
+    \item $\tan\theta$
+    \solonly{\textcolor{red}{$=\dfrac{3}{4}$}}
+    \pspace{1.2cm}
+     
+    \item $\sec\theta$
+    \solonly{\textcolor{red}{$=\dfrac{5}{4}$}}
+    \pspace{1.2cm}
+
+    \columnbreak
+    
+    \item $\csc\theta$
+    \solonly{\textcolor{red}{$=\dfrac{5}{3}$}}
+    \pspace{1.2cm}
+
+    \item $\cot\theta$
+    \solonly{\textcolor{red}{$=\dfrac{4}{3}$}}
+    \pspace{1.2cm}
+    
+    
+    \item 
+    $\sin^2{\theta}+\cos^2{\theta}$
+       \solonly{\textcolor{red}{$=1$}}
+           \pspace{1.2cm}
+\end{multicols}
+\end{enumerate}
+
+\end{enumerate}
+% \newpage
+% \newpage
+% \item  When the heart beat \textbf{begins,} blood pressure typically \underline{rises} from 80 mmHg (\textit{diastolic} blood pressure) to 120mmHg (\textit{systolic} blood pressure). When the heart beat \textbf{finishes}, blood pressure \underline{drops} from 120mmHg to 80mmHg as the heart's ventricles refill with blood. Assume that blood pressure is roughly sinusoidal with respect to time.
+% \begin{enumerate}
+% \item A patient has one heart beat (and therefore one blood pressure cycle) every $\frac{6}{7}$ seconds. How many heartbeats take place in 6 seconds?
+
+% \begin{solution}
+%     Let's translate the information we are given into rates with units.``One heartbeat every $\frac{6}{7}$ seconds'' can be written as $\dfrac{1\text{ heartbeat}}{\frac{6}{7}\text{ seconds}}$. Now, let's multiply this by $6$ seconds:
+%     \begin{center}
+%         $\dfrac{1\text{ heartbeat}}{\frac{6}{7}\text{ seconds}} \cdot  \dfrac{6\text{ seconds}}{1}=\dfrac{6}{\frac{6}{7}}$ heartbeats $=$ \fbox{$7$ heartbeats}
+%     \end{center}
+    
+% \end{solution}
+% \vfill
+% \item A patient has a systolic pressure of 120 mmHg and a diastolic pressure of 80 mmHg. Sketch a graph of $P(t)$, the patient's blood pressure, on the interval $[0, 6]$, assuming that the heart \textbf{begins} to beat at $t=0$ seconds. (How can part (a) help?) 
+
+% \begin{solution}
+%     \begin{center}
+%       \begin{tikzpicture}
+%         \begin{axis}[xtick={0,6}, ytick={80, 120}]
+%           \addplot+[domain=0:6] {-20*cos(deg(7*pi/3*x))+100};
+%         \end{axis}
+%       \end{tikzpicture}
+%     \end{center}
+% \end{solution}
+% \vfill\vfill\item What is the balance line, amplitude, and period of $P(t)$?
+% \begin{solution}
+% According to answer to part (b), $P(t)$ seems to oscillate about the horizontal line $y=100$. We define the amplitude as the distance between the balance line and the peak or trough of the sinusoid; in this case, because $P(t)$ oscillates between 80 and 120, the amplitude is 20. We were told in the problem statement that the period is $\frac{6}{7}$, but remember that the ``B" value in our model for sinusoids, $y=A\sin{Bx}+D$ and $y=A\cos{Bx}+D$, takes the form $B=\frac{2\pi}{\text{period}}$.
+% \end{solution}
+% \vfill
+% \item Use your answers to part (c) to write a sinusoidal model for $P(t)$, and briefly explain how you chose sine or cosine in your model. 
+
+% \begin{solution}
+% We use a negative cosine model here because, according to the problem, $t=0$ corresponds to the beginning of the heartbeat, or when blood pressure is at its minimum and increasing. (That's to say, the graph of $-\cos{x}$ achieves its minimum at $(0,-1)$ and increases on $0<x<\pi$.) Thus, our model is \fbox{$P(t)=-20\cos{\left(\dfrac{7\pi}{3}x\right)}+100$}.    
+% \end{solution}
+% \vfill
+% \end{enumerate}
+% \newpage
+% \item Using a special camera, a device measures the angle of elevation from the ground to the top of a building. At Point A, the device's camera has an angle of elevation of $\frac{\pi}{4}$ radians. The device is moved 100 meters closer to the building to Point B, and its camera has an angle of elevation of $\frac{\pi}{3}$ radians. How tall is the building, and what is the ground distance between Point B and the building? Provide exact answers. (Assume the device has negligible height.)
+
+% \begin{solution}
+
+%       We're looking for the height of the building; let's call that $h$.
+%       There are two right triangles in the picture that we can take
+%       advantage of, ACD and BCD. We know that angle CAD is $\frac{\pi}{4}$ and
+%       angle CBD is $\frac{\pi}{3}$. Since the angle measurements are taken
+%       $100$ feet apart, length AB is $100$ feet.
+%       Let's name the other horizontal distance that might be
+%       useful; let $x$ be the length of BD.
+%       \begin{center}
+%         \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+%           \coordinate (ground) at (0, -0.4); %
+%           \coordinate (A) at (0, 0); %
+%           \coordinate (F) at (0.5, 0); %
+%           \coordinate (G) at (2.5, 0); %
+%           \coordinate (B) at (1, 0); %
+%           \coordinate (C) at (4, 2); %
+%            \coordinate (H) at (4, 1); %
+%           \coordinate (D) at (4, 0);
+%           \draw[ ] (A) node[below left] {$A$} -- 
+%           (C) node[above] {$C$} -- (D) node[below left] {$D$} -- (F) node[below] {$100$} -- (G) node[below] {$x$} (H) node[right] {$h$}; %
+%           \draw[ ] (B) node[below right] {$B$} -- (C) -- (D); %
+%           \draw[] (A) -- (D);
+%           \draw (C |- A) -- (C); %
+%           \draw pic[draw=black, "{$\frac{\pi}{4}$}", angle radius = 20, angle eccentricity = 1.5] {angle=D--A--C};
+%           \draw pic[draw=black, "{$\frac{\pi}{3}$}", angle radius = 20, angle eccentricity = 1.5] {angle=D--B--C};
+          
+          
+          
+         
+%         \end{tikzpicture}
+%       \end{center}
+%       From triangle BCD, we can relate our variables with the equation
+%        $\tan \left(\frac{\pi}{3}\right) = \frac{h}{x}$.
+%       From triangle ACD,
+%       $\tan \left(\frac{\pi}{4}\right) = \frac{h}{x + 100}$.
+%       We can rewrite the equations as
+%       \begin{align*}
+%         x \tan \left(\frac{\pi}{3}\right) &= h \\
+%         (x + 100) \tan \left(\frac{\pi}{4}\right) &= h
+%         \end{align*}
+%         We can simplify the system of equations as
+%       \begin{align*}
+%         x \sqrt{3} &= h \\
+%         x + 100 &= h
+%         \end{align*}
+%     Since both of the equations above are equal to $h$, let's set them equal to each other and solve for $x$.
+%     \begin{align*}
+%         x \sqrt{3} &= x + 100 \\
+%         x \sqrt{3} -x &= 100 \\
+%         x (\sqrt{3} -1) &= 100 \\
+%         x &= \dfrac{100}{\sqrt{3} -1}
+%         \end{align*}
+   
+% Plugging $x= \dfrac{100}{\sqrt{3} -1}$ into either equation above equal to $h$ will yield the height of the building:
+% \begin{center}
+%     $\dfrac{100\sqrt{3}}{\sqrt{3} -1}= h$ \hspace{1cm} or \hspace{1cm} $\dfrac{100}{\sqrt{3} -1} + 100 = h$ 
+% \end{center}
+% (These two representations of $h$ look quite different but are the same value!)
+% \end{solution}
+\end{enumerate}
+
+\end{document}

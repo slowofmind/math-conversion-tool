@@ -1,0 +1,145 @@
+\documentclass[12pt,letterpaper]{article}
+
+
+
+\input{../worksheet-setup.tex}
+
+
+\chead{\Large\textbf{Linear and Matrix Transformations, $\vec\S$1.9}}% 
+
+\begin{document}
+\thispagestyle{fancy}
+
+Recall from last class:
+
+\begin{itemize}
+
+\item Define $T : \R^n \to \R^m$ by $T(\vec{x})=A\vec{x}$ where $A$ is an $m$ by $n$ matrix. Recall we call $\R^n$ the domain and $\R^m$ the codmain. The set of outputs, $\{T(\vec{x}):\vec{x}\in \R^n\}$, is the image or the range of $T$.
+\item $T : \R^n \to \R^m$ is {\bf linear} if 
+\begin{enumerate}
+	\item $T(\vec{u}+\vec{v})=T(\vec{u})+T(\vec{v})$ for all $\vec{u},\vec{v}$ in $\R^n$,
+	\item $T(c\vec{u})=cT(\vec{u})$ for all $\vec{u}$ in $\R^n$ and $c$ in $\R$.
+\end{enumerate}
+\item {\bf Properties of Linear Transformations.}
+\begin{enumerate}
+\item If $T$ is linear, then $T(\vec{0})=\vec{0}$.
+\item If $T$ is linear, then $T(c\vec{u}+d\vec{v})=cT(\vec{u})+dT(\vec{v})$.
+\end{enumerate} 
+\item All matrix transformations are linear.
+\item If $T:\mathbb{R}^n \to \mathbb{R}^m$ is given by $T(\vec{x})=A\vec{x}$, then the image of $T$ is the span of the columns of $A$; namely, $$\text{Im}(T)= \text{Span}\{ \vec{a}_1, \dots, \vec{a}_n\}.$$
+\item We also saw various geometric transformations, including projections, dilations, and sheers.
+\end{itemize}
+
+\newpage
+
+\begin{enumerate}
+
+\Problem Suppose $T: \R^2 \to \R^3$ is linear and $$T\left( \begin{bmatrix} 1\\ 0\\ \end{bmatrix} \right)=\begin{bmatrix} 5\\ -7\\ 2\\ \end{bmatrix}, \text{ and } T\left( \begin{bmatrix} 0\\ 1\\ \end{bmatrix} \right)=\begin{bmatrix} -3\\ 8\\ 0\\ \end{bmatrix}.$$ What is $$T\left( \begin{bmatrix} a\\ b\\ \end{bmatrix} \right)?$$
+
+\vfill
+
+%\Problem Suppose $T: \R^2 \to \R^3$ is linear and $
+
+{\bf Theorem 10:} Let $T: \R^n \to \R^m$ be linear. Then there exists a unique matrix $A$ such that $T(\vec{x})=A\vec{x}$ for all $\vec{x} \in \R^n$.
+
+\Problem Prove the Theorem.
+
+\vfill
+
+\vfill 
+
+\newpage
+
+\Problem Let $T: \R^2 \to \R^2$ be the linear transformation given by rotating $\vec{x}$ by $\theta$ counterclockwise. Find the associated matrix of $T$.
+
+\vfill
+
+\Problem Let $T: \R^4 \to \R^3$ be defined by $T(\vec{x})=A\vec{x}$ where $$A=\begin{bmatrix}
+1 & -4 & 8 &1\\
+0 & 2 & -1 &3\\
+0 & 0 &0 & 5\\
+\end{bmatrix}.$$ Is $T$ injective and/or surjective?
+
+\vfill
+
+\newpage
+
+{\bf Theorem 11:} Let $T: \R^n \to \R^m$ be linear. Then $T$ is injective if and only if $T(\vec{x})=\vec{0}$ has only the trivial solution.
+
+\Problem Prove the theorem.
+
+\vfill 
+
+{\bf Theorem 12:} Let $T: \R^n \to \R^m$ be linear, and let $A$ be the associated matrix. Then 
+\begin{enumerate}
+\item $T$ is surjective if and only if the columns of $A$ span $\R^m$.
+\item $T$ is injective if and only if the columns of $A$ are linearly independent. 
+\end{enumerate}
+
+\Problem Prove the theorem.
+
+\vfill 
+
+\end{enumerate}
+
+\end{document}
+
+\newpage
+\chead{\Large\textbf{Linear and Matrix Transformations -- Answers / Solutions}}%
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+  \Answer Using linearity, we get 
+  
+  \begin{align*}
+  T\left( \begin{bmatrix} a\\ b\\ \end{bmatrix} \right) &= T\left( a \begin{bmatrix} 1\\ 0\\ \end{bmatrix}+ b\begin{bmatrix} 0\\1\\ \end{bmatrix} \right)\\
+  & = a T\left( \begin{bmatrix} 1\\ 0\\ \end{bmatrix} \right)+ bT\left( \begin{bmatrix} 5\\ -7\\ 2\\ \end{bmatrix} \right)\\
+  &= a \begin{bmatrix} 1\\ 0\\ \end{bmatrix} + b\begin{bmatrix} -3\\ 8\\0 \end{bmatrix}\\
+  &= \begin{bmatrix}
+  	5 & -3\\
+  	-7 & 8\\
+  	2 &0\\
+  	\end{bmatrix} \begin{bmatrix} a\\ b\\ \end{bmatrix}.
+  \end{align*}
+
+Thus $T$ is also a matrix transformation. A natural question is whether every linear transformation is a matrix transformation.
+  
+  \Answer   We proceed as in the last example. First Let $\vec{e}_j$ be the vector in $\R^n$ with 1 in the $j$-th position and 0 elsewhere. Let $x \in \R^n$, then $$\vec{x}=x_1 \vec{e}_1+\dots+x_n \vec{e}_n.$$ Thus using the linearity of $T$, we get
+  \begin{align*}
+  T(\vec{x}) & = x_1 T(\vec{e}_1)+\dots+x_n T(\vec{e}_n)\\
+  &= \left[T(\vec{e}_1) \; \dots \; T(\vec{e}_n)\right]\vec{x}.
+  \end{align*}
+   Thus $T(\vec{x})=A\vec{x}$ where $A=\left[T(\vec{e}_1) \; \dots \; T(\vec{e}_n)\right]$.
+   
+   In order to prove uniqueness, we suppose there is another matrix $B$ such that $T(\vec{x})=B\vec{x}$ for all $x\in \R^n$. We want to show that $A=B$. Let $B=[\vec{b}_1 \; \dots \; \vec{b}_n]$. Since $A\vec{e}_j=B\vec{e}_j$, we get $\vec{b}_j=T(\vec{e}_j)$. Thus $A$ and $B$ have the same columns, and thus $A=B$ and $A$ is unique.
+  \Answer Rotating $\vec{e}_1$ and $\vec{e}_2$ by $\theta$ gives the associated matrix of $T$ is 
+  $\begin{bmatrix}
+  \cos{\theta} & -\sin{\theta}\\
+  \sin{\theta} & \cos{\theta}\\
+  \end{bmatrix}$.
+  
+  \Answer We have a pivot position in each row, so $T$ is onto (surjective). $A\vec{x}=\vec{0}$ has free variables, so $T$ is not one-to-one (injective).
+  
+  \Answer Let $T:\R^n \to \R^m$ be linear.
+  
+  $\implies$ Suppose $T$ is one-to-one (injective). Since $T$ is linear, we know $\vec{x}=\vec{0}$ is a solution. Since$T$ is injective, we know $T(\vec{x})=\vec{0}$ has at most one solution. Thus $T(\vec{x})=\vec{0}$ has only the trivial solution.
+  
+  $\impliedby$ Suppose $T(\vec{x})=\vec{0}$ has only the trivial solution and $T(\vec{u})=T(\vec{v})$. Since $T$ is linear, we get $T(\vec{u}-\vec{v})=\vec{0}$. Since $T(\vec{x})=\vec{0}$ has only the trivial solution, we know that $\vec{u}-\vec{v}=\vec{0}$, and hence $\vec{u}=\vec{v}$. Therefore $T$ is one-to-one or injective.
+  
+  \Answer Let $T: \R^n \to \R^m$ be linear and let $A$ be the associated matrix.
+  
+  {\bf Proof of (a):} $T$ is surjective means that for all $\vec{b}\in \R^m$ there exists $\vec{x}\in \R^n$, or equivalently $A\vec{x}=\vec{b}$ is consistent. By Theorem 4, $A\vec{x}=\vec{b}$ is consistent for all $\vec{b}$ if and only if the columns of $A$ span $\R^m$.
+  
+    {\bf Proof of (b):} By Theorem 11, $T$ is one-to-one if and only if $T(\vec{x})=\vec{0}$ has only the trivial solution. Thus the columns of $A$ must be linearly independent.
+  
+\end{enumerate}
+
+\end{document}
+
+
+%%% Local ables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

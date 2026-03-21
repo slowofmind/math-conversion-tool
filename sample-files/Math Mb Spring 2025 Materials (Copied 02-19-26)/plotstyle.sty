@@ -1,0 +1,129 @@
+\ProvidesPackage{plotstyle}
+
+\usepackage{pgfplots}
+\pgfplotscreateplotcyclelist{mycolor}{%
+  black, blue, red, green!70!black,magenta,
+  purple, cyan, orange
+}
+\pgfplotsset{
+  cycle list name=mycolor,
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south,rotate=-90},
+    % extra x and y ticks for asymptotes
+    % extra x tick style={grid=major, grid style={dashed,black}},
+    % extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },
+  tick label style = {font=\footnotesize, fill=white, inner sep=0pt},
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  compat=1.18,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin}}
+\pgfplotsset{closed/.style={only marks, mark=*, fill=black, thin}}
+\pgfplotsset{plusarea/.style={fill=green, fill opacity=0.5,
+    draw=green!70!black}}
+\pgfplotsset{minusarea/.style={fill=red, fill opacity=0.5,
+    draw=red!70!black}}
+\pgfplotsset{gridgraph/.style={clip=false, axis line style={shorten
+      >=-8pt}, xlabel style={xshift=8pt}, ylabel style={yshift=8pt},
+    enlargelimits=false, grid=major, tick style={black}}} 
+\pgfplotsset{vertslices/.style={ycomb, mark=none, thin}}
+\pgfplotsset{horizslices/.style={xcomb, mark=none, thin}}
+\pgfplotsset{fillregion/.style={fill=lightgray, fill opacity=0.2}}
+
+\newcommand{\axes}[1][]{
+  \begin{tikzpicture}
+    \begin{axis}[xtick=\empty, ytick=\empty, ymin=-2, ymax=2,
+      xmin=-4.25, xmax=4.25, #1]
+      \addplot+[domain=-4:4, very thin] {0};
+    \end{axis}
+  \end{tikzpicture}
+}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  pgfplots.fillbetween,
+  pgfplots.groupplots,
+  quotes,
+  angles
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\small}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\newcommand\resetstackedplots{
+  \makeatletter
+  \pgfplots@stacked@isfirstplottrue
+  \makeatother
+  \addplot [forget plot,draw=none] {0};
+}       
+
+\tikzset{
+  hatch distance/.store in=\hatchdistance,
+  hatch distance=6pt,
+  hatch thickness/.store in=\hatchthickness,
+  hatch thickness=0.4pt,
+  hatch direction/.store in=\hatchdirection,
+  hatch direction=1
+}
+
+\pgfdeclarepatternformonly[\hatchdistance,\hatchthickness,\hatchdirection]{flexible hatch}
+{\pgfqpoint{0pt}{0pt}} %bottom left
+{\pgfqpoint{\hatchdistance}{\hatchdistance}} % top right
+{\pgfpoint{\hatchdistance-1pt}{\hatchdistance-1pt}} % tile size
+{
+  \pgfsetcolor{\tikz@pattern@color}
+  \pgfsetlinewidth{\hatchthickness}
+  \ifthenelse{\equal{\hatchdirection}{1}}{
+    \pgfpathmoveto{\pgfqpoint{0pt}{0pt}}
+    \pgfpathlineto{\pgfqpoint{\hatchdistance}{\hatchdistance}}
+  }{
+    \pgfpathmoveto{\pgfqpoint{\hatchdistance}{0pt}}
+    \pgfpathlineto{\pgfpoint{-\hatchdistance}{2*\hatchdistance}}
+  }
+  \pgfusepath{stroke}
+}  
+
+% defines an anchor (by angle) that rotates with transforms
+\tikzset{
+  Anchor/.code=%
+  \begingroup
+  \pgfcoordinate{qrr@origin}{\pgfpointorigin}%
+  \pgfcoordinate{qrr@direct}{\pgfpointpolarxy{#1}{1}}%
+  \pgftransformreset
+  \pgfmathanglebetweenpoints{\pgfpointanchor{qrr@origin}{center}}{\pgfpointanchor{qrr@direct}{center}}%
+  \pgfmathsmuggle\pgfmathresult
+  \endgroup
+  \tikzset{anchor/.expanded=\pgfmathresult}%
+}
+
+\newcommand\rtheta[2]{{#1*cos(#2)},{#1*sin(#2)}}

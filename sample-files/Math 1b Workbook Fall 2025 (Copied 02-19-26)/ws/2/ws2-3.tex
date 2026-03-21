@@ -1,0 +1,216 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws2-3}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptertwo}
+}{}
+
+\section{Taylor's Remainder Theorem} \label{ws2-3}
+
+\begin{framed}
+\centerline{\textbf{Lesson Goals}}
+
+You should be able to:
+\begin{itemize}
+
+\item Use the remainder theorem to find an upper bound for the error in approximating a function by a degree $n$ Taylor polynomial
+\item Use the remainder theorem to find the degree of a Taylor polynomial that leads to a desired margin of error
+\end{itemize}
+\end{framed}
+
+
+
+ \begin{problemonly} 
+    \begin{framed}
+    \textbf{Reminder:} The $n$th degree Taylor polynomial for $f(x)$ centered at $c$ is given by
+    $$
+      P_{n}(x) = f(c) + f'(c)(x-c) + \frac{f''(c)}{2!}(x-c)^{2} + \cdots + \frac{f^{(n)}(c)}{n!}(x-c)^{n}.
+    $$
+    \end{framed}
+  \end{problemonly}
+
+\begin{enumerate}
+   
+ \item \label{motivate-taylor}
+    You are asked to predict the time dependence of sales of the iPhone X. The theoretical models from
+economics give a complicated function $f(t)=\sin(t)+t^2$ with $t$ given in months.
+\begin{enumerate}
+    \item \begin{problem}[\vfill]
+        Find the second order Taylor expansion for $f$ centered at 0.
+    \end{problem}
+    
+    \begin{solution}
+        $P_2(t)=t+t^2$.
+    \end{solution}
+    \item \begin{problem}[\vfill]
+        Here are approximate values of the $\sin$ function at various $t$: $\sin(\frac{1}{2})\approx .48,\sin(1) \approx 0.84$.
+Use these values to estimate the error when using the second order Taylor approximation at $t=\frac{1}{2}$ and $t=1$. By this, I mean that you should compute the value of the second order Taylor
+approximations at $t =\frac{1}{2}$
+and $t = 1$ and see directly how much they differ from the values given above for the $\sin$ function at these $t$-values.
+
+    \end{problem}
+    
+    \begin{solution}
+        The error is $|f(t)-P_2(t)|$.
+        $f(\frac{1}{2})\approx 0.73$ and $P_2(\frac{1}{2})=.75$, so the error is approximately $0.02$.
+
+        $f(1)\approx 1.84$ and $P_2(1)=2$ so the error is approximately $0.16$.
+    \end{solution}
+    \item \begin{problem}[\vfill]
+        We expect the size of the error to be on the order of the next term in the Taylor approximation. Compute this next term and compare its size with the error.
+    \end{problem}
+
+    \begin{solution}
+        The next term in Taylor's expansion is $\frac{1}{6}f^{(3)}(0)t^3=\frac{-1}{6}t^3$. At $t=\frac{1}{2}$ this has an absolute value of approximately $0.021$. At $t=1$, it has absolute value approximately $0.167$.
+    \end{solution}
+
+\end{enumerate}
+\pspace{\newpage}
+  \begin{problemonly} 
+  \begin{framed}
+  \textbf{Remainder Theorem.} Let $f$ be a function whose $n$-th Taylor polynomial is $P_n(x)=\displaystyle \sum_{k = 0}^{n}
+    \frac{f^{k}(c)}{k!}(x-c)^{k}$.
+    and suppose $M_{(n+1)}$ is an upper bound for $|f^{(n+1)}(x)|$ on the interval between $x$ and $c$.  Then
+    $$
+      |f(x) - P_{n}(x)| \leq \frac{M_{(n+1)}}{(n+1)!}|x-c|^{n+1} 
+    $$
+\end{framed}
+\end{problemonly}
+\item \begin{enumerate}
+    \item \begin{problem}[\vfill]
+        Use the first order Taylor approximation based at $x = 100$ to estimate $\sqrt{102}$ and $\sqrt{99}$.
+    \end{problem}
+
+    \begin{solution}
+        $P_1(x)=10+\frac{1}{20}(x-100)$.
+        Then $P_1(102)=10.1$ and $P_1(99)=9.95$.
+    \end{solution}
+\item \begin{problem}[\vfill]
+    We shall now find an upper bound for the difference between your estimates in (a) and the true
+value of these square roots. First, write the error bound from Taylor’s theorem in our case.
+\end{problem}
+
+\begin{solution}
+    The error bound in our case is $\frac{M_{(2)}|x-100|^2}{2}$.
+\end{solution}
+\item \begin{problem}[\vfill]
+    Now find a viable choice for $M_{(2)}$ in the case $t = 102$. Then, use this value of $M_{(2)}$ with $t = 102$ in the error bound formula.
+\end{problem}
+
+\begin{solution}
+    The second derivative is $f''(x)=\dfrac{-1}{4x^{\frac{3}{2}}}$ which is largest at $x=100$, which makes $\frac{1}{4000}$ a reasonable choice for $M_{(2)}$. Plugging this into our error formula, $\text{error}\leq \dfrac{2^2}{2\cdot 4000}=\dfrac{1}{2000}$.
+\end{solution}
+\item\begin{problem}[\vfill]
+    Find a viable choice for $M_{(2)}$ in the case $x = 99$. Then use this value of $M_{(2)}$ and also $x = 99$ in the error bound formula.
+\end{problem} 
+\begin{solution}
+    The second derivative is $f''(x)=\dfrac{-1}{4x^{\frac{3}{2}}}$ which is largest at $x=99$. However, we don't know $\sqrt{99}$ (this is what we are approximating), so we can choose something nearby, like $81$ which makes $\frac{1}{4\cdot 729}$ a reasonable choice for $M_{(2)}$. To simplify computations further, we could say this is less than $\frac{1}{2500}$. Using this value for $M_{(2)}$, we see our error$\leq \dfrac{1}{2\cdot2500}=\dfrac{1}{5000}$.
+\end{solution}
+\end{enumerate}
+
+\pspace{\newpage}
+
+\item\begin{problem}[\vfill]
+For $t$ near 0, the first order Taylor approximation based at $t = 0$ for sin(t) is $P_1(t) = t$. What is a
+reasonable choice for $M_{(2)}$ in this case if we want to bound the error between $\sin(t)$ and $t$ for $0\leq t \leq 1$?    
+\end{problem} 
+\begin{solution}
+    The second derivative of $\sin t$ is $-\sin t$ so a reasonable choice for $M_{(2)}$ is 1.
+\end{solution}
+
+\item \begin{enumerate}
+\item \begin{problem}[1in]
+    Write out the Taylor series for $\cos(x)$.
+\end{problem}
+
+\begin{solution}
+    The Taylor series for $\cos x$ is $\displaystyle\sum_{k=0}^\infty \dfrac{(-1)^kx^{2k}}{(2k)!}$
+\end{solution}
+\item \begin{problem}[\vfill]
+    What is $M_{(n+1)}?$
+\end{problem}
+
+\begin{solution}
+    We know any derivative for $\cos x$ is $\pm \sin x$ or $\pm \cos x$. All of these functions are bounded by 1, so 1 is a reasonable choice for $M_{(n+1)}$.
+\end{solution}
+\item\begin{problem}[\vfill]
+    We are approximating $\cos(\frac{1}{4})$. Give a reasonable $n$ so that the error is definitely less than $2^{-20} $ (which is roughly $10^{-6}$).
+\end{problem} 
+
+\begin{solution}
+    We see that $|f(x)-P_n(x)|\leq \dfrac{(\frac{1}{4})^{n+1}}{(n+1)!}$. We want this expression to be less than $2^{-20}$ to ensure that the actual error is also smaller than that. Notice that $4^{n+1}=2^{2n+2}$. So we are looking for an $n$ such that $\dfrac{1}{(n+1)!2^{2n+2}}\leq \dfrac{1}{2^{20}}$. If we ignore the $(n+1)!$ (because this only makes the left side smaller, we could find an $n$ such that $\dfrac{1}{2^{2n+2}}\leq \dfrac{1}{2^{20}}$. We simply solve $2n+2=20$, and see that $n=9$ works. Because of the $(n+1)!$ a smaller choice of $n$ also works, indeed $n=6$ is the smallest value for $n$, but 9 is a reasonable choice.
+\end{solution}
+\end{enumerate}
+  
+\pspace{\newpage}
+
+  \item Let $f(x) = \sin(2x)$.  
+  \begin{enumerate}
+    \item
+    \begin{problem}[2.0in]
+      Write down the Taylor series for $f$ centered at $0$, using sigma notation.  
+    \end{problem}
+
+
+    \begin{solution}
+ Here are the first five derivatives of $f$:
+    $$
+      f'(x) = 2 \cos(2x) \qquad f''(x) = -4 \sin(2x) \qquad f'''(x) = -8 \cos(2x) $$
+      
+      $$f^{(4)}(x) = 16 \sin(2x) \qquad f^{(5)}(x) = 2^{5} \cos(2x)  $$
+    If you evaluate each of these at $0$, notice that $f^{(n)}(0) = 0$ whenever $n$ is even.
+    The Taylor series for $f$ centered at $0$ is:
+    $$
+      \frac{2}{1!} (x-0)^{1} - \frac{8}{3!} (x-0)^{3} + \frac{2^{5}}{5!} (x-0)^{5} \cdots
+    $$
+    In sigma notation, the Taylor series for $f(x) = \sin(2x)$ is
+    $$
+      \sum_{k = 0}^{\infty} (-1)^{k} \frac{2^{2k+1}}{(2k+1)!} x^{2k + 1}.
+    $$   
+    \end{solution}
+
+    \item
+    \begin{problem}
+      Let $P_n$ denote the degree $n$ Taylor polynomial for $f$, centered at $0$.
+      Using the Remainder Theorem,
+      find a reasonable choice of $n$ for which $|P_{n}(x) - f(x)| \leq 10^{-3}$ for every $x$
+      in the interval $\displaystyle \left[ - \frac{1}{2}, \: \frac{1}{2} \right]$.
+     
+    \end{problem}  
+      
+    \begin{solution}
+      We need a reasonable choice for $M_{(n+1)}$, an upper bound for
+      $|f^{(n+1)}(x)|$ on the interval $[- \frac{1}{2}, \: \frac{1}{2} ]$.  Since
+      the sine and cosine functions are bounded between $-1$ and $1$, from our above
+      computations of derivatives we see that $M_{(n+1)} = 2^{n+1}$ is a safe choice.
+      The Remainder Theorem then tells us that
+      $$ 
+        |f(x) - P_{n}(x)| \leq \frac{2^{n+1}}{(n+1)!} \: |x - 0|^{n+1}
+      $$     
+      for every $x$ in the interval $[- \frac{1}{2}, \: \frac{1}{2} ]$.  For all
+      values of $x$ in this interval, notice that $\displaystyle |x - 0|^{n+1} \leq \frac{1}{2^{n+1}}$.      
+      Thus, our error bound tells us that
+      $$ 
+        |f(x) - P_{n}(x)| \leq \frac{2^{n+1}}{(n+1)!} \: \frac{1}{2^{n+1}} \; = \; \frac{1}{(n+1)!}
+      $$
+      for all $x$ in the interval $[- \frac{1}{2}, \: \frac{1}{2}]$.  If we want the assurance
+      that $|f(x) - P_{n}(x)| \leq 10^{-3}$, we can guarantee this by insisting that
+      $$
+        \frac{1}{(n+1)!} \leq \frac{1}{10^3}.  
+      $$
+      Equivalently, we need $(n+1)! \geq 1000$.  We don't need the very smallest choice of
+      $n$ that satisfies this (which happens to be $n = 6$).  For example, if we use $n = 11$
+      then $(n+1)! = 12! = (12)(11)(10) 9!$ is definitely larger than 1000 because $(12)(11)(10) > 10^3$.
+    \end{solution}  
+  \end{enumerate}
+
+
+
+ \end{enumerate}
+
+
+
+\end{document}

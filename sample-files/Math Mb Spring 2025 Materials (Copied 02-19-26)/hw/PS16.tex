@@ -1,0 +1,648 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 16 - Problem Solving and Transition to Limits}
+\end{center}
+
+\begin{grading}
+    \begin{enumerate}
+        \item 1 points
+        \item 10 points
+        \item 10 points (extra credit)
+        \item 5 points
+    \end{enumerate}
+    Total: 25 points. (Students can get up to 35 points with extra credit.)
+\end{grading}
+
+\begin{enumerate}
+
+
+
+\item 
+
+\begin{grading}
+  10 points. 7 for part (a), 3 for part (b). It is best if they give an analytical argument for part (b)  using the derivative equation given, instead of trying to make an intuitive argument.
+\end{grading}
+
+In a Broadway production of \emph{Mary Poppins}, there is a scene in which the actress playing Mary Poppins is suspended 10 meters in the air above the stage by a thin wire. She is then slowly lowered straight down on to the stage to give the appearance that she is floating to the ground. To achieve the desired effect, the production designer would like to lower her at a rate of 1 meter per second. There is a spotlight on the stage floor 6 meters away from the actress's landing spot, which will automatically rotate to follow her throughout her entire descent. 
+
+\begin{enumerate}
+\item How quickly must the spotlight be rotating (in radians per second) when the actress is 8 meters above the stage? Give units for your answer, and be sure that your answer has the correct sign.
+
+\pspace{\stretch{3}}
+ 
+\begin{solution} 
+
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\coordinate (0) at (0,0);
+\coordinate (A) at (3,0);
+\coordinate (B) at (3,4);
+
+\draw (0)--(A);
+\draw (A)--(B);
+\draw (B)--(0);
+
+\pic [draw, -, "$\theta$", angle eccentricity=1.5] {angle = A--0--B};
+    
+
+\draw [|-] (0,-0.2) -- (1.3,-0.2);
+\draw [-|] (1.7,-0.2) -- (3,-0.2);
+\node at (1.5,-0.2) {$6$};
+\node at (-1, 0) {Spotlight};
+\node at (3,4.5) {Actress};
+
+\draw [|-] (3.2,0) -- (3.2,1.8);
+\draw [-|] (3.2,2.2) -- (3.2,4);
+\node at (3.2,2) {$h$};
+\end{tikzpicture}
+\caption{Picture at a generic time}
+
+\end{figure}
+
+In this question, we are interested in the quantity $\frac{d\theta}{dt}$, where $\theta $ is the angle of elevation of the spotlight labeled in the diagram above. On the other hand, what we know is that 
+\[
+\frac{dh}{dt}=-1 \text{ m/s},
+\]
+where we have the negative sign because the actress's height is decreasing. Our task now is to relate the two quantities, and we have that
+
+\[
+\tan(\theta)=\frac{h}{6}.
+\]
+
+Differentiating with respect to $t$ gives
+\[
+\sec^2(\theta)\frac{d\theta}{dt}=\frac16 \cdot\frac{dh}{dt}=\frac{-1}{6}.
+\]
+Finally we need to figure out the value of $\sec^2(\theta)$ in the snapshot picture, in which case $h=8$, and therefore by the Pythagorean theorem, the hypoteneus is 10, and hence
+
+\[
+\sec^2(\theta)=\frac{1}{\cos^2(\theta)}=\frac{25}{9}.
+\]
+Therefore, putting everything together, we have that 
+\[
+\boxed{\frac{d\theta}{dt}=\frac{-3}{50} \text{ rad/s}}.
+\]
+
+A good thing to do at this point is to check that our answer makes senes: indeed, $\theta$ is decreasing (which we can tell from the sign of the derivative), which makes sense because the angle of elevation should decrease as the actress descends. 
+
+We could also have written 
+
+\[
+\theta =\arctan\left(\frac{h}{6}\right)
+\]
+
+at the beginning and differentiated with respect to $t$ using the chain rule instead of using implicit differentiation.
+
+
+\end{solution}
+
+
+
+
+\item As the actress gets closer to the stage, does the spotlight have to rotate faster, slower, or at a constant rate to stay on her? How do you know?
+
+\pspace{\nstretch{1}}
+
+\begin{solution}
+The \textit{general} formula for the rate of change of $\theta$ at any angle $\theta$ is given by
+
+\[
+\frac{d\theta}{dt}=\frac{-\cos^2{\theta}}{6}.
+\]
+Now, to see whether the spotlight is rotating \textit{faster}, we only care about the \textit{magnitude} of $d\theta/dt$, which is just $\cos^2(\theta)/6$. As $\theta \rightarrow 0$, $\cos^2(\theta)$ increases according to the graph of $\cos$, and hence the magnitude of $d\theta/dt$ also increases (i.e., $d\theta/dt$ becomes more negative.) Therefore, the spotlight rotates \fbox{faster} as the actress descends.
+\end{solution}
+\end{enumerate}
+
+
+
+\item \label{optimization-painting}
+
+\begin{grading}
+  10 points. 
+\end{grading}
+
+ 
+
+  {
+    \providecommand{\graphcommand}{}
+    \renewcommand{\graphcommand}[1]{
+      \begin{tikzpicture}
+        \coordinate (eyes) at (0, 0);
+        \coordinate (top) at (4, 1);
+        \coordinate (bottom) at (4, -2);
+        \coordinate (middle) at (4,0);
+        \newdimen\x 
+        \newdimen\y 
+        \pgfextractx{\x}{\pgfpointanchor{top}{center}} 
+        \pgfextracty{\y}{\pgfpointanchor{top}{center}} 
+        \pgfmathsetmacro{\topangle}{atan2(\x, \y)} 
+        \pgfextractx{\x}{\pgfpointanchor{bottom}{center}} 
+        \pgfextracty{\y}{\pgfpointanchor{bottom}{center}} 
+        \pgfmathsetmacro{\bottomangle}{atan2(\x, \y)} 
+
+        \draw (eyes) node[left] {eyes} -- (top) -- (bottom) -- (eyes);
+        #1
+      \end{tikzpicture}
+    }
+
+    \begin{problem}[\vfill\newpage]
+      Suppose we want to hang a $3$-ft tall rectangular painting on the wall
+      so that an observer standing 4 feet away from the painting has the
+      best view.  In other words, we want to maximize the angle $\theta$
+      (see left diagram) subtended by the painting. Show that $\theta$ is
+      maximized when the center of the painting is at the level of the
+      observer's eyes.
+
+      \emph{Hint:} Express what you're trying to optimize in terms of the
+      variable $x$ shown in the right diagram below.
+
+      \graphcommand{
+        \draw pic [draw,"$\theta$",angle radius = 10, 
+            angle eccentricity = 1.6] {angle=bottom--eyes--top};
+        \draw[|-|] ($(eyes |- top) + (0, 12pt)$) -- node[fill=white] {4} 
+        ($(top) + (0, 12pt)$);
+        \draw[|-|] ($(top) + (12pt, 0)$) -- node[fill=white] {3}
+        ($(bottom) + (12pt, 0)$); 
+      }
+      \hspace{0.25in}
+      \graphcommand{
+        \draw pic [draw,angle radius = 10] {angle=bottom--eyes--top};
+        \draw[dashed] (eyes) -- (middle);
+        \draw (middle) rectangle ++ (-5pt, 5pt);
+        \draw [|-|] ($(middle) + (12pt, 0)$) -- node[fill=white]
+        {$x$} ($(top) + (12pt, 0)$);
+      }
+
+      As always, be sure to justify that you've actually \emph{maximized}
+      $\theta$.
+    \end{problem}
+
+    \begin{solution}
+      \ideas{We start by identifying our goal.}
+
+      \highlight{\textbf{Goal:} Maximize $\theta$.}
+
+      \ideas{Next, we write a formula for the thing we're trying to maximize
+        ($\theta$).  As suggested, we'll express $\theta$ in terms of $x$.}
+
+      We can think of $\theta$ as the sum of the red angle and the blue
+      angle in the picture below:
+      \begin{center}
+        \graphcommand{
+          \draw[dashed] (eyes) -- (middle);
+          \draw (middle) rectangle ++(-5pt,5pt);
+          \draw [|-|] ($(middle) + (12pt, 0)$) -- node[fill=white]
+          {$x$} ($(top) + (12pt, 0)$);
+          \draw [|-|] ($(middle) + (20pt, 0)$) -- node[fill=white]
+          {$3 - x$} ($(bottom) + (20pt, 0)$);
+          \draw pic [draw, red, thick, angle radius = 30]
+            {angle=middle--eyes--top};
+          \draw pic [draw, blue, thick, angle radius = 20]
+            {angle=bottom--eyes--middle};
+          angle=\topangle]; 
+        }          
+      \end{center}
+
+      \highlight{\textbf{Formula for thing we're trying to maximize:} }
+      \begin{align*}
+        \theta &= \text{red angle} + \text{blue angle} \\
+        &= \arctan \left(
+          \frac{x}{4} \right)  + \arctan \left( \frac{3 - x}{4} \right) 
+      \end{align*}
+      \ideas{We already have $\theta$ as a function of just one variable
+        ($x$), so we're ready to maximize!}  We want the critical points, so
+      we should first find the derivative of $\theta(x)$:
+      \begin{align*}
+        \theta'(x) 
+        &= \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle
+            \arctan\left(\fcolorbox{blue}{white}{$\displaystyle \frac{3 -
+                  x}{4}$}\right)$}\right)+ \frac{d}{dx}
+        \left(\fcolorbox{red}{white}{$\displaystyle
+            \arctan\left(\fcolorbox{blue}{white}{$\displaystyle
+                \frac{x}{4}$}\right)$}\right) \\      
+        &= \frac{1}{\left(\frac{3 - x}{4}\right)^2+1}\cdot \left( -
+          \frac{1}{4} \right) + \frac{1}{\left(\frac{x}{4}\right)^2+1}\cdot
+        \frac{1}{4} \\
+        &= \frac{1}{4} \left[ \frac{1}{\left(\frac{x}{4}\right)^2+1} -
+          \frac{1}{\left(\frac{3 - x}{4}\right)^2+1} \right]
+      \end{align*}
+      We set this equal to 0 to find the critical points:    
+      \begin{align*}
+        \frac{1}{\left(\frac{x}{4}\right)^2+1} &= \frac{1}{\left(\frac{3 -
+              x}{4}\right)^2+1} \\
+        \shortintertext{Cross-multiplying,} %
+        \left(\frac{3 - x}{4}\right)^2+1
+        &=\left(\frac{x}{4}\right)^2+1 \\
+        \intertext{Subtracting 1 from both sides,} \left(\frac{3 -
+            x}{4}\right)^2 &= \left(\frac{x}{4}\right)^2 \\
+        \intertext{Square rooting both sides (and remembering that, when we
+          square root, we need to include a $\pm$):}%
+        \frac{3 - x}{4} &= \pm \frac{x}{4} \\
+        \intertext{Multiplying both sides by 4,}%
+        3 - x &= \pm x, \text{ which is } x \text{ or } -x \\
+        \intertext{Adding $x$ to both sides,}
+        3 &= 2x \text{ or 0} \\
+        \intertext{The equation $3 = 0$ obviously has no solutions, so we
+          just have}
+        3 &= 2x \\
+        \frac{3}{2} &= x 
+      \end{align*}    
+      \ideas{But wait, we're not done yet!  We've found a critical point,
+        but we still need to see whether it's the absolute maximum.}
+
+      Let's make a sign chart for $\theta'$.  For example, we might test $x
+      = 1$ and $x = 2$:
+      \begin{align*}
+        \theta'(1) &= \frac{1}{4}
+        \left[\frac{1}{\left(\frac{1}{4}\right)^2+1} -
+          \frac{1}{\left(\frac{2}{4}\right)^2+1} \right]  > 0 \\
+        \theta'(2) &= \frac{1}{4}
+        \left[\frac{1}{\left(\frac{2}{4}\right)^2+1} -
+          \frac{1}{\left(\frac{1}{4}\right)^2+1} \right] < 0
+      \end{align*}
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis y line=none, x axis line style={-}, xtick={1.5}, xticklabels={$\frac{3}{2}$}, ymin=-2, height=1in, width=3in]
+            \addplot+[domain=1.3:1.6, very thin]{0};
+            \draw (axis cs: 1.3, -1.5) node[right] {sign of $\theta '$};
+            \draw (axis cs: 1.45, -1.5) node{$+$};
+            \draw (axis cs: 1.55, -1.5) node{$-$};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      So, $x = \frac{3}{2}$ is indeed where the absolute maximum of
+      $\theta(x)$ occurs. When $x = \frac{3}{2}$, this means exactly half
+      the painting is above the observer's eye level, so the center of
+      painting is at the level of the observer's eyes. 
+    \end{solution}
+  }    
+
+
+
+%  \item 
+  
+%   \label{optimization-ladder-over-fence}
+%   % Stewart, 4.6 #22, numbers modified
+
+%   \begin{grading}
+%   10 points, extra credit. 4 for part (a), 6 for part (b). 
+% \end{grading}
+
+%   A fence $3 \sqrt{3}$ feet tall runs parallel to an extremely tall
+%   building at a distance of 1 foot from the building.  A ladder is propped
+%   up so that it rests on top of the fence and reaches the wall of the
+%   building, as shown.  Let $\theta$ be the angle between the ladder and
+%   the ground.
+
+%   \begin{tikzpicture}
+%     \def\ground{(0, 0)};
+%     \def\ladderslope{0.4};
+%     \def\wallx{5};
+%     \def\wally{3};
+%     \def\fencex{4};
+
+%     \draw \ground -- node[midway, sloped, above]{ladder} (\wallx, \ladderslope*\wallx);
+%     \draw (\wallx, \wally) -- node[midway, sloped, above] {wall} (\wallx,
+%     0) -- \ground; 
+%     \draw (\fencex, \ladderslope*\fencex) -- node[midway, sloped, above]
+%     {fence} (\fencex, 0);  
+%     \draw (0.8, 0.8*\ladderslope/2) node{$\theta$};
+%   \end{tikzpicture}
+
+%   \begin{enumerate}
+%   \item
+%     \begin{problem}[\stretch{0.5}]
+%       Express the length of the ladder in terms of $\theta$.
+%       (\emph{Hint:} Start by expressing the distance from the
+%         bottom of the ladder to the fence in terms of $\theta$.)
+%     \end{problem}
+
+%     \begin{solution}
+%       Let's label some variables in our picture.  Let $L$ be the length of
+%       the ladder, $h$ be the height of the wall, and $x$ be the distance
+%       from the bottom of the ladder to the fence.
+%       \begin{center}
+%         \begin{tikzpicture}
+%           \def\ground{(0, 0)};
+%           \def\ladderslope{0.4};
+%           \def\wallx{5};
+%           \def\wally{3};
+%           \def\fencex{4};
+
+%           \draw[|-|, yshift=1em, xshift=-\ladderslope*1em] \ground --
+%           node[midway, fill=white] {$L$} (\wallx, \ladderslope*\wallx); %
+%           \draw \ground -- (\wallx, \ladderslope*\wallx); %
+%           \draw (\wallx, \wally) -- (\wallx, 0) -- \ground; %
+%           \draw[|-|, yshift=-1em] \ground -- node[midway, fill=white]
+%           {$x$} (\fencex, 0); %
+%           \draw[|-|, yshift=-1em] (\fencex, 0) -- node[midway,
+%           fill=white]{1} (\wallx, 0); %
+%           \draw (\fencex, \ladderslope*\fencex) -- node[midway, sloped,
+%           above] {$3 \sqrt{3}$} (\fencex, 0); %
+%           \draw (0.8, 0.8*\ladderslope/2) node{$\theta$}; %
+%           \draw[|-|, xshift=1em] (\wallx, \ladderslope*\wallx) --
+%           node[fill=white] {$h$} (\wallx, 0); %
+%         \end{tikzpicture}        
+%       \end{center}
+%       We see two right triangles in the picture.  As the hint
+%         suggests, let's start by trying to find $x$ in terms of $\theta$.
+%         If we look at the smaller right triangle, we see that $\tan \theta
+%         = \frac{3 \sqrt{3}}{x}$, so $x = \frac{3 \sqrt{3}}{\tan \theta}$.
+
+%         From the larger right triangle, $\cos \theta = \frac{1 + x}{L}$.
+%         Therefore,
+%       \begin{align*}
+%         L &= \frac{1 + x}{\cos \theta} \\
+%         &= \left( 1 + \frac{3 \sqrt{3}}{\tan \theta} \right) \frac{1}{\cos
+%           \theta} \\ 
+%         &= \left( 1 + \frac{3 \sqrt{3} \cos \theta}{\sin \theta} \right)
+%         \frac{1}{\cos \theta} \\
+%         &= \boxed{\frac{1}{\cos \theta} + \frac{3 \sqrt{3}}{\sin \theta}}
+%       \end{align*}
+%       (Notice that we didn't end up using $h$ at all; sometimes it's hard
+%       to know what variables you'll need until you've written some things
+%       out!) 
+%     \end{solution}
+
+%   \item
+%     \begin{problem}[\vfill\newpage]
+%       What is the length of the shortest ladder that will reach from the
+%       ground over the fence to the wall of the building?  (As always, be
+%       sure to justify that the length you find really is the shortest
+%       possible.) 
+%     \end{problem}
+
+%     \begin{solution}
+%       \ideas{We start by identifying our goal.}
+
+%       \highlight{\textbf{Goal:} Minimize the length of the ladder.}
+
+%       In the previous part, we already found a formula for the thing we're
+%       trying to minimize.
+
+%       \highlight{\textbf{Formula for thing we're trying to minimize:}
+%         $\displaystyle L = \frac{1}{\cos \theta} + \frac{3 \sqrt{3}}{\sin
+%           \theta}$}
+
+%       We have the thing we're trying to minimize ($L$) in terms of just
+%       one variable ($\theta$), so we're ready to find the critical
+%       points.  
+%       \begin{align*}
+%         L(\theta) &= (\cos \theta)^{-1} + 3 \sqrt{3} (\sin \theta)^{-1} \\  
+%         L'(\theta) &=  -1 (\cos \theta)^{-2} (-\sin \theta) 
+%         + 3 \sqrt{3} \left[ -1 (\sin \theta)^{-2} \cos \theta \right] \\
+%         &= \frac{\sin \theta}{\cos^2 \theta} - \frac{3 \sqrt{3} \cos \theta}{\sin^2
+%           \theta} \\
+%         &= \frac{\sin^3 \theta - 3 \sqrt{3} \cos^3 \theta}{\sin^2 \theta \cos^2 \theta}
+%       \end{align*}
+%       So, $L'(\theta)$ is undefined when $\sin \theta = 0$ or $\cos \theta
+%       = 0$, and $L'(\theta) = 0$ when
+%       \begin{align*}
+%         \sin^3 \theta &= 3 \sqrt{3} \cos^3 \theta \\
+%         \frac{\sin^3 \theta}{\cos^3 \theta} &= 3 \sqrt{3} \\
+%         \tan^3 \theta &= 3 \sqrt{3} = 3^{3/2} \\
+%         \tan \theta &= 3^{1/2} = \sqrt{3} 
+%       \end{align*}
+%       The equations $\sin \theta = 0$, $\cos \theta = 0$, and $\tan \theta
+%       = \sqrt{3}$ all have infinitely many solutions, so it's important at
+%       this point to think about the domain of $L(\theta)$.  Since $\theta$
+%       represents the angle between the ground and the ladder and the
+%       ladder must be pointed toward the building, $\theta$ must be in the
+%       interval $\left(0, \frac{\pi}{2} \right)$.  The equations $\sin
+%       \theta = 0$ and $\cos \theta = 0$ have no solutions in $\left(0,
+%         \frac{\pi}{2} \right)$, while the equation $\tan \theta =
+%       \sqrt{3}$ has one solution in $\left(0, \frac{\pi}{2} \right)$,
+%       $\theta = \frac{\pi}{3}$.  So, $L(\theta)$ has only one critical
+%       number on its domain, $\theta = \frac{\pi}{3}$.
+
+%       \ideas{But wait, we're not done yet!  We've found a critical point,
+%         but we still need to see whether it's the absolute minimum.}  We
+%       can use either the First Derivative Test or Second Derivative Test
+%       to check whether we really have an absolute minimum.  Here, it looks
+%       somewhat tedious to compute $L''(\theta)$, so let's use the First
+%       Derivative Test.  To the left of $\frac{\pi}{3}$, we can test, for
+%       example, $L' \left( \frac{\pi}{4} \right)$:
+%       \[ L' \left( \frac{\pi}{4} \right) = \frac{ \left(
+%           \frac{\sqrt{2}}{2} \right)^3 - 3 \sqrt{3} \left(
+%           \frac{\sqrt{2}}{2} \right)^3}{\left( \frac{\sqrt{2}}{2}
+%         \right)^2 \left( \frac{\sqrt{2}}{2} \right)^2} < 0 \] There aren't
+%       any ``convenient'' values in $\left(0, \frac{\pi}{2} \right)$
+%       greater than $\frac{\pi}{3}$ for us to test, but we can think about
+%       what happens when $\theta$ is a little less than $\frac{\pi}{2}$.
+%       When $\theta$ is a little less than $\frac{\pi}{2}$, $\sin \theta$
+%       is close to 1 while $\cos \theta$ is close to 0 (but positive), so
+%       the numerator $\sin^3 \theta - 3 \sqrt{3} \cos^3 \theta$ of
+%       $L'(\theta)$ is close to $1^3 - 3 \sqrt{3} \cdot 0$ and hence
+%       positive, while the denominator $\sin^2 \theta \cos^2 \theta$ is
+%       also positive.  So, $L'(\theta)$ will be positive here, and we get
+%       the following sign chart:
+%       \begin{center}
+%         \begin{tikzpicture}
+%           \begin{axis}[axis y line=none, x axis line style={-}, xtick={0., 1.0472, 1.5708}, xticklabels={$0$, $\frac{\pi }{3}$, $\frac{\pi }{2}$}, ymin=-2, ymax=2, height=1.25in, width=3in]
+%             \addplot+[domain=-0.785398:1.5708]{0};
+%             \draw (axis cs: -0.785398, -1.5) node[right] {sign of $L'$};
+%             \draw (axis cs: -0.785398, 1) node[right] {$L$};
+%             \draw (axis cs: 0.523599, -1.5) node{$-$};
+%             \draw[->, xshift=2pt] (axis cs: 0.0523599, 1.5) -- (axis cs: 0.994838, 0.5);
+%             \draw (axis cs: 1.309, -1.5) node{$+$};
+%             \draw[->, xshift=2pt] (axis cs: 1.09956, 0.5) -- (axis cs: 1.51844, 1.5);
+%             \draw[->, xshift=2pt] (axis cs: 0.994838, 0.5) -- (axis cs: 1.09956, 0.5);
+%           \end{axis}
+%         \end{tikzpicture}
+%       \end{center}
+%       So, $L$ indeed has an absolute minimum at $\theta = \frac{\pi}{3}$.
+%       We are asked for the length of the shortest ladder, so we need to
+%       find $L$ when $\theta = \frac{\pi}{3}$; since we already wrote down
+%       a formula for $L$ in terms of $\theta$, we can simply plug $\theta =
+%       \frac{\pi}{3}$ into this:
+%       \[ L \left( \frac{\pi}{3} \right) = \frac{1}{\cos \frac{\pi}{3}} +
+%       \frac{3 \sqrt{3}}{\sin \frac{\pi}{3}} = \frac{1}{1/2} + \frac{3
+%         \sqrt{3}}{\sqrt{3} / 2} = 8.\] So, the shortest ladder that will
+%       reach is \fbox{8 feet long}.
+%     \end{solution}
+
+%   \end{enumerate}
+
+
+\item % Meredith or Meghan?
+
+\textbf{Looking forward}:  In our next class, we'll return to the topic of limits.
+  \begin{grading}
+  5 points\\
+  a) 3 points, 0.5 points each\\
+  b) 1 point\\
+  c) 1 point
+  \end{grading}
+
+  \begin{enumerate}
+  \item  \label{lhopital-prep-old-limits}
+    Evaluate the following limits using tools from last semester. 
+    \begin{enumerate}      
+
+      \item \label{lhopital-prep-old-limits-0/0-1}
+        \begin{problem}[\vfill]
+          $\displaystyle \lim_{x\to 2} \frac{4x-8}{x^2-4x+4}$
+        \end{problem}
+        
+
+        \begin{solution}
+          As $x \to 2$, both the numerator and denominator approach 0, so
+          we should try to factor them and cancel something:
+          \[ \lim_{x \to 2} \frac{4x - 8}{x^2 - 4x + 4} = \lim_{x \to 2}
+          \frac{ 4 \cancel{(x - 2)}}{(x - 2) \cancel{(x - 2)}} = \lim_{x
+            \to 2} \frac{4}{x - 2}.\]
+          This limit \fbox{does not exist}; one way to see this is to
+          think about the graph of $\frac{4}{x - 2}$:
+          \begin{center}
+            \begin{tikzpicture}
+              \begin{axis}[xtick=\empty, ytick=\empty, extra x ticks={2},
+                ymin=-15, ymax=15, width=3in]
+                \addplot+[domain=-1:5] {4/(x - 2)};
+              \end{axis}
+            \end{tikzpicture}
+          \end{center}
+          Alternatively, you can think about this algebraically: as $x \to
+          2$, the denominator $x - 2 \to 0$.  When the denominator $\to 0$
+          and the numerator doesn't, it's important to think about the
+          sign of the denominator.  When $x$ is just a bit bigger than
+          $2$, $x - 2$ is positive, so $\displaystyle \lim_{x \to 2^+}
+          \frac{4}{x - 2} = \infty$; when $x$ is just a bit less than $2$,
+          $x - 2$ is negative, so $\displaystyle \lim_{x \to 2^-}
+          \frac{4}{x - 2} = - \infty$.  Since the two one-sided limits
+          aren't equal to each other, the two-sided limit $\displaystyle
+          \lim_{x \to 2} \frac{4}{x - 2}$ does not exist. 
+        \end{solution}
+
+      \item \label{lhopital-prep-old-limits-inf/inf-1}
+        \begin{problem}[\vfill]
+          $\displaystyle \lim_{x\to 0^+} \frac{x^{-1}}{4x^{-3}}$
+        \end{problem}
+
+        \begin{solution}
+          We can simplify this: $\displaystyle \frac{x^{-1}}{4x^{-3}} =
+          \frac{x^2}{4}$, so this is asking for $\displaystyle \lim_{x \to
+            0^+} \frac{x^2}{4}$, which is $\boxed{0}$.
+        \end{solution}
+
+      \item \label{lhopital-prep-old-limits-not-indet-1}
+        \begin{problem}[\vfill]
+          $\displaystyle \lim_{x\to \infty} \frac{e^{-x}}{3x}$
+        \end{problem}
+
+        \begin{solution}
+          As $x \to \infty$, $e^{-x} \to 0$ and $3x \to \infty$, so
+          $\frac{e^{-x}}{3x} \to \boxed{0}$.  (If you plug a very large
+          $x$, you get a fraction whose numerator is tiny and whose
+          denominator is huge; this fraction is very close to 0.) 
+        \end{solution}
+
+      \item \label{lhopital-prep-old-limits-inf/inf-2}
+        \begin{problem}[\vfill\newpage]
+          $\displaystyle \lim_{x\to \infty} \frac{2x^3+2x+1}{x^3 -5}$
+        \end{problem}
+
+        \begin{solution}
+          As $x \to \infty$, both the numerator and denominator $\to
+          \infty$.  As you saw in Math Ma, we just need to think about the
+          dominant (that is, fastest-growing) terms in the numerator and
+          denominator; in the numerator, the fastest-growing term is
+          $2x^3$; in the denominator, it's $x^3$.  Therefore,
+          \[ \lim_{x\to \infty} \frac{2x^3+2x+1}{x^3 -5} = \lim_{x \to
+            \infty} \frac{2 x^3}{x^3} = \boxed{2}.\]
+        \end{solution}
+
+      \item \label{lhopital-prep-old-limits-0/0-2}
+        \begin{problem}[\vfill]
+          $\displaystyle \lim_{x\to 1} \frac{x^2-1}{3x-3}$
+        \end{problem}
+
+        \begin{solution}
+          As $x \to 1$, both the numerator and denominator $\to 0$, so we
+          should try to factor and cancel:
+          \[ \lim_{x \to 1} \frac{x^2 - 1}{3x - 3} = \lim_{x \to 1}
+          \frac{\cancel{(x - 1)} (x + 1)}{3 \cancel{(x - 1)}} = \lim_{x
+            \to 1} \frac{x + 1}{3} = \boxed{\frac{2}{3}}.\]
+        \end{solution}
+
+      \item \label{lhopital-prep-old-limits-0/0-3}
+        \begin{problem}[\vfill]
+          $\displaystyle \lim_{x\to 0} \frac{2x^3}{x^2+x}$
+        \end{problem}
+
+        \begin{solution}
+          As $x \to 0$, both the numerator and denominator $\to 0$, so we
+          should try to factor and cancel:
+          \[ \lim_{x \to 0} \frac{2x^3}{x^2 + x} = \lim_{x \to 0}
+          \frac{2x^2 \cdot \cancel{x}}{\cancel{x} (x + 1)} = \lim_{x \to
+            0} \frac{2x^2}{x + 1} = \frac{0}{1} = \boxed{0}.\]
+        \end{solution}
+
+    \end{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      Which of the limits in
+      \ref{lhopital-prep-old-limits} are ``of the form $\frac{0}{0}$''?  Which are ``of the form
+      $\frac{\infty}{\infty}$''? (Note that one of the limits above is of
+      neither type!) For help, read pages 1111 and 1112 in Gottlieb. You do not need to read
+      the description of L'H\^opital's Rule. 
+    \end{problem}
+
+    \begin{solution}
+      \renewcommand\enumiiprefix[2]{} %
+      The limits in \ref{lhopital-prep-old-limits-0/0-1},
+      \ref{lhopital-prep-old-limits-0/0-2}, and
+      \ref{lhopital-prep-old-limits-0/0-3} are of the form
+      $\frac{0}{0}$. The limits in
+      \ref{lhopital-prep-old-limits-inf/inf-1} and
+      \ref{lhopital-prep-old-limits-inf/inf-2} are of the form
+      $\frac{\infty}{\infty}$. (The limit in
+      \ref{lhopital-prep-old-limits-not-indet-1} is of the form
+      $\frac{0}{\infty}$, which is not indeterminate because any limit
+      $\displaystyle \lim_{x \to a} \frac{f(x)}{g(x)}$ in which $f(x) \to
+      0$ and $g(x) \to \infty$ is 0.)
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Explain why the term \emph{indeterminate form} makes sense for
+      limits of these two types. (Hint: look at the variety of answers you
+      got in part \ref{lhopital-prep-old-limits}.) Why aren't limits of
+      the form $\frac{0}{\infty}$ considered indeterminate forms?
+    \end{problem}
+
+    \begin{solution}
+      These limits are called indeterminate forms because we can't
+      \emph{determine} from the form of the limit what the result will
+      be. For example, the limits in i, v, and vi are all of the form
+      $\frac{0}{0}$, yet the limit in i does not exist, the limit in v is
+      $\frac{2}{3}$, and the limit in vi is 0.
+
+      Limits of the form $\frac{0}{\infty}$ are not indeterminate forms
+      because limits of this form are always zero.
+    \end{solution}
+  \end{enumerate}
+
+\end{enumerate}
+
+\psreflection{
+Optional reading for next class is Appendix F in Gottlieb.
+}
+\end{document}

@@ -1,0 +1,611 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{pifont}
+
+\usepackage{soul}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\makeatletter
+
+\newdimen\SOUL@dimen %new
+\def\SOUL@ulunderline#1{{%
+    \setbox\z@\hbox{#1}%
+    % \dimen@=\wd\z@
+    \SOUL@dimen=\wd\z@ %new
+    \dimen@i=\SOUL@uloverlap
+    \advance\SOUL@dimen2\dimen@i %\dimen@ exchanged too
+    \rlap{%
+      \null
+      \kern-\dimen@i
+      % \SOUL@ulcolor{\SOUL@ulleaders\hskip\dimen@}%
+      \SOUL@ulcolor{\SOUL@ulleaders\hskip\SOUL@dimen}% new
+    }%
+    \unhcopy\z@
+  }}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\usepackage{amsthm}
+
+% make URLs print in the same font
+\usepackage{url}
+\urlstyle{same}
+
+\usepackage{pifont}
+\def\exend{\hfill\ding{118}}
+
+%\makeatletter\@addtoreset{equation}{section}\makeatother
+%\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+
+\newtheoremstyle{theorem}% name
+{8pt}%      Space above
+{0pt}%      Space below
+{\itshape}%         Body font
+{}%         Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{.}%        Punctuation after thm head
+{.5em}%     Space after thm head: " " = normal interword space;
+                                %       \newline = linebreak
+{}%         Thm head spec (can be left empty, meaning `normal')
+
+\theoremstyle{theorem}
+
+\let\Theorem\undefined
+\newtheorem{Theorem}[equation]{Theorem}
+\let\Definition\undefined
+\newtheorem{Definition}[equation]{Definition}
+\let\Summary\undefined
+\newtheorem{Summary}[equation]{Summary}
+\let\Conjecture\undefined
+\newtheorem{Conjecture}[equation]{Conjecture}
+\let\Fact\undefined
+\newtheorem{Fact}[equation]{Fact}
+
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\makeatletter
+\def\@seccntformat#1{\@ifundefined{#1@cntformat}%
+   {\csname the#1\endcsname\quad}%       default
+   {\csname #1@cntformat\endcsname}}%    enable individual control
+\newcommand\section@cntformat{}
+\makeatother
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\begin{center}
+  \Large\textsc{Skills Check 2 Info \& Practice Problems}
+\end{center}
+
+\begin{problemonly}
+  Skills Check 2 is on exponentials and logarithms. First, here are some basics you should make sure you're comfortable with.
+
+  \begin{enumerate}
+
+  \item \textbf{The Definition of Logarithms.} Saying $y = \log_b x$ is equivalent to what exponential equation?
+
+    \pspace{0.5in}
+
+  \item \textbf{Exponent Rules.} Fill in as many blanks as you can! (There aren't rules for all of these.) 
+    \begin{enumerate}
+    \item $b^x + b^y = {}$ \fitb{1in}{}
+    \item $b^{x + y} = {}$ \fitb{1in}{$b^x \cdot b^y$}
+    \item $b^x - b^y = {}$ \fitb{1in}{}
+    \item $b^{x - y} = {}$ \fitb{1in}{$\displaystyle \frac{b^x}{b^y}$}
+    \item $b^{xy} = {}$ \fitb{1in}{$(b^x)^y$}
+    \end{enumerate}
+
+    \emph{If you think about what happens when the exponents are positive integers, do the rules make sense to you?}
+
+  \item \textbf{Logarithm Rules.} Fill in as many blanks as you can!
+    \begin{enumerate}
+    \item $\log_b (Q + R) = {}$ \fitb{1in}{}
+    \item $\log_b (Q - R) = {}$ \fitb{1in}{}
+    \item $\log_b (QR) = {}$ \fitb{1in}{$\log_b Q + \log_b R$}
+    \item $(\log_b Q) (\log_b R) = {}$ \fitb{1in}{}
+    \item $\log_b \left( \frac{Q}{R} \right) = {}$ \fitb{1in}{$\log_b Q - \log_b R$}
+    \item $\log_b (Q^y) = {}$ \fitb{1in}{$y \log_b Q$}
+    \end{enumerate}
+
+    \emph{Can you use some concrete examples to check that you've done this correctly?}
+
+  \item \textbf{Special values of the natural log.} Which of the following can be simplified? Which are undefined?
+    \begin{enumerate}
+    \item $\ln 0 = {}$ \fitb{1in}{undefined}
+    \item $\ln 1 = {}$ \fitb{1in}{$0$}
+    \item $\ln e = {}$ \fitb{1in}{$1$}
+    \item $\ln 10 = {}$ \fitb{1in}{}
+    \end{enumerate}
+
+  \end{enumerate}
+
+  \newpage
+  Here are some practice problems to give you an idea of the skills you should be comfortable with for the skills check, and there are 2 practice skills checks on Edfinity.
+\end{problemonly}
+
+\subsection*{Write an exponential function that fits a given description}
+
+\begin{enumerate}
+\item 
+
+  \begin{problem}
+    A cholera epidemic is spreading through an island, and the number of cases is growing exponentially. If there were 50 cases on the first day of the epidemic, and the number of cases increases by 150\% every 14 days, write a formula for the number of cases $t$ days after the start of the epidemic.
+  \end{problem}
+
+  \begin{solution}
+    Let's make a table. There are 50 cases on the first day of the epidemic (which is $t = 0$, since it's 0 days after the start of the epidemic). The next time that's easy for us to figure out is 14 days later, which is when $t = 14$. So, when we make our table, we'll look what happens every 14 days. Increasing by 150\% is the same as getting multiplied by 250\% or 2.5, so here's our table:
+    \begin{center}
+      \begin{tabular}{c | l}
+        $t$ & number of cases $t$ days after start of epidemic \\
+        \hline
+        0 & $50$ \\
+        14 & $50 \cdot 2.5$ \\
+        28 & $50 \cdot 2.5^2$ \\
+        42 & $50 \cdot 2.5^3$
+      \end{tabular}
+    \end{center}
+    Notice that, in the expression for the amount of substance, $2.5$ is raised to a power that is always $t / 14$ (when $t = 14$, $2.5$ is raised to the power 1; when $t = 28$, $2.5$ is raised to the power 2; and so on). So, the number of cases $t$ days after the start of the epidemic is $\boxed{50 \cdot 2.5^{t/14}}$.
+  \end{solution}
+
+\end{enumerate}
+
+\subsection*{Evaluate and estimate logarithms}
+
+\begin{enumerate}[resume]
+\item 
+
+  In each part, you're given a logarithm. If you can evaluate it exactly, do so; otherwise, give 2 consecutive integers that it's between.
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}
+      $\log_6 \left( \dfrac{36}{\sqrt[3]{6}} \right)$
+    \end{problem}
+
+    \begin{solution}
+      $\dfrac{36}{\sqrt[3]{6}} = \dfrac{6^2}{6^{1/3}} = 6^{2 - 1/3}$, so $\log_6 \left( \dfrac{36}{\sqrt[3]{6}} \right) = 2 - \dfrac{1}{3} = \boxed{\frac{5}{3}}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $\log_3 \left( \dfrac{1}{8} \right)$      
+    \end{problem}
+
+    \begin{solution}
+      $\dfrac{1}{8}$ is not a nice power of 3, so we can't evaluate this exactly. Since $\dfrac{1}{8}$ is between $3^{-2} = \dfrac{1}{9}$ and $3^{-1} = \dfrac{1}{3}$, $\log_3 \left( \dfrac{1}{8} \right)$ is \fbox{between $-2$ and $-1$}.
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $\log_3 \left( \dfrac{1}{9} \right)$
+    \end{problem}
+
+    \begin{solution}
+      $\dfrac{1}{9} = 3^{-2}$, so $\log_3 \left( \dfrac{1}{9} \right) = \boxed{-2}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $\ln 4$
+    \end{problem}
+
+    \begin{solution}
+      Since $e$ is between 2 and 3, $e < 4$ and $e^2 > 4$. So, $\ln 4$ is \fbox{between 1 and 2}.
+    \end{solution}
+
+  \end{enumerate}
+\end{enumerate}
+
+\subsection*{Apply exponent and log rules to simplify expressions and solve equations}
+
+\emph{Edfinity note:} Remember that Edfinity doesn't have a way to enter an expression like $\log_3 5$, so you should express all logarithms in terms of ln. 
+
+\begin{enumerate}[resume]
+\item 
+
+  \begin{enumerate}
+  \item
+    \begin{problem}
+      Express $\displaystyle 5 \log_b \left( \frac{u^3}{w^2} \right)$ in terms of $A = \log_b u$ and $B = \log_b w$.
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        5 \log_b \left( \frac{u^3}{w^2} \right) &= 5 \left[ \log_b \left( u^3 \right) - \log_b \left( w^2 \right) \right] \\
+        &= 5 (3 \log_b u - 2 \log_b w) \\
+        &= \boxed{5(3A - 2 B)}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}
+      Express $\displaystyle \ln \left( \dfrac{8}{3 \sqrt[3]{12}} \right)$ in terms of $A = \ln 2$ and $B = \ln 3$. 
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        \ln \left( \dfrac{8}{3 \sqrt[3]{12}} \right) &= \ln (8) - \ln \left(3 \sqrt[3]{12} \right) \\
+        &= \ln \left( 2^3 \right) - \left[ \ln 3 + \ln \left( \sqrt[3]{12} \right) \right] \\
+        &= 3 \ln 2 - \ln 3 - \frac{1}{3} \ln (12) \\
+        \intertext{Since $12 = 2^2 \cdot 3$, we can further rewrite this as:}
+        &= 3 \ln 2 - \ln 3 - \frac{1}{3} \left[ \ln \left( 2^2 \right) + \ln 3 \right] \\
+        &= 3 \ln 2 - \ln 3 - \frac{1}{3} (2 \ln 2 + \ln 3) \\
+        &= \frac{7}{3} \ln 2 - \frac{4}{3} \ln 3 \\
+        &= \boxed{\frac{7}{3} A - \frac{4}{3} B}
+      \end{align*}
+    \end{solution}
+  \end{enumerate}
+
+\item 
+  \begin{problem}[\vfill]
+    Rewrite $\dfrac{\sqrt[3]{8 \cdot 5^x}}{7^{x + 1}}$ in the form $C \cdot b^x$.
+  \end{problem}
+
+  \begin{solution}
+    Since we're trying to rewrite this in the form $C \cdot b^x$, we want to separate the terms that have an $x$ in the exponent and those that don't:
+    \begin{align*}
+      \dfrac{\sqrt[3]{8 \cdot 5^x}}{7^{x + 1}} &= \frac{8^{1/3} 5^{x/3}}{7 \cdot 7^x} \\
+      &= \frac{2 \left( 5^{1/3} \right)^x}{7 \cdot 7^x} \\
+      &= \boxed{\frac{2}{7} \left( \frac{5^{1/3}}{7} \right)^x}
+    \end{align*}
+  \end{solution}  
+
+\item 
+
+  Simplify:
+  \begin{enumerate}
+
+  \item
+    \begin{problem}
+      $\displaystyle 3(ab^2)^{x} \cdot \left(\frac{3a}{b} \right)^{2x}$
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        3(ab^2)^{x} \cdot \left(\frac{3a}{b} \right)^{2x} &= 3 a^x b^{2x} \cdot \frac{3^{2x} a^{2x}}{b^{2x}} \\
+        &= \boxed{3^{2x + 1} a^{3x}}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $\left( b^{x} + b^{-x} \right)^2 - \dfrac{1}{4 b^{2x}}$
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        \left( b^{x} + b^{-x} \right)^2 - \dfrac{1}{4 b^{2x}} &= \left( b^{x} + b^{-x} \right)\left( b^{x} + b^{-x} \right) - \dfrac{1}{4 b^{2x}} \\
+        &= \left( b^{x} \right)^2 + 2 b^{x} b^{-x} + \left( b^{-x} \right)^2 - \dfrac{1}{4} b^{-2x} \\
+        &= b^{2x} + 2 + b^{-2x} - \dfrac{1}{4} b^{-2x} \\
+        &= \boxed{b^{2x} + 2 + \dfrac{3}{4} b^{-2x}}
+      \end{align*}
+    \end{solution}
+  \end{enumerate}
+
+\item 
+
+  Simplify each as much as possible.
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}
+      $2^{3 + \log_2 5}$
+    \end{problem}
+
+    \begin{solution}
+      This is equal to $2^3 \cdot 2^{\log_2 5} = 8 \cdot 5 = \boxed{40}$.
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $10^{(\log_{10} 7) / 2}$
+    \end{problem}
+
+    \begin{solution}
+      This is equal to $\left( 10^{\log_{10} 7} \right)^{1/2} = 7^{1/2} =
+      \boxed{\sqrt{7}}$.
+    \end{solution}
+  \end{enumerate}
+
+\item Solve the following equations for $x$. It's okay to leave expressions like $3^5$ in your answers. 
+
+  \begin{enumerate}
+
+  \item 
+    \begin{problem}
+      $\log_5 (3x + 1) = 17$
+    \end{problem}
+
+    \begin{solution}
+      In words, this says that the power to which $5$ must be raised in order to get $3x + 1$ is $17$; that is,
+      \begin{align*}
+        5^{17} &= 3x + 1 \\
+        5^{17} - 1 &= 3x \\
+        \boxed{\frac{5^{17} - 1}{3}} &= x
+      \end{align*}
+    \end{solution}
+
+  \item 
+    \begin{problem}
+      $5 e^{2x} = 93$
+    \end{problem}
+
+    \begin{solution}
+      Dividing both sides by 5,
+      \begin{align*}
+        e^{2x} &= \frac{93}{5} \\
+        \intertext{Taking the natural log of both sides,}
+        2x &= \ln \left( \frac{93}{5} \right) \\
+        x &= \boxed{\frac{\ln \left( \dfrac{93}{5} \right)}{2}}
+      \end{align*}
+    \end{solution}
+
+  \item 
+
+    \begin{problem}
+      $\displaystyle\pi \cdot 3^{2x + 1} = \sqrt{\pi} \cdot 5^x$
+    \end{problem}
+
+    \begin{solution}
+      First, let's divide both sides by $\sqrt{\pi}$ to get the powers of $\pi$ together:
+      \begin{align*}
+        \sqrt{\pi} \cdot 3^{2x + 1} &= 5^x\\
+        \intertext{Since $x$ is in the exponent and the two exponentials have different bases, we'll take the natural log of both sides:}
+        \ln \left(\sqrt{\pi} \cdot 3^{2x + 1} \right) &= \ln( 5^x)\\
+        \ln \left( \sqrt{\pi} \right)  + \ln \left(3^{2x+1} \right) &= x \ln 5 \\
+        \frac{1}{2} \ln \pi + (2x + 1) \ln 3 &= x \ln 5 \\
+        \intertext{This equation is linear in $x$, so we'll get the multiples of $x$ on one side and the constants on the other:} %
+        \frac{1}{2} \ln \pi + (2 \ln 3) x + \ln 3 &= (\ln 5) x \\
+        \frac{1}{2} \ln \pi + \ln 3 &= (\ln 5) x - (2 \ln 3) x \\
+        \frac{1}{2} \ln \pi + \ln 3 &= (\ln 5 - 2 \ln 3) x \\
+        \boxed{\frac{\frac{1}{2} \ln \pi + \ln 3}{\ln 5 - 2 \ln 3}} &= x
+      \end{align*}
+    \end{solution}
+
+  \item 
+    \begin{problem}
+      $2\log_2(x - 1) - \log_2(x + 2) = 2$
+    \end{problem}
+
+    \begin{solution}
+      Here are two strategies:
+      \begin{itemize}
+      \item \textbf{Method 1:} Since $x$ is inside $\log_2$, we'll raise 2 to both sides:
+        \begin{align*}
+          2^{2\log_2(x - 1) - \log_2(x + 2)} &= 2^2 \\
+          \dfrac{2^{2 \log_2(x - 1)}}{2^{\log_2(x + 2)}} &= 4 \\
+          \dfrac{\left( 2^{\log_2 (x - 1)} \right)^2}{x + 2} &= 4 \\
+          \dfrac{(x - 1)^2}{x + 2} &= 4 \\
+          (x - 1)^2 &= 4 (x + 2) \\
+          \intertext{Since this is quadratic in $x$, we'll move everything to one side:}
+          x^2 - 2x + 1 &= 4x + 8 \\
+          x^2 - 6x - 7 &= 0 \\
+          (x - 7)(x + 1) &= 0 \\
+          x &= 7, -1
+        \end{align*}
+        Since the original equation involved logs, we need to check each solution to make sure it's in the domain of the original equation.
+        \begin{itemize}
+        \item Plugging $x = 7$ back into the original equation gives $2 \log_2 (6) - \log_2(9) = 2$; all of the logs here are defined, so this is valid.
+        \item Plugging $x = -1$ back into the original equation gives $2 \log_2(-2) - \log_2(1) = 2$, but $\log_2(-2)$ is undefined, so this isn't valid.
+        \end{itemize}
+        So, the only solution is $x = \boxed{7}$.
+
+      \item \textbf{Method 2:} Use log rules to combine the logs into a single term $\log_2(\text{stuff})$:
+        \begin{align*}
+          2 \log_2(x - 1) - \log_2 (x + 2) &= 2 \\
+          \log_2\left[ (x-1)^2\right] - \log_2(x + 2) &= 2 \\
+          \log_2 \left[ \frac{(x-1)^2}{x + 2} \right] &= 2 \\
+          \intertext{Now, this equation says that $2$ is the power we raise 2 to in order to get $\dfrac{(x-1)^2}{x + 2}$. We can rewrite this as:}
+          \frac{(x-1)^2}{x + 2} &= 2^2 
+        \end{align*}
+        From here, we can follow the same steps as in Method 1.
+
+      \end{itemize}
+    \end{solution}
+
+  \item 
+    \begin{problem}
+      $(\log_7 x)^2 = - 4 \log_7 x$
+    \end{problem}
+
+    \begin{solution}
+      Since we see $\log_7 x$ in multiple places (and we don't see any other logs), let's substitute $u = \log_7 x$. Then, the equation becomes $u^2 = -4u$. This is quadratic in $u$, so we'll move everything to one side:
+      \begin{align*}
+        u^2 + 4u &= 0 \\
+        u (u + 4) &= 0 \\
+        u &= 0, -4 \\
+        \intertext{Now that we've solved for $u$, we want to go back to $x$:}
+        \log_7 x &= 0, -4 \\
+        x &= 7^0, 7^{-4} \\
+        &= 1, 7^{-4}
+      \end{align*}
+      Again, since the original equation involved logs, we should check whether our solutions are in the domain of the original equation.
+      \begin{itemize}
+      \item If $x = 1$, then the original equation says $(\log_7 1)^2 = -4 \log_7 1$. All of the logs in this equation are defined, so this is a valid solution. (And we can see that our solution really works because $\log_7 1 = 0$, and $0^2 = -4(0)$.)
+      \item If $x = 7^{-4}$, then the original equation says $\left( \log_7 \left( 7^{-4} \right) \right)^2 = -4 \log_7 \left( 7^{-4} \right)$. Since $7^{-4} > 0$, all of the logs in this equation are defined, so this is also a valid solution. (And again, we can see that our solution really works because $\log_7 \left( 7^{-4} \right) = -4$, and $(-4)^2 = -4 (-4)$.)
+      \end{itemize}
+      So, $x = \boxed{1, 7^{-4}}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $2^{x^2} \cdot 3^x = 1$
+    \end{problem}
+
+    \begin{solution}
+      Since $x$ is in the exponent, let's take $\ln$ of both sides:
+      \begin{align*}
+        \ln \left( 2^{x^2} \cdot 3^x \right) &= \ln (1) \\
+        \ln \left( 2^{x^2} \right) + \ln \left( 3^x \right) &= 0 \\
+        x^2 \ln 2 + x \ln 3 &= 0 \\
+        \intertext{This is quadratic in $x$, so we can try to factor or use the quadratic formula. Here, it's easy to factor:}
+        x [(\ln 2) x + \ln 3] &= 0        
+      \end{align*}
+      So, either $x = 0$ or $(\ln 2) x + \ln 3 = 0$. If the latter is true, then
+      \begin{align*}
+        (\ln 2) x &= - \ln 3 \\
+        x &= \frac{\ln 3}{\ln 2}
+      \end{align*}
+      So, the solutions are $x = \boxed{0, - \frac{\ln 3}{\ln 2}}$. 
+    \end{solution}
+
+  \end{enumerate}
+\end{enumerate}
+
+\subsection*{Find derivatives of functions involving exponential and logarithmic functions}
+
+\begin{enumerate}[resume]
+\item 
+
+  Find the derivative of each of the following functions; you need not simplify. 
+
+  \begin{enumerate}
+  \item
+    \begin{problem}
+      $h(w) = 5 e^{3w} + 7 \ln w$
+    \end{problem}
+
+    \begin{solution}
+      $h'(w) = 5 \cdot 3e^{3w} + 7 \cdot \dfrac{1}{w} = \boxed{15 e^{3w} + \dfrac{7}{w}}$
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $y = \displaystyle \ln \left( \frac{1}{\sqrt{x}} \right)$
+    \end{problem}
+
+    \begin{solution}
+      We can rewrite $y = - \dfrac{1}{2} \ln x$, so $y' = - \dfrac{1}{2} \cdot \dfrac{1}{x} = \boxed{ - \frac{1}{2x}}$.
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $f(t) = (e^t)^2 (e^{2t} + 5)(e^{2t} - 5)$
+    \end{problem}
+
+    \begin{solution}
+      This is easiest if we first simplify $f(t)$:
+      \begin{align*}
+        f(t) &= (e^t)^2 (e^{2t} + 5)(e^{2t} - 5) \\
+        &= e^{2t} \left( e^{4t} - 25 \right) \\
+        &= e^{6t} - 25 e^{2t}
+      \end{align*}
+      So, $f'(t) = \boxed{6 e^{6t} - 50 e^{2t}}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $j(x) = \log_3 \left( 5 x \sqrt{x} \right) + \ln(8x^4) + 7e^{3x - 2}$
+    \end{problem}
+
+    \begin{solution}
+      Since $x \sqrt{x} = x^1 x^{1/2} = x^{1 + 1/2} = x^{3/2}$, we can rewrite
+      \begin{align*}
+        j(x) &= \log_3 5 + \log_3 \left( x^{3/2} \right) + \ln 8 + \ln \left( x^4 \right) + 7 e^{-2}  e^{3x} \\
+        &= \log_3 5 + \frac{3}{2} \log_3 x + \ln 8 + 4 \ln x + 7e^{-2} e^{3x} \\
+        \intertext{Both $\log_3 5$ and $\ln 8$ are constants, so they have derivative 0. So,} %
+        j'(x) &= \boxed{\frac{3}{2} \cdot \frac{1}{x \ln 3} + \frac{4}{x} + 7e^{-2} \cdot 3e^{3x}}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}
+      $y = e^{x - 3 \ln x}$
+    \end{problem}
+
+    \begin{solution}
+      We can rewrite
+      \begin{align*}
+        y &= \frac{e^x}{e^{3 \ln x}} \\
+        &= \frac{e^x}{(e^{\ln x})^3} \\
+        &= \frac{e^x}{x^3} \\
+        &= e^x x^{-3}
+        \intertext{By the Product Rule,}
+        y' &= \boxed{e^x x^{-3} + e^x \left( -3 x^{-4}  \right)}
+      \end{align*}
+    \end{solution}
+  \end{enumerate}
+
+\end{enumerate}
+
+\end{document}

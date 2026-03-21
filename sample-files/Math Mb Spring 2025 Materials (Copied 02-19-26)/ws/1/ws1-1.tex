@@ -1,0 +1,367 @@
+\PassOptionsToPackage{sols}{handout}
+\documentclass[main]{subfiles}
+\setcounterrefbeforedot{chapter}{m-ws1-1}
+\setcounterrefafterdot{section}{m-ws1-1}
+\addtocounter{section}{-1}
+\usepackage{solutions}
+
+\begin{document}
+
+\section{Relations, Equations, and Graphs} \label{ws1-1}
+
+% \begin{objectives}
+% You should be able to:
+
+% \begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+
+% \item Model related quantities using equations in two variables.
+
+% \item Distinguish between functional and non-functional relations.
+
+% \item You should be comfortable looking at a function and determining its structure: is it a product?  A composition?  (If so, what is the outer function?)
+
+% \end{itemize} 
+% \end{objectives}
+
+\probonly{
+\textbf{Key Idea}: A two-variable equation describes a relationship between the two variables.
+}
+
+\begin{enumerate}
+
+\item \label{equation-examples}
+\begin{problem}
+Come up with several different examples of two-variable equations. 
+Use $x$ and $y$ as the variables.
+
+For each example, ask yourself the following questions.
+
+\begin{itemize}[topsep=0pt]
+    \item Is this a valid example of a two-variable equation?
+    \item What do I know about the relationship between $x$ and $y$ described by the equation?
+\end{itemize}
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    There are many equations that come to mind and we can be imaginative here! Importantly, an equation must use an equals sign and $x$ and $y$ should be the only variables involved.\\
+    Geometric relationships can be great ways to build many two-variable equations.
+    \begin{itemize}
+        \item If we let $x$ and $y$ represent the lengths of two legs of a right triangle whose hypotenuse is 5, we can construct this equation relating these quantities: $x^2+y^2=5^2$ or $x^2+y^2=25$
+        \item If $x$ and $y$ represent the side lengths in inches of a rectangle whose area is 10, then we can write $xy=10$
+        \item If we let $x$ represent the radius of a circle in cm and $y$ is the area of the circle in square cm, we can write $y=\pi x^2$
+    \end{itemize}
+    Outside of geometric relationships, we can write familiar equations like the standard form of a line: $3x+2y=4$, or something like $y=x^2$. Notice that both of these express information about the quantities represented by $x$ and $y$. In the former, the described relationship communicates to us that 3 times the quantity $x$ and 2 times the quantity $y$ together sum to 4. And in the latter, we might describe this relationship by writing ``$y$ is the square of $x$.'' Notice that we can describe the relationships between the quantities without describing the shape or characteristics of a sketch of its graph.
+   
+\end{solution}
+
+\item 
+\begin{enumerate}
+
+\item 
+\begin{problem}
+Some equations can be rewritten in the form $y=f(x)$. Which of your examples can or cannot, and how do you know? If all your examples are in the same category, come up with other examples. 
+\end{problem}
+\pspace{\vfill}
+\begin{solution}
+    Many of the previous examples can be written in the form $y=f(x)$. Let's consider each in order:
+    \begin{itemize}
+        \item $x^2+y^2=25$ cannot be written in the form $y=f(x)$. If we try to solve for $y$, we find $y=\pm \sqrt{25-x^2}$ and that $\pm$ means there are two possible values on the right hand side, so $y$ is not a function of $x$ and cannot be written in the format $y=f(x)$.
+        \item $xy=10$ can be written as $y=\frac{10}{x}$, so yes, this can be written as $y=f(x)$
+        \item $y=\pi x^2$ is already written in the desired format without any rewriting.
+        \item $3x+2y=4$ can be written as $y=-\frac{3}{2}x+2$, so yes, it can be written in the format $y=f(x)$.
+        \item $y=x^2$ is also written in the format $y=f(x)$ without any further adjustments.
+    \end{itemize}
+\end{solution}
+
+\item 
+\begin{problem}
+Some equations can be rewritten in the form $x=g(y)$. Answer the same questions as in a).
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    Let's review our examples in order. We want to see if we can now isolate $x$ and have only one value represented on the other side of the equals sign.
+    \begin{itemize}
+        \item $x^2+y^2=25$ runs into the same trouble that we had when we tried to isolate $y$, $x=\pm \sqrt{25-y^2}$, which means that $x$ cannot be expressed as $x=g(y)$, because there are multiple values represented by the $\pm$ written on the right-hand side of the equation. 
+        \item $xy=10$ can be written as $x=\frac{10}{y}$, so this can be written as $x=g(y)$
+        \item $y=\pi x^2$ runs into similar challenges as our first example. When we try to isolate $x$, we get $x=\pm \sqrt{y}{\pi}$ and we have two values possible for the quantity on the right-hand side, so we cannot rewrite this as $x=g(y)$.
+        \item $3x+2y=4$ can be written as $x=-\frac{2}{3}y+\frac{4}{3}$, so it can be written in the format $x=g(y)$
+        \item $y=x^2$ runs into difficulty when expressing $x$ entirely in terms of $y$. After isolating, we have $x=\pm \sqrt{y}$. With the multiple values represented on the right hand side, this means we cannot rewrite in the form $x=g(y)$.
+    \end{itemize}
+\end{solution}
+\end{enumerate}
+
+\item 
+\begin{problem}
+    Recall what it means for $y$ to be a function of $x$. Is this the same as $x$ being a function of $y$?
+\end{problem}
+\pspace{\stretch{0.7}}
+
+\begin{solution}
+    When we say ``$y$ is a function of $x$," this means that for every individual value that $x$ can take on, its relationship to $y$ makes it so there is only one corresponding value of $y$. 
+    
+    This is not the same as saying ``$x$ is a function of $y$." That is saying for every individual value that $y$ can take on, its relationship to $x$ makes it so that there is only one corresponding value of $x$. 
+    
+    It's helpful not to get bogged down in only the mathematical interpretation of this. We often use the phrase in conversation too! Saying something like ``how frequently I hit up Felipe's is a function of the size of my paycheck" is expressing that there's a relationship between those two quantities. More specifically, that for every value my paycheck can assume, there is only one corresponding number of weekly visits. In informal conversation, this is  used to underscore a relationship between two quantities that change together. In mathematics, we're often pushing ourselves to explicitly describe that relationship using formulas (e.g. $x=g(y)$ and $y=f(x)$).
+    
+\end{solution}
+
+\end{enumerate}
+\pspace{\newpage}
+
+\probonly{
+\textbf{Key Idea}: The graph of an equation in $x$ and $y$ consists of all the points $(x, y)$ that satisfy the equation.
+}
+
+\begin{enumerate}[resume]
+
+\item
+\begin{problem}
+Can you sketch the graphs of any of your example equations? What tools from Math Ma can we use?
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    In Math Ma, we focused on graphing functions. If our equations can be rewritten in the form $y=f(x)$, then we can use techniques we learned from Math Ma like transforming parent functions or determining where functions are increasing and decreasing.
+
+    For example, since $xy=10$ can be written as $y=\frac{10}{x}$, we know that the graph will look like the graph of $y=\frac{1}{x}$ but vertically stretched by a factor of 10.
+
+    The equations $y=x^2$ and $y=\pi x^2$ tell us that $y$ is a quadratic function of $x$, so we know that the graphs will be parabolas. More specifically, we know both parabolas are concave upwards and have the origin as the vertex.
+
+    The equation $3x+2y=4$ can be written as $y=-\frac{3}{2}x+2$, so we know that the graph is a straight line with a slope of $-\frac{3}{2}$ and a $y$-intercept at $(0,2)$.
+
+    The equation $x^2+y^2=25$ cannot be written in the form $y=f(x)$, so it is a bit more challenging to graph. We will look at the graph of a similar equation in \ref{circle-equation}.
+\end{solution}
+
+\item 
+\begin{problem}
+The curves shown below are graphs of four different equations. Which of the equations could be written as $y=f(x)$? Which could be written as $x=g(y)$? How do you know?
+\end{problem}
+
+\begin{solution}
+    We'll review these in order:
+    \begin{enumerate}
+        \item This graph's equation could be written as either $y=f(x)$ or $x=g(y)$. We can see this because as we move along the $x$-axis, only one $y$-value is achieved at each $x$-value. As we move along the $y$-axis, we see that only one $x$-value is achieved at each $y$-value.
+        \item This graph's equation could not be written as $y=f(x)$, but it can be written as $x=g(y)$. We can tell because as we move along the $x$-axis, each $x$-value achieves multiple $y$-values. However, if we move along the $y$-axis, we can see that each $y$-value achieves only one $x$-value.
+        \item This graph's equation can be written as neither $y=f(x)$ nor $x=g(y)$. We can tell because if we move along the $x$-axis, there are many places with two corresponding $y$-values that are achieved and the same is true if we move along the $y$-axis: there are many places where more than one $x$-value is achieved.
+        \item This graph's equation can be written as $y=f(x)$, but not $x=g(y)$. We can tell because as we move along the $x$-axis, there is only one corresponding $y$-value achieved everywhere. However, if we move up and down the $y$-axis, there are multiple locations where more than one $x$-value is achieved.
+    \end{enumerate}
+\end{solution}
+
+\end{enumerate}
+\begin{center}
+\includegraphics[width=5in]{tikz/1-1/1-1-graphs-of-relations.pdf}
+\end{center}
+
+\pspace{\newpage}
+
+\probonly{
+\textbf{Key Idea}: The graph of $x^2+y^2=r^2$ is a circle of radius $r$ centered at the origin.
+}
+
+\begin{enumerate}[resume]
+\item \label{circle-equation}
+\begin{problem} 
+Let's sketch the graph of the equation $x^2+y^2=4$.
+\end{problem}
+
+\begin{enumerate}
+    \item
+    \begin{problem}
+        Determine the $x$- and $y$-intercepts of the graph.
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        To determine the $y$-intercept, we set $x$ equal to 0 and solve. 
+        \begin{align*}
+            x^2+y^2 &=4\\
+            0^2+y^2 &=4\\
+            y^2 &= 4\\
+            y&=\pm 2
+        \end{align*}
+        We have two $y$-intercepts at $y=-2$ and $y=2$.\\
+        To determine the $x$-intercept, we set $y$ equal to 0 and solve for $x$.\\
+        \begin{align*}
+             x^2+y^2 &=4\\
+            x^2+0^2 &=4\\
+            x^2 &= 4\\
+            x&=\pm 2
+        \end{align*}
+        We have two $x$-intercepts at $x=-2$ and $x=2$.
+    \end{solution}
+
+    \item
+    \begin{problem}
+        Find the 4 points where the graph intersects the lines $y=x$ and $y=-x$.
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        In order to find the point of intersection between the graph and $y=x$, we want both relationships to hold at the same time. We can do this through ``substitution," that is, if we want both $x^2+y^2=4$ and $y=x$, we can input the latter fact into the relationship described by the former. Let's take a look:
+    \begin{align*}
+        x^2+y^2&=4\\
+        x^2+x^2 &=4\\
+        2x^2 &=4\\
+        x^2 &= 2\\
+        x &= \pm \sqrt{2}
+    \end{align*}
+    The points of intersection with the line $y=x$ occur when $x$ equals $-\sqrt{2}$ and $\sqrt{2}$. Since we know that at these points of intersection, $x=y$, we know those are also the values of $y$. Taking this altogether, these will be the points $(\sqrt{2},\sqrt{2})$ and $(-\sqrt{2}, -\sqrt{2})$.\\
+
+    We'll do the same with the line $y=-x$. We need both $x^2+y^2=4$ and $y=-x$, so we'll substitute $-x$ in for $y$ in the former equation.
+    \begin{align*}
+        x^2+y^2&=4\\
+        x^2+(-x)^2&=4 \\ 
+        x^2+x^2 &= 4\\
+        2x^2 &= 4 \\
+        x^2&= 2\\
+        x &= \pm\sqrt{2}
+    \end{align*}
+     The points of intersection with the line $y=-x$ occur when $x$ equals $-\sqrt{2}$ and $\sqrt{2}$. Since we know that at these points of intersection, $y=-x$, we know the corresponding values of $y$ are the opposite sign. Taking this altogether, these will be the points $(\sqrt{2},-\sqrt{2})$ and $(-\sqrt{2}, \sqrt{2})$.\\
+    \end{solution}
+
+    \item 
+    \begin{problem}
+        Plot the points from a) and b) on the left below. What do you think the full graph looks like?
+    \end{problem}
+
+    \begin{center}
+    \strut\hfill
+        \begin{tikzpicture}
+  \begin{axis}[
+    axis equal image,
+    xmin=-2.5, xmax=2.5,
+    ymin=-2.5, ymax=2.5,
+    xtick distance=1, ytick distance=1,
+    xlabel={$x$}, ylabel={$y$}
+  ]
+  \addplot[domain=-3:3, draw=none]{x};
+  \solonly{
+  \addplot[closed, mark size=2] coordinates {(2,0) (-2,0) (0,2) (0,-2) (1.414,1.414) (-1.414,1.414) (-1.414,-1.414) (1.414,-1.414)};
+  \addplot[domain=0:360, thick] ({2*cos(x)},{2*sin(x)});
+  }
+  \end{axis}
+\end{tikzpicture}
+        \hfill
+        \begin{tikzpicture}
+  \begin{axis}[
+    axis equal image,
+    xmin=-2.5, xmax=2.5,
+    ymin=-2.5, ymax=2.5,
+    xtick distance=1, ytick distance=1,
+    xlabel={$x$}, ylabel={$y$}
+  ]
+  \addplot[domain=-3:3, draw=none]{x};
+  \addplot[closed, mark size=2] coordinates {(1.732,1)};
+  \node[above right] at (1.732,1) {$(a,b)$};
+  \draw[very thick] (0,0) -- (1.732,1) -- (1.732,0) -- cycle;
+  \draw[very thick] (1.532, 0) -- (1.532, 0.2) -- (1.732,0.2);
+  \solonly{
+  \node[right] at (1.732,0.5) {$b$};
+  \node[above] at (0.866,0) {$a$};
+  \node[above left] at (0.866, 0.5) {$2$};
+  }
+  \end{axis}
+\end{tikzpicture}
+        \hfill\strut
+    \end{center}
+
+    \item
+    \begin{problem}
+        The point $(a, b)$ is also on the graph and is shown on the right. The points $(0, 0)$, $(a, 0)$, and $(a, b)$ are the vertices of a right triangle. What can we say about the side lengths of this right triangle? What does this have to do with the graph being a circle?
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        It's helpful to break down these observations sequentially: 
+        \begin{itemize}
+            \item $a$ is the length of the base of the triangle and $b$ is the length of the height of the triangle.
+            \item The Pythagorean Theorem relates their lengths in the following manner: $a^2+b^2 = c^2$ where $c$ is the length of the hypotenuse. 
+            \item It may not immediately seem apparent what the length of the hypotenuse is, but the very first sentence of this problem tells us $(a,b)$ is on the graph, which means it obeys the relationship $x^2+y^2=4$. Applying this to the specific values $(a, b)$, we have $a^2+b^2 = 4$. 
+            \item The left-hand side here exactly matches the statement of the Pythagorean Theorem, so we know that 4 is the square of the length of the hypotenuse. This means the length of the hypotenuse is 2.
+            \end{itemize}
+        What does this have to do with the graph being a circle? It's helpful to first consider what the graph of a circle is, which is the set of all points that are a fixed distance (the radius) from the center. When we consider the graph of $x^2+y^2 = 4$, and any corresponding point $(x,y)$ that is on the graph, the location of $(x,y)$ in the coordinate plane can be broken down exactly as above, with $x$ and $y$ as the two (non-hypotenuse) sides of a right triangle. When we consider the graph of $x^2+y^2 = 4$, this is the infinite set of points that lie at the corner of a right triangle with base $|x|$, height $|y|$, and hypotenuse 2. All of these points' respective triangles have the same hypotenuse length and that hypotenuse denotes the distance from a fixed point, which is the center of the circle.
+    \end{solution}
+\begin{center}
+    \begin{tikzpicture}
+  \begin{axis}[
+    axis equal image,
+    xmin=-2.5, xmax=2.5,
+    ymin=-2.5, ymax=2.5,
+    xtick distance=1, ytick distance=1,
+    xlabel={$x$}, ylabel={$y$}
+  ]
+  \addplot[domain=-3:3, draw=none]{x};
+  \solonly{
+  \addplot[closed, mark size=2] coordinates {(1.414,1.414) (1,1.732) (1.732,1)};
+  \addplot[domain=0:360, thick] ({2*cos(x)},{2*sin(x)});
+  \draw[very thick] (0,0) -- (1.414,0) -- (1.414,1.414) -- (0,0);
+  \draw[very thick] (0,0) -- (1,1.732) -- (1,0) -- (0,0);
+  \draw[very thick] (0,0) -- (1.732,1) -- (1.732,0) -- (0,0);
+  }
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{enumerate}
+
+\pspace{\newpage}
+
+\item 
+\begin{problem}
+Solve $x^2+y^2=4$ for $y$. Does this put the equation in the form $y=f(x)$?
+\end{problem}
+\pspace{\vfill}
+
+    \begin{solution}
+        \begin{align*}
+            x^2+y^2&=4\\
+            y^2&=4-x^2\\
+            y&=\pm\sqrt{4-x^2}
+        \end{align*}
+        This does not put the equation in the form of $y=f(x)$ because $\pm\sqrt{4-x^2}$ describes two $y$-values corresponding to only one $x$-value.
+    \end{solution}
+
+\item 
+\begin{enumerate}
+\item
+\begin{problem}
+Using the calculus you learned in Math Ma, find an equation of the line tangent to the graph of $x^2+y^2=4$ at the point $(0, 2)$. Does your answer seem reasonable?
+\end{problem}
+\pspace{\vfill}
+
+    \begin{solution}
+        $(0,2)$ is on the top half of the circle, which is described by the equation $y=\sqrt{4-x^2}$. To build a tangent line, we need a point on the line and the slope of the line. The point we require on the line is $(0,2)$. The slope can be found by taking the derivative and evaluating it at $x=0$. Let's do that below:
+        \begin{align*}
+            y=f(x)&=\sqrt{4-x^2}\\
+            f(x)&=(4-x^2)^{1/2}\\
+            f'(x)&=\frac{1}{2}(4-x^2)^{-1/2}\cdot (-2x)\\
+            f'(x)&=\frac{-2x}{2\sqrt{4-x^2}}\\
+            f'(0)&=\frac{-2\cdot 0}{2\sqrt{4-0^2}}\\
+            f'(0)&=0
+        \end{align*}
+        Using point-slope form, the equation of the tangent line is $y-2=0(x-0)$ or $y-2=0$ or $y=2$. This is reasonable because the point where we are constructing the tangent line is at due north. We expect the tangent line to be a horizontal line at the $y$-value that corresponds to the radius, which is 2. That's exactly what $y=2$ is.
+    \end{solution}
+
+\item
+\begin{problem}
+Without calculus, just by looking at the graph, find an equation of the line tangent to the graph of $x^2+y^2=4$ at the point $(2,0)$. What happens if you try to use calculus? Does this make sense?
+\end{problem}
+\pspace{\vfill}
+
+    \begin{solution}
+        This question asks us to find the equation of the tangent line to the graph at $(2,0)$, which is due east. We expect this to be completely vertical line through $(2,0)$, so that would be $x=2$. If we try to use calculus like above, we have
+        \begin{align*}
+            y=f(x)&=\sqrt{4-x^2}\\
+            f(x)&=(4-x^2)^{1/2}\\
+            f'(x)&=\frac{1}{2}(4-x^2)^{-1/2}\cdot (-2x)\\
+            f'(x)&=\frac{-2x}{2\sqrt{4-x^2}}\\
+            f'(2)&=\frac{-2\cdot 2}{2\sqrt{4-2^2}}\\
+            f'(2)&=\frac{-4}{2\sqrt{0}}
+        \end{align*}
+        We are unable to divide by 0, and so the derivative at $x=2$ is undefined. This makes sense because the slope of a vertical line is undefined!
+    \end{solution}
+
+\end{enumerate}
+\end{enumerate}
+\end{document}

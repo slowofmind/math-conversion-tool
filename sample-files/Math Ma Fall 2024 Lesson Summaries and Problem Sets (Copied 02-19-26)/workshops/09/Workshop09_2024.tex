@@ -1,0 +1,510 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols, notes, workshop]{handout}
+\renewcommand{\workshopnote}{CA Notes.}    
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+\definecolor{hotpink}{rgb}{1, 0, 0.5}
+\definecolor{darkorange}{rgb}{1, 0.4, 0}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\htitle{Workshop 9}
+
+\begin{workshop}
+  Today's problems focus on practice with exponentials and logs, which will hopefully help students prepare for the upcoming skills check.
+
+  \#4 previews solving equations with logarithms and exponents (Friday's lesson). Please do \# 1-3, 5 first and then have students go back and attempt \#4 if there is extra time.
+\end{workshop}
+
+\begin{enumerate}
+\item  A population of mosquitoes is growing exponentially.  When there are 5000 mosquitoes, the mosquito population is growing at a rate of 100 mosquitoes per month. Let $f(t)$ be the mosquito population at time $t$, where $t$ is measured in months. 
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      Since the mosquito population is growing exponentially, the population is changing at a rate proportional to its size. What is the constant of proportionality in this case? In other words, fill in the blank: \probonly{$\vphantom{\boxed{\int_1^2}}$}$f'(t) = \fitb{0.25in}{}\ f(t)$.
+    \end{problem}
+
+    \begin{solution} 
+      $$f'(t) = kf(t)$$ 
+      When $f(t)=5000$, we have that $f'(t) = 100$, so then
+      $$100=k \cdot 5000 $$ 
+      $$k = \frac{1}{50}$$  
+    \end{solution} 
+
+  \item
+    \begin{problem}[\vfill]
+      How quickly is the population growing when there are 6000 mosquitoes? Be sure to include units.
+    \end{problem}
+
+    \begin{solution}
+      $f'(t)=0.02(6000)=\frac{1}{50}6000=120$ mosquitoes per month.
+    \end{solution}
+
+  \item % added 2023
+
+    \begin{workshop}
+      An important point here is that, when we interpret $f^{-1}(t)$, $t$ no longer represents time! Instead, it represents a number of mosquitoes. 
+    \end{workshop}
+
+    \begin{problem}[\vfill]
+      Is $f(t)$ invertible? How do you know? If so, interpret the meaning of $f^{-1}(t)$. 
+    \end{problem}
+
+    \begin{solution}
+        It is invertible, because $f(t)$ is strictly increasing. The inverse function, $f^{-1}$ outputs the time needed for the population to reach a certain size.  
+    \end{solution}
+
+  \end{enumerate}
+  Suppose in addition that, when $t = 0$, there are 3000 mosquitoes. 
+  \begin{enumerate}[resume]
+  \item
+
+    \begin{problem}[\stretch{2}]
+      Find a formula for $f(t)$.
+
+      \emph{Hint:} Since we're told that $f(t)$ is exponential, we can write it as $f(t) = C e^{kt}$ or as $f(t) = C \cdot b^t$. What's $C$? Can you use your answer to (a) to find either $b$ or $k$? 
+    \end{problem}
+
+    \begin{solution}
+        We know that:
+        \begin{itemize}
+            \item $f(t) = Ce^{kt}$
+            \item $f(0) = Ce^{k(0)} = C = 3000$
+            \item $f'(t) = k \cdot 3000 \cdot e^{kt}$ (because $\dfrac{d}{dx}\Big[e^{kx}\Big]=ke^{kx}$)
+        \end{itemize}
+        And since $f'(t) = k \cdot 3000 \cdot e^{kt}$, and $f'(t) - \dfrac{1}{50} \cdot f(t)$ (from Part (a)), $k$ must equal $\dfrac{1}{50}$ and thus 
+        $$f(t) = 3000 e^{\frac{1}{50}t}$$
+    \end{solution}
+
+  \item % added 2023
+
+    \begin{problem}[\nstretch{1.5}]
+      How long does it take the mosquito population to double? Give an exact answer.
+    \end{problem}
+
+    \begin{solution}
+        To answer this, we need to solve:
+        \begin{align*}
+            3000 e^{\frac{1}{50}t} = 6000 \\
+            e^{\frac{1}{50}t} = 2 \\
+            \ln(e^{\frac{1}{50}t}) = \ln(2)\\
+            \dfrac{1}{50} t = \ln(2) \\
+            t = 50 \ln(2)\\
+        \end{align*}
+        
+        
+    \end{solution}
+
+  \item % added 2023
+
+    \begin{problem}[\stretch{3}]
+      You should have found that $f$ is invertible. Find a formula for $f^{-1}(t)$. 
+    \end{problem}
+
+    \begin{solution}
+        \begin{align*}
+        \intertext{Set $f(t) = y$} \\
+            y = 3000 e^{\frac{1}{50}t} \\
+            \intertext{Swap $t$ and $y$} \\
+           t = 3000 e^{\frac{1}{50}y} \\
+            \intertext{Solve for $y$} \\
+            \ln(t) = \ln(3000) + \dfrac{1}{50} y \cdot \ln(e) \\
+            \ln(t) - \ln(3000) = \dfrac{1}{50} y \\
+            50 \ln\Big(\frac{t}{3000}\Big) = y = f^{-1}(t)\\
+        \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+  \begin{workshop}
+    Practice with log rules and graph transformations
+  \end{workshop}
+
+  In each part, you're given a function defined in terms of logs. Simplify the formula for the function as much as possible, and then pick its graph (choices 1 - 5). Explain how you made your choice. 
+
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[xtick={1}, ymin=-6, ytick={1}, clip=false]
+        \addplot+[domain=0:6, green!80!black, dashdotted] {ln(6)} node[right]{(3)}; % 
+        \addplot+[domain=0:6, skyblue, densely dotted] {ln(2)} node[right]{(4)}; %
+        \addplot+[domain=0:6, hotpink, restrict y to domain=-6:10] {7/3*ln(x) / ln(2)} node[right]{(1)}; %
+        \addplot+[domain=1/729:6, samples=201, purple] {-ln(x)/ln(3)} node[right]{(5)}; %
+        \addplot+[domain=0:6, samples=201, darkorange, densely dashed] {ln(5*x^2)/ln(3)} node[right]{(2)}; %
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+
+  \begin{enumerate}
+  \item
+
+    \begin{workshop}
+      This simplifies to just $\ln 2$, which is a constant. So, the graph is either (3) or (4). To decide which, students need to know whether $\ln 2$ is greater than or less than 1.
+    \end{workshop}
+
+    \begin{problem}[\vfill]
+      $f(x) = \ln(2x) - \ln(x)$
+    \end{problem}
+
+    \begin{solution}
+      % ln (2) is a constant < 1
+           $\ln(2x)-\ln(x) = \ln\Big(\dfrac{2x}{x}\Big) = \ln(2)$. 
+
+    This is a constant function, so it is graph (4).
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $g(x) = \log_2 \left( \sqrt[3]{x} \right) + \log_2 \left( 8 x^3 \right) - \log_2 (8x)$
+    \end{problem}
+
+    \begin{solution}
+      % vertical stretch with no flip, so still has x-intercept 1
+    \begin{align*}
+    &  g(x) = \log_2 \left( \sqrt[3]{x} \right) + \log_2 \left( 8 x^3 \right) - \log_2 (8x)  \\
+      & =\dfrac{1}{3}\log_2(x) + \log_2(8) + 3\log_2(x) - \log_2(8) - \log_2(x)\\
+        & = \frac{5}{3}\log_2(x) \\
+    \end{align*}
+    This is graph (1). 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $h(x) = \log_3 (7) - \log_3 (7x)$
+    \end{problem}
+
+    \begin{solution}
+      % vertical flip of \log_3 x
+
+      $h(x) = \log_3 (7) - \log_3 (7x) = \log_3\Big(\dfrac{7}{7x}\Big) = \log_3\Big(\dfrac{1}{x}\Big) = \log_3(x^{-1}) = -\log_3(x)$
+      
+      This is graph (5).
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      $j(x) = \log_3 (5x^2)$
+    \end{problem}
+
+    \begin{solution}
+      % vertical stretch and shift up of \log_3 x, so x-intercept no longer at 1 
+        $j(x) = \log_3 (5x^2) = \log_3(5) + \log_3(x^2) = \log_3(5)+2\log_3(x)$.
+
+        This is graph (2).
+    \end{solution}
+
+  \end{enumerate}
+
+\item  
+
+  Let $\displaystyle f(x)=\frac{\ln \left(\sqrt{3x} \right)}{2}+3$.
+
+  \begin{enumerate}
+  \item
+
+    \begin{problem}[0.5in]
+      What's the domain of $f$?
+    \end{problem}
+
+    \begin{solution}
+        The domain of $f$ is $(0, \infty)$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[1in]
+      Find $f'(x)$.
+    \end{problem}
+
+        \begin{solution}
+        It's helpful to note that $f$ can be rewritten as:
+        \begin{align*}
+            f(x)=\frac{\ln \left(\sqrt{3x} \right)}{2}+3 \\
+            = \frac{\ln(3x)^{\frac{1}{2}}}{2} + 3 \\
+             = \frac{\frac{1}{2}\ln(3x)}{2} + 3 \\
+             = \frac{\ln(3x)}{4 } +3 \\
+            = \frac{\ln(3)+\ln(x)}{4} + 3\\
+            = \frac{\ln(3)}{4} + \frac{\ln(x)}{4} + 3\\
+        \end{align*}
+
+        Then, we can see that $f'(x) = \dfrac{1}{4x}$
+    \end{solution}
+
+
+  \item \label{gottlieb-14.1.8-increasing}
+
+    \begin{grading}
+      2 points: 1 for calculating $f'$ correctly, 1 for using that to show  that $f$ is increasing everywhere
+    \end{grading}
+
+
+
+    \begin{problem}[\vfill]
+      Where is $f$ increasing? Where is $f$ decreasing? 
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        f(x) &= \frac{\frac{1}{2} \ln (3x)}{2} + 3 \\
+        &= \frac{\frac{1}{2} (\ln 3 + \ln x)}{2} + 3 \\
+        &= \frac{1}{4} ln x + \frac{\ln 3}{4} + 3, \\
+        \shortintertext{so}
+        f'(x) &= \frac{1}{4} \cdot \frac{1}{x} \\
+        &= \frac{1}{4x}
+      \end{align*}
+      This is positive everywhere on $(0, \infty)$, so $f$ is increasing on $(0, \infty)$. 
+    \end{solution} 
+
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[0.75in]
+      Explain why your answer to \ref{gottlieb-14.1.8-increasing} shows that $f$ is invertible. 
+    \end{problem}
+
+    \begin{solution} 
+      Since the function is always increasing, it will pass the horizontal test and be invertible.  
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      2 points: 0.5 for knowing to switch $x$ and $y$, 1.5 for correctly solving for $y$ (give partial credit if they make partial progress)
+    \end{grading}
+
+    \begin{problem}[\vfill\newpage]
+      Find a formula for $f^{-1}(x)$.
+    \end{problem}
+
+    \begin{solution}
+      We start with $y = \frac{\ln(\sqrt{3y})}{2}+3$, switch $x$ and $y$ (since an inverse function switches the input and output), and solve for $y$:
+      \begin{align*}
+        x &= \frac{\ln(\sqrt{3y})}{2}+3 \\
+        x-3  &=  \frac{\ln(\sqrt{3y})}{2} \\
+        2(x-3)  &=  \ln(\sqrt{3y})  \\
+        e^{2(x-3)} &= \sqrt{3y} \\
+        e^{4(x-3)}  &=  3y \\
+        \boxed{\frac{e^{4(x-3) } }{3}} &= y
+      \end{align*} 
+    \end{solution}
+
+  \end{enumerate}
+
+\item  Solve for $x$.
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      $ \log_{10} x + \log_{10} (2x) + \log_{10} 5 = 55$ (Please simplify your answer.) 
+    \end{problem}
+
+    \begin{solution}
+      $ x=10^{27}$ (take 10 to the power of each side, and careful with the exponent rules!)
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $ 3^{2x} - 10 \cdot 3^{x} + 24 = 0 $ (\emph{Hint:} Substitute $u = 3^x$. How can you express $3^{2x}$ in terms of $u$?) 
+    \end{problem}
+
+    \begin{solution}
+      $x=\log_3 4, \; \log_3 6 $ (let $y=3^x$ and solve the quadratic in $y$ first).
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      $2 \log_2 (x+1) - \log_2 (x+2) = -1 $
+    \end{problem}
+
+    \begin{solution}
+      $x=0$
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+  Find the derivative of each of the following functions. 
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\stretch{0.25}]
+      $f(x)=\ln \left(\dfrac{5}{x} \right)$
+    \end{problem}
+
+    \begin{solution}
+      $f(x)=\ln5-\ln x$, so $f'(x)=-\frac{1}{x}$
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{0.25}]
+      $f(x)= \dfrac{\ln \left(7x^3e^{5x} \right)}{e^2}$
+    \end{problem}
+
+    \begin{solution}
+        \begin{align*}
+            f(x) &= \dfrac{\ln \left(7x^3e^{5x} \right)}{e^2} \\
+             &= \frac{\ln(7) + \ln(x^3) + \ln(e^{5x})}{e^2} \\
+             &= \frac{1}{e^2}\Big(\ln(7)+ 3 \ln(x) + 5x\Big) \\
+    \intertext{So then we have}
+    f'(x) &= \frac{1}{e^2}\Big(\frac{3}{x} + 5\Big)
+        \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{0.25}]
+      $j(w) = 2^w \cdot 3^{-w/2}$
+    \end{problem}
+
+    \begin{solution}
+        \begin{align*}
+            j(w) &= 2^w \cdot 3^{-w/2} \\
+            & = 2^w \cdot (3^{-1/2})^w \\
+            & = \Big(\dfrac{2}{3^{1/2}}\Big)^w \\
+        \intertext{So then we have:} 
+        & j'(w) = \Big(\dfrac{2}{3^{1/2}}\Big)^w \cdot \ln\Big(\frac{2}{3^{1/2}}\Big) \\
+        \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{0.25}]
+      $h(t) = e^{2t + 3 \ln t}$
+    \end{problem}
+
+    \begin{solution}
+        \begin{align*}
+            h(t) &= e^{2t + 3 \ln t} \\
+            & = e^{2t}e^{3\ln(t)} \\
+            & = e^{2t}e^{\ln(t)^3} \\
+            & = e^{2t}t^3 \\
+            \intertext{So then we have:} 
+           & h'(t) = 2e^{2t}t^3 + 3e^{2t}t^2 \\
+        \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+\end{document}

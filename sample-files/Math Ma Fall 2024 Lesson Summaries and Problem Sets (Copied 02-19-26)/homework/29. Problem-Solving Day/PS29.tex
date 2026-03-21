@@ -1,0 +1,607 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\newcommand{\axes}[1][]{
+  \begin{tikzpicture}
+    \begin{axis}[xtick=\empty, ytick=\empty, ymin=-2, ymax=2,
+      xmin=-4.25, xmax=4.25, #1]
+    \end{axis}
+  \end{tikzpicture}
+}
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols, grading, workshop]{handout}
+\renewcommand{\workshopnote}{CA Notes.}    
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\makeatletter
+
+% underline links               
+\let\@href=\href
+\renewcommand{\href}[2]{\@href{#1}{\ul{#2}}}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\newcommand{\doedfinity}[2][\newpage]{
+  \begin{problem}[#1]
+    Do the Edfinity assignment ``Problem Set #2''.
+
+    We encourage you to write down any scratch work here, as well as
+    things you want your future self to remember. Nothing you write
+    here will be graded; it's just for you!
+  \end{problem}
+}
+
+\newcommand{\psrnewpage}{\newpage}
+\newcommand{\psreflection}[2][]{
+
+  \ifthenelse{\not\equal{#1}{nocite}}{
+    \begin{enumerate}[resume]
+    \item
+      \begin{problem}[1in]
+        Please cite any help you got on this problem set:
+        \begin{itemize}[nosep]
+        \item If you worked with other students, please list their names here.
+        \item If you used resources other than those on our Canvas site, please list them here.
+        \end{itemize}
+      \end{problem}
+
+    \end{enumerate}
+  }
+
+  \probonly{%
+    #2
+
+    \psrnewpage
+
+    \emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!
+    \begin{itemize}
+    \item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!
+
+      \vspace{1.5in}
+
+    \item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.
+
+      \vspace{1.5in}
+
+    \item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!
+
+      \vfill
+    \end{itemize}      
+  }
+}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 29 - Introduction to Logarithms}
+\end{center}
+
+\begin{enumerate}
+\item  \note{
+    \begin{itemize}[nosep]
+    \item Given some information about the graph of an invertible function $f$ (a point, an intercept, an asymptote), what can you say about the graph of $f^{-1}$?
+    \item Evaluate simple logs (including some natural logs).
+    \item Decide which logs are undefined / positive. 
+    \item Translating between log and exponent equations. 
+    \item Evaluate derivatives involving $b^x$
+    \end{itemize}
+  }
+
+  \doedfinity{29}
+
+\item % 13.1.3, 4
+
+  Without using technology, approximate the value of each expression below by giving two consecutive integers it's between. Justify your answers. (a) is done for you as an example.
+
+  \begin{grading}
+    4 points: 1 per part (0.25 for answer and 0.75 for explanation) 
+  \end{grading}
+
+  \begin{enumerate}
+
+  \item
+
+    \begin{grading}
+      Nothing to grade in this part
+    \end{grading}
+
+    $\log_7 50$
+
+    \textbf{Solution.} $\log_{7} 50$ is the number we must raise 7 to in order to get 50. Since $7^2 < 50 < 7^3$, $\boxed{2 < \log_{7} 50 < 3}$.
+
+  \item
+    \begin{problem}[\vfill]
+      $\log_3 29$
+    \end{problem}
+
+    \begin{solution}
+      \fbox{$3<\log_{3} (29)<4$}, since $\log_{3} (29) $ is the number we must raise 3 to in order to get 29, and $3^3<29< 2^4$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\log_{10} (0.05)$
+    \end{problem}
+
+    \begin{solution}
+      \fbox{$-2<\log_{10} (0.05)<-1$},
+      since $\log_{10} (.05) $ is the number we must raise 10 to in order to get .05, and $10^{-2}< .05 < 10^{-1}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\ln 3$
+    \end{problem}
+
+    \begin{solution}
+      $\ln 3 = \log_e 3$ is the power we must raise $e$ to in order to get 3. Since we knew $e$ is between 2 and 3, we can be sure that $e^1 < 3 < e^2$, so $\boxed{1 < \ln 3 < 2}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      $\ln \left( \dfrac{1}{2} \right)$
+    \end{problem}
+
+    \begin{solution}
+      $\ln(\frac{1}{2})$ is the number we must raise $e$ to in order
+       to get $\frac{1}{2}$. 
+       Since $e\approx 2.7$, we know that $e^{-1} < \frac{1}{2} < e^0$.
+       Therefore 
+      \fbox{$-1 < \ln(\frac{1}{2}) < 0$}.
+    \end{solution}
+
+  \end{enumerate}
+
+\item % 13.1.6 tweaked
+
+  \begin{grading}
+    1 point per part: 0.5 for answer, 0.5 for explanation
+  \end{grading}
+
+  Simplify the following without using technology; explain each briefly. ($k$ is a positive constant, and $x$ and $y$ are constants.)
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      $\log_2 \left( \sqrt{8} \right)$
+    \end{problem}
+
+    \begin{solution}
+      $\sqrt{8} = \sqrt{2^3} = 2^{3/2}$, so $\log_2 \sqrt{8} = \boxed{\frac{3}{2}}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\log_2 \left( \dfrac{1}{\sqrt{8}} \right)$
+    \end{problem}
+
+    \begin{solution}
+      $\dfrac{1}{\sqrt{8}} = (\sqrt{8})^{-1} = 2^{-3/2}$, so
+      $\log_2 \Bigl(\dfrac{1}{\sqrt{8}}\Bigr) = \boxed{-\frac{3}{2}}$.
+    \end{solution}
+
+  \item 
+    \begin{problem}[\vfill]
+      $\displaystyle \log_2\left({\frac{16}{\sqrt[3] 4}} \right)$
+    \end{problem}
+
+    \begin{solution}
+      $\dfrac{16}{\sqrt[3]{4}} = \dfrac{2^4}{2^{2/3}} = 2^{10/3}$,
+      so $\log_2\Bigl(\dfrac{16}{\sqrt[3]{4}}\Bigr) = \boxed{\frac{10}{3}}$
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\log_k \left( k^{3x} \right)$
+    \end{problem}
+
+    \begin{solution}
+      $\log_k \left( k^{3x} \right)$ is the number to which we need to
+      raise $k$ to get $k^{3x}$, so 
+      $\log_k \left( k^{3x} \right)=\boxed{3x}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $ \log_k 1$
+    \end{problem}
+
+    \begin{solution}
+      $\log_k 1$ is the number to which we need to
+      raise $k$ to get $1$, so 
+      $\log_k 1=\boxed{0}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      $\log_k (k^x k^y)$
+    \end{problem}
+
+    \begin{solution}
+      $\log_k (k^x k^y)$ is the number to which we need to
+      raise $k$ to get $k^x k^y$. We can rewrite $k^x k^y$ as 
+      $k^{x+y}$. So
+      $\log_k (k^x k^y)=\boxed{x+y}$.
+    \end{solution}
+
+  \end{enumerate}   
+
+\item  \begin{enumerate}
+  \item % ({\it 13.1.1, modified})
+
+    \begin{problem}[\vfill]
+      Sketch the graph of $f(x) = 2^x$, and then use it to sketch the graph of $g(x) = \log_2 x$ on the same axes. {\bf Label three points on each graph.}
+    \end{problem}
+
+    \begin{grading} 
+      4 points:
+      \begin{itemize}[nosep]
+      \item 1 point for graph of $2^x$
+      \item 1.5 points for graph of $\log_2 x$: 1 for the right shape and 0.5 for having a vertical asymptote at $x = 0$
+      \item 1.5 points for labeling 3 points on each graph (0.25 per point) 
+      \end{itemize}
+    \end{grading} 
+
+    \begin{solution} 
+      \begin{center}
+        \begin{tikzpicture} 
+          \begin{axis}[ xmin=-3, xmax=5, ymin=-3, ymax=5, width= 4.5 in, samples=120, axis equal image, xtick=\empty, ytick=\empty, clip=false]
+            \addplot+[domain=-3:{ln(5)/ln(2)}] {2^x} node[above]{$y = 2^x$}; %
+            \addplot+[domain={1/8}:5] {ln(x)/ln(2)} node[right]{$y = \log_2 x$}; %
+            \addplot+[closed] coordinates {(2, 1) (1, 0) (.5, -1) (1, 2) (0, 1) (-1, .5) }; % 
+            \node[inner sep=1pt, label={90:{$(2, 1)$}}] at (2, 1) {}; %
+            \node[inner sep=1pt, label={315:{$(1, 0)$}}] at (1, 0) {}; %
+            \node[inner sep=1pt, label={315:{$\left(\frac{1}{2}, -1 \right)$}}] at (.5, -1) {}; %
+            \node[inner sep=1pt, label={0:{$(1, 2)$}}] at (1, 2) {}; %
+            \node[inner sep=1pt, label={135:{$(0, 1)$}}] at (0, 1) {}; %
+            \node[inner sep=1pt, label={135:{$\left(-1, \frac{1}{2} \right)$}}] at (-1, .5) {}; %
+          \end{axis}
+        \end{tikzpicture} 
+      \end{center}
+    \end{solution} 
+
+  \item
+
+    \begin{grading}
+      6 points:
+      \begin{itemize}[nosep]
+      \item 1.5 for correct description of transformations
+      \item 1 for the graph having the right general shape (decreasing, concave up)
+      \item 1 for labeling $x = -1$ as a vertical asymptote
+      \item 1 for finding and labeling the $y$-intercept
+      \item 1.5 for finding and labeling the $x$-intercept
+      \end{itemize}
+    \end{grading} 
+
+    \begin{problem}[\stretch{1.25}]
+      Sketch a graph of $j(x) = 3 - \log_2 (x + 1)$, and explain how it's related to the graph of $g(x) = \log_2 x$. That is, what graph transformations should you do to the graph of $g(x) = \log_2(x)$ to get the graph of $j(x)$? 
+
+      Find and label any intercepts and asymptotes of $j(x)$. 
+    \end{problem}
+
+    \begin{solution} 
+      We start with the graph of $\log_2 x$, shift it to the left by 1 (which moves the vertical asymptote to $x = -1$), reflect it vertically (which doesn't move the vertical asymptote), and shift it up 3 (which doesn't move the vertical asymptote). 
+
+      The $y$-intercept is $f(0) = 3 - \log_2(1) = 3$.
+
+      To find the $x$-intercept, we solve
+      \begin{align*}
+        3 - \log_2 (x + 1) &= 0 \\
+        \log_2 (x + 1) &= 3 \\
+        x + 1 &= 2^3 = 8 \\
+        x &= 7
+      \end{align*}
+      So, here's the graph.
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[ xmin=-2, xtick={-1, 7}, ytick={3}, ymax=5, ymin=-0.75, axis equal image]
+            \addplot+[domain=-1:12] {3-ln(x+1)/ln(2)};%
+            \draw[dashed] (-1, -0.75) -- (-1, 5);%
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution} 
+
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\stretch{0.15}]
+      What is $\displaystyle \lim_{x \rightarrow -1^+} [3 - \log_2(x + 1)]$?
+    \end{problem}
+
+    \begin{solution}
+      Based on our graph, 
+      $\lim\limits_{x \to -1^+} [3 - \log_2(x + 1)] = \boxed{\infty}$.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1 point
+    \end{grading}
+
+    \begin{problem}[\nstretch{0.15}]
+      What is $\displaystyle \lim_{x \rightarrow \infty} [3 - \log_2(x + 1)]$?
+    \end{problem}
+
+    \begin{solution}
+      Based on our graph, 
+      $\lim\limits_{x \to \infty} [3 - \log_2(x + 1)] = \boxed{-\infty}$.
+    \end{solution}
+
+  \end{enumerate} 
+
+\item  \begin{enumerate}
+  \item \label{simplify-exp-of-log-expressions-2}
+
+    Simplify each expression as much as possible without using technology. In most parts, you will need to use some exponent rules; please show your work.
+
+    \begin{enumerate}
+
+    \item
+
+      \begin{grading}
+        1 point
+      \end{grading}
+
+      \begin{problem}[\stretch{0.5}]
+        $\displaystyle e^{ \ln 5}$
+      \end{problem}
+
+      \begin{solution}
+        $5$
+      \end{solution}
+
+    \item
+
+      \begin{grading}
+        1.5 points: 1 for using a correct exponent rule and 0.5 for
+        simplifying $3^{\log_3 2}$ and $3^{\log_3 7}$
+      \end{grading}
+
+      \begin{problem}[\vfill]
+        $3^{\log_3 2 + \log_3 7}$
+      \end{problem}
+
+      \begin{solution}
+        \begin{align*}
+          3^{\log_3 2 + \log_3 7} &= 3^{\log_3 2} \cdot 3^{\log_3 7} \\
+          &= 2 \cdot 7 \\
+          &= \boxed{14}
+        \end{align*}
+      \end{solution}
+
+    \item
+
+      \begin{grading}
+        1.5 points: 1 for using a correct exponent rule and 0.5 for
+        simplifying $5^{\log_5 4}$
+      \end{grading}
+
+      \begin{problem}[\vfill]
+        $\displaystyle 5^{2 - \log_5 4}$
+      \end{problem}
+
+      \begin{solution}
+        \begin{align*}
+          5^{2 - \log_5 4} &= \frac{5^2}{5^{\log_5 4}} \\
+          &= \boxed{\frac{25}{4}} \\
+        \end{align*}
+      \end{solution}
+
+    \item
+
+      \begin{grading}
+        1.5 points: 1 for using a correct exponent rule and 0.5 for
+        simplifying $e^{\ln 5}$
+      \end{grading}
+
+      \begin{problem}[\vfill]
+        $\displaystyle e^{-2 \ln 5}$
+      \end{problem}
+
+      \begin{solution}
+        \begin{align*}
+          e^{-2 \ln 5} &= (e^{\ln 5})^{-2} \\
+          &= (5)^{-2} \\
+          &= \boxed{\frac{1}{25}} \\
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}
+
+  \item
+
+    \begin{workshop}
+      A common error is to say $e^{-2 \ln 5} = -10$. This part is intended to help students realize that this can't be right; from the graph, it's clear that $e^{-2 \ln 5}$ should be positive.
+    \end{workshop}
+
+    \begin{grading}
+      1 point. If their coordinates don't make sense (for example, if one of the $y$-coordinates is negative), they get 0. 
+    \end{grading}
+
+    \begin{problem}
+      On the axes below, $\ln 5$ is labeled on the $x$-axis. First, label $-2 \ln 5$ on the $x$-axis. Then, sketch the graph of $e^x$ and label the points where $x = \ln 5$ and $x = - 2 \ln 5$ with their exact coordinates (which you found in \ref{simplify-exp-of-log-expressions-2}).
+
+      If your coordinates don't make sense with your graph, take a look at {{\#7}} on \href{https://people.math.harvard.edu/~jjchen/mathma/docs/worksheets/worksheet29-sols.html}{the worksheet ``Introduction to Logarithms''}.
+    \end{problem}
+
+    \axes[xtick={1.61, -3.22}, xticklabels={$\ln 5$}]
+
+    \begin{solution}
+    
+      \begin{tikzpicture}
+        \begin{axis}[xtick={-3.22,1.61}, xticklabels={$-2\ln 5$, $\ln 5$},
+        ytick=\empty, clip=false]
+          \addplot[domain=-4:4] {e^x};
+          \addplot[closed] coordinates {(-3.22, 0.04) (1.61, 5)};
+          \node[above] at (-3.22, 0.04) {$(-2\ln5, \frac{1}{25})$};
+          \node[right] at (1.61, 5) {$(\ln5, 5)$};
+        \end{axis}
+      \end{tikzpicture}
+    \end{solution}
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+\item 
+
+  \href{https://www.thebige.com/}{The Big E}, held each fall in West Springfield, Massachusetts, is the biggest agricultural fair in the northeastern US. According to \href{https://www.nytimes.com/2023/10/14/us/llamas-popularity-new-england.html?unlocked_article_code=1.70w.Wu6I.pNWczK6qQPiq&smid=url-share}{this article}, 180 llamas entered the 2023 Big E llama competition, and the number of llamas in the competition has been rising 10\% per year.
+
+  \begin{enumerate}
+  \item
+
+    \begin{grading}
+      1.5 points
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      If the number of llamas continues to rise by 10\% per year, write a formula for the number of llamas in the competition $t$ years after 2023. 
+    \end{problem}
+
+    \begin{solution}
+      The number of llamas $t$ years after 2023 would be 
+      $\boxed{180(1.1)^t}$.
+    \end{solution}
+
+  \item
+
+    \begin{grading}
+      1.5 points
+    \end{grading}
+
+    \begin{problem}[\vfill]
+      If the number of llamas continues to rise by 10\% per year, how many years after 2023 will the competition first have at least 300 llamas? Give an exact answer expressed as a logarithm. 
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        180(1.1)^t &= 300 \\
+        (1.1)^t &= \tfrac{5}{3} \\
+        t &= \boxed{\log_{1.1} \tfrac{5}{3}}
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+\psreflection{For next class, read \S 13.2, 13.4.}
+\end{document}

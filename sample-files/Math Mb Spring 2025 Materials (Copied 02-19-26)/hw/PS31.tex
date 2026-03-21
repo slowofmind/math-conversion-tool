@@ -1,0 +1,530 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 31 - Slicing to Find Area}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{grading}
+  Total: 25 points
+  
+    \begin{enumerate}
+    \item 20 points
+    \item 9 points
+    \item 8 points
+    \item 4 points
+    \end{enumerate}
+    Total: 41 points
+  
+\end{grading}
+
+\begin{enumerate}
+
+
+\item
+\begin{grading}
+    20 points: 2/2/2/1/1/2/2/1/1/6
+\end{grading}
+
+For help with these problems, read pp. 843-850 in Gottlieb.
+
+  Let $\mathcal{R}$ be the region enclosed by the curves $y = \sqrt{x}$
+  and $y = \dfrac{x}{2}$.  In this problem, you'll find the area of
+  $\mathcal{R}$ two ways, once by slicing vertically and once by slicing
+  horizontally.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\stretch{3}]
+      Sketch the region.
+    \end{problem}
+
+    \begin{solution}
+      The curves $y = \sqrt{x}$ and $y = \frac{x}{2}$ intersect when
+      \begin{align*}
+        \sqrt{x} &= \frac{x}{2} \\
+        2 \sqrt{x} &= x \\
+        \shortintertext{Squaring both sides,}
+        4 x &= x^2 \\
+        4x - x^2 &= 0 \\
+        x (4 - x) &= 0 \\
+        x &= 0, 4
+      \end{align*}
+      So, here's a sketch of the region: 
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[width=3in, height=2in, xtick={4}, ytick={2}]
+            \addplot+[domain=0:4, fillregion, draw=none] {sqrt(x)} -- (0,
+            0);
+            \addplot+[domain=0:4.5] {sqrt(x)};
+            \addplot+[domain=0:4.5] {x/2};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \end{enumerate}
+  We'll first tackle slicing vertically.  
+  \begin{enumerate}[resume]
+
+  \item
+    \begin{problem}[\vfill]
+      If you slice the region $\mathcal{R}$ vertically into $n$ slices of
+      equal thickness $\Delta x$ and label $x_0, x_1, \ldots, x_n$ as
+      usual, what is $\Delta x$ in terms of $n$?  What is $x_k$ in terms
+      of $\Delta x$?
+    \end{problem}
+
+    \begin{solution}
+      We're slicing the interval $[0, 4]$, so $\Delta x = \frac{4 - 0}{n}
+      = \frac{4}{n}$ and $x_k = 0 + k \Delta x$.
+    \end{solution}
+
+  \item
+
+    \begin{problem}[\vfill]
+      On your sketch of the region, draw a rectangle that approximates the
+      $k$-th slice.  What is the area of this rectangle?
+    \end{problem}
+
+    \begin{solution}
+      \begin{center}
+        \begin{tikzpicture}[declare function={f(\x)=sqrt(\x); g(\x) =
+            \x/2;}] 
+          \begin{axis}[width=3in, height=2in, xtick=\empty, ytick=\empty,
+            axis on top=true, ymin=0, axis x line=bottom, xtick={0,
+              0.307692, ..., 4.01}, xticklabels={$x_0$, $x_1$,
+              $\cdots$,,,,,$x_k$,,,,,,$x_n$}, disabledatascaling]
+            \addplot+[domain=0:4, fillregion, draw=none] {sqrt(x)} -- (0,
+            0); %
+            \addplot+[vertslices] coordinates { (0, {f(0)}) (4/13,
+              {f(4/13)}) (8/13, {f(8/13)}) (12/13, {f(12/13)}) (16/13,
+              {f(16/13)}) (20/13, {f(20/13)}) (24/13, {f(24/13)}) (28/13,
+              {f(28/13)}) (32/13, {f(32/13)}) (36/13, {f(36/13)}) (40/13,
+              {f(40/13)}) (44/13, {f(44/13)}) (48/13, {f(48/13)}) }; %
+            \addplot+[fill=white, draw=none, domain=0:4] {x/2}
+            \closedcycle; %
+            \addplot+[domain=0:4.5] {sqrt(x)}; %
+            \addplot+[domain=0:4.5] {x/2}; %
+            \draw[fill=cyan, fill opacity=0.75, draw=blue] (24/13,
+            {f(28/13)}) -- (28/13, {f(28/13)}) -- (28/13, {g(28/13)}) --
+            (24/13, {g(28/13)}) -- cycle; %
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      This rectangle's width is $\Delta x$, and its height is (top
+      $y$-coordinate) $-$ (bottom $y$-coordinate) = $\sqrt{x_k} -
+      \frac{x_k}{2}$.  Therefore, the rectangle's area is $\boxed{\left(
+          \sqrt{x_k} - \frac{x_k}{2} \right) \Delta x}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Write a Riemann sum that approximates the area of $\mathcal{R}$.
+    \end{problem}
+
+    \begin{solution}
+      To approximate the area of the whole region $\mathcal{R}$, we just
+      add up our approximations for the areas of all the slices, giving
+      $\boxed{\sum_{k=1}^n \left( \sqrt{x_k} - \frac{x_k}{2} \right)
+        \Delta x}$.
+    \end{solution}
+
+  \item
+\begin{problem}[\vfill\newpage]
+      Write a definite integral that gives the exact area of
+      $\mathcal{R}$. 
+    \end{problem}
+
+    \begin{solution}
+      Taking the limit as $n \to \infty$ of our Riemann sum, the exact
+      area of $\mathcal{R}$ is $\boxed{\int_0^4 \left( \sqrt{x} -
+          \frac{x}{2} \right) dx}$. 
+    \end{solution}
+
+  \end{enumerate}
+
+  Now, let's instead slice horizontally.
+  \begin{enumerate}[resume]
+  \item
+    \begin{problem}[\vfill]
+      If you slice the region $\mathcal{R}$ horizontally into $n$ slices
+      of equal thickness $\Delta y$ and label $y_0, y_1, \ldots, y_n$ as
+      usual, what is $\Delta y$ in terms of $n$?  What is $y_k$ in terms
+      of $\Delta y$?
+    \end{problem}
+
+    \begin{solution}
+      Now, we're slicing $[0, 2]$ on the $y$-axis, so $\Delta y = \frac{2
+        - 0}{n} = \frac{2}{n}$ and $y_k = 0 + k \Delta y$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      On your sketch of the region, draw a rectangle that approximates the
+      $k$-th slice.  What is the area of this rectangle?
+    \end{problem}
+
+    \begin{solution}
+      \begin{center}
+        \begin{tikzpicture}[declare function={f(\x)=2*\x; g(\x)=\x^2;}] 
+          \begin{axis}[width=3in, height=2in, xtick=\empty, ytick=\empty,
+            axis on top=true, ymin=0, axis x line=bottom, ytick={0,
+              0.285714, ..., 2.01}, yticklabels={$y_0 = 0$,,,,,$y_k$,,$y_n
+              = 2$}, disabledatascaling]
+            \addplot+[domain=0:4, fillregion, draw=none] {sqrt(x)} -- (0,
+            0); %
+            \addplot+[horizslices] coordinates { ({f(0)}, 0) ({f(2/7)},
+              2/7) ({f(4/7)}, 4/7) ({f(6/7)}, 6/7) ({f(8/7)}, 8/7)
+              ({f(10/7)}, 10/7) ({f(12/7)}, 12/7) ({f(2)}, 2) };
+            \addplot+[fill=white, draw=none, domain=0:4] {sqrt(x)} -- (0,
+            2) -- (0, 0); %
+            \addplot+[domain=0:4.5] {sqrt(x)}; %
+            \addplot+[domain=0:4.5] {x/2}; %
+            \draw[fill=cyan, fill opacity=0.75, draw=blue] ({f(10/7)},
+            10/7) -- ({g(10/7)}, 10/7) -- ({g(10/7)}, 8/7) -- ({f(10/7)},
+            8/7) -- cycle; %
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      The height of this slice is $\Delta y$, and its width is (right
+      $x$-coordinate) $-$ (left $x$-coordinate).  The left end of the
+      slice is on the curve $y = \sqrt{x}$ (or $x = y^2$), and the right
+      end is on the curve $y = \frac{x}{2}$ (or $x = 2y$), so the area of
+      the rectangle is $\boxed{\left(2 y_k - y_k^2 \right) \Delta y}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Write a Riemann sum that approximates the area of $\mathcal{R}$.
+    \end{problem}
+
+    \begin{solution}
+      Summing the approximate areas of all the slices, the area of
+      $\mathcal{R}$ is approximately $\boxed{\sum_{k=1}^n \left(2 y_k -
+          y_k^2 \right) \Delta y}$.
+    \end{solution}
+
+  \item
+\begin{problem}[\vfill]
+      Write a definite integral that gives the exact area of
+      $\mathcal{R}$. 
+    \end{problem}
+
+    \begin{solution}
+      Taking the limit as $n \to \infty$ of our Riemann sum, the exact
+      area of $\mathcal{R}$ is $\boxed{ \int_0^2 \left( 2y - y^2 \right)
+        dy}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\nstretch{3}]
+      Evaluate the integrals you got in
+      {{{{\#1}}(e)}} and
+      {{{{\#1}}(i)}} to
+      show that you get the same answer either way.
+    \end{problem}
+
+    \begin{solution}
+      Our integral in
+      {{{{\#1}}(e)}} was 
+      \begin{align*}
+        {\int_0^4 \left( \sqrt{x} - \frac{x}{2} \right) dx} &=
+        \left. \frac{2}{3} x^{3/2} - \frac{x^2}{4} \right|_0^4 \\
+        &= \left( \frac{2}{3} \cdot 4^{3/2} - 4 \right) - 0 \\
+        &= \frac{2}{3} \cdot 8 - 4 \\
+        &= \boxed{\frac{4}{3}}
+      \end{align*}
+      Our integral in
+      {{{{\#1}}(i)}} was
+      \begin{align*}
+        { \int_0^2 \left( 2y - y^2 \right) dy} &= \left. y^2 -
+          \frac{1}{3}y^3 \right|_0^2 \\
+        &= \left( 4 - \frac{8}{3} \right) - 0 \\
+        &= \frac{4}{3}
+      \end{align*}      
+    \end{solution}
+
+  \end{enumerate}
+
+\item
+
+\begin{grading}
+    8 points - consult Gradescope rubric
+\end{grading}
+
+\begin{problem}[\vfill\newpage]
+    Let $\mathcal{R}$ be the region in the first quadrant to the right of
+    $y = x^2$, the left of $x + y = 6$, and above $y = 1$.  Find the area
+    of $\mathcal{R}$; it's up to you whether to slice vertically or
+    horizontally.  Please include a sketch of the region $\mathcal{R}$.
+
+    (Do evaluate your integral to get a numerical answer.)
+  \end{problem}
+
+  \begin{solution}
+    Here's a picture of the region:
+    \begin{center}
+      \begin{tikzpicture}
+        \begin{axis}[ymax=6, disabledatascaling, axis equal=true,
+          width=2.5in, height=2.5in, enlargelimits=true, xtick={6},
+          ytick={1, 6}, cycle list name=mycolor, clip=false, cycle list
+          shift=2]  
+          \addplot+[domain=1:2, fillregion, draw=none]{x^2} -- (5, 1) --
+          (1, 1); %
+          \addplot+[domain=0:sqrt(6)]{x^2} node[above]{$y=x^2$}; %
+          \addplot+[domain=0:6]{6-x} node[pos=0.5, anchor=south west]{$x +
+            y = 6$}; %
+          \addplot+[domain=0:6]{1} node[right]{$y = 1$}; %
+        \end{axis}
+      \end{tikzpicture}
+    \end{center}
+    The top point of the region is where $x^2 = 6 - x$.  This equation can
+    be rearranged as $x^2 + x - 6 = 0$ and factored as $(x + 3)(x - 2) =
+    0$, and the relevant solution is $x = 2$.  So, the top point is $(2,
+    4)$.  The bottom left corner of the region is the point $(1, 1)$, and
+    the bottom right is $(5, 1)$.
+
+    If we slice vertically, there are two ``types'' of slices.  Slices to
+    the left of $x = 2$ have their top on the curve $y = x^2$, while
+    slices to the right have their top on the line $x + y = 6$.  On the
+    other hand, if we slice horizontally, then there is only one ``type''
+    of slice: all slices have their left side on $y = x^2$ and their right
+    side on $x + y = 6$.  So, let's slice horizontally; as usual, we focus
+    on the $k$-th slice and approximate it by a rectangle:
+    \begin{center}
+      \begin{tikzpicture}[declare function={f(\x)=6-\x;}]
+        \begin{axis}[ymax=6, disabledatascaling, axis equal=true,
+          width=2.5in, height=2.5in, enlargelimits=true, xtick={6},
+          ytick={1, 1.333, ..., 4, 6}, yticklabels={$y_0 =
+            1$,,,,,$y_k$,,,,$y_n = 4$, $6$}, cycle list name=mycolor,
+          clip=false, axis on top=true]
+          \addplot+[domain=1:2, fillregion, draw=none]{x^2} -- (5, 1) --
+          (1, 1); %
+          \addplot+[horizslices, black] coordinates { ({f(1)}, 1)
+            ({f(4/3)}, 4/3) ({f(5/3)}, 5/3) ({f(2)}, 2) ({f(7/3)}, 7/3)
+            ({f(8/3)}, 8/3) ({f(3)}, 3) ({f(10/3)}, 10/3) ({f(11/3)},
+            11/3)}; %
+          \addplot+[domain=1:2, fill=white, draw=none] {x^2} -- (0, 4) --
+          (0, 1) -- (1, 1); % 
+          \addplot+[domain=0:sqrt(6)]{x^2} node[above]{$y=x^2$}; %
+          \addplot+[domain=0:6]{6-x} node[pos=0.5, anchor=south west]{$x +
+            y = 6$}; %
+          \addplot+[domain=0:6]{1} node[right]{$y = 1$}; %
+          \draw[blue, fill=cyan, fill opacity=0.75] ({sqrt(8/3)}, 8/3) --
+          ({sqrt(8/3)}, 7/3) -- (10/3, 7/3) -- (10/3, 8/3) -- cycle; % 
+        \end{axis}        
+      \end{tikzpicture}
+    \end{center}
+    The rectangle has height $\Delta y$ and width (right $x$-coordinate)
+    $-$ (left $x$-coordinate).  The right end is on the line $x + y = 6$
+    (which can be rewritten as $x = 6 - y$), and the left end is on the
+    curve $y = x^2$ (which can be rewritten as $x = \sqrt{y}$).  So,
+    \[ \text{area of $k$-th slice} \approx \left( 6 - y_k - \sqrt{y_k}
+    \right) \Delta y.\] Summing over all slices and taking the limit as
+    the number of slices $\to \infty$, the area of $\mathcal{R}$ is
+    \begin{align*}
+      \int_1^4 \left( 6 - y - \sqrt{y} \right) dy &= \left. 6y -
+        \frac{y^2}{2} - \frac{2}{3} y^{3/2} \right|_1^4 \\
+      &= \left( 24 - 8 - \frac{2}{3} \cdot 8 \right) - \left( 6 -
+        \frac{1}{2} - \frac{2}{3} \right) \\
+      &= \boxed{\frac{35}{6}}
+    \end{align*}
+  \end{solution}
+
+
+
+% \item
+
+% \begin{problem}[\vfill\newpage]
+%     In this problem, you'll evaluate $\displaystyle
+%     \int_0^{\sqrt{3}/2} \arcsin x\,dx$ by
+%     visualizing it as an area and slicing this area horizontally to get an
+%      integral which is easier to evaluate than integrating by parts.
+%   \end{problem}
+
+%   \begin{solution}
+%     We can visualize $\displaystyle \int_0^{\sqrt{3}/2} \arcsin x\,dx$ as
+%     the area under $y = \arcsin x$ from $x = 0$ to $x =
+%     \frac{\sqrt{3}}{2}$:
+%     \begin{center}
+%       \begin{tikzpicture}
+%         \begin{axis}[xtick={0.866}, xticklabels={$\frac{\sqrt{3}}{2}$},
+%           ytick={1.047}, yticklabels={$\frac{\pi}{3}$}, clip=false,
+%           width=2in, height=2.5in]
+%           \addplot+[domain=0:sqrt(3)/2, fillregion] {rad(asin(x))}
+%           \closedcycle; %
+%           \addplot+[domain=-pi/2:pi/2] ({sin(deg(x))}, x)
+%           node[above] {$y = \arcsin x$};
+%         \end{axis}
+%       \end{tikzpicture}
+%     \end{center}
+%     (We've labeled $\arcsin \left(\frac{\sqrt{3}}{2} \right) =
+%     \frac{\pi}{3}$ on the $y$-axis, as that's the highest point in the
+%     region.)  We're going to slice horizontally, which means we're slicing
+%     the interval $\left[ 0, \frac{\pi}{3} \right]$ on the $y$-axis into
+%     $n$ slices of equal height $\Delta y$.  We'll label $y_0 = 0, \ldots,
+%     y_n = \frac{\pi}{3}$ as usual and focus on the $k$-th slice, which we
+%     approximate by a rectangle:
+%     \begin{center}
+%       \begin{tikzpicture}
+%         \begin{axis}[xtick={0.866}, xticklabels={$\frac{\sqrt{3}}{2}$},
+%           ytick={1.047, 0.698}, yticklabels={$\frac{\pi}{3}$, $y_k$}, axis
+%           on top, disabledatascaling, clip=false, width=2in, height=2.5in]
+%           \addplot+[domain=0:sqrt(3)/2, fillregion] {rad(asin(x))} \closedcycle;
+%           \addplot[horizslices] coordinates {
+%             ({sqrt(3)/2}, 0) ({sqrt(3)/2}, pi/27) ({sqrt(3)/2}, 2*pi/27)
+%             ({sqrt(3)/2}, 3*pi/27) ({sqrt(3)/2}, 4*pi/27) ({sqrt(3)/2}, 5*pi/27)
+%             ({sqrt(3)/2}, 6*pi/27) ({sqrt(3)/2}, 7*pi/27) ({sqrt(3)/2}, 8*pi/27)
+%             ({sqrt(3)/2}, 9*pi/27)};
+%           \addplot+[domain=0:sqrt(3)/2, fill=white, draw=none]
+%           {rad(asin(x))} -- (0, {pi/3}) -- (0, 0);
+%           \addplot+[domain=-pi/2:pi/2] ({sin(deg(x))}, x)
+%           node[above] {$y = \arcsin x$};
+%           \draw[fill=cyan, draw=blue, fill opacity=0.75] ({sqrt(3)/2},
+%           5*pi/27) -- ({sin(deg(6*pi/27))}, 5*pi/27) --
+%           ({sin(deg(6*pi/27))}, 6*pi/27) -- ({sqrt(3)/2},
+%           6*pi/27) -- cycle;
+%           \draw[dashed] (0, 6*pi/27) -- ({sin(deg(6*pi/27))}, 6*pi/27);
+%         \end{axis}
+%       \end{tikzpicture}
+%     \end{center}
+%     This rectangle's height is $\Delta y$, and its width is (right
+%     $x$-value) $-$ (left $x$-value).  The right $x$-value is
+%     $\frac{\sqrt{3}}{2}$; since $y = \arcsin x$ can be rewritten as $x =
+%     \sin y$, the left $x$-value is $\sin (y_k)$.  Therefore,
+%     \[ \text{area of $k$-th slice} \approx \left( \frac{\sqrt{3}}{2} -
+%       \sin y_k \right) \Delta y.\] Summing the areas of all the slices and
+%     taking the limit as the number of slices $\to \infty$, the area of the
+%     region is 
+%     \begin{align*}
+%       \int_0^{\pi/3} \left( \frac{\sqrt{3}}{2} - \sin y \right) dy &=
+%       \left. \frac{\sqrt{3}}{2} y + \cos y \right|_0^{\pi/3} \\
+%       &= \left( \frac{\sqrt{3}}{2} \cdot \frac{\pi}{3} + \frac{1}{2}
+%       \right) - (0 + 1) \\
+%       &= \boxed{\frac{\pi \sqrt{3}}{6} - \frac{1}{2}}
+%     \end{align*}
+%   \end{solution}
+
+\item
+
+\begin{grading}
+    9 points - consult Gradescope rubric
+\end{grading}
+  \begin{problem}[\vfill\newpage]
+    In this problem, evaluate $\displaystyle
+    \int_0^{1} \arccos x\,dx$ by first
+    visualizing it as an area and then slicing this area horizontally to get an
+     integral which is easier to evaluate than integrating by parts. Then, evaluate the resulting integral.
+  \end{problem}
+
+  \begin{solution}
+    We can visualize $\displaystyle \int_0^{1} \arccos x\,dx$ as
+    the area under $y = \arccos x$ from $x = 0$ to $x =
+    1$:
+    \begin{center}
+      \begin{tikzpicture}
+        \begin{axis}[xtick={1}, xticklabels={$1$},
+          ytick={1.571}, yticklabels={$\frac{\pi}{2}$}, clip=false,
+          width=2in, height=2.5in]
+          \addplot+[domain=0:1, fillregion] {rad(acos(x))}
+          \closedcycle; %
+          \addplot+[domain=0:pi] ({cos(deg(x))}, x)
+          node[above] {$y = \arccos x$};
+        \end{axis}
+      \end{tikzpicture}
+    \end{center}
+    (We've labeled $\arccos \left(0\right) =
+    \frac{\pi}{2}$ on the $y$-axis, as that's the highest point in the
+    region.)  We're going to slice horizontally, which means we're slicing
+    the interval $\left[ 0, \frac{\pi}{2} \right]$ on the $y$-axis into
+    $n$ slices of equal height $\Delta y$.  We'll label $y_0 = 0, \ldots,
+    y_n = \frac{\pi}{2}$ as usual and focus on the $k$-th slice, which we
+    approximate by a rectangle:
+    \begin{center}
+      \begin{tikzpicture}
+        \begin{axis}[xtick={1},
+          ytick={0.589, 1.571}, yticklabels={$y_k$,$\frac{\pi}{2}$}, axis
+          on top, disabledatascaling, clip=false, width=2in, height=2.5in]
+          \addplot+[domain=0:1, fillregion] {rad(acos(x))} \closedcycle;
+          \addplot[horizslices] coordinates {
+            (1, 0) (1, pi/16) (1, 2*pi/16)
+            (1, 3*pi/16) (1, 4*pi/16) (1, 5*pi/16)
+            (1, 6*pi/16) (1, 7*pi/16) (1, 8*pi/16)};
+          \addplot+[domain=0:1, fill=white, draw=none]
+          {rad(acos(x))} -- (1.1, {pi/2+0.1}) -- (0, {pi/2+0.1});
+          \addplot+[domain=0:pi/2, very thick] ({cos(deg(x))}, x)
+          node[midway, right] {$x = \cos y$};
+          \draw[fill=cyan, draw=blue, fill opacity=0.75] (0,
+          2*pi/16) -- ({cos(deg(3*pi/16))}, 2*pi/16) --
+          ({cos(deg(3*pi/16))}, 3*pi/16) -- (0,
+          3*pi/16) -- cycle;
+          \draw[dashed] (0, 3*pi/16) -- ({cos(deg(3*pi/16))}, 3*pi/16);
+        \end{axis}
+      \end{tikzpicture}
+    \end{center}
+    This rectangle's height is $\Delta y$, and its width is (right
+    $x$-value) $-$ (left $x$-value).  The right $x$-value is $\cos(y_k)$, since $y=\arccos(x)$ can be rewritten as $x=\cos(y)$ and the left $x$-value is 0. 
+  Therefore,
+    \[ \text{area of $k$-th slice} \approx \left( 
+      \cos y_k -0 \right)  \Delta y.\] Summing the areas of all the slices and
+    taking the limit as the number of slices $\to \infty$, the area of the
+    region is 
+    \begin{align*}
+      \int_0^{\pi/2} \left( \cos y - 0 \right) dy &=
+      \left. \sin y \right|_0^{\pi/2} \\
+      &= \left( 
+    \sin(\tfrac{\pi}{2}) - \sin(0) \right) \\
+      &= \boxed{1-0 = 1}
+    \end{align*}
+  \end{solution}
+
+
+\item
+
+\begin{grading}
+    Looking for mentions of slicing horizontally potentially reducing the number of integrals needed or transforming the integral into something easier to compute. They also should cite specific problems in their responses.
+\end{grading}
+
+  \begin{problem}[\vfill]
+    \textbf{Reflect Back.}  Looking back at the problems you did on this
+    assignment, in what situations can it be more useful or convenient to
+    slice an area horizontally rather than vertically?
+  \end{problem}  
+
+  \begin{solution}
+    There are regions like that in {{\#2}}, where if you
+    slice vertically, there are multiple ``types'' of slices but, if you
+    slice horizontally, there's just one ``type'' of slice.  In these
+    situations, slicing horizontally allows you to write just one integral
+    rather than a sum of multiple integrals.
+
+    There are also situations like that in {{\#4}}, in
+    which it's easy to write an integral by slicing vertically, but the
+    integral is hard to evaluate.  Slicing horizontally allows you to
+    write a different integral, which may be easier to evaluate. 
+  \end{solution}
+
+\end{enumerate}
+
+\spaceonly{\psreflection{
+Optional reading for next class is \S 27.1 in Gottlieb.
+}}
+
+\end{document}

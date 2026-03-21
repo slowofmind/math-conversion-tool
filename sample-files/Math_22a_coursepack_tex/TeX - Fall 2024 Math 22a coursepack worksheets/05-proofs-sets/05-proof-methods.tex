@@ -1,0 +1,171 @@
+\documentclass[12pt,letterpaper]{article}
+
+\input{../worksheet-setup.tex}
+
+\chead{\Large\textbf{Proof Methods, \fbox\S 4,  5,  6}}
+
+\begin{document}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+  \Problem Give a \emph{direct proof}\ of the following statements.
+  \begin{enumerate}
+    \Part  Recall that, for natural numbers $n$ and $k$ with $k\le n$,
+    the binomial coefficient is defined as $\binom{n}{k} =
+    \frac{n!}{k!\,(n-k)!}$.  Show that, if $n\ge2$ is an integer, that
+    $n^2 = 2\binom{n}{2} + \binom{n}{1}$.
+    \vfill
+
+    \Part Let $a$ and $b$ be integers. If $a|b$, then
+    $a|\left(3b^3-4b^2+18b+2a\right)$.  \vfill
+
+    \Part If $x$ is an integer and $x^2|x$, then $x\in
+    \{-1,0,1\}$. 
+    \vfill
+
+  \end{enumerate}
+
+  \Problem Give a \emph{contrapositive proof}\ of the following statements. 
+  \begin{enumerate}
+    \Part Suppose $x$ and $y$ are integers.  If $3\not|\,xy$,
+    then $3\not|\,x$ and $3\not|\,y$.
+    \vfill
+
+    \Part (Hammack Problem 5.6) Suppose $x$ is a real number.  If $x^3
+    -x > 0$, then $x>-1$.
+    \vfill
+
+    \Part (Hammack Problem 5.7) Suppose $a$ and $b$ are integers.  If
+    both $ab$ and $a+b$ are even, then both $a$ and $b$ are even.
+    \vfill
+  \end{enumerate}
+
+\end{enumerate}
+\newpage
+
+Prove the following using \emph{proof by contradiction}.
+\begin{enumerate}
+  \Problem $\sqrt{2}$ is irrational.
+  \vfill
+
+  \Problem There are infinitely many prime numbers.
+  \vfill
+
+ % \Problem (Hammack Problem 6.8) Suppose $a^2+b^2 = c^2$ for integers
+%  $a$, $b$ and $c$.  Then at least one of $a$ and $b$ must be even.
+ % \vfill
+
+  \Problem (Basically Hammack Problem 6.16)\footnote{%
+    This is also called the AM-GM Inequality, as it says that the
+    Arithmetic Mean $\frac{x+y}{2}$ is always greater than or equal to
+    the Geometeric Mean $\sqrt{xy}$.}   % 
+  Suppose $x$ and $y$ are non-negative real numbers.  Then
+  \begin{equation*}
+    \frac{x+y}{2} \ge \sqrt{xy}
+  \end{equation*}
+  or, equivalently, $x+y\ge 2\sqrt{xy}$.  
+  \vfill
+\end{enumerate}
+
+\end{document}
+
+\newpage
+\chead{\Large\textbf{Proof Methods -- Solutions}}
+\lhead{}
+\rhead{}
+\thispagestyle{fancy}
+
+\begin{enumerate}
+  \Answer Give a \emph{direct proof}\ of the following statements.
+  \begin{enumerate}
+    \Part  Recall that, for natural numbers $n$ and $k$ with $k\le n$,
+    the binomial coefficient is defined as $\binom{n}{k} =
+    \frac{n!}{k!\,(n-k)!}$.  Show that, if $n\ge2$ is an integer, that
+    $n^2 = 2\binom{n}{2} + \binom{n}{1}$.
+  \begin{proof}
+      	This will be a direct proof. So, take $2 \binom{n}{2} + \binom{n}{1}$ and substituting in for the binomial expressions, we get:
+    	$$2 \binom{n}{2} +  \binom{n}{1} = 2 \frac{n!}{2!\,(n-2)!} + \frac{n!}{1!\,(n-1)!}  = 2 \frac{n(n-1)}{2} + \frac{n}{1} =$$ $$ n(n-1) + n = n^2 - n + n = n^2$$
+  \end{proof}
+
+    \Part Let $a$ and $b$ be integers. If $a|b$, then
+    $a|\left(3b^3-4b^2+18b+2a\right)$.  
+    
+    \begin{proof}
+        	If $a|b$, then $ b = ak$ for some integer $k$. So then we can substitute in for $b$ in the expression and get:
+    	$$3b^3-4b^2+18b+2a = 3(ak)^3 - 4 (ak)^2 + 18(ak) + 2a = a(3a^2k^3 - 4ak^2 + 18k + 2)$$
+    	Note that $3a^2k^3 - 4ak^2 + 18k + 2$ is an integer, so $a|b$. 
+    \end{proof}
+
+    \Part If $x$ is an integer and $x^2|x$, then $x\in
+    \{-1,0,1\}$. 
+  \begin{proof}
+      	If $x^2|x$, we have that $x = x^2 k$ for some integer $k$. We have two cases. If $x$ is not zero, then we can cancel an $x$ and get that $xk = 1$, so $x|1$, so $x = \pm 1$. The other case is if $x=0$. So $x \in \{ -1,0,1 \}$.  
+  \end{proof}
+
+  \end{enumerate}
+
+  \Answer Give a \emph{contrapositive proof}\ of the following statements. 
+  \begin{enumerate}
+    \Part Suppose $x$ and $y$ are integers.  If $3\not|\,xy$,
+    then $3\not|\,x$ and $3\not|\,y$.
+  \begin{proof}
+      	The contrapositive statement is: if $3|x$ or $3|y$, then $3|xy$. So assume without loss of generality $3|x$, so $x = 3k$ for some integer $k$. So $xy = (3k)y = 3(ky)$. As $ky$ is an integer, $3| xy$. 
+  \end{proof}
+
+    \Part (Hammack Problem 5.6) Suppose $x$ is a real number.  If $x^3
+    -x > 0$, then $x>-1$.
+  \begin{proof}
+      	The contrapositive statement is: if $x \leq -1$, then $x^3 - x \leq 0$. (Note here that the opposite of greater than is less than or equal to) If $x \leq -1$, then $x^3 \leq x$, so $x^3 - x \leq 0$. 
+  \end{proof}
+
+    \Part (Hammack Problem 5.7) Suppose $a$ and $b$ are integers.  If
+    both $ab$ and $a+b$ are even, then both $a$ and $b$ are even.
+  \begin{proof}
+      	The contrapositive statement is: if $a$ or $b$ is odd, then $a+b$ or $ab$ is odd. There are two cases here. The first case is if only one of them are odd. So assume without loss of generality that $a$ is odd and $b$ is even, so $a = 2k+1$ and $b = 2j$ for integers $j,k$. Then, $a+b = 2k + 1 + 2j = 2(k+j) + 1$, which is odd. 
+    	
+    	The second case is if both are odd. So $a = 2k+1$ and $b = 2j+1$ for integers $j,k$. Then, $ab = (2k+1)(2j+1) = 4jk + 2j + 2k + 1 = 2(2jk + j  +k) + 1$ is odd. 
+  \end{proof}
+  \end{enumerate}
+
+\end{enumerate}
+\newpage
+
+Prove the following using \emph{proof by contradiction}.
+\begin{enumerate}
+  \Answer $\sqrt{2}$ is irrational.
+  \begin{proof}
+    	Assume towards a contradiction that $\sqrt{2}$ is rational. Then $\sqrt{2} = \frac{p}{q}$. We can assume that $p$ and $q$ have no common factors by reducing. So, squaring both sides gives us $2 = \frac{p^2}{q^2}$, so $2q^2 = p^2$, which means $p^2$ is even. However, this also means $p$ is even. So, $p= 2k$ for some integer $k$, so $p^2 = 4k^2 = 2q^2$. This gives us that $2k^2 = q^2$, so $q^2$ is even, so $q$ is even. However, this is a contradiction, as $p$ and $q$ are both even but have no common factors. 
+  \end{proof}
+
+  \Answer There are infinitely many prime numbers.
+  \begin{proof}
+    	Suppose towards a contradiction that there are finitely many prime numbers $p_1,...,p_n$, with $p_n$ the largest prime number. Consider the number $N = p_1...p_n + 1$. This number is larger than our largest prime, so it can't be prime, so it must be divisible by some $p_i$, a prime. However, if $p_i$ divides $N$ and $p_i $ divides $p_1 ... p_n$, then $p_i$ divides $N - p_1 ... p_n = 1$, which is a contradiction.  
+  \end{proof}
+
+%  \Answer (Hammack Problem 6.8) Suppose $a^2+b^2 = c^2$ for integers
+%  $a$, $b$ and $c$.  Then at least one of $a$ and $b$ must be even.
+%  \begin{proof}
+%    	Suppose towards a contradiction that $a$ and $b$ are both odd. Then $a = 2k+1$ and $b = 2j+1$, so $a^2 + b^2 = (2k+1)^2 + (2j+1)^2 = 4k^2 + 4k + 1 + 4j^2 + 4j + 1 = c^2$. So we have $2(2k^2 + 2k + 2j^2 + 2j + 1) = c^2$. However, this means that $2| c^2$, but $4 \not|\, c^2$, which is a contradiction. 
+%  \end{proof}
+
+  \Answer (Basically Hammack Problem 6.16)\footnote{%
+    This is also called the AM-GM Inequality, as it says that the
+    Arithmetic Mean $\frac{x+y}{2}$ is always greater than or equal to
+    the Geometeric Mean $\sqrt{xy}$.}   % 
+  Suppose $x$ and $y$ are non-negative real numbers.  Then
+  \begin{equation*}
+    \frac{x+y}{2} \ge \sqrt{xy}
+  \end{equation*}
+  or, equivalently, $x+y\ge 2\sqrt{xy}$.  
+  \begin{proof}
+    	Suppose towards a contradiction that $x+y < 2\sqrt{xy}$. As $x$ and $y$ are non-negative, we can square both sides and get $(x+y)^2 < 4xy$ so $x^2 + 2xy +y^2 < 4xy$, so $x^2 - 2xy + y^2 < 0$, so $(x-y)^2 < 0$. However, this is a contradiction as no real number squared can be less than 0.
+  \end{proof}
+\end{enumerate}
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

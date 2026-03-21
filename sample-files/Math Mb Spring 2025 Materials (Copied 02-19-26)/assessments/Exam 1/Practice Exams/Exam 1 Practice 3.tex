@@ -1,0 +1,870 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt}
+
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=blue,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+\usepackage{icomma}
+\usepackage{siunitx}
+\usepackage{pifont}
+\usepackage{diffcoeff}
+
+\usepackage{soul}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  quotes,
+  angles
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\small}
+
+\usepackage{tikzangle} % \addplot
+
+\usepackage{pgfplots}
+\pgfplotscreateplotcyclelist{mycolor}{%
+  black, blue, red, green!70!black,magenta,
+  purple, cyan, orange
+}
+\pgfplotsset{
+  cycle list name=mycolor,
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },
+  tick label style = {font=\footnotesize, fill=white, inner sep=0pt},
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin}}
+\pgfplotsset{closed/.style={only marks, mark=*, fill=black, thin}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{ideacolor}{rgb}{0.7,0,0}
+\newcommand{\ideas}[1]{\color{ideacolor} #1 \color{black}}
+\newcommand{\ideacolor}{maroon}
+
+\newlength{\highlightwidth}
+\newcommand{\highlight}[1]{\setlength{\highlightwidth}{\linewidth}%
+  \addtolength{\highlightwidth}{-55pt}%
+  \hspace{24pt}\begin{minipage}[t]{\highlightwidth} \setlength{\parskip}{8pt} #1 \end{minipage}\hspace{24pt}}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\usepackage{exam}
+\begin{document}
+
+\probonly{
+\begin{center}
+  \large\textsc{Exam 1 Practice 3}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\emph{This exam reflection and the attached practice exam will be due on Friday, March 7th at the same time as Problem Set 16. The grading will be based on completion and genuine effort. You should skip \#1a until after the lesson on workbook section 3.5, Monday, March 3rd.}
+
+\begin{enumerate}
+    \item Follow these directions while doing the practice exam. Attempt each problem without any aids. In the left-hand margin next to each part, record how long you spent on the problem and whether you 
+    \begin{enumerate}[label=\Alph*.,nosep]
+        \item were able to complete the problem on your own
+        \item got stuck partway
+        \item didn't know how to start
+    \end{enumerate}
+    \textbf{After attempting the problems without any aids,} pull up the solutions on Canvas and use them to help you answer the following questions.
+
+    \item List the problems/parts that you didn't know how to start. For each, skim the solutions and write down the topics involved that you need to review. (Use the workbook's table of contents as a guide.) You should return to these problems after you review those topics. (OH and MQC are good for this.)
+
+    \pspace{\vfill}
+    
+    \item List the problems/parts on which you got stuck partway. Read the solutions one line at a time until you find where you went wrong or got stuck. What were the key ideas or skills involved that you need to practice for the actual exam? You should put the solutions away and retry the problem yourself.
+    \pspace{\vfill}
+
+    \pspace{\newpage}
+
+    \item 
+    List the problems you were able to complete on your own. For each, compare your work to the solutions. Be strict. If you made any mistakes, try to categorize them. Did you make an algebra mistake? A differentiation mistake? Did you misunderstand the problem? Was your strategy wrong? How do you plan to not make the same mistake on the actual exam? For extra practice, redo the problem.
+
+    \pspace{\vfill}
+    
+    \item You will have two hours to complete Exam 1. Imagine that you were taking the exam today. Based on how well you were able to do these problems on your own and how long they took you, what grade do you think you would earn? If you aren't satisfied with this grade, what specific actions to you intend to take between now and the March 11th?
+
+    \pspace{\vfill}
+
+\end{enumerate}
+
+\newpage
+}
+
+\setcounter{page}{1}
+
+{\large \mbox{} \hfill \bf Name:\underline{\hspace{3in}}}\\[2pt]
+{\mbox{} \hfill \it (Please write your name neatly in print.)}\\[12pt]
+{\large \mbox{} \hfill \bf HUID:\underline{\hspace{3in}}}
+ 
+\medskip
+ 
+\noindent
+{\large\bf
+Exam 1 Practice 3\\
+Math Mb Spring 2025}
+\noindent
+
+
+{\Large
+\begin{center}\textbf{Directions---Please read carefully!} \end{center}}
+
+This is a practice test. The same directions will appear on the actual exam, so read them carefully.
+
+\hrulefill 
+
+
+This exam is subject to the Harvard College Honor Code. No calculators or any other aids are permitted.  Please write as neatly as possible, as answers that can't be read can't be graded and thus can't receive credit. To receive full credit, you must show relevant working
+and include units when appropriate. 
+
+You have 120 minutes to complete this exam. 
+
+You may ask for scratch paper if you need additional space to write, but it will not be scanned or graded. Make sure to include all relevant working in this exam booklet in the space provided for each question.
+
+\begin{center}\textbf{Good luck!}\end{center}
+
+
+\vfill
+
+\centering{
+\emph{As a member of Harvard College, I pledge that I will not give or receive assistance on this exam.}}
+\vspace{0.3in}
+
+{\large \mbox{} \hfill \bf Signature:\underline{\hspace{3in}}}
+\thispagestyle{empty}
+
+\newpage
+
+\begin{enumerate}
+
+% \item
+
+%     \begin{enumerate} 
+%     \item A graph of a sinusoidal function $y=f(x)$ is given below.
+
+% \begin{center}
+
+%   \begin{problem}
+%       \raisebox{1ex-\height}{
+%         \begin{tikzpicture}
+%           \begin{axis}[axis lines=middle,xtick=\empty, ytick=\empty, ymin=-2, ymax=6,
+%             xmin=-4, xmax=4, clip=false, width=3in, height=2in, xlabel=$x$, ylabel=$f(x)$, y label style={at={(current axis.above origin)}, anchor=south}]
+%             \addplot+[domain=-4:4]{-3*sin(deg(pi*x))+2};
+%             \filldraw (axis cs: 0.5, -1) circle(2pt) node[anchor=north
+%             west]{$(1, -1)$};
+%             \filldraw (axis cs: 2.5, -1) circle(2pt) node[anchor=north
+%             west]{$(5, -1)$};
+%             \filldraw (axis cs: 1.5, 5) circle(2pt) node[anchor=south
+%            ]{$(3, 5)$};
+%           \end{axis}
+%         \end{tikzpicture}
+%       }
+%     \end{problem}
+% \end{center}
+
+%     \begin{enumerate}
+%         \item What is the period?
+%         \vfill 
+%         \item What is the midline?
+%         \vfill 
+%         \item What is the amplitude?
+%         \vfill 
+%         \item Write a formula for $f(x)$.
+%         \vfill 
+%     \end{enumerate}
+
+%     \newpage 
+
+%     \item Given the function $f(x) = 3 \cos\Big(\tfrac{1}{2}x \Big)$,
+
+%         \begin{enumerate}
+%             \item What is the period?
+%             \vfill 
+%             \item What is the midline?
+%             \vfill 
+%             \item What is the amplitude?
+%             \vfill 
+%             \item Graph $f(x)$ over one full period on the axes below. Label the $x$- and $y$-coordinates of the minimum, maximum, and one other point on the graph. 
+
+%             \begin{center}
+%         \begin{tikzpicture}
+%           \begin{axis}[xtick=\empty, ytick=\empty, ymin=-3, ymax=3,
+%             xmin=-1, xmax=13, clip=false, width=4in, height=3in, xlabel=$x$,ylabel=$f(x)$,y label style={at={(current axis.above origin)}, anchor=south}]
+%           \end{axis}
+%         \end{tikzpicture}
+%         \end{center}
+%         \end{enumerate}
+
+% \end{enumerate}
+% \vfill 
+
+
+\newpage 
+
+\item Find the derivatives of the following functions using logarithmic differentiation.
+\begin{enumerate}
+
+    \item $f(x)=\dfrac{x^2}{(\arcsin x) \sqrt{x^2+1}}$
+    \pspace{\vfill}
+    
+    \begin{solution}
+       \begin{align*}
+        f(x)&=\dfrac{x^2}{(\arcsin x) \sqrt{x^2+1}}\\
+        \ln[f(x)]&=\ln\left[\dfrac{x^2}{(\arcsin x) \sqrt{x^2+1}} \right] \\
+        \ln[f(x)]&=\ln(x^2)-\ln(\arcsin x)-\ln{\sqrt{x^2+1}} 
+        \\
+        \ln[f(x)]&=2\ln x-\ln{(\arcsin x)}-\frac{1}{2}\ln{(x^2+1)}\\
+        \dfrac{1}{f(x)}\cdot f'(x)&=2\cdot\dfrac{1}{x}-\dfrac{1}{\arcsin x}\cdot \frac{1}{\sqrt{1-x^2}}-\dfrac{1}{2}\cdot\dfrac{1}{x^2+1}\cdot2x\\
+        \dfrac{f'(x)}{f(x)}&=\dfrac{2}{x}-\frac{1}{(\arcsin x)\sqrt{1-x^2}}-\dfrac{x}{x^2+1}\\
+        f'(x)&=f(x)\left[\dfrac{2}{x}-\frac{1}{(\arcsin x)\sqrt{1-x^2}}-\dfrac{x}{x^2+1}\right]\\
+        f'(x)&=\dfrac{x^2}{(\arcsin x) \sqrt{x^2+1}}\left[\dfrac{2}{x}-\frac{1}{(\arcsin x)\sqrt{1-x^2}}-\dfrac{x}{x^2+1}\right]
+       \end{align*} 
+    \end{solution}
+
+    \item $f(x)=(x^2+1)^{\sin x}$
+    \pspace{\vfill}
+    
+    \begin{solution}
+        \begin{align*}
+       f(x)&=(x^2+1)^{\sin x}   \\
+       \ln[f(x)]&=\ln\left[(x^2+1)^{\sin x}\right] \\
+       \ln[f(x)]&=\sin x \cdot \ln(x^2+1) \\
+       \dfrac{1}{f(x)}\cdot f'(x)&=\cos x\cdot \ln(x^2+1) + \sin x \cdot \dfrac{1}{x^2+1}\cdot 2x \\
+       f'(x)&=f(x)\left[\cos x\cdot \ln(x^2+1) + \sin x \cdot \dfrac{2x}{x^2+1}\right] \\
+       f'(x)&=(x^2+1)^{\sin x}\left[\cos x\cdot \ln(x^2+1) + \sin x \cdot \dfrac{2x}{x^2+1}\right] \\
+        \end{align*}
+    \end{solution}
+\end{enumerate}
+
+\pspace{\newpage}
+
+\item Suppose $ 0 < \theta < \pi$ and that $\cos(\theta) = -\dfrac{3}{5}$.
+
+\begin{enumerate}
+    \item Draw angle $\theta$ in standard position on the unit circle below:
+
+  \begin{tikzpicture}
+    \begin{axis}[xmin=-1.2,xmax=1.2,ymin=-1.2,ymax=1.2,
+    xlabel=$x$, ylabel=$y$,
+    width=3in, unit vector ratio*={1 1},
+    xtick={1}, ytick=\empty,clip=false,
+    x tick label style={xshift=3pt}]
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \addplot[black,domain=0:360,data cs=polar] (x,1);
+    \solonly{
+    \draw[dashed] (axis cs:-0.6,-1.2) -- node[midway, below] {${-\frac{3}{5}}$} (axis cs:-0.6,1.2);
+    \addplot[closed] coordinates {(-0.6,0.8)};
+    \draw[very thick, ->] (axis cs: 0,0) -- (axis cs: 1.2,0);
+    \draw[very thick, ->] (axis cs: 0,0) -- (axis cs: -0.9, 1.2);
+    \addplot[domain=0:126.9,->] ({0.2*cos(x)},{0.2*sin(x)});
+    \node at (axis cs: 0.15, 0.25) {$\theta$};
+    }
+    \end{axis}
+  \end{tikzpicture}
+
+    \item    Which of the following are equal to $\theta$? Circle \textbf{THREE} that apply. 
+    \probonly{
+  \begin{center}
+  \begin{itemize}
+  \begin{multicols}{2}
+  \item $\arccos\!\left(\frac{3}{5}\right)$
+  \item $\arcsin\!\left(\frac{4}{5}\right)$
+  
+  \item $\pi$ $-$ $\arcsin\!\left(\frac{4}{5}\right)$ 
+ 
+  \item $\arccos\!\left(-\frac{3}{5}\right)$
+  \item $\arcsin\!\left(-\frac{4}{5}\right)$
+   \item $\pi - \arccos\!\left(\frac{3}{5}\right)$ 
+  
+  \end{multicols}
+\end{itemize}
+\end{center}
+    }
+
+    \solonly{
+\begin{center}
+  \begin{itemize}
+  \begin{multicols}{2}
+  \item $\arccos\!\left(\frac{3}{5}\right)$
+  \item $\arcsin\!\left(\frac{4}{5}\right)$
+  
+  \item \fbox{$\pi$ $-$ $\arcsin\!\left(\frac{4}{5}\right)$} 
+ 
+  \item \fbox{$\arccos\!\left(-\frac{3}{5}\right)$}
+  \item $\arcsin\!\left(-\frac{4}{5}\right)$
+   \item \fbox{$\pi - \arccos\!\left(\frac{3}{5}\right)$ }
+  
+  \end{multicols}
+\end{itemize}
+\end{center}
+    }
+\end{enumerate}
+
+\item \label{spring2014-mb-midterm1-3-modified} 
+
+  \begin{enumerate}
+  \item \label{spring2012-mb-midterm1-5a}
+    \begin{problem}[0.5in]
+      Neville has forgotten the definition of $\arcsin x$.  You tell
+      Neville, \\
+      ``$\arcsin x$ is the angle \fitb{2in}{in $\left[ -
+          \frac{\pi}{2}, \frac{\pi}{2} \right]$ whose sine is $x$}.'' \\(Write what should go in the blank in the space below.)
+    \end{problem}
+
+  \item
+    \begin{problem}[\stretch{3}]
+      Solve the equation $2\sin^2(3x) -5 \sin (3x) - 3=0$ on the domain
+      $[0, \pi]$.
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        2\sin^2(3x) -5 \sin (3x) - 3=0 \\
+        \intertext{Let's substitute $u = \sin(3x)$ since all of the
+          $x$'s in this equation are part of $\sin(3x)$:}
+        2 u^2 -5u - 3 &= 0 \\
+        \intertext{This is a quadratic equation, so let's factor it:}
+        (2u + 1)(u - 3)&= 0 \\
+        \shortintertext{The solutions of this equation are } % 
+        u &= -\frac{1}{2}, 3 \\
+        \intertext{Remember that $u = \sin (3x)$, so we're really solving}
+        \sin(3x) &= -\frac{1}{2}, 3 \\
+        \intertext{But sin of anything can never be 3 because the range of
+          $\sin$ is $[-1, 1]$, so we're really just solving} %
+        \sin(3x) &= -\frac{1}{2} \text{ on $[0, \pi]$} \\
+        \intertext{Let's substitute $\theta = 3x$; we're interested in values
+          of $x$ with $0 \leq x \leq \pi$, so $0 \leq 3x \leq 3\pi$:}
+        \sin(\theta) &= \frac{1}{2} \text{ on $[0, 3 \pi]$} \\
+        \shortintertext{This has 2 solutions,}
+        \theta &= \frac{7\pi}{6}, \frac{11 \pi}{6} \\
+        \intertext{Since $\theta = 3x$, $x = \frac{\theta}{3}$:} %
+        x &= \boxed{\frac{7\pi}{18}, \frac{11 \pi}{18}} 
+      \end{align*}
+    \end{solution}
+\end{enumerate}
+
+\pspace{\newpage}
+
+  \item Simplify the following. If an expression is undefined, explain briefly why
+    it is undefined.
+
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $\arcsin\!\left(\frac{1}{2}\right) +
+        \arccos\!\left(-\frac{\sqrt{3}}{2}\right)$
+      \end{problem}
+
+      \begin{solution}
+        $\arcsin\!\left( \frac{1}{2} \right) = \frac{\pi}{6}$ and
+        $\arccos\!\left(-\frac{\sqrt{3}}{2}\right) = \frac{5 \pi}{6}$, so
+        the given expression is $\boxed{\pi}$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill] 
+        $ \cos\!\left( \arccos \pi \right) + \sin\!\left(\arcsin
+          \frac{3\pi}{2} \right)$
+      \end{problem}
+
+      \begin{solution}
+        Since $\arcsin$ and $\arccos$ have domain $[-1, 1]$, both $\arccos
+        \pi$ and $\arcsin \frac{3\pi}{2}$ are undefined, which makes the
+        entire expression \fbox{undefined}.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\arccos\!\left( \cos\!\left( - \frac{3}{4} \right) \right)$
+      \end{problem}
+
+      \begin{solution}
+        We can picture $\cos \left( - \frac{3}{4} \right)$ like this:
+        \begin{center}
+          \begin{tikzangle}[angle=-3/4, label=$-\frac{3}{4}$, func=cos,
+            functick=$\cos \left( - \frac{3}{4} \right)$, width=3in,
+            height=3in]            
+          \end{tikzangle}
+        \end{center}
+        (The angle shown is $- \frac{3}{4}$ radians.)  $\arccos \left(
+          \cos \left( - \frac{3}{4} \right) \right)$ is the angle in $[0,
+        \pi]$ whose cosine is $\cos \left( - \frac{3}{4} \right)$; it is
+        the blue angle $\theta$ below:
+        \begin{center}
+          \begin{tikzangle}[angle=-3/4, label=$-\frac{3}{4}$, func=cos,
+            functick=$\cos \left( - \frac{3}{4} \right)$, width=3in,
+            height=3in, secondangle=3/4, secondlabel=$\theta$]            
+          \end{tikzangle}
+        \end{center}
+        We can see from the diagram that $\theta = \boxed{\frac{3}{4}}$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\cos\!\left( \arccos\!\left( - \frac{3}{4} \right) \right)$
+      \end{problem}
+
+      \begin{solution}
+        $\arccos \left( - \frac{3}{4} \right)$ is the angle in $[0, \pi]$
+        whose cosine is $- \frac{3}{4}$; we can picture it like this:
+        \begin{center}
+          \begin{tikzangle}[angle=rad(acos(-3/4)), func=cos,
+            functick=$-\frac{3}{4}$, label=$\arccos \left( - \frac{3}{4}
+            \right)$, anchor=south west, labelpos=0.9]
+
+          \end{tikzangle}
+        \end{center}
+        The cosine of this angle is $\boxed{-\frac{3}{4}}$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\sin^{-1}\!\left( \sin 6 \right)$
+      \end{problem}
+
+      \begin{solution}
+        We can picture $\sin 6$ like this ($6$ is just a bit less than $2
+        \pi$:)
+        \begin{center}
+          \begin{tikzangle}[angle=6, label=$6$, func=sin, functick=$\sin
+            6$, labelpos=0.4] 
+          \end{tikzangle}
+        \end{center}
+        (The angle shown is 6 radians.)  Then, $\sin^{-1} \left( \sin 6
+        \right)$ is the angle in $\left[ - \frac{\pi}{2}, \frac{\pi}{2}
+        \right]$ whose sine is $\sin 6$; we can picture it as the blue
+        angle below:
+        \begin{center}
+          \begin{tikzangle}[angle=6, label=$6$, func=sin, functick=$\sin
+            6$, secondangle=6-2*pi]
+            \draw[red] (axis cs: 0, 0) -- (axis cs: \px, \py);
+          \end{tikzangle}
+        \end{center}
+        From the diagram, we can see that the blue angle is $\boxed{6 - 2
+          \pi}$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill] 
+        $2\tan\!\left(\cos^{-1} \frac{2}{3} \right)$
+      \end{problem}
+
+      \begin{solution}
+        $\cos^{-1} \left( \frac{2}{3} \right)$ is the angle in $[0, \pi]$
+        whose cosine is $\frac{2}{3}$; we can picture it as the red angle
+        below: 
+        \begin{center}
+          \begin{tikzpicture}
+            \begin{axis}[axis equal=true, xmin=-2.5, xmax=2.5, ymin=-2.5,
+              ymax=2.5, xtick=\empty, ytick=\empty, width=2.25in,
+              height=2.25in, clip=false]
+              \pgfmathsetmacro{\y}{sqrt(5)} %
+              \draw[blue, thick] (axis cs: 0, 0) -- node[below]{length 2}
+              (axis cs: 2, 0) -- (axis cs: 2, \y) -- (axis cs: 0, 0); %
+              \draw[decorate, decoration={text along path, text
+                color=blue, text={length 3}, text align={center},
+                raise=4pt}] (axis cs: 0, 0) -- (axis cs: 2, \y); %              
+              \pgfmathsetmacro{\angle}{acos(2/3)}
+              \addplot+[domain=0:\angle, red, thin, ->, >=to]
+              ({0.4 * cos(x)}, {0.4 * sin(x)}); 
+            \end{axis}
+          \end{tikzpicture}          
+        \end{center}
+        By the Pythagorean Theorem, the blue triangle has height
+        $\sqrt{5}$.  So, the tangent of this angle is
+        $\frac{\sqrt{5}}{2}$, and $2 \tan \left( \cos^{-1} \frac{2}{3}
+        \right) = \boxed{\sqrt{5}}$.         
+      \end{solution}
+
+    \end{enumerate}
+
+
+
+
+
+
+
+\pspace{\newpage}
+
+\item The Alburquerque International Balloon Fiesta is an annual hot air balloon festival in Alburquerque, New Mexico. At the festival, a photographer is focusing on one particular hot air balloon that is rising straight up at a rate of 15 feet per second. The photographer is standing 400 feet away from the spot where the balloon took off and is filming it as it rises. At what rate must she rotate the camera to continue filming the balloon when it is 300 feet above the ground and rising? Give your answer in radians per second. 
+
+Clearly show the steps of your thought process in your calculations. Final answers with minimal or no work will receive little credit.
+
+\begin{solution}
+    Let's start by drawing diagrams to understand the situation.
+    \begin{center}
+        \begin{tabular}{ccc}
+          \emph{Generic} & \hspace{0.25in} & \emph{Snapshot} \\
+          \begin{tikzpicture}
+            \coordinate (A) at (4, 2);
+            \draw (0,0) -- node[below] {400 ft}(4,0) -- node[right]{$h$} (4,2) -- (0,0);
+            \draw (12pt,0) arc[radius=12pt, start angle=0, end angle=26.6]
+            node[xshift=12pt]{$\theta$};  
+            \filldraw (0, 0) circle(2pt) node[left] {photographer};
+            \filldraw (4,2) circle (2pt) node[right] {balloon};
+        \end{tikzpicture} &&
+                    \begin{tikzpicture}
+            \coordinate (A) at (4, 3);
+            \draw (0,0) -- node[below] {400 ft}(4,0) -- node[right]{300 ft} (4,3) -- node[above left] {500 ft}(0,0);
+            \draw (12pt,0) arc[radius=12pt, start angle=0, end angle=36.7]
+            node[xshift=30pt]{$\arctan(3/4)$};  
+            \filldraw (0, 0) circle(2pt) node[left] {photographer};
+            \filldraw (4,3) circle (2pt) node[right] {balloon};
+        \end{tikzpicture}
+        \end{tabular}
+      \end{center}
+
+    We are given that $\diff{h}{t}=15$ ft/s, and we want to find $\diff{\theta}{t}$ when $h=300$ ft. So we should relate $h$ and $\theta$.
+    \begin{align*}
+        \tan \theta &= \frac{h}{400} \\
+        \intertext{Now we can differentiate both sides with respect to $t$ to get a relationship with the rates.}
+        \diff*{\tan \theta}{t} &= \diff*{\!\left(\frac{h}{400}\right)}{t} \\
+        \sec^2 \theta \cdot \diff{\theta}{t} &= \frac{1}{400}\diff{h}{t}
+        \intertext{
+        Since $\diff{h}{t} = 15$ ft/s, 
+        }
+        \sec^2 \theta \cdot \diff{\theta}{t} &= \frac{1}{400} (15)
+        \intertext{
+        Now we can plug in the value of $\sec^2 \theta$ when $h=300$ ft.
+        }
+        \left(\frac{5}{4}\right)^2 \cdot \diff{\theta}{t} &= \frac{3}{80}
+        \intertext{Solving for $\diff{\theta}{t}$,}
+        \diff{\theta}{t} &= \frac{3}{125} \text{ rad/s}
+    \end{align*}
+\end{solution}
+
+\pspace{\vfill}
+
+
+
+
+
+\pspace{\newpage}
+
+
+\item
+  \label{spring2010-midterm1-practice-18-modified}
+
+  You want to model the population size of a colony of cobras in a jungle with a sinusoidal
+  function. In your model, the population is at its maximum of 2500 at time $t = 0$ months
+  and first reaches its minimum of 1500 at time $t = 3$ months.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Sketch a graph of the modeled population size over 12 months ($0 \leq t
+      \leq 12$). Label or indicate clearly the midline and the coordinates of at least one maximum and at least one minimum.
+    \end{problem}
+
+    \begin{solution}
+      \begin{center}
+        \begin{tikzpicture}
+            \begin{axis}[
+            xlabel=$t$ (months), ylabel=population size,
+            ymin=0, ymax=3000, ytick distance=500,
+            ]
+            \addplot[domain=0:12] {500*cos(deg(pi*x/3))+2000};
+            \addplot[dashed, domain=0:12] {2000};
+            \addplot[closed] coordinates {(3,1500) (6, 2500)};
+            \node[below] at (axis cs:3,1500) {$(3, 1500)$};
+            \node[above] at (axis cs:6,2500) {$(6, 2500)$};
+            \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{0.5}]
+      Write a formula for $P(t)$, the modeled population size at time $t$. 
+    \end{problem}
+
+    \begin{solution}
+      We can see that the amplitude is $\frac{2500-1500}{2} = 500$.  The
+      balance value will be $2000$, since that is midway between the
+      extreme values.  Since $P(t)$ goes from a maximum to a minimum in 3
+      months, the period must be $2 \times 3 = 6$ months.  Therefore, we
+      need $\frac{2\pi}{B} = 6$, so $B = \frac{\pi}{3}$.  Since it has a
+      max at $t=0$, this is nicely modeled by the cosine function: $P(t) =
+      \boxed{ 500\cos \left( \frac{\pi}{3}t \right)+2000}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Find $P'(t)$ and determine the time(s) between $t=0$ and $t=12$ for which $P'(t)=0$. Make sure your answer is consistent with your graph in part (a).
+    \end{problem}
+
+    \begin{solution}
+      $P'(t)=-\frac{500\pi}{3}\sin(\frac{\pi}{3}t)$. Setting this equal to zero and solving for $t$:
+      \begin{align*}
+          -\tfrac{500\pi}{3}\sin(\tfrac{\pi}{3}t) &=0 \\
+          \sin(\tfrac{\pi}{3}t)&= 0
+          \intertext{We can make the substitution $\theta=\tfrac{\pi}{3}t$. Since we are looking for values of $t$ between $0$ and $12$, we should find values of $\theta=\tfrac{\pi}{3}t$ between $0$ and $4\pi$.}
+          \sin(\theta) &= 0 \\
+          \theta &= 0, \pi, 2\pi, 3\pi, 4\pi
+          \intertext{Undoing the substitution and solving for $t$:}
+          \tfrac{\pi}{3}t &= 0, \pi, 2\pi, 3\pi, 4\pi \\
+          t &= 0, 3, 6, 9, 12
+      \end{align*}
+    \end{solution}
+
+    \pspace{\newpage}
+
+    \item
+    \begin{problem}[\vfill]
+      Find the time(s) between $t=0$ and $t=12$ at which your model predicts there will be 1750 cobras in the jungle. Give fully simplified exact answers.
+    \end{problem}
+    
+        \begin{solution}
+      We want to solve the equation 
+      \begin{align*}
+          500\cos(\tfrac{\pi}{3}t)+2000 &= 1750 \\
+          500\cos(\tfrac{\pi}{3}t) &= -250 \\
+          \cos(\tfrac{\pi}{3}t) &= -\tfrac{1}{2}
+          \intertext{We can make the substitution $\theta=\tfrac{\pi}{3}t$. Since we are looking for values of $t$ between $0$ and $12$, we should find values of $\theta=\tfrac{\pi}{3}t$ between $0$ and $4\pi$.}
+          \cos(\theta) &= -\tfrac{1}{2} \\
+          \theta &= \tfrac{2\pi}{3}, \tfrac{4\pi}{3}, \tfrac{8\pi}{3}, \tfrac{10\pi}{3}
+          \intertext{Undoing the substitution and solving for $t$:}
+          \tfrac{\pi}{3}t &= \tfrac{2\pi}{3}, \tfrac{4\pi}{3}, \tfrac{8\pi}{3}, \tfrac{10\pi}{3} \\[2pt]
+          t &= 2, 4, 8, 10
+      \end{align*}
+    \end{solution}
+
+    \item
+    \begin{problem}[\vfill]
+      Find the time(s) between $t=0$ and $t=12$ at which your model predicts there will be 2100 cobras in the jungle. Given exact answers using inverse trigonometric functions.
+      
+    \end{problem}
+            \begin{solution}
+      We want to solve the equation 
+      \begin{align*}
+          500\cos(\tfrac{\pi}{3}t)+2000 &= 2100 \\
+          500\cos(\tfrac{\pi}{3}t) &= 100 \\
+          \cos(\tfrac{\pi}{3}t) &= \tfrac{1}{5}
+          \intertext{We can make the substitution $\theta=\tfrac{\pi}{3}t$. Since we are looking for values of $t$ between $0$ and $12$, we should find values of $\theta=\tfrac{\pi}{3}t$ between $0$ and $4\pi$.}
+          \cos(\theta) &= \tfrac{1}{5} \\
+          \theta &= \arccos(\tfrac{1}{5}),\ 2\pi-\arccos(\tfrac{1}{5}),\ 2\pi+\arccos(\tfrac{1}{5}),\ 4\pi-\arccos(\tfrac{1}{5})
+          \intertext{Undoing the substitution and solving for $t$:}
+          \tfrac{\pi}{3}t &= \arccos(\tfrac{1}{5}),\ 2\pi-\arccos(\tfrac{1}{5}),\ 2\pi+\arccos(\tfrac{1}{5}),\ 4\pi-\arccos(\tfrac{1}{5}) \\
+          t &= \tfrac{3}{\pi}\arccos(\tfrac{1}{5}),\ 6-\tfrac{3}{\pi}\arccos(\tfrac{1}{5}),\ 6+\tfrac{3}{\pi}\arccos(\tfrac{1}{5}),\ 12-\tfrac{3}{\pi}\arccos(\tfrac{1}{5})
+      \end{align*}
+    \end{solution}
+    
+
+ 
+  \end{enumerate}
+
+
+ \pspace{\newpage}
+
+\item
+  \label{spring2009-xb-midterm1-5}
+
+
+  When graphed in the $xy$-plane, the equation $$x^2 + xy + y^2 = 3$$
+  describes a ``tilted ellipse'', as shown below.
+
+  \begin{enumerate}
+
+  \item \label{spring2009-xb-midterm1-5a}
+    \begin{problem}[\vfill]
+      Find $\dfrac{dy}{dx}$.  (You may leave your answer in terms of $x$
+      and $y$.)
+
+      \begin{tikzpicture}
+        \begin{axis}[xtick={-2, 2}, ytick={-2, 2}, xmin=-2.25,
+          xmax=2.25, ymin=-2.25, ymax=2.25, width=2.5in]
+          \addplot+[domain=0:360] ({sqrt(3)*cos(x)-sin(x)}, {2*sin(x)});
+        \end{axis}
+      \end{tikzpicture}
+    \end{problem}
+
+    \begin{solution}
+      We'll use implicit differentiation.  We start with the equation of
+      the ellipse.
+      \begin{align*}
+        x^2 + xy + y^2 &= 3 \\
+        \intertext{Differentiating both sides of the equation with respect
+          to $x$,}
+        2 x+ \frac{d}{dx} \left(\fcolorbox{green}{white}{$\displaystyle
+            x$}\cdot \fcolorbox{green}{white}{$\displaystyle  y$}\right)+
+        \frac{d}{dx} \left(\fcolorbox{red}{white}{$\displaystyle
+            \fcolorbox{blue}{white}{$\displaystyle  y$}^ { 2} $}\right) &=
+        0 \\
+        2 x+ \left(x\cdot \frac{dy}{dx}+ y\right)+ 2 y \cdot \frac{dy}{dx}
+        &= 0 \\
+        \intertext{We want to solve for $\dfrac{dy}{dx}$.  The equation is
+          linear in $\dfrac{dy}{dx}$, so we put all terms with
+          $\dfrac{dy}{dx}$ on one side:}
+        x \frac{dy}{dx} + 2y \frac{dy}{dx} &= - 2x - y \\
+        \intertext{Factor $\dfrac{dy}{dx}$ out of the left side, and then
+          we can solve for it easily:}
+        (x + 2y) \frac{dy}{dx} &= - 2x - y \\
+        \frac{dy}{dx} &= \boxed{\frac{-2x - y}{x + 2y}}
+      \end{align*}
+    \end{solution}
+
+  \item \label{spring2009-xb-midterm1-5-y-intercepts}
+    \begin{problem}[\vfill]
+      Find the points where the ellipse crosses the $y$-axis.
+    \end{problem}
+
+    \begin{solution}
+      The ellipse crosses the $y$-axis where $x=0$. Plugging $0$ for $x$
+      into the equation for the ellipse gives $y^2 = 3$, i.e., $y = \pm
+      \sqrt{3}$. So the points where the ellipse crosses the $y$-axis are
+      $(0, \sqrt{3})$ and $(0, -\sqrt{3})$.
+    \end{solution}
+\pspace{\newpage}
+  \item
+    \begin{problem}[\vfill]
+      Are the tangent lines at the points you found in
+      part (b) parallel?  Explain why or
+      why not using calculus.
+    \end{problem}
+
+    \begin{solution}
+      Looking at the graph, the tangent lines certainly appear to be
+      parallel.  To be sure, we should compute the slopes of the tangent
+      lines.  This is easy since we calculated in
+      \ref{spring2009-xb-midterm1-5a} that $\dfrac{dy}{dx} =
+      \dfrac{-2x-y}{x+2y}$.  At $(0, \sqrt{3})$ we have $\displaystyle
+      \frac{dy}{dx} = \frac{-\sqrt{3}}{2\sqrt{3}} = -\frac{1}{2}$, and at
+      $(0, -\sqrt{3})$ we have $\displaystyle \frac{dy}{dx} =
+      \frac{\sqrt{3}}{-2\sqrt{3}} = -\frac{1}{2}$. So, the two tangent
+      lines are parallel.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Are the tangent lines to the ellipse horizontal at any point? If so,
+      find the exact coordinates of the point(s) where this happens. If
+      not, explain why not.
+    \end{problem}
+
+    \begin{solution}
+      Looking at the graph we can see that there are two points where the
+      tangent line is horizontal.  How do we find these points?  Well, the
+      tangent line is horizontal if its slope, $\dfrac{dy}{dx}$, is 0.
+      Since we found already that $\dfrac{dy}{dx} = \dfrac{-2x - y}{x +
+        2y}$, we want $-2x - y = 0$, or $y = -2x$.
+
+      What exactly does this mean?  Graphically, $y = -2x$ is the blue
+      line below:
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[xtick={-2, 2}, ytick={-2, 2}, xmin=-2.25,
+            xmax=2.25, ymin=-2.25, ymax=2.25, width=2in]
+            \addplot+[domain=0:360] ({sqrt(3)*cos(x)-sin(x)}, {2*sin(x)});
+            \addplot+[domain=-2:2] {-2*x};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      As we can see, the points on the ellipse where the tangent line has
+      slope $0$ are exactly the points on the ellipse with $y = -2x$.  In
+      other words, we want to find the intersection of the ellipse with $y
+      = -2x$.  To do this, we solve the system
+      \[ \left\{
+        \begin{aligned}
+          x^2 + xy + y^2 &= 3 \\
+          y &= -2x 
+        \end{aligned} \right.\]
+      Plugging the second equation into the first, we get
+      \begin{align*}
+        x^2 + x (-2x) + (-2x)^2 &= 3 \\
+        3x^2 &= 3 \\
+        x^2 &= 1 \\
+        x &= \pm 1
+      \end{align*}
+      Since we know $y = -2x$, the two points we're looking at are
+      \fbox{$(1, -2)$ and $(-1, 2)$}.
+    \end{solution}
+
+  \end{enumerate}
+
+
+\probonly{
+\newpage
+\textit{This page has been intentionally left blank for scratch work. No work on this page will be graded.}
+}
+
+\end{enumerate}
+
+
+\end{document}

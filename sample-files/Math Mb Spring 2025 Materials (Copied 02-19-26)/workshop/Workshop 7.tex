@@ -1,0 +1,699 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[workshop]{handout}
+\renewcommand{\workshopnote}{CA Notes.} 
+\usepackage{lipsum}
+ \usepackage{microtype}
+ \usepackage{vwcol}
+ 
+\begin{document}
+
+\htitle{Workshop 7: The Definite Integral}
+
+
+\begin{workshop}
+Welcome to Workshop 7! 
+\newline 
+  Students learned two classes ago that the definite integral $\displaystyle
+  \int_a^b f(x)\,dx$ is
+  \begin{itemize}[nosep]
+  \item defined as the limit of a left-hand or right-hand Riemann sum.
+  \item visualized as a signed area between $f(x)$ and the $x$-axis on the interval $x=a$ to $x=b$.
+  \item interpreted as a net change of a quantity between $x=a$ and $x=b$, \newline specifically (the quantity at $x=b$) $-$ (the quantity at $x=a$), if $f(x)$ is a rate function.    
+  \end{itemize}
+
+  This workshop will include all three of these viewpoints; accordingly, this workshop contains many problems that likely will not be completed during workshop time. As usual, remind students that solutions will be posted at the end of the day and they are encouraged to work through problems they did not get to as extra practice.
+
+  Example Lesson Plan:
+  \begin{itemize}
+      \item 30 minutes: Attendance, \#1. These types of problems can be quite challenging for students, and you should review this question together as a class and address misconceptions after students have some time to work on these in groups.(\underline{Note}: Prepare how you would explain each part of \#1 in advance.)
+      \item 15 minutes: \#2. This is a midterm-like problem. While it may not be necessary for a whole group discussion, please check in with each group to confirm they are feeling comfortable with integral properties. \#2e-g could be particularly confusing.
+      \item 30 minutes: \#3, 4, 5. These questions are meant to have students rework through Riemann sums, their notation, and the limit definition of the definite integral. Riemann sum notation is one of the most challenging pieces of the integration unit and it might be easy for students to disregard its importance for later in the semester and in courses like Math 1b. Remind them that the notation is important to understand, not just memorize. Confirm in groups that answers to \#3 are correct while you circulate.
+      \item If time permits: \#6. This question is an introduction to the idea of an area function and will set students up for the Fundamental Theorem of Calculus, Part I, in the next class. 
+  \end{itemize}
+   
+\end{workshop}
+
+\begin{enumerate}
+
+\item 
+  The graph below in solid black is $r(t)$, the rate at which the line at a soup kitchen forms, in people per hour. At 6am ($t=6$), the line starts to form. Soup is served between the hours of 9 am and 5 pm. The rate at which
+  people can be served is 200 per hour and is represented as the dashed line.
+
+    \begin{tikzpicture}[declare function={f(\x) = 
+        and(6 <= \x, \x < 9) * (8200*(\x-6))/(37*\x-210) +
+        and(9 <= \x, \x < 12.9028) * (200*(5094 - 840*\x + 35*\x^2))/(5364 - 888*\x + 37*\x^2) +
+        and (12.9028 <= \x, \x <= 17) * (-60.9824 * (\x - 17)); 
+      }]
+      \begin{axis}[xtick={6, 7, ..., 17}, ymax=300, ytick={100, 200, 300},
+        grid=major, width=4in, height=1.75in, xlabel=$t$,
+        enlargelimits=false, clip=false, axis line style={shorten >=-8pt},
+        xlabel style={xshift=8pt}]
+        \addplot+[domain=6:17] {f(x)};
+        \addplot[dashed][domain=9:17] {200};
+        \node[right] at (17,200) {rate at which people are being served};
+        \node[above] at (11.5,300) {
+        \begin{tabular}{c}
+        {\small rate at which people are arriving in line} \\
+        {\small (people / hr)}
+        \end{tabular}};
+        \coordinate (A) at (13.67,200);
+    
+    \filldraw[radius=2pt][color=black] (A) circle;
+    \node[above right][color=black] at (A){$(13\frac{2}{3}, 200)$};
+      \end{axis}
+    \end{tikzpicture}
+
+  Answer the following questions.
+  \begin{enumerate}
+  \item
+
+    \begin{problem}
+      How long is the line when the soup kitchen opens at 9 am?
+      Provide both an  exact answer involving a definite integral and an approximation.
+    \end{problem}
+\vfill
+    \begin{solution}
+      Exactly $\displaystyle \int_6^9 r(t)\,dt$, $\approx 500$ people
+    \end{solution}
+
+  \item
+    \begin{problem}
+At what time is the length of the line increasing most
+      rapidly? 
+    \end{problem}
+\vfill
+    \begin{solution}
+      \fbox{9 am}, right before opening, at a rate of 200 people per hour. The length of the line increases most rapidly when (the rate of people getting in line) $-$ (the rate of people being served soup, if it's being served at all) is the greatest. (\underline{Note}: 12pm is not the answer because, while the rate of people getting in line is greatest (300 people per hour), this rate is counteracted (subtracted) by the rate of people being served soup (200 people per hour) for an overall rate of change in line length of 100 people per hour.) 
+    \end{solution}
+
+  \item
+    \begin{problem}
+      At what time is the line the longest? (Parts b and c should have different answers.)
+    \end{problem}
+\vfill
+    \begin{solution}
+    1:40 pm, or $t=13 \frac{2}{3} = \frac{41}{3}$. As long as (the rate of people getting in line) $>$ (the rate of people being served soup), the length of the line increases. The line stops increasing in length once (the rate of people being served soup) exceeds (the rate of people getting in line). 
+    \end{solution}
+
+  \item
+    \begin{problem}
+      When the line is the longest, how many people are in
+      line? Provide both an  exact answer involving a definite integral and an approximation.
+    \end{problem}
+\vfill
+    \begin{solution}
+      The number of people is exactly
+      $\displaystyle \int_6^{\frac{41}{3}} r(t)\,dt - \left(\frac{41}{3} - 9\right)(200)$, which is
+      $\approx 700$.
+    \end{solution}
+
+  \newpage
+\fbox{
+\begin{tikzpicture}[declare function={f(\x) = 
+        and(6 <= \x, \x < 9) * (8200*(\x-6))/(37*\x-210) +
+        and(9 <= \x, \x < 12.9028) * (200*(5094 - 840*\x + 35*\x^2))/(5364 - 888*\x + 37*\x^2) +
+        and (12.9028 <= \x, \x <= 17) * (-60.9824 * (\x - 17)); 
+      }]
+      \begin{axis}[xtick={6, 7, ..., 17}, ymax=300, ytick={100, 200, 300},
+        grid=major, width=4in, height=1.75in, xlabel=$t$,
+        enlargelimits=false, clip=false, axis line style={shorten >=-8pt},
+        xlabel style={xshift=8pt}]
+        \addplot+[domain=6:17] {f(x)};
+        \addplot[dashed][domain=9:17] {200};
+        \node[right] at (17,200) {rate at which people are being served};
+        \node[above] at (11.5,300) {
+        \begin{tabular}{c}
+        {\small rate at which people are arriving in line} \\
+        {\small (people / hr)}
+        \end{tabular}};
+      \end{axis}
+    \end{tikzpicture}
+}
+    
+\item
+    \begin{problem}
+      How long is the line at 1 pm? Provide both an  exact answer involving a definite integral and an approximation.
+    \end{problem}
+\vfill
+    \begin{solution}
+      The number of people in line is exactly $\displaystyle \int_6^{13} r(t)\,dt - (13-9)(200)=\displaystyle \int_6^{13} r(t)\,dt - 800$, $\approx 675$. 
+    \end{solution}
+
+  \item
+    \begin{problem}
+      If a person arrives at 1 pm, how long must they wait to
+      be served? Provide both an  exact answer involving a definite integral and an approximation.
+    \end{problem}
+\vfill
+    \begin{solution}
+      Exactly $\displaystyle \frac{\int_6^{13} r(t)\,dt - 800 \text {\phantom{.}people}}{200 \text{\phantom{.} people per hour}}$
+       or $\displaystyle \frac{\int_6^{13} r(t)\,dt - 800}{200}$ hours, $\approx 3.375$ hours.
+    \end{solution}
+
+  \item
+    \begin{problem}
+      Unfortunately, people still in line at 5PM go home without food. How
+      many people are left in line at closing time? Provide both an  exact answer involving a definite integral and an approximation.
+    \end{problem}
+\vfill
+    \begin{solution}
+      The number of people left unserved in line is exactly $\displaystyle \int_6^{17} r(t)\,dt - (17-9)(200)=\displaystyle \int_6^{17} r(t)\,dt - 1600 \approx 350$ people. 
+    \end{solution}
+
+  \item
+    \begin{problem}
+      If there were enough food left to feed all people in line at 5 pm,
+      at approximately what time would the work of the soup kitchen be
+      done? Provide both an  exact answer involving a definite integral and an approximation.
+    \end{problem}
+\vfill
+    \begin{solution}
+      $\displaystyle \frac{\int_6^{17} r(t)\,dt - 1600}{200}$ hours after
+      5 pm, which is $\approx$ 6:45 pm. 
+    \end{solution}
+  \end{enumerate}
+
+
+  \newpage
+
+  
+\item Let $f(x)$ be a continuous function such that $\displaystyle \int_2^7 f(x)\,dx=6$. Using this information and properties of the definite integral, five out of the seven following integrals can be evaluated exactly. Evaluate these five integrals. For the two other integrals, identify why they cannot be computed without more information.
+    \begin{enumerate}
+
+    \item $\displaystyle \int_2^5 f(x)\,dx + \displaystyle \int_5^7 f(x)\,dx $
+    
+    \begin{solution}
+     $\displaystyle \int_2^5 f(x)\,dx+\displaystyle \int_5^7 f(x)\,dx=\displaystyle \int_2^7 f(x)\,dx=\fbox{6}$   
+    \end{solution}
+    \vfill
+    
+\item $\displaystyle \int_2^9 f(x)\,dx + \displaystyle \int_9^7 f(x)\,dx $
+
+\begin{solution}
+$\displaystyle \int_2^9 f(x)\,dx + \displaystyle \int_9^7 f(x)\,dx =\displaystyle \int_2^7 f(x)\,dx=\fbox{6}$ \newline 
+Alternatively, 
+$\displaystyle \int_2^9 f(x)\,dx + \displaystyle \int_9^7 f(x)\,dx = \displaystyle \int_2^9 f(x)\,dx - \displaystyle \int_7^9 f(x)\,dx =\displaystyle \int_2^7 f(x)\,dx=\fbox{6}$
+\end{solution}
+\vfill 
+\item $\displaystyle \int_2^9 f(x)\,dx + \displaystyle \int_7^9 f(x)\,dx $
+
+\begin{solution}
+\begin{align*}
+\displaystyle \int_2^9 f(x)\,dx + \displaystyle \int_7^9 f(x)\,dx &= \displaystyle \int_2^7 f(x)\,dx + \displaystyle \int_7^9 f(x)\,dx + \displaystyle \int_7^9 f(x)\,dx \\&= \displaystyle \int_2^7 f(x)\,dx + 2\displaystyle \int_7^9 f(x)\,dx\\&=6+2\displaystyle \int_7^9 f(x)\,dx
+\end{align*}
+We do not have enough information to fully compute the original integral because we would need to know $\displaystyle \int_7^9 f(x)\,dx$.
+\end{solution}
+
+
+   
+\vfill
+    \item $\displaystyle \int_7^2 \pi\cdot f(x)\,dx$
+    
+    \begin{solution}
+     $\displaystyle \int_7^2 \pi\cdot f(x)\,dx=\pi \displaystyle \int_7^2  f(x)\,dx=-\pi \displaystyle \int_2^7  f(x)\,dx=$\fbox{$-6\pi$}  
+    \end{solution}
+    \vfill
+    
+\item $\displaystyle \int_0^5 f(x+2)\,dx$
+    
+    \begin{solution}
+    The integrand of this integral represents a shift of $f(x)$ to the left by two units, and the interval of integration is also moved two units to the left (relative to the integral originally provided in the problem introduction).  Thus, 
+    $\displaystyle \int_0^5 f(x+2)\,dx=\displaystyle \int_2^7 f(x)\,dx=\fbox{6}$
+    \end{solution}
+    \vfill
+    
+\item $\displaystyle \int_0^5 f(x-2)\,dx$   
+
+\begin{solution}
+    The integrand of this integral represents a shift of $f(x)$ to the right by two units, and the interval of integration is moved two units to the left (relative to the integral originally provided in the problem introduction). If we were to rewrite the integrand just as $f(x)$, the overall integral would be equivalent to $\displaystyle \int_{-2}^3 f(x)\,dx$. We do not have enough information to compute the original integral because the provided fact does not provide information regarding the interval $x=-2$ to $x=3$. 
+\end{solution}
+\vfill
+    
+    
+\begin{workshop}
+    This question requires flexible thinking. Encourage students to rewrite the integral in a more helpful way in multiple steps.
+\end{workshop}
+  \item $\displaystyle \int_2^7  [2f(x)+3]\,dx$
+  
+  \begin{solution}
+  \begin{align*} 
+\displaystyle \int_2^7  [2f(x)+3]\,dx&=\displaystyle \int_2^7  2f(x)\,dx+\displaystyle \int_2^7 3\,dx\\&=2\displaystyle \int_2^7 f(x)\,dx+\displaystyle \int_2^7 3\,dx\\&=12+\displaystyle \int_2^7 3\,dx 
+\end{align*}
+We can interpret the remaining integral $\displaystyle \int_2^7 3\,dx $ as the signed area between the line $y=3$ and the $x$-axis from $x=2$ to $x=7$. This corresponds to the rectangular area of $3\cdot5=15$ square units. Thus, $=12+\displaystyle \int_2^7 3\,dx=12+15=\fbox{27}$. 
+  \end{solution}
+  \vfill
+  \vfill
+
+ 
+\end{enumerate}
+
+    
+
+  \newpage
+\item Below are two figures that represent an area under the curve $f(x)$. Figure 2 represents the slicing of the area in Figure 1 into $n=12$ slices of equal width. 
+ \providecommand{\graphcommand}{}
+    \renewcommand{\graphcommand}[2]{%
+      \begin{tikzpicture}[declare function={f(\x)=-16.85 + 132.68*\x -
+          34.56*\x^2 + 2.56*\x^3;}] 
+        \begin{axis}[ymin=0, hide y axis, xtick={4, 7}, xticklabels={$a$,
+            $b$}, width=2.5in, cycle list=black, #1]
+          \addplot+[domain=4:7, fill=cyan, draw=none] {f(x)} \closedcycle;
+          #2
+          \addplot+[domain=3:8] {f(x)};
+          \addplot+[domain=3:8, thin] {0};
+          \node[yshift=15pt] at (6,{f(6)}) {$y=f(x)$};
+        \end{axis}
+      \end{tikzpicture} 
+    }
+\begin{center}
+        \begin{tabular}{c @{\hspace{0.35in}} c @{\hspace{0.35in}} c}
+          \graphcommand{}{} &
+          \graphcommand{xtick={4, 7}, xticklabels={$x_0$, $x_n$}, tick label
+            style={font=\scriptsize}}{ 
+            \pgfplotsforeachungrouped \x in {4, 4.25, ..., 7.1}
+            {
+              \pgfmathsetmacro{\y}{f(\x)}
+              \edef\temp{%
+                \noexpand\draw[red] (axis cs: \x, 0) -- (axis cs: \x, \y);
+              }
+              \temp
+            } 
+          }      
+          \\
+          Figure 1 & Figure 2
+        \end{tabular}
+      \end{center}
+
+In parts (a) through (i), fill in the blanks with notation from the bank below.
+\begin{framed}
+\vspace{0.2cm}
+   \hfill  $k$ \hfill $n$  \hfill $x_k$ \hfill $x_0$ \hfill $x_n$ \hfill $f(x_k)$ \hfill $f(x_k)\Delta x$ \hfill $\Delta x$ \hfill $\displaystyle \sum_{k=1}^n f(x_k) \Delta x$ \hspace{0.5cm}
+   \vspace{0.2cm}
+\end{framed}
+
+\begin{enumerate}
+\item In Figure 2, \fitb{1.2in}{\solonly{\textcolor{red}{$n$}}} represents the total number of slices in the sliced region. \vfill
+\item In Figure 2, \fitb{1.2in}{\solonly{\textcolor{red}{$k$}}} represents the number (or index) of a certain slice in the  region. \vfill
+\item In Figure 2, \fitb{1.2in}{\solonly{\textcolor{red}{$x_0$}}} represents the first $x$-value in the interval $[a,b]$. \vfill
+\item In Figure 2, \fitb{1.2in}{\solonly{\textcolor{red}{$x_n$}}} represents the last $x$-value in the interval $[a,b]$. \vfill
+\item In Figure 2, \fitb{1.2in}{\solonly{\textcolor{red}{$x_k$}}} represents the $x$-coordinate of the right side of $k$-th slice. \vfill
+\item In Figure 2, \fitb{1.2in}{\solonly{\textcolor{red}{$f(x_k)$}}} represents the height of the right side of $k$-th slice. \vfill
+\item In Figure 2, \fitb{1.2in}{\solonly{\textcolor{red}{$\Delta x$}}} represents the width of one slice. \vfill
+\item In Figure 2, \fitb{1.2in}{\solonly{\textcolor{red}{$f(x_k)\Delta x$}}} approximates the area of one slice. \vfill
+\item In Figure 2, \fitb{1.2in}{\solonly{\textcolor{red}{$\displaystyle \sum_{k=1}^n f(x_k)\Delta x$}}} represents a sum of the approximate areas of $n$ slices. \vfill 
+\end{enumerate}
+\fbox{\textbf{Tip}: You can use this page as a reference for Riemann sum notation in the following problems.}
+\newpage
+
+\item Let's look a bit more closely at the terms in the sum $\displaystyle \sum_{k=1}^n f(x_k) \Delta x$, and its limit as $n \to \infty$.
+\begin{center}
+        \begin{tabular}{c @{\hspace{0.35in}} c @{\hspace{0.35in}} c @{\hspace{0.35in}} c}
+          \graphcommand{}{} &
+          \graphcommand{xtick={4, 7}, xticklabels={$x_0$, $x_n$}, tick label
+            style={font=\scriptsize}}{ 
+            \pgfplotsforeachungrouped \x in {4, 4.25, ..., 7.1}
+            {
+              \pgfmathsetmacro{\y}{f(\x)}
+              \edef\temp{%
+                \noexpand\draw[red] (axis cs: \x, 0) -- (axis cs: \x, \y);
+              }
+              \temp
+            } 
+          } 
+          &
+          \graphcommand{xtick={4, 7}, xticklabels={$x_0$, $x_n$}, tick label
+            style={font=\scriptsize}}{ 
+            \pgfplotsforeachungrouped \x in {4, 4.1, ..., 7.1}
+            {
+              \pgfmathsetmacro{\y}{f(\x)}
+              \edef\temp{%
+                \noexpand\draw[red] (axis cs: \x, 0) -- (axis cs: \x, \y);
+              }
+              \temp
+            } 
+          }      
+          \\
+          Figure 1 & Figure 2 & Figure 3
+        \end{tabular}
+      \end{center}
+
+The area highlighted in Figure 1 can be represented as a definite integral of the form
+\begin{center}
+$\displaystyle \int_a^b f(x)\,dx$
+ \end{center}
+or as the limit of a Riemann sum with $n$ slices as $n \to \infty$, crudely pictured in Figure 3, of the form
+\begin{center}
+$\displaystyle \lim_{n \to \infty} \displaystyle \sum_{k=1}^n f(x_k)
+  \Delta x$ \hspace{0.5cm}
+  \end{center}
+  or \begin{center}
+      $\displaystyle \lim_{n \to \infty} \displaystyle \sum_{k=0}^{n-1} f(x_k)
+  \Delta x$
+ \end{center}
+such that
+ \begin{center}
+$\Delta x=\dfrac{b-a}{n}$ \hspace{0.5cm} and
+\hspace{0.5cm} $x_k=a+k\Delta x$.
+ \end{center}
+\vfill 
+\begin{workshop}
+    Leading questions include: ``What is $a$, the beginning of the interval?" and "What is the overall length of the interval?".
+\end{workshop}
+Match each of the following integrals with their corresponding definitions of $x_k$ and $\Delta x$.
+\begin{enumerate}
+    
+
+\begin{multicols}{2}
+\item $\displaystyle \int_0^1 f(x)\,dx$
+\solonly{\textcolor{red}{$(4)$}}
+\item $\displaystyle \int_1^2 f(x)\,dx$
+\solonly{\textcolor{red}{$(3)$}}
+\item $\displaystyle \int_1^3 f(x)\,dx$
+\solonly{\textcolor{red}{$(1)$}}
+\item $\displaystyle \int_2^4 f(x)\,dx$
+\solonly{\textcolor{red}{$(2)$}}
+\columnbreak
+\newline
+(1) \hspace{0.1cm} $x_k=1+k\Delta x$ and $\Delta x=\frac{2}{n}$
+
+\vspace{0.6cm}
+
+(2) \hspace{0.1cm} $x_k=2+k\Delta x$ and $\Delta x=\frac{2}{n}$
+
+\vspace{0.6cm}
+
+(3) \hspace{0.1cm} $x_k=1+k\Delta x$ and $\Delta x=\frac{1}{n}$
+
+\vspace{0.6cm}
+
+(4) \hspace{0.1cm} $x_k=k\Delta x$ and $\Delta x=\frac{1}{n}$
+
+\vspace{0.5cm}
+
+
+
+\end{multicols}
+\end{enumerate}
+\newpage
+\item Let's practice writing Riemann sums to approximate area using Figure 2, which highlights the region between the continuous function $f(x)$ and the $x$-axis, from $x=4$ to $x=7$, sliced into $n=12$ slices:
+\begin{center}
+    \providecommand{\graphcommandd}{}
+    \renewcommand{\graphcommandd}[2]{%
+      \begin{tikzpicture}[declare function={f(\x)=-16.85 + 132.68*\x -
+          34.56*\x^2 + 2.56*\x^3;}] 
+        \begin{axis}[ymin=0, hide y axis, xtick={4, 7}, xticklabels={$a$,
+            $b$}, width=3.2in, cycle list=black, #1]
+          \addplot+[domain=4:7, fill=cyan, draw=none] {f(x)} \closedcycle;
+          #2
+          \addplot+[domain=3:8] {f(x)};
+          \addplot+[domain=3:8, thin] {0};
+          \node[yshift=15pt] at (6,{f(6)}) {$y=f(x)$};
+        \end{axis}
+      \end{tikzpicture} 
+    }
+          \graphcommandd{xtick={4, 7}, xticklabels={$4$, $7$}, tick label
+            style={font=\scriptsize}}{ 
+            \pgfplotsforeachungrouped \x in {4, 4.25, ..., 7}
+            {
+              \pgfmathsetmacro{\y}{f(\x)}
+              \edef\temp{%
+                \noexpand\draw[red] (axis cs: \x, 0) -- (axis cs: \x, \y);
+              }
+              \temp
+            } 
+          }      
+          
+        
+      \end{center}
+      \begin{enumerate}
+\begin{workshop}
+    The answers to (a) and (b) follow formulas provided on the previous page.
+\end{workshop}
+
+\item What is the width $\Delta x $ of each slice in Figure 2?
+\begin{solution}
+    $\Delta x = \frac{b-a}{n}=\frac{7-4}{12}=\frac{3}{12}=\frac{1}{4}$
+\end{solution}
+\vfill
+\item Let $x_k$ represent the $x$-coordinate of the right side of the $k$-th slice. What is the formula for $x_k$ in Figure 2, in terms of $k$ and $\Delta x$? 
+\begin{solution}
+    $x_k=4+k\Delta x$
+\end{solution}
+\vfill
+\item Write a left-hand Riemann sum with 12 slices that approximates the area of the region above. Provide your answer in sigma notation and $\dots$ notation with three initial terms and a final term. 
+
+\begin{solution}
+One answer is $\displaystyle \sum_{k=0}^{11} f(x_k) \Delta x$, where $x_k=4+k\Delta x$ and $\Delta x=\frac{3}{12}=\frac{1}{4}$.
+\newline
+Accordingly, $\displaystyle \sum_{k=0}^{11} f(x_k) \Delta x=\frac{1}{4}f(4)+\frac{1}{4}f(4.25)+\frac{1}{4}f(4.5)+\dots+\frac{1}{4}f(6.75)$
+\end{solution}
+\vfill
+\vfill
+\vfill
+\item Write a right-hand Riemann sum with 12 slices that approximates the area of the region above. Provide your answer in sigma notation and $\dots$ notation with three initial terms and a final term. 
+
+\begin{solution}
+One answer is $\displaystyle \sum_{k=1}^{12} f(x_k) \Delta x$, where $x_k=4+k\Delta x$ and $\Delta x=\frac{3}{12}=\frac{1}{4}$.
+\newline
+Accordingly, $\displaystyle \sum_{k=1}^{12} f(x_k) \Delta x=\frac{1}{4}f(4.25)+\frac{1}{4}f(4.5)+\frac{1}{4}f(4.75)+\dots+\frac{1}{4}f(7)$
+\end{solution}
+\vfill 
+\vfill
+\vfill
+\begin{workshop}
+    Because the number of slices $n$ changes, so does our definition of $\Delta x$, which depends on $n$.
+\end{workshop}
+\item Now, write a \textit{limit} of a Riemann sum that \textit{equals} the area of the highlighted region above. Provide your answer in sigma notation. Be sure to redefine any notation you introduce that changes from the last problem, like $\Delta x$.
+
+\begin{solution}
+One answer is $\displaystyle \lim_{n \to \infty} \displaystyle \sum_{k=1}^{n} f(x_k) \Delta x$, where $x_k=4+k\Delta x$ and $\Delta x=\frac{3}{n}$.   
+\end{solution}
+\vfill
+\vfill
+\vfill
+ \end{enumerate}
+\newpage
+  \item 
+  \begin{enumerate}
+\item Sketch the graph of $f(t)=3-\frac{1}{2}t$ on the interval $[0,12]$. 
+
+\begin{solution}
+    \begin{center}
+    \begin{tikzpicture}[declare function={f(\x)=-(\x-6)/2;}] 
+      \begin{axis}[axis equal image, xtick={0, 3, 6, 9, 12}, xticklabels={$0$, $3$, $6$, $9$, $12$}, ytick={-3, -1.5, 0, 1.5, 3}, yticklabels={$-3$, $-1.5$, $0$, $1.5$, $3$}, width=4in, clip=false]
+        \addplot+[domain=-1:13] {f(x)} node[pos=0, left]{$y = f(t)$}; % 
+      \end{axis}
+    \end{tikzpicture}
+    \end{center}
+\end{solution}
+\vfill
+\vfill
+\vfill
+\item Using geometry, compute the following integrals by interpreting them as signed area.
+  \begin{enumerate}
+      \item $\displaystyle \int_{0}^{6} f(t)\,dt\ $
+      
+      \begin{solution}
+          This integral corresponds to the signed area between $f(t)$ and the $t$-axis between $t=0$ and $t=6$, a triangle of height 3 and base 6. Thus, $\displaystyle \int_{0}^{6} f(t)\,dt\ =\frac{1}{2}\cdot3\cdot6=\fbox{9}$.
+      \end{solution}
+      \vfill
+\item $\displaystyle \int_{0}^{12} f(t)\,dt\ $
+      
+      \begin{solution}
+       The signed area between $f(t)$ and the $x$-axis between $x=0$ and $x=6$ is equal in magnitude but opposite in sign to the signed area between $f(t)$ and the $x$-axis between $x=6$ and $x=12$. These two signed areas sum to \fbox{0}.  
+      \end{solution}
+      \vfill
+      \item $\displaystyle \int_{0}^{9} f(t)\,dt\ $
+      
+      \begin{solution}
+        
+        $\displaystyle \int_{0}^{9} f(t)\,dt\ =\displaystyle \int_{0}^{6} f(t)\,dt\ + \displaystyle \int_{6}^{9} f(t)\,dt\ $. We can interpret $\displaystyle \int_{6}^{9} f(t)\,dt\ $ as the signed area between $f(t)$ and the $t$-axis between $t=6$ and $t=9$, which is a triangle with height $1.5$ and base $3$, which has an signed area of $-2.25$. Thus, $ \displaystyle \int_{0}^{6} f(t)\,dt\ +\displaystyle \int_{6}^{9} f(t)\,dt\ = 9 - 2.25 = \fbox{6.75}$.
+      \end{solution}
+      \vfill
+      \item $\displaystyle \int_{0}^{3} f(t)\,dt\ $
+      
+      \begin{solution}
+          This integral corresponds to the signed area between $f(t)$ and the $t$-axis between $t=0$ and $t=3$. Note that $\displaystyle \int_{0}^{3} f(t)\,dt\ =\displaystyle \int_{0}^{6} f(t)\,dt\ - \displaystyle \int_{3}^{6} f(t)\,dt\ $, and $\displaystyle \int_{3}^{6} f(t)\,dt\ $ is equal in magnitude and opposite in sign of $\displaystyle \int_{6}^{9} f(t)\,dt\ $, which we solved for in the previous part. Thus, 
+          \begin{align*}
+              \displaystyle \int_{0}^{3} f(t)\,dt\ &=\displaystyle \int_{0}^{6} f(t)\,dt\ - \displaystyle \int_{3}^{6} f(t)\,dt\
+              \\
+              &=\displaystyle \int_{0}^{6} f(t)\,dt\ + \displaystyle \int_{6}^{9} f(t)\,dt\ 
+              \\
+              &= 9 - 2.25 = \fbox{6.75}
+          \end{align*}
+      \end{solution}
+      \vfill
+      
+  \end{enumerate}
+  \newpage
+\item    
+  The graph of $f(t)=3-\frac{1}{2}t$ is the line drawn below. Let $A(x)=\displaystyle \int_{0}^{x} f(t)\,dt\ $, or the signed area between the line and the $t$-axis from $t = 0$ to $t = x$, where $x$ is in the interval $[0, 12]$. The shaded area corresponds to the value of $A(x)$ for certain $x$ values in the two examples below.
+  \begin{center}
+    \begin{tikzpicture}[declare function={f(\x)=-(\x-6)/2;}] 
+      \begin{axis}[axis equal image, xtick={0, 3, 6, 12}, xticklabels={$0$, $x$, $6$, $12$}, ytick=\empty, xlabel=$t$, width=2.5in, clip=false]
+        \addplot+[domain=-1:12] {f(x)} node[pos=0, left]{$y = f(t)$}; %
+        \addplot+[fill=black!50!white, fill opacity=0.5, domain=0:3, draw=none] {f(x)} \closedcycle; % 
+      \end{axis}
+    \end{tikzpicture}
+    \hspace{0.25in}
+    \begin{tikzpicture}[declare function={f(\x)=-(\x-6)/2;}] 
+      \begin{axis}[axis equal image, xtick={0, 10, 6, 12}, xticklabels={$0$, $x$, $6$, $12$}, ytick=\empty, xlabel=$t$, width=2.5in, clip=false]
+        \addplot+[domain=-1:12] {f(x)} node[pos=0, left]{$y = f(t)$}; %
+        \addplot+[fill=black!50!white, fill opacity=0.5, domain=0:10, draw=none] {f(x)} \closedcycle; % 
+      \end{axis}
+    \end{tikzpicture}
+     
+  \end{center}
+
+ Using the information above and your prior work, evaluate the following quantities:
+ \vspace{0.5cm}
+
+\begin{multicols}{5}
+    $A(0)$\newline
+    $A(3)$\newline
+    $A(6)$\newline
+    $A(9)$\newline
+    $A(12)$
+\end{multicols}
+\begin{solution}
+$A(0)=0$, $A(3)=6.75$, $A(6)=9$, $A(9)=6.75$, $A(12)=0$.
+\end{solution}
+
+\vfill 
+\item Without using calculus, on the interval [0,12], where is $A(x)$ increasing? Where is it decreasing?
+
+\begin{solution}
+Since $A(x)$ outputs the signed area between the curve $f(t)$ and the $t$-axis between $t=0$ and $t=x$, positive signed area accumulates from $t=0$ to $t=6$. Thus, $A(x)$ increases on $[0,6]$. In contrast, negative signed area between $f(t)$ and the $t$-axis accumulates from $t=6$ to $t=12$, so $A(x)$ decreases on $[6,12]$. Also notice how the values of $A(x)$ increase between $x=0$, $x=3$, and $x=6$, and values of $A(x)$ decrease between $x=6$, $x=9$, and $x=12$ in the previous question.
+\end{solution}
+\vfill
+\vfill
+\item Without using calculus, on the interval [0,12], is $A(x)$ concave up or concave down?
+
+\begin{solution}
+    $A(x)$ is concave down on $[0,12]$. Let's start by looking on the interval $[0,6]$: Starting at $x=0$ and approaching $x=6$ in 1 unit intervals, $A(x)$ increases (according to our answer to the previous part), and \textit{less} signed area accumulates in each 1 unit interval until $x=6$. Thus, we can infer that $A(x)$ increases more slowly on $[0,6]$, corresponding to a concave down curve. Let's use the same logic to infer concavity on $[6,12]$: as $x$ increases in 1 unit intervals from $x=6$ to $x=12$, $A(x)$ decreases, but \textit{more} negative signed area accumulates in each 1 unit interval until $x=12$. If $A(x)$ decreases faster on $x=6$ to $x=12$, $A(x)$ is also concave down on $[6,12]$. Thus, $A(x)$ is concave down on $[0,12]$.
+    \end{solution}
+\vfill
+\vfill
+\item Using your work in previous parts of the problem, sketch a graph of $A(x)$ on $[0,12]$.
+
+\begin{solution}
+    \begin{center}
+    \begin{tikzpicture}[declare function={f(\x)=-0.25*(\x)*(\x-12);}] 
+      \begin{axis}[axis equal image, xtick={0, 3, 6, 9, 12}, xticklabels={$0$, $3$, $6$, $9$, $12$}, ytick={0,6.75,9}, yticklabels={$0$, $6.75$, $9$}, width=2.2in, clip=false]
+        \addplot+[domain=0:12] {f(x)} node[pos=0, left]{}; % 
+      \end{axis}
+    \end{tikzpicture}
+    \end{center}
+\end{solution}
+\vfill
+\vfill
+\vfill
+
+\end{enumerate}
+%\item
+%Below are the velocity graphs for a chicken and a goat. Assume that at
+%  time $t=0$ the goat and the chicken start out side by side and they both
+%  travel along the same straight dirt path. Answer the questions below.
+%  When the quantity corresponds to an area, describe this area on the
+%  graph and then give it using the appropriate definite integral or sums
+%  and differences of definite integrals. The graphs intersect at $t=1.5$
+%  and $t=6.5$. The graph of $v_g(t)$ has a maximum at $t=4.5$.
+
+%  \includegraphics{images/go22m198}
+
+%  \begin{enumerate}
+
+ % \item
+ %   \begin{problem}
+ %     The lead the chicken has when the goat begins to move
+%    \end{problem}
+%\vfill
+%    \begin{solution}
+%      The goat begins to move at $t = 1$, so the chicken's lead is its net
+%      change in position from $t = 0$ to $t = 1$, or $\boxed{\int_0^1
+%        v_c(t)\, dt}$.
+%    \end{solution}
+
+  %\item
+%    \begin{problem}
+ %     The distance between the goat and the chicken at time $t=1.5$.
+ %   \end{problem}
+%\vfill
+%    \begin{solution}
+%      The distance the chicken has traveled by $t = 1.5$ is $\displaystyle
+%      \int_0^{1.5} v_c(t)\,dt$, while the distance the goat has traveled
+%      is $\displaystyle \int_0^{1.5} v_g(t)\,dt$.  Therefore, the distance
+%      between the two is $\boxed{\int_0^{1.5} v_c(t)\,dt - \int_0^{1.5}
+ %       v_g(t)\,dt}$.  (We can be sure that the chicken is ahead because,
+%      on $[0, 1.5]$, it's always moving faster than the goat.)
+%    \end{solution}
+
+%  \item
+%    \begin{problem}
+%      The distance between the goat and the chicken at time $t=3$
+ %   \end{problem}
+%\vfill
+ %   \begin{solution}
+  %    The distance the chicken has traveled by $t = 3$ is $\displaystyle
+   %   \int_0^{3} v_c(t)\,dt$, while the distance the goat has traveled
+    %  is $\displaystyle \int_0^{3} v_g(t)\,dt$.  It's not totally clear
+     % which one is ahead at $t = 3$, so we should use absolute values to
+      %describe the distance between them: $\boxed{\left| \int_0^3
+       %   v_c(t)\,dt - \int_0^3 v_g(t)\,dt \right|}$. 
+  %  \end{solution}
+
+%  \item
+ %   \begin{problem}
+  %    The time at which the goat is farthest ahead of the chicken
+%    \end{problem}
+%\vfill
+%    \begin{solution}
+%      The goat is farthest ahead of the chicken at $\boxed{t=6.5}$.
+ %     Starting at $t = 6.5$, the chicken moves faster than the goat and
+%      therefore starts to catch up to the goat. 
+%    \end{solution}
+
+%  \item
+%    \begin{problem}
+%      Approximate the time(s) at which the chicken and the goat pass one
+%      another on the path.
+%    \end{problem}
+%\vfill
+%    \begin{solution}
+%      These are the times at which the chicken and goat have traveled
+%      the same distance; that is, they are the times $T$ when
+%      $\displaystyle \int_0^T v_c(t)\,dt = \int_0^T v_g(t)\,dt$.  It looks
+%      like the only such time is \fbox{around $3$}.
+%    \end{solution}
+
+%  \item
+%    \begin{problem}
+%      Approximate the time at which the distance between the goat and the
+%      chicken is increasing most rapidly.
+%    \end{problem}
+%\vfill
+%    \begin{solution}
+%      This is the time at which the two animals' velocities differ the
+%      most.  This appears to be \fbox{around $t = 4.25$}. 
+%    \end{solution}
+
+%  \end{enumerate}
+
+ 
+
+
+    
+
+\end{enumerate}
+\end{document}

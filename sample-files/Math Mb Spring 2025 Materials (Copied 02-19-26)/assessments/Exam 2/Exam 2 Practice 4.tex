@@ -1,0 +1,874 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt}
+
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=blue,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+\usepackage{icomma}
+\usepackage{siunitx}
+\usepackage{pifont}
+\usepackage{diffcoeff}
+
+\usepackage{soul}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  quotes,
+  angles
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\small}
+
+\usepackage{tikzangle} % \addplot
+
+\usepackage{pgfplots}
+\pgfplotscreateplotcyclelist{mycolor}{%
+  black, blue, red, green!70!black,magenta,
+  purple, cyan, orange
+}
+\pgfplotsset{
+  cycle list name=mycolor,
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },
+  tick label style = {font=\footnotesize, fill=white, inner sep=0pt},
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin}}
+\pgfplotsset{closed/.style={only marks, mark=*, fill=black, thin}}
+\pgfplotsset{plusarea/.style={fill=green, fill opacity=0.5,
+    draw=green!70!black}}
+\pgfplotsset{minusarea/.style={fill=red, fill opacity=0.5,
+    draw=red!70!black}}
+\pgfplotsset{gridgraph/.style={clip=false, axis line style={shorten
+      >=-8pt}, xlabel style={xshift=8pt}, ylabel style={yshift=8pt},
+    enlargelimits=false, grid=major, tick style={black}}} 
+\pgfplotsset{vertslices/.style={ycomb, mark=none, thin}}
+\pgfplotsset{horizslices/.style={xcomb, mark=none, thin}}
+\pgfplotsset{fillregion/.style={fill=lightgray, fill opacity=0.2}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{ideacolor}{rgb}{0.7,0,0}
+\newcommand{\ideas}[1]{\color{ideacolor} #1 \color{black}}
+\newcommand{\ideacolor}{maroon}
+
+\newlength{\highlightwidth}
+\newcommand{\highlight}[1]{\setlength{\highlightwidth}{\linewidth}%
+  \addtolength{\highlightwidth}{-55pt}%
+  \hspace{24pt}\begin{minipage}[t]{\highlightwidth} \setlength{\parskip}{8pt} #1 \end{minipage}\hspace{24pt}}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\usepackage{exam}
+\begin{document}
+
+\probonly{
+\begin{center}
+  \large\textsc{Exam 2 Practice 4}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\emph{This exam reflection and the attached practice exam will be due on Monday, April 7th at the same time as Problem Set 25. The grading will be based on completion and genuine effort.}
+
+\begin{enumerate}
+    \item Follow these directions while doing the practice exam. Attempt each problem without any aids. In the left-hand margin next to each part, record how long you spent on the problem and whether you 
+    \begin{enumerate}[label=\Alph*.,nosep]
+        \item were able to complete the problem on your own
+        \item got stuck partway
+        \item didn't know how to start
+    \end{enumerate}
+    \textbf{After attempting the problems without any aids,} pull up the solutions on Canvas and use them to help you answer the following questions.
+
+    \item List the problems/parts that you didn't know how to start. For each, skim the solutions and write down the topics involved that you need to review. (Use the workbook's table of contents as a guide.) You should return to these problems after you review those topics. (OH and MQC are good for this.)
+
+    \pspace{\vfill}
+    
+    \item List the problems/parts on which you got stuck partway. Read the solutions one line at a time until you find where you went wrong or got stuck. What were the key ideas or skills involved that you need to practice for the actual exam? You should put the solutions away and retry the problem yourself.
+    \pspace{\vfill}
+
+    \pspace{\newpage}
+
+    \item 
+    List the problems you were able to complete on your own. For each, compare your work to the solutions. Be strict. If you made any mistakes, try to categorize them. Did you make an algebra mistake? A differentiation mistake? Did you misunderstand the problem? Was your strategy wrong? How do you plan to not make the same mistake on the actual exam? For extra practice, redo the problem.
+
+    \pspace{\vfill}
+    
+    \item You will have two hours to complete Exam 2. Imagine that you were taking the exam today. Based on how well you were able to do these problems on your own and how long they took you, what grade do you think you would earn? If you aren't satisfied with this grade, what specific actions to you intend to take between now and April 10th?
+
+    \pspace{\vfill}
+
+\end{enumerate}
+
+\newpage
+}
+
+\setcounter{page}{1}
+
+{\large \mbox{} \hfill \bf Name:\underline{\hspace{3in}}}\\[2pt]
+{\mbox{} \hfill \it (Please write your name neatly in print.)}\\[12pt]
+{\large \mbox{} \hfill \bf HUID:\underline{\hspace{3in}}}
+ 
+\medskip
+ 
+\noindent
+{\large\bf
+Exam 2 Practice 4\\
+Math Mb Spring 2025}
+\noindent
+
+
+{\Large
+\begin{center}\textbf{Directions---Please read carefully!} \end{center}}
+
+This is a practice test. The same directions will appear on the actual exam, so read them carefully.
+
+\hrulefill 
+
+
+This exam is subject to the Harvard College Honor Code. No calculators or any other aids are permitted.  Please write as neatly as possible, as answers that can't be read can't be graded and thus can't receive credit. To receive full credit, you must show relevant working
+and include units when appropriate. 
+
+You have 120 minutes to complete this exam. 
+
+You may ask for scratch paper if you need additional space to write, but it will not be scanned or graded. Make sure to include all relevant working in this exam booklet in the space provided for each question.
+
+\begin{center}\textbf{Good luck!}\end{center}
+
+
+\vfill
+
+\centering{
+\emph{As a member of Harvard College, I pledge that I will not give or receive assistance on this exam.}}
+\vspace{0.3in}
+
+{\large \mbox{} \hfill \bf Signature:\underline{\hspace{3in}}}
+\thispagestyle{empty}
+
+\newpage
+
+\begin{enumerate}
+
+\item 
+\begin{problem}
+A rocket is launched straight upward from an initial height of $50$ meters at $t=0$ seconds.  The rocket's velocity in meters per second is given by $v(t)$, where $t$ is measured in seconds.
+\end{problem}
+
+\begin{enumerate}
+    \item 
+    \begin{problem} 
+    Using correct units, explain the meaning of 
+    $\displaystyle\int_3^{7} v(t)\,dt$ in the context of the rocket's flight.
+    \end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    $\displaystyle\int_3^{7} v(t)\,dt$ represents the net change in the rocket's height (in meters) from 3 seconds into the flight to 7 seconds into the flight.
+\end{solution}
+
+\item 
+\begin{problem}
+We define $f(t)=\displaystyle\int_0^t v(\tau)\,d\tau$. Using correct units, explain the meaning of $f(10)$ in context.
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    $f(10)=\displaystyle\int_0^{10} v(\tau)\,d\tau$ is the net change in the rocket's height (in meters) from the start of the flight to 10 seconds into the flight.
+\end{solution}
+
+\item
+\begin{problem} 
+Write an expression that would give the exact height of the rocket at time $t=10$.
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    The exact height of the rocket in meters at time $t=10$ is given by the expression $\displaystyle 50 + \int_0^{10} v(t)\,dt$  or $50+f(10)$.
+\end{solution}
+
+
+%\textit{(Continued on next page)}
+\end{enumerate}
+
+\pspace{\newpage}
+ 
+\item  
+\begin{problem}
+Water flows from an irrigation pipe into a holding tank at a rate of $r(t)$ gallons per hour, where $t$ is the number of hours past noon. Selected values of $r(t)$ are shown in the table below.
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|} \hline
+\begin{tabular}{c} $t$ \\ (time in hours past noon) \end{tabular} &
+2 & 4 & 6 & 8  & 10 \\ \hline
+\begin{tabular}{c} $r(t)$ \\ (flow rate in gallons per hour) \end{tabular} &
+17 & 10 & 7 & 3 & 2 \\ \hline
+\end{tabular}
+\end{center}
+
+Over the course of the afternoon and evening, $r(t)$ is \textbf{decreasing} and \textbf{concave up}. The flow rate of the water is recorded for selected values of 
+$t$
+ over the interval $ 2 \leq t \leq 10$,
+as shown above.
+\end{problem}
+
+\begin{enumerate}
+    
+    
+    \item 
+    \begin{problem}
+    Use a left Riemann sum with 4 equal sub-intervals, $L_4$, to approximate 
+    $\displaystyle\int_2^{10} r(t)\,dt$.
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        \begin{align*}
+            L_4 &= r(2)\cdot 2 + r(4) \cdot 2 + r(6)\cdot 2 + r(8) \cdot 2 \\[4pt]
+            &= (17)(2)+(10)(2)+(7)(2)+(3)(2)\\[4pt]
+            &= 34+20+14+6\\[4pt]
+            &= 74\ \text{gallons}
+        \end{align*}
+    \end{solution}
+    
+\item 
+\begin{problem}
+Is $L_4$ an upper bound for  $\displaystyle\int_2^{10} r(t)\,dt$, a lower bound for  $\displaystyle\int_2^{10} r(t)\,dt$, or is it impossible to determine? If it can be determined, let us know precisely what property of $r(t)$ allowed you to make the determination. 
+\end{problem}
+\pspace{\vfill}
+
+\begin{solution}
+    Because $r(t)$ is decreasing, each term of $L_4$ is an overestimate of the actual amount on that sub-interval. Thus, $L_4$ is an upper bound for $\displaystyle\int_2^{10} r(t)\,dt$.
+\end{solution}
+
+\item 
+\begin{problem}
+Suppose we were also able to compute $R_8$, $L_8$, $R_{40}$, $L_{40}$ and $\displaystyle\lim_{n\to \infty} R_n$. Order these, along with  $\displaystyle\int_2^{10} r(t)\,dt$ from 
+    \textbf{least to greatest.} using an ``$=$" sign or ``$<$'' sign between the terms. 
+\end{problem}
+
+    \newcommand{\blank}{\quad\underline{\phantom{\int_0^8 v(t)\,dt}}\quad}
+
+\probonly{
+    \[\hss
+    \blank\qquad \blank\qquad\blank\qquad\blank\qquad\blank\qquad\blank
+    \hss\]
+}
+\pspace{\vfill}
+
+\begin{solution}
+    \[R_8 < R_{40} < \lim_{n\to\infty} R_n=\int_2^{10} r(t)\,dt < L_{40} < L_8\]
+\end{solution}
+
+\end{enumerate}
+
+\pspace{\newpage}
+
+\item
+
+Evaluate the following limits. It is up to you to determine an appropriate method. Answers with no work shown or no reasoning given will not receive credit.
+
+
+\begin{enumerate}
+  \item
+
+    \begin{problem}
+      $\displaystyle \lim_{x \to \infty} \frac{x + \ln x}{5x^2+300}$
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+      The dominant terms in the numerator and denominator are $x$ and $5x^2$, respectively. This means that we can replace our limit with one that's easier to evaluate.
+      \begin{align*}
+      \lim_{x \to \infty} \frac{x + \ln x}{5x^2+300} 
+      &= \lim_{x \to \infty} \frac{x}{5x^2} \\
+      &=  \lim_{x \to \infty} \frac{1}{5x} \\
+      &= \boxed{0}
+      \end{align*}
+    \end{solution}
+
+
+  \item
+    \begin{problem}
+      $\displaystyle \lim_{x \to 0^+} x^2\ln(x) $
+    \end{problem}
+\pspace{\vfill}
+
+
+    \begin{solution}      
+   As $x \to 0^{+}$, notice that $x^2$ goes to $0$ and $\ln x$ approaches $-\infty$, so this is a ``$0 \cdot \infty$" type limit (an indeterminate form). We should rewrite as a fraction to use L'Hôpital's rule. 
+   \begin{align*}
+\lim_{x \to 0^+} x^2\ln(x) &= \lim_{x \to 0^+} \frac{\ln(x)}{1/x^2}\\
+&= \lim_{x \to 0^+} \frac{\ln(x)}{1/x^2} \\
+&\stackrel{L'H}{=}
+\lim_{x \to 0^+} \frac{1/x}{-2/x^3} \\
+&= \lim_{x \to 0^+} \frac{-x^2}{2} \\
+&= \boxed{0}
+\end{align*}
+
+    \end{solution}
+
+  %\item
+
+  %  \begin{problem}
+   %   $\displaystyle \lim_{x \to \infty} \frac{5^{100}x^5 + 3^{2x} + 7 \cos
+    %    x}{10^{500}\ln x + 2^{3x} + 5 \sin(2x)}$
+    %\end{problem}
+
+   % \begin{solution}
+    %  In the sum $5^{100}x^5 + 3^{2x} + 7 \cos
+     %   x$, $3^{2x}$ is the fastest
+     % growing term (we know $3^{2x} \gg x^5$, and multiplying that $x^5$ by a constant (no matter how large) will not change that;  and $7 \cos x$ doesn't
+      %really grow; it just oscillates between $-7$ and $7$, so $3^{2x}$
+      %definitely grows faster than $7 \sin x$).  Similarly, in the sum $10^{500}\ln x + 2^{3x} + 5 \sin(2x)$, $2^{3x}$ is the fastest growing term.  So, the
+      %given limit is equal to 
+
+%$\displaystyle \lim_{x \to \infty}
+ %     \frac{3^{2x}}{2^{3x}} = \lim_{x \to \infty} \frac{(3^2)^x}{(2^3)^x}
+  %     = \lim_{x \to \infty} \left(\frac{9}{8} \right)^x =  \boxed{\infty}$. 
+   % \end{solution}
+
+    \item
+        \begin{problem}
+            $\displaystyle \lim_{x \to \infty} x^2  e^{-4x} $ 
+        \end{problem}
+        \pspace{\vfill}
+
+        \begin{solution}
+            We rewrite it as $\displaystyle\lim_{x \to -\infty} \frac{x^2}{e^{-4x}}$ and we see that this limit is of the form $\frac{\infty}{\infty}$. Applying L'H\^opital's Rule twice, we get
+            $$\lim_{x \to -\infty} \frac{x^2}{e^{-4x}} \stackrel{L'H}{=} \lim_{x \to -\infty} \frac{2x}{-4e^{-4x}} \stackrel{L'H}{=} \lim_{x \to -\infty} \frac{2}{16e^{-4x}} = \boxed{0}.$$
+        \end{solution}
+
+
+\pspace{\newpage}
+
+
+    \item
+        \begin{problem}
+            $\displaystyle \lim_{x \to 0^+} \frac{\ln x - x}{x^2}$
+        \end{problem}
+        \pspace{\vfill}
+
+        \begin{solution}
+            We check that this is a $\frac{-\infty}{0}$ limit, and so the answer is $\boxed{-\infty}$.
+            (This is not an indeterminate form!)
+        \end{solution}
+
+        \item 
+        \begin{problem} 
+        $\displaystyle \lim_{x \to 3} \dfrac{x^3-3x^2}{x-3}$
+        \end{problem}
+        \pspace{\vfill}
+
+        \begin{solution}
+            This is a $\frac{0}{0}$ limit, but we can factor and cancel to evaluate.
+            \begin{align*}
+                \lim_{x\to3} \frac{x^3-3x^2}{x-3} 
+                &= \lim_{x\to3} \frac{x^2(x-3)}{x-3} \\
+                &= \lim_{x\to3} x^2 \\
+                &= \boxed{9}
+            \end{align*}
+        \end{solution}
+
+
+        \end{enumerate}
+
+\pspace{\newpage} 
+
+% \item (7 points total, (a) 1 point, (b) 3 points (i 1pt, ii 2pts), (c) 3 points) 
+
+% Complete the following: 
+% \begin{enumerate}
+
+   
+%             \item Write down the domain and range of $f(x) = \arcsin (x)$: 
+            
+%             \textbf{Domain:} \hfill \textbf{Range:} \hfill \phantom{.}
+
+
+
+%             \begin{solution}
+%                 The domain of $f(x)= \arcsin(x)$ is $[-1, 1]$ (coming from the range of $\sin(x)$) and it's range is $\Big[ -\dfrac{\pi}{2}, \dfrac{\pi}{2}\Big]$ coming from the restricted domain of $\sin(x)$.
+%             \end{solution}
+            
+            
+
+        
+% \vspace{.2 in}
+%     \item Simplify the following expressions. Your answers should not contain any trig or inverse trig functions.
+%     \begin{enumerate}
+%      \item $\arcsin\bigl(\sin\Bigl(\dfrac{5\pi}{6}\Bigr)\bigr)$
+% \vfill  
+% \item $\tan(\arcsin\Bigl(\dfrac{-1}{3}\Bigr)\bigr)$
+
+% \vfill 
+     
+%     \end{enumerate}
+
+% \newpage 
+
+%     \item Theo doesn't remember the derivative of $\arctan(x)$. Help Theo by determining the derivative of $\arctan(x)$ by first setting $y=\arctan(x)$, solving for $x$, and then using implicit differentiation. Make sure your final answer is in terms of $x$ and does not involve inverse trig functions. There are two different ways to do this. Make sure your line of reasoning is clearly explained.
+% \vfill 
+% \end{enumerate}
+
+ % \newpage
+
+
+\item 
+
+\begin{problem}
+A large farmers' market opened this past weekend. The rate at which people entered the farmers' market (in hundreds of people per hour) can be modeled by $r(t)$, and the rate of people leaving the market (in hundreds of people per hour) can be modeled by $s(t)$, with time $t$ measured in hours from opening (so $t=0$ is when it opens to the public). Before opening, 200 people were already at the market setting up.
+\end{problem}
+
+\begin{center}
+    \begin{tikzpicture}
+     \begin{axis}[cycle list=black, minor tick num=1,
+       grid=both, xtick={-2, 0, ..., 12}, height=2.5in, width=3in,
+       ytick={-2, 0,..., 10},samples=100]
+       \addplot+[domain=0:12, ultra thick] {1+10*(x+0.5)^2*e^(-x)} node[pos=0.5, right] {$r(t)$};
+       \addplot+[domain=0:12,  thick] {3*sin(deg(x/(2*pi))} node[pos=0.2,above] {$s(t)$};
+     \end{axis}
+   \end{tikzpicture}
+  \end{center}
+
+
+Answer the following questions using the graphs of $r(t)$ and $s(t)$
+on the closed interval $0 \leq t \leq 12$. You may give approximate values as needed.
+
+
+\begin{enumerate}
+    \item 
+    \begin{problem}
+    At approximately what time were people entering the market most rapidly? Write one sentence explaining how you know. 
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        People were entering the market most rapidly approximately 1.5 hours after opening. This is because $r(t)$ gives the rate at which people enter the farmers' market, and the graph of $r(t)$ is the highest at $t\approx 1.5$.
+    \end{solution}
+    
+    \item 
+    \begin{problem}
+    At approximately what time was the the number of people at the market greatest? Write one sentence explaining how you know. 
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        The number of people at the market was greatest at approximately 5.5 hours after opening. This is because the rate of change of the number of people in the market is $r(t)-s(t)$. Before $t\approx 5.5$, this rate is positive, so the number of people in the market is increasing. After $t\approx 5.5$, this rate is negative, so the number of people in the market is decreasing. 
+    \end{solution}
+
+    \item 
+    \begin{problem}
+    Write an expression for the number of people in the market at the time indicated in part (b).
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+    The number of people in the market at time $t=0$ is $200$, and the rate of change of the number of people in the market is $r(t)-s(t)$, so the total number of people at $t=5.5$ is
+        $\displaystyle 200+\int_0^{5.5} \big[r(t)-s(t)\big]dt$.
+    \end{solution}
+
+    % \item Were there more people in the market when it opened or at time $t=12$? Write one sentence explaining how you know.
+
+% \vfill 
+    
+\end{enumerate}
+
+\pspace{\newpage}
+
+\item
+\begin{problem}
+Suppose we are given the following information about a continuous function $h(x)$: $\displaystyle\int_{2}^{7} h(x) \,dx =10$. 
+
+Evaluate the following definite integrals. 
+\end{problem}
+
+\begin{enumerate}
+    \item 
+    \begin{problem}
+    $\displaystyle\int_{2}^{7} \Big[\frac{\pi h(x)}{5} +6\Big] \,dx$
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        \begin{align*}
+            \displaystyle\int_{2}^{7} \Big[\frac{\pi h(x)}{5} +6\Big] \,dx &= \displaystyle\int_{2}^{7} \frac{\pi h(x)}{5} \,dx + \displaystyle\int_{2}^{7} 6 \, dx \\
+            &= \frac{\pi}{5}\displaystyle\int_{2}^{7} h(x) \,dx + \displaystyle\int_{2}^{7} 6 \, dx
+        \end{align*}
+
+        We can visualize $\displaystyle\int_{2}^{7} 6 \, dx$ as the following signed area:
+
+        \begin{center}
+        \begin{tikzpicture}
+            \begin{axis}[cycle list=black, axis equal=true, xtick={2, 7},
+              ytick={0, 6}, width=2in]
+              \addplot+[domain=2:7, plusarea] {6} \closedcycle;
+              \addplot+[domain=0:8] {6};
+            \end{axis}
+          \end{tikzpicture}
+          \end{center}
+
+        So we have 
+        \begin{align*}
+            \displaystyle\int_{2}^{7} \Big[\frac{\pi h(x)}{5} +6\Big] \,dx &= \frac{\pi}{5} \left (10\right ) + 30 \\
+            &= \boxed{2\pi + 30} \\
+        \end{align*}
+    
+    \end{solution}
+
+    
+    \item
+    \begin{problem}
+    $\displaystyle\int_{6}^{11} 3h(x-4) \,dx$
+    \end{problem}
+    \pspace{\vfill}
+    
+    \begin{solution}
+        The graph of $h(x-4)$ is the graph of $h(x)$ shifted to the right 4 units. So the signed area under $h(x-4)$ from $x=6$ to $x=11$ is the same as the signed area under $h(x)$ from $x=2$ to $x=7$. So,
+
+        \[\displaystyle\int_{6}^{11} 3h(x-4) \,dx = 3\displaystyle\int_{6}^{11} h(x-4) \,dx = 3\displaystyle\int_{2}^{7} h(x) \,dx = \boxed{30}\]
+    \end{solution}
+\end{enumerate}
+\newpage 
+
+\begin{framed}
+        Continued from the previous page. The problem statement is provided again below.
+    
+Suppose we are given the following information about a continuous function $h(x)$: $\displaystyle\int_{2}^{7} h(x) \,dx =10$. 
+Evaluate the following definite integrals.
+    \end{framed}
+
+    \begin{enumerate}[resume]
+
+    
+    \item 
+    \begin{problem}
+    $\displaystyle\int_{2}^{8} h(x) \,dx- \int_{7}^{8}h(x) \,dx$ 
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        \begin{align*}
+            \displaystyle\int_{2}^{8} h(x) \,dx- \int_{7}^{8}h(x) \,dx &= \displaystyle\int_{2}^{8} h(x) \,dx+ \int_{8}^{7}h(x) \,dx\\
+            &= \displaystyle\int_{2}^{7} h(x) \,dx\\
+            &= \boxed{10}
+        \end{align*}
+    \end{solution}
+
+    
+    \item
+    \begin{problem}
+    $\displaystyle\int_{7}^{2} (h(x) + 4x)\,dx$
+    \end{problem}
+    \pspace{\vfill}
+    
+    \begin{solution}
+        \begin{align*}
+            \displaystyle\int_{7}^{2} (h(x) + 4x)\,dx &= -\displaystyle\int_{2}^{7} (h(x) + 4x)\,dx\\
+            &= -\Bigg[\displaystyle\int_{2}^{7} h(x)\,dx + \displaystyle\int_{2}^{7} 4x \,dx \Bigg]
+        \end{align*}
+
+    We know that $\displaystyle\int_{7}^{2} h(x) \, dx=10$ and we can visualize $\displaystyle\int_{2}^{7} 4x \,dx$ as signed area under $y=4x$ from $x=2$ to $x=7$.
+
+    \begin{center}
+        \begin{tikzpicture}
+            \begin{axis}[cycle list=black, axis equal=true, xtick={2, 7},
+              ytick={8, 28}, width=2 in, xmin=0, xmax=8, ymin=0, ymax=30]
+              \addplot+[domain=2:7, plusarea] {4*x} \closedcycle;
+              \addplot+[domain=0:10] {4*x} node[left] {$y=4x$};
+            \end{axis}
+        \end{tikzpicture}
+    \end{center}
+
+    We can find this area using geometry, splitting the region into a rectangle and a triangle. The rectangle has area $5\cdot8=40$ and the triangle has area $\frac{1}{2}\cdot 5\cdot 20 = 50$. So, $\displaystyle\int_{2}^{7} 4x \,dx = 90$. Putting this together:
+
+    \[\displaystyle\int_{7}^{2} (h(x) + 4x)\,dx = -\Bigg[\displaystyle\int_{2}^{7} h(x)\,dx + \displaystyle\int_{2}^{7} 4x \,dx \Bigg] = -(10+90)=\boxed{-100}\]
+    
+    \end{solution}
+
+    
+\end{enumerate}
+
+\newpage 
+
+\item
+
+The graph of the function $f$,
+ consisting of three line segments, is shown below. Let 
+ $\displaystyle g(x)=\int_1^x f(t)\,dt$.
+
+ \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+      xmin=-2.5, xmax=4.5, ymin=-2.5, ymax=4.5, axis equal image, clip=false,
+      xtick distance = 1, ytick distance=1, grid=major
+      ]
+        \node (A) at (-2,0){};
+        \node (B) at (0,4){};
+        \node (C) at (1,2){};
+        \node (D) at (4,-1){};
+        \addplot[only marks, mark=*] coordinates {
+        (-2,0)
+        (0,4)
+        (1,2)
+        (4,-1)
+        };
+        \addplot[very thick] coordinates {
+        (-2,0)
+        (0,4)
+        (1,2)
+        (4,-1)
+        };
+      \end{axis}
+    \end{tikzpicture}
+ \end{center}
+ \begin{enumerate}
+     \item 
+     \begin{problem}
+     Compute $g(-2)$ and $g(4)$.
+     \end{problem}
+      \pspace{\vfill}
+
+      \begin{solution}
+          \begin{align*}
+              g(-2) &= \int_1^{-2} f(t)\,dt \\
+              &= -\int_{-2}^1 f(t)\,dt
+          \intertext{
+          We can figure out that $\displaystyle \int_{-2}^1 f(t)\,dt=7$ by finding the signed area under the graph of $f$, so}
+          g(-2)&= -7.
+          \end{align*}
+
+          Similarly,
+          \begin{align*}
+              g(4)&=\int_1^4f(t)\,dt \\[4pt]
+              &= 1.5
+          \end{align*}
+          which we also figure out by looking at the signed area under the graph of $f$.
+          
+      \end{solution}
+     
+     \item 
+     \begin{problem}
+     Find $g'(1)$.
+     \end{problem}
+     \pspace{\vfill}
+
+     \begin{solution}
+         By FTC1, $g'(x)=f(x)$, so $g'(1)=f(1)=2$.
+     \end{solution}
+     
+     \item 
+     \begin{problem}
+     On what interval(s) is $g$ increasing? Justify your answer.
+     \end{problem}
+     \pspace{\vfill}
+
+     \begin{solution}
+         Since $g'(x)=f(x)$, $g'$ is positive on the interval $(-2,\,3)$. This means that $g$ is increasing on the interval $(-2,\,3 )$. 
+     \end{solution}
+     
+     \item 
+     \begin{problem}
+     On what interval(s) is $g$ concave up? Justify your answer.
+     \end{problem}
+     \pspace{\vfill}
+
+     \begin{solution}
+         Since $g'(x)=f(x)$, $g'$ is increasing on the interval $(-2,\,0)$. This means that $g$ is concave up on the interval $(-2,\,0)$.
+     \end{solution}
+     
+     \item 
+     \begin{problem}
+     Find the \textbf{maximum value} of $g$ on the closed interval $[-2,\,4]$. Justify your answer.
+     \end{problem}
+     \pspace{\vfill}
+
+     \begin{solution}
+     
+     \textbf{Method 1:}
+      By FTC1, $g$ is differentiable and thus continuous. We are looking at a continuous function on a closed interval, so the maximum value of $g$ must occur at either a critical point or an endpoint. We can compare the values to determine the maximum.
+
+      The only critical point on $(-2,\,4)$ is at $3$ since $g'(3)=f(3)=0$. The value of $g(3)$ is $\int_1^3f(t)\,dt=2$, found using area.
+      
+      Comparing the values at the endpoints and critical points,
+      \begin{align*}
+          g(-2) &= -7\\
+          g(3) &= 2 \\
+          g(4) &= 1.5
+      \end{align*}
+      we see the maximum value is $2$.
+
+      \textbf{Method 2:}
+      By FTC1, $g$ is differentiable and thus continuous. We know that $g$ is increasing on $(-2,\,3)$ and decreasing on $(3,\,4)$, and since $g$ is continuous, we can include the endpoints to conclude that $g$ is increasing on $[-2,\,3]$ and decreasing on $[3,\,4]$. Therefore the maximum value must be $g(3)$, which is $\int_1^3f(t)\,dt=2$, found using area.
+     \end{solution}
+
+ \end{enumerate}
+
+ \pspace{\newpage}
+
+\item 
+\begin{problem}
+    The graph of $y=\arccos(x)$ is shown below.
+\end{problem}
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+        xmin=-2, xmax=2, xlabel=$x$, ylabel=$y$,
+        axis equal image, height=2.5in
+        ]
+            \addplot[domain=-1:1] {rad(acos(x))};
+            \addplot[closed] coordinates {(-1,pi) (1,0)};
+            \solonly{
+            \addplot[domain=-1:1, fill=green, fill opacity=0.5] {rad(acos(x))} \closedcycle;
+            }
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\begin{enumerate}
+    \item 
+    \begin{problem}
+    Illustrate on the graph the geometric meaning of $\displaystyle \int_{-1}^1 \arccos(x)\,dx$.
+    \end{problem}
+
+    \begin{solution}
+        See graph.
+    \end{solution}
+
+    \item 
+    \begin{problem}
+    Approximate $\displaystyle \int_{-1}^1 \arccos(x)\,dx$ by a right Riemann sum with 4 equal sub-intervals, $R_4$. Simplify.
+    \end{problem}
+    \pspace{\vfill}
+
+    \begin{solution}
+        \begin{align*}
+            R_4 &= \arccos(-0.5)\cdot 0.5 + \arccos(0) \cdot 0.5 + \arccos(0.5) \cdot 0.5 + \arccos(1) \cdot 0.5 \\[4pt]
+            &= (\tfrac{2\pi}{3})(0.5) + (\tfrac{\pi}{2})(0.5)+(\tfrac{\pi}{3})(0.5) + (0)(0.5) \\[4pt]
+            &= \boxed{\tfrac{3\pi}{4}}
+        \end{align*}
+    \end{solution}
+
+    \item
+    \begin{problem}
+    Now we want to write a formula for a right Riemann sum with $n$ equal sub-intervals, $R_n$.
+    \end{problem}
+
+    \begin{enumerate}
+        \item 
+        \begin{problem}
+            Write a formula for the width of each sub-interval $\Delta x$ in terms of $n$.
+        \end{problem}
+        \pspace{\stretch{0.3}}
+
+        \begin{solution}
+            Since the width of the interval $[-1,\,1]$ is $2$, $\boxed{\Delta x = \tfrac{2}{n}}$.
+        \end{solution}
+
+        \item
+        \begin{problem}
+            Write a formula for the right endpoint of the $k$th sub-interval $x_k$ in terms of $k$ and $n$.
+        \end{problem}
+        \pspace{\stretch{0.3}}
+
+        \begin{solution}
+            The right endpoint of the $kth$ sub-interval is $k\Delta x$ to the right of $x=-1$, so $x_k=-1+k\Delta x$. Since $\Delta x = \tfrac{2}{n}$, $\boxed{x_k=-1+\tfrac{2k}{n}}$.
+        \end{solution}
+
+        \item
+        \begin{problem}
+            Write a formula for $R_n$ using sigma notation.
+        \end{problem}
+        \pspace{\stretch{0.3}}
+
+        \begin{solution}
+            \begin{align*}
+                R_n &= \sum_{k=1}^n f(x_k)\Delta x \\
+                \intertext{We can substitute our formulas for $\Delta x$ and $x_k$:}
+                &= \sum_{k=1}^n f(-1+\tfrac{2k}{n})(\tfrac{2}{n})\\
+                \intertext{And since $f(x)=\arccos x$:}
+                R_n &= \sum_{k=1}^n \arccos(-1+\tfrac{2k}{n})(\tfrac{2}{n})
+            \end{align*}
+        \end{solution}
+    \end{enumerate}
+    
+\end{enumerate}
+
+   \end{enumerate} 
+
+
+\end{document}

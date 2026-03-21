@@ -1,0 +1,553 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{pifont}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\pgfplotsset{gridgraph/.style={clip=false, axis line style={shorten
+      >=-8pt}, xlabel style={xshift=8pt}, ylabel style={yshift=8pt},
+    enlargelimits=false, grid=major, tick style={black}}} 
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols]{handout}
+\renewcommand{\workshopnote}{CA Notes.}    
+
+\providecommand{\check}{}
+\renewcommand{\check}{\ifmmode{\text{ \ding{51} }}\else{\ding{51} }\fi}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\htitle{Workshop 5}
+
+\begin{workshop}
+  Start workshop by having students talk about what they do with the feedback they get on homework; there are slides in the Google Drive called ``Workshop 5 - Homework feedback''.
+
+  It's likely that a fair number of students aren't regularly looking at their feedback. So, show students the video on Slide 2, just to make sure everyone knows how to view their feedback. Then give them a few minutes to think about what they might want to do with this. There are a few suggestions on Slide 4.   
+\end{workshop}
+
+\begin{enumerate}
+\item 
+
+  \begin{workshop}
+    This problem puts together lots that we've talked about recently; it's really meaty, so students might spend most of workshop working just on this problem, and that's fine. 
+  \end{workshop}
+
+  Let $f(x) = \dfrac{x^3 + 16}{x}$.
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Find all values of $x$ in $(-\infty, \infty)$ at which $f$ is discontinuous. Use limits to classify each discontinuity (as a removable discontinuity, jump, or vertical asymptote). If a limit does not exist, calculate both one-sided limits.
+    \end{problem}
+
+    \begin{solution}
+        $f$ is discontinous at $x=0$. 
+        \begin{itemize}
+            \item $\displaystyle \lim_{x \to 0^+} \dfrac{x^3 + 16}{x} = \infty$
+              \item $\displaystyle \lim_{x \to 0^-} \dfrac{x^3 + 16}{x} = -\infty$
+              \item $\displaystyle \lim_{x \to 0} \dfrac{x^3 + 16}{x}$ does not exist
+        \end{itemize}
+        This together means that $x=0$ is a vertical asymptote.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Does $f$ have horizontal asymptotes? If so, where? Use limits to support your answer. 
+    \end{problem}
+
+    \begin{solution}
+        We determine if $f$ has a horizontal asymptote by computing the limits as $x$ grows and decreases without bound (ie limits at infinity).
+        \begin{itemize}
+            \item $\displaystyle \lim_{x \to \infty} \dfrac{x^3 + 16}{x} = \displaystyle \lim_{x \to \infty} \dfrac{x^3}{x} = \displaystyle\lim_{x\to\infty} x^2 = \infty$
+            \item $\displaystyle \lim_{x \to -\infty} \dfrac{x^3 + 16}{x} = \displaystyle \lim_{x \to -\infty} \dfrac{x^3}{x} = \displaystyle\lim_{x\to-\infty} x^2 = \infty$
+        \end{itemize}
+        So $f$ does not have any horizontal asymptotes.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Find all intercepts of $y = f(x)$. If any intercept is at a non-integer value, give two consecutive integers that it's between. 
+    \end{problem}
+
+    \begin{solution}
+        The $x$-intercept occurs when the output is 0. In other words, we need to solve the equation:
+        $$\dfrac{x^3+16}{x}= 0$$
+        We do so as follows:
+        \begin{align*}
+            \dfrac{x^3+16}{x}= 0 \\
+            \intertext{This can only occur when the numerator is equal to 0, so the solutions to this equation will be the same as the solutions to } \\
+            x^3 + 16 = 0 \\
+            x^3 = -16 \\
+            x = \sqrt[3]{16} \\            
+        \end{align*}
+        Since $-27 < -16 < -8$, we have that 
+        \begin{align*}
+               \sqrt[3]{-27}< \sqrt[3]{-16} < \sqrt[3]{-8}\\
+               -3 < \sqrt[3]{-16} < -2
+        \end{align*}
+
+    For the $y$-intercept, this occurs when $x = 0$, but we can see that the function is undefined there, so this function has no $y$-intercept. This matches with what we found in Part (a), where we showed that $f$ has a vertical asymptote at $x=0$. 
+     
+    \end{solution}
+
+  \item
+
+    \begin{workshop}
+      We need to first rewrite $f(x)$ as $x^2 + \dfrac{16}{x} = x^2 + 16 x^{-1}$ to be able to use the differentiation rules we learned in class.
+    \end{workshop}
+
+    \begin{problem}[\vfill]
+      Where is $f$ increasing? Where is $f$ decreasing?
+    \end{problem}
+
+    \begin{solution}
+        We need to eventually take the derivative of $f$, but let's first rewrite it to make that easier:
+        $$f(x) = \dfrac{x^3+16}{x} = x^2 + \dfrac{16}{x} = x^2 + 16x^{-1}$$
+        $f$ is increasing when $f'$ is positive, and decreasing when $f'$ is negative. We see that 
+        $$f'(x) = 2x - 16x^-2 = 2x - \dfrac{16}{x^2},$$
+        and we need to see where this is equal to 0 and where it is undefined.
+        \begin{itemize}
+            \item First determine where it is equal to 0:
+            \begin{align*}
+                2x-\dfrac{16}{x^2} = 0 \\
+                2x = \dfrac{16}{x^2} \\
+                2x^3 = 16 \\
+                x^3  = 8 \\
+                x = 2
+            \end{align*}
+            \item $f'$ is undefined when $x = 0$. 
+        \end{itemize}
+        We will now put these values into a sign chart 
+
+        \begin{center}
+        \begin{tikzpicture}[scale=1]
+          \draw[<->] (-2,0) -- (4, 0);
+          \node[left] at (-2,0) {$f'(x)$};
+          \foreach \x in {0,2}
+            \draw[shift={(\x,0)},color=black] (0pt,3pt) -- (0pt,-3pt) node[below] {$\x$};
+          \foreach \x in {0,2}
+            \node[circle, fill=black, inner sep=2pt] at (\x,0) {};
+          \node[above] at (-1,0) {$-$};
+          \node[above] at (1,0) {$-$};
+          \node[above] at (3,0) {$+$};
+        \end{tikzpicture}
+      \end{center}
+      Therefore, $f$ increases on the interval $(2, \infty)$ and decreases on $(-\infty, 0) \cup (0,2)$
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Where is $f$ concave up? Where is $f$ concave down? 
+    \end{problem}
+
+    \begin{solution}
+        $f$ is concave up when $f''$ is positive and concave down when $f''$ is negative. To make this determination, we will first need to determine what $f''$ is, and we see that 
+        $$f''(x) = 2 + 32x^{-3} = 2 + \dfrac{32}{x^3}$$
+        We need to see where this is equal to 0 and where it is undefined.
+        \begin{itemize}
+            \item First determine where it is equal to 0:
+            \begin{align*}
+                2+\dfrac{32}{x^3} = 0 \\
+                2 = -\dfrac{32}{x^3} \\
+                2x^3 = -32 \\
+                x^3  = -16 \\
+                x = - \sqrt[3]{16}\\
+            \end{align*}
+            and we can recall from earlier that $-3< -\sqrt[3]{16}<-2$
+            \item $f''$ is undefined when $x = 0$. 
+        \end{itemize}
+        We will now put these values into a sign chart 
+            \begin{center}
+        \begin{tikzpicture}[scale=1]
+          \draw[<->] (-4,0) -- (2, 0);
+          \node[left] at (-4,0) {$f''(x)$};
+        \draw[shift={(-2.5,0)},color=black] (0pt,3pt) -- (0pt,-3pt) node[below] {$\sqrt[3]{-16}$};
+              \draw[shift={(0,0)},color=black] (0pt,3pt) -- (0pt,-3pt) node[below] {$0$};
+      %    \foreach \x in {-2.5,0}
+       %     \draw[shift={(\x,0)},color=black] (0pt,3pt) -- (0pt,-3pt) node[below] {$\x$};
+         \foreach \x in {-2.5,0}
+          \node[circle, fill=black, inner sep=2pt] at (\x,0) {};
+          \node[above] at (-3.5,0) {$+$};
+          \node[above] at (-1,0) {$-$};
+          \node[above] at (1,0) {$+$};
+        \end{tikzpicture}
+      \end{center}
+      So $f$ is concave up on $(\infty, \sqrt[3]{-16}) \cup (0, \infty)$ and concave down on $(\sqrt[3]{-16}, 0 )$
+        
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{4}]
+      Use your answers to the previous parts to sketch a graph of $f$. 
+    \end{problem}
+
+    \begin{solution}
+    
+            \begin{tikzpicture}
+      \begin{axis}[xmin=-8, xmax=8, ymin=-20, ymax=20, ytick={-20, -16, ..., 20} , grid=both, 
+      %y label style={rotate=90},
+      xtick={-8, -6, ..., 8}, xlabel=$x$, ylabel=$f(x)$,  minor tick num=1,
+      ]
+    \addplot[draw=none] coordinates {(0,0)};
+    \addplot[domain = -8:8, color = black]{(x^3+16)/x};
+    \end{axis}
+    \end{tikzpicture}
+    \end{solution}
+
+  \item
+    \begin{problem}
+      \check Graphing involves putting a lot of information together, and it's easy to miss something on a first attempt. So, it's a good habit to always go back and check that the graph you sketched agrees with everything you've found out. Do that now!
+    \end{problem}
+
+  \end{enumerate}
+
+\item  \emph{Derivative practice.}
+
+  \begin{workshop}
+    Part of the goal here is to have students practice working with exponents. We won't cover Chain Rule until next semester; if you see students using it (for example, to differentiate $(r^2 - 3)^2$), let them know they should also know how to do the problem without using the Chain Rule.
+  \end{workshop}
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\stretch{0.5}]
+      If $g(w) = \dfrac{w^{99}}{11} - 3 w^{5/3}$, find $g'(w)$. 
+    \end{problem}
+
+    \begin{solution}
+        $g'(w) = 92^{98} - 5w^{\frac{2}{3}}$
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      If $f(t) = \sqrt{t} + \dfrac{\pi}{\sqrt{t^3}}$, find $\dfrac{df}{dt}$. 
+    \end{problem}
+
+    \begin{solution}
+        $f(t) = \sqrt{t} + \dfrac{\pi}{\sqrt{t^3}} = t^{\frac{1}{2}} + \pi t^{-\frac{3}{2}}$, so
+        $$\dfrac{df}{dt} = \dfrac{1}{2}t^{-\frac{1}{2}} - \dfrac{3\pi}{2}t^{-\frac{5}{2}}$$
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      If $j(r) = (r^2 - 3)^2$, find $j'(r)$. 
+    \end{problem}
+    
+    \begin{solution}
+        $j(r) = (r^2-3)^2 = (r^2 -3)(r^2-3) = r^4 - 6r^2 + 9$, so
+        $$j'(r) = 4r^3 - 12r$$
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      If $y = \dfrac{(8x)^{2/3}}{x^2}$, find a simplified formula for $y'$. (This is another notation for finding the derivative of $\dfrac{(8x)^{2/3}}{x^2}$.) 
+    \end{problem}
+
+    \begin{solution}
+        \begin{align*}
+            y = \dfrac{(8x)^{2/3}}{x^2} = \dfrac{8^{2/3}x^{2/3}}{x^2} \\
+            = 4 x^{2/3-2} = 4x^{-4/3}\\
+            \intertext{so therefore} \\
+            y' = -\dfrac{16}{3}x^{-7/3}
+        \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+  \begin{workshop}
+    If students get to this problem, here are a few things to watch out for: 
+    \begin{itemize}
+    \item The first thing you should try with a limit $\displaystyle \lim_{x \to a} f(x)$ is to plug in $x = a$. (Students sometimes jump ahead to factoring / thinking about the sign of the denominator when that isn't relevant.) 
+
+    \item Help students understand why the work you do for $\dfrac{0}{0}$ is different from the work you do for $\dfrac{\text{non-zero}}{0}$.
+      \begin{itemize}
+      \item I like to remind students that a $\dfrac{0}{0}$ limit isn't actually dividing 0 by 0; instead, as $x$ gets close to $a$, we're getting $\dfrac{\text{something close to 0}}{\text{something close to 0}}$. But if you think about examples like $\dfrac{0.01}{0.01}$ or $\dfrac{0.005}{0.001}$ or $\dfrac{0.01}{0.0001}$, you see that $\dfrac{\text{something close to 0}}{\text{something close to 0}}$ could be all sorts of values, so we need more algebraic information.
+      \item On the other hand, something like a $\dfrac{2}{0}$ limit is really $\dfrac{\text{something close to 2}}{\text{something close to 0}}$, which is either really positive or really negative. To figure out which, we need to know whether the ``something close to 0'' is positive or negative. That's why we look at the sign of the denominator. 
+      \end{itemize}
+
+    \item When we do limits as $x \to \pm \infty$, we keep just the fastest growing term in a sum. Students often want to do this even for limits as $x \to \text{a number}$, so help them understand why it's okay for limits as $x \to \pm \infty$ and not for limits as $x \to \text{a number}$. 
+    \end{itemize}
+  \end{workshop}
+
+  \emph{Limit practice.} Calculate the following.
+
+  \begin{enumerate} 
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \rightarrow 4 } \frac{3-x}{(x-4)^2}$
+    \end{problem}
+
+\begin{solution}
+    Direct substitution results of $x=4$ results in $\dfrac{-1}{0}$, so we have more work to do. Let's look at the one-sided limits:
+    \begin{itemize}
+        \item $\displaystyle\lim_{x\to4^+} \dfrac{3-x}{(x-4)^2}  = - \infty$. We see this as when $x$ approaches 4 from the right, $3-x$ approaches $-1$ and $(x-4)^2$ approaches 0, but is always positive. 
+    \item $\displaystyle\lim_{x\to4^-} \dfrac{3-x}{(x-4)^2}  = - \infty$. We see this as when $x$ approaches 4 from the left, $3-x$ approaches $-1$ and $(x-4)^2$ approaches 0, but is again always positive. 
+    \end{itemize}
+\end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \rightarrow 4} \frac{x^2+16}{(x+4)^2}$
+    \end{problem}
+
+    \begin{solution}
+        Direct substitution yields that      $\displaystyle \lim_{x \rightarrow 4} \frac{x^2+16}{(x+4)^2} = \dfrac{32}{64} = \dfrac{1}{2}$
+    \end{solution}
+
+  \item
+
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \rightarrow -\infty} \frac{x^2+16}{(x+4)^2}$
+    \end{problem}
+
+    \begin{solution}
+    Appealing to dominant terms, we see that:
+              $\displaystyle \lim_{x \rightarrow -\infty} \frac{x^2+16}{(x+4)^2} = \displaystyle \lim_{x \to -\infty} \dfrac{x^2}{x^2} = 1$
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      $\displaystyle \lim_{x \rightarrow 4} \frac{x^2-16}{x-4}$
+    \end{problem}
+
+    \begin{solution}
+        Direct substitution results in $\dfrac{0}{0}$, but we can see there is some factoring that can be done in the numerator and see: 
+        $$\displaystyle \lim_{x \rightarrow 4} \dfrac{x^2-16}{x-4} = \displaystyle \lim_{x \rightarrow 4} \dfrac{(x+4)(x-4)}{(x-4)} = \displaystyle \lim_{x \rightarrow 4} (x+4) = 8$$
+    \end{solution}
+
+  \end{enumerate} 
+
+\item  \label{fall2018-final-practice1-8} 
+
+  Here are graphs of two functions $f$ and $g$. Evaluate the following limits.
+  \begin{center}
+    \begin{tikzpicture} 
+      \begin{axis}[gridgraph, xtick={-5, -4, ..., 5}, ytick={-3, -2, ...,
+          3}, title={$f(x)$}, every axis plot/.style={very thick}]
+        \addplot+[domain=-5:-3] [very thick] {2};
+        \addplot+[domain=-3:-1] [very thick] {x+2};
+        \addplot+[sharp plot] coordinates { (-1, 3) (1, 2) (2, 3) };
+        \addplot+[domain=2:4] [very thick] {-(x-2)^2/2-1};
+
+        \addplot[open] coordinates{(-3,2) (-1,1) (2,3) (4,-3) (1, 2)};
+        \addplot[closed] coordinates { (-3, -1) (-1, 3) (2, -1) (1, -2)};
+
+      \end{axis}
+    \end{tikzpicture}
+    \hspace{0.5in}
+    \begin{tikzpicture} 
+      \begin{axis}[xtick={-5, -4, ..., 5}, ytick={-6, -5, -4, ..., 10},
+        ymax=5, title={$g(x)$}, gridgraph, every axis plot/.style={very
+          thick}]  
+        \addplot+[domain=-4:-1] [very thick] {-(x-1)-3};
+        \addplot+[sharp plot] coordinates { (-2+1, -3) (1+1, 3) (2+1, -3) }; 
+        \addplot+[domain=3:5] [very thick] {(x-1-2)^2+1};
+
+        \addplot[open] coordinates{(-2+1,-1) (2+1, -3)};
+        \addplot[closed] coordinates { (2+1, 1) (-2+1, -3)};
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}    
+
+  \begin{enumerate}[topsep=0pt]
+
+  \item \label{fall2015-1a-midterm1-4a}
+    \begin{problem}[{\vfill}]
+      $\displaystyle \lim_{x \to 1} [f(x) + g(x)]$
+    \end{problem}
+
+    \begin{solution}
+        $\displaystyle \lim_{x \to 1} [f(x) + g(x)] = \displaystyle \lim_{x \to 1} f(x) + \displaystyle \lim_{x \to 1}g(x) = 2 + 1 =3 $
+    \end{solution}
+
+  \item
+    \begin{problem}[{\vfill}]
+      $\displaystyle \lim_{p\to -1} \frac{f(p)}{g(p)}$
+    \end{problem}
+
+    \begin{solution}
+      $\displaystyle \lim_{p \to -1} f(p)$ does not exist because the one-sided limits $\displaystyle \lim_{p \to -1} f(p)$ and $\displaystyle \lim_{p \to-1} f(p)$ do not agree. Therefore, we should look at the given limit from both sides. As $p \to -1^+$, $f(p) \to 3$ and $g(p) \to -3$, so $\frac{f(p)}{g(p)} \to \frac{3}{-3} = -1$. As $p \to -1^-$, $f(p) \to 1$ and $g(p) \to -1$, so $\frac{f(p)}{g(p)} \to \frac{-1}{1} = -1$. Since both $\displaystyle \lim_{p \to -1^-} \frac{f(p)}{g(p)}$ and $\displaystyle \lim_{p \to -1^+} \frac{f(p)}{g(p)}$ are equal to $-1$, $\displaystyle \lim_{p \to -1} \frac{f(p)}{g(p)} = \boxed{-1}$.
+    \end{solution}
+
+  \item
+
+    \begin{workshop}
+      This is a $\dfrac{0}{0}$ limit, so we should try to factor and cancel. Since $f$ and $g$ are both linear around $x = -2$, we can write down formulas for them.
+    \end{workshop}
+
+    \begin{problem}[{\vfill}]
+      $\displaystyle \lim_{x\to -2^-} \frac{g(x)}{f(x)}$
+    \end{problem}
+
+    \begin{solution}
+      As $x \to -2^-$, $g(x) \to 0 $ and $f(x) \to 0$.  In this situation, we need to do more work.  A way to leverage more information here is to write down an algebraic formula for the numerator and the denominator near $x=-2$
+      $\displaystyle
+      \lim_{x \to -2^-} \frac{g(x)}{f(x)} =  \lim_{x \to -2^-} \frac{-x-2}{x+2} =\boxed{-1}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{x \to -2^+} \dfrac{x^2}{g(x)}$
+    \end{problem}
+
+    \begin{solution}
+        As $x$ approaches $-2$ from the right, $x^2$ approaches $4$ and $g(x)$ approaches 0, but is always negative. Thus    $\displaystyle \lim_{x \to -2^+} \dfrac{x^2}{g(x)} = -\infty$
+    \end{solution}
+
+  \item
+
+    \begin{workshop}
+      This is a $\dfrac{0}{0}$ limit, so we could use a similar strategy to (c), but it's better to recognize this as the definition of $g'(1)$! Even if students don't see that right away, can they recognize $\dfrac{g(x) - g(1)}{x - 1}$ is the slope of the secant line between $(1, g(1))$ and $(x, g(x))$? 
+    \end{workshop}
+
+    \begin{problem}[{\vfill}]
+      $\displaystyle \lim_{x \to 1} \frac{g(x) - g(1)}{x - 1}$
+    \end{problem}
+
+    \begin{solution}
+        This is the limit definition of the derivative of $g(x)$ at $x=1$. In other words,
+         $$\displaystyle \lim_{x \to 1} \frac{g(x) - g(1)}{x - 1}=g'(1)$$
+        
+        The slope of this linear portion of the graph is 2 (this can be determined by visual inspection). 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      $\displaystyle \lim_{h \to 0} \dfrac{g(-3 + h) - g(-3)}{h}$
+    \end{problem}
+
+    \begin{solution}
+        This is the limit definition of the derivative of $g(x)$ at $x=-3$. In other words, 
+        $$\displaystyle \lim_{h \to 0} \dfrac{g(-3 + h) - g(-3)}{h}=g'(-3)$$
+        The slope of this linear portion of the graph is $-1$ (this can be determined by visual inspection). 
+    \end{solution}
+
+  \item 
+    \begin{problem}
+      List all points in the interval $(-4, 5)$ where $g$ is not differentiable.
+    \end{problem}
+
+    \begin{solution} 
+      $-1, 2, 3$ 
+    \end{solution} 
+
+  \end{enumerate}
+
+\end{enumerate}
+\end{document}

@@ -1,0 +1,427 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{workbook}
+
+\usepackage[sols]{handout}
+
+\begin{document}
+
+\begin{center}
+  \large\textsc{Problem Set 34 - Introduction to Differential Equations}
+  
+      \pspace{12pt}
+  \begin{problemonly}\large Name: \rule{5cm}{0.15mm}\\ \end{problemonly}
+\end{center}
+
+\begin{grading}
+  
+    \begin{enumerate}
+    \item 2 points
+    \item 12 points 
+    \item 5 points
+    \item 3 points - 2/1
+    \item 5 points - 2/3
+    \item 2 points 
+    \end{enumerate}
+  Total: 29 points
+\end{grading}
+
+\begin{enumerate}
+
+\item 
+
+
+
+ %(variation on 31.2.1) % 31.2.1
+
+  \begin{problem}
+    Which two of the following are solutions to the differential equation
+    $y'(t)=-5y$?  Be sure to pick two solutions.
+  \end{problem}
+
+  
+    \begin{enumerate}[label=\protect\maybecircle{\Alph*.}]
+    \begin{multicols}{4}
+    \plainitem $y=e^{5t}$
+    \plainitem $y= - \frac{5}{2} t^2$
+    \circleitem $y=e^{-5t}$
+    \plainitem $y=\sin(5t)$
+    \plainitem $y=e^{5t} + 7$
+    \plainitem  $y=7e^{5t} $
+    \plainitem $y=e^{-5t} + 3$
+    \circleitem $y=3e^{-5t} $
+    \end{multicols}
+    \end{enumerate}    
+  
+
+  \begin{solution}
+    Let's check each one:
+    \begin{enumerate}[label=\protect\maybecircle{\Alph*.}]      
+    \item If $y(t) = e^{5t}$, then differentiating gives us $y'(t) = 5
+      e^{5t}$.  On the other hand, $-5 y(t) = -5 e^{5t}$, so $y'(t)$ and
+      $-5 y(t)$ are not the same.
+    \item If $y(t) = - \frac{5}{2} t^2$, then $y'(t) = -5t$ while $- 5
+      y(t) = -\frac{25}{2} t^2$; so, $y'(t)$ and $-5 y(t)$ are not the
+      same.
+    \item If $y(t) = e^{-5t}$, then $y'(t) = - 5 e^{-5t}$ while $-5 y(t) =
+      - 5 e^{-5t}$, so $y'(t)$ and $-5 y(t)$ are the same in this case.
+    \item If $y(t) = \sin(5t)$, then $y'(t) = 5 \cos(5t)$ while $-5 y(t) =
+      -5 \sin(5t)$; these are not the same.
+    \item If $y(t) = e^{5t} + 7$, then $y'(t) = 5 e^{5t}$ while $-5 y(t) = -5
+      (e^{5t} + 7) = - 5 e^{5t} - 35$; these are not the same.
+    \item If $y(t) = 7 e^{5t}$, then $y'(t) = 35 e^{5t}$ while $-5 y(t) =
+      -35 e^{5t}$; these are not the same.
+    \item If $y(t) = e^{-5t} + 3$, then $y'(t) = - 5 e^{-5t}$ and $-5 y(t)
+      = -5 \left( e^{-5t} + 3 \right) = -5 e^{-5t} - 15$; these are not
+      the same.
+    \item If $y(t) = 3 e^{-5t}$, then $y'(t) = -15 e^{-5t}$ and $-5 y(t) =
+      -15 e^{-5t}$; these are equal. 
+    \end{enumerate}
+  \end{solution}
+
+\pspace{\vfill\newpage}
+
+\item 
+
+\begin{grading}
+    12 points. 3 for each differential equation. For each solution they pick, they must
+show that the left-hand side equals the right-hand side. If they don’t, they should receive little or no
+credit.
+\end{grading}
+
+ % 31.2.5
+
+  \begin{problem}
+    For help with this problem read the two examples on
+    pp. 991-992 in Gottlieb.
+
+    Determine which of the following functions are solutions to each of
+    the differential equations below. A given differential equation may
+    have more than one solution.
+    
+    \emph{Recall that $\displaystyle \frac{d^2 y}{dt^2}$ means $\displaystyle \frac{d}{dt}\bigg(\frac{dy}{dt}\bigg)$, the second derivative of $y$ with respect to $t$.}
+  \end{problem}
+
+      Differential equations:
+    
+      \begin{enumerate}
+      \begin{multicols}{4}
+      \item $\displaystyle \frac{dy}{dt} = t$
+      \item $\displaystyle \frac{dy}{dt}=y$
+      \item $\displaystyle \frac{dy}{dt}=e^t$
+      \item$\displaystyle \frac{d^2 y}{dt^2}=4y$
+      \end{multicols}
+      \end{enumerate}
+  
+    Solution choices:    
+      \begin{enumerate}[label=\roman*., ref=\roman*]
+      \begin{multicols}{4}
+      \item $y=\frac{t^2}{2}$
+\item $y=\frac{t^2}{2}+5$
+\item $y=e^{-2t}$
+\item $y=e^t+5$
+\item $y=2e^t$
+\item $y=e^{2t}$
+\item $y=5e^{2t}$
+\item $y=e^{2t}+5$
+\end{multicols}
+\end{enumerate}
+
+      \pspace{\vfill}
+
+
+  \begin{solution}
+    \begin{enumerate}
+    \item The solutions of $\displaystyle \frac{dy}{dt} = t$ are
+      {i} and {ii}.
+      This differential equation is saying that the derivative of $y(t)$
+      is the function $t$, so $y(t)$ is an antiderivative of $t$; that is,
+      $y(t) = \displaystyle \int t\,dt = \frac{t^2}{2} + C$.
+
+    \item Among the choices, the only one that is a solution of
+      $\displaystyle \frac{dy}{dt}=y$ is $y = 2 e^t$, choice
+      {v}.  After all, we know that the general
+      solution of $\frac{dy}{dt} = y$ is $y = C e^t$. 
+
+    \item Among the choices, the only one that is a solution of
+      $\displaystyle \frac{dy}{dt} = e^t$ is $y = e^t + 5$, choice
+      {iv}.  This differential equation is saying
+      that $y$ is an antiderivative of $e^t$, so the general solution is
+      $y(t) = \displaystyle \int e^t\,dt = e^t + C$.
+
+    \item Choices {iii},
+      {vi}, and {vii} are
+       solutions of $\displaystyle \frac{d^2 y}{dt^2}=4y$.  (We don't know
+       the general solution of this differential equation, but we can
+       check each choice.)
+
+    \end{enumerate}
+  \end{solution}
+
+\pspace{\newpage}
+
+\item 
+
+\begin{grading}
+    5 points. They need to check all 5 choices.
+\end{grading}
+
+  \begin{problem}
+    Which one of the following is a solution to the differential equation
+    $\displaystyle \frac{dy}{dt}=y+1$?
+  \end{problem}
+
+  
+    \begin{enumerate}[label=\protect\maybecircle{\Alph*.}]
+    \plainitem $y=Ce^{t}$
+    \plainitem $y=Ce^t-t$
+    \plainitem $y=C(t^2+t)$
+    \circleitem $y=Ce^t-1$
+    \plainitem $y=Ce^{-t}+1$
+    \end{enumerate}
+  
+
+  \begin{solution}
+    We just check each one:
+    \begin{enumerate}[label=\Alph*.]
+    \item If $y = C e^t$, then $\frac{dy}{dt} = C e^t$ while $y + 1 = C
+      e^t + 1$, so $\frac{dy}{dt} \neq y + 1$.
+    \item If $y = C e^t - t$, then $\frac{dy}{dt} = C e^t - 1$ while $y +
+      1 = C e^t - t + 1$, so $\frac{dy}{dt} \neq y + 1$.
+    \item If $y = C (t^2 + t)$, then $\frac{dy}{dt} = C (2t + 1)$ while $y
+      + 1 = C (t^2 + t) + 1$, so $\frac{dy}{dt} \neq y + 1$.
+    \item If $y = C e^t - 1$, then $\frac{dy}{dt} = C e^t$ while $y + 1 =
+      C e^t$, so $\frac{dy}{dt} = y + 1$.
+    \item If $y = C e^{-t} + 1$, then $\frac{dy}{dt} = - C e^{-t}$ while
+      $y + 1 = C e^{-t} + 2$, so $\frac{dy}{dt} \neq y + 1$. 
+    \end{enumerate}
+  \end{solution}
+
+\pspace{\vfill}
+
+\item
+
+% Meghan / Meredith?
+
+  The differential equations $\frac{dy}{dt} = t^3$ and $\frac{dy}{dt} =
+  y^3$ look similar but are in fact very different.
+
+  \begin{enumerate}
+  \item
+\begin{problem}[\vfill]
+      It should be relatively easy to solve one of these two. Write the
+      general solution for the easier equation and explain in one complete
+      sentence what your method was.
+    \end{problem}
+
+    \begin{solution}
+      It's easy to solve $\frac{dy}{dt} = t^3$: this equation says that
+      $y$ is an antiderivative of $t^3$, so the general solution is $y(t) =
+      \displaystyle \int t^3\,dt = \boxed{\frac{t^4}{4} + C}$.
+      So, our method was to find all antiderivatives of $t^3$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      The more challenging equation can't be solved using the method you
+      used in {{{{\#4}}(a)}}. Why is that? What is the key
+      difference?
+    \end{problem}
+
+    \begin{solution}
+      The differential equation $\frac{dy}{dt} = y^3$ says that $y$ is an
+      antiderivative of $y^3$; the problem is that $y$ is a function that
+      we don't know yet, so we don't have a concrete function to
+      anti-differentiate.
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+%(Almost identical to 31.2.12) 
+
+  %($\star$) 
+  When a population has unlimited resources and is free from
+  disease and strife, the rate at which the population grows in often
+  modeled as being proportional to the population size.  That is, if
+  $P(t)$ is the population size at time $t$, then $\dfrac{dP}{dt} = kP$
+  where $k$ is a constant.  (The constant $k$ is called the
+  \uline{relative growth rate} of the population.)  Assume that both the
+  bug and the minnow populations described below behave according to this
+  model.
+
+  In both scenarios described below you are given enough information to
+  find the relative growth rate $k$. In one case, you can find $k$ using
+  just the differential equation; in the second scenario, you must
+  actually use the solutions of the differential equation to find $k$.
+
+  \begin{enumerate}
+
+  \item
+    \begin{problem}[\vfill]
+      Let $M=M(t)$ be the minnow population at time $t$, $t$ in weeks. At
+      $t=0$ there are 500 minnows.  When there are 700 minnows, the
+      population is growing at a rate of 50 minnows per week.  Write a
+      differential equation reflecting the situation.  (Note: We've
+      already said above that we want to model this as $\dfrac{dM}{dt} =
+      kM$, so you just need to find $k$.)
+    \end{problem}
+
+    \begin{solution}
+      We are told that, when $M = 700$, $\frac{dM}{dt} = 50$; we can plug
+      this information directly into the differential equation
+      $\frac{dM}{dt} = kM$ to solve for $k$: $50 = k (700)$, so $k =
+      \frac{1}{14}$.  So, the differential equation is
+      $\boxed{\frac{dM}{dt} = \frac{1}{14}M}$.
+    \end{solution}
+
+  \item
+\begin{problem}[\vfill]
+      Let $B=B(t)$ be the bug population at time $t$, $t$ in weeks. At
+      $t=0$ there are 6000 bugs. When $t=5$ there are 9000 bugs. Write a
+      differential equation reflecting the situation.
+    \end{problem}
+
+    \begin{solution}
+      We're modeling this as $\frac{dB}{dt} = kB$, but we are not told
+      $\frac{dB}{dt}$ at any time, so we need to solve the differential
+      equation in order to determine $k$.
+
+      The general solution of $\frac{dB}{dt} = kB$ is $B(t) = C e^{kt}$.
+      We're told that $B(0) = 6000$ and $B(5) = 9000$; let's see what
+      these tell us:
+      \begin{align*}
+        B(0) &= 6000 \Longrightarrow C e^{k \cdot 0} = 6000
+        \Longrightarrow C = 6000 \\
+        B(5) &= 9000 \Longrightarrow C e^{5k} = 9000
+      \end{align*}
+      Since we already figured out that $C = 6000$, the second equation
+      tells us that
+      \begin{align*}
+        6000 e^{5k} &= 9000 \\
+        e^{5k} &= \frac{9000}{6000} = \frac{3}{2} \\
+        5k &= \ln \left( \frac{3}{2} \right) \\
+        k &= \frac{1}{5} \ln \left( \frac{3}{2} \right)
+      \end{align*}
+      So, our differential equation is $\boxed{\frac{dB}{dt} = \frac{1}{5}
+        \ln \left( \frac{3}{2} \right) B}$. 
+    \end{solution}
+
+  \end{enumerate}
+
+
+
+\pspace{\vfill\newpage}
+
+\item
+\begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Yoshi currently has $Y$ dollars in his bank account.  If the account has a
+      nominal annual interest rate of 7\%, compounded continuously, how
+      much money will Yoshi have in $t$ years?  (Assume Yoshi makes no
+      deposits or withdrawals.)
+    \end{problem}
+
+   \emph{If you'd like to refresh your understanding
+         of compound interest, see
+          \#4 in section 4.3 of the workbook and
+          Problem Set 19, \#2. You may use the continuous compounding formula, $A=Pe^{rt}$.}
+
+    \begin{solution}
+      This is continuous compounding, so the amount of money Yoshi will have in $t$ years is $Y e^{0.07 t}$.
+    \end{solution}
+
+  \item
+\begin{problem}[\vfill]
+      Let $M(t)$ be the amount of money that Yoshi has in $t$ years.
+      Which of the following differential equations is $M(t)$ a solution
+      of?
+      
+        \begin{enumerate}[label=\protect\maybecircle{\Alph*.}]
+        \plainitem $\frac{dM}{dt} = 0.07$
+        \plainitem $\frac{dM}{dt} = 1.07$
+        \plainitem $\frac{dM}{dt} = 0.07 t$
+        \circleitem $\frac{dM}{dt} = 0.07 M$
+        \end{enumerate}
+      
+    \end{problem}
+
+    \begin{solution}
+      The derivative of $M(t) = Y e^{0.07 t}$ is $\frac{dM}{dt} = 0.07 Y
+      e^{0.07 t}$, which is $0.07 M(t)$. 
+    \end{solution}
+
+  % \item
+  %   \begin{problem}[\vfill]
+  %     Interpret the differential equation you chose in
+  %     words.  That is, if you had to describe to a friend what the
+  %     differential equation says about how fast Yoshi's money is growing, what would you say?
+  %   \end{problem}
+
+  %   \begin{solution}
+  %     The differential equation $\frac{dM}{dt} = 0.07 M$ can be read as
+  %     saying, ``The (instantaneous) rate at which the account earns
+  %     interest is always equal to 7\% of the amount of money.''  
+  %   \end{solution}
+
+  % \item
+  %   \begin{problem}[\vfill]
+  %     How long does it take Yoshi's money to double?
+  %   \end{problem}
+
+  %   \begin{solution}
+  %     If Yoshi starts with $\$Y$, we'd like to know when his amount of
+  %     money reaches $\$2Y$.  That is, we'd like to solve
+  %     \begin{align*}
+  %       Y e^{0.07 t} &= 2Y \\
+  %       e^{0.07 t} &= 2 \\
+  %       0.07 t &= \ln 2 \\
+  %       t &= \frac{\ln 2}{0.07}
+  %     \end{align*}
+  %     So, it takes $\boxed{\frac{\ln 2}{0.07} \approx 9.9}$ years for
+  %     Yoshi's money to double. 
+  %   \end{solution}
+
+  \end{enumerate}
+
+\item 
+
+ \textbf{Reflect Back.}
+You know
+  enough to find the general solution of one of the following differential
+  equations.  Which one?  Find its general solution.
+
+  
+    \begin{enumerate}
+    \item $\dfrac{dy}{dt} = ty + 1$
+    \item $\dfrac{dy}{dt} = y^2 + 1$
+    \item
+$\dfrac{dy}{dt} = t^2 + 1$
+    \end{enumerate}    
+
+    \pspace{\vfill}
+  
+
+  \begin{solution}
+    The one that is simple is {{(c)}}: it
+    says that $y$ is an antiderivative of $t^2 + 1$, so the general
+    solution is $y = \displaystyle \int (t^2 + 1)\,dt = \boxed{\frac{1}{3}
+      t^3 + t + C}$.
+  \end{solution}  
+
+\end{enumerate}
+\spaceonly{\psreflection{
+Optional reading for next class is \S31.1 in Gottlieb.
+}}
+
+\end{document}

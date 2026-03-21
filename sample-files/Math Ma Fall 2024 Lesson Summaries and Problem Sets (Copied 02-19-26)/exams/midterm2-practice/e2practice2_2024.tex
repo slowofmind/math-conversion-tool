@@ -1,0 +1,710 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+%
+\providecommand{\topic}{}
+\renewcommand{\topic}[1]{}
+
+\usepackage{cancel}  
+\newcommand{\colorcancel}[2]{\renewcommand{\CancelColor}{\color{#1}}\cancel{#2}\renewcommand{\CancelColor}{\color{black}}}
+\usepackage{pifont}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\pgfplotsset{gridgraph/.style={clip=false, axis line style={shorten
+      >=-8pt}, xlabel style={xshift=8pt}, ylabel style={yshift=8pt},
+    enlargelimits=false, grid=major, tick style={black}}} 
+
+\newcommand{\axes}[1][]{
+  \begin{tikzpicture}
+    \begin{axis}[xtick=\empty, ytick=\empty, ymin=-2, ymax=2,
+      xmin=-4.25, xmax=4.25, #1]
+    \end{axis}
+  \end{tikzpicture}
+}
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\makeatletter
+
+\newdimen\SOUL@dimen %new
+\def\SOUL@ulunderline#1{{%
+    \setbox\z@\hbox{#1}%
+    % \dimen@=\wd\z@
+    \SOUL@dimen=\wd\z@ %new
+    \dimen@i=\SOUL@uloverlap
+    \advance\SOUL@dimen2\dimen@i %\dimen@ exchanged too
+    \rlap{%
+      \null
+      \kern-\dimen@i
+      % \SOUL@ulcolor{\SOUL@ulleaders\hskip\dimen@}%
+      \SOUL@ulcolor{\SOUL@ulleaders\hskip\SOUL@dimen}% new
+    }%
+    \unhcopy\z@
+  }}
+
+\makeatother
+
+\renewcommand{\answer}[1]{#1}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\newcommand{\highlight}[1]{\boldmath\hl{\textbf{#1}}\unboldmath}
+
+\newcommand{\goal}[1]{\textbf{\textcolor{skyblue}{#1}}}
+
+\usepackage{amsthm}
+
+% make URLs print in the same font
+\usepackage{url}
+\urlstyle{same}
+
+\usepackage{pifont}
+\def\exend{\hfill\ding{118}}
+
+%\makeatletter\@addtoreset{equation}{section}\makeatother
+%\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+
+\newtheoremstyle{theorem}% name
+{8pt}%      Space above
+{0pt}%      Space below
+{\itshape}%         Body font
+{}%         Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{.}%        Punctuation after thm head
+{.5em}%     Space after thm head: " " = normal interword space;
+                                %       \newline = linebreak
+{}%         Thm head spec (can be left empty, meaning `normal')
+
+\theoremstyle{theorem}
+
+\let\Theorem\undefined
+\newtheorem{Theorem}[equation]{Theorem}
+\let\Definition\undefined
+\newtheorem{Definition}[equation]{Definition}
+\let\Summary\undefined
+\newtheorem{Summary}[equation]{Summary}
+\let\Conjecture\undefined
+\newtheorem{Conjecture}[equation]{Conjecture}
+\let\Fact\undefined
+\newtheorem{Fact}[equation]{Fact}
+
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\makeatletter
+\def\@seccntformat#1{\@ifundefined{#1@cntformat}%
+   {\csname the#1\endcsname\quad}%       default
+   {\csname #1@cntformat\endcsname}}%    enable individual control
+\newcommand\section@cntformat{}
+\makeatother
+
+  \usepackage{exam}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+  \title{Exam 2, Practice 2}
+
+\instructions{instructions.tex}{}
+
+\listofproblems
+
+\begin{enumerate}
+\item \points{12} 
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Find the critical points of $f(x) = x^4 + 4x^3 -2$. 
+    \end{problem}
+
+    \begin{solution}
+      $f'(x)=4x^3+12x^2=4x^2(x+3)$ is never undefined, and it's 0 when $x = \boxed{0, -3}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\nstretch{1.5}]
+      What does the Second Derivative Test tell you about each critical point? 
+    \end{problem}
+
+    \begin{solution}
+      $f''(x)=12x^2 + 24x$. 
+
+      $f''(-3)=12(9)-24(3)>0$, so $f$ is concave up at $x = -3$, and \fbox{$x=-3$ is a local minimum}.
+
+      $f''(0) = 12(0)-24(0)=0$, so the Second Derivative Test is \fbox{inconclusive about $x = 0$}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Does $f$ have a global maximum on $[-10, 10]$? If so, where (at what $x$-value)? How about a global minimum? 
+    \end{problem}
+
+    \begin{solution}
+      Since $f$ is continuous on $[-10, 10]$ and $[-10, 10]$ is a closed interval, the Extreme Value Theorem guarantees that $f$ has a global maximum and global minimum on $[-10, 10]$. To find them, we can just plug the critical points and endpoints into $f$:
+      \begin{align*}
+        f(-10) &= 10000 - 4000 - 2 = 5998 \\
+        f(-3) &= 81 - 4 \cdot 27 - 2 = -29 \\
+        f(0) &= -2 \\
+        f(10) &= 10000 + 4000 - 2 = 13998
+      \end{align*}
+      So, on $[-10, 10]$, $f$ has a \fbox{global maximum at $x = 10$ and global minimum at $x = -3$}. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Does $f$ have a global maximum on $(-\infty, \infty)$? If so, where? How about a global minimum? 
+    \end{problem}
+
+    \begin{solution}
+      Since $(-\infty, \infty)$ isn't a closed interval, the Extreme Value Theorem doesn't give us any information about this situation. To decide whether $f$ has a global maximum and minimum on $(-\infty, \infty)$, we need to compare the value of $f$ at the critical points with what happens to $f(x)$ as $x \to \pm \infty$.
+
+      Let's first calculate $\displaystyle \lim_{x \to \infty} x^4 + 4x^3 - 2$. As we've seen, when we're dealing with a sum where some terms go to $\pm \infty$, we can just keep the fastest growing term.\footnote{Why does this work? In the sum $x^4 + 4x^3 - 2$, when $x$ is really big, $x^4$ is much bigger than $4x^3$ and $2$, so $x^4 + 4x^3 - 2 \approx x^4$ when $x$ is very big.} So, $\displaystyle \lim_{x \to \infty} x^4 + 4x^3 - 2 = \lim_{x \to \infty} x^4 = \infty$. Similarly, $\displaystyle \lim_{x \to -\infty} x^4 + 4x^3 - 2 = \lim_{x \to -\infty} x^4 = \infty$.
+
+      In the previous part, we already calculated that $f(-3) = -29$ and $f(0) = -2$. So, we conclude that \fbox{$f$ doesn't have a global maximum on $(-\infty, \infty)$}, and it has a \fbox{global minimum at $x = -3$}.       
+    \end{solution}
+
+  \end{enumerate}      
+
+\item \points{14} 
+
+  \begin{enumerate}
+  \item 
+    \begin{problem}[\vfill]
+      If $\displaystyle f(x) = \dfrac{(x^2 + \sqrt{x} + 1) \left( \dfrac{1}{\sqrt{x}} + \dfrac{1}{2 x^7} + 3 \right)}{5}$, find $f'(x)$. You need not simplify your answer.
+    \end{problem}
+
+    \begin{solution}
+      We can rewrite this as $f(x) = \dfrac{1}{5} \left[ (x^2 + \sqrt{x} + 1) \left( \dfrac{1}{\sqrt{x}} + \dfrac{1}{2 x^7} + 3 \right) \right]$. By the Constant Multiple Rule, we can pull the $\frac{1}{5}$ out, so 
+      \begin{align*}
+        f'(x) &= \frac{1}{5} \frac{d}{dx} \left[ (x^2 + x^{1/2} + 1) \left( x^{-1/2} + \frac{1}{2} x^{-7} + 3 \right) \right] \\
+        \intertext{By the Product Rule, this is equal to:} %
+        &= \boxed{\frac{1}{5} \left[ (x^2 + x^{1/2} + 1) \left( - \frac{1}{2} x^{-3/2} - \frac{7}{2} x^{-8} \right) + \left( 2x + \frac{1}{2} x^{-1/2} \right) \left( x^{-1/2} + \frac{1}{2} x^{-7} + 3 \right) \right]}
+      \end{align*}      
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Simplify $(2^x + 2^{3x})^2 - \displaystyle \frac{2^{7x}}{2^{3x-1}}$. Your final answer shouldn't have any fractions or parentheses.
+    \end{problem}
+
+    \begin{solution}
+      \begin{align*}
+        (2^x + 2^{3x})^2 - \frac{2^{7x}}{2^{3x-1}} &= (2^x + 2^{3x}) (2^x + 2^{3x}) - 2^{7x - (3x - 1)} \\
+        &= \left( 2^x \right)^2 + 2 \left( 2^{3x} \right) \left( 2^x \right) + \left( 2^{3x} \right)^2 - 2^{4x + 1} \\
+        &= 2^{2x} + \cancel{2^{4x + 1}} + 2^{6x} - \cancel{2^{4x + 1}} \\
+        &= \boxed{2^{2x} + 2^{6x}}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Factor $b^x$ out of $(3b)^x + 5 (b^2)^x + \sqrt{4 b^{3x}}$.
+    \end{problem}
+
+    \begin{solution}
+      We'll first expand the given expression and then factor out $b^x$:
+      \begin{align*}
+        (3b)^x + 5 (b^2)^x + \sqrt{4 b^{3x}} &= 3^x b^x + 5 b^{2x} + 2
+        b^{3x/2} \\
+        &= \boxed{b^x \left( 3^x + 5 b^x + 2 b^{x/2} \right)}
+      \end{align*}
+    \end{solution}    
+
+  \item % previously on homework
+
+    \begin{problem}[\vfill\newpage]
+      Suppose that $f$ is a function on $(-\infty, \infty)$ that has a global maximum value of 15 at $x = 4$. Let $g(x) = f(-2x) + 3$. Do you have enough information to find the global maximum of $g$? If so, say what the global maximum value is and where (at what $x$-value) it occurs; if not, explain why not. 
+    \end{problem}
+
+    \begin{solution}
+      We get the graph of $g$ by flipping the graph of $f$ over the $y$-axis, stretching horizontally by a factor of $\frac{1}{2}$, and shifting up 3.
+
+      Originally, the highest point on the graph of $f$ is $(4, 15)$. 
+      When we flip the graph of $f$ over the $y$-axis, the highest point is then $(-4, 15)$. When we stretch this horizontally by a factor of $\frac{1}{2}$, the highest point is $(-2, 15)$. And when we shift this up by 3, the highest point is then $(-2, 18)$.
+
+      So, $g(x)$ has a \fbox{maximum value of $18$ at $x = -2$}. 
+    \end{solution}
+
+  \end{enumerate}
+
+\item \label{fall2017-midterm-1} \points{7}  
+
+  In each part, either sketch an example of a function $f$ with the given properties, or say that no such function exists. Make sure any sketches clearly meet the given the conditions.
+  \begin{enumerate}
+
+  \item \label{fall2017-midterm-1c}
+    \begin{problem}
+      $f$ is continuous on $(-\infty, \infty)$, and $\displaystyle \lim_{x \to 3} \frac{f(x) - f(3)}{x - 3}$ does not exist.
+    \end{problem}
+
+    \begin{problemonly} 
+      \axes[]
+    \end{problemonly} 
+
+    \begin{solution}
+      You should recognize $\displaystyle \lim_{x \to 3} \frac{f(x) - f(3)}{x - 3}$ as the limit definition of $f'(3)$, so we're trying to draw an example where $f'(3)$ doesn't exist. Since $f$ is supposed to be continuous at $x = 3$, we should make the graph have a corner at $x = 3$. Here's one example:
+      \begin{center}
+        \answer{
+          \begin{tikzpicture}
+            \begin{axis}[xtick={3}, ytick=\empty, width=2.5in]
+              \addplot+[domain=-1:7]{abs(x-3)};
+            \end{axis}
+          \end{tikzpicture}
+        }
+        \end{center}        
+    \end{solution}
+
+  \item \label{fall2017-prefinal-3a}
+
+    \begin{problem}
+      $f$ has domain $(-2, 2)$, is continuous on its domain, has a global maximum at $x = 1$, and has no critical points. 
+    \end{problem}
+
+    \begin{problemonly}
+      \axes[xmin=-2, xmax=2, ymin=-1, ymax=3, gridgraph, xtick={-2, -1, 1, 2}, ytick={-1, 1, 2, 3}, axis equal image]
+    \end{problemonly}
+
+    \begin{solution}
+      This is \fbox{impossible}. If $f$ has a global maximum at $1$, then $f(1)$ must be at least as high as the points on either side of it. So, $x = 1$ is also a local maximum, which can only happen if $x = 1$ is a critical point.
+    \end{solution}
+
+  \item \label{fall2017-prefinal-3c}
+
+    \begin{problem}
+      $f$ has domain $[-2, 2]$ and has a global maximum but no global minimum on $[-2, 2]$. 
+    \end{problem}
+
+    \begin{problemonly}
+      \axes[xmin=-2, xmax=2, ymin=-1, ymax=3, gridgraph, xtick={-2, -1, 1, 2}, ytick={-1, 1, 2, 3}, axis equal image]
+    \end{problemonly}
+
+    \begin{solution}
+      The Extreme Value Theorem says this is impossible if $f$ is continuous. So, we should draw a discontinuous example. Here are two possibilities. 
+      \begin{center}
+        \answer{
+          \begin{tikzpicture}
+            \begin{axis}[xmin=-2, xmax=2, ymin=-1, ymax=3, gridgraph, axis equal image]
+              \addplot+[sharp plot] coordinates {(-2, 1) (-1, 3) (0, 3) (1, 1) (2, -1)};%
+              \addplot+[closed] coordinates { (-2, 1) (2, 1)};%
+              \addplot+[open] coordinates {(2, -1)};
+            \end{axis}
+          \end{tikzpicture}
+          \hspace{0.5in}
+          \begin{tikzpicture}
+            \begin{axis}[xmin=-2, xmax=2, ymin=-1, ymax=3, gridgraph, axis equal image]
+              \addplot+[domain=-2:2] {x^2 / 2}; 
+              \addplot+[closed] coordinates {(0, 1) (-2, 2) (2, 2)}; %
+              \addplot+[open] coordinates {(0, 0)}; %
+            \end{axis}
+          \end{tikzpicture}
+        }
+      \end{center}
+    \end{solution}
+
+    \begin{grading}
+      A common error is to draw a function that isn't defined on the entire domain $[-2, 2]$. Check your example to make sure it's really defined at every point in $[-2, 2]$. 
+    \end{grading}
+
+  \end{enumerate}
+
+  \pspace{\newpage}
+
+\item \points{9} 
+
+ Substance X is radioactive and decays over time. At the start of an experiment, a sample of substance X is observed to have a mass of 100 grams, and the mass of the sample is changing at a rate of $-20$ grams per hour at that moment. The rate of change is always proportional to the mass of the sample.
+
+\begin{enumerate}
+    \item 
+    \begin{problem}[\vfill]What is the rate of change of the mass of the sample when there are 50 grams of substance X remaining? Include units.
+    \end{problem}
+\begin{solution}
+    One of the properties of exponential functions is that the derivative of the function is proportional to the function value. If we define $X(t)$ to give the mass of substance $X$ that remains as a function of time $t$ in hours, this can be expressed as 
+    $$\dfrac{dX}{dt}=kX$$
+    Given the values that are described in the prompt, we can write this as:
+    $$-20=k\cdot 100$$
+    Solving for the proportionality constant, we find that $k=\frac{-1}{5}$. This proportionality is true for all amounts of substance $X$, so in order to find the rate of change of the mass of the sample when there are 50 grams of substance $X$, we use:
+    $$\frac{dX}{dt}=\frac{-1}{5}\cdot X$$
+    We set $X=50$ and solve for $\dfrac{dX}{dt}$:
+    $$\frac{dX}{dt}=\frac{-1}{5}\cdot 50$$
+    $$\frac{dX}{dt}=-10$$.
+    The sample is decreasing at a rate of 10 grams/hour.
+\end{solution}
+    \item 
+    \begin{problem}[\vfill] Express the mass of the sample as a function of $t$, the number of hours since the start of the experiment.\\
+    \end{problem}
+\begin{solution}
+    The general form of an exponential function is $C\cdot b^t$. We know that the mass of the sample should be 100 grams at the start of the experiment when $t=0$. This means $C=100$. The one other piece of information we have is that the derivative is $\frac{-1}{5}$ times the function. The choice of base that is reflects this is base $e$ because we know that $\frac{d}{dx}(e^{kx}) = ke^{kx}$, and we can see that the proportionality constant $k$ (which for us would be -1/5) multiplies the original function. This leaves our model as:
+    $$X(t) = 100\cdot e^{-t/5}$$
+\end{solution}
+    \item 
+    \begin{problem}Sketch a graph of the function you wrote in part (b). Label the $y$-intercept and any asymptotes.\\
+    
+    \end{problem}
+    \begin{problemonly}
+        \axes[]
+      \end{problemonly} 
+\begin{solution}
+      \begin{tikzpicture}
+            \begin{axis}[ytick=\empty, yticklabels={$100$}, xtick=\empty, ylabel={mass (grams)}, xlabel={$t$ (years)}, ]
+              \addplot+[domain=-1:5] {100*e^(-.2*x)};
+              \node [left ] at (axis cs: 0,100) {$100$};
+              \addplot[domain=-1:4, dashed, red] (\x,0) node[above] {$y=0$};
+              %\addplot+[red, domain=-1:2] {100-20*x};
+            \end{axis}
+          \end{tikzpicture}
+\end{solution}
+\newpage 
+    \item 
+    \begin{problem}[\vfill]Your lab partner claims that 1 hour after the start of the experiment, the mass of the sample will be exactly 80 grams. Explain why this is incorrect.\\
+    \end{problem}
+\begin{solution}
+    The derivative is only equal to -20 at the exact time $t=0$. That is the instantaneous rate of change there, but that does not hold until $t=1$. 
+\end{solution}
+    \item 
+    \begin{problem}[\vfill] Use linear approximation to estimate the mass of the sample 30 minutes after the start of the experiment. Include units.\\
+    \end{problem}
+\begin{solution}
+    If the instantaneous rate of change at the start of the experiment is -20 grams/hour, that would scale to -10 grams lost in the first half hour (or 30 minutes). 100-10 leaves us 90 grams, our approximate remaining mass.
+\end{solution}
+    \item 
+    \begin{problem}[\vfill]Is the approximation you made in part (e) an underestimate or an overestimate? Explain your reasoning.\\
+    \end{problem}
+    \begin{solution}
+        This is an underestimate. The exponential decay function is concave up, so the tangent line at any point lies entirely below the curve. \\
+         \begin{tikzpicture}
+            \begin{axis}[ytick=\empty, yticklabels={$100$}, xtick=\empty, ylabel={mass (grams)}, xlabel={$t$ (years)}, ]
+              \addplot+[domain=-1:5] {100*e^(-.2*x)};
+              \node [left ] at (axis cs: 0,100) {$100$};
+              \addplot[domain=-1:4, dashed, red] (\x,0) node[above] {$y=0$};
+              \addplot+[red, domain=-1:2] {100-20*x};
+            \end{axis}
+          \end{tikzpicture}
+    \end{solution}
+\end{enumerate}
+\newpage
+
+\item \points{16} 
+
+  In this problem, we'll look at $\displaystyle f(x) = \frac{3x^2 -6x}{x^2 - x - 2}$.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Find and classify all discontinuities of $f$ (that is, say whether each discontinuity is a removable discontinuity, jump discontinuity, or vertical asymptote). Please justify your answer completely, calculating all relevant limits. If a limit doesn't exist, calculate both one-sided limits. 
+    \end{problem}
+
+    \begin{solution}
+      Since $f$ is given by a single non-piecewise formula, its discontinuities are where it's undefined. This happens when the denominator is equal to 0:
+      \begin{align*}
+        x^2 - x - 2 &= 0 \\
+        (x - 2)(x + 1) &= 0 \\
+        x &= 2, -1
+      \end{align*}
+      We use limits to classify each discontinuity. First, let's look at $\displaystyle \lim_{x \to -1} \frac{3x^2 -6x}{x^2 - x - 2}$. In this limit, the numerator tends to $9$ while the denominator tends to 0. So, we need to think about the sign of the denominator.
+
+      When $x$ is just a bit bigger than $-1$ (like $x = -0.99$), the denominator $(x - 2)(x + 1)$ is negative, so $\dfrac{3x^2 - 6x}{x^2 - x - 2} = \dfrac{\text{a number close to 9}}{\text{a number just a little less than 0}}$, which is very negative. Therefore, $\boxed{\lim_{x \to -1^+} f(x) = -\infty}$.
+
+      When $x$ is just a bit less than $-1$ (like $x = -1.01$), the denominator $(x - 2)(x + 1)$ is positive, so $\dfrac{3x^2 - 6x}{x^2 - x - 2} = \dfrac{\text{a number close to 9}}{\text{a number just a little bigger than 0}}$ will be very positive. Therefore, $\boxed{ \lim_{x \to -1^-} f(x) = \infty}$.
+
+      So, $f(x)$ has a \fbox{vertical asymptote at $x = -1$}.
+
+      Now, let's look at $\displaystyle \lim_{x \to 2} \frac{3x^2 -6x}{x^2 - x - 2}$. Here, the numerator and denominator both tend to 0, so we should try to factor and cancel something:
+      \begin{align*}
+        \lim_{x \to 2} \frac{3x^2 -6x}{x^2 - x - 2} &= \lim_{x \to 2} \frac{3x \colorcancel{skyblue}{(x - 2)}}{\colorcancel{skyblue}{(x - 2)}(x + 1)} \\
+        &= \lim_{x \to 2} \frac{3x}{x + 1} \\
+        &= \frac{6}{3}
+        \end{align*}
+        Therefore, $\boxed{\lim_{x \to 2} f(x) = 2}$, and $f(x)$ has a \fbox{removable discontinuity at $x = 2$}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\nstretch{0.25}]
+      Find the $x$-intercepts of $y = f(x)$.
+    \end{problem}
+
+    \begin{solution}
+      We want to solve $f(x) = 0$, which happens when the numerator $3x (x - 2)$ is equal to 0. This happens when $x = 0$ or $x = 2$, but $x = 2$ isn't actually an $x$-intercept because we already saw that $f$ is undefined at $x = 2$. So, the only $x$-intercept is $\boxed{0}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Find all horizontal asymptotes of $f$. 
+    \end{problem}
+
+    \begin{solution}
+      Finding the horizontal asymptotes of $f$ means calculating $\displaystyle \lim_{x \to \infty} f(x)$ and $\displaystyle \lim_{x \to -\infty} f(x)$. Let's first look at $\displaystyle \lim_{x \to \infty} f(x)$. In $\displaystyle \lim_{x \to \infty} \frac{3x^2 -6x}{x^2 - x - 2}$, both the numerator and denominator have terms that $\to \infty$, so we use our usual strategy of keeping the highest power in each sum: \[ \lim_{x \to \infty} \frac{3x^2 -6x}{x^2 - x - 2} = \lim_{x \to \infty} \frac{3x^2}{x^2} = \lim_{x \to \infty} 3 = 3.\] By the same reasoning,
+      \[ \lim_{x \to -\infty} \frac{3x^2 -6x}{x^2 - x - 2} = \lim_{x \to -\infty} \frac{3x^2}{x^2} = 3.\] So, $\boxed{y = 3}$ is the only horizontal asymptote.      
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Use the information you've found in this problem to sketch a plausible graph of $f$. (We don't expect you to know the actual graph of $f$; we're just asking you to sketch something consistent with your answers to (a) - (c).) 
+    \end{problem}
+
+    \begin{solution}
+      Here's the actual graph of $f$:
+      \begin{center}
+        \answer{
+          \begin{tikzpicture}
+            \begin{axis}[extra x ticks={-1}, ymin=-10, ymax=10,
+              ytick={3}, xtick={2}, extra x tick style={grid
+                style={dashed}}] 
+              \addplot+[domain=-5:5] {3*x/(x+1)};%
+              \addplot+[open] coordinates {(2, 2)}; %
+              \addplot+[domain=-5:5, dashed] {3};%
+            \end{axis}
+          \end{tikzpicture}
+        }
+      \end{center}
+    \end{solution}
+
+    \begin{grading}
+      We don't expect you to know the actual graph of $f$; rather, the graph you sketched should have the following features:
+      \begin{itemize}
+      \item $\displaystyle \lim_{x \to -1^+} f(x) = -\infty$ and $\displaystyle \lim_{x \to -1^-} f(x) = \infty$
+      \item $\displaystyle \lim_{x \to -\infty} f(x) = 3$ and $\displaystyle \lim_{x \to \infty} f(x) = 3$
+      \item The only $x$-intercept is at $x = 0$.
+      \item $f$ has a removable discontinuity at $x = 2$.
+      \end{itemize}
+    \end{grading}
+
+  \end{enumerate}
+
+\item \label{fall2012-1a-midterm2-4-shortened} \points{8} 
+
+  \topic{linear approximation}
+
+  A company is producing a vaccine for a new strain of flu. Suppose the function
+  \begin{equation*}
+    P(x) 
+    = \sqrt{x}\left(10x- \frac{4}{5} x^2 \right) - 20
+  \end{equation*}
+  models their weekly profit (in hundreds of dollars) as a function of $x$, the number of liters of vaccine they produce in a week.
+  \begin{enumerate}
+  \item
+    \begin{problem}[\stretch{0.5}]
+      Explain in words what $\dfrac{P(7) - P(4)}{7 - 4}$ represents. (Your answer should involve profit.)
+    \end{problem}
+
+    \begin{solution}
+      It represents \answer{the average rate of change of profit between a production level of 4 liters of vaccine and a production level of 7 liters of vaccine}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{2}]
+      Calculate $P'(9)$. Please simplify your answer, and include units.
+    \end{problem}
+
+    \begin{solution}
+      We can rewrite $P(x) = 10 x^{3/2} -\frac{4}{5} x^{5/2} -20$, so
+      \begin{equation*}
+        P'(x) 
+        = 10\cdot \frac{3}{2} x^{1/2} -\frac{4}{5} \cdot \frac{5}{2} x^{3/2} 
+        = 15 x^{1/2} -2 x^{3/2}
+      \end{equation*}
+      Therefore,
+      \begin{align*}
+        P'(9) &= 15 \cdot 9^{1/2} - 2 \cdot 9^{3/2} \\
+        &= 15 \cdot 9^{1/2} - 2 \cdot \left( 9^{1/2} \right)^3 \\
+        &= 15 \cdot 3 - 2 \cdot 3^3 \\
+        &= -9 
+      \end{align*}
+      Since $P$ is measured in hundreds of dollars and $x$ is measured in liters, $P'(x)$ has units of hundreds of dollars per liter. So, $P'(9) = \boxed{-9 \text{ hundred dollars per liter}}$.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      The company is currently producing 9 liters of vaccine each week. If they were to increase their production to 9.1 liters of vaccine each week, by about how much would you expect your weekly profit to change? Please include units, and be sure to say whether the profit would increase or decrease. 
+    \end{problem}
+
+    \begin{solution}
+      From our calculation in (b), at the current production level of 9 liters of vaccine per week, we expect the profit to change by $-9$ hundred dollars per liter of vaccine. So, if they increase production by $0.1$ liters, we expect their profit to change by
+      \[ \approx (-9 \text{ hundred dollars per liter})(0.1 \text{ liters}) = -0.9 \text{ hundred dollars}.\] In other words, we expect their profit to \fbox{decrease by about \$90}. 
+    \end{solution}
+
+  \end{enumerate}
+
+\item \label{fall2012-1a-midterm2-6a} \points{14} \finishexam 
+
+  \begin{problem}[\newpage]
+    Your architectural firm is designing a building shaped like a box with a \textbf{square base}, tiled on the \textbf{sides} and \textbf{top} with solar panels. (There are no solar panels on the bottom of the building.) The building will have a volume of 8 cubic hectometers (hm). Zoning regulations require that the base of the building have area no less than 1 $\text{hm}^2$ and no more than 9 $\text{hm}^2$. Furthermore, the solar panels for the top have been engineered to absorb twice as much solar energy per $\text{hm}^2$ as the ones for the side. If you want the building to absorb as much solar energy as possible, what dimensions should you make it?
+
+    Be sure to organize your work to clearly communicate your reasoning, and justify completely. 
+  \end{problem}  
+
+  \begin{solution}
+    \highlight{Goal:} Maximize \goal{solar energy absorbed}.
+
+    \highlight{Formula for goal:} 
+    \begin{align}
+      \text{\goal{solar energy absorbed}} = {} & \text{energy absorbed by sides} + \text{energy absorbed by top} \nonumber \\
+      = {} & \text{(area of sides)(energy absorbed per hm$^2$ of sides)} \nonumber \\
+      & + \text{(area of top)(energy absorbed per hm$^2$ of top)} \label{eq:fall2012-1a-midterm2-6a-energy}
+    \end{align}
+    This gives us an idea of what variables we need.
+
+    \highlight{Define variables:}
+    \begin{itemize}[nosep]
+    \item \goal{$E$ = amount of solar energy}
+    \item $w$ = width of the square base in hm
+    \item $h$ = height of the building in hm
+    \item $k$ (a positive constant) = the amount of solar energy per hm$^2$ that the side solar panels absorb
+    \end{itemize}
+    Here are two examples:
+    \begin{center}
+      \begin{tikzpicture}
+        \draw (0, 0) -- node[below]{$w$} (1, 0) -- node[anchor=north
+        west]{$w$} (1.5, 0.5) -- node[right]{$h$} (1.5, 2.5) -- (0.5,
+        2.5) -- (0, 2) -- (0, 0); %
+        \draw (0, 2) -- (1, 2) -- (1.5, 2.5); \draw (1, 0) -- (1, 2);
+      \end{tikzpicture}
+      \hspace{0.25in}
+      \begin{tikzpicture}[x=1.75cm, y=0.5cm]
+        \draw (0, 0) -- node[below]{$w$} (1, 0) -- node[anchor=north
+        west]{$w$} (1.5, 0.5) -- node[right]{$h$} (1.5, 2.5) -- (0.5,
+        2.5) -- (0, 2) -- (0, 0); %
+        \draw (0, 2) -- (1, 2) -- (1.5, 2.5); \draw (1, 0) -- (1, 2);
+      \end{tikzpicture}
+    \end{center}
+    There are 4 sides, each of area $hw$, while the top has area $w^2$. The amount of energy per hm$^2$ that the top of the building will absorb is $2k$. So, (\ref{eq:fall2012-1a-midterm2-6a-energy}) becomes
+    \begin{equation} \label{eq:fall2012-1a-midterm2-6a-energy-2}
+      \goal{$E$} = (4hw) k + w^2 (2k) = 4 k hw + 2k w^2
+    \end{equation}
+    This formula involves both $h$ and $w$, so we need to \highlight{relate $h$ and $w$ using something else we're told in the problem}.
+    \begin{align*}
+      \text{volume} &= 8 \\
+      w^2 h &= 8 \\
+      h &= \frac{8}{w^2}
+    \end{align*}
+    (We could also have solved $w^2 h = 8$ for $w$, but that looks slightly more complicated.) Plugging this into (\ref{eq:fall2012-1a-midterm2-6a-energy-2}) gives $E$ in terms of $w$:
+    \[ \goal{$E(w)$} = 4 k \left( \frac{8}{w^2} \right) w + 2 k w^2 = 32 k w^{-1} + 2k w^2.\]
+
+    \highlight{Domain:} There's one piece of information in the problem we haven't used yet, which is that the base of the building must have area $\geq 1$ and $\leq 9$. This tells us that $w$, the width of the square base, must be $\geq 1$ and $\leq 3$. So, we're trying to \hl{maximize $E(w)$ on $[1, 3]$}.
+
+    \highlight{Critical points:}
+    \[ E'(w) = - 32 k w^{-2} + 4 kw = 4k \left( w - \frac{8}{w^2} \right).\] This is undefined when $w = 0$ and 0 when $w = 2$. But since we're only interested in the domain $[1, 3]$, the only relevant critical point is $w = 2$.\footnote{Since $w = 0$ isn't in the domain of $E(w)$, we wouldn't call it a critical point anyway.}
+
+    \highlight{Global maximum:} Since we're maximizing on a closed interval, let's plug the critical point and endpoints in to $E(w)$ to see which gives us the highest value:
+    \begin{align*}
+      E(1) &= 34 k \\
+      E(2) &= 24k \\
+      E(3) &= \frac{86}{3} k
+    \end{align*}
+    The highest of these values is $E(1)$, so the optimal width of the building is 1 hm. Therefore, the building should be \fbox{$1 \text{ hm} \times 1 \text{ hm} \times 8 \text{ hm}$}.
+  \end{solution}
+
+\end{enumerate}
+
+\end{document}

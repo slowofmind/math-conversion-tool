@@ -1,0 +1,605 @@
+\PassOptionsToPackage{sols}{handout}
+\documentclass[main]{subfiles}
+\setcounterrefbeforedot{chapter}{m-ws5-6}
+\setcounterrefafterdot{section}{m-ws5-6}
+\addtocounter{section}{-1}
+\usepackage{solutions}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chapterfive}
+}{}
+
+\section{The Fundamental Theorem of Calculus, Part 2} \label{ws5-6}
+
+\begin{problemonly}
+    \begin{framed}
+
+\textbf{Key Ideas}:
+
+\begin{itemize}[topsep=0pt,partopsep=0pt,parsep=8pt,itemsep=0pt]
+
+\item You should understand FTOC 2 and be able to use it to calculate
+  definite integrals.  (Given what we already know about definite
+  integrals, this means that you should also be able to use FTOC 2 to
+  calculate signed area under curves and to find net change given a rate
+  of change.)
+
+\item You should understand the term \uline{antiderivative} and be able to
+  find antiderivatives of basic functions.
+
+\end{itemize}
+\end{framed}
+\end{problemonly}
+
+\begin{enumerate}
+\item 
+  \note{The goal of this problem is to have students discover FTOC 2 (I may have them start on their own at the boards and then I'll
+    do it with them).}
+
+  (Blue Bell revisited) At the Blue Bell ice cream factory, milk is stored
+  in a 40,000 gallon tank.  The rate of milk flowing into and out of the
+  tank $t$ hours after noon one day is $f(t) = 1000 - 300 t^2$ gallons per
+  hour.  At 2 pm, there are 15,000 gallons of milk in the tank.
+  \begin{enumerate}
+
+  \item
+
+    \note{This is just a reminder about the difference between amount and
+      net change.}
+
+    \begin{problem}[0.35in]
+      How much milk is in the tank at 5 pm?  Express your answer in terms
+      of a definite integral or area function.
+    \end{problem}
+
+    \begin{solution}
+      At 2 pm, there are 15,000 gallons of milk in the tank.  The net
+      change in the amount of milk from 2 pm to 5 pm is $\displaystyle
+      \int_2^5 f(t)\,dt$, so the amount of milk in the tank at 5 pm is
+      $\boxed{15,000 + \int_2^5 f(t)\,dt}$.
+    \end{solution}
+
+  \item
+
+    \note{I might talk a bit about how the only way we know how to do this
+      is to actually compute a limit of Riemann sums, which is fairly
+      unappealing.  The goal for the day is to (finally!) figure out a
+      faster way of evaluating this. Rather than focusing on the definite
+      integral as signed area, let's focus on the definite integral as 
+      a net change in amount.}
+
+    \begin{problem}[0.35in]
+      Express the net change in the amount of milk between 1 pm and 3 pm
+      as a definite integral.
+    \end{problem}
+
+    \begin{solution}
+      $\displaystyle \int_1^3 f(t)\,dt$.
+    \end{solution}
+
+  \item
+    \note{Here, we'll need to use the fact that the only antiderivatives
+      of $f(t) = 1000 - 300 t^2$ are $1000 t - 100 t^3 + C$; in other
+      words, any two antiderivatives differ by a constant.  It's
+      worthwhile to state this fact explicitly.}
+
+    \begin{problem}[\stretch{4}]
+      Let $M(t)$ be the amount of milk in the tank at time $t$.  What is
+      $M'(t)$?  What is $M(2)$?  Using these two pieces of information,
+      can you find a formula for $M(t)$?
+    \end{problem}
+
+    \begin{solution}
+      $M'(t)$ is the rate of change of the amount of milk in the tank at
+      time $t$, which is exactly $f(t) = 1000 - 300t^2$.  $M(2)$ is the
+      amount of milk in the tank at 2 pm, which is 15000.  We'd like to
+      use the two pieces of information $M'(t) = 1000 - 300 t^2$ and $M(2)
+      = 15000$ to find $M(t)$.
+
+      First, since $M'(t) = 1000 - 300 t^2$, $M(t)$ is a function whose
+      derivative is $1000 - 300 t^2$; the only such functions are $1000 t
+      - 100 t^3 + C$ for some constant $C$.  We can use the fact that
+      $M(2) = 15000$ to solve for $C$:
+      \begin{align*}
+        M(2) &= 15000 \\
+        1000 \cdot 2 - 100 \cdot 2^3 + C &= 15000 \\
+        2000 - 800 + C &= 15000 \\
+        C &= 15000 - 2000 + 800 = 13800
+      \end{align*}
+      So, $M(t) = \boxed{1000 t - 100 t^3 + 13800}$. 
+    \end{solution}
+
+  \item
+
+    \note{As we do this, I want them to see that, although we solved for
+      $C$ in the previous part, we didn't actually need that value to
+      compute this net change.  Therefore, we could have used any
+      antiderivative $1000 t - 100 t^3 + C$ of $f$.}
+
+    \begin{problem}[0.75in]
+      Use your answer to {{{{\#1}}(c)}} to find the net
+      change in the amount of milk in the tank between 1 pm and 3 pm.
+    \end{problem}
+
+    \begin{solution}
+      Now that we have a formula for $M(t)$, we can use it to find this
+      net change.  After all, this net change simply means (amount of milk
+      at 3 pm) $-$ (amount of milk at 1 pm), which is
+      \begin{align*}
+        M(3) - M(1) &= \left( 1000 \cdot 3 - 100 \cdot 3^3 + 13800 \right)
+        - \left( 1000 \cdot 1 - 100 \cdot 1^3 + 13800 \right) \\
+        &= \boxed{-600}
+      \end{align*}
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+
+\begin{framed}
+    A function $F$ is an \textbf{antiderivative} of $f$ if its derivative is $f$ ; that is, $F$ is an antiderivative of $f$ if $F'= f $.
+\end{framed}
+
+\begin{framed}
+    \textbf{Summary.} If $f(t)$ is a continuous rate function, the
+    amount function $F$ is an antiderivative of $f$: $F'=f$.
+    \[
+    \begin{tabular}{c}
+    \text{net change in amount}\\
+    \text{from $t=a$ to $t=b$}
+    \end{tabular}
+    = \int_a^b f(t)\,dt = \cfitb{0.5in}{F(b)} - \cfitb{0.5in}{F(a)}
+    \]
+\end{framed}
+\vspace{-8pt}
+What you just found out was extremely important! We can apply what we've
+learned to situations where we are not considering $f$ to be a rate 
+function. This gives us a nice way of computing definite integrals.
+
+\begin{framed}
+  \textbf{The Fundamental Theorem of Calculus, Part 2 (FTOC 2).} If $f$ is
+  a continuous function on $[a, b]$ and $F$ is an antiderivative of $f$,
+  that is, $F'=f$, then $\displaystyle \int_a^b f(t)\,dt
+  = {}$ \fitb{2in}{$\bm{F(b) - F(a)}$}. 
+\end{framed}
+\pspace{\newpage}
+
+\begin{enumerate}[resume]
+\item 
+  \note{We'll use FTOC 2 to evaluate this, but I'd also like them to
+    realize that we could just use symmetry to see that the integral is
+    0. }
+
+  \begin{problem}[\stretch{0.5}]
+    Evaluate $\displaystyle \int_{-2}^2 4x^3\,dx$.
+  \end{problem}
+
+  \begin{solution}
+    By FTOC 2, if $F$ is \emph{any} antiderivative of $4x^3$, then
+    $\displaystyle \int_{-2}^2 4x^3\,dx = F(2) - F(-2)$.  So, let's try to
+    think of an antiderivative of $4x^3$; that is, we want to think of a
+    function whose derivative is $4x^3$.  One example is $F(x) = x^4$.
+    So, $\displaystyle \int_{-2}^2 4x^3\,dx = x^4 \Big|_{-2}^2 = 2^4 -
+    (-2)^4 = \boxed{0}$.
+  \end{solution}
+
+\item 
+  \note{This is to address the question of whether we need to reverse the
+    endpoints to use FTOC 2.  (That is, although we can first rewrite the
+    integral as $-\displaystyle \int_3^4 x\,dx$, it's not necessary to do
+    so when using FTOC 2.)}
+
+  \begin{problem}[\stretch{0.5}]
+    Evaluate $\displaystyle \int_4^3 x\,dx$.
+  \end{problem}
+
+  \begin{solution}
+    One antiderivative of $x$ is $\frac{1}{2} x^2$, so $\displaystyle
+    \int_4^3 x\,dx = \left. \frac{1}{2} x^2 \right|_4^3 = \frac{1}{2}
+    \cdot 3^2 - \frac{1}{2} \cdot 4^2 = \boxed{-\frac{7}{2}}$.
+  \end{solution}
+
+\item 
+  \begin{enumerate}
+  \item
+    \begin{problem}[\stretch{0.5}]
+      Find two different antiderivatives of $f(t)=3t^2+5$.
+    \end{problem}
+
+    \begin{solution}
+      We are looking for functions whose derivative is $3t^2 + 5$.  Some
+      possibilities are $t^3 + 5t$, $t^3 + 5t + 1$, and $t^3 + 5t + 7$.  The way to state all of the antiderivatives of $3t^2 + 5$ is $t^3 + 5t + C$
+      where $C$ is any constant.
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{0.5}]
+      For each antiderivative you found in
+      {{{{\#4}}(a)}}, use that antiderivative along
+      with FTOC 2 to evaluate $\displaystyle \int_{-1}^{10} (3t^2+5)\,dt$.
+    \end{problem}
+
+    \begin{solution}
+      We'll use the general antiderivative $t^3 + 5t + C$:
+      \begin{align*}
+        \int_{-1}^{10} (3t^2 + 5)\,dt &= t^3 + 5t + C \Big|_{-1}^{10} \\
+        &= ({10}^3 + 5 \cdot {10} + C) - [(-1)^3 + 5 (-1) + C] \\
+        &= \boxed{1056}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\stretch{0.75}]
+      In {{{{\#4}}(b)}}, you should have gotten
+      the same answer using either antiderivative. Explain, in your own
+      words, why this works.
+    \end{problem}
+
+    \begin{solution}
+      Different antiderivatives correspond to different values of $C$, but
+      the value of $C$ doesn't affect the final answer: when we evaluate
+      the difference $({10}^3 + 5 \cdot {10} + C) - [(-1)^3 + 5 (-1) +
+      C]$, the $C$s cancel.
+    \end{solution}
+
+  \end{enumerate}
+\end{enumerate}
+
+\begin{framed}
+    \textbf{Summary,} If $F$ and $G$ are two antiderivatives of $f$, 
+    that is, $F'=f$ and $G'=f$, what is the relationship between F and G? 
+    \fitb[\vphantom{\huge X}]{5.1in}{$F$ and $G$ differ by a constant}.
+\end{framed}
+
+\begin{enumerate}[resume]
+\item 
+  \begin{problem}[\stretch{1.25}]
+    Find the signed area under the curve $y=\sin x$ from $x=\frac{\pi}{2}$
+    to $x=\pi$. Should your answer be positive or negative? Take a moment
+    to celebrate the simplicity of your answer. There's something
+    surprisingly nice about this!
+  \end{problem}
+
+  \begin{solution}
+    The signed area under $y = \sin x$ from $x = \frac{\pi}{2}$ to $x =
+    \pi$ is $\displaystyle \int_{\pi/2}^\pi \sin x\,dx$.  We can see from
+    a picture that this should be positive, since $\sin x$ is positive on
+    $\left[ \frac{\pi}{2}, \pi \right]$.
+
+    To use FTOC 2, we need to think of an antiderivative of $\sin x$; one
+    example is $-\cos x$.  Therefore, 
+    \begin{align*}
+      \int_{\pi/2}^\pi \sin x\,dx &= - \cos x \Big|_{\pi / 2}^\pi \\
+      &= - \cos \pi - \left( - \cos \frac{\pi}{2} \right) \\
+      &= \boxed{1}
+    \end{align*}
+    (As expected, our answer is positive.)
+  \end{solution}
+  
+\pspace{\newpage}
+
+\item
+  \begin{enumerate}
+    \item 
+    \begin{problem}[\stretch{0.75}]
+    Evaluate $\displaystyle \int_0^1 \frac{1}{1+x^2}\,dx$
+    \end{problem}
+
+    \begin{solution}
+       If the integrand looks familiar, it's 
+        probably because
+        we've seen that it's the derivative of $\arctan x$. This
+        means that $\arctan x$ is an antiderivative of $\dfrac{1}{1+x^2}$.
+        Using FTOC 2 to evaluate:
+        \begin{align*}
+            \int_0^1 \frac{1}{1+x^2}\,dx &= \left[\arctan x\right]_0^1 \\
+            &= \arctan 1 - \arctan 0 \\
+            &= \boxed{\frac{\pi}{4}.}
+        \end{align*}
+    \end{solution}
+
+    \item
+    \begin{problem}[\stretch{0.75}]
+    Evaluate $\displaystyle \int_1^7 \frac{1}{x}\,dx$
+    \end{problem}
+
+    \begin{solution}
+       You may be tempted to use the Power Rule, but there's no function
+       $x^n$ whose derivative has an exponent of $-1$. You should
+       instead recognize that the derivative of $\ln x$ is $1/x$.
+       Using FTOC 2 to evaluate:
+        \begin{align*}
+            \int_1^7 \frac{1}{x}\,dx &= \left[\ln x\right]_1^7 \\
+            &= \ln 7 - \ln 1 \\
+            &= \boxed{\ln 7.}
+        \end{align*}
+    \end{solution}
+  \end{enumerate}
+
+% \item  A bronze statue sits in a courtyard.  One sunny day, the statue's
+%   temperature at noon is 40 degrees Celsius.  Suppose that the statue's
+%   temperature is changing at a rate of $r(t) = \cos t + 2$ degrees Celsius
+%   per hour, where $t$ is the numbers of hours since noon.
+
+%   \begin{enumerate}
+%   \item
+%     \begin{problem}[0.35in]
+%       At what times is the statue heating up?  At what times is the statue
+%       cooling down?
+%     \end{problem}
+
+%     \begin{solution}
+%       $r(t)$ is always positive, so the statue is \fbox{always heating
+%         up}.
+%     \end{solution}
+
+%   \item
+
+%     \note{When I've taught this before, students who had no trouble with
+%       {{\#1}} did have trouble with this.  The issue
+%       seemed to be that they got in the habit of ``take an antiderivative
+%       and plug in'' and then plugged in random things, as opposed to first
+%       thinking, ``I'm looking for $40 + \displaystyle \int_0^1 r(t)\,dt$''
+%       and then using FTOC 2 to evaluate that.}
+
+%     \begin{problem}[\vfill]
+%       What is the statue's temperature at 1:00 pm?
+%     \end{problem}
+
+%     \begin{solution}
+%       The statue's temperature at 1:00 pm is $\displaystyle 40 + \int_0^1
+%       r(t)\,dt = 40 + \int_0^1 \left( \cos t + 2 \right) dt$.  One
+%       antiderivative of $\cos t + 2$ is $\sin t + 2t$, so
+%       \begin{align*}
+%         40 + \int_0^1 \left( \cos t + 2 \right) dt &= 40 + \left( \sin t +
+%           2t \Big|_0^1 \right) \\
+%         &= 40 + \left[ (\sin 1 + 2) - (\sin 0) + 0 \right] \\
+%         &= \boxed{42 + \sin 1}
+%       \end{align*}
+%     \end{solution}
+
+%   \item
+
+%     \begin{problem}[\nstretch{0.25}]
+%       Do a consistency check: given that the statue's temperature at noon
+%       was 40 degrees, do your answers make sense with each other?
+%     \end{problem}
+
+%     \begin{solution}
+%       Yes. The temperature of the statue has increased by $2+\sin(1)$
+%       degrees, which is consistent with the fact that the statue is always
+%       heating up. 
+%     \end{solution}
+
+%   \end{enumerate}
+
+\item 
+  A busy bagel shop starts making bagels at 6 am each morning.  One day,
+  the rate at which bagels are made is 
+  \[ r(t) =
+  \begin{cases}
+    30 \sqrt{t} & 0 \leq t \leq 4 \\
+    7.5 (12 - t) & 4 < t \leq 12
+  \end{cases}
+  \text{ bagels per hour},\] where $t$ is measured in hours after 6 am.
+  (The graph of $r(t)$ is below.)
+
+  \begin{tikzpicture}[declare
+    function={f(\x)=(\x<=4)*30*sqrt(\x)+(\x>4)*7.5*(12-\x);}] 
+    \begin{axis}[gridgraph, xtick={1, 2, ..., 12}, ytick={30, 60},
+      width=4in, height=2in, xlabel=$t$, ylabel={rate
+        (bagels per hour)}, cycle list=black,
+        y label style={yshift=6pt}] 
+      \addplot+[domain=0:4, black] {f(x)}; %
+      \addplot+[domain=4:12, samples=2] {f(x)};
+    \end{axis}
+  \end{tikzpicture}  
+
+  The bagel shop is open 7 am - 6 pm; on this day, customers come at a
+  steady rate of 30 customers per hour between 7 am and 6 pm.  Each
+  customer orders one bagel and receives it immediately.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\stretch{0.5}]
+      At what times on this day is the number of bagels the shop has
+      available increasing?  At what times is it decreasing?  
+    \end{problem}
+
+    \begin{solution}
+      Here is the graph of $r(t)$, together with the rate at which
+      customers come:
+      \begin{center}
+        \begin{tikzpicture}[declare
+          function={f(\x)=(\x<=4)*30*sqrt(\x)+(\x>4)*7.5*(12-\x);}] 
+          \begin{axis}[gridgraph, xtick={1, 2, ..., 12}, ytick={30, 60},
+            width=4in, height=2in, xlabel=$t$, ylabel={rate
+              (bagels per hour)}] 
+            \addplot+[domain=0:4, green!70!black] {f(x)} node[anchor=south
+            west] {rate at which bagels are made}; %
+            \addplot+[domain=4:12, green!70!black, samples=2] {f(x)};
+            \addplot+[domain=0:1, red] {0}; %
+            \addplot+[domain=1:12, red] {30} node[right]{rate at which
+              bagels are sold}; %
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      The number of bagels increases as long as bagels are made more
+      quickly than they are sold; therefore, the number of bagels is
+      \fbox{increasing before 2 pm ($t = 8$) and decreasing after 2 pm}. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\nstretch{1.5}]
+      At the end of the day, any unsold bagels are donated to a local food
+      pantry.  How many bagels are donated at the end of this day? 
+    \end{problem}
+
+    \begin{solution}
+      The number of unsold bagels is (number of bagels made) $-$ (number
+      of bagels sold).  We can picture the number of bagels made as the
+      area under $r(t)$ from $t = 0$ to $t = 12$; we can picture the
+      number of bagels sold as the area under $y = 30$ from $t = 1$ to
+      $12$:
+      \begin{center}
+        \begin{tikzpicture}[declare
+          function={f(\x)=(\x<=4)*30*sqrt(\x)+(\x>4)*7.5*(12-\x);}]
+          \begin{axis}[gridgraph, xtick={1, 2, ..., 12}, ytick={30, 60},
+            width=4in, height=2in, grid=none, xlabel=$t$, ylabel={rate
+              (bagels per hour)}, samples=91] 
+            \addplot+[domain=0:4, green!70!black] {f(x)}; %
+            \addplot+[domain=4:12, green!70!black, samples=2] {f(x)};
+            \addplot+[domain=0:12, green!70!black, pattern=flexible hatch,
+            pattern color=green!70!black, draw=none] {f(x)}
+            \closedcycle; %
+            \addplot+[domain=0:1, red] {0}; %
+            \addplot+[domain=1:12, red, pattern=flexible hatch, pattern
+            color=red, hatch direction=-1] {30} \closedcycle; %
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      So, we want to calculate the green area minus the red area.  
+      The green area from $t = 0$ to $t = 4$ is $\displaystyle \int_0^4 30
+      \sqrt{t}\,dt$.  An antiderivative of $30 \sqrt{t} = 30 t^{1/2}$ is
+      $20 t^{3/2}$, so FTOC 2 says $\displaystyle \int_0^4 30 \sqrt{t}\,dt
+      = 20 t^{3/2} \Big|_0^4 = 20 \cdot 4^{3/2} - 20 \cdot 0 = 20 \cdot 8
+      = 160$.  The green region from $t = 4$ to $t = 12$ is a triangle of
+      width $8$ and height $60$, so its area is $\frac{1}{2} \cdot 8 \cdot
+      60 = 240$.  Therefore, the total green area is $160 + 240 = 400$.
+      (That is, $400$ bagels were made on this day.)
+
+      The red region is a rectangle of width $11$ and height $30$, so its
+      area is $330$.  (That is, $330$ bagels were sold.)
+
+      So, the number of unsold bagels is $400 - 330 = \boxed{70}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[2in]
+      What is the largest number of bagels the shop has available at any
+      point during this day?
+    \end{problem}
+
+    \begin{solution}      
+      The number of bagels the shop has available is highest at $t = 8$
+      (after all, we figured out in
+      {{{{\#7}}(a)}} that
+      the number of bagels increases until $t = 8$ and decreases after
+      that).  So, we need to figure out the number of bagels at $t = 8$.
+      The number of bagels available at $t = 8$ is (number of bagels made
+      by $t = 8$) $-$ (number of bagels sold by $t = 8$), which we can
+      picture as the green area below minus the red area:
+      \begin{center}
+        \begin{tikzpicture}[declare
+          function={f(\x)=(\x<=4)*30*sqrt(\x)+(\x>4)*7.5*(12-\x);}]
+          \begin{axis}[gridgraph, xtick={1, 2, ..., 12}, ytick={30, 60},
+            width=4in, height=2in, grid=none, xlabel=$t$, ylabel={rate
+              (bagels per hour)}, samples=91] 
+            \addplot+[domain=0:4, green!70!black] {f(x)}; %
+            \addplot+[domain=4:12, green!70!black, samples=2] {f(x)}; %
+            \addplot+[domain=0:12, green!70!black] {f(x)} \closedcycle; %
+            \addplot+[domain=0:8, green!70!black, pattern=flexible hatch,
+            pattern color=green!70!black] {f(x)} \closedcycle;
+            \addplot+[domain=0:1, red] {0}; %
+            \addplot+[domain=1:12, red] {30}; %
+            \addplot+[domain=1:8, red, pattern=flexible hatch, pattern
+            color=red, hatch direction=-1] {30} \closedcycle;
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      We can calculate this by finding the area of the two green regions
+      below and subtracting the area of the red region:
+      \begin{center}
+        \begin{tikzpicture}[declare
+          function={f(\x)=(\x<=4)*30*sqrt(\x)+(\x>4)*7.5*(12-\x);}]
+          \begin{axis}[gridgraph, xtick={1, 2, ..., 12}, ytick={30, 60},
+            width=3in, height=1.5in, grid=none, samples=91, axis on top, cycle
+            list=black, disabledatascaling]  
+            \addplot+[domain=0:4, green!70!black] {f(x)}; %
+            \addplot+[domain=4:8, samples=2, green!70!black] {f(x)}; %
+            \addplot+[domain=8:12, samples=2, black] {f(x)}; %
+            \addplot+[domain=0:4, plusarea, draw=none] {f(x)}
+            \closedcycle; %
+            \addplot+[domain=4:8, plusarea, draw=none] {f(x)}
+            \closedcycle; %
+            \addplot+[domain=4:8, fill=white, draw=none] {30}
+            \closedcycle; %
+            \draw[green!70!black, thick] (4, 0) -- (4, 60); %
+            \draw[green!70!black, thick] (4, 30) -- (8, 30); %
+            \draw[green!50!black] (2.5, 25) node[circle, draw, inner
+            sep=2pt] {1}; % 
+            \draw[green!50!black] (5.5, 40) node[circle, draw, inner
+            sep=2pt] {2}; 
+          \end{axis}
+        \end{tikzpicture}
+        \hspace{0.25in}
+        \begin{tikzpicture}[declare
+          function={f(\x)=(\x<=4)*30*sqrt(\x)+(\x>4)*7.5*(12-\x);}]
+          \begin{axis}[gridgraph, xtick={1, 2, ..., 12}, ytick={30, 60},
+            width=3in, height=1.5in, grid=none, samples=2, ymax=60]
+            \addplot+[domain=1:4, minusarea] {30} \closedcycle;
+            \addplot+[domain=0:1, red] {0}; %
+            \addplot+[domain=1:12, red] {30}; %
+          \end{axis}
+        \end{tikzpicture}        
+      \end{center}
+      Region 1 has area $\displaystyle \int_0^4 30 \sqrt{t}\,dt$, which we
+      already found to be $160$ in
+      {{{{\#7}}(b)}}.  Region 2 is a triangle
+      of width 4 and height $30$, so its area is $60$.  The red region has
+      area $90$, so the number of bagels the shop has available at $t = 8$
+      is $160 + 60 - 90 = \boxed{130}$. 
+    \end{solution}
+
+  \end{enumerate}
+
+\item 
+  \begin{enumerate}
+  \item
+    \begin{problem}[1in]
+      Which of the following are antiderivatives of $f(x) =
+      \dfrac{1}{\sqrt{1 - x^2}}$?
+      \begin{center}
+        \setboolean{doCircle}{true}\maybecircle{$\arcsin x$} \hspace{0.5in}
+        $\arccos x$ \hspace{0.5in} $\arctan x$ \hspace{0.5in}
+        \setboolean{doCircle}{true}\maybecircle{$\arcsin x + 7$} 
+        \hspace{0.5in} \setboolean{doCircle}{true}\maybecircle{$- \arccos
+          x$} 
+      \end{center}
+    \end{problem}
+
+    \begin{solution}
+      We can check by taking the derivative of each: $\arcsin x$, $\arcsin
+      x + 7$, and $- \arccos x$ all have derivative $\frac{1}{\sqrt{1 -
+          x^2}}$.  $\arccos x$ has derivative $- \frac{1}{\sqrt{1 -
+          x^2}}$, while $\arctan x$ has derivative $\frac{1}{1 + x^2}$. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Since $f(x) = \dfrac{1}{\sqrt{1 - x^2}}$ is continuous on its domain
+      $(-1, 1)$, if $F(x)$ is one antiderivative of $f(x)$, then the most
+      general antiderivative of $f(x)$ is $F(x) + C$.  Explain why this
+      does \emph{not} contradict your answers to
+      {{{{\#8}}(a)}}.
+    \end{problem}
+
+    \begin{solution}
+      Since $\arcsin x$ is one antiderivative of $\frac{1}{\sqrt{1 -
+          x^2}}$, the most general antiderivative of $\frac{1}{\sqrt{1 -
+          x^2}}$ is $\arcsin x + C$.  The fact that $\arcsin x + 7$ is
+      also an antiderivative of $\frac{1}{\sqrt{1 - x^2}}$ clearly agrees
+      with this, but the fact that $-\arccos x$ is an antiderivative of
+      $\frac{1}{\sqrt{1 - x^2}}$ seems to disagree with this.
+      However, as you found in
+          {{{Problem Set 14}, {{\#3}}}}, $\arcsin x + \arccos x =
+          \frac{\pi}{2}$, so $\arcsin x - \frac{\pi}{2} = - \arccos x$.
+          Thus, $-\arccos x$ really is $\arcsin x$ plus a constant.
+    \end{solution}
+
+  \end{enumerate}
+
+\end{enumerate}
+\end{document}

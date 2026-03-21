@@ -1,0 +1,458 @@
+\documentclass[main]{subfiles}
+\usepackage[sols]{workbook}
+\numbering{ws2-9}
+
+\begin{document}
+
+\ifSubfilesClassLoaded{%
+  \chaptermark{\chaptertwo}
+}{}
+
+\section{Alternating Series Test} \label{ws2-9}
+
+\begin{framed}
+\centerline{\textbf{Lesson Goals}}
+
+You should be able to:
+\begin{itemize}
+\item State the Alternating Series Test for Convergence, and explain the intuition behind it
+\item Determine if a given series is an alternating series, and use the Alternating Series Test to determine if it converges
+\item Find an upper bound on the error from a partial sum approximation of a convergent alternating series
+\item Determine how many terms will ensure that a partial sum approximation of a convergent alternating series is within a certain margin of error
+\item Test a series for absolute convergence to determine if it converges
+
+\end{itemize}
+\end{framed}
+
+\begin{enumerate}
+
+\item   \label{alt-harmonic}
+
+  \begin{problem}[3.1in]
+    Draw the first six partial sums of $\displaystyle \sum_{k=1}^{\infty} (-1)^{k+1} \frac{1}{k} $ on a number 
+    line.  Does it look like the sum converges?
+  \end{problem}
+
+  \begin{solution}
+    The partial sum diagram below
+    suggests that the series converges, which actually is the case.  (Convergence
+    follows from the Alternating Series Test.)
+    \begin{center}
+      \includegraphics[width=4in]{ws/images/alternating-harmonic}
+    \end{center}
+  \end{solution}
+
+%  \item \begin{problem}[0.8in]
+%    Can you relate the sum in part (a) to the Taylor series for $\mathrm{ln}(1+x)$ centered at 
+%    $0$, evaluated at a specific value of $x$?
+%  \end{problem}
+  
+%  \begin{solution}
+%    The series is what you get if you plug $x=1$ into the Taylor Series for $\mathrm{ln}(1+x)$ 
+%    centered at $x=0$.
+%  \end{solution}
+
+
+
+\begin{problemonly}
+\begin{framed}
+\centerline{\textbf{The Alternating Series Test}}
+
+A series of the form $\displaystyle \sum_{k = 1}^{\infty} (-1)^{k} |b_{k}|$ or
+$\displaystyle \sum_{k = 1}^{\infty} (-1)^{k+1} |b_{k}|$ where $|b_k| > 0$ for each $k$ is called an \uline{alternating series}.  If the following two conditions are met, then the alternating series converges:
+\begin{itemize}
+  \item $|b_{k+1}| \leq |b_{k}|$ for each $k = 1, 2, 3, \dots$
+  \item $\displaystyle \lim_{k \to \infty} |b_{k}| = 0.$
+\end{itemize}  
+\end{framed}
+\end{problemonly}
+
+\pspace{\newpage}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\item     \label{test-alt-series}
+\begin{problem}
+Determine whether each of the series below converges or diverges.  Explain which
+test for convergence or divergence you are using, and why the test applies.
+\end{problem}
+
+\begin{enumerate}
+  \item  
+  \begin{problem}[\vfill] 
+     $\displaystyle\sum_{k=3}^\infty\frac{(-1)^k}{100\sqrt[3]{k}}$
+  \end{problem}
+
+  \begin{solution}
+  The series does alternate, so let's see whether the Alternating Series Test
+  applies.  Letting $\displaystyle b_k = \frac{1}{100 \sqrt[3]{k}}$, the series
+  has the form $\displaystyle \sum_{k = 3}^{\infty} (-1)^{k} b_{k}$.  The first
+  condition of the Alternating Series Test is met because
+  $$
+    b_{k+1} \; = \; \frac{1}{100 \sqrt[3]{k+1}} < \frac{1}{100 \sqrt[3]{k}} \; = \; b_{k}
+  $$
+  for each $k$.  The second condition of the Alternating Series Test is also
+  met because
+  $$
+    \lim_{k \to \infty} b_{k} \; = \; \lim_{k \to \infty} \frac{1}{100 \sqrt[3]{k}} \; = \; 0.
+  $$
+  It follows that this series converges, by the Alternating Series Test.
+  \end{solution}
+
+
+  \item  
+  \begin{problem}[\vfill]
+     $\displaystyle\sum_{k=1}^\infty (-1)^{k+1} \frac{k}{2k + 1}$
+  \end{problem}
+
+  \begin{solution}
+    Again, the series alternates, so let's see whether the Alternating Series Test
+    applies.  Let $\displaystyle b_{k} = \frac{k}{2k + 1}$, and note that the
+    series has the form $\displaystyle \sum_{k = 1}^{\infty} (-1)^{k+1} b_{k}$.
+    But this time,
+    $$
+      \lim_{k \to \infty} b_{k} \; = \; \lim_{k \to \infty} \frac{k}{2k + 1} \; = \; \frac{1}{2}.
+    $$
+    This means that the Alternating Series Test does not apply---it is inconclusive.
+    However, there is good news---the fact that the limit we just took is not equal
+    to zero means that this series definitely diverges according to the $N$th term
+    test for divergence.
+  \end{solution}
+
+
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{problemonly}
+\begin{framed}
+\textbf{Definition.}  A series $\sum a_k$ is called \uline{absolutely
+convergent} if the series of absolute values $\sum |a_k|$ is
+convergent.
+
+\textbf{Theorem.}  If a series $\sum a_k$ is absolutely convergent,
+then it is convergent.
+
+The opposite (converse) of the theorem is not true: there are
+convergent series which are not absolutely convergent.  These series
+are called \uline{conditionally convergent}.
+\end{framed}
+\end{problemonly}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\item 
+\begin{problem}[1in]
+  Give an example of a series that converges but does not converge absolutely.
+\end{problem}
+
+\begin{solution} 
+  The alternating harmonic series $\displaystyle \sum_{k=1}^{\infty} (-1)^{k+1}\frac{1}{k}$ is 
+  convergent (by the Alternating Series Test, since $\displaystyle \frac{1}{k}$ is decreasing 
+  and since $\displaystyle\lim_{k\rightarrow \infty} \frac{1}{k} = 0$).  But if we sum the 
+  absolute values of the terms in the alternating harmonic series, we 
+  get the harmonic series, which diverges.  Thus, the alternating harmonic series is an 
+  example of a series that is \fbox{conditionally convergent}.
+  
+  Another example of a conditionally convergent series is in Problem~\ref{abs-conv}(b).
+\end{solution}
+
+\pspace{\newpage}
+
+
+\item \label{abs-conv}
+
+\note{In Part (a), I'll point out why it's advantageous to start by testing
+for absolute convergence, and that there's never a need to invoke the
+Alternating Series Test (even though it does apply).  Note that Part (b)
+revisits the series from Problem~\ref{test-alt-series}(a) above.}
+
+
+\begin{problem}
+Determine whether each of the series below diverges, converges absolutely, or converges 
+conditionally. Write down the test you are using. 
+\end{problem}
+
+\begin{enumerate}
+  \item  
+  \begin{problem}[\vfill] 
+     $\displaystyle \sum_{k=1}^\infty (-1)^k\frac{4}{k^3}$
+  \end{problem}
+
+  \begin{solution}
+  We will test for absolute convergence first because, if the series does
+  converge absolutely, we'll be done (because absolute convergence implies
+  convergence).  Summing the absolute values of the terms in the series,
+  we obtain
+  \[\sum_{k=1}^\infty \left|(-1)^k\frac{4}{k^3}\right| = \sum_{k=1}^\infty \frac{4}{k^3}.\]
+  This is $4$ times a $p$-series with $p = 3 > 1$, which converges.  Therefore,
+  the series $\displaystyle \sum_{k=1}^\infty (-1)^k\frac{4}{k^3}$  
+  \fbox{converges absolutely}.  Note:  You could also use the Alternating
+  Series Test to show that the series converges, but this would have been
+  a waste of effort---it would have told you nothing about whether the
+  series converges absolutely.
+  \end{solution}
+
+
+
+  \item  
+  \begin{problem}[\vfill] 
+     $\displaystyle\sum_{k=3}^\infty\frac{(-1)^k}{100\sqrt[3]{k}}$
+  \end{problem}
+
+  \begin{solution}
+  This is the same series from Problem~\ref{test-alt-series}(a) above.
+  We already know that the series converges by the Alternating Series Test,
+  so let's test whether it converges absolutely.  Summing the absolute
+  values of the terms, we obtain the series
+  \[ \displaystyle\sum_{k=3}^\infty   \left|\frac{(-1)^k}{100\sqrt[3]{k}} \right| = 
+  \displaystyle\sum_{k=3}^\infty\frac{1}{100\sqrt[3]{k}} = \frac{1}{100}  
+  \sum_{k=3}^\infty\frac{1}{{k}^{1/3}}\]  This is a p-series with $p=1/3 \leq 1$, 
+  which diverges.  Therefore, our original series does not converge absolutely.
+  Since it converges but does not converge absolutely, the series is 
+  \fbox{conditionally convergent}.
+  \end{solution}
+
+
+  \item  
+  \begin{problem}[\vfill]
+     $\displaystyle\sum_{k=1}^\infty \frac{- 3^k}{k^ {2/3}}$
+  \end{problem}
+
+  \begin{solution}
+  This series doesn't alternate.  Moreover, $3^k \gg k^{2/3}$, and therefore 
+  there is no way the terms are going to zero as $k \to \infty$.  By
+  the Nth-term Test for Divergence, this series \fbox{diverges}.
+  \end{solution}
+
+
+  \item  
+  \begin{problem}[\vfill] 
+    $\displaystyle\sum_{k=1}^\infty \frac{(-3)^{k+ 20}}{4^ {k}}$
+  \end{problem}
+
+  \begin{solution}
+  Notice right away that the series can be written as 
+  \[\sum_{k=1}^\infty \frac{(-3)^{k+ 20}}{4^ {k}} = \sum_{k=1}^\infty 3^{20} 
+  \left(\frac{-3}{4}\right)^{k}\]
+  Which is a geometric series with common ratio $r=\frac{-3}{4}$.  If we sum
+  the absolute values of the terms instead, we end up with a geometric series
+  with common ratio $3/4$, which converges.  It follows that the series 
+  $\displaystyle\sum_{k=1}^\infty \frac{(-3)^{k+ 20}}{4^ {k}}$ 
+  \fbox{converges absolutely}.
+  \end{solution}
+
+\end{enumerate}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pspace{\newpage}
+
+
+
+\begin{problemonly}
+\begin{framed}
+\centerline{\textbf{Associated Error Bound for a Convergent Alternating Series:}}
+
+Consider an alternating series
+$$
+\sum_{k=1}^\infty (-1)^{k+1} |a_k| = |a_1| - |a_2| + |a_3| - |a_4| + |a_5| - |a_6| + \cdots
+$$
+where $|a_k| > 0$ for each $k$.  If this series satisfies the conditions of the 
+Alternating Series Test (and therefore converges to some limit $S$), then the 
+error committed in using the partial sum
+$$
+  s_n \; = \;   |a_1| - |a_2| + |a_3| - |a_4| + \cdots + (-1)^{n+1} |a_n|
+$$
+to approximate $S$ is at most $|a_{n+1}|$, the magnitude of the first unused term.
+That is, $$|s_n - S| \leq |a_{n+1}|$$
+\end{framed}
+\end{problemonly}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\item \label{sine1}
+\note{Emphasize to students that we will once again assume that the sine function is equal to its Taylor series centered at $0$, which hasn't been fully verified so far.}
+
+We have seen that the Taylor polynomials for $\sin(x)$ centered at 0 appear to give great approximations for the function when $x$ is close to 0. Assuming that these polynomial approximations actually get closer and closer to $\sin(x)$ as the degree increases, we would like to know how accurate these approximations actually are.
+
+\begin{enumerate}
+
+\item
+\begin{problem}[\vfill] Show that the Taylor series for $\sin(x)$ centered at 0, given by $$\displaystyle \sum_{k=0}^{\infty} \frac{(-1)^k}{(2k+1)!}x^{2k+1}=x-\frac{1}{3!}x^3+\frac{1}{5!}x^5-\cdots$$ converges when $x=1$.   Do the same for $x=-1$.
+\end{problem}
+
+\begin{solution}
+When $x=1$, the Taylor series for $\sin(1)$ centered at 0 is given by $\displaystyle \sum_{k=0}^{\infty} \frac{(-1)^k}{(2k+1)!}$. These terms are alternating, decreasing, and $\displaystyle\lim_{k\to\infty} \frac{1}{(2k+1)!}=0$. Therefore, by the Alternating Series Test, the series converges. We can show convergence similarly for $x=-1$.
+\end{solution}
+
+\item 
+\begin{problem}[\vfill]
+    Explain why the Taylor series for $\sin(x)$ converges for all $x$ in the interval $[-1,1]$.
+\end{problem}
+
+\begin{solution}
+When $x=0$, the Taylor series clearly converges to 0. 
+
+If $0<x<1$, the Taylor series will alternate in sign, with the first term being positive. And if $-1<x<0$, the Taylor series will also alternate in sign, but with the first term being negative. Thus, for all values of $x$, the Taylor series is an alternating series! Also, for all $x$ in $[-1,1]$, it is evident that the size of the terms $\displaystyle \left|\frac{(-1)^k\cdot x^{2k+1}}{(2k+1)!}\right|$ will decrease towards 0, since the numerator will not increase in size as $k\to\infty$, while the denominator will increase (quickly) to $\infty$ as $k\to\infty$. Thus, by the Alternating Series Test, the Taylor series for $\sin x$ converges for all $x$ in $[-1,1]$.
+\end{solution}
+\pspace{\newpage}
+\item
+\begin{problem}[\vfill] If you program a computer to compute $\sin(x)$ by using $\displaystyle \sin(x) \approx x - \frac{x^3}{3!} +  \frac{x^5}{5!}$ for all $x \in [-1, 1]$, what is an upper bound for the error involved in this approximation?
+\end{problem}
+
+\begin{solution}
+We saw in the previous problem that for all the values of $x$ in this range, the terms of the series are alternating and decreasing to zero. So, we may use the alternating series error bound.  Thus, for any $x$, a bound on the error is 
+\[  \left| \frac{x^7}{7!} \right| \]
+What is the biggest this quantity can be on the interval $-1\leq x\leq 1$?  Evidently, the numerator is never bigger than when $x = \pm1$.  So a reasonable upper bound on the error is $\frac{1^7}{7!} =\frac{1}{5040}\leq \fbox{0.0002}$.  
+
+This is actually really cool -- it means that if we use the  (easy to work with) degree $5$ Taylor polynomial for $\sin$ instead of the (hard to evaluate) function itself, we have less than an error of $0.0002$ on the interval $-1\leq x\leq 1$.
+\end{solution}
+
+\item 
+\begin{problem}[\vfill]
+If you want to approximate $\sin(1)$ with error less than $10^{-8}$, what \textit{degree} could you use for your Taylor polynomial to achieve this? 
+\end{problem}
+
+\begin{solution}
+If $f(x) = \sin(x)$, then the Taylor series for $f$ centered at $0$ is given by
+$$
+  x - \frac{x^3}{3!} + \frac{x^5}{5!}-\frac{x^7}{7!} +\frac{x^9}{9!} - \frac{x^{11}}{11!} + \cdots
+$$
+Soon, we will have the tools needed to show that this series actually equals $\sin(x)$
+for each real $x$.  Taking this for granted for now, this means
+$$
+  \sin(1) \; = \;  1 - \frac{1}{3!} + \frac{1}{5!} - \frac{1}{7!} + \frac{1}{9!} - \frac{1}{11!} + \cdots
+$$
+This is an alternating series which satisfies the conditions of the Alternating Series Test,
+and therefore converges.  Moreover, given any two consecutive partial sums (say $s_{n}$ and $s_{n+1}$),
+we know that whatever the series converges to must lie in between $s_{n}$ and $s_{n+1}$.  
+Since $|s_{n+1} - s_{n}| = |a_{n+1}|$, this means that if we use $s_{n}$ to approximate
+the sum of this alternating series, our error is at most as large as the magnitude of 
+the first unused term, that is, $|a_{n+1}|$.
+
+For instance, if we make the approximation
+\begin{equation}
+  \label{sine1-est}
+  \sin 1 \approx 1 - \frac{1^3}{3!} + \frac{1^5}{5!}-\frac{1^7}{7!} 
+   +\frac{1^9}{9!} - \frac{1^{11}}{11!} + \frac{1^{13}}{13!} - \frac{1^{15}}{15!}
+\end{equation}
+then our error is at most $\displaystyle \frac{1}{17!}$.  Moreover,
+\begin{eqnarray*}
+17! &=& (17 \cdot 16 \cdot 15 \cdot 14 \cdot 13 \cdot 12 \cdot 11 \cdot 10) \cdot 9!\\
+    &>& (10 \cdot 10 \cdot 10 \cdot 10 \cdot 10 \cdot 10 \cdot 10 \cdot 10) \cdot 9!\\
+    &=&  10^{8} \cdot 9! \; > \; 10^{8}.
+\end{eqnarray*}
+So the error in the approximation~(\ref{sine1-est}) above is less than 
+\[\frac{1}{17!} < \frac{1}{10^8}\]
+Or, if you happen to have a calculator handy, you can just compute: the error will be no 
+greater than
+\[\frac{1}{17!} \approx 2.81148 \times 10^{-15} < 10^{-8}\]
+
+\fbox{So, we may use the degree $15$ Taylor polynomial.}  
+
+\end{solution}
+
+
+
+
+
+
+
+
+
+\end{enumerate}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%  NOTE FOR FALL 2023:  NOT SURE WHO WROTE THIS NEXT PROBLEM, BUT IT WASN'T WELL
+%  THOUGHT-OUT AND I'M COMMENTING IT OUT.  NICE IDEA AND COULD BE ADAPTED, BUT
+%  NEED TO GIVE STUDENTS GUIDANCE AS TO WHY THE MONOTONICITY CONDITION OF THE
+%  ALT SERIES TEST IS MET FOR X OUTSIDE THE INTERVAL [-1,1].
+
+%\item 
+%\begin{problem}[2in]
+%  If you program a computer to compute $\sin(x)$ by using $\displaystyle \sin(x) \approx x - 
+%  \frac{x^3}{3!} +  \frac{x^5}{5!}$ for all $x \in [-2, 2]$, what is an upper bound for the 
+%  error involved in this approximation?
+%\end{problem}
+
+
+%\begin{solution}
+%For all the values of $x$ in this domain, the terms of the series are alternating and decreasing 
+%to zero, so , as in the previous problem, we may use the alternating series error bound.  Thus, 
+%for any $x$, a bound on the error is 
+%\[  \left| \frac{x^7}{7!} \right| \]
+%What is the biggest this quantity can be on the interval $-2\leq x\leq 2$?  Evidently, the 
+%numerator is never bigger than when $x = \pm2$.  So a reasonable bound on the error is $2^7/7! 
+%\leq 0.0254$  This is actually really cool -- it means that if we use the (super amazing, easy 
+%to work with polynomial!) degree $5$ Taylor polynomial for $\sin$ instead of the (hard to 
+%evaluate, pain in the butt) function itself, we have less than a $3\%$ error on the interval 
+%$-2\leq x\leq 2$.
+
+%\end{solution}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{comment}
+\item 
+
+\begin{problem}[2in]
+Suppose you want to approximate $\cos(0.5)$ with error less than $0.0001$,
+using a Taylor polynomial for the cosine function centered at $0$.
+What degree polynomial can you take to guarantee the desired precision?
+\end{problem}
+
+\begin{solution}
+We are assuming for now that the cosine function is equal to its Taylor series 
+everywhere, i.e.,
+\[
+\cos x = 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \frac{x^6}{6!} + \cdots = \sum_{k=0}^{\infty} 
+(-1)^k\frac{x^{2k}}{(2k)!}
+\]
+for each real $x$.
+
+So we get that 
+\[\cos (0.5) = 1 - \frac{(0.5)^2}{2!} + \frac{(0.5)^4}{4!} - \frac{(0.5)^6}{6!} + \cdots = 
+\sum_{k=0}^{\infty} (-1)^k\frac{(0.5)^{2k}}{(2k)!}\]
+Notice that the terms of the series are definitely decreasing to zero, since the numerator 
+$(0.5)^{2k}$ decreases to $0$ and the denominator $(2k)!$ increases without bound. And the 
+terms clearly alternate in sign.  So the conditions of the alternating series test are 
+satisfied.  This tells is not only that the series converges, but that if we truncate the
+series after finitely many terms, then the error is no greater 
+than the size of the first unused term.  So, for example, 
+
+\[\left| \,\, \cos(0.5) - \left[1 - \frac{(0.5)^2}{2!} + \frac{(0.5)^4}{4!} \right] \,\, 
+\right| < \left| - \frac{(0.5)^6}{6!}\right| = \frac{(\frac{1}{2})^6}{6!}  = 
+\frac{1}{(64)(720)}< \frac{1}{(50)(500)} = \frac{1}{25000} < \frac{1}{10000}\]
+
+
+Suppose we change the question: how many terms do we need to find an approximation with error 
+less than $1/10^{9}$?  We need to find a value of $N$ such that $\frac{1}{2^N\cdot 
+N!}<\frac{1}{10^9}$, or alternately so that $2^N\cdot N!>10^9$.  Try coming up with a
+``practical" choice of $N$ by hand.  You may want to look at the solution of
+Problem~\ref{sine1} above for inspiration as to how to estimate factorials.
+
+\end{solution}
+\end{comment}
+
+
+
+\end{enumerate}
+
+
+
+\end{document}

@@ -1,0 +1,787 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+%
+\providecommand{\topic}{}
+\renewcommand{\topic}[1]{}
+
+\usepackage{cancel}  
+\newcommand{\colorcancel}[2]{\renewcommand{\CancelColor}{\color{#1}}\cancel{#2}\renewcommand{\CancelColor}{\color{black}}}
+\usepackage{pifont}
+
+\newlist{altenumerate}{enumerate}{3}
+
+\usepackage{soul}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}  
+\pgfplotscreateplotcyclelist{mycolor}{black, blue, red, green!70!black, magenta, purple, cyan, orange }  
+\pgfplotsset{
+  disabledatascaling,
+  cycle list=tikzcolor, 
+  axis lines=middle,
+  every axis plot/.style={no marks, thick},
+  every axis/.style={
+    enlarge x limits=false,
+    enlarge y limits=auto,
+    xlabel style={at={(current axis.right of origin)},anchor=west},
+    ylabel style={at={(current axis.above origin)},anchor=south},
+    % extra x and y ticks for asymptotes
+    extra x tick style={grid=major, grid style={dashed,black}},
+    extra y tick style={grid=major, grid style={dashed,black}},
+    /pgf/number format/1000 sep={},
+  },    
+  tick label style = {font=\footnotesize, fill=\currentbgcolor, inner sep=0pt},    
+  xticklabel shift=1pt,    
+  scaled ticks=false,
+  scaled y ticks=false,
+  unbounded coords=jump,
+  samples=101,
+  minor tick length=0,
+  scatter/classes={
+    open={mark=*,draw=black,fill=white, mark size=2, thin},
+    closed={mark=*,draw=black,fill=black, mark size=2, thin}
+  },
+  width=3in,
+}
+\pgfplotsset{open/.style={only marks, mark=*, fill=white, thin, mark size=2}}
+\pgfplotsset{closed/.style={only marks, mark=*, draw=black, fill=black,
+    thin, mark size=2}}
+\pgfplotsset{labeled/.style={nodes near coords, only marks, mark=*, draw=black, fill=black, thin, mark size=2, point meta=explicit symbolic}}
+
+\pgfplotsset{gridgraph/.style={clip=false, axis line style={shorten
+      >=-8pt}, xlabel style={xshift=8pt}, ylabel style={yshift=8pt},
+    enlargelimits=false, grid=major, tick style={black}}} 
+
+\newcommand{\axes}[1][]{
+  \begin{tikzpicture}
+    \begin{axis}[xtick=\empty, ytick=\empty, ymin=-2, ymax=2,
+      xmin=-4.25, xmax=4.25, #1]
+    \end{axis}
+  \end{tikzpicture}
+}
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage[sols]{handout}
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+% Make an environment that puts items in columns, first going across. 
+\usepackage{tabto}
+\newenvironment{enumeratecols}[2][]
+{\NumTabs{#2}%
+  \begin{enumerate*}[%before={\hspace{\dimexpr-\parindent-1pt}\tab},%
+    itemjoin={\tab},#1]}%
+  {\end{enumerate*}}
+
+\makeatletter
+
+% underline links               
+\let\@href=\href
+\renewcommand{\href}[2]{\@href{#1}{\ul{#2}}}
+
+\newdimen\SOUL@dimen %new
+\def\SOUL@ulunderline#1{{%
+    \setbox\z@\hbox{#1}%
+    % \dimen@=\wd\z@
+    \SOUL@dimen=\wd\z@ %new
+    \dimen@i=\SOUL@uloverlap
+    \advance\SOUL@dimen2\dimen@i %\dimen@ exchanged too
+    \rlap{%
+      \null
+      \kern-\dimen@i
+      % \SOUL@ulcolor{\SOUL@ulleaders\hskip\dimen@}%
+      \SOUL@ulcolor{\SOUL@ulleaders\hskip\SOUL@dimen}% new
+    }%
+    \unhcopy\z@
+  }}
+
+\let\@uhref=\href
+\usepackage[style=verbose-ibid,backend=bibtex]{biblatex}
+\let\@autocite=\autocite
+\renewcommand{\autocite}[1]{
+  \let\href=\@href
+  \@autocite{#1}
+  \let\href=\@uhref
+}
+\let\@autocites=\autocites
+\renewcommand{\autocites}[2]{
+  \let\href=\@href
+  \@autocites{#1}{#2}
+  \let\href=\@uhref
+}
+\bibliography{references}
+\makeatother
+
+\renewcommand{\answer}[1]{#1}
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+\definecolor{hotpink}{rgb}{1, 0, 0.5}
+
+\definecolor{skyblue}{rgb}{0, 0.5, 1}
+
+\newcommand{\highlight}[1]{\boldmath\hl{\textbf{#1}}\unboldmath}
+
+\newcommand{\goal}[1]{\textbf{\textcolor{skyblue}{#1}}}
+
+\usepackage{amsthm}
+
+% make URLs print in the same font
+\usepackage{url}
+\urlstyle{same}
+
+\usepackage{pifont}
+\def\exend{\hfill\ding{118}}
+
+%\makeatletter\@addtoreset{equation}{section}\makeatother
+%\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+
+\newtheoremstyle{theorem}% name
+{8pt}%      Space above
+{0pt}%      Space below
+{\itshape}%         Body font
+{}%         Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{.}%        Punctuation after thm head
+{.5em}%     Space after thm head: " " = normal interword space;
+                                %       \newline = linebreak
+{}%         Thm head spec (can be left empty, meaning `normal')
+
+\theoremstyle{theorem}
+
+\let\Theorem\undefined
+\newtheorem{Theorem}[equation]{Theorem}
+\let\Definition\undefined
+\newtheorem{Definition}[equation]{Definition}
+\let\Summary\undefined
+\newtheorem{Summary}[equation]{Summary}
+\let\Conjecture\undefined
+\newtheorem{Conjecture}[equation]{Conjecture}
+\let\Fact\undefined
+\newtheorem{Fact}[equation]{Fact}
+
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\makeatletter
+\def\@seccntformat#1{\@ifundefined{#1@cntformat}%
+   {\csname the#1\endcsname\quad}%       default
+   {\csname #1@cntformat\endcsname}}%    enable individual control
+\newcommand\section@cntformat{}
+\makeatother
+
+  \usepackage{exam}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+  \title{Exam 2, Practice 3}
+
+\instructions{instructions.tex}{}
+
+\listofproblems
+
+\begin{enumerate}
+\item \points{12} 
+
+  Your friend would like to approximate $\sqrt{8.4}$ by hand and thinks of 3 ways to do this:
+  \begin{altenumerate}[label=\arabic*.]
+  \item Use the secant line of $y = \sqrt{x}$ between $x = 4$ and $x = 9$.
+  \item Use the secant line of $y = \sqrt{x}$ between $x = 9$ and $x = 16$.
+  \item Use the line tangent to $y = \sqrt{x}$ at $x = 9$.
+  \end{altenumerate}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      Sketch 3 graphs of $\sqrt{x}$; on the three graphs, illustrate your friend's 3 methods.
+      In addition, say whether each method will give an upper bound or
+      lower bound for $\sqrt{8.4}$.
+    \end{problem}
+
+    \begin{solution}
+      In each picture, the approximation of $\sqrt{8.4}$ is the height of the line at $x = 8.4$.
+      \begin{center}
+        \begin{tikzpicture}[declare function={f(\x)=ln(1+\x);}]
+          \begin{axis}[xtick={4, 9, 16}, width=2.5in, ytick=\empty]
+            \addplot+[domain=0:18]{ln(1+x)}; 
+            \addplot+[sharp plot, hotpink] coordinates {(4, {f(4)}) (9, {f(9)})} node[pos=0.5, anchor=north west]{Method 1}; %
+          \end{axis}
+        \end{tikzpicture}
+        \qquad
+        \begin{tikzpicture}[declare function={f(\x)=ln(1+\x);}]
+          \begin{axis}[xtick={4, 9, 16}, width=2.5in, ytick=\empty]
+            \addplot+[domain=0:18]{ln(1+x)}; 
+            \addplot+[domain=7:18, green!80!black] {(f(16)-f(9))/7*(x-9) + f(9)} node[pos=0, anchor=south east]{Method 2}; %
+          \end{axis}
+        \end{tikzpicture}
+        \qquad
+        \begin{tikzpicture}[declare function={f(\x)=ln(1+\x);}]
+          \begin{axis}[xtick={4, 9, 16}, width=2.5in, ytick=\empty]
+            \addplot+[domain=0:18]{ln(1+x)}; 
+            \addplot+[domain=6:12, skyblue] {1/10*(x-9) + f(9)} node[pos=1, anchor=south east]{Method 3}; % 
+          \end{axis}
+        \end{tikzpicture}        
+      \end{center}
+      We can see that \fbox{Method 1 will give a lower bound} and \fbox{Methods 2 and 3 will give upper bounds}. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\nstretch{0.5}]
+      Based on your pictures, which method do you expect to give the
+      closest approximation? 
+    \end{problem}
+
+    \begin{solution}
+      It looks like \answer{Method 3} will be closest. 
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Calculate the approximation your friend's 3rd idea gives. 
+    \end{problem}
+
+    \begin{solution}
+      We need to find the tangent line at $x = 9$. The slope is $f'(9)$:
+      \begin{align*}
+        f'(x) &= \dfrac{1}{2} x^{-1/2} = \dfrac{1}{2 \sqrt{x}} \\
+        f'(9) &= \dfrac{1}{2 \sqrt{9}} = \dfrac{1}{6}
+      \end{align*}
+      Since $(9, 3)$ is a point on the tangent line, the equation of the line is $y - 3 = \dfrac{1}{6} (x - 9)$, or $y = 3 + \dfrac{1}{6} (x - 9)$.
+      So,
+      \begin{align*}
+        \sqrt{x} & \approx 3 + \dfrac{1}{6} (x - 9) \text{ for $x$ near 9} \\
+        \intertext{Plugging in $x = 8.4$ gives}
+        \sqrt{8.4} & \approx 3 + \dfrac{1}{6} (8.4 - 9) \\
+        & = 3 - 0.1 \\
+        &= \boxed{2.9}
+      \end{align*}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      Another friend suggests that you could get an even better approximation by hand if you use the secant line of $y = \sqrt{x}$ between $x = 8.3$ and $x = 8.5$. Explain why this is or isn't a good idea.
+    \end{problem}
+
+    \begin{solution}
+      \answer{This approximation would involve $\sqrt{8.3}$ and $\sqrt{8.5}$; we don't know the exact values of those, so we wouldn't get a very useful approximation!}
+    \end{solution}
+
+  \end{enumerate}
+
+\item \points{14}
+
+  \begin{problem}[\newpage]
+    A company called The Pi(e) Guys is designing a metal can for pie filling. The metal used for the sides costs 1 cent per cm$^2$, while the metal used for the top and bottom costs 2 cents per cm$^2$. Since the founders love both pie and $\pi$, they have decided to spend $300 \pi$ cents on each can. If they want to maximize the volume of each can, what dimensions should they make the can?
+
+    Please communicate your reasoning clearly, and organize your work so the reader can follow it easily. 
+  \end{problem}
+
+  \begin{solution}
+    \highlight{Goal:} Maximize \goal{volume}
+
+    \highlight{Define variables:}
+    \begin{itemize}[nosep]
+    \item \goal{$V$ = volume}
+    \item $r$ = radius
+    \item $h$ = height
+    \end{itemize}
+    Here are two possible cans:
+    \begin{center}
+      \begin{tikzpicture}[x=0.75cm, y=0.75cm]
+        \draw (0,0) ellipse (1.25 and 0.5);
+        \draw[dashed] (0, 0) -- node[midway, above, inner sep=1pt] {$r$} (1.25, 0); 
+        \draw (-1.25,0) -- (-1.25,-3.5);
+        \draw (-1.25,-3.5) arc (180:360:1.25 and 0.5);
+        \draw [dashed] (-1.25,-3.5) arc (180:360:1.25 and -0.5);
+        \draw (1.25,-3.5) -- (1.25,0);
+        \draw[|-|] (-1.75, -3.5) -- node[midway, inner sep=6pt, fill=white] {$h$} (-1.75,0); 
+      \end{tikzpicture}
+      \hspace{0.25in}
+      \begin{tikzpicture}[x=1.25cm, y=0.375cm]
+        \draw (0,0) ellipse (1.25 and 0.5);
+        \draw[dashed] (0, -3.5) -- node[midway, above, inner sep=1pt] {$r$} (1.25, -3.5); 
+        \draw (-1.25,0) -- (-1.25,-3.5);
+        \draw (-1.25,-3.5) arc (180:360:1.25 and 0.5);
+        \draw [dashed] (-1.25,-3.5) arc (180:360:1.25 and -0.5);
+        \draw (1.25,-3.5) -- (1.25,0);
+        \draw[|-|, xshift=10pt] (-1.75, -3.5) -- node[midway, fill=white] {$h$} (-1.75,0); 
+      \end{tikzpicture}
+    \end{center}        
+    \highlight{Formula for goal:} $\goal{$V$} = \pi r^2 h$
+
+    This formula involves both $r$ and $h$, so we need to \highlight{relate $r$ and $h$ using something else we're told in the problem}.
+    \begin{align*}
+      \text{cost} &= 300 \pi \\
+      \text{cost of top and bottom} + \text{cost of sides} &= 300 \pi \\
+      (2 \text{ cents / cm$^2$})(\text{surface area of top and bottom}) + (1 \text{ cents/cm$^2$})(\text{surface area of sides}) &= 300 \pi \\
+      2 (2 \pi r^2) + 1 (2 \pi r h) &= 300 \pi \\
+      4 \pi r^2 + 2 \pi r h &= 300 \pi
+    \end{align*}
+    It looks easier to solve this for $h$:
+    \begin{align}
+      2 \pi r h &= 300 \pi - 4 \pi r^2 \nonumber \\
+      h &= \frac{300 \pi - 4 \pi r^2}{2 \pi r} \nonumber \\
+      &= \frac{\colorcancel{hotpink}{2 \pi} (150 - 2 r^2)}{\colorcancel{hotpink}{2 \pi} r} \nonumber \\
+      &= \frac{150 - 2r^2}{r} \label{eq:fall2023-e2practice-can-optimization}
+    \end{align}
+    Plugging this into out formula for \goal{$V$}, we get \goal{$V$} as a function of just $r$:
+    \[ \goal{$V(r)$} = \pi r^2 \cdot \frac{150 - 2r^2}{r} = \pi r (150 - 2r^2) = \pi(150 r - 2r^3).\]
+    \highlight{Critical points:} $V'(r) = \pi (150 - 6r^2)$. This is never undefined, and it's 0 when
+    \begin{align*}
+      150 &= 6r^2 \\
+      25 &= r^2 \\
+      \pm 5 &= r
+    \end{align*}
+    Of course, $r = -5$ doesn't make sense in our situation, so $r = 5$ is the only critical point in the domain. 
+
+    \highlight{Global maximum:} Since there's only one critical point in the domain, we can try the First or Second Derivative Test. Let's try the Second Derivative Test, since it's easy to calculate that $V''(r) = \pi (-12r)$. Then, $V''(5) = \pi (-60) < 0$, so $V(r)$ has a local maximum at $r = 5$. Since this was the only critical point in the domain, this must be the global maximum.
+
+    \highlight{Answer the question:} We can plug $r = 5$ back into (\ref{eq:fall2023-e2practice-can-optimization}) to find that the corresponding value of $h$ is $h = 20$. So, \fbox{the can should have radius 5 cm and height 20 cm}.
+  \end{solution}
+
+\item \points{11}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}
+      On the axes below, sketch the graph of $f(x) = 6 \left( \frac{2}{3} \right)^x$. Label any intercepts. In addition, label 2 points with their (simplified) exact coordinates: please label one point with $x > 0$ and one with $x < 0$.
+    \end{problem}
+
+    \begin{problemonly}
+      \axes[width=4.5in, height=4.5in]
+    \end{problemonly}
+
+    \begin{solution}
+      Since $\frac{2}{3} < 1$, this is an exponential decay function. The $y$-intercept is $f(0) = 6 \left( \frac{2}{3} \right)^0 = 6$.  To get two points, we can just plug in a few values of $x$. For example, $f(1) = 6 \left( \frac{2}{3} \right)^1 = 6 \cdot \frac{2}{3} = 4$ and $f(-1) = 6 \left( \frac{2}{3} \right)^{-1} = 6 \cdot \frac{3}{2} = 9$. 
+      \begin{center}
+        \answer{
+          \begin{tikzpicture}
+            \begin{axis}[xtick=\empty, ytick=\empty, ymax=20.25, ymin=-20.25, width=4.5in, height=4.5in]
+              \begin{scope}[skyblue]
+                \addplot+[domain=-3:3] {6 * (2/3)^x}; %
+                \addplot+[closed] coordinates {(0, 6)} node[anchor=south west]{$(0, 6)$}; %
+                \addplot+[closed] coordinates {(1, 4)} node[anchor=north east]{$(1, 4)$}; %
+                \addplot+[closed] coordinates {(-1, 9)} node[anchor=south west]{$(-1, 9)$}; %
+              \end{scope}
+            \end{axis}
+          \end{tikzpicture}
+        }
+      \end{center}
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Using a dashed line, sketch the graph of $g(x) = 6 \left( \frac{2}{3} \right)^{x / 2}$ on the axes in (a). Label any intercepts, and label 2 additional points with their (simplified) exact coordinates. Explain how this graph relates to the graph you drew in (a). 
+    \end{problem}
+
+    \begin{solution}
+      Notice that $g(x) = f\left( \dfrac{x}{2} \right)$, so we get the graph of $g$ by stretching the graph of $f$ horizontally by a factor of $2$. This means the point $(0, 6)$ stays where it is, the point $(1, 4)$ moves to $\left( 2, 4 \right)$, and the point $(-1, 9)$ moves to $\left( -2, 9 \right)$:
+      \begin{center}
+        \answer{
+          \begin{tikzpicture}
+            \begin{axis}[xtick=\empty, ytick=\empty, ymax=20.25, ymin=-20.25, width=4.5in, height=4.5in]
+              \begin{scope}[skyblue]
+                \addplot+[domain=-3:3] {6 * (2/3)^x}; %
+                \addplot+[closed] coordinates {(1, 4)} node[anchor=north east]{$(1, 4)$}; %
+                \addplot+[closed] coordinates {(-1, 9)} node[anchor=south west]{$(-1, 9)$}; %
+              \end{scope}
+              \addplot+[dashed, domain=-3:3] {6 * (2/3)^(x / 2)}; % 
+              \addplot+[closed] coordinates {(0, 6)} node[anchor=south west]{$(0, 6)$}; %
+              \addplot+[closed] coordinates {(2, 4)} node[anchor=south west, fill=white]{$\left(2, 4 \right)$}; %
+              \addplot+[closed] coordinates {(-2, 9)} node[anchor=north east, fill=white]{$\left(-2, 9 \right)$}; %
+            \end{axis}
+          \end{tikzpicture}
+        }
+      \end{center}
+    \end{solution}
+
+  \item Suppose $a$ and $b$ are numbers such that $3^a = 2$ and $3^b = 5$. Simplify the following expressions. (Your answers shouldn't involve $a$ and $b$.) 
+
+    \begin{enumerate}
+    \item
+      \begin{problem}[\vfill]
+        $3^{b - a}$
+      \end{problem}
+
+      \begin{solution}
+        $3^{b - a} = \dfrac{3^b}{3^a} = \boxed{\frac{5}{2}}$.
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $3^{a + 2b}$
+      \end{problem}
+
+      \begin{solution}
+        \begin{align*}
+          3^{a + 2b} &= 3^a \cdot 3^{2b} \\
+          &= 3^a \cdot (3^b)^2 \\
+          &= 2 \cdot 5^2 \\
+          &= \boxed{50}
+        \end{align*}
+      \end{solution}
+
+    \end{enumerate}
+
+  \end{enumerate}
+
+\item \label{fall2014-1a-midterm1-5-modified} \points{15}  % Jason Bland
+
+  The graph of a function $f$ defined on $[-3, 3]$ is given below:
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[gridgraph, xtick={-3, -2, ..., 3}]
+        \addplot+[domain=-3:-2] {3 + x};%
+        \addplot+[domain=-2:0] {2 + 2 * x};%
+        \addplot+[domain=0:1] {-1- x};%
+        \addplot+[domain=1:3] {-2 * (x - 2)^2};%
+        \addplot[closed] coordinates { (-3, 0) (-2, -2) (0, -1) (3, -2) };%
+        \addplot[open] coordinates { (-2, 1) (0, 2) (-0.5, 1)};%
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+
+  \begin{enumerate}
+  \item 
+    \begin{problem}[\stretch{2}]
+      Sketch a graph of $f'(x)$ on $(-3, 3)$. Make sure it's clear where $f'$ is undefined. 
+    \end{problem}
+
+    \begin{solution}
+      $f$ is not differentiable at $x = -2, -0.5, 0, 1$, so $f'$ will be undefined there. Between $x = -3$ and $x = -2$, the graph of $f$ has slope 1, so the graph of $f'$ should just equal 1 on the interval $(-3, -2)$. Between $x = -2$ and $x = 0$ (except at $x = -0.5$), the graph of $f$ has slope 2, so the graph of $f'$ should equal 2 there. Between $x = 0$ and $x = 1$, the graph of $f$ has slope $-1$, so the graph of $f'$ should equal $-1$ there. Right after $x = 1$, the slope is positive; as $x$ increases, the slope gets less positive, hitting 0 at $x = 2$. After that, it gets more and more negative. So, that gives us a graph like this: 
+      \begin{center}
+        \answer{
+          \begin{tikzpicture}
+            \begin{axis}[xtick={-3, -2, ..., 3}, ytick={-1, 1, 2}]
+              \addplot+[domain=-3:-2] {1};%
+              \addplot+[domain=-2:0] {2};%
+              \addplot+[domain=0:1] {-1};%
+              \addplot+[domain=1:3] {-4 * (x - 2)};%
+              \addplot+[open] coordinates { (-3, 1) (-2, 1) (-2, 2) (-0.5, 2) (0, 2) (0, -1) (1, -1) (1, 4) (3, -4) };% 
+            \end{axis}
+          \end{tikzpicture}
+        }
+      \end{center}
+      If you're having trouble understanding this graph, try playing around with \href{https://www.geogebra.org/m/jbhsbuhb}{this applet}; drag the green dot to see how the slope changes. 
+    \end{solution}
+
+    \begin{grading}
+      The piece on the interval $(1, 3)$ should be decreasing and have an $x$-intercept of 2, but we don't have enough information to tell whether it's actually linear. 
+    \end{grading}
+
+  \item Evaluate the following limits or state that they do not exist. If a limit does not exist but is $\infty$ or $-\infty$, indicate that as well. Show your work / explain your reasoning. 
+
+    \begin{enumerate}
+
+    \item 
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \lim_{t \to 2} \frac{3^{-t}}{f(t)}$
+      \end{problem}
+
+      \begin{solution}
+        As $t \to 2$, the numerator $\to 3^{-2} = \dfrac{1}{9}$ while the denominator $f(t)$ approaches 0. In this situation, we must think about the sign of the denominator.
+
+        When $t$ is just a bit bigger than $2$, the denominator $f(t)$ is just a little bit less than 0 (while the numerator is close to $\frac{1}{9}$), so $\dfrac{3^{-t}}{f(t)}$ will be very negative. Therefore, $\displaystyle \lim_{t \to 2^+} \frac{3^{-t}}{f(t)} = - \infty$.
+
+        When $t$ is just a bit less than $2$, the denominator $f(t)$ is again just a little bit less than 0 (and the denominator is still close to $\frac{1}{9}$), so $\dfrac{3^{-t}}{f(t)}$ will again be very negative. Therefore, $\displaystyle \lim_{t \to 2^-} \frac{3^{-t}}{f(t)} = - \infty$.
+
+        Therefore, $\displaystyle \lim_{t \to 2} \frac{3^{-t}}{f(t)} = \boxed{-\infty}$.
+      \end{solution}
+
+    \item \label{fall2014-1a-midterm1-5b}
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{x \to -1} \frac{f(x) - f(-1)}{x + 1}$
+      \end{problem}
+
+      \begin{solution}
+        You should recognize this as $f'(-1)$, which is $\boxed{2}$ from the graph.
+
+        \emph{Alternate approach:} Even if you didn't immediately recognize this as the limit definition of the derivative, you can still do this problem! The expression \( \dfrac{f(x) - f(-1)}{x + 1}\) should jump out as being an average rate of change / slope of a secant line. In particular, it's the slope of the secant line between \((-1, f(-1))\) and $(x, f(x))$. When $x$ is close to $-1$ (which is what we care about since we're taking the limit as $x \to -1$), this slope is 2. So, the limit is also 2. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{h \to 0^+} \frac{f(-2 + h) - f(-2)}{h}$
+      \end{problem}
+
+      \begin{solution}
+        This should remind you of the definition of $f'(-2)$, except that this is only a right-handed limit. We can see from the graph that $f'(-2)$ does not exist, but this one-sided limit could still exist.
+
+        You should recognize $\dfrac{f(-2 + h) - f(-2)}{h}$ as the slope of the secant line between the points $(-2, f(-2))$ and $(-2 + h, f(-2 + h))$; when $h > 0$, this means the slope of the secant line between $(-2, f(-2))$ and a point just to the right of that. From the graph, we can see that such a slope is always $2$, so this limit must be \fbox{2} as well.
+
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill]
+        $\displaystyle \lim_{w \to 2} \frac{w^2 - 4}{w^2 + 5w + 6}$
+      \end{problem}
+
+      \begin{solution}
+        As $w \to 2$, the numerator approaches $2^2 - 4 = 0$ and the denominator approaches $2^2 + 5 \cdot 2 + 6 = 20$. So, $\displaystyle \lim_{w \to 2} \frac{w^2 - 4}{w^2 + 5w + 6} = \frac{0}{20} = \boxed{0}$. 
+      \end{solution}
+
+    \item
+      \begin{problem}[\vfill\newpage]
+        $\displaystyle \lim_{w \to -2} \frac{w^2 - 4}{w^2 + 5w + 6}$
+      \end{problem}
+
+      \begin{solution}
+        As $w \to -2$, the numerator approaches $(-2)^2 - 4 = 0$ and the denominator approaches $(-2)^2 + 5(-2) + 6 = 0$, so we need to factor and cancel.
+        \begin{align*}
+          \lim_{w \to -2} \frac{w^2 - 4}{w^2 + 5w + 6} &= \lim_{w \to -2} \frac{(w - 2)(w + 2)}{(w + 2)(w + 3)} \\
+          &= \lim_{w \to -2} \frac{w - 2}{w + 3} \\
+          &= \frac{-4}{1} \\
+          &= \boxed{-4}
+        \end{align*}
+      \end{solution}
+    \end{enumerate}
+
+  \end{enumerate}
+
+\item \label{fall2015-1a-m2practice3-1} \label{timolol} \points{16} 
+
+  \topic{graphing}
+
+  The drug timolol treats high blood pressure by making a patient's heart beat more slowly. To prescribe it safely, doctors need to understand how it affects a patient's heart rate while exercising. Based on data, an appropriate model is $\displaystyle E(C) = 160 - \frac{90C}{12 + C}$ where $E$ is exercise heart rate (in beats per minute) and $C$ is the plasma concentration\probonly{\footnote{Plasma concentration basically measures how much drug a patient has in his/her body.}} of timolol (in ng/mL)\solonly{\autocites{RefWorks:12}{Holford1982143}}. We're only interested in this function for $C \geq 0$, since it doesn't make sense to talk about negative drug concentrations.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      On what intervals in $[0, \infty)$ is $E(C)$ increasing? On what intervals is it decreasing?
+    \end{problem}
+
+    \begin{solution}
+      As usual, we figure this out by looking at the sign of $E'(C)$. Using the Sum Rule and the Quotient Rule,
+      \begin{align*}
+        E'(C) &= 0 - \frac{(12 + C) 90 - 90C (1)}{(12 + C)^2} \\
+        &= - \frac{1080}{(12 + C)^2}
+      \end{align*}
+      On $[0, \infty)$, this is never undefined or 0, so $E'(C)$ never changes sign. So, we can test any point in $[0, \infty)$ to determine the sign of $E'$ for all of $[0, \infty)$. For example, $E'(1) = - \dfrac{1080}{13^2} < 0$, so $E'(C)$ is negative on $[0, \infty)$.
+      \begin{center}
+        \begin{tikzpicture}
+          \begin{axis}[axis y line=none, x axis line style={-}, xtick={0}, ymin=-2, ymax=2, height=1.25in, width=3in, clip=false]
+            \addplot+[domain=-0.1:0.1, very thin]{0};
+            \draw(-0.1, 0) node[anchor=south west] {$E$};%
+            \draw (-0.1, -1.5) node[right] {sign of $E'$};%
+            \draw (0.05, -1.5) node{$-$};%
+            \draw[->, xshift=2pt] (0.00666667, 1.5) -- (0.0933333, 0.5);%
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+      So, $E(C)$ is \fbox{decreasing on $[0, \infty)$}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill\newpage]
+      On what intervals in $[0, \infty)$ is $E(C)$ concave up? On what intervals is it concave down?
+    \end{problem}
+
+    \begin{solution}
+      Now, we need to calculate $E''(C)$. We need to use the Quotient Rule, but we need to first expand the denominator (since that's the only way we'll be able to differentiate it): $E'(C) = \dfrac{- 1080}{C^2 + 24 C + 144}$. Then, 
+      \begin{align*}
+        E''(C) &= \dfrac{(C^2 + 24 C + 144)(0) - (-1080) (2C + 24)}{(C^2 + 24 C + 144)^2} \\
+        &= \dfrac{1080 \cdot 2 (C + 12)}{(C + 12)^4} \\
+        &= \dfrac{2160}{(C + 12)^3}
+      \end{align*}
+      On $[0, \infty)$, this is never 0 or undefined, so $E''(C)$ never changes sign. So, we can test any point in $[0, \infty)$ to determine the sign of $E''$ everywhere in $[0, \infty)$. For example, $E''(1) = \dfrac{2160}{13^3} > 0$, so $E''(C)$ is always positive. Therefore, $E(C)$ is \fbox{concave up on $[0, \infty)$}.
+    \end{solution}
+
+  \item \label{timolol-asymptote}
+    \begin{problem}[\stretch{0.5}]
+      On $[0, \infty)$, does $E(C)$ have a horizontal asymptote? If so, where? Explain how you know.
+    \end{problem}
+
+    \begin{solution}
+      We need to calculate $\displaystyle \lim_{C \to \infty} E(C)$, or $\displaystyle \lim_{C \to \infty} \left( 160 - \frac{90C}{12 + C} \right)$. When $C$ is really big, 12 is quite insignificant compared to $C$, so $C + 12 \approx C$, and \[ \lim_{C \to \infty} \left( 160 - \frac{90C}{12 + C} \right) = \lim_{C \to \infty} \left( 160 - \frac{90C}{C} \right) = \lim_{C \to \infty} (160 - 90) = 70.\] Therefore, $E(C)$ has a horizontal asymptote at \fbox{$E = 70$}.
+    \end{solution}
+
+  \item
+    \begin{problem}[\vfill]
+      Sketch the graph of $E(C)$ on $[0, \infty)$. Label all asymptotes and intercepts. 
+    \end{problem}
+
+    \begin{solution}
+      The $y$-intercept is $E(0) = 160$. We've found that $E(C)$ is decreasing and concave up everywhere on $[0, \infty)$, and $\displaystyle
+      \lim_{C \to \infty} E(C) = 70$. So, the graph looks like this:
+      \begin{center}
+        \answer{
+          \begin{tikzpicture}
+            \begin{axis}[xtick=\empty, ytick={70, 160}, ymin=0]
+              \addplot+[domain=0:200] {160-90*x/(12+x)};
+              \addplot+[domain=0:200, dashed, black] {70};
+            \end{axis}
+          \end{tikzpicture}
+        }
+      \end{center}
+    \end{solution}
+
+  \item
+    \begin{problem}[\nstretch{0.5}]
+      Explain the practical significance of your answer to
+      \ref{timolol-asymptote} in terms of the drug's effect.
+    \end{problem}
+
+    \begin{solution}
+      \answer{We can see from the graph that, no matter how much timolol the patient takes, their exercise heart rate will never go below 70.}
+    \end{solution}
+
+  \end{enumerate}
+
+\item \points{12}  \finishexam
+
+   A smartphone battery, when fully charged, has a maximum voltage of about 4 volts. We can model the voltage of a smartphone battery by the function $V(t) = 4(1-e^{-t})$, where $t$ is the number of hours since the phone started charging. 
+
+\begin{enumerate}
+    \item 
+    \begin{problem}[\vfill] Calculate $V(0)$. Interpret this value in the context of the problem.
+    \end{problem}
+\begin{solution} 
+$$V(0)=4(1-e^{-0})=4(1-1)=0$$
+In the context of the problem, this means that at $t=0$, right when the smartphone begins charging, the voltage of the battery is 0 volts.
+\end{solution}
+    \item 
+    \begin{problem}[\vfill] Determine $\lim\limits_{t\to\infty} V(t)$. Interpret this limit in the context of the problem.\\
+    \end{problem}
+
+\begin{solution}
+As $t\to\infty$, $e^{-t}\to 0$, so $\displaystyle \lim_{t\to\infty}V(t) = 4$. In the context of the problem, this means that as time continues passing, the battery's voltage approaches 4 volts.
+\end{solution}
+
+    \item 
+    \begin{problem}[\vfill] Find $V'(t)$.
+    \end{problem}
+\begin{solution}
+    We begin by expanding before differentiating:
+        $$V(t) = 4-4e^{-t}$$
+        $$V'(t) = 4e^{-t}$$
+    \end{solution}
+    \item 
+    \begin{problem}[\vfill] Calculate $V'(0)$. Interpret this value in the context of the problem.
+    \end{problem}
+    \begin{solution}
+        $$V'(0)=4e^{-0}=4$$
+        In the context of this problem, this means at $t=0$ (when the battery begins charging), the voltage is increasing at a rate of 4 volts/hour.
+    \end{solution}
+    
+\begin{problemonly}
+\newpage
+\end{problemonly}
+    \item 
+    \begin{problem}[\vfill]
+    Determine $\lim\limits_{t\to\infty} V'(t)$. Interpret this limit in the context of the problem.\\
+    \end{problem}
+\begin{solution}
+    Since as $t\to\infty$, $e^{-t}\to 0$, we have:
+    $$\lim_{t\to\infty} 4e^{-t}=0$$
+    In the context of this problem, this means that as time passes, the rate at which the battery's voltage is changing goes to 0 volts/hour.
+\end{solution}
+    \item 
+    \begin{problem}[\vfill]
+    Determine the open intervals on which $V(t)$ is increasing. Justify your answer.\\
+    \end{problem}
+\begin{solution}
+    The intervals on which $V(t)$ is increasing are the intervals on which $V'(t)>0$. \\
+    $V'(t) = 4e^{-t}$, which is positive everywhere, \\
+    so $V(t)$ is increasing everywhere on the interval $(-\infty, \infty)$.
+\end{solution}
+    \item 
+    \begin{problem}[\vfill] Does $V(t)$ attain a global maximum on the interval $[0, \infty)$? Explain your reasoning.
+    \end{problem}
+
+    \begin{solution}
+        Since the function is increasing everywhere, it will never achieve a global maxima on the interval $[0,\infty)$.
+    \end{solution}
+
+    \item 
+    \begin{problem}Sketch the graph of the phone battery's voltage over time. Label all intercepts and asymptotes.
+    \end{problem}
+     \begin{problemonly}
+        \axes[]
+      \end{problemonly} 
+      \begin{solution}
+      This is a function that begins at (0,0) with a slope at 4, continues increasing, approaches 4 in the limit and the slope approaches 0 (meaning the function flattens out).\\
+      
+          \begin{tikzpicture}
+            \begin{axis}[ yticklabels={$4$}, xtick=\empty, ylabel={voltage (volts)}, xlabel={$t$ (hours)}, ]
+              \addplot+[domain=0:6] {4-4*e^(-x))};
+              
+              \addplot[domain=-1:5.5, dashed, red] (\x,4) node[above] {$y=4$};
+              \node[above left, outer sep=2pt] (0,0) {(0,0)};
+              
+            \end{axis}
+          \end{tikzpicture}
+      \end{solution}
+
+\end{enumerate}
+\end{enumerate}
+
+\end{document}

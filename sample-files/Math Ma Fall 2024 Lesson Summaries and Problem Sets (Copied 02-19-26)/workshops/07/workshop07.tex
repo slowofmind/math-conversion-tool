@@ -1,0 +1,306 @@
+\documentclass{article}
+
+\textwidth=6.5in
+\textheight=8.5in
+\voffset=-54pt
+\oddsidemargin=0in
+\evensidemargin=0in
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb}
+\usepackage{ifthen}
+
+\usepackage[inline]{enumitem}
+\setlist{topsep=0pt, parsep=8pt}
+
+\usepackage[rgb,table]{xcolor}\convertcolorsUfalse
+\usepackage{graphicx}
+
+% change hyperref options
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[bookmarks,colorlinks,linkcolor=black,citecolor=blue,pdfstartview=FitH,urlcolor=blue]{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{bookmark}
+
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{framed}
+\usepackage{array}
+
+\usepackage{icomma}
+
+\usepackage{soul}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  matrix,%
+  % enables the snake paths
+  decorations.pathmorphing,%
+  % enables bigger arrows
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.text,%
+  calc,%
+  patterns,%
+  shapes.geometric,%
+  arrows,
+  decorations.shapes,
+  positioning,
+  plotmarks,
+  intersections
+}
+\tikzset{>=latex} % sets default arrow type in tikz
+\tikzset{font=\normalsize}
+\tikzset{mark size=1.5pt, mark options=thin}
+\tikzset{pin distance=4pt,
+  every pin edge/.style={<-, thin, shorten <= -2pt}}
+
+\interfootnotelinepenalty=10000
+\renewcommand{\thefootnote}{(\arabic{footnote})}
+
+\usepackage{multirow, bigdelim}
+
+% change to \usepackage[sols]{handout} to see solutions
+\usepackage{handout}
+\renewcommand{\workshopnote}{CA Notes.}    
+
+\newcommand\iscurrentenumi[1]{%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1}}
+\setenumerate[1]{ref=\#\arabic*}
+\setenumerate[2]{ref=\protect\iscurrentenumi{\theenumi}(\alph*)}
+\newcommand\enumiiprefix[2]{%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\equal{#2}{(\alph{enumii})}}}{}{}%
+  \ifthenelse{{\equal{#1}{\theenumi}}\AND{\NOT{\equal{#2}{(\alph{enumii})}}}}{#2}{}%
+  \ifthenelse{\equal{#1}{\theenumi}}{}{#1#2}%
+}
+\setenumerate[3]{ref=\protect\enumiiprefix{\theenumi}{(\alph{enumii})}\roman*}
+
+\makeatletter
+
+\newcommand\calculator{
+  \begin{tikzpicture}[x=0.15ex, y=0.15ex, baseline=1.5pt]
+    \begin{scope}[thick]
+      \draw (0, 0) -- (10, 0) -- (10, 14) -- (0, 14) -- cycle;
+      \foreach \x in {10/3, 20/3}
+      {
+        \draw (\x, 0) -- (\x, 10);
+      }
+      \foreach \y in {10/3, 20/3, 10}
+      {
+        \draw (0, \y) -- (10, \y);
+      }
+    \end{scope}
+  \end{tikzpicture}
+}
+\newcommand{\calcitem}{\refstepcounter{enum\romannumeral\@enumdepth}%
+\item[\calculator \csname labelenum\romannumeral\@enumdepth\endcsname]}
+
+\makeatother
+
+\definecolor{purple}{rgb}{0.5,0,1.0}
+
+\usepackage{fancyhdr}
+\lhead{\textcolor{white}{This content is protected and may not be shared, uploaded, or distributed.}}
+\rhead{}
+\rfoot{\vspace*{\fill}\footnotesize\textcopyright{} \emph{Harvard Math Ma}}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\begin{document}
+
+\htitle{Workshop 7}
+
+\begin{workshop}
+  Today's workshop doesn't have a metacognitive learning strategy because there's a lot of math we want students to explore. This workshop has some really important ideas that set students up for tomorrow's class. We'd really like everyone to leave workshop having a solid set of observations for \ref{prep-for-deriv-of-exp}. Ideally, students will also do \ref{workshop-horizontal-stretch-of-exp}, but it's okay if they don't have time for it.
+\end{workshop}
+
+\begin{enumerate}
+\item  \label{workshop-exponential-vs-linear}
+
+  A scientist is monitoring two bacteria colonies. At this moment, both colonies have 1000 bacteria.
+
+  \begin{enumerate}
+  \item
+
+    \begin{workshop}
+      Help students with intuition here. Each hour, the population increases by 5\% of the current population, not the initial population. Since the population is increasing, this means the amount the population increases each hour is also increasing. So, in the first hour, it will increase by 5\% of its initial size; in each subsequent hour, it will increase by more than 5\% of its initial size. Therefore, in 10 hours, the population will increase by more than 50\% of the initial population size.
+
+      If this is confusing, it can help to translate this to concrete numbers. The question is asking whether the population will increase by exactly 500, more than 500, or fewer than 500 bacteria. In the first hour, it will increase by 50 bacteria. In each hour after that, it will increase by more than 50 bacteria. So, in 10 hours, it will increase by more than 500 bacteria. 
+    \end{workshop}
+
+    \begin{problem}[\vfill]
+      The population of the first colony increases by 5\% per hour. In the next 10 hours, will it increase by exactly 50\%, more than 50\%, or less than 50\% of its current size? Explain how you know. (You should be able to do this without doing any calculations!) 
+    \end{problem}
+
+  \item
+
+    \begin{workshop}
+      We can use exactly the same reasoning here, except now the population is shrinking. So, in the first hour, the population will decrease by 50 bacteria. In each hour after that, it will decrease by less than 50 bacteria. So, over 10 hours, it will decrease by less than 500 bacteria. 
+    \end{workshop}
+
+    \begin{problem}[\vfill]
+      The population of the second colony decreases by 5\% per hour. In the next 10 hours, will it decrease by exactly 50\%, more than 50\%, or less than 50\% of its current size? Explain how you know. (Again, you shouldn't need to do any calculations.) 
+    \end{problem}
+
+  \end{enumerate}
+
+\item  \label{numerically-approximate-derivative-of-b^x}
+
+  \begin{workshop}
+    Please have the students get into groups, and give each group a value of $b$: either $2$, $3$, or $10$. Make sure at least one group has each value so that, when groups compare, they can see all 3 values of $b$. 
+  \end{workshop}
+
+  In class tomorrow, we'll figure out what the derivative of $b^x$ is. To prepare, you'll do some numerical investigation now.
+
+  Your workshop leader will assign your group a value of $b$. Let $f(x) = b^x$, where $b$ is the value your group has been assigned.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[0.35in]
+      Write the limit definition of $f'(1)$.
+    \end{problem}
+
+  \calcitem
+
+    \begin{workshop}
+      To approximate $\displaystyle \lim_{h \to 0} \frac{f(1 + h) - f(1)}{h}$, we can simply pick a value of $h$ that's close to 0 and evaluate $\dfrac{f(1 + h) - f(1)}{h}$. Graphically, that's the slope of a secant line. 
+    \end{workshop}
+
+    \begin{problem}[\vfill\newpage]
+      How can you numerically approximate the value of the limit you just wrote down? Use this strategy to numerically approximate $f'(1)$. Illustrate your approximation on a graph of $f$.
+    \end{problem}
+
+  \calcitem
+    \begin{problem}
+      Use the same idea to approximate these values: 
+
+      $f'(0) \approx$
+
+      $f'(1) \approx$
+
+      $f'(2) \approx$
+
+      $f'(3) \approx$
+
+      $f'(4) \approx$
+
+      Put your results on the board so that other groups can take a look. 
+    \end{problem}
+
+  \end{enumerate}
+
+\item  \label{prep-for-deriv-of-exp}
+
+  \begin{workshop}
+    Consider bringing all the students together for this discussion. The most obvious pattern is for $f(x) = 10^x$; they should see that $f'(1) = 10 f'(0), f'(2) = 10 f'(1), \ldots$. Then hopefully they will notice that there's a similar relationship for $f(x) = 2^x$: $f'(1) = 2 f'(0), f'(2) = 2 f'(1), \ldots$. And for $f(x) = 3^x$, we have $f'(1) = 3 f'(0), f'(2) = 3 f'(1), \ldots$. So, it looks like increasing $x$ by 1 multiplies the derivative of $f(x) = b^x$ by $b$. 
+
+    Encourage students to take a few minutes to write down the patterns they observe. (They will write this up on the pset.) 
+  \end{workshop}
+
+  \begin{problem}[\vfill]
+    Take a look at other groups' tables so that you see what happens for a few different values of $b$. What patterns do you notice?
+  \end{problem}
+
+\item  \label{workshop-horizontal-stretch-of-exp}
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      On the board, sketch a really big graph of $y = 3^x$. Label three points with exact coordinates, one with $x > 0$, one with $x < 0$, and one with $x = 0$. 
+    \end{problem}
+
+  \item
+
+    \begin{workshop}
+      Help students think about consistency here. For example, once they've tried to figure out where the 3 points move to, they can check that the resulting points are actually on $y = 3^{2x}$ by plugging the points into this equation.
+
+      The points should also help them think about whether they've situated the graphs correctly relative to each other: they have the same $y$-intercept, $3^{2x}$ is higher when $x > 0$, and $3^x$ is higher when $x < 0$. 
+    \end{workshop}
+
+    \begin{problem}[\stretch{0.25}]
+      Use an appropriate graph transformation to graph $y = 3^{2x}$ in a different color on the same set of axes. Where do the 3 points you labeled in (a) move to? Label those points with their exact coordinates. 
+    \end{problem}
+
+  \item
+    \begin{problem}[\nstretch{0.1}]
+      We can write $3^{2x}$ as $b^x$ for what value of $b$?
+    \end{problem}
+  \end{enumerate}
+
+\item  \label{optimization-enclosure}
+
+  \begin{problem}[\newpage]
+    You're in charge of constructing a rectangular enclosure surrounded by four walls (but no floor or ceiling). Each wall needs to be at least 4 feet long. One pair of opposite walls cost \$100 per foot in length, while the other pair of opposite walls cost \$50 per foot. The budget for constructing the walls is $\$2800$, and you are required to spend all of it.
+
+    Find the minimum and maximum possible area of the enclosure, if they exist. If they don't exist, explain why. 
+  \end{problem}
+
+\item 
+
+  Suppose $a, b, c$ are numbers such that $5^a = 2$, $5^b = \dfrac{1}{3}$, and $5^c = 7$.
+
+  \begin{enumerate}
+  \item
+    \begin{problem}[\stretch{0.25}]
+      In each statement, fill in the blanks with consecutive integers (for example, 3 and 4).
+      \begin{itemize}
+      \item $a$ is between \fitb{0.25in}{0} and \fitb{0.25in}{1}.
+      \item $b$ is between $\fitb{0.25in}{-1}$ and \fitb{0.25in}{0}.
+      \item $c$ is between \fitb{0.25in}{1} and \fitb{0.25in}{2}.        
+      \end{itemize}
+    \end{problem}
+
+  \item
+
+    \begin{workshop}
+      The point here is just for students to recognize they should view $a, b, c$ as $x$-values on this graph and to make sure their graph is consistent with their answers to (a). 
+    \end{workshop}
+
+    \begin{problem}[\vfill]
+      Sketch a graph of $y = 5^x$, and label $a, b, c$ on your graph. 
+    \end{problem}
+
+  \item
+    Simplify the following expressions. (Your answers shouldn't involve $a$, $b$, or $c$.)
+
+    \begin{enumerate}
+    \item
+      \begin{problem}[\stretch{0.35}]
+        $5^{a + b}$
+      \end{problem}
+
+    \item
+      \begin{problem}[\stretch{0.35}]
+        $5^{-c}$
+      \end{problem}
+
+    \item
+      \begin{problem}[\stretch{0.35}]
+        $5^{3b}$
+      \end{problem}
+
+    \item
+      \begin{problem}[\nstretch{0.35}]
+        $5^{2a + b - c}$
+      \end{problem}
+
+    \end{enumerate}
+
+  \end{enumerate}
+
+\item  In each part, you're given a function; sketch its graph, and label all asymptotes and intercepts. 
+  \begin{enumerate}
+  \item
+    \begin{problem}[\vfill]
+      $f(x) = 3 \cdot 2^{-x} - 12$
+    \end{problem}
+
+  \item
+    \begin{problem}[\vfill]
+      $g(x) = 3^{x - 2}$
+    \end{problem}
+
+  \end{enumerate}
+
+\end{enumerate}
+\end{document}
