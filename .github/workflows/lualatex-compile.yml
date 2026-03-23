@@ -1,9 +1,10 @@
 # LuaLaTeX Compilation Pipeline
 # Triggered when .tex files are committed to pipeline-lualatex-input/
-# Runs LuaLaTeX in Docker, creates a GitHub Release with the PDF attached.
+# Runs LuaLaTeX in Docker, commits PDF to pipeline-output/ and creates a Release.
 #
-# The browser tool (index.html) commits files here via the GitHub API,
-# then polls for completion and fetches the PDF from the release.
+# The browser tool fetches the PDF from pipeline-output/ via the Contents API
+# using Accept: application/vnd.github.raw (raw binary, no base64).
+# The Release serves as a backup and direct-access point.
 
 name: LuaLaTeX Compile
 
@@ -50,7 +51,22 @@ jobs:
       - name: Show output files
         run: ls -lh pipeline-output/
 
-      - name: Create release with PDF
+      - name: Commit results and clean up input
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Stage output files (PDF + logs)
+          git add pipeline-output/
+          
+          # Remove processed input files to keep repo clean
+          git rm pipeline-lualatex-input/*.tex 2>/dev/null || true
+          
+          # Commit with [skip ci] to prevent re-triggering
+          git commit -m "LuaLaTeX compilation output [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: Create release with PDF (backup)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -65,7 +81,7 @@ jobs:
           fi
           
           # Extract base name for the release title
-          BASENAME=$(basename pipeline-lualatex-input/*.tex .tex 2>/dev/null | head -1)
+          BASENAME=$(basename pipeline-output/*.pdf .pdf 2>/dev/null | head -1)
           
           # Create the release with all PDF and log files attached
           gh release create "$TAG" \
@@ -80,12 +96,5 @@ jobs:
             pipeline-output/*.pdf \
             --title "LuaLaTeX: ${BASENAME}" \
             --notes "Compiled from ${BASENAME}.tex on $(date -u '+%Y-%m-%d %H:%M UTC')" \
-            --latest=false
-
-      - name: Clean up input files
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git rm pipeline-lualatex-input/*.tex 2>/dev/null || true
-          git commit -m "LuaLaTeX compilation complete [skip ci]" || echo "No changes to commit"
-          git push
+            --latest=false \
+            2>/dev/null || echo "::warning::Release creation failed (non-fatal)"
