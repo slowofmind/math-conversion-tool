@@ -24,6 +24,16 @@ For testing purposes, I've decided to make a number of different options availab
     - the previous option also autoinserts a Mathjax config script so that "Include Hidden MathML" is enabled by default. MathJax normally has this option disabled due to "fragility" of hiding the MathML, and instead just inserts the MathJax-generated speech strings directly into the DOM. The MathJax Context Menu (right click on equation or shift+enter) can be used to change the settings back.
     - possible future enhancement: user interface to customize Mathjax config for use with CDNs.
 5. ```SCORM``` Download option for HTML output: Canvas currently only supports the now outdated MathJax 2.9, and blocks scripts (including newer version of MathJax) in uploaded HTML files. A workaround discovered by math faculty at other institutions is to enable Canvas LTI support for ```SCORM```; while nearly two decades old, it wraps files in a framework that allows MathJax CDN scripts to run in Canvas. (Need verification: my trial version of Canvas does not support SCORM)
+6. MuPDF pipeline for converting vector-based PDF images in to SVGs and raster-based PDF images into PNG. (LaTeX authors will sometimes pre-compile image content into PDFs and link to them in the main document file; these are problematic to embed in HTML or DOCX)
+
+## Things to add:
+
+- Documentation....lots of documentation.
+- Additional Lua filters and LaTeXML bindings for dealing with things like conditional output, accessibility support for tables, etc.
+- Support for compiling TikZ/PGF plots code contained in the LaTeX source file ito images and then converting to SVGs
+- A panel for adding accessibility support in the source LaTeX file (prompts to check heading levels, ordered lists, etc)
+- Maybe PreTeXt or PreFigure support ???
+- an unicorn/pony/carebear that helps with....[TBD]
 
 
 
