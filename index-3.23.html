@@ -2508,9 +2508,6 @@ const pandocDefaultTo = 'html5';
 function setActiveEngine(engine) {
   activeEngine = engine;
 
-  // Restore iframe sandbox if switching away from PDF display
-  restoreHtmlPreview();
-
   // Update engine button styling
   document.querySelectorAll('.engine-btn').forEach(b => {
     b.classList.remove('active');
@@ -4285,15 +4282,18 @@ document.getElementById('btnConvert').addEventListener('click', () => {
   } else if (activeEngine === 'latexml') {
     runLatexmlConversion();
   } else if (activeEngine === 'lualatex') {
-    runLualatexCompilation();
+    // TODO: implement LuaLaTeX conversion
+    updateStatus('error', 'LuaLaTeX compilation is not yet implemented');
+    updateLog([{
+      line: null, column: null, level: 'info',
+      message: 'LuaLaTeX compilation via GitHub Actions is planned but not yet implemented.',
+      matchedText: null, type: 'lualatex-todo',
+    }], '');
   }
 });
 
 async function runConversion() {
   if (!pandocModule) return;
-
-  // Restore iframe sandbox in case previous output was a PDF
-  restoreHtmlPreview();
 
   const btn = document.getElementById('btnConvert');
   btn.disabled = true;
@@ -5770,9 +5770,6 @@ async function listRepoDir(path) {
 // --- Main LaTeXML conversion flow ---
 
 async function runLatexmlConversion() {
-  // Restore iframe sandbox in case previous output was a PDF
-  restoreHtmlPreview();
-
   // Ensure we have a token (service token or user-provided)
   let token = getGitHubToken();
   if (!token) {
@@ -5928,241 +5925,6 @@ document.getElementById('btnEngineLualatex').addEventListener('contextmenu', (e)
   e.preventDefault();
   promptForGitHubToken();
 });
-
-
-// ════════════════════════════════════════════════════════════════════
-// SECTION 13: LuaLaTeX COMPILATION (via GitHub Actions + Releases)
-// ════════════════════════════════════════════════════════════════════
-//
-// Architecture:
-//   1. User clicks LuaLaTeX → Compile
-//   2. JS commits .tex to pipeline-lualatex-input/ via GitHub API
-//   3. Push triggers lualatex-compile.yml workflow
-//   4. Workflow runs LuaLaTeX in Docker, creates a GitHub Release with PDF attached
-//   5. JS polls for workflow completion, then finds the release
-//   6. JS downloads the PDF asset as raw binary (no base64)
-//   7. PDF displayed in the preview iframe using browser's built-in PDF viewer
-
-// --- Find the most recent LuaLaTeX release created after a given time ---
-
-async function findLualatexRelease(afterTimestamp, maxAttempts = 8) {
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    try {
-      const releases = await githubAPI('/releases?per_page=10');
-      const release = releases.find(r =>
-        r.tag_name.startsWith('lualatex-') &&
-        new Date(r.created_at).getTime() > afterTimestamp
-      );
-      if (release) return release;
-    } catch (err) {
-      console.warn('[lualatex] Release poll error (will retry):', err.message);
-    }
-    // Wait before retrying — the release may take a moment to appear after workflow completes
-    await new Promise(r => setTimeout(r, 3000));
-  }
-  return null;
-}
-
-// --- Download a release asset as raw binary (no base64) ---
-
-async function downloadReleaseAsset(asset) {
-  const token = getGitHubToken();
-  if (!token) throw new Error('No GitHub token configured');
-
-  // Use the API URL with Accept: application/octet-stream to get raw binary
-  // This returns a 302 redirect to a temporary download URL
-  const resp = await fetch(asset.url, {
-    headers: {
-      'Authorization': `token ${token}`,
-      'Accept': 'application/octet-stream',
-    },
-  });
-
-  if (!resp.ok) {
-    throw new Error(`Failed to download asset: ${resp.status} ${resp.statusText}`);
-  }
-
-  return await resp.arrayBuffer();
-}
-
-// --- Display a PDF in the preview iframe ---
-
-function displayPdfInPreview(pdfArrayBuffer, filename) {
-  const blob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
-  const blobUrl = URL.createObjectURL(blob);
-
-  const previewFrame = document.getElementById('previewFrame');
-
-  // Remove sandbox to allow browser's built-in PDF viewer to work.
-  // This is safe because PDF blob URLs cannot execute scripts or access the parent page.
-  previewFrame.removeAttribute('sandbox');
-
-  // Clear any srcdoc and set src to the blob URL
-  previewFrame.removeAttribute('srcdoc');
-  previewFrame.src = blobUrl;
-
-  // Store the blob URL for cleanup when switching away
-  previewFrame._pdfBlobUrl = blobUrl;
-}
-
-// --- Restore iframe to HTML mode (re-enable sandbox) ---
-
-function restoreHtmlPreview() {
-  const previewFrame = document.getElementById('previewFrame');
-  // Clean up any PDF blob URL
-  if (previewFrame._pdfBlobUrl) {
-    URL.revokeObjectURL(previewFrame._pdfBlobUrl);
-    previewFrame._pdfBlobUrl = null;
-  }
-  // Restore sandbox for safe HTML rendering
-  previewFrame.setAttribute('sandbox', 'allow-scripts');
-  previewFrame.removeAttribute('src');
-}
-
-// --- Main LuaLaTeX compilation flow ---
-
-async function runLualatexCompilation() {
-  // Ensure we have a token (service token or user-provided)
-  let token = getGitHubToken();
-  if (!token) {
-    token = promptForGitHubToken();
-    if (!token) {
-      updateStatus('error', 'GitHub token required for LuaLaTeX compilation');
-      return;
-    }
-  }
-
-  const btn = document.getElementById('btnConvert');
-  const sourceText = inputBinaryFile ? null : editor.getValue();
-
-  if (!sourceText || !sourceText.trim()) {
-    updateStatus('error', 'No LaTeX source to compile');
-    return;
-  }
-
-  // Check that input looks like LaTeX
-  if (!sourceText.includes('\\documentclass') && !sourceText.includes('\\begin{document}')) {
-    const proceed = confirm(
-      'The source does not appear to contain \\documentclass.\n' +
-      'LuaLaTeX requires a complete LaTeX document. Continue anyway?'
-    );
-    if (!proceed) return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Compiling…';
-  clearDecorations();
-
-  // Use a timestamp to create a unique filename and avoid collisions
-  const timestamp = Date.now();
-  const baseName = inputFileName || 'untitled';
-  const texFilename = `${baseName}-${timestamp}.tex`;
-
-  try {
-    // Step 1: Commit the .tex file to pipeline-lualatex-input/
-    updateStatus('loading', 'LuaLaTeX: uploading source…');
-    const commitSha = await commitFileToRepo(
-      `pipeline-lualatex-input/${texFilename}`,
-      sourceText,
-      `LuaLaTeX: ${baseName}.tex`
-    );
-    console.log('[lualatex] Committed pipeline-lualatex-input/' + texFilename, 'SHA:', commitSha);
-
-    // Step 2: Wait for the GitHub Actions workflow to complete
-    updateStatus('loading', 'LuaLaTeX: workflow queued…');
-    const run = await waitForWorkflowRun(commitSha, 480000);  // 8 min timeout for compilation
-
-    if (run.conclusion !== 'success') {
-      const runUrl = run.html_url;
-      throw new Error(
-        `Workflow ${run.conclusion}. ` +
-        `Check the Actions tab for details: ${runUrl}`
-      );
-    }
-    console.log('[lualatex] Workflow completed:', run.html_url);
-
-    // Step 3: Find the release created by the workflow
-    updateStatus('loading', 'LuaLaTeX: finding release…');
-    const release = await findLualatexRelease(timestamp);
-
-    if (!release) {
-      throw new Error(
-        'Compilation completed but release not found. ' +
-        'Check the repo\'s Releases page and the Actions tab.'
-      );
-    }
-    console.log('[lualatex] Found release:', release.tag_name, release.html_url);
-
-    // Step 4: Find the PDF asset in the release
-    const pdfAsset = release.assets.find(a => a.name.endsWith('.pdf'));
-    if (!pdfAsset) {
-      throw new Error(
-        'Release found but no PDF file attached. ' +
-        'The compilation may have failed — check the Actions log.'
-      );
-    }
-
-    // Step 5: Download the PDF as raw binary
-    updateStatus('loading', `LuaLaTeX: downloading ${pdfAsset.name}…`);
-    const pdfData = await downloadReleaseAsset(pdfAsset);
-    const sizeKB = (pdfData.byteLength / 1024).toFixed(1);
-    console.log(`[lualatex] Downloaded ${pdfAsset.name}: ${sizeKB} KB`);
-
-    // Step 6: Display PDF in preview panel
-    displayPdfInPreview(pdfData, pdfAsset.name);
-
-    // Update source editor with compilation info
-    sourceEditor.setValue(
-      `% LuaLaTeX compilation complete\n` +
-      `% Output: ${pdfAsset.name} (${sizeKB} KB)\n` +
-      `% Release: ${release.html_url}\n` +
-      `% The PDF is displayed in the Preview tab.`,
-      -1
-    );
-
-    // Store for download
-    const blob = new Blob([pdfData], { type: 'application/pdf' });
-    const downloadName = `${baseName}.pdf`;
-    lastOutput = { blob, filename: downloadName };
-
-    const downloadBtn = document.getElementById('btnDownloadOutput');
-    downloadBtn.textContent = `📥 ${downloadName} (${sizeKB} KB)`;
-    downloadBtn.style.display = '';
-
-    // Hide SCORM button (not applicable for PDF)
-    document.getElementById('btnDownloadScorm').style.display = 'none';
-
-    // Update log — also check for compilation log in the release
-    const logAsset = release.assets.find(a => a.name.endsWith('-lualatex.log'));
-    const logEntries = [{
-      line: null, column: null, level: 'info',
-      message: `LuaLaTeX compilation complete (${sizeKB} KB). Output: ${downloadName}`,
-      matchedText: null, type: 'lualatex-success',
-    }];
-    if (logAsset) {
-      logEntries.push({
-        line: null, column: null, level: 'info',
-        message: `Compilation log available in release: ${release.html_url}`,
-        matchedText: null, type: 'lualatex-log-link',
-      });
-    }
-    updateLog(logEntries, '');
-
-    updateStatus('ready', `LuaLaTeX: compiled (${sizeKB} KB)`);
-
-  } catch (err) {
-    console.error('[lualatex] Error:', err);
-    updateStatus('error', `LuaLaTeX: ${err.message.substring(0, 80)}`);
-    updateLog([{
-      line: null, column: null, level: 'error',
-      message: `LuaLaTeX compilation failed: ${err.message}`,
-      matchedText: null, type: 'lualatex-error',
-    }], '');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Compile';
-  }
-}
 
 
 // ════════════════════════════════════════════════════════════════════
