@@ -1025,6 +1025,10 @@
 
   <div class="toolbar-group">
     <button class="toolbar-btn" id="btnUpload" title="Upload file" aria-label="Upload file">📄 Upload</button>
+    <select class="toolbar-select" id="selSampleFiles" aria-label="Load a sample file" style="min-width:110px;">
+      <option value="" selected disabled>Sample Files</option>
+      <option value="samples/4-calculus-derivatives.tex">Calculus: Derivatives</option>
+    </select>
   </div>
 
   <div class="toolbar-divider"></div>
@@ -2084,6 +2088,39 @@ document.getElementById('btnUpload').addEventListener('click', () => {
 fileInput.addEventListener('change', async (e) => {
   await handleFileUpload(e.target.files[0]);
   fileInput.value = '';
+});
+
+// ─── Sample files dropdown ───
+document.getElementById('selSampleFiles').addEventListener('change', async (e) => {
+  const path = e.target.value;
+  if (!path) return;
+
+  try {
+    const resp = await fetch(path);
+    if (!resp.ok) throw new Error(`Failed to load ${path}: ${resp.status}`);
+    const text = await resp.text();
+
+    // Clear any binary state and load into editor
+    clearBinaryInput();
+
+    const filename = path.split('/').pop();
+    document.getElementById('tabFilename').textContent = filename;
+    inputFileName = filename.replace(/\.[^.]+$/, '') || 'untitled';
+
+    editor.setValue(text, -1);
+    editor.session.setMode('ace/mode/latex');
+    document.getElementById('selFrom').value = 'latex';
+    document.getElementById('statusFormat').textContent = 'LaTeX';
+    updateExtensions();
+
+    updateStatus('ready', `Loaded sample: ${filename}`);
+  } catch (err) {
+    console.error('Failed to load sample file:', err);
+    updateStatus('error', `Failed to load sample: ${err.message}`);
+  }
+
+  // Reset dropdown so the same file can be re-selected
+  e.target.selectedIndex = 0;
 });
 
 // ─── Drag-and-drop file upload onto editor ───
