@@ -34,7 +34,7 @@ For testing purposes, I've also added the option to use **[LaTeXML](https://math
 
 ## next steps
 
-In addition to basic vetting of code and some serious accessibility testing and redesign, there are a number features that need to be enhanced or built from scratch. The potentially include:
+In addition to basic vetting of code and some serious accessibility testing and redesign, there are a number features that need to be enhanced or built from scratch. These potentially include:
 
 - documentation for everything
 - An "accessibility checker" for LaTeX files that to flag structural problems and offer suggested fixes
