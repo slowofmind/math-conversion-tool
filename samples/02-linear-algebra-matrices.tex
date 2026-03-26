@@ -1,0 +1,112 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[shortlabels]{enumitem}
+\usepackage[margin=1in]{geometry}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}
+
+\title{Worksheet 4: Matrix Operations and Row Reduction}
+\author{Math 22a --- Linear Algebra}
+\date{Fall 2025}
+
+\begin{document}
+\maketitle
+
+\begin{definition}
+An $m \times n$ \textbf{matrix} is a rectangular array of numbers with $m$ rows and $n$ columns:
+\[
+  A = \begin{pmatrix}
+    a_{11} & a_{12} & \cdots & a_{1n} \\
+    a_{21} & a_{22} & \cdots & a_{2n} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    a_{m1} & a_{m2} & \cdots & a_{mn}
+  \end{pmatrix}.
+\]
+We write $A = (a_{ij})$ where $a_{ij}$ denotes the entry in row $i$, column $j$.
+\end{definition}
+
+\begin{exercise}
+Perform the indicated matrix operations, or explain why the operation is not defined.
+\begin{enumerate}[(a)]
+  \item $\begin{pmatrix} 2 & -1 \\ 0 & 3 \end{pmatrix}
+         + \begin{pmatrix} 1 & 4 \\ -2 & 5 \end{pmatrix}$
+
+  \item $3 \begin{pmatrix} 1 & 0 & -2 \\ 4 & 1 & 3 \end{pmatrix}
+         - \begin{pmatrix} 2 & -1 & 0 \\ 0 & 3 & -6 \end{pmatrix}$
+
+  \item $\begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}
+         \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}$
+
+  \item $\begin{pmatrix} 1 & 2 & 3 \end{pmatrix}
+         \begin{pmatrix} 4 \\ 5 \\ 6 \end{pmatrix}$
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+Use Gaussian elimination to reduce each augmented matrix to row echelon form, then solve the corresponding system.
+\begin{enumerate}[(a)]
+  \item $\left(\begin{array}{ccc|c}
+    1 & 2 & -1 & 3 \\
+    2 & 5 & 0  & 7 \\
+    -1 & 1 & 3 & 0
+  \end{array}\right)$
+
+  \item $\left(\begin{array}{ccc|c}
+    1 & -1 & 2  & 4 \\
+    3 & -3 & 6  & 12 \\
+    2 & 1  & -1 & 2
+  \end{array}\right)$
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+For each matrix below, find the reduced row echelon form and determine the rank.
+\begin{enumerate}[(a)]
+  \item $A = \begin{pmatrix} 1 & 3 & 5 & 7 \\ 2 & 4 & 6 & 8 \\ 0 & 1 & 1 & 1 \end{pmatrix}$
+
+  \item $B = \begin{pmatrix} 1 & 0 & 2 \\ 0 & 1 & -1 \\ 2 & 1 & 3 \\ 1 & -1 & 3 \end{pmatrix}$
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+Determine whether each set of vectors is linearly independent.
+\begin{enumerate}[(a)]
+  \item $\mathbf{v}_1 = \begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix}, \quad
+         \mathbf{v}_2 = \begin{pmatrix} 4 \\ 5 \\ 6 \end{pmatrix}, \quad
+         \mathbf{v}_3 = \begin{pmatrix} 7 \\ 8 \\ 9 \end{pmatrix}$
+
+  \item $\mathbf{u}_1 = \begin{pmatrix} 1 \\ 0 \\ 1 \end{pmatrix}, \quad
+         \mathbf{u}_2 = \begin{pmatrix} 0 \\ 1 \\ 1 \end{pmatrix}, \quad
+         \mathbf{u}_3 = \begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix}$
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+Let $T \colon \mathbb{R}^2 \to \mathbb{R}^2$ be the linear transformation defined by
+\[
+  T\begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} 2x - y \\ x + 3y \end{pmatrix}.
+\]
+\begin{enumerate}[(a)]
+  \item Write the standard matrix $A$ for $T$.
+  \item Compute $T\begin{pmatrix} 1 \\ -1 \end{pmatrix}$.
+  \item Is $T$ one-to-one? Is $T$ onto? Justify your answers.
+  \item Find $\det(A)$ and use it to determine whether $A$ is invertible.
+\end{enumerate}
+\end{exercise}
+
+\begin{theorem}[Invertible Matrix Theorem --- Partial List]
+Let $A$ be an $n \times n$ matrix. The following are equivalent:
+\begin{enumerate}[(i)]
+  \item $A$ is invertible.
+  \item $A$ is row equivalent to $I_n$.
+  \item $A$ has $n$ pivot positions.
+  \item The equation $A\mathbf{x} = \mathbf{0}$ has only the trivial solution.
+  \item The columns of $A$ are linearly independent.
+  \item $\det(A) \neq 0$.
+\end{enumerate}
+\end{theorem}
+
+\end{document}

@@ -1,0 +1,110 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb}
+\usepackage[shortlabels]{enumitem}
+\usepackage[margin=1in]{geometry}
+\usepackage{siunitx}
+\usepackage{cancel}
+
+%%
+%% The diffcoeff package provides semantic derivative notation:
+%%   \diff{f}{x}       →  df/dx
+%%   \diff[2]{y}{x}    →  d²y/dx²
+%%   \diffp{f}{x}      →  ∂f/∂x
+%%   \diffp[2]{f}{x}   →  ∂²f/∂x²
+%%   \diff*{y}{x}{t=0} →  dy/dx evaluated at t=0 (with \difdef config)
+%%
+\usepackage{diffcoeff}
+
+%% Configure the "evaluated at" variant: produces  df/dx |_{x=a}
+\difdef { f } {}
+{
+  outer-Ldelim = \left . ,
+  outer-Rdelim = \right | ,
+  sub-nudge = 0 mu
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+
+\title{Problem Set 5: Derivative Notation and Applications}
+\author{Math Mb --- Calculus with Applications}
+\date{Spring 2025}
+
+\begin{document}
+\maketitle
+
+\section*{Part I: Derivative Notation with \texttt{diffcoeff}}
+
+The following problems use Leibniz notation for derivatives. Remember that $\diff{y}{x}$ denotes the first derivative of $y$ with respect to $x$, while $\diff[2]{y}{x}$ denotes the second derivative.
+
+\begin{enumerate}
+\item For each function, compute $\diff{y}{x}$.
+\begin{enumerate}[(a)]
+  \item $y = 3x^4 - 2x^2 + 7x - 5$
+  \item $y = e^{2x} \sin(3x)$
+  \item $y = \dfrac{\ln x}{x^2 + 1}$
+\end{enumerate}
+
+\item For $f(x) = x^3 - 6x^2 + 9x + 1$, compute $\diff{f}{x}$ and $\diff[2]{f}{x}$. Then find the intervals where $f$ is concave up and concave down.
+
+\item If $f(x) = x e^{-x}$, evaluate:
+\[
+  \diff*{f}{x}{x = 1} \qquad \text{and} \qquad \diff*[2]{f}{x}{x = 1}.
+\]
+\end{enumerate}
+
+\section*{Part II: Partial Derivatives}
+
+For functions of several variables, $\diffp{f}{x}$ denotes the partial derivative of $f$ with respect to $x$, holding other variables constant.
+
+\begin{enumerate}[resume]
+\item Let $f(x, y) = x^2 y^3 - 4xy + \cos(xy)$. Find:
+\begin{enumerate}[(a)]
+  \item $\diffp{f}{x}$
+  \item $\diffp{f}{y}$
+  \item $\diffp[2]{f}{x}$
+  \item $\diffp{f}{x,y}$ \quad (the mixed partial)
+\end{enumerate}
+
+\item Verify that $\diffp{f}{x,y} = \diffp{f}{y,x}$ for $f(x, y) = e^{x} \sin(y) + x^2 y$.
+\end{enumerate}
+
+\section*{Part III: Related Rates}
+
+\begin{enumerate}[resume]
+\item A spherical balloon is being inflated so that its volume increases at a rate of $\diff{V}{t} = \SI{100}{\centi\meter\cubed\per\second}$. How fast is the radius increasing when $r = \SI{10}{\centi\meter}$?
+
+Recall that $V = \frac{4}{3}\pi r^3$, so
+\[
+  \diff{V}{t} = 4\pi r^2 \diff{r}{t}.
+\]
+Solve for $\diff*{r}{t}{r = 10}$.
+
+\item A 10-foot ladder leans against a wall. The bottom slides away from the wall at $\SI{2}{\foot\per\second}$. Let $x$ be the distance from the wall to the bottom and $y$ the height of the top.
+\begin{enumerate}[(a)]
+  \item Use the Pythagorean relation $x^2 + y^2 = 100$ to find $\diff{y}{t}$ in terms of $x$, $y$, and $\diff{x}{t}$.
+  \item How fast is the top sliding down when $x = 6$ feet?
+\end{enumerate}
+
+\item The temperature at a point on a metal plate is given by $T(x, y) = 100 - x^2 - 2y^2$ (in degrees Celsius). An ant walks along the path $x(t) = \cos t$, $y(t) = \sin t$.
+\begin{enumerate}[(a)]
+  \item Use the chain rule in the form
+  \[
+    \diff{T}{t} = \diffp{T}{x} \diff{x}{t} + \diffp{T}{y} \diff{y}{t}
+  \]
+  to find how fast the temperature is changing along the ant's path.
+  \item Evaluate $\diff*{T}{t}{t = \pi/4}$.
+\end{enumerate}
+\end{enumerate}
+
+\section*{Part IV: Linearization}
+
+\begin{enumerate}[resume]
+\item The linear approximation of $f(x)$ near $x = a$ is
+\[
+  L(x) = f(a) + \diff*{f}{x}{x=a} \cdot (x - a).
+\]
+Use this to approximate $\sqrt{4.1}$ by linearizing $f(x) = \sqrt{x}$ at $a = 4$.
+\end{enumerate}
+
+\end{document}

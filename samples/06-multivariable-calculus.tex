@@ -1,0 +1,111 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{bm}
+\usepackage[shortlabels]{enumitem}
+\usepackage[margin=1in]{geometry}
+
+\newtheorem*{theorem*}{Theorem}
+\newtheorem*{definition*}{Definition}
+
+\DeclareMathOperator{\divergence}{div}
+\DeclareMathOperator{\curl}{curl}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+
+\title{Handout 6: Partial Derivatives and Multiple Integrals}
+\author{Math 21a --- Multivariable Calculus}
+\date{Spring 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Partial Derivatives}
+
+\begin{definition*}
+If $f(x, y)$ is a function of two variables, the \textbf{partial derivatives} of $f$ are
+\[
+  f_x(x,y) = \frac{\partial f}{\partial x} = \lim_{h \to 0} \frac{f(x+h, y) - f(x,y)}{h}, \qquad
+  f_y(x,y) = \frac{\partial f}{\partial y} = \lim_{h \to 0} \frac{f(x, y+h) - f(x,y)}{h}.
+\]
+\end{definition*}
+
+\begin{enumerate}
+\item Find all first and second partial derivatives of the following functions.
+\begin{enumerate}[(a)]
+  \item $f(x, y) = x^3 y^2 - 2xy^4 + \cos(xy)$
+
+  \item $g(x, y) = e^{x^2 + y^2}$
+
+  \item $h(x, y, z) = xyz + \ln(x^2 + z^2)$
+\end{enumerate}
+
+\item Verify that $f_{xy} = f_{yx}$ for $f(x, y) = x^2 \sin(y) + y^3 e^x$.
+\end{enumerate}
+
+\section*{The Gradient and Directional Derivatives}
+
+The \textbf{gradient} of $f(x,y)$ is the vector
+\[
+  \nabla f = \left\langle \frac{\partial f}{\partial x}, \; \frac{\partial f}{\partial y} \right\rangle = f_x \, \bm{\hat{\imath}} + f_y \, \bm{\hat{\jmath}}.
+\]
+The \textbf{directional derivative} of $f$ in the direction of unit vector $\bm{u}$ is
+\[
+  D_{\bm{u}} f = \nabla f \cdot \bm{u}.
+\]
+
+\begin{enumerate}[resume]
+\item Let $f(x,y) = x^2 y - y^3$.
+\begin{enumerate}[(a)]
+  \item Compute $\nabla f$ at the point $(2, -1)$.
+  \item Find the directional derivative of $f$ at $(2, -1)$ in the direction of $\bm{v} = \langle 3, 4 \rangle$.
+  \item In what direction does $f$ increase most rapidly at $(2, -1)$? What is the maximum rate of increase?
+\end{enumerate}
+
+\item Find and classify all critical points of $f(x,y) = x^3 + y^3 - 3xy$ using the second derivative test. Recall that the discriminant is
+\[
+  D = f_{xx} f_{yy} - (f_{xy})^2.
+\]
+\end{enumerate}
+
+\section*{Double and Triple Integrals}
+
+\begin{enumerate}[resume]
+\item Evaluate each iterated integral.
+\begin{enumerate}[(a)]
+  \item $\displaystyle \int_0^2 \int_0^{x} (x^2 + y) \, dy \, dx$
+
+  \item $\displaystyle \int_0^1 \int_{y}^{1} e^{x^2} \, dx \, dy$ \quad \emph{(Hint: Reverse the order of integration.)}
+\end{enumerate}
+
+\item Evaluate $\displaystyle \iint_R (x + 2y) \, dA$ where $R$ is the region bounded by $y = x^2$ and $y = 2x$.
+
+\item Convert to polar coordinates and evaluate:
+\[
+  \iint_D \sqrt{x^2 + y^2} \, dA
+\]
+where $D$ is the disk $x^2 + y^2 \leq 4$.
+
+\item Evaluate the triple integral
+\[
+  \iiint_E z \, dV
+\]
+where $E$ is the solid bounded by $z = 0$, $z = \sqrt{x^2 + y^2}$, and $x^2 + y^2 = 4$.
+
+\emph{Hint:} Use cylindrical coordinates: $x = r\cos\theta$, $y = r\sin\theta$, $z = z$, and $dV = r \, dz \, dr \, d\theta$.
+\end{enumerate}
+
+\section*{Vector Fields (Preview)}
+
+\begin{theorem*}[Green's Theorem]
+Let $C$ be a positively oriented, piecewise-smooth, simple closed curve in the plane, and let $D$ be the region bounded by $C$. If $P$ and $Q$ have continuous partial derivatives on an open region containing $D$, then
+\[
+  \oint_C P \, dx + Q \, dy = \iint_D \left( \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y} \right) dA.
+\]
+\end{theorem*}
+
+\begin{enumerate}[resume]
+\item Use Green's Theorem to evaluate $\displaystyle \oint_C (y^2 \, dx + x \, dy)$ where $C$ is the boundary of the unit square $[0,1] \times [0,1]$, traversed counterclockwise.
+\end{enumerate}
+
+\end{document}
