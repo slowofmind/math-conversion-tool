@@ -3,7 +3,7 @@
 
 ## the problem: 
 
-[Pandoc](https://pandoc.org/MANUAL.html) is a decent tool, for converting [LaTeX](https://www.learnlatex.org/en/) files with math content into accessible HTML, DOCX, and EPUB formats. It works well for relatively simple LaTeX files (short handouts, simple problem sets) that use relatively common LaTeX packages (amsmath, amssymb, enumitem if not customized), especially if using HTML output along with MathJax.
+[Pandoc](https://pandoc.org/MANUAL.html) is a decent tool for converting [LaTeX](https://www.learnlatex.org/en/) files with math content into accessible HTML, DOCX, and EPUB formats. It works well for relatively simple LaTeX files (short handouts, simple problem sets) that use relatively common LaTeX packages (amsmath, amssymb, enumitem if not customized), especially if using HTML output along with MathJax.
 
 However, it can become more challenging when a LaTeX file contains any of the following:
 - more specialized LaTeX packages (```diffcoeff```, ```ifthen```, ```siunitx``` in some cases)
