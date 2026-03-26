@@ -28,7 +28,7 @@ I've created a very basic proof of concept that uses **[Pandoc-wasm](https://pan
 - an script that automatically converts auxilliary  PDF image files to PNGs or SVGs so that they can be properly included in HTML and DOCX output.
 - a find and replace tool for working with the nested commands common in LaTeX that leverages the built-in error reporting
 - an additional Pandoc math conversion option to allow use of MathJax version 4 (standard Pandoc still uses version 3)
-- an option to download HTML output as a ```SCORM``` package; if Harvard's Canvas instance allows use of the LTI for [SCORM](https://community.instructure.com/en/kb/articles/660683-how-do-i-import-scorm-files-as-an-assignment), uploading in a SCORM package would prevent Canvas from blocking scripts included in the HTML — meaning instructors could use MathJax v4 instead of MathJax 2.9 (the current Canvas default)
+- an option to download HTML output as a ```SCORM``` package; if Harvard's Canvas instance allows use of the LTI for [SCORM](https://community.instructure.com/en/kb/articles/660683-how-do-i-import-scorm-files-as-an-assignment), uploading in a SCORM package would prevent Canvas from blocking scripts included in the HTML — allowing use of MathJax v4 instead of the current Canvas default (the outdated MathJax 2.9)
 
 For testing purposes, I've also added the option to use **[LaTeXML](https://math.nist.gov/~BMiller/LaTeXML/)** instead of Pandoc for conversion, as well as an option to compile to PDFs using TexLive 2026. Since these both require connections to external resources, I am not certain that I will include them in any kind of version for faculty (unless LaTeXML proves to be significantly useful)
 
