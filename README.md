@@ -1,40 +1,58 @@
-# Accessible Math Conversion Tool
+# Accessible STEM: A Toolkit for Instructor-Created Course Content
+[Current working title, subject to change.]
 
-> [!WARNING]
-> This tool currently sits somewhere in the range between proof-of-concept and mad ravings. The code is in need of serious review; it was constructed largely via LLM (a mix of Claude Sonnet and Opus models). It works for Pandoc conversions, and the cleanup tool is somewhat functional (if you know how to use it), but the code and the styling should be poked carefully from a distance with a long stick. You have been warned.
+So, I am applying for a 
 
-Still here? Ok. The purpose of this tool is to provide a customized pipeline for teaching staff to convert their personal LaTeX course materials into accessible formats. While tools like Pandoc and LaTeXML already provide this ability, they can be tedious to install and configure, and often are opaque when it comes to figuring out how to convert complex or customized LaTeX source materials. A better idea is to wrap one or more existing conversion solutions in a custom interface along with specialized pre-built scripts and workflows designed to handle the kinds of files typically created by instructors.
+## the problem: 
 
-For testing purposes, I've decided to make a number of different options available, add on a variety of features, and then compare to find out what works best. While the core was originally ```Pandoc-wasm``` ("Pandoc in the browser), I decided to add the ability to convert using LaTeXML, and also to compile to PDF using TexLive 2026 for purposes of comparing current experimental PDF tagging capabilities against HTML output. The latter two pipelines work via a docker image and GitHub actions loosely inspired by the "BookML" tool, but focused on producing a single standalone file for delivery. (This means that Pandoc-wasm isn't currently packaged for download and local desktop use.)
+[Pandoc](https://pandoc.org/MANUAL.html) is a decent tool, for converting [LaTeX](https://www.learnlatex.org/en/) files with math content into accessible HTML, DOCX, and EPUB formats. It works well for relatively simple LaTeX files (short handouts, simple problem sets) that use relatively common LaTeX packages (amsmath, amssymb, enumitem if not customized), especially if using HTML output along with MathJax.
 
-## Here's what's currently included (in various stated of completion)
+However, it can become more challenging when a LaTeX file contains any of the following:
+- more specialized LaTeX packages (```diffcoeff```, ```ifthen```, ```siunitx``` in some cases)
+- custom macros that take complex arguments,
+- visual formatting mixed with semantically-relevant content (using ```xcolor``` commands in math environments)
+- more advanced math content 
+- various forms of image content (external graphics files saved as PDFs, programmatic graphics via TikZ/PGFplots)
 
-1. Options for converting using An Ace code editor panel for minor LaTeX edits
-2. An output panel with three different viewing options:
-   - Preview for HTML output
-   - Code viewer for underlying HTML output
-   - Error panel showing the output from the Pandoc log file; this contains both actual conversion errors as well as general conversion information. Elements of the log file are piped to the code editor where they are highlighted to make review easier.
-3. A "LaTeX Cleaning tool"; this is actually a language agnostic stack-based parser that handles nested the kind of nested commands (and occasionally environments) found in LaTeX. It offers options for editing the opening and closing "tags" of a command, removing them, or removing the tags and anything between them. The whole prefix/anchor/suffix structure takes some getting used to, but it's pretty robust. There is currently a partially-implemented experimental feature that autopopulates the fields with any element that Pandoc can't process during conversion and also highlights the corresponding code in the editor The profile system is not fully implemented at this time.
-4. Three hardcoded lua filters which can be toggled on and off; these include
-    - a filter for correcting minor issues with nested ```enumerate``` environments when converting HTML
-    - a filter for dealing with file path issues with uploaded images
-    - a filter that converts uploaded images into base64 and embeds them directly into an output HTML file. (This allows student to receive a single inclusive HTML file and avoids a conflict between Pandoc's built-in "embed resources" and using MathJax via CDN.)
-5. New math content conversion options for HTML output:
-    - an option to use MathJax v4.1 via CDN (Pandoc's default MathJax option uses v3). 
-    - the previous option also autoinserts a Mathjax config script so that "Include Hidden MathML" is enabled by default. MathJax normally has this option disabled due to "fragility" of hiding the MathML, and instead just inserts the MathJax-generated speech strings directly into the DOM. The MathJax Context Menu (right click on equation or shift+enter) can be used to change the settings back.
-    - possible future enhancement: user interface to customize Mathjax config for use with CDNs.
-5. ```SCORM``` Download option for HTML output: Canvas currently only supports the now outdated MathJax 2.9, and blocks scripts (including newer version of MathJax) in uploaded HTML files. A workaround discovered by math faculty at other institutions is to enable Canvas LTI support for ```SCORM```; while nearly two decades old, it wraps files in a framework that allows MathJax CDN scripts to run in Canvas. (Need verification: my trial version of Canvas does not support SCORM)
-6. MuPDF pipeline for converting vector-based PDF images in to SVGs and raster-based PDF images into PNG. (LaTeX authors will sometimes pre-compile image content into PDFs and link to them in the main document file; these are problematic to embed in HTML or DOCX)
+It's possible to solve many of these problems via custom pre-processing scripts, output filters, or templates. However, the additional work required to create any of these can potentially discourage faculty adoption. Even when they are willing to put in the work to build their own custom solution, increased workloads mean that they don't often have the time. The ongoing work with **Digital Accessibility Services** to create guides and documentation is a necessary first step towards improving support for faculty, but at some point many instructors will hit a wall with complex LaTeX content and give up. So something more is needed.
 
-## Things to add:
+## the solution
+The logical next step would be to provide some sort of **toolkit or platform with pre-built tools, scripts, and templates** that extend Pandoc's existing capabilities so that faculty don't have to spend time creating their own infrastructure to do so. So that's what I've decided to try and do. 
 
-- Documentation....lots of documentation.
-- Additional Lua filters and LaTeXML bindings for dealing with things like conditional output, accessibility support for tables, etc.
-- Support for compiling TikZ/PGF plots code contained in the LaTeX source file ito images and then converting to SVGs
-- A panel for adding accessibility support in the source LaTeX file (prompts to check heading levels, ordered lists, etc)
-- Maybe PreTeXt or PreFigure support ???
-- an unicorn/pony/carebear that helps with....[TBD]
+I've created a very basic [proof of concept](https://code.harvard.edu/pages/nim022/math-conversion-tool/) that uses **[Pandoc-wasm](https://pandoc.org/releases.html#pandoc-3.9-2026-02-03) ("[Pandoc in the browser](https://pandoc.org/wasm-demo/)")** as a wrapper or platform and added the following:
 
+- a basic [Ace code editor](https://ace.c9.io/) as an interface for performing minor edits in the browser
+- a mechanism for highlighting potential problems in the code editor based on information generated directly from Pandoc error logs during conversion
+- a simple [lua filter](https://pandoc.org/lua-filters.html) to help with basic formatting for ordered lists 
+- two additional lua filters
+	- one to resolve minor path issues with uploaded supplemental images
+	- one that embeds image content (used to bypass a conflict between Pandoc's existing "embed resources" option and selecting MathJax an an option for HTML output.)
+- an script that automatically converts auxilliary  PDF image files to PNGs or SVGs so that they can be properly included in HTML and DOCX output.
+- a find and replace tool for working with the nested commands common in LaTeX that leverages the built-in error reporting
+- an additional Pandoc math conversion option to allow use of MathJax version 4 (standard Pandoc still uses version 3)
+- an option to download HTML output as a ```SCORM``` package; if Harvard's Canvas instance allows use of the LTI for [SCORM](https://community.instructure.com/en/kb/articles/660683-how-do-i-import-scorm-files-as-an-assignment), uploading in a SCORM package would prevent Canvas from blocking scripts included in the HTML — meaning instructors could use MathJax v4 instead of MathJax 2.9 (the current Canvas default)
+
+For testing purposes, I've also added the option to use **[LaTeXML](https://math.nist.gov/~BMiller/LaTeXML/)** instead of Pandoc for conversion, as well as an option to compile to PDFs using TexLive 2026. Since these both require connections to external resources, I am not certain that I will include them in any kind of version for faculty (unless LaTeXML proves to be significantly useful)
+
+## next steps
+
+In addition to basic vetting of code and some serious accessibility testing and redesign, there are a number features that need to be enhanced or built from scratch. The potentially include:
+
+- documentation for everything
+- An "accessibility checker" for LaTeX files that to flag structural problems and offer suggested fixes
+- better workflow for the "log file-to-editor" error display
+- options for including MathJax scripts as separate files (rather than CDN links) with output; the goal would be to provide content that could be used offline (for when students lack reliable internet or taking exams where instructors want all internet connections to be disabled)
+- a wide variety of lua filters for managing many of the problems mentioned earlier 
+- ways to integrate both Pandoc and LaTeXML to take advantage of Pandoc's extensibility and multiple output formats as well as LaTeXML's deeper support for a wide range of LaTeX packages and content
+- script templates for instructors to easily create their own lua filters (or bindings for LaTeXML)
+- LaTeX templates to help instructors create content that works for both compiling to PDF and converting to other formats
+- a GitHub action to allow Overleaf users with premium accounts to effectively run conversions from within Overleaf. (Not ideal, but might increase adoption)
+
+## long term goals and questions
+
+The biggest question is where this "platform" would live. If only using Pandoc and the various filters and scripts, it is theoretically possible to build a single HTML file where all processing happens client-side. This would make hosting relatively easy, and would even allow users to download the file and use it like a desktop app. However, if LaTeXMl turns out to make everything significantly easier for faculty, then ideally we would want a web server of some kind. (My understanding is that docker images cannot be hosted in the Harvard enterprise vesion of GitHub, and while hosting via my personal external account works for testing, it's not a viable long term solution)
+
+I have no strong opinions on who would own this long term; I'm happy to provide support beyond the initial project year, and the basic infrastructure is stable enough to likely require mimimal upkeep. However, these decisions require input from different stakeholders regardless of whether it ends up being hosted by the ATC, DAS, UDR, or another group.
 
 
 
