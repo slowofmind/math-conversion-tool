@@ -1,7 +1,5 @@
 # Accessible STEM: A Toolkit for Instructor-Created Course Content
-[Current working title, subject to change.]
-
-So, I am applying for a 
+[working title, subject to change.]
 
 ## the problem: 
 
