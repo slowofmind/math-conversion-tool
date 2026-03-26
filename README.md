@@ -17,7 +17,7 @@ It's possible to solve many of these problems via custom pre-processing scripts,
 ## the solution
 The logical next step would be to provide some sort of **toolkit or platform with pre-built tools, scripts, and templates** that extend Pandoc's existing capabilities so that faculty don't have to spend time creating their own infrastructure to do so. So that's what I've decided to try and do. 
 
-I've created a very basic [proof of concept](https://code.harvard.edu/pages/nim022/math-conversion-tool/) that uses **[Pandoc-wasm](https://pandoc.org/releases.html#pandoc-3.9-2026-02-03) ("[Pandoc in the browser](https://pandoc.org/wasm-demo/)")** as a wrapper or platform and added the following:
+I've created a very basic proof of concept that uses **[Pandoc-wasm](https://pandoc.org/releases.html#pandoc-3.9-2026-02-03) ("[Pandoc in the browser](https://pandoc.org/wasm-demo/)")** as a wrapper or platform and added the following:
 
 - a basic [Ace code editor](https://ace.c9.io/) as an interface for performing minor edits in the browser
 - a mechanism for highlighting potential problems in the code editor based on information generated directly from Pandoc error logs during conversion
