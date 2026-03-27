@@ -2129,6 +2129,14 @@ document.getElementById('selSampleFiles').addEventListener('change', async (e) =
     document.getElementById('statusFormat').textContent = 'LaTeX';
     updateExtensions();
 
+    // Ensure Convert button reflects current engine state
+    const convertBtn = document.getElementById('btnConvert');
+    if (activeEngine === 'pandoc') {
+      convertBtn.disabled = !pandocModule;
+    } else {
+      convertBtn.disabled = false;
+    }
+
     updateStatus('ready', `Loaded sample: ${filename}`);
   } catch (err) {
     console.error('Failed to load sample file:', err);
