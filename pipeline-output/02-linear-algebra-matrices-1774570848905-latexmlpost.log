@@ -1,0 +1,8 @@
+latexmlpost (LaTeXML version 0.8.8) paginating /tmp/pipeline/02-linear-algebra-matrices-1774570848905/xml/02-linear-algebra-matrices-1774570848905.xml
+(post-processing...
+(Scan 02-linear-algebra-matrices-1774570848905.html processing... 0.02 sec)
+(CrossRef 02-linear-algebra-matrices-1774570848905.html processing... 0.01 sec)
+(MathML::Presentation[w/TeXMath] 02-linear-algebra-matrices-1774570848905.html 37 to process... 0.07 sec)
+(XSLT[using LaTeXML-html5.xsl] 02-linear-algebra-matrices-1774570848905.html processing... 0.01 sec)
+(Writer 02-linear-algebra-matrices-1774570848905.html processing... 0.00 sec) 0.11 sec)
+Postprocessing complete No obvious problems (reqd. 0.23s)
