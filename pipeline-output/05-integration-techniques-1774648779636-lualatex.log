@@ -1,0 +1,183 @@
+Rc files read:
+  NONE
+Latexmk: This is Latexmk, John Collins, 15 June 2025. Version 4.87.
+No existing .aux file, so I'll make a simple one, and require run of *latex.
+Latexmk: applying rule 'lualatex'...
+Rule 'lualatex':  Reasons for rerun
+Category 'other':
+  Rerun of 'lualatex' forced or previously required:
+    Reason or flag: 'Initial setup'
+
+------------
+Run number 1 of rule 'lualatex'
+------------
+------------
+Running 'lualatex  -synctex=1 -interaction=nonstopmode -halt-on-error -recorder -output-directory="/tmp/pipeline/05-integration-techniques-1774648779636/pdf"  "/source/05-integration-techniques-1774648779636.tex"'
+------------
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026) 
+ restricted system commands enabled.
+(/source/05-integration-techniques-1774648779636.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/size11.clo
+luaotfload | db : Font names database not found, generating new one.
+luaotfload | db : This can take several minutes; please be patient.))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/mathtools/mathtools.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/tools/calc.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/mathtools/mhsetup.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/enumitem/enumitem.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/iftex/ifvtex.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/iftex/iftex.sty)))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/l3backend/l3backend-luatex.def)
+(/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techn
+iques-1774648779636.aux)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-def/luatex.def
+(/usr/local/texlive/2026/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg)))
+*geometry* driver: auto-detecting
+*geometry* detected driver: luatex
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd) [1{/usr/local/t
+exlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3]
+(/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techn
+iques-1774648779636.aux))
+ 536 words of node memory still in use:
+   7 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 13 attribute, 55 glue_spe
+c, 13 attribute_list, 1 write nodes
+   avail lists: 2:504,3:136,4:7,5:211,6:32,7:2310,8:54,9:578,10:6,11:92
+</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman10-italic.o
+tf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.
+otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman10-regu
+lar.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman12-
+bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman12
+-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmrom
+an17-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmex10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmmi10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmmi12.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmmi8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmr10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy1
+0.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.
+pfb>
+Output written on 05-integration-techniques-1774648779636.pdf (3 pages, 100342 
+bytes).
+SyncTeX written on 05-integration-techniques-1774648779636.synctex.gz.
+Transcript written on 05-integration-techniques-1774648779636.log.
+Latexmk: Getting log file '/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techniques-1774648779636.log'
+Latexmk: Examining '/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techniques-1774648779636.fls'
+Latexmk: Examining '/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techniques-1774648779636.log'
+Latexmk: Log file says output to '05-integration-techniques-1774648779636.pdf'
+Latexmk: Log file says output to '05-integration-techniques-1774648779636.pdf'
+Latexmk: Using bibtex to make bibliography file(s).
+Latexmk: applying rule 'lualatex'...
+Rule 'lualatex':  Reasons for rerun
+Changed files or newly in use/created:
+  /tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techniques-1774648779636.aux
+  /usr/local/texlive/2026/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-bold.lua
+  /usr/local/texlive/2026/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-italic.lua
+  /usr/local/texlive/2026/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-regular.lua
+  /usr/local/texlive/2026/texmf-var/luatex-cache/generic/fonts/otl/lmroman12-bold.lua
+  /usr/local/texlive/2026/texmf-var/luatex-cache/generic/fonts/otl/lmroman12-regular.lua
+  /usr/local/texlive/2026/texmf-var/luatex-cache/generic/fonts/otl/lmroman17-regular.lua
+
+------------
+Run number 2 of rule 'lualatex'
+------------
+------------
+Running 'lualatex  -synctex=1 -interaction=nonstopmode -halt-on-error -recorder -output-directory="/tmp/pipeline/05-integration-techniques-1774648779636/pdf"  "/source/05-integration-techniques-1774648779636.tex"'
+------------
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026) 
+ restricted system commands enabled.
+(/source/05-integration-techniques-1774648779636.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/size11.clo))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/mathtools/mathtools.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/tools/calc.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/mathtools/mhsetup.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/enumitem/enumitem.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/iftex/ifvtex.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/iftex/iftex.sty)))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/l3backend/l3backend-luatex.def)
+(/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techn
+iques-1774648779636.aux)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-def/luatex.def
+(/usr/local/texlive/2026/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg)))
+*geometry* driver: auto-detecting
+*geometry* detected driver: luatex
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd) [1{/usr/local/t
+exlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3]
+(/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techn
+iques-1774648779636.aux))
+ 536 words of node memory still in use:
+   7 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 13 attribute, 55 glue_spe
+c, 13 attribute_list, 1 write nodes
+   avail lists: 2:504,3:136,4:7,5:211,6:32,7:2310,8:54,9:578,10:6,11:92
+</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman10-italic.o
+tf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.
+otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman10-regu
+lar.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman12-
+bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmroman12
+-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm/lmrom
+an17-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmex10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmmi10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmmi12.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmmi8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmr10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy1
+0.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.
+pfb>
+Output written on 05-integration-techniques-1774648779636.pdf (3 pages, 100342 
+bytes).
+SyncTeX written on 05-integration-techniques-1774648779636.synctex.gz.
+Transcript written on 05-integration-techniques-1774648779636.log.
+Latexmk: Getting log file '/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techniques-1774648779636.log'
+Latexmk: Examining '/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techniques-1774648779636.fls'
+Latexmk: Examining '/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techniques-1774648779636.log'
+Latexmk: Log file says output to '05-integration-techniques-1774648779636.pdf'
+Latexmk: Log file says output to '05-integration-techniques-1774648779636.pdf'
+Latexmk: Using bibtex to make bibliography file(s).
+Latexmk: All targets (/tmp/pipeline/05-integration-techniques-1774648779636/pdf/05-integration-techniques-1774648779636.pdf) are up-to-date
+
