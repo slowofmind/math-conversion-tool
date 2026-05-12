@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ws3-3-mod</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<h1 id="ws3-3">Continuity &amp; Reasoning About Signs</h1>
+<div class="problemonly">
+<div class="framed">
+<p>You should be able to:</p>
+<ul>
+<li><p>Explain the idea of continuity, both intuitively and precisely
+using the limit definition.</p></li>
+<li><p>Use limits to classify discontinuities as <em>removable
+discontinuities</em>, <em>jump discontinuities</em>, or <em>vertical
+asymptotes</em>, and describe what each type of discontinuity looks like
+graphically.</p></li>
+<li><p>Explain what relationships there are between whether a function
+is continuous at <span class="math inline">\(a\)</span> and whether it’s
+differentiable at <span class="math inline">\(a\)</span>.</p></li>
+<li><p>Take discontinuities into account when constructing a sign chart
+for a function.</p></li>
+</ul>
+</div>
+</div>
+<p>Over the course of the first few problems, we’ll be filling in
+information in the following box. It’s full of important definitions and
+properties!</p>
+<div class="framed">
+<p><strong>Limit definitions of continuity /
+discontinuities</strong>.</p>
+<ol>
+<li><p>A function <span class="math inline">\(f(x)\)</span> is
+continuous at <span class="math inline">\(x = a\)</span> if
+<u></u>.</p></li>
+<li><p>What are the 3 types of discontinuities we named, and how do we
+describe each in terms of limits?</p>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+</ul></li>
+</ol>
+</div>
+<ol>
+<li><ol>
+<li><div class="problem">
+<p>Using white chalk, sketch some functions <span
+class="math inline">\(f(x)\)</span> for which <span
+class="math inline">\(\displaystyle \lim_{x \to 3} f(x) \neq
+f(3)\)</span>. Try to draw a few examples that look really
+different!</p>
+</div>
+<div class="solution">
+<p>Here are a few examples:</p>
+<div class="center">
+
+</div>
+<p>The first example shows a removable discontinuity at <span
+class="math inline">\(x = 3\)</span>, the second shows a jump, and the
+third shows a vertical asymptote.</p>
+</div></li>
+<li><div class="problem">
+<p>Using colored chalk, sketch some functions <span
+class="math inline">\(f(x)\)</span> for which <span
+class="math inline">\(\displaystyle \lim_{x \to 3} f(x) = f(3)\)</span>.
+Try to draw a few examples that look really different!</p>
+</div>
+<div class="solution">
+<p>Here are two examples:</p>
+<div class="center">
+
+</div>
+</div></li>
+</ol></li>
+<li><p><span id="continuous-differentiable-1"
+data-label="continuous-differentiable-1"></span></p>
+<p>Here’s the graph of a function <span
+class="math inline">\(f(x)\)</span>.</p>
+<div class="minipage">
+<p><img src="images/continuous-differentiable-1" style="width:2in"
+alt="image" /></p>
+</div>
+<div class="minipage">
+<ol>
+<li><div class="problem">
+<p>At what values of <span class="math inline">\(x\)</span> in <span
+class="math inline">\((-4, 4)\)</span> is <span
+class="math inline">\(f(x)\)</span> <em>not</em> continuous? In other
+words, at what values of <span class="math inline">\(x\)</span> does
+<span class="math inline">\(f(x)\)</span> have a discontinuity? What
+type is each discontinuity?</p>
+</div>
+<div class="solution">
+<p>It has a removable discontinuity at <span class="math inline">\(x =
+-2\)</span>, a jump discontinuity at <span class="math inline">\(x =
+1\)</span>, a vertical asymptote at <span class="math inline">\(x =
+2\)</span>, and another removable discontinuity at <span
+class="math inline">\(x = 3\)</span>.</p>
+</div></li>
+<li><div class="problem">
+<p>At what values of <span class="math inline">\(x\)</span> in <span
+class="math inline">\((-4, 4)\)</span> is <span
+class="math inline">\(f(x)\)</span> <em>not</em> differentiable?</p>
+</div>
+<div class="solution">
+<p>It is not differentiable at <span class="math inline">\(x =
+-3\)</span>, <span class="math inline">\(x = -2\)</span>, <span
+class="math inline">\(x = -1\)</span>, <span class="math inline">\(x =
+1\)</span>, <span class="math inline">\(x = 2\)</span>, and <span
+class="math inline">\(x = 3\)</span>.</p>
+</div></li>
+</ol>
+</div></li>
+</ol>
+<div class="framed">
+<p><strong>A useful fact.</strong> Any function we can write down with a
+single (non-piecewise) algebraic formula is continuous at every point in
+its domain. In other words, the discontinuities of a function described
+by a single formula are where it’s undefined.</p>
+</div>
+<ol>
+<li><div class="problem">
+<p>Let <span class="math inline">\(f(x) = \dfrac{x - 3}{x - 2}\)</span>.
+Find all values of <span class="math inline">\(x\)</span> in <span
+class="math inline">\((-\infty, \infty)\)</span> at which <span
+class="math inline">\(f\)</span> is discontinuous (by determining where
+it is not defined), and use limits to classify each (that is, to decide
+whether it’s removable, a jump, or a vertical asymptote).</p>
+</div>
+<div class="solution">
+<p>This function is defined as a single algebraic formula, and so it is
+continuous at every point in its domain. The only value not in its
+domain is <span class="math inline">\(x=2\)</span>. Let’s consider <span
+class="math inline">\(\lim\limits_{x \to 2} f(x)\)</span>. Direct
+substitution gives us <span class="math inline">\(\frac{-1}{0}\)</span>,
+which means we are likely dealing with a vertical asymptote. To figure
+out more, let’s look at the one-sided limits.</p>
+<p>As <span class="math inline">\(x\)</span> approaches <span
+class="math inline">\(2\)</span> from the left, the numerator is
+negative and the denominator is negative, so <span
+class="math inline">\(\lim\limits_{x \to 2^-} \frac{x-3}{x-2} =
+\infty.\)</span> As <span class="math inline">\(x\)</span> approaches
+<span class="math inline">\(2\)</span> from the right, the numerator is
+negative and the denominator is positive, so <span
+class="math inline">\(\lim\limits_{x \to 2^+} \frac{x-3}{x-2} =
+-\infty.\)</span> This confirms that <span
+class="math inline">\(x=2\)</span> is a vertical asymptote.</p>
+</div></li>
+<li><p><span id="continuity-differentiability-relationship"
+data-label="continuity-differentiability-relationship"></span></p>
+<p><strong>Important implications!</strong> Decide whether each of the
+following statements is true or false. If it’s false, give an example
+that shows that it’s false (such an example is known as a
+<em>counterexample</em>).</p>
+<ol>
+<li><div class="problem">
+<p>If <span class="math inline">\(f(x)\)</span> is continuous at <span
+class="math inline">\(x = a\)</span>, then <span
+class="math inline">\(f(x)\)</span> is differentiable at <span
+class="math inline">\(x = a\)</span>.</p>
+</div>
+<div class="solution">
+<p>False; for example, in <a href="#continuous-differentiable-1"
+data-reference-type="ref"
+data-reference="continuous-differentiable-1">[continuous-differentiable-1]</a>,
+<span class="math inline">\(f(x)\)</span> is continuous at <span
+class="math inline">\(x = -3\)</span>, but it is not differentiable at
+<span class="math inline">\(x = -3\)</span>. Any place where <span
+class="math inline">\(f(x)\)</span> has a “corner” is a
+counterexample.</p>
+</div></li>
+<li><div class="problem">
+<p>If <span class="math inline">\(f(x)\)</span> is differentiable at
+<span class="math inline">\(x = a\)</span>, then <span
+class="math inline">\(f(x)\)</span> is continuous at <span
+class="math inline">\(x = a\)</span>.</p>
+</div>
+<div class="solution">
+<p>This is true.</p>
+</div></li>
+</ol></li>
+<li><ol>
+<li><div class="problem">
+<p>Can you sketch a function <span class="math inline">\(g(x)\)</span>
+defined on <span class="math inline">\([-4, 3]\)</span> which satisfies
+all 4 of the following properties, or is it impossible?</p>
+<ul>
+<li><p><span class="math inline">\(g(-4) = 2\)</span></p></li>
+<li><p><span class="math inline">\(g(3) = -1\)</span></p></li>
+<li><p><span class="math inline">\(g\)</span> has no zeros in <span
+class="math inline">\([-4, 3]\)</span></p></li>
+<li><p><span class="math inline">\(g\)</span> is continuous on <span
+class="math inline">\([-4, 3]\)</span></p></li>
+</ul>
+</div>
+<div class="solution">
+<p>This is impossible.</p>
+</div></li>
+<li><div class="problem">
+<p>Can you sketch a function <span class="math inline">\(g(x)\)</span>
+defined on <span class="math inline">\([-4, 3]\)</span> which satisfies
+the first 3 properties in (a), or is it impossible?</p>
+</div>
+<div class="solution">
+<p>If we get rid of the requirement that the function is continuous,
+then it’s possible:</p>
+<div class="center">
+
+</div>
+</div></li>
+</ol></li>
+<li><p><strong>Summarize.</strong> When we are working with continuous
+functions, which happens throughout calculus, some special properties
+hold, which we will frequently take advantage of.</p>
+<ol>
+<li><div class="problem">
+<p>If a function <span class="math inline">\(g\)</span> switches from
+positive to negative or vice versa at <span class="math inline">\(x =
+a\)</span>, what can you say about the behavior of <span
+class="math inline">\(g\)</span> at <span class="math inline">\(x =
+a\)</span>?</p>
+</div>
+<div class="solution">
+<p>There are two possibilities: <span class="math inline">\(g(a) =
+0\)</span>, or <span class="math inline">\(g\)</span> has a
+discontinuity at <span class="math inline">\(a\)</span>.</p>
+</div></li>
+</ol>
+<div class="framed">
+<p>This is a specific application of a broader theorem, known as the
+<strong>Intermediate Value Theorem</strong>, which states that if some
+function <span class="math inline">\(f\)</span> is continuous on the
+closed interval <span class="math inline">\([a, b]\)</span> and <span
+class="math inline">\(f(a) = A\)</span> and <span
+class="math inline">\(f(b)=B\)</span>, then somewhere on the interval,
+<span class="math inline">\(f\)</span> attains every value between <span
+class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span>. (Gottlieb, p.271)</p>
+</div>
+<ol>
+<li><div class="problem">
+<p><strong>Key Skill:</strong> There are many situations where we want
+to determine the sign of a function. If you want to make a <strong>sign
+chart</strong> for <span class="math inline">\(g(x)\)</span> and <span
+class="math inline">\(g(x)\)</span> is given by a single (non-piecewise)
+algebraic formula, you should start by finding values of <span
+class="math inline">\(x\)</span> where <span
+class="math inline">\(g(x)\)</span> is <u></u>.</p>
+</div></li>
+</ol></li>
+<li><div class="problem">
+<p><strong>Practice using sign charts.</strong> Suppose <span
+class="math inline">\(f\)</span> is a function with domain <span
+class="math inline">\((-\infty, \infty)\)</span>, and <span
+class="math inline">\(f&#39;(x) = \dfrac{x + 2}{\sqrt[3]{x}}\)</span>.
+Where is <span class="math inline">\(f\)</span> decreasing? Build a sign
+chart to determine the answer.</p>
+</div>
+<div class="solution">
+<p>Let’s make a sign chart for <span
+class="math inline">\(f&#39;\)</span>. We can see that <span
+class="math inline">\(f&#39;\)</span> is undefined when <span
+class="math inline">\(x=0\)</span>, and <span
+class="math inline">\(f&#39;(x)=0\)</span> when <span
+class="math inline">\(x=-2\)</span>. These values go on our sign
+chart.</p>
+<div class="center">
+
+</div>
+<p>To determine the sign of <span
+class="math inline">\(f&#39;(x)\)</span> on each interval, we can test
+at one <span class="math inline">\(x\)</span>-value in each interval.
+<span class="math display">\[\begin{alignat*}
+{3}
+      f&#39;(-3) &amp;= \dfrac{-3+2}{\sqrt[3]{-3}}
+&amp;=\frac{\text{negative}}{\text{negative}}
+      &amp;= \text{positive} \\
+      f&#39;(-1) &amp;= \dfrac{-1+2}{\sqrt[3]{-1}}
+&amp;=\frac{\text{positive}}{\text{negative}}
+      &amp;= \text{negative} \\
+      f&#39;(1) &amp;= \dfrac{1+2}{\sqrt[3]{1}}
+&amp;=\frac{\text{positive}}{\text{negative}}
+      &amp;= \text{positive}
+\end{alignat*}\]</span></p>
+<p>This gives us the following sign chart.</p>
+<div class="center">
+
+</div>
+<p>Since <span class="math inline">\(f&#39;\)</span> is negative on the
+interval <span class="math inline">\((-2, 0)\)</span>, <span
+class="math inline">\(f\)</span> is decreasing on the interval <span
+class="math inline">\((-2, 0)\)</span>.</p>
+</div></li>
+<li><div class="problem">
+<p><strong>Practice identifying and classifying
+discontinuities.</strong> Let <span class="math inline">\(f(x) =
+\dfrac{x^2 + 2x}{|x|}\)</span>. Find all values of <span
+class="math inline">\(x\)</span> at which <span
+class="math inline">\(f(x)\)</span> is discontinuous. For each such
+value <span class="math inline">\(a\)</span>, calculate <span
+class="math inline">\(\displaystyle \lim_{x \to a^+} f(x)\)</span> and
+<span class="math inline">\(\displaystyle \lim_{x \to a^-}
+f(x)\)</span>, and use this to classify the discontinuity <span
+class="math inline">\(a\)</span>.</p>
+</div>
+<div class="solution">
+<p>Since <span class="math inline">\(f(x)\)</span> is an algebraic
+formula, <span class="math inline">\(f\)</span> is only discontinuous
+when <span class="math inline">\(f(x)\)</span> is undefined. The only
+value where this occurs is <span class="math inline">\(x=0\)</span>.
+Let’s find the one-sided limits as <span class="math inline">\(x \to
+0\)</span>.</p>
+<p>As <span class="math inline">\(x\)</span> approaches <span
+class="math inline">\(0\)</span> from the left, since <span
+class="math inline">\(x\)</span> is negative, <span
+class="math inline">\(|x| = -x\)</span>, so <span
+class="math display">\[\begin{align*}
+        \lim_{x\to 0^-} \frac{x^2+2x}{|x|} &amp;= \lim_{x\to 0^-}
+\frac{x^2+2x}{-x} \\
+        &amp;= \lim_{x\to 0^-} -(x+2) \\
+        &amp;= -2.
+\end{align*}\]</span></p>
+<p>As <span class="math inline">\(x\)</span> approaches <span
+class="math inline">\(0\)</span> from the right, since <span
+class="math inline">\(x\)</span> is positive, <span
+class="math inline">\(|x| = x\)</span>, so <span
+class="math display">\[\begin{align*}
+        \lim_{x\to 0^+} \frac{x^2+2x}{|x|} &amp;= \lim_{x\to 0^+}
+\frac{x^2+2x}{x} \\
+        &amp;= \lim_{x\to 0^+} (x+2) \\
+        &amp;= 2.
+\end{align*}\]</span></p>
+<p>Since both one-sided limits exist but <span
+class="math inline">\(\lim\limits_{x \to 0} f(x)\)</span> does not
+exist, <span class="math inline">\(x=0\)</span> is a jump
+discontinuity.</p>
+</div></li>
+<li><div class="problem">
+<p>Let <span class="math inline">\(f(x) =
+    \begin{cases}
+      x^{2/3} &amp; \text{ if } x &lt; 8 \\
+      x - 4 &amp; \text{ if } 8 \leq x \leq 16 \\
+      \dfrac{1}{x - 20} &amp; \text{ if } x &gt; 16
+    \end{cases}\)</span></p>
+<p>Since <span class="math inline">\(f\)</span> isn’t defined by a
+single formula, what points should we consider if we want to find the
+discontinuities of <span class="math inline">\(f\)</span>? For each such
+value <span class="math inline">\(a\)</span>, use limits to determine
+whether <span class="math inline">\(f\)</span> is continuous at <span
+class="math inline">\(a\)</span>. If <span
+class="math inline">\(f\)</span> is not continuous at <span
+class="math inline">\(a\)</span>, determine which type of discontinuity
+<span class="math inline">\(f\)</span> has there.</p>
+</div>
+<div class="solution">
+<p>Since <span class="math inline">\(f\)</span> isn’t defined by a
+single formula, in addition to any values for which <span
+class="math inline">\(f(x)\)</span> is undefined, we should consider the
+endpoints of the various pieces. Thus, we should consider the <span
+class="math inline">\(x\)</span>-values <span
+class="math inline">\(8\)</span>, <span
+class="math inline">\(16\)</span>, and <span
+class="math inline">\(20\)</span>.</p>
+<ul>
+<li><p>First, let’s look at <span class="math inline">\(x=8\)</span>. As
+<span class="math inline">\(x\)</span> approaches <span
+class="math inline">\(8\)</span> from the left, we have <span
+class="math inline">\(\lim\limits_{x \to 8^-} f(x) = \lim\limits_{x \to
+8^-} x^{2/3} = 4\)</span>. As <span class="math inline">\(x\)</span>
+approaches <span class="math inline">\(8\)</span> from the right, we
+have <span class="math inline">\(\lim\limits_{x \to 8^+} f(x)
+=\lim\limits_{x \to 8^+} (x-4) = 4\)</span>. Since the one-sided limits
+are equal, the two-sided limit is <span
+class="math inline">\(\lim\limits_{x \to 8} f(x) =4\)</span>. Also,
+<span class="math inline">\(f(8) = 4\)</span>. Since <span
+class="math inline">\(\lim\limits_{x \to 8} f(x)\)</span> exists and is
+equal to <span class="math inline">\(f(8)\)</span>, <span
+class="math inline">\(f\)</span> is continuous at <span
+class="math inline">\(x=8\)</span>.</p></li>
+<li><p>Now let’s look at <span class="math inline">\(x=16\)</span>. As
+<span class="math inline">\(x\)</span> approaches <span
+class="math inline">\(16\)</span> from the left, we have <span
+class="math inline">\(\lim\limits_{x \to 16^-} f(x) = \lim\limits_{x \to
+16^-} (x-4) = 12\)</span>. As <span class="math inline">\(x\)</span>
+approaches <span class="math inline">\(16\)</span> from the right, we
+have <span class="math inline">\(\lim\limits_{x \to 16^+} f(x)
+=\lim\limits_{x \to 16^+} \frac{1}{x-20}=
+    -\frac{1}{4}\)</span>. The one-sided limits exist but are not equal,
+so <span class="math inline">\(f\)</span> has a jump discontinuity at
+<span class="math inline">\(x=16\)</span>.</p></li>
+<li><p>Lastly, let’s look at <span class="math inline">\(x=20\)</span>.
+As <span class="math inline">\(x\)</span> approaches <span
+class="math inline">\(20\)</span> from the left, we have <span
+class="math inline">\(\lim\limits_{x \to 20^-} f(x) = \lim\limits_{x \to
+20^-} \frac{1}{x-20} = -\infty\)</span>. As <span
+class="math inline">\(x\)</span> approaches <span
+class="math inline">\(20\)</span> from the right, we have <span
+class="math inline">\(\lim\limits_{x \to 20^+} f(x) =\lim\limits_{x \to
+20^+} \frac{1}{x-20}=
+    \infty\)</span>. Since at least one of the one-sided limits is <span
+class="math inline">\(\pm \infty\)</span>, <span
+class="math inline">\(f\)</span> has an infinite discontinuity at <span
+class="math inline">\(x=20\)</span>, aka a vertical asymptote.</p></li>
+</ul>
+</div></li>
+</ol>
+</body>
+</html>

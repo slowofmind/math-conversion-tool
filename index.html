@@ -4476,7 +4476,8 @@ async function runConversion() {
         const mathScripts =
             '<script>\n'
           + 'MathJax = {\n'
-          + '  loader: { load: ["a11y/assistive-mml"] },\n'
+          + '  loader: { load: ["a11y/assistive-mml", "[tex]/physics"] },\n'
+          + '  tex: { packages: { "[+]": ["physics"] } },\n'
           + '  options: { menuOptions: { settings: { assistiveMml: true } } }\n'
           + '};\n'
           + ES + '\n'
