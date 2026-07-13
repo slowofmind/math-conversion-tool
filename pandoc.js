@@ -36,6 +36,49 @@ import {
   PreopenDirectory,
 } from "https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.3.0/dist/index.js";
 
+// ════════════════════════════════════════════════════════════════════
+// DEVICE-BEGIN — synthetic "xform" device (tier-1 WASI). A byte-in / byte-out
+// virtual file backed by a SYNCHRONOUS JS transform set via setDeviceTransform().
+// On a pandoc.wasm upgrade: drop in the upstream pandoc.js, then re-apply this
+// block AND the one `fileSystem.set("xform", …)` line inside convert(). This is
+// the only local patch; nothing else here depends on pandoc internals.
+// ════════════════════════════════════════════════════════════════════
+let deviceTransform = (b) => b;   // default: passthrough
+export function setDeviceTransform(fn) { deviceTransform = fn; }
+
+class DeviceFd extends OpenFile {
+  constructor(inode) { super(inode); this._wrote = false; }
+  fd_write(data) {
+    const inode = this.file;
+    // First write on THIS handle starts a fresh transaction (mode "w" = truncate).
+    // GHC's wasi-libc does not set RIGHTS_FD_WRITE on write-opens, so detect the
+    // write session by the first fd_write instead of by rights bits.
+    if (!this._wrote) { this._wrote = true; inode.input = []; inode.result = null; }
+    inode.input.push(new Uint8Array(data));
+    return { ret: 0, nwritten: data.byteLength };
+  }
+  fd_read(size) {
+    const inode = this.file;
+    if (inode.result == null) {
+      let total = 0; for (const c of inode.input) total += c.length;
+      const all = new Uint8Array(total); let o = 0;
+      for (const c of inode.input) { all.set(c, o); o += c.length; }
+      inode.result = inode.transform(all);   // synchronous JS transform
+    }
+    const pos = Number(this.file_pos);
+    const slice = inode.result.slice(pos, pos + size);
+    this.file_pos += BigInt(slice.length);
+    return { ret: 0, data: slice };
+  }
+}
+class DeviceInode extends File {
+  constructor(transform) { super(new Uint8Array(0)); this.transform = transform; this.input = []; this.result = null; }
+  path_open(oflags, fs_rights_base, fd_flags) { return { ret: 0, fd_obj: new DeviceFd(this) }; }
+}
+// ════════════════════════════════════════════════════════════════════
+// DEVICE-END
+// ════════════════════════════════════════════════════════════════════
+
 const args = ["pandoc.wasm", "+RTS", "-H64m", "-RTS"];
 const env = [];
 const in_file = new File(new Uint8Array(), { readonly: true });
@@ -120,6 +163,7 @@ export async function convert(options, stdin, files) {
   fileSystem.set("stdout", out_file);
   fileSystem.set("stderr", err_file);
   fileSystem.set("warnings", warnings_file);
+  fileSystem.set("xform", new DeviceInode(deviceTransform));   // DEVICE: mount synthetic device
   for (const file in files) {
     await addFile(file, files[file], true);
   }

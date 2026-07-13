@@ -1292,6 +1292,8 @@
         <label for="opt-math">Math rendering method:</label>
         <select id="opt-math" style="width:auto;">
           <option value="mathjax4" selected>MathJax 4</option>
+          <option value="mathjax-omml">MathJax → OMML (Word math, docx)</option>
+          <option value="mathjax-mathml">MathJax → MathML (HTML)</option>
           <option value="mathjax" >MathJax 3 (Pandoc default)</option>
           <option value="mathml">MathML (Pandoc texmath)</option>
           <option value="">Do not convert math content</option>
@@ -1990,7 +1992,7 @@ let pandocVersion = '';
 async function initPandoc() {
   try {
     updateStatus('loading', 'Loading Pandoc WASM…');
-    const mod = await import('./pandoc.js');
+    const mod = await import('./pandoc.js');   // pandoc.js carries the synthetic "xform" device (DEVICE block)
     pandocModule = mod;
 
     // Query version
@@ -3889,6 +3891,8 @@ function buildOptions() {
         method: 'mathjax',
         url: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js'
       };
+    } else if (mathEl.value === 'mathjax-omml' || mathEl.value === 'mathjax-mathml') {
+      // Handled by the MathJax device Lua filter (docx→OMML / html→MathML); no html-math-method.
     } else {
       opts['html-math-method'] = mathEl.value;
     }
@@ -4059,6 +4063,8 @@ function buildOptions() {
         }
       }
     }
+    // MathJax device filter (docx→OMML / html→MathML) — appended last so it runs after other filters
+    if (needsMathjaxDevice()) filterNames.push('_mjx-math.lua');
     if (filterNames.length > 0) opts.filters = filterNames;
   }
 
@@ -4103,6 +4109,8 @@ function buildFiles() {
       raw[f.filename] = new Blob([f.content], { type: 'text/plain' });
     }
   });
+  // MathJax device filter content (docx→OMML / html→MathML)
+  if (needsMathjaxDevice()) raw['_mjx-math.lua'] = new Blob([MJX_MATH_LUA], { type: 'text/plain' });
   // Binary input file
   if (inputBinaryFile) raw[inputBinaryFile.name] = inputBinaryFile.blob;
   // pandoc.js expects Blob objects (calls blob.arrayBuffer())
@@ -4111,6 +4119,86 @@ function buildFiles() {
     files[name] = (data instanceof Blob) ? data : new Blob([data]);
   }
   return files;
+}
+
+// ── MathJax → OMML / MathML tier-1 device ───────────────────────────
+// Batched, target-aware Lua filter: collect all math, one device transaction,
+// reinsert as RawInline. Target is chosen from the output FORMAT (omml→docx,
+// mathml→html); the device transform (set below) branches to match.
+const MJX_MATH_LUA = `
+local PREFIX = 'MJXDEV:'
+local collected = {}
+local target, rawfmt
+if FORMAT:match('docx') then target = 'omml'; rawfmt = 'openxml'
+elseif FORMAT:match('html') then target = 'mathml'; rawfmt = 'html' end
+function Math(el)
+  if not target then return nil end
+  local i = #collected + 1
+  collected[i] = { tex = el.text, display = (el.mathtype == 'DisplayMath') }
+  return pandoc.RawInline(rawfmt, PREFIX .. i)
+end
+function Pandoc(doc)
+  if not target or #collected == 0 then return doc end
+  local payload = pandoc.json.encode({ target = target, items = collected })
+  local fw = io.open('xform','w'); if not fw then io.stderr:write('MJX-DEV-W-FAIL'); return doc end
+  fw:write(payload); fw:close()
+  local fr = io.open('xform','r'); if not fr then io.stderr:write('MJX-DEV-R-FAIL'); return doc end
+  local out = fr:read('a'); fr:close()
+  local ok, results = pcall(pandoc.json.decode, out)
+  if not ok then io.stderr:write('MJX-DEV-BADJSON'); return doc end
+  return doc:walk {
+    RawInline = function(el)
+      local n = el.text:match('^' .. PREFIX .. '(%d+)$')
+      if n then return pandoc.RawInline(rawfmt, results[tonumber(n)]) end
+    end
+  }
+end
+`;
+
+let _mjxDeviceReady = null;
+function needsMathjaxDevice() {
+  const m = document.getElementById('opt-math')?.value;
+  const to = document.getElementById('selTo').value.split(/[+-]/)[0];
+  return (m === 'mathjax-omml' && to === 'docx') ||
+         (m === 'mathjax-mathml' && /^html/.test(to));
+}
+function ensureMathjaxDevice() {
+  if (!_mjxDeviceReady) {
+    _mjxDeviceReady = (async () => {
+      const [{ tex2mml }, cond, { rewriteIsotopes }] = await Promise.all([
+        import('./mathjax-bundle.js'),
+        import('./mml-condition.js'),
+        import('./mml-isotopes-browser.js'),
+      ]);
+      const { conditionForOmml, conditionUniversal } = cond;
+      const xslText = await (await fetch('MML2OMML.XSL')).text();
+      const proc = new XSLTProcessor();
+      proc.importStylesheet(new DOMParser().parseFromString(xslText, 'application/xml'));
+      const enc = new TextEncoder(), dec = new TextDecoder();
+      const mmlToOmml = (mml) => {
+        const d = new DOMParser().parseFromString(mml, 'application/xml');
+        return new XMLSerializer().serializeToString(proc.transformToFragment(d, document));
+      };
+      const OMML_ERR = '<m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"><m:r><m:t>?</m:t></m:r></m:oMath>';
+      const MML_ERR = '<math xmlns="http://www.w3.org/1998/Math/MathML"><merror><mtext>?</mtext></merror></math>';
+      pandocModule.setDeviceTransform((bytes) => {
+        const batch = JSON.parse(dec.decode(bytes));
+        const items = batch.items || [];
+        const out = items.map((it) => {
+          try {
+            const mml = tex2mml(it.tex, it.display);
+            return batch.target === 'omml'
+              ? mmlToOmml(rewriteIsotopes(conditionForOmml(mml)))
+              : conditionUniversal(mml);
+          } catch (e) {
+            return batch.target === 'omml' ? OMML_ERR : MML_ERR;
+          }
+        });
+        return enc.encode(JSON.stringify(out));
+      });
+    })();
+  }
+  return _mjxDeviceReady;
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -4372,6 +4460,9 @@ async function runConversion() {
     const isBinaryOutput = BINARY_FORMATS.includes(baseToFmt);
 
     console.log('Pandoc options:', JSON.stringify(options, null, 2));
+
+    // Load the MathJax device (once) before converting, if a MathJax device mode is active.
+    if (needsMathjaxDevice()) { updateStatus('loading', 'Loading math engine…'); await ensureMathjaxDevice(); }
 
     // Retry loop for missing resources (up to 20 retries)
     let result;
