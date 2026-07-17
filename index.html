@@ -1992,7 +1992,7 @@ let pandocVersion = '';
 async function initPandoc() {
   try {
     updateStatus('loading', 'Loading Pandoc WASM…');
-    const mod = await import('./pandoc.js');   // pandoc.js carries the synthetic "xform" device (DEVICE block)
+    const mod = await import('./pandoc-wasm/pandoc.js');   // pandoc.js carries the synthetic "xform" device (DEVICE block)
     pandocModule = mod;
 
     // Query version
@@ -4166,12 +4166,12 @@ function ensureMathjaxDevice() {
   if (!_mjxDeviceReady) {
     _mjxDeviceReady = (async () => {
       const [{ tex2mml }, cond, { rewriteIsotopes }] = await Promise.all([
-        import('./mathjax-bundle.js'),
-        import('./mml-condition.js'),
-        import('./mml-isotopes-browser.js'),
+        import('./math-conversion/mathjax-bundle.js'),
+        import('./math-conversion/mml-condition.js'),
+        import('./math-conversion/mml-isotopes-browser.js'),
       ]);
       const { conditionForOmml, conditionUniversal } = cond;
-      const xslText = await (await fetch('MML2OMML.XSL')).text();
+      const xslText = await (await fetch('math-conversion/MML2OMML.XSL')).text();
       const proc = new XSLTProcessor();
       proc.importStylesheet(new DOMParser().parseFromString(xslText, 'application/xml'));
       const enc = new TextEncoder(), dec = new TextDecoder();
@@ -4223,7 +4223,7 @@ async function loadMuPDF() {
   mupdfLoading = true;
   try {
     updateStatus('loading', 'Loading MuPDF WASM…');
-    mupdfModule = await import('./mupdf.js');
+    mupdfModule = await import('./image-processing/mupdf.js');
     updateStatus('ready', `Pandoc WASM ${pandocVersion} ready`);
     return mupdfModule;
   } catch (err) {
@@ -5748,9 +5748,9 @@ document.addEventListener('keydown', (e) => {
 // ════════════════════════════════════════════════════════════════════
 //
 // Architecture:
-//   1. User clicks "LaTeXML" → JS commits .tex to pipeline-input/ via GitHub API
+//   1. User clicks "LaTeXML" → JS commits .tex to latexml-pipeline-input/ via GitHub API
 //   2. Push triggers the latexml-convert.yml workflow on github.com
-//   3. Workflow runs LaTeXML in Docker, commits HTML output to pipeline-output/
+//   3. Workflow runs LaTeXML in Docker, commits HTML output to latexml-pipeline-output/
 //   4. JS polls for workflow completion, then fetches the HTML result
 //   5. Result is displayed in the existing preview/source panels
 //
@@ -5970,14 +5970,14 @@ async function runLatexmlConversion() {
   const expectedOutput = `${baseName}-${timestamp}-${variantSuffix}.html`;
 
   try {
-    // Step 1: Commit the .tex file to pipeline-input/
+    // Step 1: Commit the .tex file to latexml-pipeline-input/
     updateStatus('loading', 'LaTeXML: uploading source…');
     const commitSha = await commitFileToRepo(
-      `pipeline-input/${texFilename}`,
+      `latexml-pipeline-input/${texFilename}`,
       sourceText,
       `LaTeXML: ${baseName}.tex`
     );
-    console.log('[latexml] Committed pipeline-input/' + texFilename, 'SHA:', commitSha);
+    console.log('[latexml] Committed latexml-pipeline-input/' + texFilename, 'SHA:', commitSha);
 
     // Step 2: Wait for the GitHub Actions workflow to complete
     updateStatus('loading', 'LaTeXML: workflow queued…');
@@ -6000,7 +6000,7 @@ async function runLatexmlConversion() {
     for (let attempt = 0; attempt < 6; attempt++) {
       try {
         // Try the expected filename first
-        outputHtml = await fetchRepoFile(`pipeline-output/${expectedOutput}`);
+        outputHtml = await fetchRepoFile(`latexml-pipeline-output/${expectedOutput}`);
         break;
       } catch (_) {
         // Workflow commit might not have propagated yet, or filename differs
@@ -6012,20 +6012,20 @@ async function runLatexmlConversion() {
 
     // If exact filename didn't work, scan the directory for our output
     if (!outputHtml) {
-      const files = await listRepoDir('pipeline-output');
+      const files = await listRepoDir('latexml-pipeline-output');
       // Look for the selected variant HTML file that matches our base name
       const match = files.find(f =>
         f.includes(baseName) && f.includes(variantSuffix) && f.endsWith('.html')
       );
       if (match) {
-        outputHtml = await fetchRepoFile(`pipeline-output/${match}`);
+        outputHtml = await fetchRepoFile(`latexml-pipeline-output/${match}`);
       }
     }
 
     if (!outputHtml) {
       throw new Error(
         'Conversion completed but output file not found. ' +
-        'Check the repo\'s pipeline-output/ folder and the Actions tab.'
+        'Check the repo\'s latexml-pipeline-output/ folder and the Actions tab.'
       );
     }
 
@@ -6089,9 +6089,9 @@ document.getElementById('btnEngineLualatex').addEventListener('contextmenu', (e)
 //
 // Architecture:
 //   1. User clicks LuaLaTeX → Compile
-//   2. JS commits .tex to pipeline-lualatex-input/ via GitHub API
+//   2. JS commits .tex to lualatex-pipeline-input/ via GitHub API
 //   3. Push triggers lualatex-compile.yml workflow
-//   4. Workflow runs LuaLaTeX in Docker, commits PDF to pipeline-output/
+//   4. Workflow runs LuaLaTeX in Docker, commits PDF to lualatex-pipeline-output/
 //      (also creates a GitHub Release as backup)
 //   5. JS polls for workflow completion, then fetches the PDF
 //   6. PDF fetched via Contents API with raw media type (no base64)
@@ -6197,14 +6197,14 @@ async function runLualatexCompilation() {
   const expectedPdf = `${baseName}-${timestamp}.pdf`;
 
   try {
-    // Step 1: Commit the .tex file to pipeline-lualatex-input/
+    // Step 1: Commit the .tex file to lualatex-pipeline-input/
     updateStatus('loading', 'LuaLaTeX: uploading source…');
     const commitSha = await commitFileToRepo(
-      `pipeline-lualatex-input/${texFilename}`,
+      `lualatex-pipeline-input/${texFilename}`,
       sourceText,
       `LuaLaTeX: ${baseName}.tex`
     );
-    console.log('[lualatex] Committed pipeline-lualatex-input/' + texFilename, 'SHA:', commitSha);
+    console.log('[lualatex] Committed lualatex-pipeline-input/' + texFilename, 'SHA:', commitSha);
 
     // Step 2: Wait for the GitHub Actions workflow to complete
     updateStatus('loading', 'LuaLaTeX: workflow queued…');
@@ -6219,14 +6219,14 @@ async function runLualatexCompilation() {
     }
     console.log('[lualatex] Workflow completed:', run.html_url);
 
-    // Step 3: Fetch the PDF from pipeline-output/ via raw Contents API
+    // Step 3: Fetch the PDF from lualatex-pipeline-output/ via raw Contents API
     updateStatus('loading', 'LuaLaTeX: fetching PDF…');
 
     let pdfData = null;
     // Poll briefly — the workflow's commit may take a moment to propagate
     for (let attempt = 0; attempt < 8; attempt++) {
       try {
-        pdfData = await fetchRepoFileRaw(`pipeline-output/${expectedPdf}`);
+        pdfData = await fetchRepoFileRaw(`lualatex-pipeline-output/${expectedPdf}`);
         break;
       } catch (_) {
         if (attempt < 7) {
@@ -6237,19 +6237,19 @@ async function runLualatexCompilation() {
 
     // If exact filename didn't work, scan the directory
     if (!pdfData) {
-      const files = await listRepoDir('pipeline-output');
+      const files = await listRepoDir('lualatex-pipeline-output');
       const match = files.find(f =>
         f.includes(baseName) && f.endsWith('.pdf')
       );
       if (match) {
-        pdfData = await fetchRepoFileRaw(`pipeline-output/${match}`);
+        pdfData = await fetchRepoFileRaw(`lualatex-pipeline-output/${match}`);
       }
     }
 
     if (!pdfData) {
       throw new Error(
         'Compilation completed but PDF not found. ' +
-        'Check the repo\'s pipeline-output/ folder and the Actions tab.'
+        'Check the repo\'s lualatex-pipeline-output/ folder and the Actions tab.'
       );
     }
 

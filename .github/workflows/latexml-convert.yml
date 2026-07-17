@@ -1,6 +1,6 @@
 # LaTeXML Conversion Pipeline
-# Triggered when .tex files are committed to pipeline-input/
-# Runs LaTeXML in Docker, commits HTML output to pipeline-output/
+# Triggered when .tex files are committed to latexml-pipeline-input/
+# Runs LaTeXML in Docker, commits HTML output to latexml-pipeline-output/
 #
 # The browser tool (index.html) commits files here via the GitHub API,
 # then polls for completion and fetches the results.
@@ -10,7 +10,7 @@ name: LaTeXML Convert
 on:
   push:
     paths:
-      - 'pipeline-input/**'
+      - 'latexml-pipeline-input/**'
 
 permissions:
   contents: write
@@ -34,21 +34,21 @@ jobs:
       - name: Verify input files
         run: |
           echo "Files to process:"
-          ls -lh pipeline-input/*.tex 2>/dev/null || echo "No .tex files found"
+          ls -lh latexml-pipeline-input/*.tex 2>/dev/null || echo "No .tex files found"
 
       - name: Create output directory
-        run: mkdir -p pipeline-output
+        run: mkdir -p latexml-pipeline-output
 
       - name: Run LaTeXML pipeline
         run: |
           docker run --rm \
             -e MODE=latexml \
-            -v "${{ github.workspace }}/pipeline-input:/source" \
-            -v "${{ github.workspace }}/pipeline-output:/output" \
+            -v "${{ github.workspace }}/latexml-pipeline-input:/source" \
+            -v "${{ github.workspace }}/latexml-pipeline-output:/output" \
             ghcr.io/slowofmind/latexml-pipeline:latest
 
       - name: Show output files
-        run: ls -lh pipeline-output/
+        run: ls -lh latexml-pipeline-output/
 
       - name: Commit results and clean up input
         run: |
@@ -56,10 +56,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
           # Stage output files
-          git add pipeline-output/
+          git add latexml-pipeline-output/
           
           # Remove processed input files to keep repo clean
-          git rm pipeline-input/*.tex 2>/dev/null || true
+          git rm latexml-pipeline-input/*.tex 2>/dev/null || true
           
           # Commit with [skip ci] to prevent re-triggering
           git commit -m "LaTeXML conversion output [skip ci]" || echo "No changes to commit"
