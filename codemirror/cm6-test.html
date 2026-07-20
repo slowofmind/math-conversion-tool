@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!-- cm6-test.html — scratch smoke-test for the facade bundle.
+     Serve the project folder over http:// and open /codemirror/cm6-test.html.
+     Exercises every facade API before index.html migration begins. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CM6 facade smoke test</title>
+<style>
+  body { font-family: sans-serif; margin: 16px; }
+  .ed { border: 1px solid #999; height: 220px; margin-bottom: 8px; }
+  button { margin: 2px; }
+  /* Diagnostic line tints — same class names index.html will use */
+  .pandoc-error-line   { background: rgba(255, 0, 0, 0.10); }
+  .pandoc-warning-line { background: rgba(255, 165, 0, 0.15); }
+  .pandoc-info-line    { background: rgba(0, 120, 255, 0.10); }
+  .cm-facade-highlight { background: rgba(0, 200, 0, 0.25); }
+  #status { font: 12px monospace; color: #444; }
+</style>
+</head>
+<body>
+<h3>Main editor (latex, editable)</h3>
+<div id="ed1" class="ed"></div>
+<div id="status">Ln ?, Col ?</div>
+<div>
+  <button id="bDiag">setDiagnostics (3 tiers)</button>
+  <button id="bClear">clearDiagnostics</button>
+  <button id="bGoto">gotoLine(6,8)</button>
+  <button id="bHl">highlightRanges</button>
+  <button id="bHlClear">clearHighlights</button>
+  <button id="bWrap">toggle wrap</button>
+  <button id="bComp">toggle completion</button>
+  <button id="bRO">toggle readOnly</button>
+  <button id="bSetText">setText (reset)</button>
+</div>
+<h3>Source viewer (html, read-only)</h3>
+<div id="ed2" class="ed"></div>
+
+<script type="module">
+import { createEditor, CM6_BUNDLE_VERSION } from './cm6-editor.js';
+console.log('CM6 bundle version:', CM6_BUNDLE_VERSION);
+
+const sample = [
+  '\\documentclass{article}',
+  '\\usepackage{graphicx}',
+  '\\begin{document}',
+  '\\section{Introduction}',
+  'Some text with $x^2 + y^2 = z^2$ inline math.',
+  'A line with \\badcommand{oops} to diagnose.',
+  '\\includegraphics{figure.pdf}',
+  '\\begin{itemize}',
+  '\\item First item',
+  '\\end{itemize}',
+  '\\end{document}',
+].join('\n');
+
+const ed1 = createEditor(document.getElementById('ed1'), {
+  language: 'latex', ariaLabel: 'Source editor', initialText: sample,
+  scrollPastEnd: true,
+  onCursor: (line, col) => {
+    document.getElementById('status').textContent = `Ln ${line}, Col ${col}`;
+  },
+});
+
+const ed2 = createEditor(document.getElementById('ed2'), {
+  language: 'html', readOnly: true, ariaLabel: 'Output source viewer',
+  initialText: '<html>\n  <body>\n    <p>Converted output goes here.</p>\n  </body>\n</html>',
+  fontSize: '13px',
+});
+
+// Pandoc-tailored completion source — lives OUTSIDE the bundle (this is
+// the pattern index.html will use). Snippets + infoHTML "hints".
+ed1.registerCompletionSource(({ prefix }) => {
+  if (!prefix.startsWith('\\')) return null;
+  const envs = [
+    { label: '\\begin{itemize}', insert: '\\begin{itemize}\n\\item ${1}\n\\end{itemize}',
+      detail: 'bulleted list',
+      infoHTML: '<b>Pandoc-friendly.</b> Converts cleanly to ul/li in HTML and native lists in DOCX.' },
+    { label: '\\includegraphics', insert: '\\includegraphics{${1:file}}',
+      detail: 'image',
+      infoHTML: 'Remember <b>\\alt{...}</b> or a preflight warning will flag missing alt text.' },
+    { label: '\\section', insert: '\\section{${1:title}}\n\\label{sec:${2}}',
+      detail: 'section + label',
+      infoHTML: 'Labels enable stable cross-references across all output formats.' },
+  ];
+  const opts = envs.filter(o => o.label.startsWith(prefix));
+  return opts.length ? { fromCol: null, options: opts } : null;
+});
+
+let wrap = true, comp = true, ro = false, hlToken = null;
+const $ = (id) => document.getElementById(id);
+$('bDiag').onclick = () => ed1.setDiagnostics([
+  { line: 6, startCol: 14, endCol: 25, severity: 'error',
+    message: 'Undefined control sequence \\badcommand' },
+  { line: 7, startCol: 1, endCol: 30, severity: 'warn',
+    message: 'PDF image will need conversion for HTML output' },
+  { line: 9, startCol: 1, endCol: 6, severity: 'info',
+    message: 'Item text example info' },
+]);
+$('bClear').onclick = () => ed1.clearDiagnostics();
+$('bGoto').onclick = () => ed1.gotoLine(6, 8);
+$('bHl').onclick = () => {
+  ed1.clearHighlights();
+  hlToken = ed1.highlightRanges(
+    [{ line: 5, startCol: 16, endCol: 37 }, { line: 4, startCol: 1, endCol: 9 }]);
+};
+$('bHlClear').onclick = () => ed1.clearHighlights(hlToken);
+$('bWrap').onclick = () => { wrap = !wrap; ed1.setLineWrap(wrap); };
+$('bComp').onclick = () => { comp = !comp; ed1.setCompletionEnabled(comp); };
+$('bRO').onclick = () => { ro = !ro; ed1.setReadOnly(ro); };
+$('bSetText').onclick = () => ed1.setText(sample);
+</script>
+</body>
+</html>
