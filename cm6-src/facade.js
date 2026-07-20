@@ -15,7 +15,7 @@ import { EditorState, Compartment, StateEffect, StateField } from "@codemirror/s
 import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
 import {
   indentOnInput, syntaxHighlighting, defaultHighlightStyle, bracketMatching,
-  foldGutter, foldKeymap, indentUnit, StreamLanguage,
+  foldGutter, foldKeymap, indentUnit, LanguageSupport,
 } from "@codemirror/language";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import {
@@ -24,14 +24,28 @@ import {
 import { setDiagnostics as cmSetDiagnostics, lintGutter, lintKeymap } from "@codemirror/lint";
 import { html } from "@codemirror/lang-html";
 import { markdown } from "@codemirror/lang-markdown";
-import { stex } from "@codemirror/legacy-modes/mode/stex";
+import { latexLanguage } from "codemirror-lang-latex";
+import { classHighlighter, tagHighlighter, tags as lzTags } from "@lezer/highlight";
 
-export const CM6_BUNDLE_VERSION = "0.1.0";
+// classHighlighter has no dedicated classes for these two tags (they only
+// match via parents: processingInstruction→tok-meta, bracket→tok-punctuation).
+// This supplementary highlighter emits precise classes so index.html CSS can
+// target math delimiters and braces without also hitting verbatim content.
+const extraTokenClasses = tagHighlighter([
+  { tag: lzTags.processingInstruction, class: "tok-processingInstruction" },
+  { tag: lzTags.bracket, class: "tok-bracket" },
+]);
+
+export const CM6_BUNDLE_VERSION = "0.3.0";
 
 // ── Language registry ──────────────────────────────────────────────
+// LaTeX: Overleaf's Lezer grammar via codemirror-lang-latex (TeXlyre),
+// grammar/fold/indent ONLY — their linter, tooltips, and autocomplete
+// are deliberately not enabled (Pandoc-specific intelligence lives in
+// index.html per the facade design rule).
 function languageFor(name) {
   switch (name) {
-    case "latex":    return StreamLanguage.define(stex);
+    case "latex":    return new LanguageSupport(latexLanguage);
     case "html":     return html();
     case "markdown": return markdown();
     default:         return [];   // plain text
@@ -162,7 +176,16 @@ export function createEditor(containerEl, opts = {}) {
     lineNumbers(), highlightActiveLineGutter(), highlightSpecialChars(),
     history(), foldGutter(), drawSelection(), dropCursor(),
     EditorState.allowMultipleSelections.of(true), indentOnInput(),
-    syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+    // NOTE: no {fallback:true} here — a fallback highlighter deactivates
+    // itself whenever another highlighter (classHighlighter below) is
+    // registered, which would kill all default colors.
+    syntaxHighlighting(defaultHighlightStyle),
+    // classHighlighter stamps stable .tok-* classes on every token so the
+    // palette can live in index.html CSS (no rebuild to change colors).
+    // Classes accumulate alongside defaultHighlightStyle's inline colors;
+    // index.html only styles tags the default palette omits.
+    syntaxHighlighting(classHighlighter),
+    syntaxHighlighting(extraTokenClasses),
     bracketMatching(), closeBrackets(), rectangularSelection(),
     crosshairCursor(), highlightActiveLine(), highlightSelectionMatches(),
     keymap.of([

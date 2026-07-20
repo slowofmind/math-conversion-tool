@@ -547,6 +547,21 @@
   .pandoc-error-text { background: rgba(198, 40, 40, 0.30); border-bottom: 2px solid var(--error); }
   .pandoc-info-text { background: rgba(255, 170, 0, 0.32); border-bottom: 2px solid #d4a017; }
 
+  /* ─── SYNTAX TOKEN PALETTE (CM6 classHighlighter) ───
+     The facade stamps stable .tok-* classes on every syntax token; colors
+     live HERE, not in the bundle, so palette changes never need a rebuild.
+     defaultHighlightStyle (in the bundle) already colors keywords, comments,
+     strings, headings, class/env names, etc. — the rules below cover only
+     the tags it leaves unpainted, which is where the LaTeX grammar puts
+     most math tokens ($ delimiters, math identifiers, operators, braces).
+     The .cm-editor prefix outranks CM's runtime-injected default colors
+     (e.g. Dollar otherwise inherits meta-gray from the default style). */
+  .cm-editor .tok-processingInstruction { color: #b05a00; font-weight: 600; } /* math delimiters: $ \( \[ */
+  .cm-editor .tok-variableName { color: #116d9e; }  /* math identifiers/content */
+  .cm-editor .tok-operator { color: #9333aa; }      /* \symbols, & ~ and math operators */
+  .cm-editor .tok-bracket { color: #8a6d1a; }       /* { } [ ] and math open/close */
+  .cm-editor .tok-number { color: #1a7f37; }
+
   /* ─── RESIZE GUTTER ─── */
   .resize-gutter {
     width: 5px;
