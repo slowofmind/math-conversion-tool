@@ -5,14 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Accessible STEM: A Toolkit for Instructor-Created Course Content</title>
 
-<!-- Ace Editor from CDN -->
-<script src="ace/ace.js"></script>
-<script src="ace/mode-latex.js"></script>
-<script src="ace/mode-html.js"></script>
-<script src="ace/mode-markdown.js"></script>
-<!-- Ace themes: textmate (light) is built-in; one_dark kept for potential future dark mode -->
-<script src="ace/theme-one_dark.js"></script>
-<script src="ace/ext-searchbox.js"></script>
+<!-- Editor: CodeMirror 6 facade bundle (built from cm6-src/, see CM6-FACADE-DESIGN.md).
+     Imported as an ES module inside the main script; no script tags needed here.
+     The ace/ folder is retired by the cm6-migration branch. -->
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto+Mono:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap');
@@ -464,12 +459,10 @@
   .editor-content { flex: 1; position: relative; overflow: hidden; border-left: 3px solid var(--harvard-crimson); transition: box-shadow 0.15s; }
   .editor-content.drag-over { box-shadow: inset 0 0 0 3px var(--harvard-blue); }
 
-  /* Ace editor custom theme overrides */
+  /* Editor container (CM6 mounts here and fills it) */
   #aceEditor {
     position: absolute;
     inset: 0;
-    font-family: 'Roboto Mono', monospace !important;
-    font-size: 14px;
   }
 
   /* Binary input overlay */
@@ -539,29 +532,20 @@
   }
   .pdf-modal-btn.primary:hover { opacity: 0.9; }
 
-  /* Override Ace gutter background */
-  .ace_gutter { background: var(--bg-secondary) !important; border-right: 1px solid var(--border) !important; }
-  .ace_gutter-cell { color: var(--text-muted) !important; }
-  .ace_gutter-cell.ace_info {
-    background-image: none !important;
-    border-left: 3px solid #d4a017;
-  }
-  .ace_gutter-cell.ace_warning {
-    background-image: none !important;
-    border-left: 3px solid var(--warning);
-  }
-  .ace_gutter-cell.ace_error {
-    background-image: none !important;
-    border-left: 3px solid var(--error);
-  }
+  /* CodeMirror 6 gutter + severity styling (replaces Ace overrides) */
+  .cm-editor .cm-gutters { background: var(--bg-secondary); border-right: 1px solid var(--border); color: var(--text-muted); }
+  .cm-editor.cm-focused { outline: none; }
+  .cm-lint-marker-info    { content: none; }
+  .cm-gutter-lint .cm-lint-marker { width: 0.9em; }
 
-  /* Pandoc warning/error/info markers */
-  .pandoc-warning-line { position: absolute; background: rgba(255, 193, 7, 0.18); border-left: 3px solid var(--warning); }
-  .pandoc-error-line { position: absolute; background: rgba(198, 40, 40, 0.14); border-left: 3px solid var(--error); }
-  .pandoc-info-line { position: absolute; background: rgba(255, 193, 7, 0.13); border-left: 3px solid #d4a017; }
-  .pandoc-warning-text { position: absolute; background: rgba(255, 170, 0, 0.38); border-bottom: 2px solid var(--warning); }
-  .pandoc-error-text { position: absolute; background: rgba(198, 40, 40, 0.30); border-bottom: 2px solid var(--error); }
-  .pandoc-info-text { position: absolute; background: rgba(255, 170, 0, 0.32); border-bottom: 2px solid #d4a017; }
+  /* Pandoc warning/error/info decorations (CM6 line/mark classes — no
+     absolute positioning; CM6 applies these to real content elements) */
+  .pandoc-warning-line { background: rgba(255, 193, 7, 0.18); box-shadow: inset 3px 0 0 var(--warning); }
+  .pandoc-error-line { background: rgba(198, 40, 40, 0.14); box-shadow: inset 3px 0 0 var(--error); }
+  .pandoc-info-line { background: rgba(255, 193, 7, 0.13); box-shadow: inset 3px 0 0 #d4a017; }
+  .pandoc-warning-text { background: rgba(255, 170, 0, 0.38); border-bottom: 2px solid var(--warning); }
+  .pandoc-error-text { background: rgba(198, 40, 40, 0.30); border-bottom: 2px solid var(--error); }
+  .pandoc-info-text { background: rgba(255, 170, 0, 0.32); border-bottom: 2px solid #d4a017; }
 
   /* ─── RESIZE GUTTER ─── */
   .resize-gutter {
@@ -644,8 +628,9 @@
   /* Preview iframe */
   #previewFrame { flex: 1; border: none; background: #fff; }
 
-  /* Source tab Ace editor */
-  #outputSource { flex: 1; }
+  /* Source tab editor (CM6 container) */
+  #outputSource { flex: 1; min-height: 0; overflow: hidden; position: relative; }
+  #outputSource .cm-editor { height: 100%; }
 
   /* Log tab */
   .log-container {
@@ -1938,47 +1923,37 @@
 
 <script type="module">
 // ════════════════════════════════════════════════════════════════════
-// SECTION 1: ACE EDITOR SETUP
+// SECTION 1: EDITOR SETUP (CodeMirror 6 via facade — see CM6-FACADE-DESIGN.md)
+// The `editor` and `sourceEditor` names are facade EditorHandles, not Ace
+// instances. API: getText/setText, getCursor/gotoLine/focus, setLanguage,
+// setReadOnly, setDiagnostics/clearDiagnostics, highlightRanges,
+// registerCompletionSource, setLineWrap, setCompletionEnabled.
+// Lines/columns are 1-based (matches Pandoc warning JSON).
 // ════════════════════════════════════════════════════════════════════
+import { createEditor } from './codemirror/cm6-editor.js';
 
-const editor = ace.edit('aceEditor');
-editor.setTheme('ace/theme/textmate');
-editor.session.setMode('ace/mode/latex');
-editor.renderer.getContainerElement().setAttribute('aria-label', 'Source editor');
-editor.textInput.getElement().setAttribute('aria-label', 'Source editor');
-editor.setOptions({
+const editor = createEditor(document.getElementById('aceEditor'), {
+  language: 'latex',
+  ariaLabel: 'Source editor',
+  initialText: '',
   fontSize: '14px',
   fontFamily: "'Roboto Mono', monospace",
-  showPrintMargin: false,
-  wrap: true,
-  tabSize: 2,
-  useSoftTabs: true,
-  enableBasicAutocompletion: false,
-  scrollPastEnd: 0.3,
+  lineWrap: true,
+  scrollPastEnd: true,
+  onCursor: (line, col) => {
+    document.getElementById('statusCursor').textContent =
+      `Ln ${line}, Col ${col}`;
+  },
 });
 
-// Default sample content
-editor.setValue('', -1);
-
-// Track cursor position in status bar
-editor.session.selection.on('changeCursor', () => {
-  const pos = editor.getCursorPosition();
-  document.getElementById('statusCursor').textContent =
-    `Ln ${pos.row + 1}, Col ${pos.column + 1}`;
-});
-
-// Output source viewer (read-only Ace)
-const sourceEditor = ace.edit('outputSource');
-sourceEditor.setTheme('ace/theme/textmate');
-sourceEditor.session.setMode('ace/mode/html');
-sourceEditor.setReadOnly(true);
-sourceEditor.renderer.getContainerElement().setAttribute('aria-label', 'Output source viewer');
-sourceEditor.textInput.getElement().setAttribute('aria-label', 'Output source viewer');
-sourceEditor.setOptions({
+// Output source viewer (read-only)
+const sourceEditor = createEditor(document.getElementById('outputSource'), {
+  language: 'html',
+  readOnly: true,
+  ariaLabel: 'Output source viewer',
   fontSize: '13px',
   fontFamily: "'Roboto Mono', monospace",
-  showPrintMargin: false,
-  wrap: true,
+  lineWrap: true,
 });
 
 
@@ -2057,7 +2032,7 @@ async function handleFileUpload(file) {
   if (fmt && BINARY_INPUT_FORMATS.includes(fmt)) {
     // Binary input — store as blob, show overlay
     inputBinaryFile = { name: file.name, blob: file };
-    editor.setValue('', -1);
+    editor.setText('');
     editor.setReadOnly(true);
 
     // Update tab name and track filename
@@ -2087,12 +2062,12 @@ async function handleFileUpload(file) {
     inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
 
     const text = await file.text();
-    editor.setValue(text, -1);
+    editor.setText(text);
 
     if (fmt) {
       document.getElementById('selFrom').value = fmt;
       const modeMap = { 'latex': 'latex', 'markdown': 'markdown', 'html': 'html' };
-      editor.session.setMode('ace/mode/' + (modeMap[fmt] || 'text'));
+      editor.setLanguage(modeMap[fmt] || 'text');
       document.getElementById('statusFormat').textContent = fmt;
       updateExtensions();
     }
@@ -2125,8 +2100,8 @@ document.getElementById('selSampleFiles').addEventListener('change', async (e) =
     document.getElementById('tabFilename').textContent = filename;
     inputFileName = filename.replace(/\.[^.]+$/, '') || 'untitled';
 
-    editor.setValue(text, -1);
-    editor.session.setMode('ace/mode/latex');
+    editor.setText(text);
+    editor.setLanguage('latex');
     document.getElementById('selFrom').value = 'latex';
     document.getElementById('statusFormat').textContent = 'LaTeX';
     updateExtensions();
@@ -2372,119 +2347,81 @@ function findInSource(text, source) {
 }
 
 // ════════════════════════════════════════════════════════════════════
-// SECTION 5: ACE DECORATIONS
+// SECTION 5: EDITOR DIAGNOSTICS (Pandoc warnings → in-editor marks)
 // ════════════════════════════════════════════════════════════════════
 
-let activeMarkers = [];
-const Range = ace.require('ace/range').Range;
-
+// Warning objects → editor diagnostics. The position-resolution logic here
+// (matchedText search, column walk-back) is Pandoc-specific and deliberately
+// lives HERE rather than in the CM6 bundle (see CM6-FACADE-DESIGN.md).
+// The facade renders each diagnostic as gutter icon + underline + line tint.
+// The planned preflight script should push its findings through this same
+// function (or call editor.setDiagnostics with the same object shape).
 function applyDecorations(warnings) {
-  clearDecorations();
-  const session = editor.session;
-  const annotations = [];
+  const diags = [];
 
   for (const warn of warnings) {
     if (!warn.line) continue;
+    if (warn.line < 1 || warn.line > editor.lineCount()) continue;
 
-    const aceRow = warn.line - 1; // 0-based
-    if (aceRow < 0 || aceRow >= session.getLength()) continue;
+    const severity = warn.level === 'error' ? 'error'
+                   : warn.level === 'warn' ? 'warn'
+                   : 'info';
 
-    const aceType = warn.level === 'error' ? 'error'
-                  : warn.level === 'warn' ? 'warning'
-                  : 'info';
+    const lineText = editor.getLine(warn.line);
+    let startCol = null, endCol = null;   // 1-based; endCol is one past the token
 
-    const cssPrefix = warn.level === 'error' ? 'pandoc-error'
-                    : warn.level === 'warn' ? 'pandoc-warning'
-                    : 'pandoc-info';
-
-    // 1. Gutter annotation
-    annotations.push({
-      row: aceRow,
-      column: warn.column ? warn.column - 1 : 0,
-      text: warn.message,
-      type: aceType,
-    });
-
-    // 2. Full-line background marker
-    const lineRange = new Range(aceRow, 0, aceRow, Infinity);
-    activeMarkers.push(
-      session.addMarker(lineRange, `${cssPrefix}-line`, 'fullLine', false)
-    );
-
-    // 3. Text-range marker for the specific offending token
-    const lineText = session.getLine(aceRow);
-    let textMarked = false;
-
+    // 1. Prefer the exact matched token text
     if (warn.matchedText) {
-      let idx = lineText.indexOf(warn.matchedText);
+      let needle = warn.matchedText;
+      let idx = lineText.indexOf(needle);
       if (idx < 0) {
-        const alt = warn.matchedText.replace(/\\\\/g, '\\');
-        if (alt !== warn.matchedText) idx = lineText.indexOf(alt);
+        const alt = needle.replace(/\\\\/g, '\\');
+        if (alt !== needle) { needle = alt; idx = lineText.indexOf(alt); }
       }
-      if (idx >= 0) {
-        const len = (idx === lineText.indexOf(warn.matchedText))
-          ? warn.matchedText.length
-          : warn.matchedText.replace(/\\\\/g, '\\').length;
-        const textRange = new Range(aceRow, idx, aceRow, idx + len);
-        activeMarkers.push(
-          session.addMarker(textRange, `${cssPrefix}-text`, 'text', false)
-        );
-        textMarked = true;
-      }
+      if (idx >= 0) { startCol = idx + 1; endCol = idx + needle.length + 1; }
     }
 
-    // Fallback: use column position to find the construct
-    // Pandoc's column typically points 1 past the end of the construct,
-    // so we walk backward from the column to find where it starts.
-    if (!textMarked && warn.column) {
-      const endCol = Math.min(warn.column - 1, lineText.length);
-      // Walk backward to find the start of the LaTeX command or braced group
-      let startCol = endCol;
-      // Step 1: skip back past closing brace and its contents
-      if (startCol > 0 && lineText[startCol - 1] === '}') {
+    // 2. Fallback: walk backward from Pandoc's column (which typically
+    //    points 1 past the end of the construct) to find where it starts.
+    if (startCol === null && warn.column) {
+      const end0 = Math.min(warn.column - 1, lineText.length); // 0-based end
+      let start0 = end0;
+      // Step 1: skip back past a closing brace and its contents
+      if (start0 > 0 && lineText[start0 - 1] === '}') {
         let depth = 0;
-        for (let i = startCol - 1; i >= 0; i--) {
+        for (let i = start0 - 1; i >= 0; i--) {
           if (lineText[i] === '}') depth++;
           else if (lineText[i] === '{') depth--;
-          if (depth === 0) { startCol = i; break; }
+          if (depth === 0) { start0 = i; break; }
         }
       }
       // Step 2: skip back past the command name (letters after backslash)
-      if (startCol > 0 && /[a-zA-Z@*]/.test(lineText[startCol - 1])) {
-        while (startCol > 0 && /[a-zA-Z@*]/.test(lineText[startCol - 1])) startCol--;
-      }
+      while (start0 > 0 && /[a-zA-Z@*]/.test(lineText[start0 - 1])) start0--;
       // Step 3: include the leading backslash if present
-      if (startCol > 0 && lineText[startCol - 1] === '\\') startCol--;
-      
-      if (startCol < endCol) {
-        const textRange = new Range(aceRow, startCol, aceRow, endCol);
-        activeMarkers.push(
-          session.addMarker(textRange, `${cssPrefix}-text`, 'text', false)
-        );
-        textMarked = true;
-      }
-      // Forward fallback if backward walk didn't find anything
-      if (!textMarked) {
-        const rest = lineText.substring(Math.min(endCol, lineText.length));
+      if (start0 > 0 && lineText[start0 - 1] === '\\') start0--;
+
+      if (start0 < end0) { startCol = start0 + 1; endCol = end0 + 1; }
+
+      // Forward fallback if the backward walk found nothing
+      if (startCol === null) {
+        const rest = lineText.substring(Math.min(end0, lineText.length));
         const tok = rest.match(/^\\?[a-zA-Z@*]+(?:\{[^}]*\})?|^\{[^}]*\}|^\S+/);
-        if (tok) {
-          const textRange = new Range(aceRow, endCol, aceRow, endCol + tok[0].length);
-          activeMarkers.push(
-            session.addMarker(textRange, `${cssPrefix}-text`, 'text', false)
-          );
-        }
+        if (tok) { startCol = end0 + 1; endCol = end0 + tok[0].length + 1; }
       }
     }
+
+    // 3. Last resort: mark the whole line
+    if (startCol === null) { startCol = 1; endCol = Math.max(2, lineText.length + 1); }
+
+    diags.push({ line: warn.line, startCol, endCol, severity,
+                 message: warn.message || '' });
   }
 
-  session.setAnnotations(annotations);
+  editor.setDiagnostics(diags);
 }
 
 function clearDecorations() {
-  const session = editor.session;
-  for (const id of activeMarkers) session.removeMarker(id);
-  activeMarkers = [];
-  session.clearAnnotations();
+  editor.clearDiagnostics();
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -3606,7 +3543,7 @@ let lastOutput = null;  // { blob, filename } — stores last conversion output 
 // Clear binary input state and restore editor
 function clearBinaryInput() {
   inputBinaryFile = null;
-  editor.setValue('', -1);
+  editor.setText('');
   editor.setReadOnly(false);
   inputFileName = 'untitled';
   document.getElementById('binaryInputOverlay').style.display = 'none';
@@ -4450,7 +4387,7 @@ async function runConversion() {
   updateStatus('loading', 'Converting…');
   clearDecorations();
 
-  const sourceText = inputBinaryFile ? null : editor.getValue();
+  const sourceText = inputBinaryFile ? null : editor.getText();
 
   try {
     const options = buildOptions();
@@ -4530,7 +4467,7 @@ async function runConversion() {
       downloadBtn.style.display = '';
       scormBtn.style.display = 'none';
 
-      sourceEditor.setValue(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`, -1);
+      sourceEditor.setText(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`);
 
       const previewFrame = document.getElementById('previewFrame');
       previewFrame.srcdoc = `<body style="background:#f5f5f5;color:#1e2124;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
@@ -4579,7 +4516,7 @@ async function runConversion() {
         outputText = outputText.replace('</head>', () => mathScripts + '</head>');
       }
 
-      sourceEditor.setValue(outputText, -1);
+      sourceEditor.setText(outputText);
 
       const previewFrame = document.getElementById('previewFrame');
       previewFrame.srcdoc = outputText;
@@ -4655,7 +4592,7 @@ function updateLog(warnings) {
     // Click to jump to line
     if (warn.line) {
       entry.addEventListener('click', () => {
-        editor.gotoLine(warn.line, warn.column ? warn.column - 1 : 0, true);
+        editor.gotoLine(warn.line, warn.column || 1);
         editor.focus();
         // Highlight active log entry
         container.querySelectorAll('.log-entry').forEach(e => e.classList.remove('active'));
@@ -5476,11 +5413,11 @@ document.getElementById('btnRunCleanup').addEventListener('click', () => {
   const profile = getActiveProfile();
   if (profile.searchParameters.length === 0) return;
 
-  const source = editor.getValue();
+  const source = editor.getText();
   const outcome = runProfile(source, profile);
 
   if (outcome.totalMatches > 0) {
-    editor.setValue(outcome.result, -1);  // -1 = move cursor to start
+    editor.setText(outcome.result);
     const summary = outcome.perPattern
       .filter(p => p.matchCount > 0)
       .map(p => p.name + ': ' + p.matchCount)
@@ -5577,10 +5514,7 @@ function activateOutputTab(tab) {
   const target = 'tab' + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1);
   document.getElementById(target).classList.add('active');
 
-  // Resize source editor when its tab is shown
-  if (tab.dataset.tab === 'source') {
-    setTimeout(() => sourceEditor.resize(), 50);
-  }
+  // (CM6 self-measures on visibility change — no resize call needed)
 }
 
 outputTabs.forEach(tab => {
@@ -5624,8 +5558,7 @@ function toggleSidebar() {
   btnCleanup.classList.toggle('active');
   const isExpanded = !sidebar.classList.contains('collapsed');
   btnCleanup.setAttribute('aria-expanded', String(isExpanded));
-  // Resize Ace editors after CSS transition completes
-  setTimeout(() => { editor.resize(); sourceEditor.resize(); }, 250);
+  // (CM6 self-measures after the CSS transition — no resize call needed)
 }
 
 btnCleanup.addEventListener('click', toggleSidebar);
@@ -5676,8 +5609,7 @@ function setLayout(mode) {
     centerWrap.className = 'center-wrap';
   }
 
-  // Reflow Ace editors after layout change
-  setTimeout(() => { editor.resize(); sourceEditor.resize(); }, 50);
+  // (CM6 self-measures after layout change — no resize call needed)
 }
 
 btnSide.addEventListener('click',   () => setLayout('side'));
@@ -5716,9 +5648,6 @@ document.addEventListener('mousemove', (e) => {
       outputPanel.style.flex = '1';
     }
   }
-
-  editor.resize();
-  sourceEditor.resize();
 });
 
 document.addEventListener('mouseup', () => {
@@ -5938,7 +5867,7 @@ async function runLatexmlConversion() {
   }
 
   const btn = document.getElementById('btnConvert');
-  const sourceText = inputBinaryFile ? null : editor.getValue();
+  const sourceText = inputBinaryFile ? null : editor.getText();
 
   if (!sourceText || !sourceText.trim()) {
     updateStatus('error', 'No LaTeX source to convert');
@@ -6030,8 +5959,8 @@ async function runLatexmlConversion() {
     }
 
     // Step 4: Display results in the output panel
-    sourceEditor.setValue(outputHtml, -1);
-    sourceEditor.session.setMode('ace/mode/html');
+    sourceEditor.setText(outputHtml);
+    sourceEditor.setLanguage('html');
 
     const previewFrame = document.getElementById('previewFrame');
     previewFrame.srcdoc = outputHtml;
@@ -6170,7 +6099,7 @@ async function runLualatexCompilation() {
   }
 
   const btn = document.getElementById('btnConvert');
-  const sourceText = inputBinaryFile ? null : editor.getValue();
+  const sourceText = inputBinaryFile ? null : editor.getText();
 
   if (!sourceText || !sourceText.trim()) {
     updateStatus('error', 'No LaTeX source to compile');
@@ -6260,11 +6189,10 @@ async function runLualatexCompilation() {
     displayPdfInPreview(pdfData, expectedPdf);
 
     // Update source editor with compilation info
-    sourceEditor.setValue(
+    sourceEditor.setText(
       `% LuaLaTeX compilation complete\n` +
       `% Output: ${expectedPdf} (${sizeKB} KB)\n` +
-      `% The PDF is displayed in the Preview tab.`,
-      -1
+      `% The PDF is displayed in the Preview tab.`
     );
 
     // Store for download
