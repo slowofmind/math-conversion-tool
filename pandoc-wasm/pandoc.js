@@ -94,12 +94,57 @@ const fds = [
 ];
 const options = { debug: false };
 const wasi = new WASI(args, env, fds, options);
-const { instance } = await WebAssembly.instantiateStreaming(
-  fetch(new URL("./pandoc.wasm?sha1=81325b24686ba020293da498958982a8caa7a102", import.meta.url)),
-  {
-    wasi_snapshot_preview1: wasi.wasiImport,
+// ════════════════════════════════════════════════════════════════════
+// WASM-LOADER-BEGIN — local patch (compressed wasm delivery).
+// GitHub Pages serves pandoc.wasm (~56 MB) uncompressed, so we ship a
+// gzipped copy as pandoc-wasm.bin (~15 MB) and decompress in the browser
+// via DecompressionStream, preserving streaming compilation. The .bin
+// extension (not .gz) is deliberate: it stops servers like Apache from
+// adding Content-Encoding: gzip and double-decompressing.
+// Falls back to the raw pandoc.wasm if anything goes wrong.
+// On a pandoc.wasm upgrade: regenerate pandoc-wasm.bin from the new wasm
+// (gzip it), update the sha1 cache-buster below, and re-apply this block
+// in place of the upstream instantiateStreaming call.
+// ════════════════════════════════════════════════════════════════════
+const WASM_SHA1 = "81325b24686ba020293da498958982a8caa7a102";
+
+async function instantiatePandocWasm(imports) {
+  if (typeof DecompressionStream === "function") {
+    try {
+      const resp = await fetch(
+        new URL(`./pandoc-wasm.bin?sha1=${WASM_SHA1}`, import.meta.url)
+      );
+      if (resp.ok && resp.body) {
+        const wasmStream = resp.body.pipeThrough(
+          new DecompressionStream("gzip")
+        );
+        const wasmResp = new Response(wasmStream, {
+          headers: { "Content-Type": "application/wasm" },
+        });
+        return await WebAssembly.instantiateStreaming(wasmResp, imports);
+      }
+      console.warn(
+        `[pandoc.js] pandoc-wasm.bin fetch returned ${resp.status}; falling back to raw pandoc.wasm`
+      );
+    } catch (err) {
+      console.warn(
+        "[pandoc.js] compressed wasm load failed; falling back to raw pandoc.wasm:",
+        err
+      );
+    }
   }
-);
+  return await WebAssembly.instantiateStreaming(
+    fetch(new URL(`./pandoc.wasm?sha1=${WASM_SHA1}`, import.meta.url)),
+    imports
+  );
+}
+// ════════════════════════════════════════════════════════════════════
+// WASM-LOADER-END
+// ════════════════════════════════════════════════════════════════════
+
+const { instance } = await instantiatePandocWasm({
+  wasi_snapshot_preview1: wasi.wasiImport,
+});
 
 wasi.initialize(instance);
 instance.exports.__wasm_call_ctors();
