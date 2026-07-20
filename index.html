@@ -1812,6 +1812,11 @@
           <button class="toolbar-btn" id="btnDuplicateProfile" style="font-size:10px; padding:3px 6px;" title="Duplicate profile" aria-label="Duplicate profile">⧉</button>
           <button class="toolbar-btn" id="btnDeleteProfile" style="font-size:10px; padding:3px 6px; color:var(--error);" title="Delete profile" aria-label="Delete profile">✕</button>
         </div>
+        <div style="display:flex; gap:4px; margin-top:4px;">
+          <button class="toolbar-btn" id="btnExportProfile" style="font-size:10px; padding:3px 6px; flex:1;" title="Download the active profile as a JSON file" aria-label="Export profile to JSON file">⭳ Export</button>
+          <button class="toolbar-btn" id="btnImportProfile" style="font-size:10px; padding:3px 6px; flex:1;" title="Load a profile from a JSON file" aria-label="Import profile from JSON file">⭱ Import</button>
+          <input type="file" id="profileImportFile" accept=".json,application/json" style="display:none;" aria-hidden="true" tabindex="-1">
+        </div>
       </div>
 
       <!-- Profile scope -->
@@ -1859,6 +1864,18 @@
           </select>
           <button class="toolbar-btn" id="btnAddPattern" style="font-size:11px; padding:4px 10px;">+ Add</button>
         </div>
+      </div>
+
+      <!-- Conversion integration -->
+      <div class="cleanup-section">
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+          <input type="checkbox" id="chkCleanupOnConvert" checked>
+          Apply cleanup during conversion
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:4px;">
+          <input type="checkbox" id="chkAutoPopulate" checked>
+          Add patterns from conversion warnings
+        </label>
       </div>
 
       <button class="cleanup-run-btn" id="btnRunCleanup">▶ Run Cleanup</button>
@@ -4402,7 +4419,7 @@ async function runConversion() {
   updateStatus('loading', 'Converting…');
   clearDecorations();
 
-  const sourceText = inputBinaryFile ? null : editor.getText();
+  const sourceText = inputBinaryFile ? null : getSourceForConversion();
 
   try {
     const options = buildOptions();
@@ -4452,6 +4469,18 @@ async function runConversion() {
 
     // Parse warnings
     const warnings = parseWarnings(result.warnings, result.stderr, sourceText || '');
+
+    // Cleanup-on-convert ran over a copy of the source, so warning line
+    // numbers refer to the cleaned text, not the editor content.
+    if (lastCleanupReplacements > 0) {
+      warnings.unshift({
+        line: null, column: null, level: 'warn',
+        message: 'Cleanup was applied before conversion (' + lastCleanupReplacements +
+          ' replacement' + (lastCleanupReplacements === 1 ? '' : 's') +
+          ') — line numbers listed may not match line numbers in the original.',
+        matchedText: null, type: 'cleanup'
+      });
+    }
 
     // Add placeholder warnings
     for (const pf of placeholderFiles) {
@@ -4547,8 +4576,10 @@ async function runConversion() {
       scormBtn.style.display = (isHtmlOutput && mathMethod === 'mathjax4') ? '' : 'none';
     }
 
-    // Auto-populate cleanup patterns from warnings
-    populateCleanupFromWarnings(warnings);
+    // Auto-populate cleanup patterns from warnings (user-toggleable)
+    if (document.getElementById('chkAutoPopulate').checked) {
+      populateCleanupFromWarnings(warnings);
+    }
 
     // Status
     const warnCount = warnings.filter(w => w.level === 'warn').length;
@@ -5053,26 +5084,83 @@ function runProfile(text, profile) {
 
 // ─── 8.4 PATTERN CARD UI ───────────────────────────────────────────
 
+// ─── Preset profile registry ───
+// Hardcoded, read-only templates. Selecting a preset instantiates a working
+// copy in the "My profiles" list; user edits never touch these definitions.
+// TO ADD A NEW PRESET: append one object literal below. The shape is the same
+// as the `profile` field of an exported JSON file — minimal fields are fine,
+// normalizeProfile() fills in defaults on instantiation.
+const PROFILE_FORMAT_VERSION = '1.0';   // matches the VS Code extension's format
+const PRESET_PROFILES = [
+  {
+    name: 'Strip text formatting',
+    searchParameters: [
+      { name: 'Strip \\textbf', patternType: 'matched_pair',
+        opening: { prefix: '\\textbf', anchor: '{', suffix: '' },
+        closing: { prefix: '', anchor: '}', suffix: '' },
+        replacementMode: 'remove_tags' },
+      { name: 'Strip \\textit', patternType: 'matched_pair',
+        opening: { prefix: '\\textit', anchor: '{', suffix: '' },
+        closing: { prefix: '', anchor: '}', suffix: '' },
+        replacementMode: 'remove_tags' },
+      { name: 'Strip \\underline', patternType: 'matched_pair',
+        opening: { prefix: '\\underline', anchor: '{', suffix: '' },
+        closing: { prefix: '', anchor: '}', suffix: '' },
+        replacementMode: 'remove_tags' },
+      // \textcolor{red}{text}: removing "\textcolor{" .. "}" deletes the
+      // command and its color argument; the bare {text} group left behind
+      // is harmless to Pandoc.
+      { name: 'Drop \\textcolor color arg', patternType: 'matched_pair',
+        opening: { prefix: '\\textcolor', anchor: '{', suffix: '' },
+        closing: { prefix: '', anchor: '}', suffix: '' },
+        replacementMode: 'remove_all' },
+    ],
+  },
+  {
+    name: 'Math spacing hacks (Pandoc-safe)',
+    searchParameters: [
+      // Invisible-spacing commands with no clean MathML equivalent:
+      // delete command and argument entirely.
+      { name: 'Delete \\vphantom{…}', patternType: 'matched_pair',
+        opening: { prefix: '\\vphantom', anchor: '{', suffix: '' },
+        closing: { prefix: '', anchor: '}', suffix: '' },
+        replacementMode: 'remove_all' },
+      { name: 'Delete \\hphantom{…}', patternType: 'matched_pair',
+        opening: { prefix: '\\hphantom', anchor: '{', suffix: '' },
+        closing: { prefix: '', anchor: '}', suffix: '' },
+        replacementMode: 'remove_all' },
+      { name: 'Delete \\phantom{…}', patternType: 'matched_pair',
+        opening: { prefix: '\\phantom', anchor: '{', suffix: '' },
+        closing: { prefix: '', anchor: '}', suffix: '' },
+        replacementMode: 'remove_all' },
+      // \smash{content}: keep the content, drop the wrapper.
+      { name: 'Unwrap \\smash{…}', patternType: 'matched_pair',
+        opening: { prefix: '\\smash', anchor: '{', suffix: '' },
+        closing: { prefix: '', anchor: '}', suffix: '' },
+        replacementMode: 'remove_tags' },
+      // \raisebox{2pt}{content}: removing "\raisebox{" .. "}" deletes the
+      // command and its dimension argument, leaving a harmless {content} group.
+      { name: 'Drop \\raisebox dimension', patternType: 'matched_pair',
+        opening: { prefix: '\\raisebox', anchor: '{', suffix: '' },
+        closing: { prefix: '', anchor: '}', suffix: '' },
+        replacementMode: 'remove_all' },
+    ],
+  },
+];
+
+// Normalize a raw profile object (from a preset literal or an imported JSON
+// file) into a fully-defaulted working profile. Extra/unknown fields on
+// patterns are preserved so extension profiles round-trip intact.
+function normalizeProfile(raw) {
+  const p = createProfile(raw.name, (raw.searchParameters || []).map(sp => createSearchParameter(sp)));
+  p.createNewFile = !!raw.createNewFile;
+  p.scope = raw.scope || null;
+  return p;
+}
+
 // State
 const expandedPatterns = new Set();
-let profiles = [
-  createProfile('Default', [
-    createSearchParameter({
-      name: 'Strip \\textbf',
-      patternType: PatternType.MATCHED_PAIR,
-      opening: createTagPattern('\\textbf', '{', ''),
-      closing: createTagPattern('', '}', ''),
-      replacementMode: ReplacementMode.REMOVE_TAGS,
-    }),
-    createSearchParameter({
-      name: 'Strip \\textit',
-      patternType: PatternType.MATCHED_PAIR,
-      opening: createTagPattern('\\textit', '{', ''),
-      closing: createTagPattern('', '}', ''),
-      replacementMode: ReplacementMode.REMOVE_TAGS,
-    }),
-  ]),
-];
+let profiles = [normalizeProfile(PRESET_PROFILES[0])];
 let activeProfileIndex = 0;
 
 function getActiveProfile() {
@@ -5083,13 +5171,28 @@ function getActiveProfile() {
 function renderProfileSelect() {
   const sel = document.getElementById('cleanupProfile');
   sel.innerHTML = '';
+
+  const gMine = document.createElement('optgroup');
+  gMine.label = 'My profiles';
   profiles.forEach((p, i) => {
     const opt = document.createElement('option');
     opt.value = i;
     opt.textContent = p.name;
     if (i === activeProfileIndex) opt.selected = true;
-    sel.appendChild(opt);
+    gMine.appendChild(opt);
   });
+  sel.appendChild(gMine);
+
+  const gPresets = document.createElement('optgroup');
+  gPresets.label = 'Presets';
+  PRESET_PROFILES.forEach((p, i) => {
+    const opt = document.createElement('option');
+    opt.value = 'preset:' + i;
+    opt.textContent = p.name;
+    gPresets.appendChild(opt);
+  });
+  sel.appendChild(gPresets);
+
   // Add "New Profile" option
   const newOpt = document.createElement('option');
   newOpt.value = '__new__';
@@ -5104,6 +5207,21 @@ document.getElementById('cleanupProfile').addEventListener('change', (e) => {
       profiles.push(createProfile(name.trim()));
       activeProfileIndex = profiles.length - 1;
     }
+    renderProfileSelect();
+    renderCleanupUI();
+    return;
+  }
+  if (e.target.value.startsWith('preset:')) {
+    // Presets are read-only templates: selecting one activates the existing
+    // working copy of the same name, or instantiates a fresh copy if none.
+    const preset = PRESET_PROFILES[parseInt(e.target.value.slice(7))];
+    let idx = profiles.findIndex(p => p.name === preset.name);
+    if (idx === -1) {
+      profiles.push(normalizeProfile(preset));
+      idx = profiles.length - 1;
+    }
+    activeProfileIndex = idx;
+    expandedPatterns.clear();
     renderProfileSelect();
     renderCleanupUI();
     return;
@@ -5134,6 +5252,89 @@ document.getElementById('btnDeleteProfile').addEventListener('click', () => {
   expandedPatterns.clear();
   renderProfileSelect();
   renderCleanupUI();
+});
+
+// ─── Profile export / import (JSON, extension-compatible envelope) ───
+document.getElementById('btnExportProfile').addEventListener('click', () => {
+  const profile = getActiveProfile();
+  const envelope = {
+    formatVersion: PROFILE_FORMAT_VERSION,
+    exportDate: new Date().toISOString(),
+    exportedBy: 'Accessible STEM LaTeX Cleanup (web)',
+    profile: profile,
+  };
+  const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = profile.name.replace(/\s+/g, '-') + '-profile.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  updateStatus('ready', 'Profile "' + profile.name + '" exported');
+});
+
+document.getElementById('btnImportProfile').addEventListener('click', () => {
+  document.getElementById('profileImportFile').click();
+});
+
+document.getElementById('profileImportFile').addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';   // allow re-importing the same file later
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try {
+      data = JSON.parse(reader.result);
+    } catch (err) {
+      updateStatus('error', 'Import failed: not valid JSON');
+      return;
+    }
+
+    // Accept both the versioned envelope and a bare profile object.
+    const raw = data.profile || data;
+    if (!raw || typeof raw.name !== 'string' || !Array.isArray(raw.searchParameters)) {
+      updateStatus('error', 'Import failed: missing profile name or searchParameters');
+      return;
+    }
+
+    // Version check mirrors the VS Code extension: same major = compatible.
+    if (data.profile && data.formatVersion) {
+      const importedMajor = parseInt(String(data.formatVersion).split('.')[0], 10);
+      const currentMajor  = parseInt(PROFILE_FORMAT_VERSION.split('.')[0], 10);
+      if (importedMajor !== currentMajor) {
+        updateStatus('error', 'Import failed: profile format ' + data.formatVersion +
+          ' is incompatible with ' + PROFILE_FORMAT_VERSION);
+        return;
+      }
+    } else if (data.profile && !data.formatVersion) {
+      if (!confirm('This profile file has no version information (older export?). Import anyway?')) return;
+    }
+
+    const imported = normalizeProfile(raw);
+
+    // Note patterns whose mode the web runner cannot execute (extension-only).
+    const unsupported = imported.searchParameters.filter(p =>
+      p.replacementMode && !Object.values(ReplacementMode).includes(p.replacementMode));
+    // Avoid name collisions with existing profiles.
+    let name = imported.name;
+    let n = 2;
+    while (profiles.some(p => p.name === name)) name = imported.name + ' (' + (n++) + ')';
+    imported.name = name;
+
+    profiles.push(imported);
+    activeProfileIndex = profiles.length - 1;
+    expandedPatterns.clear();
+    renderProfileSelect();
+    renderCleanupUI();
+    updateStatus('ready', 'Profile "' + name + '" imported' +
+      (unsupported.length ? ' (' + unsupported.length + ' pattern(s) use modes this tool cannot run and will be skipped)' : ''));
+  };
+  reader.onerror = () => updateStatus('error', 'Import failed: could not read file');
+  reader.readAsText(file);
 });
 
 // ─── Profile scope toggle ───
@@ -5422,6 +5623,35 @@ document.getElementById('btnCollapseAll').addEventListener('click', () => {
   expandedPatterns.clear();
   renderPatternList();
 });
+
+// ─── Conversion-time cleanup ───
+// Single source of truth for the text handed to the conversion engines
+// (Pandoc WASM, LaTeXML, LuaLaTeX): the editor content, optionally run
+// through the active cleanup profile first. The editor itself is never
+// modified here — cleanup applies to a copy of the text.
+// lastCleanupReplacements records whether the most recent conversion ran on
+// cleaned (i.e. line-shifted) text, so the log can warn about line drift.
+let lastCleanupReplacements = 0;
+function getSourceForConversion() {
+  lastCleanupReplacements = 0;
+  const raw = editor.getText();
+  const chk = document.getElementById('chkCleanupOnConvert');
+  if (!chk || !chk.checked) return raw;
+
+  const profile = getActiveProfile();
+  if (!profile || profile.searchParameters.length === 0) return raw;
+
+  const outcome = runProfile(raw, profile);
+  if (outcome.totalMatches > 0) {
+    lastCleanupReplacements = outcome.totalMatches;
+    console.log('[cleanup] Applied "' + profile.name + '" before conversion: ' +
+      outcome.totalMatches + ' replacement(s)',
+      outcome.perPattern.filter(p => p.matchCount > 0));
+    updateStatus('loading', 'Converting… (cleanup: ' + outcome.totalMatches +
+      ' replacement' + (outcome.totalMatches === 1 ? '' : 's') + ' applied)');
+  }
+  return outcome.result;
+}
 
 // ─── Run Cleanup (wired to Ace editor) ───
 document.getElementById('btnRunCleanup').addEventListener('click', () => {
@@ -5882,7 +6112,7 @@ async function runLatexmlConversion() {
   }
 
   const btn = document.getElementById('btnConvert');
-  const sourceText = inputBinaryFile ? null : editor.getText();
+  const sourceText = inputBinaryFile ? null : getSourceForConversion();
 
   if (!sourceText || !sourceText.trim()) {
     updateStatus('error', 'No LaTeX source to convert');
@@ -6114,7 +6344,7 @@ async function runLualatexCompilation() {
   }
 
   const btn = document.getElementById('btnConvert');
-  const sourceText = inputBinaryFile ? null : editor.getText();
+  const sourceText = inputBinaryFile ? null : getSourceForConversion();
 
   if (!sourceText || !sourceText.trim()) {
     updateStatus('error', 'No LaTeX source to compile');
