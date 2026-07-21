@@ -1812,6 +1812,9 @@
           <button class="toolbar-btn" id="btnDuplicateProfile" style="font-size:10px; padding:3px 6px;" title="Duplicate profile" aria-label="Duplicate profile">⧉</button>
           <button class="toolbar-btn" id="btnDeleteProfile" style="font-size:10px; padding:3px 6px; color:var(--error);" title="Delete profile" aria-label="Delete profile">✕</button>
         </div>
+        <div style="margin-top:4px;">
+          <select class="cleanup-select" id="presetAdder" style="width:100%;" aria-label="Add preset patterns to the active profile"></select>
+        </div>
         <div style="display:flex; gap:4px; margin-top:4px;">
           <button class="toolbar-btn" id="btnExportProfile" style="font-size:10px; padding:3px 6px; flex:1;" title="Download the active profile as a JSON file" aria-label="Export profile to JSON file">⭳ Export</button>
           <button class="toolbar-btn" id="btnImportProfile" style="font-size:10px; padding:3px 6px; flex:1;" title="Load a profile from a JSON file" aria-label="Import profile from JSON file">⭱ Import</button>
@@ -1848,6 +1851,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <div class="cleanup-section-label" style="margin-bottom:0;">Patterns <span id="patternCount">(0)</span></div>
           <div style="display:flex; gap:4px;">
+            <button class="toolbar-btn" id="btnClearPatterns" style="font-size:10px; padding:2px 6px; color:var(--error);" title="Remove all patterns from this profile" aria-label="Clear all patterns">🗑</button>
             <button class="toolbar-btn" id="btnExpandAll" style="font-size:10px; padding:2px 6px;" aria-label="Expand all patterns">⊞</button>
             <button class="toolbar-btn" id="btnCollapseAll" style="font-size:10px; padding:2px 6px;" aria-label="Collapse all patterns">⊟</button>
           </div>
@@ -5158,9 +5162,37 @@ function normalizeProfile(raw) {
   return p;
 }
 
+// Two patterns are "the same" if they'd match the same construct: pairs
+// compare their opening tag triple (covers commands via prefix+anchor and
+// environments via anchor+suffix); single strings compare the find text.
+function patternsEquivalent(a, b) {
+  if (a.patternType !== b.patternType) return false;
+  if (a.patternType === PatternType.SINGLE_STRING) {
+    return a.findString === b.findString && !!a.useRegex === !!b.useRegex;
+  }
+  const ao = a.opening || {}, bo = b.opening || {};
+  return ao.prefix === bo.prefix && ao.anchor === bo.anchor && ao.suffix === bo.suffix;
+}
+
+// The one way patterns enter a profile from any bulk source (preset adder,
+// JSON import, auto-populate): normalize each candidate to a fresh copy and
+// append it unless an equivalent pattern is already present. Appending the
+// same source twice is a no-op, which makes mixing sources order-independent.
+function mergePatternsInto(profile, rawParams) {
+  let added = 0;
+  for (const raw of rawParams || []) {
+    const cand = createSearchParameter(raw);
+    if (!profile.searchParameters.some(p => patternsEquivalent(p, cand))) {
+      profile.searchParameters.push(cand);
+      added++;
+    }
+  }
+  return added;
+}
+
 // State
 const expandedPatterns = new Set();
-let profiles = [normalizeProfile(PRESET_PROFILES[0])];
+let profiles = [createProfile('My cleanup')];   // start with a blank workspace
 let activeProfileIndex = 0;
 
 function getActiveProfile() {
@@ -5172,26 +5204,13 @@ function renderProfileSelect() {
   const sel = document.getElementById('cleanupProfile');
   sel.innerHTML = '';
 
-  const gMine = document.createElement('optgroup');
-  gMine.label = 'My profiles';
   profiles.forEach((p, i) => {
     const opt = document.createElement('option');
     opt.value = i;
     opt.textContent = p.name;
     if (i === activeProfileIndex) opt.selected = true;
-    gMine.appendChild(opt);
+    sel.appendChild(opt);
   });
-  sel.appendChild(gMine);
-
-  const gPresets = document.createElement('optgroup');
-  gPresets.label = 'Presets';
-  PRESET_PROFILES.forEach((p, i) => {
-    const opt = document.createElement('option');
-    opt.value = 'preset:' + i;
-    opt.textContent = p.name;
-    gPresets.appendChild(opt);
-  });
-  sel.appendChild(gPresets);
 
   // Add "New Profile" option
   const newOpt = document.createElement('option');
@@ -5211,24 +5230,39 @@ document.getElementById('cleanupProfile').addEventListener('change', (e) => {
     renderCleanupUI();
     return;
   }
-  if (e.target.value.startsWith('preset:')) {
-    // Presets are read-only templates: selecting one activates the existing
-    // working copy of the same name, or instantiates a fresh copy if none.
-    const preset = PRESET_PROFILES[parseInt(e.target.value.slice(7))];
-    let idx = profiles.findIndex(p => p.name === preset.name);
-    if (idx === -1) {
-      profiles.push(normalizeProfile(preset));
-      idx = profiles.length - 1;
-    }
-    activeProfileIndex = idx;
-    expandedPatterns.clear();
-    renderProfileSelect();
-    renderCleanupUI();
-    return;
-  }
   activeProfileIndex = parseInt(e.target.value);
   expandedPatterns.clear();
   renderCleanupUI();
+});
+
+// ─── Preset adder ───
+// Presets are ingredient lists, not profiles: picking one appends its
+// patterns to the active profile (duplicates skipped), then the control
+// snaps back to its placeholder.
+(function initPresetAdder() {
+  const sel = document.getElementById('presetAdder');
+  const ph = document.createElement('option');
+  ph.value = '';
+  ph.textContent = '＋ Add preset patterns…';
+  sel.appendChild(ph);
+  PRESET_PROFILES.forEach((p, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = p.name;
+    sel.appendChild(opt);
+  });
+})();
+
+document.getElementById('presetAdder').addEventListener('change', (e) => {
+  const v = e.target.value;
+  e.target.selectedIndex = 0;   // snap back to placeholder
+  if (v === '') return;
+  const preset = PRESET_PROFILES[parseInt(v)];
+  const added = mergePatternsInto(getActiveProfile(), preset.searchParameters);
+  renderPatternList();
+  updateStatus('ready', added > 0
+    ? added + ' pattern' + (added === 1 ? '' : 's') + ' added from "' + preset.name + '"'
+    : 'No new patterns — "' + preset.name + '" is already in this profile');
 });
 
 document.getElementById('btnDuplicateProfile').addEventListener('click', () => {
@@ -5314,27 +5348,37 @@ document.getElementById('profileImportFile').addEventListener('change', (e) => {
       if (!confirm('This profile file has no version information (older export?). Import anyway?')) return;
     }
 
-    const imported = normalizeProfile(raw);
-
-    // Note patterns whose mode the web runner cannot execute (extension-only).
-    const unsupported = imported.searchParameters.filter(p =>
+    // Append the file's patterns to the ACTIVE profile (duplicates skipped),
+    // so imports mix with presets, auto-populated, and manual entries.
+    // To restore a saved profile exactly: clear all patterns, then import.
+    const prof = getActiveProfile();
+    const candidates = raw.searchParameters;
+    const unsupported = candidates.filter(p =>
       p.replacementMode && !Object.values(ReplacementMode).includes(p.replacementMode));
-    // Avoid name collisions with existing profiles.
-    let name = imported.name;
-    let n = 2;
-    while (profiles.some(p => p.name === name)) name = imported.name + ' (' + (n++) + ')';
-    imported.name = name;
+    const added = mergePatternsInto(prof, candidates);
+    const dupes = candidates.length - added;
 
-    profiles.push(imported);
-    activeProfileIndex = profiles.length - 1;
     expandedPatterns.clear();
-    renderProfileSelect();
-    renderCleanupUI();
-    updateStatus('ready', 'Profile "' + name + '" imported' +
-      (unsupported.length ? ' (' + unsupported.length + ' pattern(s) use modes this tool cannot run and will be skipped)' : ''));
+    renderPatternList();
+    updateStatus('ready', added + ' pattern' + (added === 1 ? '' : 's') +
+      ' added from "' + raw.name + '"' +
+      (dupes ? ' (' + dupes + ' duplicate' + (dupes === 1 ? '' : 's') + ' skipped)' : '') +
+      (unsupported.length ? ' — ' + unsupported.length + ' use modes this tool cannot run and will be skipped' : ''));
   };
   reader.onerror = () => updateStatus('error', 'Import failed: could not read file');
   reader.readAsText(file);
+});
+
+// ─── Clear all patterns (reset to blank slate) ───
+document.getElementById('btnClearPatterns').addEventListener('click', () => {
+  const prof = getActiveProfile();
+  if (prof.searchParameters.length === 0) return;
+  if (!confirm('Remove all ' + prof.searchParameters.length + ' pattern' +
+    (prof.searchParameters.length === 1 ? '' : 's') + ' from "' + prof.name + '"?')) return;
+  prof.searchParameters = [];
+  expandedPatterns.clear();
+  renderPatternList();
+  updateStatus('ready', 'All patterns cleared');
 });
 
 // ─── Profile scope toggle ───
@@ -5677,31 +5721,31 @@ document.getElementById('btnRunCleanup').addEventListener('click', () => {
 function populateCleanupFromWarnings(warnings) {
   const prof = getActiveProfile();
   const skipped = warnings.filter(w => w.type === 'SkippedContent' && w.matchedText);
-  let added = 0;
+
+  // Classify each warning into a candidate pattern; mergePatternsInto
+  // handles dedupe against the profile AND within this batch.
+  const candidates = [];
+  const pairExistsFor = (suffix) =>
+    prof.searchParameters.concat(candidates).some(p =>
+      p.patternType === PatternType.MATCHED_PAIR &&
+      p.opening && p.opening.suffix === suffix);
 
   for (const w of skipped) {
     const text = w.matchedText;
 
-    // \begin{env} → environment matched pair (Pandoc keeps environment
-    // content, so removing the delimiters is enough).
+    // \begin{env} → environment matched pair. EDIT_TAGS with blank
+    // replacements = remove the delimiters, keep the content (what Pandoc
+    // itself does with unknown environments).
     const envMatch = text.match(/^\\begin\{([^}]+)\}$/);
     if (envMatch) {
       const envName = envMatch[1];
-      if (!prof.searchParameters.some(p =>
-        p.patternType === PatternType.MATCHED_PAIR &&
-        p.opening && p.opening.suffix === '{' + envName + '}')) {
-        prof.searchParameters.push(createSearchParameter({
-          name: 'Unwrap \\begin{' + envName + '}',
-          patternType: PatternType.MATCHED_PAIR,
-          opening: createTagPattern('', '\\begin', '{' + envName + '}'),
-          closing: createTagPattern('', '\\end', '{' + envName + '}'),
-          // EDIT_TAGS with blank replacements = remove the delimiters, keep
-          // the content (what Pandoc itself does with unknown environments),
-          // while showing new users the replacement fields exist.
-          replacementMode: ReplacementMode.EDIT_TAGS,
-        }));
-        added++;
-      }
+      candidates.push({
+        name: 'Unwrap \\begin{' + envName + '}',
+        patternType: PatternType.MATCHED_PAIR,
+        opening: createTagPattern('', '\\begin', '{' + envName + '}'),
+        closing: createTagPattern('', '\\end', '{' + envName + '}'),
+        replacementMode: ReplacementMode.EDIT_TAGS,
+      });
       continue;
     }
 
@@ -5709,50 +5753,39 @@ function populateCleanupFromWarnings(warnings) {
     // (possibly earlier in this same batch); don't add a redundant
     // single-string. Falls through only if no such pair exists.
     const endMatch = text.match(/^\\end\{([^}]+)\}$/);
-    if (endMatch && prof.searchParameters.some(p =>
-      p.patternType === PatternType.MATCHED_PAIR &&
-      p.opening && p.opening.suffix === '{' + endMatch[1] + '}')) {
+    if (endMatch && pairExistsFor('{' + endMatch[1] + '}')) {
       continue;
     }
 
     // \cmd{…} (optionally starred) → command matched pair. When Pandoc
     // skips a command it deletes the command AND its brace content, so the
     // rescue default keeps the content: EDIT_TAGS with blank replacement
-    // fields (equivalent to remove-tags, but surfaces the replace option).
-    // Matching only the leading "\cmd{" also survives multi-line arguments
-    // truncated by the warning parser — the pair engine brace-counts the
-    // rest itself. Dedupe is by command name, not full matched text.
+    // fields. Matching only the leading "\cmd{" also survives multi-line
+    // arguments truncated by the warning parser — the pair engine
+    // brace-counts the rest itself.
     const cmdMatch = text.match(/^\\([A-Za-z@]+\*?)\s*\{/);
     if (cmdMatch) {
       const cmd = '\\' + cmdMatch[1];
-      if (!prof.searchParameters.some(p =>
-        p.patternType === PatternType.MATCHED_PAIR &&
-        p.opening && p.opening.prefix === cmd && p.opening.anchor === '{')) {
-        prof.searchParameters.push(createSearchParameter({
-          name: 'Unwrap ' + cmd + '{…}',
-          patternType: PatternType.MATCHED_PAIR,
-          opening: createTagPattern(cmd, '{', ''),
-          closing: createTagPattern('', '}', ''),
-          replacementMode: ReplacementMode.EDIT_TAGS,
-        }));
-        added++;
-      }
+      candidates.push({
+        name: 'Unwrap ' + cmd + '{…}',
+        patternType: PatternType.MATCHED_PAIR,
+        opening: createTagPattern(cmd, '{', ''),
+        closing: createTagPattern('', '}', ''),
+        replacementMode: ReplacementMode.EDIT_TAGS,
+      });
       continue;
     }
 
     // Bare command / anything else → literal single-string removal.
-    if (!prof.searchParameters.some(p =>
-      p.patternType === PatternType.SINGLE_STRING &&
-      p.findString === text)) {
-      prof.searchParameters.push(createSearchParameter({
-        name: 'Remove ' + text,
-        patternType: PatternType.SINGLE_STRING,
-        findString: text,
-        replaceString: '',
-      }));
-      added++;
-    }
+    candidates.push({
+      name: 'Remove ' + text,
+      patternType: PatternType.SINGLE_STRING,
+      findString: text,
+      replaceString: '',
+    });
   }
+
+  const added = mergePatternsInto(prof, candidates);
   if (added > 0) renderPatternList();
 }
 
