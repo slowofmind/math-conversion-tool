@@ -5681,7 +5681,9 @@ function populateCleanupFromWarnings(warnings) {
 
   for (const w of skipped) {
     const text = w.matchedText;
-    // Check for \begin{env} patterns
+
+    // \begin{env} → environment matched pair (Pandoc keeps environment
+    // content, so removing the delimiters is enough).
     const envMatch = text.match(/^\\begin\{([^}]+)\}$/);
     if (envMatch) {
       const envName = envMatch[1];
@@ -5697,19 +5699,54 @@ function populateCleanupFromWarnings(warnings) {
         }));
         added++;
       }
-    } else {
-      // Single string removal
+      continue;
+    }
+
+    // \end{env} → already covered by the pair created from its \begin
+    // (possibly earlier in this same batch); don't add a redundant
+    // single-string. Falls through only if no such pair exists.
+    const endMatch = text.match(/^\\end\{([^}]+)\}$/);
+    if (endMatch && prof.searchParameters.some(p =>
+      p.patternType === PatternType.MATCHED_PAIR &&
+      p.opening && p.opening.suffix === '{' + endMatch[1] + '}')) {
+      continue;
+    }
+
+    // \cmd{…} (optionally starred) → command matched pair. When Pandoc
+    // skips a command it deletes the command AND its brace content, so the
+    // rescue default is REMOVE_TAGS: strip the wrapper, keep the content.
+    // Matching only the leading "\cmd{" also survives multi-line arguments
+    // truncated by the warning parser — the pair engine brace-counts the
+    // rest itself. Dedupe is by command name, not full matched text.
+    const cmdMatch = text.match(/^\\([A-Za-z@]+\*?)\s*\{/);
+    if (cmdMatch) {
+      const cmd = '\\' + cmdMatch[1];
       if (!prof.searchParameters.some(p =>
-        p.patternType === PatternType.SINGLE_STRING &&
-        p.findString === text)) {
+        p.patternType === PatternType.MATCHED_PAIR &&
+        p.opening && p.opening.prefix === cmd && p.opening.anchor === '{')) {
         prof.searchParameters.push(createSearchParameter({
-          name: 'Remove ' + text,
-          patternType: PatternType.SINGLE_STRING,
-          findString: text,
-          replaceString: '',
+          name: 'Unwrap ' + cmd + '{…}',
+          patternType: PatternType.MATCHED_PAIR,
+          opening: createTagPattern(cmd, '{', ''),
+          closing: createTagPattern('', '}', ''),
+          replacementMode: ReplacementMode.REMOVE_TAGS,
         }));
         added++;
       }
+      continue;
+    }
+
+    // Bare command / anything else → literal single-string removal.
+    if (!prof.searchParameters.some(p =>
+      p.patternType === PatternType.SINGLE_STRING &&
+      p.findString === text)) {
+      prof.searchParameters.push(createSearchParameter({
+        name: 'Remove ' + text,
+        patternType: PatternType.SINGLE_STRING,
+        findString: text,
+        replaceString: '',
+      }));
+      added++;
     }
   }
   if (added > 0) renderPatternList();
