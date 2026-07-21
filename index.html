@@ -1880,6 +1880,10 @@
           <input type="checkbox" id="chkAutoPopulate" checked>
           Add patterns from conversion warnings
         </label>
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:4px;" title="Failsafe: whenever you download a converted file, the active profile is saved alongside it as JSON">
+          <input type="checkbox" id="chkExportProfileWithOutput">
+          Download profile JSON with output
+        </label>
       </div>
 
       <button class="cleanup-run-btn" id="btnRunCleanup">▶ Run Cleanup</button>
@@ -3599,6 +3603,7 @@ document.getElementById('btnDownloadOutput').addEventListener('click', () => {
   a.href = url;
   a.download = lastOutput.filename;
   a.click();
+  maybeExportProfileWithOutput();
 });
 
 // ── SCORM package download ──────────────────────────────────────────
@@ -3749,6 +3754,7 @@ document.getElementById('btnDownloadScorm').addEventListener('click', () => {
     a.download = `${baseName}-scorm.zip`;
     a.click();
     URL.revokeObjectURL(url);
+    maybeExportProfileWithOutput();
   };
   reader.readAsArrayBuffer(htmlBlob);
 });
@@ -5289,7 +5295,7 @@ document.getElementById('btnDeleteProfile').addEventListener('click', () => {
 });
 
 // ─── Profile export / import (JSON, extension-compatible envelope) ───
-document.getElementById('btnExportProfile').addEventListener('click', () => {
+function exportActiveProfile() {
   const profile = getActiveProfile();
   const envelope = {
     formatVersion: PROFILE_FORMAT_VERSION,
@@ -5306,7 +5312,22 @@ document.getElementById('btnExportProfile').addEventListener('click', () => {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  updateStatus('ready', 'Profile "' + profile.name + '" exported');
+  return profile.name;
+}
+
+// Failsafe: when enabled, every output download also saves the profile that
+// produced it, so a useful pattern set can't be lost with the session.
+function maybeExportProfileWithOutput() {
+  const chk = document.getElementById('chkExportProfileWithOutput');
+  if (!chk || !chk.checked) return;
+  const profile = getActiveProfile();
+  if (!profile || profile.searchParameters.length === 0) return;
+  exportActiveProfile();
+}
+
+document.getElementById('btnExportProfile').addEventListener('click', () => {
+  const name = exportActiveProfile();
+  updateStatus('ready', 'Profile "' + name + '" exported');
 });
 
 document.getElementById('btnImportProfile').addEventListener('click', () => {
