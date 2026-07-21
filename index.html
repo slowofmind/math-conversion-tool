@@ -5098,15 +5098,15 @@ const PRESET_PROFILES = [
       { name: 'Strip \\textbf', patternType: 'matched_pair',
         opening: { prefix: '\\textbf', anchor: '{', suffix: '' },
         closing: { prefix: '', anchor: '}', suffix: '' },
-        replacementMode: 'remove_tags' },
+        replacementMode: 'edit_tags' },
       { name: 'Strip \\textit', patternType: 'matched_pair',
         opening: { prefix: '\\textit', anchor: '{', suffix: '' },
         closing: { prefix: '', anchor: '}', suffix: '' },
-        replacementMode: 'remove_tags' },
+        replacementMode: 'edit_tags' },
       { name: 'Strip \\underline', patternType: 'matched_pair',
         opening: { prefix: '\\underline', anchor: '{', suffix: '' },
         closing: { prefix: '', anchor: '}', suffix: '' },
-        replacementMode: 'remove_tags' },
+        replacementMode: 'edit_tags' },
       // \textcolor{red}{text}: removing "\textcolor{" .. "}" deletes the
       // command and its color argument; the bare {text} group left behind
       // is harmless to Pandoc.
@@ -5137,7 +5137,7 @@ const PRESET_PROFILES = [
       { name: 'Unwrap \\smash{…}', patternType: 'matched_pair',
         opening: { prefix: '\\smash', anchor: '{', suffix: '' },
         closing: { prefix: '', anchor: '}', suffix: '' },
-        replacementMode: 'remove_tags' },
+        replacementMode: 'edit_tags' },
       // \raisebox{2pt}{content}: removing "\raisebox{" .. "}" deletes the
       // command and its dimension argument, leaving a harmless {content} group.
       { name: 'Drop \\raisebox dimension', patternType: 'matched_pair',
@@ -5691,11 +5691,14 @@ function populateCleanupFromWarnings(warnings) {
         p.patternType === PatternType.MATCHED_PAIR &&
         p.opening && p.opening.suffix === '{' + envName + '}')) {
         prof.searchParameters.push(createSearchParameter({
-          name: 'Remove \\begin{' + envName + '}',
+          name: 'Unwrap \\begin{' + envName + '}',
           patternType: PatternType.MATCHED_PAIR,
           opening: createTagPattern('', '\\begin', '{' + envName + '}'),
           closing: createTagPattern('', '\\end', '{' + envName + '}'),
-          replacementMode: ReplacementMode.REMOVE_ALL,
+          // EDIT_TAGS with blank replacements = remove the delimiters, keep
+          // the content (what Pandoc itself does with unknown environments),
+          // while showing new users the replacement fields exist.
+          replacementMode: ReplacementMode.EDIT_TAGS,
         }));
         added++;
       }
@@ -5714,7 +5717,8 @@ function populateCleanupFromWarnings(warnings) {
 
     // \cmd{…} (optionally starred) → command matched pair. When Pandoc
     // skips a command it deletes the command AND its brace content, so the
-    // rescue default is REMOVE_TAGS: strip the wrapper, keep the content.
+    // rescue default keeps the content: EDIT_TAGS with blank replacement
+    // fields (equivalent to remove-tags, but surfaces the replace option).
     // Matching only the leading "\cmd{" also survives multi-line arguments
     // truncated by the warning parser — the pair engine brace-counts the
     // rest itself. Dedupe is by command name, not full matched text.
@@ -5729,7 +5733,7 @@ function populateCleanupFromWarnings(warnings) {
           patternType: PatternType.MATCHED_PAIR,
           opening: createTagPattern(cmd, '{', ''),
           closing: createTagPattern('', '}', ''),
-          replacementMode: ReplacementMode.REMOVE_TAGS,
+          replacementMode: ReplacementMode.EDIT_TAGS,
         }));
         added++;
       }
