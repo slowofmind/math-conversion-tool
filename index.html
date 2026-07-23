@@ -2709,10 +2709,28 @@ document.getElementById('btnAuxDir')?.addEventListener('click', () => {
   document.getElementById('auxDirInput').click();
 });
 document.getElementById('auxDirInput')?.addEventListener('change', async (e) => {
+  const topDirs = new Set();
   for (const file of e.target.files) {
     const path = file.webkitRelativePath || file.name;
     const content = new Uint8Array(await file.arrayBuffer());
     resourceFiles.auxFiles[path] = content;
+    const slash = path.indexOf('/');
+    if (slash > 0) topDirs.add(path.slice(0, slash));
+  }
+  // A directory upload keeps the selected folder's own name as the first
+  // path component ("include-test/ws/1/x.tex") while the document refers
+  // to "ws/1/x". Auto-add each uploaded top-level folder to the resource
+  // path so pandoc searches inside it when resolving includes and images.
+  // (Visible in the Media tab's Resource path field; user-editable.)
+  if (topDirs.size > 0) {
+    const rpInput = document.getElementById('opt-resource-path');
+    if (rpInput) {
+      const parts = rpInput.value.trim()
+        ? rpInput.value.trim().split(/[;:]/).filter(Boolean)
+        : ['.'];
+      for (const d of topDirs) if (!parts.includes(d)) parts.push(d);
+      rpInput.value = parts.join(':');
+    }
   }
   renderAuxFileList();
   e.target.value = '';
@@ -3846,7 +3864,11 @@ function buildOptions() {
   const dpi = document.getElementById('opt-dpi');
   if (dpi && dpi.value) opts.dpi = parseInt(dpi.value);
   const resPath = document.getElementById('opt-resource-path');
-  if (resPath && resPath.value.trim()) opts['resource-path'] = resPath.value.trim();
+  // Pandoc's defaults format takes resource-path as a LIST, not the CLI's
+  // colon/semicolon-joined string — split before passing to convert().
+  if (resPath && resPath.value.trim()) {
+    opts['resource-path'] = resPath.value.trim().split(/[;:]/).filter(Boolean);
+  }
 
   // Citations (wired later)
   const citMethod = document.getElementById('opt-citation-method');

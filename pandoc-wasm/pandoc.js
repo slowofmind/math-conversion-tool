@@ -34,6 +34,7 @@ import {
   File,
   ConsoleStdout,
   PreopenDirectory,
+  Directory,
 } from "https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.3.0/dist/index.js";
 
 // ════════════════════════════════════════════════════════════════════
@@ -227,10 +228,10 @@ export async function convert(options, stdin, files) {
 
   if (options["output-file"]) {
     files[options["output-file"]] =
-       new Blob([fileSystem.get(options["output-file"]).data]);
+       new Blob([getFileEntry(options["output-file"]).data]);   // NESTED-FS: path-aware lookup
   }
   if (options["extract-media"]) {
-    const mediaFile = fileSystem.get(options["extract-media"]);
+    const mediaFile = getFileEntry(options["extract-media"]);   // NESTED-FS: path-aware lookup
     if (mediaFile && mediaFile.data && mediaFile.data.length > 0) {
       files[options["extract-media"]] =
          new Blob([mediaFile.data], { type: 'application/zip' });
@@ -249,8 +250,60 @@ export async function convert(options, stdin, files) {
   };
 }
 
+// ════════════════════════════════════════════════════════════════════
+// NESTED-FS-BEGIN — local patch (subdirectory support in the virtual FS).
+// Upstream addFile stores every file as ONE flat Map entry, so a name like
+// "ws/1/file.tex" becomes a single root entry whose NAME contains slashes.
+// The WASI shim resolves paths component-by-component through nested
+// Directory objects, so pandoc's \input / \include / \subfile /
+// \includegraphics into subfolders all failed with "Could not load
+// include file". This patch splits names on "/" and builds real nested
+// Directory nodes (shim 0.3.0: Directory.contents is a Map).
+// CANDIDATE FOR UPSTREAMING to pandoc-wasm (see UPSTREAM-CANDIDATES.md).
+// On a pandoc.wasm upgrade: re-apply this block (addFile + getFileEntry +
+// the two getFileEntry call sites in convert()) and add `Directory` to
+// the browser_wasi_shim import at the top of the file.
+// ════════════════════════════════════════════════════════════════════
+function splitPath(filename) {
+  return filename.split("/").filter((p) => p !== "" && p !== ".");
+}
+
+// Walk (creating as needed) nested Directory nodes; return the contents
+// Map into which the leaf entry should be placed.
+function dirContentsFor(parts) {
+  let map = fileSystem;
+  for (const part of parts) {
+    let entry = map.get(part);
+    if (!(entry instanceof Directory)) {
+      entry = new Directory(new Map());
+      map.set(part, entry);
+    }
+    map = entry.contents;
+  }
+  return map;
+}
+
+// Path-aware replacement for fileSystem.get(); returns the File at a
+// possibly-nested path, or undefined.
+function getFileEntry(filename) {
+  const parts = splitPath(filename);
+  const name = parts.pop();
+  let map = fileSystem;
+  for (const part of parts) {
+    const entry = map.get(part);
+    if (!(entry instanceof Directory)) return undefined;
+    map = entry.contents;
+  }
+  return map.get(name);
+}
+
 async function addFile(filename, blob, readonly) {
   const buffer = await blob.arrayBuffer();
   const file = new File(new Uint8Array(buffer), { readonly: readonly });
-  fileSystem.set(filename, file);
+  const parts = splitPath(filename);
+  const name = parts.pop();
+  dirContentsFor(parts).set(name, file);
 }
+// ════════════════════════════════════════════════════════════════════
+// NESTED-FS-END
+// ════════════════════════════════════════════════════════════════════
