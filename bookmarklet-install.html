@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install the "Send to ATC Tool" bookmarklet</title>
+<style>
+  :root { --blue: #1a3c6e; --border: #d0d4da; --muted: #555; }
+  body { font-family: 'Roboto', system-ui, sans-serif; max-width: 720px;
+         margin: 40px auto; padding: 0 16px; line-height: 1.55; color: #1a1a1a; }
+  h1 { font-size: 24px; } h2 { font-size: 18px; margin-top: 32px; }
+  a:focus-visible, button:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--blue); outline-offset: 2px; }
+  .bml {
+    display: inline-block; background: var(--blue); color: #fff;
+    padding: 10px 22px; border-radius: 6px; text-decoration: none;
+    font-weight: 600; cursor: grab; }
+  .drop-hint { color: var(--muted); font-size: 14px; }
+  .notice { background: #f4f6f9; border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 16px; margin: 16px 0; }
+  textarea { width: 100%; height: 110px; font-family: monospace;
+    font-size: 12px; border: 1px solid var(--border); border-radius: 4px; }
+  button { padding: 8px 18px; border-radius: 4px; border: 1px solid var(--border);
+    background: #fff; font-size: 14px; cursor: pointer; }
+  button.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  #copyStatus { margin-left: 10px; font-size: 14px; color: var(--blue); }
+  ol li { margin: 6px 0; }
+</style>
+</head>
+<body>
+<h1>Send your Overleaf project to the ATC tool with one click</h1>
+<p>This page installs a small browser bookmark (a "bookmarklet"). Once it
+is on your bookmarks bar, opening any Overleaf project and clicking the
+bookmark transfers the whole project — every file, including images —
+directly into the Accessible STEM tool in a new tab. Nothing is uploaded
+anywhere except from your browser to your browser: the project travels
+between the two tabs on your own computer.</p>
+
+<div class="notice"><strong>Before you start:</strong> make sure your
+bookmarks bar is visible. Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>
+(Windows) or <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac) to show it.</div>
+
+<h2>Option 1 — drag to install (most people)</h2>
+<p>Drag this button up onto your bookmarks bar:</p>
+<p><a id="bml" class="bml" href="#">Send to ATC Tool</a>
+<span class="drop-hint">← drag me to the bookmarks bar (don't click)</span></p>
+<p id="clickHint" class="drop-hint" role="status"></p>
+
+<h2>Option 2 — copy the code (keyboard &amp; screen reader users)</h2>
+<ol>
+  <li>Press the button below to copy the bookmarklet code.</li>
+  <li>Open your browser's bookmark manager
+      (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> in Chrome/Edge).</li>
+  <li>Add a new bookmark: name it <em>Send to ATC Tool</em> and paste the
+      copied code into the URL field.</li>
+  <li>If your browser removed the leading <code>javascript:</code> from the
+      paste, type it back in at the start.</li>
+</ol>
+<p><button id="copyBtn" class="primary" type="button">Copy bookmarklet code</button>
+<span id="copyStatus" role="status" aria-live="polite"></span></p>
+<p><label for="codeBox">Bookmarklet code (read-only):</label><br>
+<textarea id="codeBox" readonly aria-describedby="codeNote"></textarea></p>
+<p id="codeNote" class="drop-hint">The code is generated for this copy of
+the tool (<span id="toolUrl"></span>), so always install from the site you
+intend to use.</p>
+
+<h2>Option 3 — import a bookmarks file</h2>
+<p>Download a small bookmarks file and import it: in Chrome or Edge open
+the bookmark manager, choose the ⋮ menu → <em>Import bookmarks</em>, and
+select the downloaded file. The bookmark arrives inside an "Imported"
+folder — drag it from there onto your bookmarks bar.</p>
+<p><button id="dlBtn" type="button">Download bookmarks file</button></p>
+
+<h2>How to use it</h2>
+<ol>
+  <li>Open your project in Overleaf.</li>
+  <li>Click <em>Send to ATC Tool</em> on your bookmarks bar.</li>
+  <li>A new tab opens with the tool; its status bar narrates the transfer.
+      Large projects can take 15–30 seconds to fetch — that's normal.</li>
+  <li>When the import finishes, your main document is in the editor and
+      every other project file is listed under the Media tab.</li>
+</ol>
+<div class="notice"><strong>If you see a Harvard login instead of the
+tool:</strong> sign in, then go back to your Overleaf tab and click the
+bookmark again. The first attempt times out quietly; the second works.</div>
+<p class="drop-hint">Bookmarklets are desktop-only; phone and tablet
+browsers don't have a bookmarks bar in the same sense.</p>
+
+<script>
+const TOOL = new URL('index.html', location.href).href;
+const CODE = String.raw`javascript:(()=>{const TOOL='${TOOL}';const TO=new URL(TOOL).origin;const m=location.pathname.match(/\/project\/([a-f0-9]{24})/i);if(!m){alert('Open an Overleaf project first.');return;}let box=document.getElementById('atc-transfer-status');if(!box){box=document.createElement('div');box.id='atc-transfer-status';box.style.cssText='position:fixed;top:12px;right:12px;z-index:99999;background:#1a3c6e;color:#fff;padding:10px 16px;border-radius:6px;font:13px sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.3)';document.body.appendChild(box);}const say=t=>{box.textContent='ATC transfer: '+t;};const done=t=>{say(t);setTimeout(()=>box.remove(),4000);};const child=window.open(TOOL+'#overleaf-import');if(!child){done('popup blocked');return;}say('fetching project...');const name=document.title.replace(/\s*[-\u2013|].*Overleaf.*$/i,'').trim();let zip=null,ready=false,sent=false;const go=()=>{if(!zip||!ready||sent)return;sent=true;child.postMessage({type:'atc-overleaf-zip',zip,projectName:name},TO);say('sending...');};window.addEventListener('message',ev=>{if(ev.origin!==TO||ev.source!==child)return;const d=ev.data;if(d&&d.type==='atc-import-ready'){ready=true;if(!zip)child.postMessage({type:'atc-transfer-note',text:'Fetching project from Overleaf'+(name?' ('+name+')':'')+'...'},TO);go();}if(d&&d.type==='atc-zip-received'){done('sent \u2713');}});fetch('/project/'+m[1]+'/download/zip',{credentials:'same-origin'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.arrayBuffer();}).then(b=>{zip=b;say('fetched '+Math.round(b.byteLength/1024)+' KB...');go();}).catch(e=>done('failed: '+e.message));setTimeout(()=>{if(!sent)done('timed out');},90000);})();`;
+</script>
+<script>
+document.getElementById('toolUrl').textContent = TOOL;
+const bml = document.getElementById('bml');
+bml.href = CODE;
+bml.addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById('clickHint').textContent =
+    'Almost! Drag the button up to the bookmarks bar instead of clicking it ' +
+    '(or use Option 2 below).';
+});
+document.getElementById('codeBox').value = CODE;
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const status = document.getElementById('copyStatus');
+  try {
+    await navigator.clipboard.writeText(CODE);
+    status.textContent = 'Copied to clipboard.';
+  } catch {
+    const box = document.getElementById('codeBox');
+    box.focus(); box.select();
+    status.textContent = 'Press Ctrl+C to copy the selected code.';
+  }
+});
+document.getElementById('dlBtn').addEventListener('click', () => {
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const doc = '<!DOCTYPE NETSCAPE-Bookmark-file-1>\n' +
+    '<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">\n' +
+    '<TITLE>Bookmarks</TITLE>\n<H1>Bookmarks</H1>\n<DL><p>\n' +
+    '    <DT><A HREF="' + esc(CODE) + '">Send to ATC Tool</A>\n</DL><p>\n';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([doc], { type: 'text/html' }));
+  a.download = 'atc-tool-bookmark.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+</script>
+</body>
+</html>

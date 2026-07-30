@@ -1006,6 +1006,11 @@
   .filter-reorder-btn:hover { color: var(--text-primary); background: var(--bg-tertiary); border-color: var(--border); }
   .filter-reorder-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
 
+  .toolbar-link {
+    align-self: center; font-size: 12px; color: var(--text-muted);
+    text-decoration: underline; margin-left: 4px; white-space: nowrap;
+  }
+  .toolbar-link:hover, .toolbar-link:focus-visible { color: var(--text-primary); }
   /* Toggle button in toolbar for options panel */
   .toolbar-btn.options-toggle.panel-open { color: var(--accent); }
 
@@ -1097,6 +1102,8 @@
   <div class="toolbar-group">
     <button class="toolbar-btn options-toggle panel-open" id="btnOptions" title="Toggle conversion options panel" aria-expanded="true" aria-controls="optionsPanel">Options</button>
   </div>
+
+  <a class="toolbar-link" href="bookmarklet-install.html" target="_blank" rel="noopener" title="Install the bookmarklet that sends Overleaf projects to this tool">Overleaf setup</a>
 
   <span class="toolbar-spacer"></span>
 
