@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Overleaf transfer harness (dev only)</title>
+<style>
+  body { font-family: sans-serif; max-width: 640px; margin: 40px auto; }
+  pre { background: #f4f4f4; padding: 12px; min-height: 80px; }
+  button { padding: 6px 16px; }
+</style>
+</head>
+<body>
+<h1>Overleaf transfer harness</h1>
+<p><strong>Dev aid only — not part of the tool.</strong> Simulates the future
+bookmarklet: pick a project zip, then click Send. It opens the tool with the
+<code>#overleaf-import</code> flag, waits for the ready ping, and posts the
+zip via postMessage exactly as the bookmarklet will.</p>
+<p>
+  <input type="file" id="zip" accept=".zip">
+  <button id="send" disabled>Open tool &amp; send</button>
+</p>
+<pre id="log"></pre>
+<script>
+const log = (m) => { document.getElementById('log').textContent += m + '\n'; };
+let buf = null;
+document.getElementById('zip').addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  buf = await f.arrayBuffer();
+  document.getElementById('send').disabled = false;
+  log('zip loaded: ' + f.name + ' (' + buf.byteLength + ' bytes)');
+});
+document.getElementById('send').addEventListener('click', () => {
+  const child = window.open('index.html#overleaf-import');
+  if (!child) { log('popup blocked - allow popups for this site'); return; }
+  log('opened tool tab, waiting for ready ping...');
+  let sent = false;
+  window.addEventListener('message', (ev) => {
+    if (ev.origin !== location.origin) return;
+    if (ev.data && ev.data.type === 'atc-import-ready' && !sent) {
+      sent = true;
+      child.postMessage(
+        { type: 'atc-overleaf-zip', zip: buf, projectName: 'harness test' },
+        location.origin
+      );
+      log('ready ping received -> zip sent');
+    }
+    if (ev.data && ev.data.type === 'atc-zip-received') {
+      log('tool acknowledged receipt - check the tool tab');
+    }
+  });
+});
+</script>
+</body>
+</html>

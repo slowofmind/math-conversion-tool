@@ -505,6 +505,7 @@
   .pdf-modal {
     background: #ffffff; border: 1px solid var(--border);
     border-radius: 8px; padding: 24px 28px; max-width: 420px; width: 90%;
+    max-height: 85vh; display: flex; flex-direction: column;
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
   }
   .pdf-modal h3 {
@@ -515,8 +516,12 @@
   }
   .pdf-modal ul {
     margin: 0 0 16px; padding-left: 20px; font-size: 13px;
+    overflow-y: auto; flex: 1 1 auto; min-height: 0;
     color: var(--text-secondary); line-height: 1.6;
     font-family: 'Roboto Mono', monospace;
+  }
+  .pdf-modal-list {
+    overflow-y: auto; flex: 1 1 auto; min-height: 0; margin: 0 0 16px;
   }
   .pdf-modal-actions {
     display: flex; gap: 8px; justify-content: flex-end;
@@ -1013,7 +1018,7 @@
 </head>
 <body>
 
-<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ" aria-label="Upload document file">
+<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ,.zip" aria-label="Upload document file">
 
 <!-- ═══ TITLE BAR ═══ -->
 <div class="title-bar">
@@ -2061,6 +2066,12 @@ async function handleFileUpload(file) {
 
   // Auto-detect format from extension
   const ext = file.name.split('.').pop().toLowerCase();
+  // Project zips route to the multi-file importer (main doc -> editor,
+  // other entries -> auxiliary files). Covers picker and drag-and-drop.
+  if (ext === 'zip') {
+    await importProjectZip(await file.arrayBuffer(), `"${file.name}"`);
+    return;
+  }
   const formatMap = {
     'tex': 'latex', 'latex': 'latex', 'md': 'markdown', 'markdown': 'markdown',
     'html': 'html', 'htm': 'html', 'rst': 'rst', 'org': 'org', 'typ': 'typst',
@@ -2736,6 +2747,256 @@ document.getElementById('auxDirInput')?.addEventListener('change', async (e) => 
   e.target.value = '';
   await handlePdfAuxFiles();
 });
+
+// ─── Project zip import (Overleaf transfer, Checkpoint 1) ───────────
+// Reads a .zip entirely in the browser (mirror of buildZip: EOCD →
+// central directory → local headers; deflate entries decompressed via
+// DecompressionStream('deflate-raw')), picks the main .tex document,
+// loads it into the editor, and routes every other entry into
+// resourceFiles.auxFiles under its zip-relative path. This is also the
+// landing point for the future Overleaf postMessage receiver.
+
+async function inflateRawBytes(bytes) {
+  const ds = new DecompressionStream('deflate-raw');
+  const resp = new Response(new Blob([bytes]).stream().pipeThrough(ds));
+  return new Uint8Array(await resp.arrayBuffer());
+}
+
+// Parse a zip ArrayBuffer → { entries: [{path, data:Uint8Array}], errors: [] }.
+// Stored (method 0) and deflate (method 8) supported; zip64 rejected.
+// Per-entry failures are collected, not fatal (flag-don't-fail).
+async function parseZip(arrayBuffer) {
+  const buf = new Uint8Array(arrayBuffer);
+  const view = new DataView(arrayBuffer);
+  // End-of-central-directory record: scan backward over a possible
+  // trailing comment (comment max 65535 bytes; record itself 22).
+  let eocd = -1;
+  const scanStart = Math.max(0, buf.length - 65558);
+  for (let i = buf.length - 22; i >= scanStart; i--) {
+    if (view.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error('not a zip file (no end-of-central-directory record)');
+  const count = view.getUint16(eocd + 10, true);
+  let offset = view.getUint32(eocd + 16, true);
+  if (count === 0xFFFF || offset === 0xFFFFFFFF) {
+    throw new Error('zip64 archives are not supported');
+  }
+  const decoder = new TextDecoder('utf-8');
+  const entries = [];
+  const errors = [];
+  for (let n = 0; n < count; n++) {
+    if (view.getUint32(offset, true) !== 0x02014b50) {
+      errors.push(`central directory damaged at entry ${n}`);
+      break;
+    }
+    const method = view.getUint16(offset + 10, true);
+    const compSize = view.getUint32(offset + 20, true);
+    const nameLen = view.getUint16(offset + 28, true);
+    const extraLen = view.getUint16(offset + 30, true);
+    const commentLen = view.getUint16(offset + 32, true);
+    const localOff = view.getUint32(offset + 42, true);
+    const path = decoder.decode(buf.subarray(offset + 46, offset + 46 + nameLen));
+    offset += 46 + nameLen + extraLen + commentLen;
+    if (path.endsWith('/')) continue; // directory record
+    try {
+      // Local header name/extra lengths can differ from the central copy.
+      if (view.getUint32(localOff, true) !== 0x04034b50) throw new Error('bad local header');
+      const lNameLen = view.getUint16(localOff + 26, true);
+      const lExtraLen = view.getUint16(localOff + 28, true);
+      const dataStart = localOff + 30 + lNameLen + lExtraLen;
+      const raw = buf.subarray(dataStart, dataStart + compSize);
+      let data;
+      if (method === 0) data = new Uint8Array(raw);
+      else if (method === 8) data = await inflateRawBytes(raw);
+      else throw new Error(`unsupported compression method ${method}`);
+      entries.push({ path, data });
+    } catch (err) {
+      errors.push(`${path}: ${err.message}`);
+    }
+  }
+  return { entries, errors };
+}
+
+function isJunkZipEntry(path) {
+  if (path.startsWith('__MACOSX/')) return true;
+  const base = path.split('/').pop();
+  return base === '.DS_Store' || base === 'Thumbs.db' ||
+         base === 'desktop.ini' || base.startsWith('._');
+}
+
+// Pick the main document among zip entries. Preference order:
+// (1) sole .tex containing \documentclass; (2) a root-level main.tex,
+// then a unique main.tex anywhere; (3) ask the user (candidates list).
+function detectMainTexFile(entries) {
+  const dec = new TextDecoder('utf-8');
+  const texEntries = entries.filter(e => e.path.toLowerCase().endsWith('.tex'));
+  if (texEntries.length === 0) return { main: null, candidates: [] };
+  const withClass = texEntries.filter(e => {
+    try { return dec.decode(e.data).includes('\\documentclass'); }
+    catch { return false; }
+  });
+  const pool = withClass.length > 0 ? withClass : texEntries;
+  if (pool.length === 1) return { main: pool[0], candidates: pool };
+  const mains = pool.filter(e => e.path.split('/').pop().toLowerCase() === 'main.tex');
+  const rootMain = mains.find(e => !e.path.includes('/'));
+  if (rootMain) return { main: rootMain, candidates: pool };
+  if (mains.length === 1) return { main: mains[0], candidates: pool };
+  return { main: null, candidates: pool };
+}
+
+function escapeHtmlText(s) {
+  return s.replace(/[&<>"]/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+// Modal chooser when the main document is ambiguous. Resolves to the
+// chosen path, or null on cancel. Modeled on showPdfPrompt.
+function showMainFilePrompt(candidateNames) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'pdf-modal-overlay';
+    const options = candidateNames.map((n, i) =>
+      `<label style="display:block;margin:4px 0;">` +
+      `<input type="radio" name="mainTexPick" value="${i}"${i === 0 ? ' checked' : ''}> ` +
+      `${escapeHtmlText(n)}</label>`
+    ).join('');
+    overlay.innerHTML = `
+      <div class="pdf-modal">
+        <h3>Choose the Main Document</h3>
+        <p>This project has more than one candidate for the main document.
+           The chosen file opens in the editor; all other files become
+           auxiliary resources.</p>
+        <div class="pdf-modal-list">${options}</div>
+        <div class="pdf-modal-actions">
+          <button class="pdf-modal-btn" id="mainPickCancel">Cancel import</button>
+          <button class="pdf-modal-btn primary" id="mainPickOk">Import</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#mainPickOk').addEventListener('click', () => {
+      const sel = overlay.querySelector('input[name="mainTexPick"]:checked');
+      document.body.removeChild(overlay);
+      resolve(sel ? candidateNames[Number(sel.value)] : null);
+    });
+    overlay.querySelector('#mainPickCancel').addEventListener('click', () => {
+      document.body.removeChild(overlay);
+      resolve(null);
+    });
+  });
+}
+
+function addToResourcePath(dir) {
+  if (!dir) return;
+  const rpInput = document.getElementById('opt-resource-path');
+  if (!rpInput) return;
+  const parts = rpInput.value.trim()
+    ? rpInput.value.trim().split(/[;:]/).filter(Boolean)
+    : ['.'];
+  if (!parts.includes(dir)) parts.push(dir);
+  rpInput.value = parts.join(':');
+}
+
+// Import a project zip: main file → editor, everything else → auxFiles.
+// sourceLabel appears in status messages ('"foo.zip"', 'Overleaf', …).
+async function importProjectZip(arrayBuffer, sourceLabel) {
+  updateStatus('loading', 'Reading project zip…');
+  let parsed;
+  try {
+    parsed = await parseZip(arrayBuffer);
+  } catch (err) {
+    updateStatus('error', `Zip import failed: ${err.message}`);
+    return;
+  }
+  const entries = parsed.entries.filter(e => !isJunkZipEntry(e.path));
+  if (entries.length === 0) {
+    updateStatus('error', 'Zip import: no usable files found in the archive');
+    return;
+  }
+  // Decide the main document BEFORE touching any state, so a cancelled
+  // prompt leaves the workspace exactly as it was.
+  const det = detectMainTexFile(entries);
+  let mainEntry = det.main;
+  if (!mainEntry && det.candidates.length > 1) {
+    const pick = await showMainFilePrompt(det.candidates.map(e => e.path));
+    if (pick === null) { updateStatus('ready', 'Zip import cancelled'); return; }
+    mainEntry = det.candidates.find(e => e.path === pick);
+  }
+  const auxEntries = entries.filter(e => e !== mainEntry);
+  for (const e of auxEntries) resourceFiles.auxFiles[e.path] = e.data;
+  // Wrapper-folder guard: Overleaf zips carry project-relative paths with
+  // no wrapper, but a hand-zipped folder wraps everything in one top
+  // directory — mirror the directory-upload fix and search inside it.
+  const topDirs = new Set();
+  let allNested = entries.length > 0;
+  for (const e of entries) {
+    const slash = e.path.indexOf('/');
+    if (slash > 0) topDirs.add(e.path.slice(0, slash)); else allNested = false;
+  }
+  if (allNested && topDirs.size === 1) addToResourcePath([...topDirs][0]);
+  if (mainEntry) {
+    const baseName = mainEntry.path.split('/').pop();
+    await handleFileUpload(new File([mainEntry.data], baseName));
+    // If the main file lives in a subfolder, search that folder too.
+    if (mainEntry.path.includes('/')) {
+      addToResourcePath(mainEntry.path.slice(0, mainEntry.path.lastIndexOf('/')));
+    }
+  }
+  renderAuxFileList();
+  const total = auxEntries.length + (mainEntry ? 1 : 0);
+  let msg = `Imported ${total} file${total === 1 ? '' : 's'} from ${sourceLabel}`;
+  msg += mainEntry ? ` · main: ${mainEntry.path}` : ' (no main .tex — auxiliary files only)';
+  if (parsed.errors.length > 0) {
+    msg += ` · ${parsed.errors.length} skipped (see console)`;
+    console.warn('Zip import skipped entries:', parsed.errors);
+  }
+  updateStatus('ready', msg);
+  await handlePdfAuxFiles();
+}
+
+// ─── Overleaf transfer receiver (Checkpoint 2) ───────────────────────
+// Active only when the page is opened with #overleaf-import in the URL
+// (the bookmarklet opens it that way), so ordinary visits never run it.
+// Protocol: this page pings its opener {type:'atc-import-ready'} until
+// answered; the sender then posts {type:'atc-overleaf-zip', zip, projectName};
+// this page acks {type:'atc-zip-received'} and imports the zip. Origin
+// is checked on every message; one project per page load.
+const OVERLEAF_ORIGINS = ['https://www.overleaf.com', 'https://overleaf.com'];
+// Dev convenience: when the tool itself is served from localhost, accept
+// the local origin too so the harness page can exercise the handshake.
+if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+  OVERLEAF_ORIGINS.push(location.origin);
+}
+
+(function setupOverleafReceiver() {
+  if (!location.hash.includes('overleaf-import')) return;
+  if (!window.opener) return;
+  updateStatus('loading', 'Waiting for project transfer from Overleaf...');
+  let received = false;
+  window.addEventListener('message', async (event) => {
+    if (!OVERLEAF_ORIGINS.includes(event.origin)) return;
+    const d = event.data;
+    if (d && d.type === 'atc-transfer-note' && typeof d.text === 'string') {
+      updateStatus('loading', d.text.slice(0, 200));
+      return;
+    }
+    if (!d || d.type !== 'atc-overleaf-zip' || !(d.zip instanceof ArrayBuffer)) return;
+    if (received) return;
+    received = true;
+    try { event.source?.postMessage({ type: 'atc-zip-received' }, event.origin); } catch {}
+    const label = d.projectName ? `Overleaf ("${d.projectName}")` : 'Overleaf';
+    await importProjectZip(d.zip, label);
+  });
+  // Announce readiness; the sender holds the zip until it hears this.
+  // Repeats for up to ~10 s in case the opener attached its listener late;
+  // browsers silently drop pings whose targetOrigin doesn't match the opener.
+  let pings = 0;
+  const readyTimer = setInterval(() => {
+    if (received || ++pings > 40) { clearInterval(readyTimer); return; }
+    for (const o of OVERLEAF_ORIGINS) {
+      try { window.opener.postMessage({ type: 'atc-import-ready' }, o); } catch {}
+    }
+  }, 250);
+})();
 
 const resourceFiles = {
   auxFiles: {},       // additional files (images, includes)
