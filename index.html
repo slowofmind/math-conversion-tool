@@ -5013,6 +5013,7 @@ function createSearchParameter(overrides) {
     name: '',
     patternType: PatternType.MATCHED_PAIR,
     useRegex: false,
+    repeatUntilStable: false,
     scope: null,
     opening: createTagPattern(),
     closing: createTagPattern(),
@@ -5303,82 +5304,128 @@ function processSingleStringParameter(text, param) {
   return { result, matchCount: positions.length };
 }
 
-function extractScopeRegion(text, scope) {
-  if (!scope) return { scopedText: text, startOffset: 0 };
+// --- Scope region finding (shared machinery with matched-pair patterns) ---
+// A scope is matched with the SAME stack-based, nesting-aware finder used by
+// matched-pair patterns (findAllMatchedPairs), so prefix/anchor/suffix
+// semantics are identical at every level. Scope tags are literal (non-regex).
+// Returns an array of { start, end } region INTERIORS (tags excluded),
+// non-overlapping, in document order.
+//
+// Degenerate forms:
+//   scope null          -> one region covering the whole text
+//   opening + closing   -> the interior of EVERY matched pair (may be [])
+//   opening only        -> first opening match to end of text ([] if none)
+//   closing only        -> start of text to first closing match
+//                          (whole text if none - legacy leniency, matching the
+//                          pre-2026-08 extractScopeRegion behavior)
+function findAllScopeRegions(text, scope) {
+  if (!scope) return [{ start: 0, end: text.length }];
 
-  let startPos = 0, endPos = text.length;
+  const hasTag = (t) => !!(t && ((t.anchor || '') !== '' || (t.prefix || '') !== '' || (t.suffix || '') !== ''));
+  const hasOpening = !scope.openingAtStartOfFile && hasTag(scope.opening);
+  const hasClosing = !scope.closingAtEndOfFile && hasTag(scope.closing);
 
-  if (scope.openingAtStartOfFile) {
-    startPos = 0;
-  } else if (scope.opening) {
-    const tag = buildTagString(scope.opening);
-    if (tag) {
-      const idx = text.indexOf(tag);
-      if (idx === -1) return { scopedText: '', startOffset: 0 };
-      startPos = idx + tag.length;
-    }
+  if (hasOpening && hasClosing) {
+    const scopeParam = { opening: scope.opening, closing: scope.closing, useRegex: false };
+    const pairs = findAllMatchedPairs(text, scopeParam);
+    return pairs.map((m) => ({ start: m.opening.endIndex, end: m.closing.startIndex }));
   }
 
-  if (scope.closingAtEndOfFile) {
-    endPos = text.length;
-  } else if (scope.closing) {
-    const tag = buildTagString(scope.closing);
-    if (tag) {
-      const idx = text.indexOf(tag, startPos);
-      if (idx === -1) endPos = text.length;
-      else endPos = idx;
-    }
+  if (hasOpening) {
+    const opening = findOpeningPattern(text, { opening: scope.opening, useRegex: false }, 0);
+    if (!opening) return [];
+    return [{ start: opening.endIndex, end: text.length }];
   }
 
-  return { scopedText: text.substring(startPos, endPos), startOffset: startPos };
+  if (hasClosing) {
+    const closing = findOpeningPattern(text, { opening: scope.closing, useRegex: false }, 0);
+    if (!closing) return [{ start: 0, end: text.length }];
+    return [{ start: 0, end: closing.startIndex }];
+  }
+
+  return [{ start: 0, end: text.length }];
+}
+
+// --- Per-pattern body processing (optional repeat-until-stable) ---
+// One "pass" = the standard find-all-then-replace-backward sweep. With
+// repeatUntilStable, passes repeat until a pass finds ZERO matches
+// (count-based termination - immune to the old length-comparison blindness),
+// capped at MAX_STABLE_PASSES. Hitting the cap is FLAGGED, not silent:
+// a wrapping pattern that re-matches its own output would otherwise loop.
+const MAX_STABLE_PASSES = 50;
+
+function processParameterBody(text, param) {
+  const onePass = (t) => {
+    if (param.patternType === PatternType.MATCHED_PAIR) return processMatchedPairParameter(t, param);
+    if (param.patternType === PatternType.SINGLE_STRING) return processSingleStringParameter(t, param);
+    return { result: t, matchCount: 0 };
+  };
+
+  if (!param.repeatUntilStable) {
+    const once = onePass(text);
+    return { result: once.result, matchCount: once.matchCount, capped: false };
+  }
+
+  let current = text;
+  let total = 0;
+  for (let pass = 0; pass < MAX_STABLE_PASSES; pass++) {
+    const o = onePass(current);
+    current = o.result;
+    total += o.matchCount;
+    if (o.matchCount === 0) return { result: current, matchCount: total, capped: false };
+  }
+  return { result: current, matchCount: total, capped: true };
+}
+
+// --- Scoped parameter processing ---
+// Regions are processed BACK-TO-FRONT: edits inside a later region never
+// disturb the recorded offsets of earlier regions - the same index-
+// preservation idiom as backward replacement inside a pattern.
+function processScopedParameter(text, param, scope) {
+  const regions = findAllScopeRegions(text, scope);
+  if (regions.length === 0) return { result: text, matchCount: 0, capped: false };
+
+  let result = text;
+  let matchCount = 0;
+  let capped = false;
+
+  for (let i = regions.length - 1; i >= 0; i--) {
+    const region = regions[i];
+    const slice = result.substring(region.start, region.end);
+    const o = processParameterBody(slice, param);
+    matchCount += o.matchCount;
+    capped = capped || o.capped;
+    if (o.result !== slice) {
+      result = result.substring(0, region.start) + o.result + result.substring(region.end);
+    }
+  }
+  return { result, matchCount, capped };
 }
 
 function processSearchParameter(text, param) {
-  const scope = param.scope || null;
-  const { scopedText, startOffset } = extractScopeRegion(text, scope);
-
-  let processed;
-  if (param.patternType === PatternType.MATCHED_PAIR) {
-    processed = processMatchedPairParameter(scopedText, param);
-  } else if (param.patternType === PatternType.SINGLE_STRING) {
-    processed = processSingleStringParameter(scopedText, param);
-  } else {
-    return { result: text, matchCount: 0 };
-  }
-
-  if (scope && (startOffset > 0 || startOffset + scopedText.length < text.length)) {
-    const before = text.substring(0, startOffset);
-    const after  = text.substring(startOffset + scopedText.length);
-    return { result: before + processed.result + after, matchCount: processed.matchCount };
-  }
-  return processed;
+  // Standalone entry point: honors the pattern's own scope only. Profile
+  // scope inheritance (override semantics) is applied by runProfile.
+  return processScopedParameter(text, param, param.scope || null);
 }
 
 function runProfile(text, profile) {
-  const profileScope = profile.scope || null;
-  const { scopedText, startOffset } = extractScopeRegion(text, profileScope);
-
-  let current = scopedText;
+  let current = text;
   let totalMatches = 0;
   const perPattern = [];
 
   for (const param of profile.searchParameters) {
-    const { result, matchCount } = processSearchParameter(current, param);
-    current = result;
-    totalMatches += matchCount;
-    perPattern.push({ name: param.name || getPatternSummaryText(param), matchCount });
+    // OVERRIDE semantics: a pattern's own scope replaces the profile scope
+    // entirely and is searched against the full current text; without one,
+    // the pattern inherits the profile scope. Regions are recomputed for
+    // every pattern because earlier patterns' edits shift positions.
+    const effectiveScope = param.scope || profile.scope || null;
+    const o = processScopedParameter(current, param, effectiveScope);
+    current = o.result;
+    totalMatches += o.matchCount;
+    perPattern.push({ name: param.name || getPatternSummaryText(param), matchCount: o.matchCount, capped: o.capped });
   }
 
-  let finalResult;
-  if (profileScope && (startOffset > 0 || startOffset + scopedText.length < text.length)) {
-    const before = text.substring(0, startOffset);
-    const after  = text.substring(startOffset + scopedText.length);
-    finalResult = before + current + after;
-  } else {
-    finalResult = current;
-  }
-
-  return { result: finalResult, totalMatches, perPattern };
+  return { result: current, totalMatches, perPattern };
 }
 
 
@@ -5458,11 +5505,29 @@ function normalizeProfile(raw) {
   return p;
 }
 
-// Two patterns are "the same" if they'd match the same construct: pairs
-// compare their opening tag triple (covers commands via prefix+anchor and
-// environments via anchor+suffix); single strings compare the find text.
+// Two patterns are "the same" if they'd match the same construct IN THE
+// SAME PLACES: pairs compare their opening tag triple (covers commands via
+// prefix+anchor and environments via anchor+suffix); single strings compare
+// the find text. Scope and repeat-until-stable are DISTINGUISHING fields:
+// the same construct scoped to different regions (e.g. preamble vs body)
+// is a different pattern, not a duplicate.
+function tagTripleEqual(x, y) {
+  const a = x || {}, b = y || {};
+  return (a.prefix || '') === (b.prefix || '') &&
+         (a.anchor || '') === (b.anchor || '') &&
+         (a.suffix || '') === (b.suffix || '');
+}
+function scopesEquivalent(sa, sb) {
+  const a = sa || {}, b = sb || {};
+  return !!a.openingAtStartOfFile === !!b.openingAtStartOfFile &&
+         !!a.closingAtEndOfFile === !!b.closingAtEndOfFile &&
+         tagTripleEqual(a.opening, b.opening) &&
+         tagTripleEqual(a.closing, b.closing);
+}
 function patternsEquivalent(a, b) {
   if (a.patternType !== b.patternType) return false;
+  if (!scopesEquivalent(a.scope, b.scope)) return false;
+  if (!!a.repeatUntilStable !== !!b.repeatUntilStable) return false;
   if (a.patternType === PatternType.SINGLE_STRING) {
     return a.findString === b.findString && !!a.useRegex === !!b.useRegex;
   }
@@ -5692,6 +5757,29 @@ document.getElementById('btnClearPatterns').addEventListener('click', () => {
   updateStatus('ready', 'All patterns cleared');
 });
 
+// ─── Anchor autofill (quality-of-life; kill switch below) ───
+// When the OPENING anchor's typed value exactly matches a key in the map,
+// the CLOSING anchor autofills with its partner - only if currently empty,
+// never clobbering user input - and focus jumps to the opening SUFFIX field
+// (the natural next stop, e.g. to type "{figure}" after "\begin").
+// To disable the feature entirely, set ANCHOR_AUTOFILL_ENABLED = false.
+// To add pairs, extend ANCHOR_AUTOFILL_MAP.
+const ANCHOR_AUTOFILL_ENABLED = true;
+const ANCHOR_AUTOFILL_MAP = { '{': '}', '\\begin': '\\end' };
+
+function attachAnchorAutofill(openAnchorInput, closeAnchorInput, openSuffixInput, onFill) {
+  if (!ANCHOR_AUTOFILL_ENABLED) return;
+  if (!openAnchorInput || !closeAnchorInput) return;
+  openAnchorInput.addEventListener('input', () => {
+    const partner = ANCHOR_AUTOFILL_MAP[openAnchorInput.value];
+    if (partner === undefined) return;
+    if (closeAnchorInput.value !== '') return;
+    closeAnchorInput.value = partner;
+    if (onFill) onFill(partner);
+    if (openSuffixInput) openSuffixInput.focus();
+  });
+}
+
 // ─── Profile scope toggle ───
 const scopeHeader = document.getElementById('profileScopeHeader');
 function toggleScope() {
@@ -5731,6 +5819,15 @@ scopeHeader.addEventListener('keydown', (e) => {
     }
   });
 });
+
+// Anchor autofill on the profile scope fields. No onFill needed: the focus
+// jump blurs the opening anchor, which fires the blur-save above and reads
+// the just-autofilled closing anchor from the DOM.
+attachAnchorAutofill(
+  document.getElementById('scopeOpenAnchor'),
+  document.getElementById('scopeCloseAnchor'),
+  document.getElementById('scopeOpenSuffix'),
+  null);
 
 // ─── Pattern list rendering ───
 function renderPatternList() {
@@ -5846,12 +5943,14 @@ function createPatternFields(pattern, index) {
     openRow.appendChild(mkInput('pf-input-flex', 'Prefix',
       (pattern.opening && pattern.opening.prefix) || '',
       v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.prefix = v; }));
-    openRow.appendChild(mkInput('pf-input-anchor', 'Anchor',
+    const openAnchorInp = mkInput('pf-input-anchor', 'Anchor',
       (pattern.opening && pattern.opening.anchor) || '',
-      v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.anchor = v; }));
-    openRow.appendChild(mkInput('pf-input-flex', 'Suffix',
+      v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.anchor = v; });
+    openRow.appendChild(openAnchorInp);
+    const openSuffixInp = mkInput('pf-input-flex', 'Suffix',
       (pattern.opening && pattern.opening.suffix) || '',
-      v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.suffix = v; }));
+      v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.suffix = v; });
+    openRow.appendChild(openSuffixInp);
     container.appendChild(openRow);
 
     // Closing row
@@ -5864,13 +5963,22 @@ function createPatternFields(pattern, index) {
     closeRow.appendChild(mkInput('pf-input-flex', 'Prefix',
       (pattern.closing && pattern.closing.prefix) || '',
       v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.prefix = v; }));
-    closeRow.appendChild(mkInput('pf-input-anchor', 'Anchor',
+    const closeAnchorInp = mkInput('pf-input-anchor', 'Anchor',
       (pattern.closing && pattern.closing.anchor) || '',
-      v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.anchor = v; }));
-    closeRow.appendChild(mkInput('pf-input-flex', 'Suffix',
+      v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.anchor = v; });
+    closeRow.appendChild(closeAnchorInp);    closeRow.appendChild(mkInput('pf-input-flex', 'Suffix',
       (pattern.closing && pattern.closing.suffix) || '',
       v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.suffix = v; }));
     container.appendChild(closeRow);
+
+    // Anchor autofill: typing "{" or "\begin" as the opening anchor fills
+    // the (empty) closing anchor and jumps focus to the opening suffix.
+    // The closing anchor's model field is written here explicitly because
+    // its own blur handler never fires on a programmatic fill.
+    attachAnchorAutofill(openAnchorInp, closeAnchorInp, openSuffixInp, (partner) => {
+      if (!pattern.closing) pattern.closing = createTagPattern();
+      pattern.closing.anchor = partner;
+    });
 
     // Mode row
     const modeRow = document.createElement('div');
@@ -5942,7 +6050,124 @@ function createPatternFields(pattern, index) {
     }
   }
 
+  // ── Scope + repeat controls (both pattern types) ──
+  container.appendChild(createPatternScopeSection(pattern, index));
+
+  const repRow = document.createElement('div');
+  repRow.className = 'pf-row';
+  const repLbl = document.createElement('label');
+  repLbl.className = 'pf-checkbox';
+  repLbl.title = 'Re-run this pattern until a pass finds no matches (max 50 passes). Leave OFF for wrapping patterns whose replacement still matches the pattern - those would re-wrap on every pass and stop at the cap.';
+  const repChk = document.createElement('input');
+  repChk.type = 'checkbox';
+  repChk.checked = pattern.repeatUntilStable || false;
+  repChk.onchange = () => { pattern.repeatUntilStable = repChk.checked; };
+  repLbl.appendChild(repChk);
+  repLbl.appendChild(document.createTextNode(' Repeat until stable'));
+  repRow.appendChild(repLbl);
+  container.appendChild(repRow);
+
   return container;
+}
+
+// ─── Per-pattern scope disclosure ───
+// Mirrors the profile-level Scope section, one per pattern card. Collapsed
+// by default. Empty fields = INHERIT the profile scope; any anchor filled =
+// this pattern's scope OVERRIDES the profile scope and is searched against
+// the whole document. Fields save on blur; an anchor is required to
+// activate a side (same convention as the profile scope).
+function createPatternScopeSection(pattern, index) {
+  const section = document.createElement('div');
+  section.className = 'scope-section';
+  section.style.marginTop = '4px';
+
+  const header = document.createElement('div');
+  header.className = 'scope-header';
+  header.setAttribute('role', 'button');
+  header.setAttribute('tabindex', '0');
+  header.setAttribute('aria-expanded', 'false');
+
+  const label = document.createElement('span');
+  const toggle = document.createElement('span');
+  toggle.setAttribute('aria-hidden', 'true');
+  toggle.textContent = '›';
+  header.appendChild(label);
+  header.appendChild(toggle);
+
+  const fields = document.createElement('div');
+  fields.className = 'scope-fields';
+  fields.style.display = 'none';
+
+  const hasTagText = (t) => !!(t && ((t.anchor || '') !== '' || (t.prefix || '') !== '' || (t.suffix || '') !== ''));
+  const refreshLabel = () => {
+    const set = pattern.scope && (hasTagText(pattern.scope.opening) || hasTagText(pattern.scope.closing));
+    label.textContent = set ? 'Scope (set - overrides profile)' : 'Scope (inherits profile)';
+  };
+
+  const inputs = [];
+  const saveScope = () => {
+    const oA = inputs[1].value.trim();
+    const cA = inputs[4].value.trim();
+    if (oA || cA) {
+      pattern.scope = {};
+      if (oA) pattern.scope.opening = { prefix: inputs[0].value, anchor: inputs[1].value, suffix: inputs[2].value };
+      if (cA) pattern.scope.closing = { prefix: inputs[3].value, anchor: inputs[4].value, suffix: inputs[5].value };
+    } else {
+      pattern.scope = null;
+    }
+    refreshLabel();
+  };
+
+  const scopeRow = (rowLabel, tag) => {
+    const row = document.createElement('div');
+    row.className = 'pf-row';
+    const l = document.createElement('span');
+    l.className = 'pf-label';
+    l.textContent = rowLabel;
+    row.appendChild(l);
+    [['pf-input-flex', 'Prefix', 'prefix'], ['pf-input-anchor', 'Anchor', 'anchor'], ['pf-input-flex', 'Suffix', 'suffix']].forEach((d) => {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'pf-input ' + d[0];
+      inp.placeholder = d[1];
+      inp.setAttribute('aria-label', (rowLabel === 'O:' ? 'Opening' : 'Closing') + ' pattern scope ' + d[2]);
+      inp.value = (tag && tag[d[2]]) || '';
+      inp.onblur = saveScope;
+      inputs.push(inp);
+      row.appendChild(inp);
+    });
+    return row;
+  };
+
+  const sc = pattern.scope || {};
+  fields.appendChild(scopeRow('O:', sc.opening));
+  fields.appendChild(scopeRow('C:', sc.closing));
+
+  // Anchor autofill on the scope rows (inputs: 0-2 = O prefix/anchor/suffix,
+  // 3-5 = C prefix/anchor/suffix). saveScope reads the DOM, so it doubles
+  // as the onFill model sync.
+  attachAnchorAutofill(inputs[1], inputs[4], inputs[2], saveScope);
+
+  const hint = document.createElement('div');
+  hint.className = 'pf-note';
+  hint.textContent = 'Runs the pattern inside EVERY region this scope matches. Blank O: = start of file; blank C: = end of file. Anchor required to activate a side.';
+  fields.appendChild(hint);
+
+  const toggleFields = () => {
+    const expanding = fields.style.display === 'none';
+    fields.style.display = expanding ? '' : 'none';
+    toggle.textContent = expanding ? '⌄' : '›';
+    header.setAttribute('aria-expanded', expanding ? 'true' : 'false');
+  };
+  header.addEventListener('click', toggleFields);
+  header.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFields(); }
+  });
+
+  refreshLabel();
+  section.appendChild(header);
+  section.appendChild(fields);
+  return section;
 }
 
 // ─── Toggle / Delete / Add ───
@@ -6002,6 +6227,12 @@ function getSourceForConversion() {
     console.log('[cleanup] Applied "' + profile.name + '" before conversion: ' +
       outcome.totalMatches + ' replacement(s)',
       outcome.perPattern.filter(p => p.matchCount > 0));
+    const cappedPatterns = outcome.perPattern.filter(p => p.capped);
+    if (cappedPatterns.length > 0) {
+      console.warn('[cleanup] Repeat-until-stable hit the pass cap for: ' +
+        cappedPatterns.map(p => p.name).join(', ') +
+        ' - the pattern may re-match its own output; result may be over-processed');
+    }
     updateStatus('loading', 'Converting… (cleanup: ' + outcome.totalMatches +
       ' replacement' + (outcome.totalMatches === 1 ? '' : 's') + ' applied)');
   }
@@ -6019,8 +6250,8 @@ document.getElementById('btnRunCleanup').addEventListener('click', () => {
   if (outcome.totalMatches > 0) {
     editor.setText(outcome.result);
     const summary = outcome.perPattern
-      .filter(p => p.matchCount > 0)
-      .map(p => p.name + ': ' + p.matchCount)
+      .filter(p => p.matchCount > 0 || p.capped)
+      .map(p => p.name + ': ' + p.matchCount + (p.capped ? ' (repeat cap hit - check pattern)' : ''))
       .join(', ');
     updateStatus('ready', outcome.totalMatches + ' replacement' + (outcome.totalMatches === 1 ? '' : 's') + ' — ' + summary);
   } else {
