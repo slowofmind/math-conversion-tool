@@ -5166,11 +5166,18 @@ function verifyClosingPattern(content, closingSpec, anchorPos, param) {
   const useRegex = param.useRegex || false;
 
   try {
+    // In regex mode the prefix/suffix fields are regex SOURCE; the matched
+    // text length can differ from the source length, so the tag span must be
+    // computed from what actually matched (fix 2026-08-02: regex closing
+    // suffix previously over-consumed, e.g. \{problem\} ate 2 extra chars).
+    let prefixMatchLen = prefix.length;
     if (prefix) {
       if (useRegex) {
         const prefixRegex = new RegExp('(' + prefix + ')$');
         const textBefore = content.substring(Math.max(0, anchorPos - 50), anchorPos);
-        if (!prefixRegex.exec(textBefore)) return null;
+        const pm = prefixRegex.exec(textBefore);
+        if (!pm) return null;
+        prefixMatchLen = pm[1].length;
       } else {
         const prefixStart = anchorPos - prefix.length;
         if (prefixStart < 0) return null;
@@ -5179,11 +5186,14 @@ function verifyClosingPattern(content, closingSpec, anchorPos, param) {
     }
 
     const anchorEnd = anchorPos + anchor.length;
+    let suffixMatchLen = suffix.length;
     if (suffix) {
       if (useRegex) {
         const suffixRegex = new RegExp('^(' + suffix + ')');
         const textAfter = content.substring(anchorEnd, Math.min(content.length, anchorEnd + 50));
-        if (!suffixRegex.exec(textAfter)) return null;
+        const sm = suffixRegex.exec(textAfter);
+        if (!sm) return null;
+        suffixMatchLen = sm[1].length;
       } else {
         const suffixEnd = anchorEnd + suffix.length;
         if (suffixEnd > content.length) return null;
@@ -5191,8 +5201,8 @@ function verifyClosingPattern(content, closingSpec, anchorPos, param) {
       }
     }
 
-    const patternStart = prefix ? anchorPos - prefix.length : anchorPos;
-    const patternEnd = suffix ? anchorEnd + suffix.length : anchorEnd;
+    const patternStart = prefix ? anchorPos - prefixMatchLen : anchorPos;
+    const patternEnd = suffix ? anchorEnd + suffixMatchLen : anchorEnd;
     return {
       fullMatch: content.substring(patternStart, patternEnd),
       startIndex: patternStart,
