@@ -1,0 +1,828 @@
+{
+  "formatVersion": "1.0",
+  "exportDate": "2026-08-02T00:00:00.000Z",
+  "exportedBy": "Claude + Nicholas working session (see ma2025-conversion-disposition.md)",
+  "profile": {
+    "name": "Ma2025 Problems (v0)",
+    "createNewFile": false,
+    "scope": null,
+    "searchParameters": [
+      {
+        "name": "note: remove instructor commentary (tags + content)",
+        "patternType": "matched_pair",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\note",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "solution env: remove entirely (problems output)",
+        "patternType": "matched_pair",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "\\begin",
+          "suffix": "{solution}"
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "\\end",
+          "suffix": "{solution}"
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "solonly: remove (sols-mode content)",
+        "patternType": "matched_pair",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\solonly",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "probonly: strip tags, keep content",
+        "patternType": "matched_pair",
+        "useRegex": false,
+        "repeatUntilStable": true,
+        "scope": null,
+        "opening": {
+          "prefix": "\\probonly",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "problem env: strip tags + optional space arg",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": true,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "\\begin",
+          "suffix": "\\{problem\\}(\\[[^\\]]*\\])?"
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "\\end",
+          "suffix": "\\{problem\\}"
+        },
+        "replacementMode": "remove_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "fitb: replace whole construct with blank underscores",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\fitb(\\[[^\\]]*\\])?\\{[^{}]*\\}",
+          "anchor": "{",
+          "suffix": "(?:[^{}]|\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\})*"
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "\\_\\_\\_\\_",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "cfitb: replace whole construct with blank underscores",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\cfitb(\\[[^\\]]*\\])?\\{[^{}]*\\}",
+          "anchor": "{",
+          "suffix": "(?:[^{}]|\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\})*"
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "\\_\\_\\_\\_",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "mc-list label spec: drop maybecircle wrapper (any list env)",
+        "patternType": "single_string",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "\\[label=\\\\protect\\\\maybecircle\\{\\\\Alph\\*\\.\\}\\]",
+        "replaceString": "[label=\\Alph*.]"
+      },
+      {
+        "name": "plainitem -> item",
+        "patternType": "single_string",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "\\plainitem",
+        "replaceString": "\\item"
+      },
+      {
+        "name": "circleitem -> item (problems: no reveal)",
+        "patternType": "single_string",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "\\circleitem",
+        "replaceString": "\\item"
+      },
+      {
+        "name": "grading env: remove entirely (instructor/facilitator layer)",
+        "patternType": "matched_pair",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "\\begin",
+          "suffix": "{grading}"
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "\\end",
+          "suffix": "{grading}"
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "workshop env: remove entirely (instructor/facilitator layer)",
+        "patternType": "matched_pair",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "\\begin",
+          "suffix": "{workshop}"
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "\\end",
+          "suffix": "{workshop}"
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "wsplan env: remove entirely (instructor/facilitator layer)",
+        "patternType": "matched_pair",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "\\begin",
+          "suffix": "{wsplan}"
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "\\end",
+          "suffix": "{wsplan}"
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "solutiononly env: remove entirely (instructor/facilitator layer)",
+        "patternType": "matched_pair",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "\\begin",
+          "suffix": "{solutiononly}"
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "\\end",
+          "suffix": "{solutiononly}"
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "maybecircle generic: strip wrapper + condition, keep choice text",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": true,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\maybecircle(\\[[^\\]]*\\])?",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "answer marker: strip, keep content",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": true,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\answer",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "answeronly: remove entirely (sols-facing short answer)",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\answeronly",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "spaceonly: remove entirely (spacing-only content, defensive)",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\spaceonly",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "problemonly env: strip tags, keep content (worksheet apparatus)",
+        "patternType": "matched_pair",
+        "useRegex": false,
+        "repeatUntilStable": true,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "\\begin",
+          "suffix": "{problemonly}"
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "\\end",
+          "suffix": "{problemonly}"
+        },
+        "replacementMode": "remove_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "htitle -> section* (semantic heading)",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": true,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\htitle",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "\\section*{",
+          "newClosingTag": "}"
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "stitle: remove entirely (solsonly-build title, defensive)",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\stitle",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "pspace: remove entirely (spacing/page-break dispatch)",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\pspace",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "continueproblem: remove entirely (print-pagination duplicate)",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\continueproblem",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "psreflection DEFINITION: remove in-file newcommand block",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\newcommand\\{\\\\psreflection\\}\\[2\\]\\[\\]",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "psreflection [nocite] calls -> psreflectionnc",
+        "patternType": "single_string",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "\\psreflection[nocite]{",
+        "replaceString": "\\psreflectionnc{"
+      },
+      {
+        "name": "inject Pandoc-safe psreflection definitions before begin document",
+        "patternType": "single_string",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "\\begin{document}",
+        "replaceString": "\\newcommand{\\psreflection}[2][]{\n\n\\textbf{Please cite any help you got on this problem set:}\n\\begin{itemize}\n\\item If you worked with other students, please list their names here.\n\\item If you used resources other than those on our Canvas site, please list them here.\n\\end{itemize}\n\n#2\n\n\\emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!\n\\begin{itemize}\n\\item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!\n\\item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.\n\\item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!\n\\end{itemize}\n}\n\\newcommand{\\psreflectionnc}[1]{\n\n#1\n\n\\emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!\n\\begin{itemize}\n\\item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!\n\\item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.\n\\item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!\n\\end{itemize}\n}\n\n\\begin{document}"
+      },
+      {
+        "name": "version COURSE-VARIANT: remove tag and content (undefined cmd, ws6-5 authoring error)",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\version\\{[^}]*\\}",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "calcitem DEFINITION: remove in-file newcommand block (MUST precede calcitem replace)",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\newcommand\\{\\\\calcitem\\}",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "remove_all",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "calcitem -> item + [Calculator allowed] marker",
+        "patternType": "single_string",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "\\calcitem",
+        "replaceString": "\\item \\textbf{[Calculator allowed]}"
+      },
+      {
+        "name": "highlight -> textbf (inset-block device; salience via bold; upgrade path: sentinel strategy-step class)",
+        "patternType": "matched_pair",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "\\\\highlight",
+          "anchor": "{",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "}",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "\\textbf{",
+          "newClosingTag": "}"
+        },
+        "findString": "",
+        "replaceString": ""
+      },
+      {
+        "name": "enumeratecols: end tag -> end enumerate",
+        "patternType": "single_string",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "\\end{enumeratecols}",
+        "replaceString": "\\end{enumerate}"
+      },
+      {
+        "name": "enumeratecols: begin tag rename (column-count strip follows)",
+        "patternType": "single_string",
+        "useRegex": false,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "\\begin{enumeratecols}",
+        "replaceString": "\\begin{enumerate}"
+      },
+      {
+        "name": "enumeratecols: strip column count, plain form",
+        "patternType": "single_string",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "(?<=\\\\begin\\{enumerate\\})\\{[0-9]+\\}",
+        "replaceString": ""
+      },
+      {
+        "name": "enumeratecols: strip column count after [opts]",
+        "patternType": "single_string",
+        "useRegex": true,
+        "repeatUntilStable": false,
+        "scope": null,
+        "opening": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "closing": {
+          "prefix": "",
+          "anchor": "",
+          "suffix": ""
+        },
+        "replacementMode": "edit_tags",
+        "modifications": {
+          "newOpeningTag": "",
+          "newClosingTag": ""
+        },
+        "findString": "(?<=\\\\begin\\{enumerate\\}\\[[^\\]]*\\])\\{[0-9]+\\}",
+        "replaceString": ""
+      }
+    ]
+  }
+}
