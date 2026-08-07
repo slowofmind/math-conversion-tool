@@ -58,7 +58,7 @@ visible, even though their code does not live in this repository.
 | LaTeXML | Remote conversion engine, run inside a Docker image via GitHub Actions in a separate repository | Public domain (work of NIST, US Government) | https://math.nist.gov/~BMiller/LaTeXML/ |
 | latexml-oxide | Planned replacement engine for the LaTeXML pipeline (Docker) | CC0-1.0 | https://github.com/dginev/latexml-oxide |
 | TeX Live | Inside the Docker images (LaTeXML package support; LuaLaTeX PDF compilation) | Aggregate of free licenses (LPPL, GPL, and others, per package) | https://tug.org/texlive/ |
-| BusyTeX via texlyre-busytex | Planned future in-browser PDF compilation (WASM TeX Live) | AGPL-3.0-or-later (derived from busytex, MIT) | https://github.com/TeXlyre/texlyre-busytex |
+| BusyTeX via texlyre-busytex | Planned future in-browser processing of LaTeX code-based images (WASM TeX Live); unlike the Docker engines above, it will be distributed as part of this repository once integrated | AGPL-3.0-or-later (derived from busytex, MIT) | https://github.com/TeXlyre/texlyre-busytex |
 | MathJax (CDN) | Loaded at runtime by generated HTML output and by the preview pane | Apache-2.0 | https://www.mathjax.org |
 
 ## Combined-work licensing summary

@@ -54,17 +54,27 @@ Included in this repository:
   TeX-to-MathML conversion, and loaded from CDN by generated HTML output
 - **MML2OMML.XSL** — MathML-to-Word-math stylesheet in `math-conversion/`;
   its license could not be verified, so it is specifically flagged for
-  review in `THIRD-PARTY-NOTICES.md`. A Microsoft Q&A thread indicates the
-  companion stylesheet shipped with Office originated in the open-source
-  TEI XSL stylesheets project and is generally considered redistributable
-  under that project's license; the notices file discusses how far that
-  extends to this file.
+  review in `THIRD-PARTY-NOTICES.md`. A [Microsoft Q&A thread](https://learn.microsoft.com/en-us/answers/questions/5286296/redistrubution-of-omml2mml-xsl-from-ms-office)
+  indicates the companion stylesheet shipped with Office originated in the
+  open-source TEI XSL stylesheets project and is generally considered
+  redistributable under that project's license; the notices file discusses
+  how far that extends to this file.
 
-Used remotely or planned, but not distributed here: **LaTeXML** (public
-domain, NIST) and **latexml-oxide** (CC0) as alternate conversion engines
-run in Docker via GitHub Actions; **TeX Live** (aggregate of free licenses)
-inside those Docker images; and **BusyTeX via texlyre-busytex**
-(AGPL-3.0-or-later), planned for future in-browser PDF compilation.
+Used remotely for testing purposes, but not distributed here: **LaTeXML**
+(public domain, NIST) and **latexml-oxide** (CC0) as alternate conversion
+engines run in Docker via GitHub Actions, with **TeX Live** (an aggregate of
+free licenses) inside those Docker images. These arrangements exist for
+internal testing only and will change before wider sharing: the LuaLaTeX
+(PDF) pipeline and its Docker image will be removed entirely, and whether
+LaTeXML is retained as a comparison engine is still undecided. The GitHub
+Action currently runs from the developer's personal account, with an access
+token embedded in `index.html` for testing; that token will be removed
+before the repository is shared beyond legal review and internal testing,
+and if a Docker-based conversion Action is retained, credentials will be
+handled outside this repository. **BusyTeX via texlyre-busytex**
+(AGPL-3.0-or-later) is planned for future in-browser processing of LaTeX
+code-based images included in source files; unlike the remote engines, it
+will be distributed as part of this repository once integrated.
 
 ## Licensing
 
