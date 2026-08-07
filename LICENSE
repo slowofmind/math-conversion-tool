@@ -1,3 +1,8 @@
+This MIT License applies to the original work in this repository. Bundled
+third-party components (including Pandoc, MuPDF, CodeMirror, and MathJax)
+are covered by their own licenses; see THIRD-PARTY-NOTICES.md for the full
+inventory and for how the combined work is governed when distributed.
+
 MIT License
 
 Copyright (c) 2026 Nicholas McNab
