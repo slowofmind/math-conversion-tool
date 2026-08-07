@@ -1,8 +1,0 @@
-latexmlpost (LaTeXML version 0.8.8) paginating /tmp/pipeline/04a-calculus-derivatives-1782001314243/xml/04a-calculus-derivatives-1782001314243.xml
-(post-processing...
-(Scan 04a-calculus-derivatives-1782001314243.html processing... 0.01 sec)
-(CrossRef 04a-calculus-derivatives-1782001314243.html processing... 0.00 sec)
-(MathML::Presentation[w/TeXMath] 04a-calculus-derivatives-1782001314243.html 12 to process... 0.02 sec)
-(XSLT[using LaTeXML-html5.xsl] 04a-calculus-derivatives-1782001314243.html processing... 0.01 sec)
-(Writer 04a-calculus-derivatives-1782001314243.html processing... 0.00 sec) 0.04 sec)
-Postprocessing complete No obvious problems (reqd. 0.15s)

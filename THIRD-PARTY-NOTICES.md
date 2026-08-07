@@ -33,6 +33,19 @@ impermissible, open-source JavaScript MathML-to-OMML converters exist as
 replacements, or the file can be excluded and documented as a
 user-supplied dependency.
 
+Supporting context: a March 2024 thread on Microsoft Q&A
+(https://learn.microsoft.com/en-us/answers/questions/5286296/redistrubution-of-omml2mml-xsl-from-ms-office)
+addresses the companion stylesheet. The answer there states that
+`omml2mml.xsl` originated in the open-source "XSL stylesheets for TEI XML"
+project and that using and redistributing it — including commercially — is
+generally considered acceptable under the terms of that project's open-source
+license, with documentation crediting the TEI stylesheets recommended as the
+way to disclose the dependency. Two caveats keep this flag open rather than
+resolved: the thread concerns `omml2mml.xsl` (the OMML-to-MathML direction),
+not the MathML-to-OMML file included here, and the reply is a community
+answer on a locked thread, hedged with phrases like "most likely," rather
+than an official Microsoft licensing statement.
+
 ## Components referenced but not distributed in this repository
 
 These are used by remote conversion pipelines (GitHub Actions driving Docker

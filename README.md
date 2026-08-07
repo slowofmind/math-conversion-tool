@@ -53,8 +53,12 @@ Included in this repository:
 - **MathJax v4** (Apache-2.0) — bundled in `math-conversion/` for
   TeX-to-MathML conversion, and loaded from CDN by generated HTML output
 - **MML2OMML.XSL** — MathML-to-Word-math stylesheet in `math-conversion/`;
-  its license could not be verified and it is specifically flagged for
-  review in `THIRD-PARTY-NOTICES.md`
+  its license could not be verified, so it is specifically flagged for
+  review in `THIRD-PARTY-NOTICES.md`. A Microsoft Q&A thread indicates the
+  companion stylesheet shipped with Office originated in the open-source
+  TEI XSL stylesheets project and is generally considered redistributable
+  under that project's license; the notices file discusses how far that
+  extends to this file.
 
 Used remotely or planned, but not distributed here: **LaTeXML** (public
 domain, NIST) and **latexml-oxide** (CC0) as alternate conversion engines
@@ -72,5 +76,8 @@ fuller summary.
 
 ## Status
 
-Active development; a working proof of concept used for internal testing at
-Harvard. Interfaces, file layout, and component choices are still changing.
+A working proof of concept, currently used for internal testing at Harvard.
+The goal is a release for general use by Harvard faculty and staff, with the
+possibility of sharing the code publicly beyond Harvard so that other
+institutions and the broader accessibility community can use and build on
+it. Interfaces, file layout, and component choices are still changing.

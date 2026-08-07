@@ -1,7 +1,0 @@
-latexmlpost (LaTeXML version 0.8.8) paginating /tmp/pipeline/ws4-3-1784507446936/xml/ws4-3-1784507446936.xml
-(post-processing...
-(Scan ws4-3-1784507446936.html processing... 0.00 sec)
-(CrossRef ws4-3-1784507446936.html processing... 0.00 sec)
-(XSLT[using LaTeXML-html5.xsl] ws4-3-1784507446936.html processing... 0.00 sec)
-(Writer ws4-3-1784507446936.html processing... 0.00 sec) 0.00 sec)
-Postprocessing complete No obvious problems (reqd. 0.13s)
