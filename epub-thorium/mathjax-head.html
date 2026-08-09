@@ -1,0 +1,226 @@
+<!-- ============================================================================
+     mathjax-head.html — injected into every EPUB chapter head via pandoc -H.
+     MathJax v4 (pinned 4.1.x), TeX input (pandoc mathjax spans), SVG output,
+     physics extension, speech+braille via SRE running in a fully inlined
+     worker (zero network inside the worker), plus Thorium/r2-navigator
+     workarounds. Works offline; engine tree must be added to the container by
+     postprocess-epub.py (EPUB/MathJax/).
+
+     Status surface: document.documentElement data-mathjax-epub attribute
+     (prefetching | ready | degraded-prefetch | degraded-patch) and
+     [mathjax-epub] console lines.
+
+     PINNED INTERNALS CAVEAT: the createWorker override patches an
+     undocumented MathJax internal (HTMLAdaptor.prototype.createWorker).
+     Verified against 4.1.2. Re-verify on any MathJax upgrade.
+     ========================================================================= -->
+
+<!-- 0. Math CSS. Kept inside this head snippet so the whole customization
+     travels as ONE file: pandoc-wasm frontends expose header files (-H)
+     but their css option can fail. Content mirrors math.css; the separate
+     css flag is therefore optional/redundant on the CLI.
+     (NB: never put a double hyphen inside these comments; XML forbids it.) -->
+<style type="text/css">
+mjx-container {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+}
+mjx-container[display="true"] {
+  display: block;
+  margin: 1em 0;
+}
+/* Placeholder: Thorium context-menu + subtitle-overlay tuning goes here. */
+</style>
+
+<!-- 1. Prefetch: pull worker + mathmaps into page memory (page context CAN
+     read EPUB-internal URLs; workers cannot — hence this indirection). -->
+<script type="text/javascript">
+//<![CDATA[
+(function () {
+  'use strict';
+  var TAG = '[mathjax-epub]';
+  var root = document.documentElement;
+  root.setAttribute('data-mathjax-epub', 'prefetching');
+
+  var BASE = '../MathJax/';
+  var FILES = {
+    worker:        BASE + 'sre/speech-worker.js',
+    'en.json':     BASE + 'sre/mathmaps/en.json',
+    'base.json':   BASE + 'sre/mathmaps/base.json',
+    'nemeth.json': BASE + 'sre/mathmaps/nemeth.json'
+  };
+
+  function xhrText(url) {
+    return new Promise(function (resolve, reject) {
+      var x = new XMLHttpRequest();
+      x.open('GET', url, true);
+      x.onload = function () {
+        if (x.status === 200 || (x.status === 0 && x.responseText)) resolve(x.responseText);
+        else reject(new Error('XHR ' + x.status + ' for ' + url));
+      };
+      x.onerror = function () { reject(new Error('XHR network error for ' + url)); };
+      x.send();
+    });
+  }
+  function fetchText(url) {
+    if (typeof fetch !== 'function') return xhrText(url);
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).catch(function () { return xhrText(url); });
+  }
+
+  var store = { ready: false, workerSource: null, mathmaps: {}, promise: null };
+  window.__mjxEpubAssets = store;
+  store.promise = Promise.all(Object.keys(FILES).map(function (key) {
+    return fetchText(FILES[key]).then(function (text) {
+      if (key === 'worker') store.workerSource = text;
+      else store.mathmaps[key] = text;
+    });
+  })).then(function () {
+    store.ready = true;
+    console.log(TAG + ' assets prefetched');
+  }).catch(function (err) {
+    root.setAttribute('data-mathjax-epub', 'degraded-prefetch');
+    console.error(TAG + ' prefetch FAILED: ' + (err && err.message || err) +
+      ' — speech/braille will be unavailable; rendering may still work.');
+  });
+})();
+//]]>
+</script>
+
+<!-- 2. MathJax config: physics, a11y, inline-worker patch, pageReady gate,
+     Thorium arrow-key + focus workarounds. -->
+<script type="text/javascript">
+//<![CDATA[
+(function () {
+  'use strict';
+  var TAG = '[mathjax-epub]';
+  var root = document.documentElement;
+
+  // --- Thorium/r2-navigator focus guard -------------------------------------
+  // Thorium reacts to focusin on document.body (reading-location update +
+  // scroll-into-view) and yanks the view when the explorer focuses an
+  // equation. Capture at document level fires first; stopPropagation keeps
+  // equation focus page-internal. Inert in other readers.
+  document.addEventListener('focusin', function (ev) {
+    var el = ev.target;
+    while (el && el.nodeType === 1) {
+      if (el.tagName && el.tagName.toLowerCase() === 'mjx-container') {
+        ev.stopPropagation();
+        return;
+      }
+      el = el.parentNode;
+    }
+  }, true);
+
+  // --- createWorker override -------------------------------------------------
+  function installWorkerPatch() {
+    var store = window.__mjxEpubAssets;
+    var HA;
+    try { HA = MathJax._.adaptors.HTMLAdaptor.HTMLAdaptor; } catch (e) { HA = null; }
+    if (!HA || !HA.prototype || typeof HA.prototype.createWorker !== 'function') {
+      root.setAttribute('data-mathjax-epub', 'degraded-patch');
+      console.error(TAG + ' createWorker not found — MathJax internals changed? ' +
+        'Speech worker will attempt stock (network) path and likely fail in EPUB readers.');
+      return false;
+    }
+    var original = HA.prototype.createWorker;
+    HA.prototype.createWorker = function (listener, options) {
+      try {
+        if (!store || !store.workerSource) throw new Error('prefetched assets unavailable');
+        var mapsJs = '{';
+        var first = true;
+        for (var name in store.mathmaps) {
+          if (!store.mathmaps.hasOwnProperty(name)) continue;
+          mapsJs += (first ? '' : ',') + JSON.stringify(name) + ':' + store.mathmaps[name];
+          first = false;
+        }
+        mapsJs += '}';
+        var content =
+          'self.maps = ' + JSON.stringify((options && options.maps) || '') + ';\n' +
+          'self.__mathmaps = ' + mapsJs + ';\n' +
+          '(function () {\n' +
+          '  var origFetch = self.fetch;\n' +
+          '  self.fetch = function (url) {\n' +
+          '    var m = String(url).match(/([^\\/\\\\]+\\.json)(\\?.*)?$/);\n' +
+          '    if (m && self.__mathmaps[m[1]]) {\n' +
+          '      var data = self.__mathmaps[m[1]];\n' +
+          '      return Promise.resolve({\n' +
+          '        ok: true, status: 200,\n' +
+          '        json: function () { return Promise.resolve(data); },\n' +
+          '        text: function () { return Promise.resolve(JSON.stringify(data)); }\n' +
+          '      });\n' +
+          '    }\n' +
+          '    console.log("[mathjax-epub worker] non-embedded request: " + url);\n' +
+          '    if (origFetch) return origFetch.apply(self, arguments);\n' +
+          '    return Promise.reject(new Error("no fetch for " + url));\n' +
+          '  };\n' +
+          '})();\n' +
+          store.workerSource;
+        var url = URL.createObjectURL(new Blob([content], { type: 'text/javascript' }));
+        var w = new Worker(url);
+        w.onmessage = listener;
+        URL.revokeObjectURL(url);
+        console.log(TAG + ' inline speech worker created');
+        return w;
+      } catch (err) {
+        console.error(TAG + ' inline worker failed (' + (err && err.message) + '); using stock method');
+        return original.call(this, listener, options);
+      }
+    };
+    return true;
+  }
+
+  // --- Thorium arrow-key opt-out ---------------------------------------------
+  // r2-navigator treats any element whose ancestor chain carries a
+  // contenteditable attribute (value irrelevant) as owning its arrow keys.
+  // contenteditable="false" is editing-inert everywhere.
+  function optOutOfArrowCapture() {
+    var nodes = document.querySelectorAll('mjx-container');
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].setAttribute('contenteditable', 'false');
+    }
+  }
+
+  window.MathJax = {
+    loader: {
+      load: ['[tex]/physics']
+    },
+    tex: {
+      // NOTE: physics rebinds \div (division sign -> divergence operator).
+      // If a document needs ÷, shadow it via macros here or drop physics for
+      // that conversion. See mathjax-intent-extension docs §5.1.
+      packages: { '[+]': ['physics'] }
+    },
+    options: {
+      a11y: { speech: true, braille: true, subtitles: true, viewBraille: false }
+    },
+    startup: {
+      ready: function () {
+        installWorkerPatch();
+        MathJax.startup.defaultReady();
+        MathJax.startup.promise.then(function () {
+          optOutOfArrowCapture();
+          if (root.getAttribute('data-mathjax-epub') === 'prefetching') {
+            root.setAttribute('data-mathjax-epub', 'ready');
+          }
+          console.log(TAG + ' typeset complete; version ' + (MathJax.version || '?'));
+        });
+      },
+      pageReady: function () {
+        // Gate typesetting on the prefetch so the worker is never created
+        // before its source is in memory.
+        return window.__mjxEpubAssets.promise.then(function () {
+          return MathJax.startup.defaultPageReady();
+        });
+      }
+    }
+  };
+})();
+//]]>
+</script>
+
+<!-- 3. The engine: TeX + MathML input, SVG output (no font files needed). -->
+<script defer="defer" src="../MathJax/tex-mml-svg.js" type="text/javascript"></script>

@@ -1974,9 +1974,6 @@
   <div class="statusbar-item" id="statusWarnings" style="display:none;"></div>
 </div>
 
-<script src="./epub-thorium/jszip.min.js"></script>
-<script src="./epub-thorium/postprocess-epub.js"></script>
-
 <script type="module">
 // ════════════════════════════════════════════════════════════════════
 // SECTION 1: EDITOR SETUP (CodeMirror 6 via facade — see CM6-FACADE-DESIGN.md)
@@ -2036,7 +2033,6 @@ async function initPandoc() {
     const outputFormats = await mod.query({ query: 'output-formats' });
     populateFormats('selFrom', inputFormats, 'latex');
     populateFormats('selTo', outputFormats, 'html5');
-    ensureThoriumOption();   // synthetic 'EPUB for Thorium Reader' preset
 
     // Load extensions for default formats
     updateExtensions();
@@ -3786,8 +3782,7 @@ async function updateExtensions() {
 
   // Query output extensions
   outputExtensionsList = [];
-  const effOut = outputFmt === 'pdf' ? 'typst'
-                 : (outputFmt === 'epub-thorium' ? 'epub' : outputFmt);
+  const effOut = outputFmt === 'pdf' ? 'typst' : outputFmt;
   try {
     const extData = await pandocModule.query({ query: 'extensions-for-format', format: effOut });
     outputExtensionsList = Object.entries(extData)
@@ -3847,39 +3842,6 @@ document.getElementById('selTo').addEventListener('change', () => { updateExtens
 
 // --- Format metadata ---
 const BINARY_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'epub2', 'epub3', 'pdf', 'chunkedhtml'];
-
-// ── EPUB for Thorium Reader preset ───────────────────────────────────
-// Synthetic output format: not a Pandoc format. buildOptions() normalises
-// it to 'epub'; the MathJax payload is spliced into the EPUB afterwards.
-const THORIUM_HEAD_NAME = '_thorium-mathjax-head.html';
-const thoriumAssets = { headHtml: null, payloadBytes: null };
-
-function isThoriumPreset() {
-  const el = document.getElementById('selTo');
-  return !!el && el.value === 'epub-thorium';
-}
-
-function ensureThoriumOption() {
-  const sel = document.getElementById('selTo');
-  if (!sel || sel.querySelector('option[value="epub-thorium"]')) return;
-  const opt = document.createElement('option');
-  opt.value = 'epub-thorium';
-  opt.textContent = 'EPUB for Thorium Reader';
-  sel.appendChild(opt);
-}
-
-async function ensureThoriumAssets() {
-  if (thoriumAssets.headHtml && thoriumAssets.payloadBytes) return;
-  const [headResp, payResp] = await Promise.all([
-    fetch('./epub-thorium/mathjax-head.html'),
-    fetch('./epub-thorium/mathjax-payload-4.1.2-en.zip')
-  ]);
-  if (!headResp.ok) throw new Error('epub-thorium/mathjax-head.html not found');
-  if (!payResp.ok) throw new Error('epub-thorium/mathjax-payload-4.1.2-en.zip not found');
-  thoriumAssets.headHtml = await headResp.text();
-  thoriumAssets.payloadBytes = new Uint8Array(await payResp.arrayBuffer());
-}
-
 const EXTENSION_BY_FORMAT = {
   'html': 'html', 'html5': 'html', 'html4': 'html', 'chunkedhtml': 'zip',
   'markdown': 'md', 'markdown_strict': 'md', 'markdown_mmd': 'md', 'markdown_phpextra': 'md',
@@ -4131,9 +4093,7 @@ function extractMissingFile(errMsg) {
 // --- Build pandoc options object from all tabs ---
 function buildOptions() {
   const fromFmt = document.getElementById('selFrom').value;
-  const toFmtRaw = document.getElementById('selTo').value;
-  const thoriumPreset = (toFmtRaw === 'epub-thorium');
-  const toFmt = thoriumPreset ? 'epub' : toFmtRaw;
+  const toFmt = document.getElementById('selTo').value;
   const opts = {
     from: buildFormatWithExtensions(fromFmt, inputExtensions),
     to: buildFormatWithExtensions(toFmt, outputExtensions),
@@ -4207,10 +4167,6 @@ function buildOptions() {
       opts['html-math-method'] = mathEl.value;
     }
   }
-
-  // EPUB for Thorium Reader: force plain MathJax. The payload is spliced
-  // into the EPUB post-process, so no CDN URL is wanted here.
-  if (thoriumPreset) opts['html-math-method'] = 'mathjax';
 
   // Code highlighting (wired later)
   const hlStyle = document.getElementById('opt-highlight-style');
@@ -4321,9 +4277,7 @@ function buildOptions() {
   if (resourceFiles.referenceDoc) opts['reference-doc'] = resourceFiles.referenceDoc.name;
 
   // Include files
-  const headerNames = resourceFiles.headerFiles.map(f => f.name);
-  if (thoriumPreset) headerNames.push(THORIUM_HEAD_NAME);
-  if (headerNames.length > 0) opts['include-in-header'] = headerNames;
+  if (resourceFiles.headerFiles.length > 0) opts['include-in-header'] = resourceFiles.headerFiles.map(f => f.name);
   if (resourceFiles.beforeBodyFiles.length > 0) opts['include-before-body'] = resourceFiles.beforeBodyFiles.map(f => f.name);
   if (resourceFiles.afterBodyFiles.length > 0) opts['include-after-body'] = resourceFiles.afterBodyFiles.map(f => f.name);
 
@@ -4427,8 +4381,6 @@ function buildFiles() {
   });
   // MathJax device filter content (docx→OMML / html→MathML)
   if (needsMathjaxDevice()) raw['_mjx-math.lua'] = new Blob([MJX_MATH_LUA], { type: 'text/plain' });
-  // Thorium preset: virtual header carrying the MathJax bootstrap
-  if (isThoriumPreset() && thoriumAssets.headHtml) raw[THORIUM_HEAD_NAME] = new Blob([thoriumAssets.headHtml], { type: 'text/html' });
   // Binary input file
   if (inputBinaryFile) raw[inputBinaryFile.name] = inputBinaryFile.blob;
   // pandoc.js expects Blob objects (calls blob.arrayBuffer())
@@ -4775,8 +4727,6 @@ async function runConversion() {
   const sourceText = inputBinaryFile ? null : getSourceForConversion();
 
   try {
-    if (isThoriumPreset()) { updateStatus('loading', 'Loading Thorium EPUB assets…'); await ensureThoriumAssets(); }
-
     const options = buildOptions();
     const files = buildFiles();
     const outFileName = options['output-file'];
@@ -4858,37 +4808,20 @@ async function runConversion() {
 
     if (isBinaryOutput && files[outFileName]) {
       // Binary output — show info in editor/preview, enable download
-      let blob = files[outFileName];
-      let outName = outFileName;
-
-      // EPUB for Thorium Reader — splice the MathJax payload into the EPUB.
-      // Flag-don't-fail: on any error keep the plain EPUB and warn in the console.
-      if (isThoriumPreset()) {
-        try {
-          updateStatus('loading', 'Adding MathJax payload to EPUB…');
-          const epubBytes = new Uint8Array(await blob.arrayBuffer());
-          const res = await processEpub(epubBytes, thoriumAssets.payloadBytes, { JSZip: window.JSZip });
-          blob = new Blob([res.data], { type: 'application/epub+zip' });
-          outName = outFileName.replace(/\.epub$/i, '') + '-thorium.epub';
-          console.log('Thorium EPUB post-process:', res.stats);
-        } catch (e) {
-          console.warn('Thorium EPUB post-process failed; keeping plain EPUB:', e);
-        }
-      }
-
+      const blob = files[outFileName];
       const sizeKB = (blob.size / 1024).toFixed(1);
 
-      lastOutput = { blob, filename: outName };
-      downloadBtn.textContent = `📥 ${outName} (${sizeKB} KB)`;
+      lastOutput = { blob, filename: outFileName };
+      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
       downloadBtn.style.display = '';
       scormBtn.style.display = 'none';
 
-      sourceEditor.setText(`[Binary output: ${outName} (${sizeKB} KB)]\nUse the download button to save this file.`);
+      sourceEditor.setText(`[Binary output: ${outFileName} (${sizeKB} KB)]\nUse the download button to save this file.`);
 
       const previewFrame = document.getElementById('previewFrame');
       previewFrame.srcdoc = `<body style="background:#f5f5f5;color:#1e2124;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
         <div style="font-size:48px;margin-bottom:16px;">📄</div>
-        <div style="font-size:16px;">${outName} (${sizeKB} KB)</div>
+        <div style="font-size:16px;">${outFileName} (${sizeKB} KB)</div>
         <div style="font-size:12px;color:#666666;margin-top:8px;">Binary file — use the download button above</div>
         ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#b86e00;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
       </body>`;
