@@ -1,0 +1,987 @@
+{
+  "$schema": "./intent-vocabulary.schema.md",
+  "meta": {
+    "version": "0.2.0",
+    "updated": "2026-08-09",
+    "locales": [
+      "en"
+    ],
+    "status": "first tranche + 5 showcase adoptions (2026-08-09). Not complete.",
+    "conceptNameSources": {
+      "mathcat": "Name taken verbatim from MathCAT Rules/Intent/*.yaml. Best available proxy for the eventual W3C open vocabulary, since MathCAT is the reference implementation. PREFER THESE.",
+      "w3c": "Name taken from W3C open/core vocabulary material.",
+      "coined": "Our own name. Expect to rename when the W3C vocabulary settles."
+    },
+    "mathcatField": {
+      "infers": "MathCAT already gets this right unaided. Value of annotating is SRE-only. Tier 2.",
+      "wrong": "MathCAT infers something, but often the wrong thing. Annotating fixes BOTH channels. Tier 1.",
+      "absent": "MathCAT has no rule. Annotating fixes both channels. Tier 1."
+    },
+    "notes": [
+      "arity is informational. Actual arity is counted from the \\iarg markers at parse time, so one entry serves whatever notation uses it.",
+      "macro.name must not duplicate another entry's macro.name — build-time error.",
+      "macro.name MAY shadow a package command (physics, ams, base): verified that config macros win in either load order. An author's own \\newcommand still beats ours, which is correct.",
+      "confidence flags an entry a subject-matter expert should review before use."
+    ],
+    "groups": {
+      "core-authored": "The hand-authored core (34 as of 2026-08-09). Always enabled; toggles cannot turn it off.",
+      "algebra-arithmetic": "School/college algebra and arithmetic notation.",
+      "calculus-analysis": "Calculus and real/complex analysis.",
+      "linear-algebra": "Vectors, matrices, linear maps.",
+      "geometry-topology": "Geometry and topology.",
+      "discrete": "Combinatorics, graph theory, logic, computing.",
+      "number-theory": "Number theory.",
+      "probability-statistics": "Probability and statistics.",
+      "abstract-algebra-category": "Groups, rings, fields, categories.",
+      "special-functions": "Named special functions.",
+      "physics-quantum": "Physics incl. bra-ket / quantum notation beyond the core.",
+      "chemistry-units": "Chemistry notation and units.",
+      "other": "Everything the rollup map does not otherwise place."
+    },
+    "groupNotes": "Rollup groups are the toggle surface (build-time flag and per-document intent-groups: metadata). Entries may also carry a fine-grained \"area\" (from the open-list importer) and \"experimental\": true. \"mathcatName\" records MathCAT's divergent name for the same concept where one exists (see docs/mathcat-vs-open-list-comparison.md); the build MATHCAT_NAMES switch selects which name the intent attribute carries."
+  },
+  "notations": [
+    {
+      "id": "vbar-single",
+      "tex": "\\left| X \\right|",
+      "description": "one expression between vertical bars",
+      "concepts": [
+        "absolute-value",
+        "determinant",
+        "cardinality",
+        "magnitude",
+        "modulus"
+      ],
+      "mathcatBehaviour": "determinant if the content is an <mi> of only uppercase letters, else absolute-value. Controlled by ClearSpeak_AbsoluteValue (Auto | AbsEnd | Cardinality | Determinant); default Auto.",
+      "priority": "highest — |S| for set cardinality is read as 'determinant of S'"
+    },
+    {
+      "id": "dbar-single",
+      "tex": "\\left\\| X \\right\\|",
+      "description": "one expression between double vertical bars",
+      "concepts": [
+        "norm",
+        "magnitude"
+      ],
+      "mathcatBehaviour": "infers norm",
+      "priority": "low — MathCAT is right; SRE says 'the metric of'"
+    },
+    {
+      "id": "paren-pair",
+      "tex": "\\left( a, b \\right)",
+      "description": "two comma-separated expressions in parentheses",
+      "concepts": [
+        "open-interval",
+        "ordered-pair",
+        "gcd",
+        "point",
+        "cycle"
+      ],
+      "mathcatBehaviour": "infers open-interval",
+      "priority": "high — genuinely undecidable without the author; the canonical W3C example"
+    },
+    {
+      "id": "bracket-pair",
+      "tex": "\\left[ a, b \\right]",
+      "description": "two comma-separated expressions in square brackets",
+      "concepts": [
+        "closed-interval",
+        "commutator",
+        "matrix-row",
+        "equivalence-class"
+      ],
+      "mathcatBehaviour": "infers closed-interval",
+      "priority": "high"
+    },
+    {
+      "id": "angle-bar-angle",
+      "tex": "\\left\\langle a | b \\right\\rangle",
+      "description": "angle brackets with an internal vertical bar",
+      "concepts": [
+        "inner-product",
+        "braket",
+        "expectation-value",
+        "ket",
+        "bra"
+      ],
+      "mathcatBehaviour": "absent — no bra-ket inference",
+      "priority": "highest for physics — SRE reads the bar as the relation 'divides'"
+    },
+    {
+      "id": "bar-angle-angle-bar",
+      "tex": "\\left| a \\right\\rangle \\left\\langle b \\right|",
+      "description": "ket followed by bra: |a><b| outer product / projector",
+      "concepts": [
+        "ketbra"
+      ],
+      "mathcatBehaviour": "absent — no inference; symbols spoken",
+      "priority": "high for physics/QC — equal labels = projector; physics \\ketbra \\outerproduct \\dyad \\op all produce it; starred variants emit a FLAT token run (no wrapper mrow, non-stretchy bars)"
+    },
+    {
+      "id": "angle-bar-bar-angle",
+      "tex": "\\left\\langle m | A | n \\right\\rangle",
+      "description": "angle brackets with two internal vertical bars: matrix-element sandwich",
+      "concepts": [
+        "matrix-element",
+        "expectation-value"
+      ],
+      "mathcatBehaviour": "absent — SRE reads both bars as 'divides'; starred physics variants misread as absolute value",
+      "priority": "high for physics — <psi|A|psi> with equal labels is the expectation-value reading (author chooses); physics \\mel \\matrixelement and 2-arg \\expval produce it"
+    },
+    {
+      "id": "overline",
+      "tex": "\\overline{AB}",
+      "description": "a bar over one or more symbols",
+      "concepts": [
+        "complex-conjugate",
+        "line-segment",
+        "mean",
+        "set-complement",
+        "repeating-decimal"
+      ],
+      "mathcatBehaviour": "infers line-segment or repeating-decimal depending on content",
+      "priority": "high — five common readings"
+    },
+    {
+      "id": "superscript-T",
+      "tex": "X^{T}",
+      "description": "a capital T in the exponent position",
+      "concepts": [
+        "transpose",
+        "power"
+      ],
+      "mathcatBehaviour": "infers transpose",
+      "priority": "medium"
+    },
+    {
+      "id": "prime",
+      "tex": "f'",
+      "description": "prime mark",
+      "concepts": [
+        "derivative",
+        "prime-notation",
+        "transpose",
+        "set-complement"
+      ],
+      "mathcatBehaviour": "says 'prime'",
+      "priority": "medium"
+    }
+  ],
+  "concepts": [
+    {
+      "concept": "absolute-value",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 1,
+      "notation": "vbar-single",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the absolute value of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "abs",
+        "args": 1,
+        "tex": "\\left|\\iarg{#1}\\right|"
+      },
+      "notes": "Shadows physics \\abs, deliberately. Same meaning, but ours emits intent."
+    },
+    {
+      "concept": "determinant",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 1,
+      "notation": "vbar-single",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the determinant of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "determ",
+        "args": 1,
+        "tex": "\\left|\\iarg{#1}\\right|"
+      },
+      "notes": "MathCAT infers this for an uppercase <mi>. Annotating still helps SRE, and removes reliance on a typographic guess."
+    },
+    {
+      "concept": "cardinality",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "wrong",
+      "tier": 1,
+      "arity": 1,
+      "notation": "vbar-single",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the cardinality of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "card",
+        "args": 1,
+        "tex": "\\left|\\iarg{#1}\\right|"
+      },
+      "notes": "HIGHEST VALUE ENTRY. |S| for a set is read by MathCAT as 'determinant of S' because S is uppercase. Ubiquitous in discrete maths and set theory."
+    },
+    {
+      "concept": "magnitude",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 1,
+      "notation": "vbar-single",
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the magnitude of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "magn",
+        "args": 1,
+        "tex": "\\left|\\iarg{#1}\\right|"
+      },
+      "notes": "MathCAT has a vector-magnitude rule but |v| lowercase falls through to absolute-value. Review: is 'magnitude' or 'absolute value' wanted for vectors in your courses?"
+    },
+    {
+      "concept": "modulus",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "wrong",
+      "tier": 1,
+      "arity": 1,
+      "notation": "vbar-single",
+      "confidence": "low",
+      "phrases": {
+        "en": {
+          "open": "the modulus of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "modulus",
+        "args": 1,
+        "tex": "\\left|\\iarg{#1}\\right|"
+      },
+      "notes": "Complex modulus. REVIEW: many courses simply say 'absolute value' for this; may be redundant with absolute-value. Also collides conceptually with modular arithmetic 'mod'."
+    },
+    {
+      "concept": "norm",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 1,
+      "notation": "dbar-single",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the norm of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "norm",
+        "args": 1,
+        "tex": "\\left\\|\\iarg{#1}\\right\\|"
+      },
+      "notes": "Shadows physics \\norm, deliberately. SRE alone says 'the metric of', which is wrong."
+    },
+    {
+      "concept": "subscripted-norm",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 2,
+      "notation": "dbar-single",
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the",
+          "mid1": "norm of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "normsub",
+        "args": 2,
+        "tex": "\\left\\|\\iarg[b]{#1}\\right\\|_{\\iarg{#2}}"
+      },
+      "notes": "REVIEW argument order: phrasing wants the subscript first ('the L 2 norm of v'), so slot a is the subscript. Verify this reads correctly."
+    },
+    {
+      "concept": "open-interval",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 2,
+      "notation": "paren-pair",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the open interval from",
+          "mid1": "to",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "openint",
+        "args": 2,
+        "tex": "\\left(\\iarg{#1},\\iarg[b]{#2}\\right)"
+      }
+    },
+    {
+      "concept": "closed-interval",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 2,
+      "notation": "bracket-pair",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the closed interval from",
+          "mid1": "to",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "closedint",
+        "args": 2,
+        "tex": "\\left[\\iarg{#1},\\iarg[b]{#2}\\right]"
+      }
+    },
+    {
+      "concept": "open-closed-interval",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 2,
+      "notation": "paren-pair",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the interval from",
+          "mid1": "exclusive to",
+          "close": "inclusive"
+        }
+      },
+      "macro": {
+        "name": "opclint",
+        "args": 2,
+        "tex": "\\left(\\iarg{#1},\\iarg[b]{#2}\\right]"
+      }
+    },
+    {
+      "concept": "closed-open-interval",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 2,
+      "notation": "bracket-pair",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the interval from",
+          "mid1": "inclusive to",
+          "close": "exclusive"
+        }
+      },
+      "macro": {
+        "name": "clopint",
+        "args": 2,
+        "tex": "\\left[\\iarg{#1},\\iarg[b]{#2}\\right)"
+      }
+    },
+    {
+      "concept": "ordered-pair",
+      "source": "w3c",
+      "group": "core-authored",
+      "mathcat": "wrong",
+      "tier": 1,
+      "arity": 2,
+      "notation": "paren-pair",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the ordered pair",
+          "mid1": "comma",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "pair",
+        "args": 2,
+        "tex": "\\left(\\iarg{#1},\\iarg[b]{#2}\\right)"
+      },
+      "notes": "MathCAT reads (a,b) as an open interval. Wrong whenever it is a point or a tuple — very common in coordinate geometry."
+    },
+    {
+      "concept": "gcd",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "wrong",
+      "tier": 1,
+      "arity": 2,
+      "notation": "paren-pair",
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the greatest common divisor of",
+          "mid1": "and",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "gcdof",
+        "args": 2,
+        "tex": "\\gcd\\left(\\iarg{#1},\\iarg[b]{#2}\\right)"
+      },
+      "notes": "Only ambiguous in the bare (a,b) form used in number theory. With an explicit \\gcd both engines are fine, so the macro spells it out."
+    },
+    {
+      "concept": "binomial-coefficient",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcatName": "binomial",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 2,
+      "notation": null,
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "",
+          "mid1": "choose",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "binomc",
+        "args": 2,
+        "tex": "\\binom{\\iarg{#1}}{\\iarg[b]{#2}}"
+      },
+      "notes": "MathCAT calls this 'binomial'. REVIEW which spelling to keep; W3C material uses binomial-coefficient. MathCAT names this concept \"binomial\" (defs:19, \"choose\"); recorded per the mathcatName policy."
+    },
+    {
+      "concept": "inner-product",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 2,
+      "notation": "angle-bar-angle",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the inner product of",
+          "mid1": "and",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "ipof",
+        "args": 2,
+        "tex": "\\left\\langle\\iarg{#1},\\iarg[b]{#2}\\right\\rangle"
+      },
+      "notes": "physics has \\ip / \\innerproduct; ours is named ipof to leave those alone since their bracket style differs."
+    },
+    {
+      "concept": "braket",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 2,
+      "notation": "angle-bar-angle",
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the inner product of",
+          "mid1": "and",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "DECIDED 2026-08-05 (docs/braket-intent-recommendations.md): distinct concept name, spoken as inner product. Evidence: 'inner product of X with Y' dominant across Susskind/Adams/Shor transcripts; #90 thread converged on distinct bra/ket names (Ginev endorsed; Böhm's final GitHub position). MathCAT channel speaks the name literally with comma separators: 'braket of a comma b' (verified live via NVDA 2026-08-05). Distinct from our inner-product entry (angle-comma notation). Fluent speech drops everything but labels ('phi psi') — noted, not implemented; terse layer later. Rename once W3C settles #90. physics owns \\braket/\\ip."
+    },
+    {
+      "concept": "ket",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 1,
+      "notation": "angle-bar-angle",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "ket",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "DECIDED 2026-08-05. Ket-first order: Wikipedia explicit ('pronounce it ket-A'), Zwiebach/Susskind transcripts, IBM-Watrous ('read as ket a'), German/French parallel; label-first 'psi ket' unattested anywhere. Fluent speech drops 'ket' ('the state psi') — noted, not implemented. No macro — physics owns \\ket."
+    },
+    {
+      "concept": "bra",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 1,
+      "notation": "angle-bar-angle",
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "bra",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "DECIDED 2026-08-05. 'bra vector psi' attested ~8x (Susskind); IBM-Watrous 'read as bra a'. Medium not high: no other transcript voicing found; bras rarely voiced standalone. physics owns \\bra."
+    },
+    {
+      "concept": "expectation-value",
+      "source": "w3c",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 1,
+      "notation": "angle-bar-angle",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the expectation value of",
+          "mid1": "in the state",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "W3C open list has this exact name+notation (arity 1, 'expectation value of $1', area quantum physics). Arity here is informational: authored with a second \\iarg (the \\expval{A}{psi} form, <psi|A|psi>), mid1 engages: 'the expectation value of A in the state psi' — verbatim instructor-endorsed (Adams 8.04 L4, answering a pronunciation question). Fluent alternative 'psi A psi' noted, not implemented. Distinct from probability's expected-value E(X). physics owns \\expval/\\ev."
+    },
+    {
+      "concept": "ketbra",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 2,
+      "notation": "bar-angle-angle-bar",
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the outer product of",
+          "mid1": "and",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "DECIDED 2026-08-05. |psi><phi|. Spoken as outer product: Susskind 'the outer product of the ket vector B with the bra vector A'; Azure 'the ketbra or outer product'. 'dyad' is attested second choice (Susskind), not used. Equal-labels case is a projector ('projector onto psi') — future enhancement, noted. MathCAT literal fallback: 'ketbra of a comma b' (verified live 2026-08-05). Distinct from W3C outer-product (X⊗Y infix). physics owns \\ketbra/\\outerproduct/\\dyad/\\op."
+    },
+    {
+      "concept": "matrix-element",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 3,
+      "notation": "angle-bar-bar-angle",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the matrix element",
+          "mid1": "",
+          "mid2": "",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "DECIDED 2026-08-05. <m|A|n>, args in written order (bra label, operator, ket label) -> 'the matrix element m A n'. Evidence: Susskind names it 'matrix element of K between vector B and vector A' and fluently reads bare 'n K r'; corpus supports 'matrix element of A between states m and n'. Rejected reordering template ('of $2 between $1 and $3') — moves args away from notation and every attested reading. Equal-labels case = expectation value (author's choice which intent fits). Within #90's 'maybe others'. physics owns \\mel/\\matrixelement."
+    },
+    {
+      "concept": "cross-product",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 2,
+      "notation": null,
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the cross product of",
+          "mid1": "and",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "crossp",
+        "args": 2,
+        "tex": "\\iarg{#1}\\times\\iarg[b]{#2}"
+      }
+    },
+    {
+      "concept": "dot-product",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 2,
+      "notation": null,
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the dot product of",
+          "mid1": "and",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "dotp",
+        "args": 2,
+        "tex": "\\iarg{#1}\\cdot\\iarg[b]{#2}"
+      }
+    },
+    {
+      "concept": "transpose",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 1,
+      "notation": "superscript-T",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the transpose of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "transp",
+        "args": 1,
+        "tex": "{\\iarg{#1}}^{\\mathsf{T}}"
+      }
+    },
+    {
+      "concept": "trace",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 1,
+      "notation": null,
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the trace of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "traceof",
+        "args": 1,
+        "tex": "\\operatorname{tr}\\left(\\iarg{#1}\\right)"
+      }
+    },
+    {
+      "concept": "complex-conjugate",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "wrong",
+      "tier": 1,
+      "arity": 1,
+      "notation": "overline",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the complex conjugate of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "conj",
+        "args": 1,
+        "tex": "\\overline{\\iarg{#1}}"
+      },
+      "notes": "MathCAT infers line-segment for an overline over two capitals, so complex conjugate of AB is misread. The canonical W3C example of this ambiguity."
+    },
+    {
+      "concept": "line-segment",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 1,
+      "notation": "overline",
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the line segment",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "lineseg",
+        "args": 1,
+        "tex": "\\overline{\\iarg{#1}}"
+      }
+    },
+    {
+      "concept": "mean",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "wrong",
+      "tier": 1,
+      "arity": 1,
+      "notation": "overline",
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the mean of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "meanof",
+        "args": 1,
+        "tex": "\\overline{\\iarg{#1}}"
+      },
+      "notes": "x-bar in statistics. REVIEW spoken form: 'x bar' is what many statistics courses actually say aloud."
+    },
+    {
+      "concept": "set-complement",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "wrong",
+      "tier": 1,
+      "arity": 1,
+      "notation": "overline",
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the complement of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "complementof",
+        "args": 1,
+        "tex": "\\overline{\\iarg{#1}}"
+      }
+    },
+    {
+      "concept": "vector",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 2,
+      "arity": 1,
+      "notation": null,
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the vector",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "vecof",
+        "args": 1,
+        "tex": "\\mathbf{\\iarg{#1}}"
+      },
+      "notes": "REVIEW: arity here is 1 with the name spoken after the phrase, giving 'the vector v'. Confirm that reads naturally."
+    },
+    {
+      "concept": "derivative",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 2,
+      "notation": "prime",
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the derivative of",
+          "mid1": "with respect to",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "deriv",
+        "args": 2,
+        "tex": "\\frac{d\\iarg{#1}}{d\\iarg[b]{#2}}"
+      },
+      "notes": "MathCAT has calculus rules for nabla forms but not for d/dx. REVIEW against MathCAT Rules/Intent/calculus.yaml before finalising."
+    },
+    {
+      "concept": "definite-integral",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 3,
+      "notation": null,
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the integral from",
+          "mid1": "to",
+          "mid2": "of",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "defint",
+        "args": 4,
+        "tex": "\\int_{\\iarg{#1}}^{\\iarg[b]{#2}}\\iarg[c]{#3}\\,d#4"
+      },
+      "notes": "Four macro arguments but arity 3: the differential variable #4 is presentational only and is not an intent slot. REVIEW whether it should be."
+    },
+    {
+      "concept": "set",
+      "source": "mathcat",
+      "group": "core-authored",
+      "mathcat": "infers",
+      "tier": 3,
+      "arity": 1,
+      "notation": null,
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the set",
+          "close": ""
+        }
+      },
+      "macro": {
+        "name": "set",
+        "args": 1,
+        "tex": "\\left\\{\\iarg{#1}\\right\\}"
+      },
+      "notes": "Tier 3: BOTH engines already handle set-builder well — verified that '\\left\\{ x \\mid x>0 \\right\\}' speaks as 'the set of all x such that x is greater than 0' with no annotation. The macro exists mainly to occupy the name so braket cannot autoload."
+    },
+    {
+      "concept": "cardinality-of-set-builder",
+      "source": "coined",
+      "group": "core-authored",
+      "mathcat": "absent",
+      "tier": 3,
+      "arity": 1,
+      "notation": null,
+      "confidence": "low",
+      "phrases": {
+        "en": {
+          "open": "the number of elements in",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "PLACEHOLDER. Probably redundant with cardinality; included only to record that the case was considered. Delete unless a reviewer wants it."
+    },
+    {
+      "concept": "time-derivative",
+      "source": "coined",
+      "group": "calculus-analysis",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 1,
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the time derivative of",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "Newton dot, \\dot{x}. Authored 2026-08-09 for the showcase/platform demo (APMTH 108 / Strogatz). Coined per the 5.7 shortcut: open list has no entry; check W3C discussion before promoting. No macro: wrap \\dot{...} explicitly."
+    },
+    {
+      "concept": "fixed-point",
+      "source": "coined",
+      "group": "calculus-analysis",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 1,
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the fixed point",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "x^* as equilibrium of a dynamical system (APMTH 108 / Strogatz). Same notation means optimal-solution in optimization — the star is course-dependent; suggest tool must offer both. Authored 2026-08-09, coined per 5.7 shortcut."
+    },
+    {
+      "concept": "optimal-solution",
+      "source": "coined",
+      "group": "other",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 1,
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the optimal solution",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "x^* as the optimizer (APMTH 121 / LP, Chvatal). Counterpart of fixed-point on the same notation. Authored 2026-08-09, coined per 5.7 shortcut."
+    },
+    {
+      "concept": "gradient",
+      "source": "coined",
+      "group": "calculus-analysis",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 1,
+      "confidence": "medium",
+      "phrases": {
+        "en": {
+          "open": "the gradient of",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "\\nabla f. Open list has NO gradient entry (verified 2026-08-09); nabla is also divergence/curl/covariant-derivative depending on context, so no macro — wrap explicitly. Coined per 5.7 shortcut."
+    },
+    {
+      "concept": "concentration",
+      "source": "w3c",
+      "group": "chemistry-units",
+      "mathcat": "absent",
+      "tier": 1,
+      "arity": 1,
+      "confidence": "high",
+      "phrases": {
+        "en": {
+          "open": "the concentration of",
+          "close": ""
+        }
+      },
+      "macro": null,
+      "notes": "[X] molar concentration. From the intent-editor open list (chemistry area, arity 1, list phrase \"concentration of\"; we add \"the\" per house style). Collides with interval/matrix brackets. Adopted 2026-08-09 ahead of the bulk merge. First non-experimental chemistry entry."
+    }
+  ]
+}

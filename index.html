@@ -4435,7 +4435,11 @@ function ensureMathjaxDevice() {
   if (!_mjxDeviceReady) {
     _mjxDeviceReady = (async () => {
       const [{ tex2mml }, cond, { rewriteIsotopes }] = await Promise.all([
-        import('./math-conversion/mathjax-bundle.js'),
+        // 2026-08-09: intent-aware bundle (adds \intent/\iarg/\speakas + the
+        // vocabulary shortcut macros; no-intent sources convert IDENTICALLY —
+        // byte-parity verified). Built by mathjax-intent-extension
+        // build/bundle/. To revert, point back at './math-conversion/mathjax-bundle.js'.
+        import('./math-conversion/mathjax-bundle-intent.js'),
         import('./math-conversion/mml-condition.js'),
         import('./math-conversion/mml-isotopes-browser.js'),
       ]);
