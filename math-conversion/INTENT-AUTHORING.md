@@ -67,9 +67,11 @@ converting to HTML and inspecting the emitted `<math>` for
 
 ## Known limits (don't chase as bugs)
 
-- SRE/aria-label speech in OUTPUT pages needs the ~1KB rules shim from the
-  mathjax-intent-extension project (not shipped here yet). MathCAT/NVDA
-  needs nothing.
+- SRE/aria-label speech in OUTPUT pages: NOW AVAILABLE by uploading
+  `filters/mathjax-intent-toggle.lua` as a Lua filter (see
+  `filters/INTENT-SRE-OUTPUT.md` — includes the mode toggle and offline
+  fallback). Without it, output pages are static MathML only; MathCAT/NVDA
+  needs nothing either way.
 - The docx/OMML path ignores intent attributes (harmless pass-through).
 - `\intent` etc. are conversion-time commands; they will not compile in
   ordinary LaTeX (a PDF-compat .sty is designed, not built).
