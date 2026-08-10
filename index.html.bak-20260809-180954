@@ -1307,7 +1307,6 @@
           <option value="mathjax4" selected>MathJax 4</option>
           <option value="mathjax-omml">MathJax → OMML (Word math, docx)</option>
           <option value="mathjax-mathml">MathJax → MathML (HTML)</option>
-          <option value="mathjax-mathml-intent">MathJax → MathML + intent/SRE speech (HTML)</option>
           <option value="mathjax" >MathJax 3 (Pandoc default)</option>
           <option value="mathml">MathML (Pandoc texmath)</option>
           <option value="">Do not convert math content</option>
@@ -3881,32 +3880,6 @@ async function ensureThoriumAssets() {
   thoriumAssets.payloadBytes = new Uint8Array(await payResp.arrayBuffer());
 }
 
-// ── MathJax intent + SRE speech ──────────────────────────────────────
-// Pairs with the 'MathJax → MathML + intent/SRE speech' math method.
-// Division of labour: the MathJax *device* bakes intent= and ext-* attributes
-// into the static MathML at conversion time; this *filter* loads MathJax 4.1.3
-// in the page and merges the ClearSpeak rules that read those ext-* carriers
-// into the SRE speech worker. Without the filter the intent= channel still
-// works (MathCAT/NVDA), but composed speech degrades to structural reading.
-// Source of truth is the file on disk — fetched, never embedded, so the
-// shipped filter and the platform copy cannot drift apart.
-const INTENT_FILTER_NAME = 'mathjax-intent-toggle.lua';
-const INTENT_FILTER_URL  = './filters/mathjax-intent-toggle.lua';
-let intentFilterSource = null;
-
-function needsIntentFilter() {
-  const m = document.getElementById('opt-math')?.value;
-  const to = document.getElementById('selTo')?.value.split(/[+-]/)[0] || '';
-  return m === 'mathjax-mathml-intent' && /^html/.test(to);
-}
-
-async function ensureIntentFilter() {
-  if (intentFilterSource) return;
-  const r = await fetch(INTENT_FILTER_URL);
-  if (!r.ok) throw new Error(INTENT_FILTER_URL + ' not found (HTTP ' + r.status + ')');
-  intentFilterSource = await r.text();
-}
-
 const EXTENSION_BY_FORMAT = {
   'html': 'html', 'html5': 'html', 'html4': 'html', 'chunkedhtml': 'zip',
   'markdown': 'md', 'markdown_strict': 'md', 'markdown_mmd': 'md', 'markdown_phpextra': 'md',
@@ -4228,8 +4201,7 @@ function buildOptions() {
         method: 'mathjax',
         url: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js'
       };
-    } else if (mathEl.value === 'mathjax-omml' || mathEl.value === 'mathjax-mathml'
-               || mathEl.value === 'mathjax-mathml-intent') {
+    } else if (mathEl.value === 'mathjax-omml' || mathEl.value === 'mathjax-mathml') {
       // Handled by the MathJax device Lua filter (docx→OMML / html→MathML); no html-math-method.
     } else {
       opts['html-math-method'] = mathEl.value;
@@ -4239,14 +4211,6 @@ function buildOptions() {
   // EPUB for Thorium Reader: force plain MathJax. The payload is spliced
   // into the EPUB post-process, so no CDN URL is wanted here.
   if (thoriumPreset) opts['html-math-method'] = 'mathjax';
-
-  // intent/SRE method: the filter injects through header-includes, which
-  // Pandoc only renders in standalone mode. Non-standalone would emit a page
-  // with no MathJax at all, so force it rather than fail silently.
-  if (needsIntentFilter() && !opts.standalone) {
-    console.log('[intent] forcing --standalone (header-includes are required)');
-    opts.standalone = true;
-  }
 
   // Code highlighting (wired later)
   const hlStyle = document.getElementById('opt-highlight-style');
@@ -4415,10 +4379,6 @@ function buildOptions() {
         }
       }
     }
-    // Intent/SRE filter — MUST precede the device filter: _mjx-math.lua
-    // replaces every Math element with a placeholder RawInline, so anything
-    // running after it sees no math and injects nothing.
-    if (needsIntentFilter()) filterNames.push(INTENT_FILTER_NAME);
     // MathJax device filter (docx→OMML / html→MathML) — appended last so it runs after other filters
     if (needsMathjaxDevice()) filterNames.push('_mjx-math.lua');
     if (filterNames.length > 0) opts.filters = filterNames;
@@ -4467,8 +4427,6 @@ function buildFiles() {
   });
   // MathJax device filter content (docx→OMML / html→MathML)
   if (needsMathjaxDevice()) raw['_mjx-math.lua'] = new Blob([MJX_MATH_LUA], { type: 'text/plain' });
-  // Intent/SRE filter source, fetched from ./filters/ (not embedded)
-  if (needsIntentFilter() && intentFilterSource) raw[INTENT_FILTER_NAME] = new Blob([intentFilterSource], { type: 'text/plain' });
   // Thorium preset: virtual header carrying the MathJax bootstrap
   if (isThoriumPreset() && thoriumAssets.headHtml) raw[THORIUM_HEAD_NAME] = new Blob([thoriumAssets.headHtml], { type: 'text/html' });
   // Binary input file
@@ -4520,7 +4478,7 @@ function needsMathjaxDevice() {
   const m = document.getElementById('opt-math')?.value;
   const to = document.getElementById('selTo').value.split(/[+-]/)[0];
   return (m === 'mathjax-omml' && to === 'docx') ||
-         ((m === 'mathjax-mathml' || m === 'mathjax-mathml-intent') && /^html/.test(to));
+         (m === 'mathjax-mathml' && /^html/.test(to));
 }
 function ensureMathjaxDevice() {
   if (!_mjxDeviceReady) {
@@ -4818,7 +4776,6 @@ async function runConversion() {
 
   try {
     if (isThoriumPreset()) { updateStatus('loading', 'Loading Thorium EPUB assets…'); await ensureThoriumAssets(); }
-    if (needsIntentFilter()) { updateStatus('loading', 'Loading intent/SRE filter…'); await ensureIntentFilter(); }
 
     const options = buildOptions();
     const files = buildFiles();
