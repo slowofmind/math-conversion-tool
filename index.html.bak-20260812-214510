@@ -1308,8 +1308,12 @@
           <option value="mathjax-omml">MathJax → OMML (Word math, docx)</option>
           <option value="mathjax-mathml">MathJax → MathML (HTML)</option>
           <option value="mathjax-mathml-intent">MathJax → MathML + intent/SRE speech (HTML)</option>
+          <option value="mathjax" >MathJax 3 (Pandoc default)</option>
           <option value="mathml">MathML (Pandoc texmath)</option>
           <option value="">Do not convert math content</option>
+          <option value="katex">KaTeX</option>
+          <option value="webtex">WebTeX (images)</option>
+          <option value="gladtex">GladTeX</option>
         </select>
       </div>
     </div>
