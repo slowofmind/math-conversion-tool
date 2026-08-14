@@ -1084,15 +1084,26 @@
 
   <div class="toolbar-divider"></div>
 
-  <div class="toolbar-group">
+  <!-- ENGINE BUTTONS HIDDEN ==================================================
+       Pandoc is the only engine exposed for now, so the engine selector is
+       hidden rather than deleted. The LaTeXML / LuaLaTeX pipeline code is all
+       still present under the hood; it is simply unreachable from the UI, and
+       the embedded token has been removed (search: TOKEN SLOT).
+
+       The buttons are hidden with a wrapper rather than removed because
+       several addEventListener calls reference these ids directly and would
+       throw at load time if the elements did not exist.
+
+       To restore: delete the style="display:none" below and put a valid PAT
+       in the TOKEN SLOT.
+       ==================================================================== -->
+  <div class="toolbar-group" style="display:none;" aria-hidden="true">
     <div class="engine-group" role="radiogroup" aria-label="Conversion engine">
-      <button class="engine-btn active" id="btnEnginePandoc" role="radio" aria-checked="true">Pandoc</button>
-      <button class="engine-btn" id="btnEngineLatexml" role="radio" aria-checked="false">LaTeXML</button>
-      <button class="engine-btn" id="btnEngineLualatex" role="radio" aria-checked="false">LuaLaTeX</button>
+      <button class="engine-btn active" id="btnEnginePandoc" role="radio" aria-checked="true" tabindex="-1">Pandoc</button>
+      <button class="engine-btn" id="btnEngineLatexml" role="radio" aria-checked="false" tabindex="-1">LaTeXML</button>
+      <button class="engine-btn" id="btnEngineLualatex" role="radio" aria-checked="false" tabindex="-1">LuaLaTeX</button>
     </div>
   </div>
-
-  <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
     <button class="toolbar-btn primary" id="btnConvert" disabled>Convert</button>
@@ -6764,10 +6775,29 @@ const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GIT
 
 // --- PAT management (localStorage + embedded service token) ---
 
-// Embedded service token for internal testing.
-// Fine-grained PAT scoped to math-conversion-tool repo only (contents:write, actions:read).
-// Replace PASTE_YOUR_TOKEN_HERE with the actual token.
-const SERVICE_TOKEN = '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';
+// ============================================================================
+// TOKEN SLOT - intentionally empty.
+// ============================================================================
+// This is where the GitHub Personal Access Token would go IF the Docker-based
+// LaTeXML / LuaLaTeX conversion via GitHub Actions were re-enabled.
+//
+// The pipeline code is all still present and functional; only the token and
+// the engine buttons that reached it have been removed. Restoring the feature
+// means (a) putting a valid fine-grained PAT below, and (b) un-hiding the
+// engine buttons in the toolbar markup (search: ENGINE BUTTONS HIDDEN).
+//
+// Required PAT scopes, limited to the pipeline repo only:
+//     contents:write   commit the .tex file (NOTE: also grants repo read)
+//     actions:read     poll workflow runs, download artifacts
+//
+// SECURITY: anything placed here is readable by every visitor who can load
+// this page - client-side JavaScript cannot hide a secret. The previous token
+// is in git history and should be treated as compromised. Prefer a server-side
+// proxy that holds the credential, or per-user tokens via the right-click
+// prompt (promptForGitHubToken), over embedding one here again.
+//
+// Leave as an empty string to keep the pipeline engines inert.
+const SERVICE_TOKEN = '';
 
 function getGitHubToken() {
   // User-provided token takes priority over service token
