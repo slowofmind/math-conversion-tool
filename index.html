@@ -1304,12 +1304,13 @@
       <div class="opt-group">
         <label for="opt-math">Math rendering method:</label>
         <select id="opt-math" style="width:auto;">
-          <option value="mathjax4" selected>MathJax 4</option>
-          <option value="mathjax-omml">MathJax → OMML (Word math, docx)</option>
-          <option value="mathjax-mathml">MathJax → MathML (HTML)</option>
-          <option value="mathjax-mathml-intent">MathJax → MathML + intent/SRE speech (HTML)</option>
-          <option value="mathml">MathML (Pandoc texmath)</option>
-          <option value="">Do not convert math content</option>
+          <!-- Rebuilt at runtime by refreshMathOptions() to match the
+               selected output format. These initial entries are the
+               HTML-family list, matching the default output (html5). -->
+          <option value="mathjax-mathml-intent" selected>MathML (custom MathJax conversion + intent/SRE speech)</option>
+          <option value="mathjax-mathml">MathML (custom MathJax conversion)</option>
+          <option value="mathjax4">MathJax (default script reference)</option>
+          <option value="mathml">MathML (default texmath)</option>
         </select>
       </div>
     </div>
@@ -2031,9 +2032,9 @@ async function initPandoc() {
     // Populate format dropdowns
     const inputFormats = await mod.query({ query: 'input-formats' });
     const outputFormats = await mod.query({ query: 'output-formats' });
-    populateFormats('selFrom', inputFormats, 'latex');
-    populateFormats('selTo', outputFormats, 'html5');
-    ensureThoriumOption();   // synthetic 'EPUB for Thorium Reader' preset
+    populateFormats('selFrom', filterFormats(inputFormats, INPUT_FORMAT_ALLOW), 'latex');
+    populateFormats('selTo', filterFormats(outputFormats, OUTPUT_FORMAT_ALLOW), 'html5');
+    refreshMathOptions();    // math methods for the default output format
 
     // Load extensions for default formats
     updateExtensions();
@@ -2044,13 +2045,96 @@ async function initPandoc() {
   }
 }
 
+// ── Visible format allowlists ─────────────────────────────
+// Internal capability is unchanged; this only limits what the dropdowns show.
+// A future 'production mode' can bypass these and expose the full Pandoc set.
+// Order here IS the display order. Verified on Pandoc 3.10: 'html5' and 'html'
+// are the same writer (byte-identical output), and 'epub' and 'epub3' are the
+// same (package version 3.0). We keep 'html5'/'epub' as the internal values so
+// pandocDefaultTo and the LaTeXML engine path need no changes.
+const INPUT_FORMAT_ALLOW  = ['latex', 'markdown'];
+const OUTPUT_FORMAT_ALLOW = ['html5', 'docx', 'chunkedhtml', 'epub'];
+
+const FORMAT_LABELS = {
+  'latex': 'LaTeX', 'markdown': 'Markdown',
+  'html5': 'HTML', 'docx': 'DOCX', 'chunkedhtml': 'Chunked HTML', 'epub': 'EPUB'
+};
+
+// Keep allowlist order; drop anything this Pandoc build doesn't offer.
+function filterFormats(available, allow) {
+  const have = new Set(available);
+  return allow.filter(f => have.has(f));
+}
+
+// ── Output-format families for math handling ───────────────────
+// 'chunkedhtml' does NOT start with 'html', so a bare /^html/ test excludes it.
+function isHtmlFamily(fmt) {
+  const b = (fmt || '').split(/[+-]/)[0];
+  return /^html/.test(b) || b === 'chunkedhtml';
+}
+function isEpubFamily(fmt) {
+  return /^epub/.test((fmt || '').split(/[+-]/)[0]);
+}
+function mathFamilyFor(fmt) {
+  const b = (fmt || '').split(/[+-]/)[0];
+  if (isHtmlFamily(b)) return 'html';
+  if (isEpubFamily(b)) return 'epub';
+  if (b === 'docx') return 'docx';
+  return null;
+}
+
+// ── Math methods offered per output family ───────────────────
+// [internal value, visible label]. FIRST ENTRY IS THE DEFAULT for that family.
+// Convention: custom pipelines first, stock Pandoc behaviour last.
+// NOTE: 'epub-thorium' was formerly a synthetic OUTPUT format; it is now a
+// MATH METHOD. The string is reused so isThoriumPreset() and its downstream
+// call sites keep working unchanged. Rename in the production-mode pass.
+const MATH_METHODS = {
+  html: [
+    ['mathjax-mathml-intent', 'MathML (custom MathJax conversion + intent/SRE speech)'],
+    ['mathjax-mathml',        'MathML (custom MathJax conversion)'],
+    ['mathjax4',              'MathJax (default script reference)'],
+    ['mathml',                'MathML (default texmath)']
+  ],
+  docx: [
+    ['mathjax-omml', 'OMML (custom MathJax conversion)'],
+    ['',             'OMML (default texmath)']
+  ],
+  epub: [
+    ['mathjax-mathml', 'MathML (custom MathJax conversion)'],
+    ['epub-thorium',   'full MathJax library for Thorium reader'],
+    ['mathml',         'MathML (default texmath)']
+  ]
+};
+
+// Rebuild the math dropdown for the current output format. Preserves the
+// current selection when still valid, else falls back to the family default
+// (first entry). Unknown formats (e.g. LuaLaTeX 'pdf' mode) are left alone
+// rather than blanked.
+function refreshMathOptions() {
+  const sel = document.getElementById('opt-math');
+  if (!sel) return;
+  const fam = mathFamilyFor(document.getElementById('selTo')?.value);
+  if (!fam || !MATH_METHODS[fam]) return;
+  const list = MATH_METHODS[fam];
+  const prev = sel.value;
+  sel.innerHTML = '';
+  for (const [value, label] of list) {
+    const opt = document.createElement('option');
+    opt.value = value;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  }
+  sel.value = list.some(([v]) => v === prev) ? prev : list[0][0];
+}
+
 function populateFormats(selectId, formats, defaultVal) {
   const sel = document.getElementById(selectId);
   sel.innerHTML = '';
   for (const fmt of formats) {
     const opt = document.createElement('option');
     opt.value = fmt;
-    opt.textContent = fmt;
+    opt.textContent = FORMAT_LABELS[fmt] || fmt;
     if (fmt === defaultVal) opt.selected = true;
     sel.appendChild(opt);
   }
@@ -2648,6 +2732,7 @@ function setActiveEngine(engine) {
     selFrom.value = pandocDefaultFrom;
     selTo.value = pandocDefaultTo;
     updateExtensions();
+    refreshMathOptions();
   } else if (engine === 'latexml') {
     selFrom.value = 'latex';
     selFrom.disabled = true;
@@ -3840,7 +3925,7 @@ function buildFormatWithExtensions(baseFormat, extState) {
 
 // Update extensions when format dropdowns change
 document.getElementById('selFrom').addEventListener('change', () => { updateExtensions(); });
-document.getElementById('selTo').addEventListener('change', () => { updateExtensions(); });
+document.getElementById('selTo').addEventListener('change', () => { updateExtensions(); refreshMathOptions(); });
 
 // --- Format metadata ---
 const BINARY_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'epub2', 'epub3', 'pdf', 'chunkedhtml'];
@@ -3852,18 +3937,14 @@ const THORIUM_HEAD_NAME = '_thorium-mathjax-head.html';
 const thoriumAssets = { headHtml: null, payloadBytes: null };
 
 function isThoriumPreset() {
-  const el = document.getElementById('selTo');
-  return !!el && el.value === 'epub-thorium';
+  const math = document.getElementById('opt-math');
+  const to = document.getElementById('selTo');
+  if (!math || !to) return false;
+  return math.value === 'epub-thorium' && isEpubFamily(to.value);
 }
 
-function ensureThoriumOption() {
-  const sel = document.getElementById('selTo');
-  if (!sel || sel.querySelector('option[value="epub-thorium"]')) return;
-  const opt = document.createElement('option');
-  opt.value = 'epub-thorium';
-  opt.textContent = 'EPUB for Thorium Reader';
-  sel.appendChild(opt);
-}
+// ensureThoriumOption() was retired: Thorium is now a MATH METHOD offered for
+// EPUB output (see MATH_METHODS.epub), not a synthetic output format.
 
 async function ensureThoriumAssets() {
   if (thoriumAssets.headHtml && thoriumAssets.payloadBytes) return;
@@ -3893,7 +3974,7 @@ let intentFilterSource = null;
 function needsIntentFilter() {
   const m = document.getElementById('opt-math')?.value;
   const to = document.getElementById('selTo')?.value.split(/[+-]/)[0] || '';
-  return m === 'mathjax-mathml-intent' && /^html/.test(to);
+  return m === 'mathjax-mathml-intent' && isHtmlFamily(to);
 }
 
 async function ensureIntentFilter() {
@@ -4155,8 +4236,8 @@ function extractMissingFile(errMsg) {
 function buildOptions() {
   const fromFmt = document.getElementById('selFrom').value;
   const toFmtRaw = document.getElementById('selTo').value;
-  const thoriumPreset = (toFmtRaw === 'epub-thorium');
-  const toFmt = thoriumPreset ? 'epub' : toFmtRaw;
+  const thoriumPreset = isThoriumPreset();   // now driven by the math method
+  const toFmt = toFmtRaw;
   const opts = {
     from: buildFormatWithExtensions(fromFmt, inputExtensions),
     to: buildFormatWithExtensions(toFmt, outputExtensions),
@@ -4225,7 +4306,8 @@ function buildOptions() {
         url: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js'
       };
     } else if (mathEl.value === 'mathjax-omml' || mathEl.value === 'mathjax-mathml'
-               || mathEl.value === 'mathjax-mathml-intent') {
+               || mathEl.value === 'mathjax-mathml-intent'
+               || mathEl.value === 'epub-thorium') {
       // Handled by the MathJax device Lua filter (docx→OMML / html→MathML); no html-math-method.
     } else {
       opts['html-math-method'] = mathEl.value;
@@ -4486,7 +4568,8 @@ local PREFIX = 'MJXDEV:'
 local collected = {}
 local target, rawfmt
 if FORMAT:match('docx') then target = 'omml'; rawfmt = 'openxml'
-elseif FORMAT:match('html') then target = 'mathml'; rawfmt = 'html' end
+elseif FORMAT:match('html') then target = 'mathml'; rawfmt = 'html'
+elseif FORMAT:match('epub') then target = 'mathml'; rawfmt = 'html' end
 function Math(el)
   if not target then return nil end
   local i = #collected + 1
@@ -4516,7 +4599,8 @@ function needsMathjaxDevice() {
   const m = document.getElementById('opt-math')?.value;
   const to = document.getElementById('selTo').value.split(/[+-]/)[0];
   return (m === 'mathjax-omml' && to === 'docx') ||
-         ((m === 'mathjax-mathml' || m === 'mathjax-mathml-intent') && /^html/.test(to));
+         ((m === 'mathjax-mathml' || m === 'mathjax-mathml-intent')
+          && (isHtmlFamily(to) || isEpubFamily(to)));
 }
 function ensureMathjaxDevice() {
   if (!_mjxDeviceReady) {
