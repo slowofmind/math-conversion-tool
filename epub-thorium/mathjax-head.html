@@ -115,7 +115,52 @@ mjx-container[display="true"] {
     }
   }, true);
 
-  // --- createWorker override -------------------------------------------------
+  // --- intent ClearSpeak rules ----------------------------------------------
+  // Copied from filters/mathjax-intent-toggle.lua (RULES). These are the SRE
+  // half of the intent layer: they match the ext-* carrier attributes that the
+  // conversion-time device baked into the static MathML. The TeX-input half is
+  // deliberately absent -- see mathjax-configuration-reference.md section 8.
+  //
+  //   * priority must be the LAST constraint, and above ~250 to beat built-ins
+  //   * ARG stays STRICTLY descendant: a self-selecting [n] re-invokes speech
+  //     on the same node -- infinite recursion, empty output (2026-08-09)
+  //   * registered for clearspeak ONLY, so MathSpeak keeps reading verbatim
+  var RULES_LOCALE = 'en';
+  var ARG = function (n) { return './/*[@ext-argname="' + n + '"]'; };
+  var PRIO = 'priority=1000';
+  var INTENT_RULES = {};
+  INTENT_RULES[RULES_LOCALE + '/rules/intent'] = {
+    domain: 'clearspeak', locale: RULES_LOCALE, modality: 'speech',
+    inherits: 'base',
+    rules: [
+      ['Rule', 'intent-arity0', 'default',
+        '[t] @ext-open',
+        'self::*[@ext-arity="0"]', PRIO],
+      ['Rule', 'intent-arity1', 'default',
+        '[t] @ext-open; [n] ' + ARG('a') + '; [t] @ext-close',
+        'self::*[@ext-arity="1"]', PRIO],
+      // MERGED arity-1: SRE's semantic collapse can fold a lone-token operand
+      // into the wrapper node, so self carries BOTH ext-arity and ext-argname
+      // and the descendant lookup finds nothing ("the vector" bug).
+      ['Rule', 'intent-arity1-merged', 'default',
+        '[t] @ext-open; [t] text(); [t] @ext-close',
+        'self::*[@ext-arity="1"]', 'self::*[@ext-argname]', 'priority=1100'],
+      ['Rule', 'intent-arity2', 'default',
+        '[t] @ext-open; [n] ' + ARG('a') + '; [t] @ext-mid1; [n] ' + ARG('b') +
+        '; [t] @ext-close',
+        'self::*[@ext-arity="2"]', PRIO],
+      ['Rule', 'intent-arity3', 'default',
+        '[t] @ext-open; [n] ' + ARG('a') + '; [t] @ext-mid1; [n] ' + ARG('b') +
+        '; [t] @ext-mid2; [n] ' + ARG('c') + '; [t] @ext-close',
+        'self::*[@ext-arity="3"]', PRIO],
+      // \speakas -- author's literal string; terminal, beats the concept rules.
+      ['Rule', 'intent-say', 'default',
+        '[t] @ext-say',
+        'self::*[@ext-say]', 'priority=2000']
+    ]
+  };
+
+  // --- createWorker override (MERGED: offline mathmaps + intent rules) -------
   function installWorkerPatch() {
     var store = window.__mjxEpubAssets;
     var HA;
@@ -138,15 +183,24 @@ mjx-container[display="true"] {
           first = false;
         }
         mapsJs += '}';
+        // Neutralise "<" so a stray "</script" cannot end the block early.
+        function embed(v) { return JSON.stringify(v).replace(/</g, '\\u003c'); }
         var content =
           'self.maps = ' + JSON.stringify((options && options.maps) || '') + ';\n' +
           'self.__mathmaps = ' + mapsJs + ';\n' +
+          'self.__intentRules = ' + embed(INTENT_RULES) + ';\n' +
+          'self.__intentFile = ' + embed(RULES_LOCALE + '.json') + ';\n' +
           '(function () {\n' +
           '  var origFetch = self.fetch;\n' +
           '  self.fetch = function (url) {\n' +
           '    var m = String(url).match(/([^\\/\\\\]+\\.json)(\\?.*)?$/);\n' +
           '    if (m && self.__mathmaps[m[1]]) {\n' +
           '      var data = self.__mathmaps[m[1]];\n' +
+          // NO bookkeeping keys in this object: SRE enumerates it and
+          // dispatches every key as a rule set. Merging is idempotent.
+          '      if (m[1] === self.__intentFile) {\n' +
+          '        for (var k in self.__intentRules) data[k] = self.__intentRules[k];\n' +
+          '      }\n' +
           '      return Promise.resolve({\n' +
           '        ok: true, status: 200,\n' +
           '        json: function () { return Promise.resolve(data); },\n' +
@@ -163,7 +217,8 @@ mjx-container[display="true"] {
         var w = new Worker(url);
         w.onmessage = listener;
         URL.revokeObjectURL(url);
-        console.log(TAG + ' inline speech worker created');
+        console.log(TAG + ' inline speech worker created; intent rules merged into ' +
+                    RULES_LOCALE + '.json');
         return w;
       } catch (err) {
         console.error(TAG + ' inline worker failed (' + (err && err.message) + '); using stock method');
@@ -186,7 +241,16 @@ mjx-container[display="true"] {
 
   window.MathJax = {
     loader: {
-      load: ['[tex]/physics']
+      // All four resolve from ../MathJax/ inside the container (no network).
+      //   a11y/explorer      declares the options.a11y defaults, INCLUDING
+      //                      subtitles and viewBraille. Without it those keys
+      //                      are rejected at config time and the subtitle
+      //                      region never shows. Not optional.
+      //   a11y/assistive-mml provides the hidden-MathML mode reached from the
+      //                      context menu -- the MathCAT route and the
+      //                      no-speech fallback. The HTML path loads it; this
+      //                      one previously did not.
+      load: ['a11y/explorer', 'a11y/assistive-mml', '[tex]/physics']
     },
     tex: {
       // NOTE: physics rebinds \div (division sign -> divergence operator).
@@ -195,7 +259,33 @@ mjx-container[display="true"] {
       packages: { '[+]': ['physics'] }
     },
     options: {
-      a11y: { speech: true, braille: true, subtitles: true, viewBraille: false }
+      // TWO NAMESPACES -- see ../../mathjax-configuration-reference.md
+      //
+      // menuOptions.settings = MenuSettings, declared in ui/menu/Menu.ts.
+      //   Only keys in that static list may be set here (speech, braille,
+      //   enrich, assistiveMml, speechRules, collapsible, ...).
+      //
+      // a11y = document options, declared in a11y/explorer.ts OPTIONS.a11y
+      //   (subtitles, viewBraille, voicing, magnification, highlight, ...).
+      //   Requires a11y/explorer in loader.load above.
+      //
+      // Setting a key in the wrong namespace logs
+      //   Invalid option "<key>" (no default value)
+      // and the value is silently discarded -- the feature just never turns on.
+      // FIXED 2026-08-14: subtitles/braille were previously all under a11y
+      // with no explorer loaded, so subtitles and braille display were dead.
+      menuOptions: {
+        settings: {
+          enrich:       true,   // gates speech/braille/explorer
+          speech:       true,   // MathJax voices each expression
+          braille:      true,   // generate braille
+          assistiveMml: false   // hidden MathML off by default; menu turns it on
+        }
+      },
+      a11y: {
+        subtitles:   true,      // speech shown on screen while exploring
+        viewBraille: false      // braille shown as subtitles; off by default
+      }
     },
     startup: {
       ready: function () {

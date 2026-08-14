@@ -371,7 +371,17 @@ local MATHJAX_CONFIG = [==[
 <script>
 window.MathJax = {
   loader: {
-    load: ['a11y/assistive-mml', '[tex]/physics', '[tex]/mathtools']
+    // a11y/explorer is preloaded deliberately. It is normally lazy-loaded, but
+    // it OWNS the defaults for 'subtitles' and 'viewBraille' (they are declared
+    // in explorer.js and nowhere else). Without it, any attempt to set those
+    // keys before the explorer arrives -- e.g. applyMode() calling
+    // setVar(pool,'subtitles',true) -- raises
+    //     Invalid option "subtitles" (no default value)
+    // and the subtitle region stays hidden, because the explorer gates it on
+    //     s.subtitles && s.speech && i.enableSpeech
+    // Symptom when this is missing: subtitles appear only AFTER the user opens
+    // the context menu or toggles modes, both of which force the load.
+    load: ['a11y/assistive-mml', 'a11y/explorer', '[tex]/physics', '[tex]/mathtools']
   },
   tex: {
     packages: { '[+]': ['physics', 'mathtools'] },
@@ -383,15 +393,38 @@ window.MathJax = {
     // everything else loads on demand via the bundled autoload extension
   },
   options: {
+    // TWO DISTINCT NAMESPACES -- do not merge them.
+    //
+    // options.menuOptions.settings  = MenuSettings, declared statically in
+    //   ui/menu/Menu.ts. Only keys present in those defaults may be set here.
+    //   Includes: enrich, speech, braille, assistiveMml, speechRules,
+    //   brailleCode, brailleSpeech, brailleCombine, collapsible, roleDescription,
+    //   inTabOrder, tabSelects, help, renderer, scale, zoom ...
+    //
+    // options.a11y = DOCUMENT options, declared by a11y/explorer.ts
+    //   (ExplorerMathDocument.OPTIONS.a11y). Includes: subtitles, viewBraille,
+    //   voicing, magnification, magnify, treeColoring, highlight, hover,
+    //   infoType/infoRole/infoPrefix, backgroundColor/Opacity, foreground*.
+    //   These require a11y/explorer to be LOADED (see loader.load above),
+    //   because that component is what declares their defaults.
+    //
+    // The menu can still change a11y keys at runtime: Menu.a11yVar() builds a
+    // variable whose getter/setter proxy to getA11y/setA11y. That is a RUNTIME
+    // mechanism, not a static default -- which is why the menu can toggle
+    // subtitles even though 'subtitles' is not a MenuSettings key, and why
+    // setting it here under menuOptions.settings raises
+    //     Invalid option "subtitles" (no default value)
     menuOptions: {
       settings: {
         enrich:       true,   // gates speech/braille/explorer (v4 default on)
         speech:       true,   // MathJax voices each expression (v4 default on)
-        subtitles:    true,   // speech string shown on screen while exploring
         assistiveMml: false,  // hidden MathML OFF (MathCat mode turns it on)
         braille:      false,  // leave braille generation off unless requested
         collapsible:  false
       }
+    },
+    a11y: {
+      subtitles: true       // speech string shown on screen while exploring
     }
   }
 };

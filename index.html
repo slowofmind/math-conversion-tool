@@ -1318,7 +1318,7 @@
           <!-- Rebuilt at runtime by refreshMathOptions() to match the
                selected output format. These initial entries are the
                HTML-family list, matching the default output (html5). -->
-          <option value="mathjax-mathml-intent" selected>MathML (custom MathJax conversion + intent/SRE speech)</option>
+          <option value="mathjax-mathml-intent" selected>MathML (custom MathJax conversion + SRE speech)</option>
           <option value="mathjax-mathml">MathML (custom MathJax conversion)</option>
           <option value="mathjax4">MathJax (default script reference)</option>
           <option value="mathml">MathML (default texmath)</option>
@@ -2102,7 +2102,7 @@ function mathFamilyFor(fmt) {
 // call sites keep working unchanged. Rename in the production-mode pass.
 const MATH_METHODS = {
   html: [
-    ['mathjax-mathml-intent', 'MathML (custom MathJax conversion + intent/SRE speech)'],
+    ['mathjax-mathml-intent', 'MathML (custom MathJax conversion + SRE speech)'],
     ['mathjax-mathml',        'MathML (custom MathJax conversion)'],
     ['mathjax4',              'MathJax (default script reference)'],
     ['mathml',                'MathML (default texmath)']
@@ -3947,6 +3947,84 @@ const BINARY_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'epub2', 'epub3', 'pdf', 
 const THORIUM_HEAD_NAME = '_thorium-mathjax-head.html';
 const thoriumAssets = { headHtml: null, payloadBytes: null };
 
+// ===========================================================================
+// Pandoc EPUB writer repair: valueless attributes -> attr=""
+// ===========================================================================
+// See docs/pandoc-epub-bugs.md. Pandoc's EPUB writer serialises an empty
+// attribute value as a bare attribute name, which is legal HTML but invalid
+// XHTML. Every EPUB content document is rewritten so that any valueless
+// attribute gets an explicit empty value.
+//
+// Normalising ALL valueless attributes (not just ext-*) is deliberate: XHTML
+// requires a value for every attribute, including ones that are boolean in
+// HTML (hidden, checked, disabled...). There is no valueless attribute that is
+// valid in an EPUB content document, so a blanket fix cannot over-reach.
+//
+// The tag pattern tolerates quoted values containing < or > (data-latex holds
+// both) and never matches closing tags. Only *.xhtml / *.html entries are
+// touched; the OPF, NCX, CSS and payload pass through byte-for-byte.
+const EPUB_TAG_WITH_ATTRS =
+  /<([A-Za-z][\w:.-]*)((?:\s+[\w:.-]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)\s*(\/?)>/g;
+const EPUB_ONE_ATTR = /\s+([\w:.-]+)(\s*=\s*(?:"[^"]*"|'[^']*'))?/g;
+
+function fixValuelessAttributes(text) {
+  let count = 0;
+  const out = text.replace(EPUB_TAG_WITH_ATTRS, (tag, name, attrs, slash) => {
+    if (!attrs) return tag;
+    let rebuilt = '';
+    let changed = false;
+    let m;
+    EPUB_ONE_ATTR.lastIndex = 0;
+    while ((m = EPUB_ONE_ATTR.exec(attrs)) !== null) {
+      if (m[2] === undefined) {
+        rebuilt += ' ' + m[1] + '=""';
+        changed = true;
+        count++;
+      } else {
+        rebuilt += ' ' + m[1] + m[2].replace(/^\s*=\s*/, '=');
+      }
+    }
+    return changed ? '<' + name + rebuilt + (slash ? '/' : '') + '>' : tag;
+  });
+  return { text: out, count: count };
+}
+
+async function repairEpubEmptyAttributes(epubBytes) {
+  const JSZipCtor = window.JSZip;
+  if (!JSZipCtor) throw new Error('JSZip unavailable');
+  const zin = await JSZipCtor.loadAsync(epubBytes);
+
+  let changed = 0, docs = 0;
+  const names = Object.keys(zin.files).filter((n) => !zin.files[n].dir);
+  const edits = {};
+  for (const n of names) {
+    if (!/\.(xhtml|html)$/i.test(n)) continue;
+    const t = await zin.file(n).async('string');
+    const r = fixValuelessAttributes(t);
+    if (r.count) { edits[n] = r.text; changed += r.count; docs++; }
+  }
+  if (!changed) return { data: epubBytes, changed: 0, docs: 0 };
+
+  // Rebuild: mimetype MUST be first and STORED, per the EPUB OCF spec.
+  const zout = new JSZipCtor();
+  if (zin.file('mimetype')) {
+    zout.file('mimetype', await zin.file('mimetype').async('uint8array'),
+              { compression: 'STORE' });
+  }
+  for (const n of names) {
+    if (n === 'mimetype') continue;
+    if (edits[n] !== undefined) {
+      zout.file(n, edits[n], { compression: 'DEFLATE' });
+    } else {
+      zout.file(n, await zin.file(n).async('uint8array'),
+                { compression: 'DEFLATE' });
+    }
+  }
+  const data = await zout.generateAsync({ type: 'uint8array',
+                                          mimeType: 'application/epub+zip' });
+  return { data: data, changed: changed, docs: docs };
+}
+
 function isThoriumPreset() {
   const math = document.getElementById('opt-math');
   const to = document.getElementById('selTo');
@@ -3961,16 +4039,20 @@ async function ensureThoriumAssets() {
   if (thoriumAssets.headHtml && thoriumAssets.payloadBytes) return;
   const [headResp, payResp] = await Promise.all([
     fetch('./epub-thorium/mathjax-head.html'),
-    fetch('./epub-thorium/mathjax-payload-4.1.2-en.zip')
+    fetch('./epub-thorium/mathjax-payload-4.1.3-en.zip')
   ]);
   if (!headResp.ok) throw new Error('epub-thorium/mathjax-head.html not found');
-  if (!payResp.ok) throw new Error('epub-thorium/mathjax-payload-4.1.2-en.zip not found');
+  if (!payResp.ok) throw new Error('epub-thorium/mathjax-payload-4.1.3-en.zip not found');
   thoriumAssets.headHtml = await headResp.text();
   thoriumAssets.payloadBytes = new Uint8Array(await payResp.arrayBuffer());
 }
 
 // ── MathJax intent + SRE speech ──────────────────────────────────────
-// Pairs with the 'MathJax → MathML + intent/SRE speech' math method.
+// Pairs with the 'MathML (custom MathJax conversion + SRE speech)' method.
+// NOTE: BOTH custom MathML methods are intent-capable - the intent-aware
+// bundle is imported unconditionally in ensureMathjaxDevice(), so intent=
+// attributes appear whenever the source uses \intent/\iarg/\speakas.
+// This method additionally injects the page-side SRE speech layer.
 // Division of labour: the MathJax *device* bakes intent= and ext-* attributes
 // into the static MathML at conversion time; this *filter* loads MathJax 4.1.3
 // in the page and merges the ClearSpeak rules that read those ext-* carriers
@@ -4325,9 +4407,17 @@ function buildOptions() {
     }
   }
 
-  // EPUB for Thorium Reader: force plain MathJax. The payload is spliced
-  // into the EPUB post-process, so no CDN URL is wanted here.
-  if (thoriumPreset) opts['html-math-method'] = 'mathjax';
+  // EPUB for Thorium Reader: NO html-math-method.
+  //
+  // Until 2026-08-14 this forced 'mathjax', which left the math as LaTeX for
+  // read-time typesetting (Route A). It now runs the same conversion-time
+  // device as HTML/DOCX (Route B): the math is already static MathML carrying
+  // intent= and ext-* by the time Pandoc writes the EPUB, so setting a
+  // math method here would be wrong -- there is no TeX left to typeset.
+  //
+  // The bundled MathJax still loads (via the spliced payload + header) to
+  // render the MathML to SVG and to drive SRE speech/subtitles/explorer.
+  // 'epub-thorium' is already in the no-op branch above, so nothing is set.
 
   // intent/SRE method: the filter injects through header-includes, which
   // Pandoc only renders in standalone mode. Non-standalone would emit a page
@@ -4611,7 +4701,12 @@ function needsMathjaxDevice() {
   const to = document.getElementById('selTo').value.split(/[+-]/)[0];
   return (m === 'mathjax-omml' && to === 'docx') ||
          ((m === 'mathjax-mathml' || m === 'mathjax-mathml-intent')
-          && (isHtmlFamily(to) || isEpubFamily(to)));
+          && (isHtmlFamily(to) || isEpubFamily(to))) ||
+         // Thorium preset is Route B as of 2026-08-14: the device bakes static
+         // MathML (intent= + ext-*) at conversion time, and the bundled MathJax
+         // takes MathML as INPUT. Previously this returned false and the EPUB
+         // shipped raw LaTeX, so \intent was undefined at read time.
+         (m === 'epub-thorium' && isEpubFamily(to));
 }
 function ensureMathjaxDevice() {
   if (!_mjxDeviceReady) {
@@ -4994,6 +5089,29 @@ async function runConversion() {
       // Binary output — show info in editor/preview, enable download
       let blob = files[outFileName];
       let outName = outFileName;
+
+      // ---- Pandoc EPUB writer repair -------------------------------------
+      // Pandoc's EPUB writer drops empty attribute VALUES from raw HTML
+      // (verified on local Pandoc 3.10 CLI as well as wasm), producing
+      //     <mrow ... ext-close data-latex="...">
+      // which is invalid XHTML. Readers stop rendering at the first one.
+      // html5 and chunkedhtml are unaffected — EPUB only.
+      // Runs for every EPUB, before the Thorium splice.
+      // Flag-don't-fail: on error keep the unrepaired EPUB and warn.
+      if (isEpubFamily(baseToFmt)) {
+        try {
+          const fixed = await repairEpubEmptyAttributes(
+            new Uint8Array(await blob.arrayBuffer()));
+          if (fixed.changed) {
+            blob = new Blob([fixed.data], { type: 'application/epub+zip' });
+            console.log('EPUB attribute repair: ' + fixed.changed +
+                        ' valueless attribute(s) fixed in ' +
+                        fixed.docs + ' document(s)');
+          }
+        } catch (e) {
+          console.warn('EPUB attribute repair failed; keeping EPUB as-is:', e);
+        }
+      }
 
       // EPUB for Thorium Reader — splice the MathJax payload into the EPUB.
       // Flag-don't-fail: on any error keep the plain EPUB and warn in the console.

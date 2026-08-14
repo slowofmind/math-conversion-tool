@@ -11,6 +11,8 @@
 //                (MathCAT / SRE). Safe to reuse in the accessibility pipeline.
 //                  • remapMhchemArrows: mhchem Private-Use-Area glyphs -> Unicode
 //
+//                  • normalizeEmptyAttributes: bare attr -> attr="" (XHTML)
+//
 //   OMML-ONLY  — only needed for the Word / OMML path; do NOT carry into HTML.
 //                  • fixBarAccents: coax the XSL into m:bar for over/underlines
 
@@ -64,14 +66,69 @@ export function fixBarAccents(mml) {
 }
 
 // ===========================================================================
+// UNIVERSAL — valueless attributes -> attr=""  (XHTML / EPUB safety)
+// ===========================================================================
+// The intent vocabulary legitimately yields EMPTY phrases: "the absolute value
+// of x" has no closing phrase, so ext-close is set to "". MathJax's HTML
+// serializer then emits a bare attribute name:
+//
+//     <mrow ext-open="the absolute value of" ext-close data-latex="...">
+//
+// HTML treats that as a boolean attribute and reads it back as "", which is
+// exactly what the ClearSpeak rule [t] @ext-close wants. XHTML does not: every
+// attribute MUST have a value, so an EPUB reader stops at the first one and
+// renders the chapter only up to that point. The OMML path is equally strict,
+// since it parses the MathML with XSLTProcessor.
+//
+// We KEEP the attribute and give it an explicit empty value rather than
+// dropping it, so rule matching and semantics are unchanged.
+//
+// NOT THE FIX FOR THE EPUB BUG (2026-08-14). tex2mml already emits
+// ext-close="" correctly -- verified directly. The bare attributes seen in
+// EPUB output are produced LATER, by Pandoc's own EPUB writer, which strips
+// empty attribute values on the way to XHTML (reproduced on local Pandoc 3.10
+// CLI, so not a wasm artefact). That is repaired after conversion by
+// repairEpubEmptyAttributes() in index.html. See docs/pandoc-epub-bugs.md.
+//
+// This function is kept as defence in depth: it costs nothing, and it protects
+// the OMML path, where MML2OMML.XSL is parsed by XSLTProcessor and would be
+// equally intolerant of a bare attribute if a future MathJax serialiser change
+// ever produced one.
+//
+// The tag pattern tolerates quoted values containing < or > (data-latex can
+// hold either), and never matches closing tags, since those start with "/".
+const TAG_WITH_ATTRS =
+  /<([A-Za-z][\w:.-]*)((?:\s+[\w:.-]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)\s*(\/?)>/g;
+const ONE_ATTR = /\s+([\w:.-]+)(\s*=\s*(?:"[^"]*"|'[^']*'))?/g;
+
+export function normalizeEmptyAttributes(mml) {
+  return mml.replace(TAG_WITH_ATTRS, (tag, name, attrs, slash) => {
+    if (!attrs) return tag;
+    let rebuilt = '';
+    let changed = false;
+    let m;
+    ONE_ATTR.lastIndex = 0;
+    while ((m = ONE_ATTR.exec(attrs)) !== null) {
+      if (m[2] === undefined) {
+        rebuilt += ' ' + m[1] + '=""';
+        changed = true;
+      } else {
+        rebuilt += ' ' + m[1] + m[2].replace(/^\s*=\s*/, '=');
+      }
+    }
+    return changed ? '<' + name + rebuilt + (slash ? '/' : '') + '>' : tag;
+  });
+}
+
+// ===========================================================================
 // Composed entry points
 // ===========================================================================
 // HTML / MathML / speech reuse: universal transforms only.
 export function conditionUniversal(mml) {
-  return remapMhchemArrows(mml);
+  return normalizeEmptyAttributes(remapMhchemArrows(mml));
 }
 
 // Word / OMML pipeline: universal + OMML-specific.
 export function conditionForOmml(mml) {
-  return fixBarAccents(remapMhchemArrows(mml));
+  return normalizeEmptyAttributes(fixBarAccents(remapMhchemArrows(mml)));
 }
