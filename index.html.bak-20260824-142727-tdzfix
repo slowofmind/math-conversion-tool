@@ -5181,24 +5181,15 @@ const { updateLog } = initLogDisplay({ editor });
 // ════════════════════════════════════════════════════════════════════
 // CLEANUP ENGINE — cleanup/cleanup-engine.js
 // ════════════════════════════════════════════════════════════════════
-const { getSourceForConversion, populateCleanupFromWarnings,
-        maybeExportProfileWithOutput, renderCleanupUI,
-        lastCleanupReplacements } = initCleanupEngine({ editor, updateStatus });
+const { getSourceForConversion, populateCleanupFromWarnings, maybeExportProfileWithOutput, renderCleanupUI } = initCleanupEngine({ editor, updateStatus });
 // ════════════════════════════════════════════════════════════════════
 // Smart — cleanup/smart-cleanup.js
 // ════════════════════════════════════════════════════════════════════
-// activateOutputTab is declared further down (it was SECTION 9), so it
-// must be passed lazily: an eager property would be read before the
-// binding exists.
-initSmartCleanup({ editor, updateStatus, updateLog,
-                   activateOutputTab: (...a) => activateOutputTab(...a) });
+initSmartCleanup({ editor, updateStatus, updateLog, activateOutputTab });
 // ════════════════════════════════════════════════════════════════════
 // MathML INTENT — intent/intent-review.js
 // ════════════════════════════════════════════════════════════════════
-const { IntentReview, runIntentScan } = initIntentReview({
-  editor, updateStatus, updateLog,
-  activateOutputTab: (...a) => activateOutputTab(...a),
-});
+const { IntentReview, runIntentScan } = initIntentReview({ editor, updateStatus, updateLog, activateOutputTab });
 // ════════════════════════════════════════════════════════════════════
 // OUTPUT TABS — js/output-tabs.js
 // ════════════════════════════════════════════════════════════════════

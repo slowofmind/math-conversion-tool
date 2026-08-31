@@ -1,0 +1,240 @@
+// test-intent-apply.mjs — Stage 5: drives the REAL IntentReview module out
+// of index.html in jsdom, with the real scanner, vocabulary and CM6 facade.
+// The point of this suite is the offset arithmetic after an apply: every
+// remaining finding must still sit exactly on the text it was found on.
+import { readFileSync, readdirSync, writeFileSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { JSDOM } from 'jsdom';
+
+const PLAT = 'C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion';
+const CORPUS = 'C:/Users/nim022/Desktop/mma-code/000 - Broad range of Math samples/Math_22a_coursepack_tex/TeX - Fall 2024 Math 22a coursepack worksheets';
+
+const dom = new JSDOM(`<!doctype html><html><body>
+  <div id="host"></div>
+  <select id="opt-math"><option value="mathjax-mathml-intent" selected>x</option></select>
+  <div class="intent-nav" id="intentNav" hidden><span id="intentNavStatus"></span></div>
+  <div id="intentLive" role="status" aria-live="polite"></div>
+  <div id="intentPanel">
+    <div id="intentPanelEmpty"></div>
+    <div id="intentPanelBody" hidden>
+      <div id="intentProgress"></div>
+      <h3 id="intentFindingHead"></h3>
+      <div id="intentNotes"></div>
+      <div id="intentChoices" role="radiogroup"></div>
+      <button id="btnIntentApply"></button>
+      <button id="btnIntentSkip"></button>
+      <button id="btnIntentUndo"></button>
+    </div>
+  </div>
+</body></html>`, { pretendToBeVisual: true });
+
+for (const k of ['window', 'document', 'navigator', 'HTMLElement', 'Element',
+                 'Node', 'Range', 'getComputedStyle', 'DOMParser',
+                 'MutationObserver', 'requestAnimationFrame',
+                 'cancelAnimationFrame']) {
+  if (globalThis[k] === undefined) globalThis[k] = dom.window[k];
+}
+
+const { createEditor } = await import(
+  pathToFileURL(join(PLAT, 'codemirror', 'cm6-editor.js')).href);
+const editor = createEditor(dom.window.document.getElementById('host'),
+  { initialText: '', language: 'latex' });
+globalThis.editor = editor;
+globalThis.updateStatus = () => {};
+globalThis.updateLog = () => {};
+
+// The extracted module, imported directly (it used to be lifted out of
+// index.html by string search; the module is now a real file).
+const { initIntentReview } = await import(
+  pathToFileURL(join(PLAT, 'intent', 'intent-review.js')).href);
+const { IntentReview } = initIntentReview({
+  editor,
+  updateStatus: () => {},
+  updateLog: () => {},
+  activateOutputTab: () => {},
+});
+
+// --- real scanner --------------------------------------------------------
+const scanPath = join(PLAT, 'cm6-src', '_intent-scan-lifted.mjs');
+writeFileSync(scanPath, readFileSync(join(PLAT, 'math-conversion', 'intent-scan.js')));
+const B = await import(pathToFileURL(scanPath).href);
+const vocab = JSON.parse(readFileSync(
+  join(PLAT, 'math-conversion', 'intent-vocabulary.json'), 'utf8'));
+const sv = B.suggestVocabFrom(vocab);
+
+function scan(text) {
+  const r = B.detect(text, sv.groups, new Set(B.groupIdsFrom(vocab)));
+  const f = B.filterFindings(r.kept, sv, { disabled: [] });
+  const pay = f.kept.map(x => B.buildSuggestions(x, text, sv));
+  for (const p of pay) { const lc = B.lineCol(text, p.start); p.line = lc.line; p.col = lc.col; }
+  return pay;
+}
+
+let pass = 0, fail = 0;
+const ok = (n, c, d) => { if (c) { pass++; console.log('   ok   ' + n); }
+  else { fail++; console.log('  FAIL  ' + n + (d !== undefined ? ' :: ' + d : '')); } };
+const D = dom.window.document;
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
+const live = () => D.getElementById('intentLive').textContent;
+
+/** THE invariant: every pending finding's offsets still bracket its text. */
+function offsetsIntact(label) {
+  const bad = IntentReview.findings.filter(
+    p => p.status === 'pending' && editor.getRange(p.start, p.end) !== p.text);
+  ok(label, bad.length === 0,
+     bad.length ? `${bad.length} drifted, first: ${JSON.stringify(bad[0].text)} vs `
+       + JSON.stringify(editor.getRange(bad[0].start, bad[0].end)) : '');
+}
+
+const radios = () => D.querySelectorAll('#intentChoices input[name="intentCandidate"]');
+const pick = (i) => { IntentReview.select(i); };
+
+// ── 1. a small document, exercised end to end ────────────────────────
+const DOC = [
+  'Let $|x|$ be a distance and $|S|$ a set size.',
+  'Also $|A|$ for a matrix, and $3 \\mid 12$ divisibility.',
+  'And a norm $\\|v\\|$ at the end.',
+].join('\n') + '\n';
+
+editor.setText(DOC);
+let pay = scan(DOC);
+console.log(`\nsynthetic document: ${pay.length} findings\n`);
+ok('the fixture produces several findings', pay.length >= 4, String(pay.length));
+
+IntentReview.load(pay, DOC);
+IntentReview.goTo(0);
+await wait(40);
+ok('panel body shown', D.getElementById('intentPanelBody').hidden === false);
+ok('radios rendered for every candidate',
+   radios().length === IntentReview.findings[0].candidates.length,
+   `${radios().length} vs ${IntentReview.findings[0].candidates.length}`);
+ok('radios share one name and are a labelled group',
+   D.getElementById('intentChoices').getAttribute('role') === 'radiogroup');
+
+// Apply the FIRST finding and check the rest survive.
+const f0 = IntentReview.findings[0];
+const cand0 = f0.candidates[0];
+const expect0 = cand0.rewrite.macroText || cand0.rewrite.wrapText;
+ok('macro form is preferred when available',
+   cand0.rewrite.macroText ? expect0 === cand0.rewrite.macroText : true, expect0);
+pick(0);
+IntentReview.applyCurrent();
+await wait(40);
+ok('document now contains the annotation', editor.getText().includes(expect0),
+   expect0);
+ok('finding marked applied', f0.status === 'applied', f0.status);
+ok('apply is announced with the concept name',
+   live().includes(cand0.concept), live());
+offsetsIntact('offsets of the REMAINING findings survived the apply');
+
+// Apply a second one, further down the document.
+IntentReview.applyCurrent();
+await wait(40);
+offsetsIntact('offsets survived a second apply');
+
+// Skip one.
+const beforeSkip = editor.getText();
+IntentReview.skipCurrent();
+await wait(40);
+ok('skip writes nothing', editor.getText() === beforeSkip);
+offsetsIntact('offsets survived a skip');
+
+// ── 2. confirm-only candidates write nothing ─────────────────────────
+const confirmIdx = IntentReview.findings.findIndex(
+  p => p.status === 'pending' && p.candidates.some(c => c.confirmOnly));
+if (confirmIdx >= 0) {
+  IntentReview.goTo(confirmIdx);
+  const ci = IntentReview.findings[confirmIdx].candidates.findIndex(c => c.confirmOnly);
+  pick(ci);
+  await wait(20);
+  const before = editor.getText();
+  IntentReview.applyCurrent();
+  await wait(40);
+  ok('confirm-only wrote nothing to the document', editor.getText() === before);
+  ok('confirm-only still resolves the finding',
+     IntentReview.findings[confirmIdx].status === 'applied');
+  ok('confirm-only says nothing was written', /[Nn]othing was written/.test(live()),
+     live());
+} else {
+  console.log('   --   no confirm-only candidate in this fixture');
+}
+
+// ── 3. undo ──────────────────────────────────────────────────────────
+editor.setText(DOC);
+pay = scan(DOC);
+IntentReview.load(pay, DOC);
+IntentReview.goTo(0);
+await wait(20);
+pick(0);
+IntentReview.applyCurrent();
+await wait(40);
+const afterApply = editor.getText();
+IntentReview.undoLast();
+ok('undo restores the original text', editor.getText() === DOC,
+   JSON.stringify(editor.getText().slice(0, 60)));
+ok('undone finding is pending again',
+   IntentReview.findings[0].status === 'pending', IntentReview.findings[0].status);
+offsetsIntact('offsets correct again after undo');
+await wait(60);   // announcements are debounced so they re-fire reliably
+ok('undo is announced', /Undone/.test(live()), live());
+
+// ── 4. staleness blocks apply ────────────────────────────────────────
+editor.replaceRange(0, 0, '% author typed something\n');
+ok('editing marks the review stale', IntentReview.stale === true);
+const staleText = editor.getText();
+IntentReview.goTo(0);
+IntentReview.applyCurrent();
+await wait(40);
+ok('apply refuses while stale', editor.getText() === staleText);
+
+// ── 5. the real corpus: apply EVERY finding in document order ────────
+function findTex(dir, name, out = []) {
+  for (const en of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, en.name);
+    if (en.isDirectory()) findTex(p, name, out);
+    else if (en.name === name) out.push(p);
+  }
+  return out;
+}
+const hit = findTex(CORPUS, '02-raisin-games.tex');
+if (hit.length) {
+  const text = readFileSync(hit[0], 'utf8');
+  editor.setText(text);
+  const all = scan(text);
+  IntentReview.load(all, text);
+  console.log(`\n02-raisin-games.tex: applying all ${all.length} findings\n`);
+  let applied = 0, guard = 0;
+  IntentReview.goTo(0);
+  while (IntentReview.findings.some(p => p.status === 'pending') && guard++ < 500) {
+    const before = IntentReview.findings.filter(p => p.status === 'pending').length;
+    IntentReview.applyCurrent();
+    const after = IntentReview.findings.filter(p => p.status === 'pending').length;
+    if (after === before) { IntentReview.skipCurrent(); }
+    else applied++;
+  }
+  ok('every finding reached a decision',
+     IntentReview.findings.every(p => p.status !== 'pending'),
+     String(IntentReview.findings.filter(p => p.status === 'pending').length));
+  ok('applies actually happened', applied > 0, String(applied));
+  const invalidated = IntentReview.findings.filter(p => p.status === 'invalidated').length;
+  ok('no finding was silently invalidated on a non-overlapping corpus',
+     invalidated === 0, String(invalidated));
+  // Every applied annotation must be present in the final text.
+  const missing = IntentReview.findings.filter(
+    p => p.status === 'applied' && p.appliedText
+      && !editor.getText().includes(p.appliedText));
+  ok('every applied annotation is present in the final document',
+     missing.length === 0,
+     missing.length ? missing[0].appliedText : '');
+  // And the result must re-scan cleanly: annotated spans are not re-offered.
+  const rescan = scan(editor.getText());
+  ok('re-scanning the annotated document offers fewer findings',
+     rescan.length < all.length, `${rescan.length} vs ${all.length}`);
+}
+
+console.log(`\nintent apply: ${pass} passed, ${fail} failed`);
+
+unlinkSync(scanPath);
+process.exit(fail === 0 ? 0 : 1);
+

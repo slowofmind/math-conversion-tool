@@ -1,0 +1,1407 @@
+// cleanup/cleanup-engine.js
+//
+// Extracted from index.html 20260824-135655. Dependencies are injected by
+// initCleanupEngine(ctx) rather than reached for as globals, so this module can be
+// imported and tested on its own — see cm6-src/test-*.mjs.
+//
+// Everything below is the original code, moved verbatim.
+
+export function initCleanupEngine(ctx) {
+  const editor = ctx.editor;
+  const updateStatus = (...a) => ctx.updateStatus(...a);
+
+  // ════════════════════════════════════════════════════════════════════
+  // SECTION 8: CLEANUP ENGINE
+  //   Data model, stack-based parser, pattern card UI
+  //   (ported from atc-latex-cleanup-tool/src/core/)
+  // ════════════════════════════════════════════════════════════════════
+
+  // ─── 8.1 DATA MODEL ─────────────────────────────────────────────────
+
+  const PatternType = Object.freeze({
+    MATCHED_PAIR:  'matched_pair',
+    SINGLE_STRING: 'single_string',
+  });
+
+  const ReplacementMode = Object.freeze({
+    EDIT_TAGS:   'edit_tags',
+    REMOVE_TAGS: 'remove_tags',
+    REMOVE_ALL:  'remove_all',
+  });
+
+  function createTagPattern(prefix, anchor, suffix) {
+    return {
+      prefix: prefix || '',
+      anchor: anchor || '',
+      suffix: suffix || '',
+    };
+  }
+
+  function createSearchParameter(overrides) {
+    const base = {
+      name: '',
+      patternType: PatternType.MATCHED_PAIR,
+      useRegex: false,
+      repeatUntilStable: false,
+      scope: null,
+      opening: createTagPattern(),
+      closing: createTagPattern(),
+      replacementMode: ReplacementMode.EDIT_TAGS,
+      modifications: { newOpeningTag: '', newClosingTag: '' },
+      findString: '',
+      replaceString: '',
+    };
+    return Object.assign(base, overrides || {});
+  }
+
+  function createProfile(name, searchParameters) {
+    return {
+      name: name || 'Default',
+      createNewFile: false,
+      scope: null,
+      searchParameters: searchParameters || [],
+    };
+  }
+
+  function createInlineScope(overrides) {
+    return Object.assign({
+      openingAtStartOfFile: false,
+      opening: null,
+      closingAtEndOfFile: false,
+      closing: null,
+    }, overrides || {});
+  }
+
+  // ─── Escape sequence processing (extension's regex-chain approach) ───
+  function processEscapeSequences(text) {
+    if (!text) return '';
+    return text
+      .replace(/\\\\/g, '\uE000')
+      .replace(/\\n(?!\w)/g, '\n')
+      .replace(/\\r(?!\w)/g, '\r')
+      .replace(/\\t(?!\w)/g, '\t')
+      .replace(/\\"/g, '"')
+      .replace(/\uE000/g, '\\');
+  }
+
+  function escapeRegexSpecialChars(str) {
+    if (!str) return '';
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function buildTagString(tag) {
+    if (!tag) return '';
+    return (tag.prefix || '') + (tag.anchor || '') + (tag.suffix || '');
+  }
+
+  function getPatternSummaryText(pattern) {
+    if (pattern.patternType === PatternType.SINGLE_STRING) {
+      return pattern.findString || '(empty)';
+    }
+    const o = pattern.opening ? buildTagString(pattern.opening) : '';
+    const c = pattern.closing ? buildTagString(pattern.closing) : '';
+    return o + '    ' + c;
+  }
+
+
+  // ─── 8.2 CORE MATCHING FUNCTIONS ────────────────────────────────────
+
+  function findOpeningPattern(content, param, startPosition) {
+    if (startPosition === undefined) startPosition = 0;
+    if (!param.opening) return null;
+
+    const prefix = param.opening.prefix || '';
+    const anchor = param.opening.anchor || '';
+    const suffix = param.opening.suffix || '';
+    const useRegex = param.useRegex || false;
+    const searchContent = content.substring(startPosition);
+
+    try {
+      let fullPattern;
+      if (useRegex) {
+        const anchorPattern = escapeRegexSpecialChars(anchor);
+        fullPattern = (prefix || '') + anchorPattern + (suffix || '');
+      } else {
+        fullPattern = escapeRegexSpecialChars(prefix) +
+                      escapeRegexSpecialChars(anchor) +
+                      escapeRegexSpecialChars(suffix);
+      }
+
+      const regex = new RegExp(fullPattern);
+      const match = regex.exec(searchContent);
+      if (!match) return null;
+
+      const fullMatch = match[0];
+      const startIndex = startPosition + match.index;
+      const endIndex = startIndex + fullMatch.length;
+
+      let anchorIndex;
+      if (useRegex) {
+        const anchorPos = fullMatch.search(new RegExp(escapeRegexSpecialChars(anchor)));
+        anchorIndex = startIndex + anchorPos;
+      } else {
+        anchorIndex = startIndex + (prefix ? prefix.length : 0);
+      }
+
+      return { fullMatch, startIndex, endIndex, anchorIndex };
+    } catch (error) {
+      console.error('Error in findOpeningPattern:', error);
+      return null;
+    }
+  }
+
+  function findMatchingClosing(content, param, opening) {
+    if (!param.opening || !param.closing) return null;
+
+    const openAnchor  = param.opening.anchor || '';
+    const closeAnchor = param.closing.anchor || '';
+
+    let position = opening.endIndex;
+    let stack = 1;
+
+    try {
+      while (position < content.length && stack > 0) {
+        const nextOpen  = content.indexOf(openAnchor, position);
+        const nextClose = content.indexOf(closeAnchor, position);
+
+        if (nextClose === -1) return null;
+
+        if (nextOpen !== -1 && nextOpen < nextClose) {
+          stack++;
+          position = nextOpen + openAnchor.length;
+        } else {
+          stack--;
+          if (stack === 0) {
+            const closingMatch = verifyClosingPattern(content, param.closing, nextClose, param);
+            if (closingMatch) return closingMatch;
+            stack = 1;
+          }
+          position = nextClose + closeAnchor.length;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error in findMatchingClosing:', error);
+      return null;
+    }
+  }
+
+  function verifyClosingPattern(content, closingSpec, anchorPos, param) {
+    if (!closingSpec) return null;
+
+    const prefix  = closingSpec.prefix || '';
+    const anchor  = closingSpec.anchor || '';
+    const suffix  = closingSpec.suffix || '';
+    const useRegex = param.useRegex || false;
+
+    try {
+      // In regex mode the prefix/suffix fields are regex SOURCE; the matched
+      // text length can differ from the source length, so the tag span must be
+      // computed from what actually matched (fix 2026-08-02: regex closing
+      // suffix previously over-consumed, e.g. \{problem\} ate 2 extra chars).
+      let prefixMatchLen = prefix.length;
+      if (prefix) {
+        if (useRegex) {
+          const prefixRegex = new RegExp('(' + prefix + ')$');
+          const textBefore = content.substring(Math.max(0, anchorPos - 50), anchorPos);
+          const pm = prefixRegex.exec(textBefore);
+          if (!pm) return null;
+          prefixMatchLen = pm[1].length;
+        } else {
+          const prefixStart = anchorPos - prefix.length;
+          if (prefixStart < 0) return null;
+          if (content.substring(prefixStart, anchorPos) !== prefix) return null;
+        }
+      }
+
+      const anchorEnd = anchorPos + anchor.length;
+      let suffixMatchLen = suffix.length;
+      if (suffix) {
+        if (useRegex) {
+          const suffixRegex = new RegExp('^(' + suffix + ')');
+          const textAfter = content.substring(anchorEnd, Math.min(content.length, anchorEnd + 50));
+          const sm = suffixRegex.exec(textAfter);
+          if (!sm) return null;
+          suffixMatchLen = sm[1].length;
+        } else {
+          const suffixEnd = anchorEnd + suffix.length;
+          if (suffixEnd > content.length) return null;
+          if (content.substring(anchorEnd, suffixEnd) !== suffix) return null;
+        }
+      }
+
+      const patternStart = prefix ? anchorPos - prefixMatchLen : anchorPos;
+      const patternEnd = suffix ? anchorEnd + suffixMatchLen : anchorEnd;
+      return {
+        fullMatch: content.substring(patternStart, patternEnd),
+        startIndex: patternStart,
+        endIndex: patternEnd,
+        anchorIndex: anchorPos,
+      };
+    } catch (error) {
+      console.error('Error verifying closing pattern:', error);
+      return null;
+    }
+  }
+
+  function findAllMatchedPairs(content, param) {
+    const matches = [];
+    let searchStart = 0;
+
+    while (searchStart < content.length) {
+      const opening = findOpeningPattern(content, param, searchStart);
+      if (!opening) break;
+
+      const closing = findMatchingClosing(content, param, opening);
+      if (!closing) {
+        searchStart = opening.endIndex;
+        continue;
+      }
+
+      matches.push({ opening, closing });
+      searchStart = closing.endIndex;
+    }
+
+    return matches;
+  }
+
+
+  // ─── 8.3 REPLACEMENT + ORCHESTRATION ────────────────────────────────
+
+  function applyMatchedPairReplacement(content, opening, closing, param) {
+    const beforeOpening = content.substring(0, opening.startIndex);
+    const innerContent  = content.substring(opening.endIndex, closing.startIndex);
+    const afterClosing  = content.substring(closing.endIndex);
+    const mode = param.replacementMode || ReplacementMode.EDIT_TAGS;
+
+    switch (mode) {
+      case ReplacementMode.EDIT_TAGS: {
+        let newOpen = (param.modifications && param.modifications.newOpeningTag) || '';
+        let newClose = (param.modifications && param.modifications.newClosingTag) || '';
+        newOpen = processEscapeSequences(newOpen);
+        newClose = processEscapeSequences(newClose);
+        return beforeOpening + newOpen + innerContent + newClose + afterClosing;
+      }
+      case ReplacementMode.REMOVE_TAGS:
+        return beforeOpening + innerContent + afterClosing;
+      case ReplacementMode.REMOVE_ALL:
+        return beforeOpening + afterClosing;
+      default:
+        return content;
+    }
+  }
+
+  function processMatchedPairParameter(text, param) {
+    if (!param.opening || !param.closing) return { result: text, matchCount: 0 };
+
+    const allMatches = findAllMatchedPairs(text, param);
+    if (allMatches.length === 0) return { result: text, matchCount: 0 };
+
+    allMatches.sort((a, b) => b.opening.startIndex - a.opening.startIndex);
+
+    let result = text;
+    for (const match of allMatches) {
+      result = applyMatchedPairReplacement(result, match.opening, match.closing, param);
+    }
+    return { result, matchCount: allMatches.length };
+  }
+
+  function processSingleStringParameter(text, param) {
+    const findStr    = param.findString || '';
+    const replaceStr = processEscapeSequences(param.replaceString || '');
+    const useRegex   = param.useRegex || false;
+
+    if (!findStr) return { result: text, matchCount: 0 };
+
+    if (useRegex) {
+      try {
+        const re = new RegExp(findStr, 'g');
+        let matchCount = 0;
+        const result = text.replace(re, (...args) => { matchCount++; return replaceStr; });
+        return { result, matchCount };
+      } catch (e) {
+        console.warn('Regex error:', e);
+        return { result: text, matchCount: 0 };
+      }
+    }
+
+    const positions = [];
+    let pos = 0;
+    while (pos < text.length) {
+      const idx = text.indexOf(findStr, pos);
+      if (idx === -1) break;
+      positions.push(idx);
+      pos = idx + findStr.length;
+    }
+    if (positions.length === 0) return { result: text, matchCount: 0 };
+
+    let result = text;
+    for (let i = positions.length - 1; i >= 0; i--) {
+      const idx = positions[i];
+      result = result.substring(0, idx) + replaceStr + result.substring(idx + findStr.length);
+    }
+    return { result, matchCount: positions.length };
+  }
+
+  // --- Scope region finding (shared machinery with matched-pair patterns) ---
+  // A scope is matched with the SAME stack-based, nesting-aware finder used by
+  // matched-pair patterns (findAllMatchedPairs), so prefix/anchor/suffix
+  // semantics are identical at every level. Scope tags are literal (non-regex).
+  // Returns an array of { start, end } region INTERIORS (tags excluded),
+  // non-overlapping, in document order.
+  //
+  // Degenerate forms:
+  //   scope null          -> one region covering the whole text
+  //   opening + closing   -> the interior of EVERY matched pair (may be [])
+  //   opening only        -> first opening match to end of text ([] if none)
+  //   closing only        -> start of text to first closing match
+  //                          (whole text if none - legacy leniency, matching the
+  //                          pre-2026-08 extractScopeRegion behavior)
+  function findAllScopeRegions(text, scope) {
+    if (!scope) return [{ start: 0, end: text.length }];
+
+    const hasTag = (t) => !!(t && ((t.anchor || '') !== '' || (t.prefix || '') !== '' || (t.suffix || '') !== ''));
+    const hasOpening = !scope.openingAtStartOfFile && hasTag(scope.opening);
+    const hasClosing = !scope.closingAtEndOfFile && hasTag(scope.closing);
+
+    if (hasOpening && hasClosing) {
+      const scopeParam = { opening: scope.opening, closing: scope.closing, useRegex: false };
+      const pairs = findAllMatchedPairs(text, scopeParam);
+      return pairs.map((m) => ({ start: m.opening.endIndex, end: m.closing.startIndex }));
+    }
+
+    if (hasOpening) {
+      const opening = findOpeningPattern(text, { opening: scope.opening, useRegex: false }, 0);
+      if (!opening) return [];
+      return [{ start: opening.endIndex, end: text.length }];
+    }
+
+    if (hasClosing) {
+      const closing = findOpeningPattern(text, { opening: scope.closing, useRegex: false }, 0);
+      if (!closing) return [{ start: 0, end: text.length }];
+      return [{ start: 0, end: closing.startIndex }];
+    }
+
+    return [{ start: 0, end: text.length }];
+  }
+
+  // --- Per-pattern body processing (optional repeat-until-stable) ---
+  // One "pass" = the standard find-all-then-replace-backward sweep. With
+  // repeatUntilStable, passes repeat until a pass finds ZERO matches
+  // (count-based termination - immune to the old length-comparison blindness),
+  // capped at MAX_STABLE_PASSES. Hitting the cap is FLAGGED, not silent:
+  // a wrapping pattern that re-matches its own output would otherwise loop.
+  const MAX_STABLE_PASSES = 50;
+
+  function processParameterBody(text, param) {
+    const onePass = (t) => {
+      if (param.patternType === PatternType.MATCHED_PAIR) return processMatchedPairParameter(t, param);
+      if (param.patternType === PatternType.SINGLE_STRING) return processSingleStringParameter(t, param);
+      return { result: t, matchCount: 0 };
+    };
+
+    if (!param.repeatUntilStable) {
+      const once = onePass(text);
+      return { result: once.result, matchCount: once.matchCount, capped: false };
+    }
+
+    let current = text;
+    let total = 0;
+    for (let pass = 0; pass < MAX_STABLE_PASSES; pass++) {
+      const o = onePass(current);
+      current = o.result;
+      total += o.matchCount;
+      if (o.matchCount === 0) return { result: current, matchCount: total, capped: false };
+    }
+    return { result: current, matchCount: total, capped: true };
+  }
+
+  // --- Scoped parameter processing ---
+  // Regions are processed BACK-TO-FRONT: edits inside a later region never
+  // disturb the recorded offsets of earlier regions - the same index-
+  // preservation idiom as backward replacement inside a pattern.
+  function processScopedParameter(text, param, scope) {
+    const regions = findAllScopeRegions(text, scope);
+    if (regions.length === 0) return { result: text, matchCount: 0, capped: false };
+
+    let result = text;
+    let matchCount = 0;
+    let capped = false;
+
+    for (let i = regions.length - 1; i >= 0; i--) {
+      const region = regions[i];
+      const slice = result.substring(region.start, region.end);
+      const o = processParameterBody(slice, param);
+      matchCount += o.matchCount;
+      capped = capped || o.capped;
+      if (o.result !== slice) {
+        result = result.substring(0, region.start) + o.result + result.substring(region.end);
+      }
+    }
+    return { result, matchCount, capped };
+  }
+
+  function processSearchParameter(text, param) {
+    // Standalone entry point: honors the pattern's own scope only. Profile
+    // scope inheritance (override semantics) is applied by runProfile.
+    return processScopedParameter(text, param, param.scope || null);
+  }
+
+  function runProfile(text, profile) {
+    let current = text;
+    let totalMatches = 0;
+    const perPattern = [];
+
+    for (const param of profile.searchParameters) {
+      // OVERRIDE semantics: a pattern's own scope replaces the profile scope
+      // entirely and is searched against the full current text; without one,
+      // the pattern inherits the profile scope. Regions are recomputed for
+      // every pattern because earlier patterns' edits shift positions.
+      const effectiveScope = param.scope || profile.scope || null;
+      const o = processScopedParameter(current, param, effectiveScope);
+      current = o.result;
+      totalMatches += o.matchCount;
+      perPattern.push({ name: param.name || getPatternSummaryText(param), matchCount: o.matchCount, capped: o.capped });
+    }
+
+    return { result: current, totalMatches, perPattern };
+  }
+
+
+  // ─── 8.4 PATTERN CARD UI ───────────────────────────────────────────
+
+  // ─── Preset profile registry ───
+  // Hardcoded, read-only templates. Selecting a preset instantiates a working
+  // copy in the "My profiles" list; user edits never touch these definitions.
+  // TO ADD A NEW PRESET: append one object literal below. The shape is the same
+  // as the `profile` field of an exported JSON file — minimal fields are fine,
+  // normalizeProfile() fills in defaults on instantiation.
+  const PROFILE_FORMAT_VERSION = '1.0';   // matches the VS Code extension's format
+  const PRESET_PROFILES = [
+    {
+      name: 'Strip text formatting',
+      searchParameters: [
+        { name: 'Strip \\textbf', patternType: 'matched_pair',
+          opening: { prefix: '\\textbf', anchor: '{', suffix: '' },
+          closing: { prefix: '', anchor: '}', suffix: '' },
+          replacementMode: 'edit_tags' },
+        { name: 'Strip \\textit', patternType: 'matched_pair',
+          opening: { prefix: '\\textit', anchor: '{', suffix: '' },
+          closing: { prefix: '', anchor: '}', suffix: '' },
+          replacementMode: 'edit_tags' },
+        { name: 'Strip \\underline', patternType: 'matched_pair',
+          opening: { prefix: '\\underline', anchor: '{', suffix: '' },
+          closing: { prefix: '', anchor: '}', suffix: '' },
+          replacementMode: 'edit_tags' },
+        // \textcolor{red}{text}: removing "\textcolor{" .. "}" deletes the
+        // command and its color argument; the bare {text} group left behind
+        // is harmless to Pandoc.
+        { name: 'Drop \\textcolor color arg', patternType: 'matched_pair',
+          opening: { prefix: '\\textcolor', anchor: '{', suffix: '' },
+          closing: { prefix: '', anchor: '}', suffix: '' },
+          replacementMode: 'remove_all' },
+      ],
+    },
+    {
+      name: 'Math spacing hacks (Pandoc-safe)',
+      searchParameters: [
+        // Invisible-spacing commands with no clean MathML equivalent:
+        // delete command and argument entirely.
+        { name: 'Delete \\vphantom{…}', patternType: 'matched_pair',
+          opening: { prefix: '\\vphantom', anchor: '{', suffix: '' },
+          closing: { prefix: '', anchor: '}', suffix: '' },
+          replacementMode: 'remove_all' },
+        { name: 'Delete \\hphantom{…}', patternType: 'matched_pair',
+          opening: { prefix: '\\hphantom', anchor: '{', suffix: '' },
+          closing: { prefix: '', anchor: '}', suffix: '' },
+          replacementMode: 'remove_all' },
+        { name: 'Delete \\phantom{…}', patternType: 'matched_pair',
+          opening: { prefix: '\\phantom', anchor: '{', suffix: '' },
+          closing: { prefix: '', anchor: '}', suffix: '' },
+          replacementMode: 'remove_all' },
+        // \smash{content}: keep the content, drop the wrapper.
+        { name: 'Unwrap \\smash{…}', patternType: 'matched_pair',
+          opening: { prefix: '\\smash', anchor: '{', suffix: '' },
+          closing: { prefix: '', anchor: '}', suffix: '' },
+          replacementMode: 'edit_tags' },
+        // \raisebox{2pt}{content}: removing "\raisebox{" .. "}" deletes the
+        // command and its dimension argument, leaving a harmless {content} group.
+        { name: 'Drop \\raisebox dimension', patternType: 'matched_pair',
+          opening: { prefix: '\\raisebox', anchor: '{', suffix: '' },
+          closing: { prefix: '', anchor: '}', suffix: '' },
+          replacementMode: 'remove_all' },
+      ],
+    },
+    // --- Ma 2025 course profiles (Harvard Math Ma workbook / handout.sty corpus) ---
+    // Embedded for testing. CANONICAL SOURCE: ma2025-problems-profile.json and
+    // ma2025-solutions-profile.json in the repo root; re-embed here after editing
+    // those files or the copies will drift. Pattern docs: ma2025-conversion-disposition.md.
+    {"name":"Ma2025 Problems (v0)","createNewFile":false,"scope":null,"searchParameters":[{"name":"note: remove instructor commentary (tags + content)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\note","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"solution env: remove entirely (problems output)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{solution}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{solution}"},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"solonly: remove (sols-mode content)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\solonly","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"probonly: strip tags, keep content","patternType":"matched_pair","useRegex":false,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\probonly","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"problem env: strip tags + optional space arg","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"\\{problem\\}(\\[[^\\]]*\\])?"},"closing":{"prefix":"","anchor":"\\end","suffix":"\\{problem\\}"},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"fitb: replace whole construct with blank underscores","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\fitb(\\[[^\\]]*\\])?\\{[^{}]*\\}","anchor":"{","suffix":"(?:[^{}]|\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\})*"},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"\\_\\_\\_\\_","newClosingTag":""},"findString":"","replaceString":""},{"name":"cfitb: replace whole construct with blank underscores","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\cfitb(\\[[^\\]]*\\])?\\{[^{}]*\\}","anchor":"{","suffix":"(?:[^{}]|\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\})*"},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"\\_\\_\\_\\_","newClosingTag":""},"findString":"","replaceString":""},{"name":"mc-list label spec: drop maybecircle wrapper (any list env)","patternType":"single_string","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\[label=\\\\protect\\\\maybecircle\\{\\\\Alph\\*\\.\\}\\]","replaceString":"[label=\\Alph*.]"},{"name":"plainitem -> item","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\plainitem","replaceString":"\\item"},{"name":"circleitem -> item (problems: no reveal)","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\circleitem","replaceString":"\\item"},{"name":"grading env: remove entirely (instructor/facilitator layer)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{grading}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{grading}"},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"workshop env: remove entirely (instructor/facilitator layer)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{workshop}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{workshop}"},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"wsplan env: remove entirely (instructor/facilitator layer)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{wsplan}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{wsplan}"},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"solutiononly env: remove entirely (instructor/facilitator layer)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{solutiononly}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{solutiononly}"},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"maybecircle generic: strip wrapper + condition, keep choice text","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\maybecircle(\\[[^\\]]*\\])?","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"answer marker: strip, keep content","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\answer","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"answeronly: remove entirely (sols-facing short answer)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\answeronly","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"spaceonly: remove entirely (spacing-only content, defensive)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\spaceonly","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"problemonly env: strip tags, keep content (worksheet apparatus)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{problemonly}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{problemonly}"},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"htitle -> section* (semantic heading)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\htitle","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"\\section*{","newClosingTag":"}"},"findString":"","replaceString":""},{"name":"stitle: remove entirely (solsonly-build title, defensive)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\stitle","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"pspace: remove entirely (spacing/page-break dispatch)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\pspace","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"continueproblem: remove entirely (print-pagination duplicate)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\continueproblem","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"psreflection DEFINITION: remove in-file newcommand block","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\newcommand\\{\\\\psreflection\\}\\[2\\]\\[\\]","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"psreflection [nocite] calls -> psreflectionnc","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\psreflection[nocite]{","replaceString":"\\psreflectionnc{"},{"name":"inject Pandoc-safe psreflection definitions before begin document","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\begin{document}","replaceString":"\\newcommand{\\psreflection}[2][]{\n\n\\textbf{Please cite any help you got on this problem set:}\n\\begin{itemize}\n\\item If you worked with other students, please list their names here.\n\\item If you used resources other than those on our Canvas site, please list them here.\n\\end{itemize}\n\n#2\n\n\\emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!\n\\begin{itemize}\n\\item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!\n\\item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.\n\\item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!\n\\end{itemize}\n}\n\\newcommand{\\psreflectionnc}[1]{\n\n#1\n\n\\emph{Reflection space.} It's a good habit to take a few minutes at the end of each pset to reflect on what you learned and jot down notes to your future self. Here are a few reflection questions to get you started. Nothing you write here will be graded; it's just for you!\n\\begin{itemize}\n\\item Take a few minutes to look back at the problems. How could you explain to someone else how to do each problem? What was your strategy, and how did you know to use that strategy? If there are problems where you don't feel able to answer this, write down which ones they are. Come back to them in a few days when we post the homework solutions!\n\\item Take a look back at the learning objectives on today's worksheet; how are you feeling about each one? If there are ones you know you need more practice with, write those down here.\n\\item What did you find most challenging about this material? Do you have any lingering questions about it? If so, write them down here so you don't forget them. At some point, stop by office hours or MQC to ask!\n\\end{itemize}\n}\n\n\\begin{document}"},{"name":"version COURSE-VARIANT: remove tag and content (undefined cmd, ws6-5 authoring error)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\version\\{[^}]*\\}","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"calcitem DEFINITION: remove in-file newcommand block (MUST precede calcitem replace)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\newcommand\\{\\\\calcitem\\}","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"calcitem -> item + [Calculator allowed] marker","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\calcitem","replaceString":"\\item \\textbf{[Calculator allowed]}"},{"name":"highlight -> textbf (inset-block device; salience via bold; upgrade path: sentinel strategy-step class)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\highlight","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"\\textbf{","newClosingTag":"}"},"findString":"","replaceString":""},{"name":"enumeratecols: end tag -> end enumerate","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\end{enumeratecols}","replaceString":"\\end{enumerate}"},{"name":"enumeratecols: begin tag rename (column-count strip follows)","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\begin{enumeratecols}","replaceString":"\\begin{enumerate}"},{"name":"enumeratecols: strip column count, plain form","patternType":"single_string","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"(?<=\\\\begin\\{enumerate\\})\\{[0-9]+\\}","replaceString":""},{"name":"enumeratecols: strip column count after [opts]","patternType":"single_string","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"(?<=\\\\begin\\{enumerate\\}\\[[^\\]]*\\])\\{[0-9]+\\}","replaceString":""}]},
+    {"name":"Ma2025 Solutions (v0)","createNewFile":false,"scope":null,"searchParameters":[{"name":"note: remove instructor commentary (tags + content)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\note","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"probonly: remove (problems-mode content)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\probonly","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"solonly: strip tags, keep content","patternType":"matched_pair","useRegex":false,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\solonly","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"solution env: bold Solution. lead-in, tags removed","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{solution}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{solution}"},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"\\textbf{Solution.} ","newClosingTag":""},"findString":"","replaceString":""},{"name":"problem env: strip tags + optional space arg (italics loss accepted)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"\\{problem\\}(\\[[^\\]]*\\])?"},"closing":{"prefix":"","anchor":"\\end","suffix":"\\{problem\\}"},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"fitb: show answer underlined","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\fitb(\\[[^\\]]*\\])?\\{[^{}]*\\}","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"\\underline{","newClosingTag":"}"},"findString":"","replaceString":""},{"name":"cfitb: show answer underlined","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\cfitb(\\[[^\\]]*\\])?\\{[^{}]*\\}","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"\\underline{","newClosingTag":"}"},"findString":"","replaceString":""},{"name":"mc-list label spec: drop maybecircle wrapper (any list env)","patternType":"single_string","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\[label=\\\\protect\\\\maybecircle\\{\\\\Alph\\*\\.\\}\\]","replaceString":"[label=\\Alph*.]"},{"name":"plainitem -> item","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\plainitem","replaceString":"\\item"},{"name":"circleitem -> item + (correct) marker","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\circleitem","replaceString":"\\item \\textbf{(correct)}"},{"name":"grading env: remove entirely (instructor/facilitator layer)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{grading}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{grading}"},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"workshop env: remove entirely (instructor/facilitator layer)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{workshop}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{workshop}"},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"wsplan env: remove entirely (instructor/facilitator layer)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{wsplan}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{wsplan}"},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"solutiononly env: strip tags, keep content (sols-doc content)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{solutiononly}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{solutiononly}"},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"maybecircle [1=1]: mark correct choice (marker after text)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\maybecircle\\[1=1\\]","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":" \\textbf{(correct)}"},"findString":"","replaceString":""},{"name":"maybecircle generic: strip wrapper + condition, keep choice text","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\maybecircle(\\[[^\\]]*\\])?","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"answer marker: strip, keep content","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\answer","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"answeronly: strip, keep short-form answer","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\answeronly","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"spaceonly: remove entirely (spacing-only content, defensive)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\spaceonly","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"problemonly env: remove entirely (front-matter noise in answer key)","patternType":"matched_pair","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"\\begin","suffix":"{problemonly}"},"closing":{"prefix":"","anchor":"\\end","suffix":"{problemonly}"},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"htitle -> section* (semantic heading)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":true,"scope":null,"opening":{"prefix":"\\\\htitle","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"\\section*{","newClosingTag":"}"},"findString":"","replaceString":""},{"name":"stitle: remove entirely (solsonly-build title, defensive)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\stitle","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"pspace: remove entirely (spacing/page-break dispatch)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\pspace","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"continueproblem: remove entirely (print-pagination duplicate)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\continueproblem","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"psreflection DEFINITION: remove in-file newcommand block","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\newcommand\\{\\\\psreflection\\}\\[2\\]\\[\\]","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"psreflection [nocite] calls -> psreflectionnc","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\psreflection[nocite]{","replaceString":"\\psreflectionnc{"},{"name":"inject Pandoc-safe psreflection definitions before begin document","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\begin{document}","replaceString":"\\newcommand{\\psreflection}[2][]{\n\n\\textbf{Please cite any help you got on this problem set:}\n\\begin{itemize}\n\\item If you worked with other students, please list their names here.\n\\item If you used resources other than those on our Canvas site, please list them here.\n\\end{itemize}\n}\n\\newcommand{\\psreflectionnc}[1]{}\n\n\\begin{document}"},{"name":"version COURSE-VARIANT: remove tag and content (undefined cmd, ws6-5 authoring error)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\version\\{[^}]*\\}","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"calcitem DEFINITION: remove in-file newcommand block (MUST precede calcitem replace)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\newcommand\\{\\\\calcitem\\}","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"remove_all","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"","replaceString":""},{"name":"calcitem -> item + [Calculator allowed] marker","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\calcitem","replaceString":"\\item \\textbf{[Calculator allowed]}"},{"name":"highlight -> textbf (inset-block device; salience via bold; upgrade path: sentinel strategy-step class)","patternType":"matched_pair","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"\\\\highlight","anchor":"{","suffix":""},"closing":{"prefix":"","anchor":"}","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"\\textbf{","newClosingTag":"}"},"findString":"","replaceString":""},{"name":"enumeratecols: end tag -> end enumerate","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\end{enumeratecols}","replaceString":"\\end{enumerate}"},{"name":"enumeratecols: begin tag rename (column-count strip follows)","patternType":"single_string","useRegex":false,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"\\begin{enumeratecols}","replaceString":"\\begin{enumerate}"},{"name":"enumeratecols: strip column count, plain form","patternType":"single_string","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"(?<=\\\\begin\\{enumerate\\})\\{[0-9]+\\}","replaceString":""},{"name":"enumeratecols: strip column count after [opts]","patternType":"single_string","useRegex":true,"repeatUntilStable":false,"scope":null,"opening":{"prefix":"","anchor":"","suffix":""},"closing":{"prefix":"","anchor":"","suffix":""},"replacementMode":"edit_tags","modifications":{"newOpeningTag":"","newClosingTag":""},"findString":"(?<=\\\\begin\\{enumerate\\}\\[[^\\]]*\\])\\{[0-9]+\\}","replaceString":""}]},
+  ];
+
+  // Normalize a raw profile object (from a preset literal or an imported JSON
+  // file) into a fully-defaulted working profile. Extra/unknown fields on
+  // patterns are preserved so extension profiles round-trip intact.
+  function normalizeProfile(raw) {
+    const p = createProfile(raw.name, (raw.searchParameters || []).map(sp => createSearchParameter(sp)));
+    p.createNewFile = !!raw.createNewFile;
+    p.scope = raw.scope || null;
+    return p;
+  }
+
+  // Two patterns are "the same" if they'd match the same construct IN THE
+  // SAME PLACES: pairs compare their opening tag triple (covers commands via
+  // prefix+anchor and environments via anchor+suffix); single strings compare
+  // the find text. Scope and repeat-until-stable are DISTINGUISHING fields:
+  // the same construct scoped to different regions (e.g. preamble vs body)
+  // is a different pattern, not a duplicate.
+  function tagTripleEqual(x, y) {
+    const a = x || {}, b = y || {};
+    return (a.prefix || '') === (b.prefix || '') &&
+           (a.anchor || '') === (b.anchor || '') &&
+           (a.suffix || '') === (b.suffix || '');
+  }
+  function scopesEquivalent(sa, sb) {
+    const a = sa || {}, b = sb || {};
+    return !!a.openingAtStartOfFile === !!b.openingAtStartOfFile &&
+           !!a.closingAtEndOfFile === !!b.closingAtEndOfFile &&
+           tagTripleEqual(a.opening, b.opening) &&
+           tagTripleEqual(a.closing, b.closing);
+  }
+  function patternsEquivalent(a, b) {
+    if (a.patternType !== b.patternType) return false;
+    if (!scopesEquivalent(a.scope, b.scope)) return false;
+    if (!!a.repeatUntilStable !== !!b.repeatUntilStable) return false;
+    if (a.patternType === PatternType.SINGLE_STRING) {
+      return a.findString === b.findString && !!a.useRegex === !!b.useRegex;
+    }
+    const ao = a.opening || {}, bo = b.opening || {};
+    return ao.prefix === bo.prefix && ao.anchor === bo.anchor && ao.suffix === bo.suffix;
+  }
+
+  // The one way patterns enter a profile from any bulk source (preset adder,
+  // JSON import, auto-populate): normalize each candidate to a fresh copy and
+  // append it unless an equivalent pattern is already present. Appending the
+  // same source twice is a no-op, which makes mixing sources order-independent.
+  function mergePatternsInto(profile, rawParams) {
+    let added = 0;
+    for (const raw of rawParams || []) {
+      const cand = createSearchParameter(raw);
+      if (!profile.searchParameters.some(p => patternsEquivalent(p, cand))) {
+        profile.searchParameters.push(cand);
+        added++;
+      }
+    }
+    return added;
+  }
+
+  // State
+  const expandedPatterns = new Set();
+  let profiles = [createProfile('My cleanup')];   // start with a blank workspace
+  let activeProfileIndex = 0;
+
+  function getActiveProfile() {
+    return profiles[activeProfileIndex] || profiles[0];
+  }
+
+  // ─── Profile selector ───
+  function renderProfileSelect() {
+    const sel = document.getElementById('cleanupProfile');
+    sel.innerHTML = '';
+
+    profiles.forEach((p, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = p.name;
+      if (i === activeProfileIndex) opt.selected = true;
+      sel.appendChild(opt);
+    });
+
+    // Add "New Profile" option
+    const newOpt = document.createElement('option');
+    newOpt.value = '__new__';
+    newOpt.textContent = '+ New Profile…';
+    sel.appendChild(newOpt);
+  }
+
+  document.getElementById('cleanupProfile').addEventListener('change', (e) => {
+    if (e.target.value === '__new__') {
+      const name = prompt('New profile name:');
+      if (name && name.trim()) {
+        profiles.push(createProfile(name.trim()));
+        activeProfileIndex = profiles.length - 1;
+      }
+      renderProfileSelect();
+      renderCleanupUI();
+      return;
+    }
+    activeProfileIndex = parseInt(e.target.value);
+    expandedPatterns.clear();
+    renderCleanupUI();
+  });
+
+  // ─── Preset adder ───
+  // Presets are ingredient lists, not profiles: picking one appends its
+  // patterns to the active profile (duplicates skipped), then the control
+  // snaps back to its placeholder.
+  (function initPresetAdder() {
+    const sel = document.getElementById('presetAdder');
+    const ph = document.createElement('option');
+    ph.value = '';
+    ph.textContent = '＋ Add preset patterns…';
+    sel.appendChild(ph);
+    PRESET_PROFILES.forEach((p, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = p.name;
+      sel.appendChild(opt);
+    });
+  })();
+
+  document.getElementById('presetAdder').addEventListener('change', (e) => {
+    const v = e.target.value;
+    e.target.selectedIndex = 0;   // snap back to placeholder
+    if (v === '') return;
+    const preset = PRESET_PROFILES[parseInt(v)];
+    const added = mergePatternsInto(getActiveProfile(), preset.searchParameters);
+    renderPatternList();
+    updateStatus('ready', added > 0
+      ? added + ' pattern' + (added === 1 ? '' : 's') + ' added from "' + preset.name + '"'
+      : 'No new patterns — "' + preset.name + '" is already in this profile');
+  });
+
+  document.getElementById('btnDuplicateProfile').addEventListener('click', () => {
+    const src = getActiveProfile();
+    const name = prompt('Duplicate profile name:', src.name + ' (copy)');
+    if (name && name.trim()) {
+      const dup = JSON.parse(JSON.stringify(src));
+      dup.name = name.trim();
+      profiles.push(dup);
+      activeProfileIndex = profiles.length - 1;
+      renderProfileSelect();
+      renderCleanupUI();
+    }
+  });
+
+  document.getElementById('btnDeleteProfile').addEventListener('click', () => {
+    if (profiles.length <= 1) return;
+    if (!confirm('Delete profile "' + getActiveProfile().name + '"?')) return;
+    profiles.splice(activeProfileIndex, 1);
+    activeProfileIndex = Math.min(activeProfileIndex, profiles.length - 1);
+    expandedPatterns.clear();
+    renderProfileSelect();
+    renderCleanupUI();
+  });
+
+  // ─── Profile export / import (JSON, extension-compatible envelope) ───
+  function exportActiveProfile() {
+    const profile = getActiveProfile();
+    const envelope = {
+      formatVersion: PROFILE_FORMAT_VERSION,
+      exportDate: new Date().toISOString(),
+      exportedBy: 'Accessible STEM LaTeX Cleanup (web)',
+      profile: profile,
+    };
+    const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = profile.name.replace(/\s+/g, '-') + '-profile.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return profile.name;
+  }
+
+  // Failsafe: when enabled, every output download also saves the profile that
+  // produced it, so a useful pattern set can't be lost with the session.
+  function maybeExportProfileWithOutput() {
+    const chk = document.getElementById('chkExportProfileWithOutput');
+    if (!chk || !chk.checked) return;
+    const profile = getActiveProfile();
+    if (!profile || profile.searchParameters.length === 0) return;
+    exportActiveProfile();
+  }
+
+  document.getElementById('btnExportProfile').addEventListener('click', () => {
+    const name = exportActiveProfile();
+    updateStatus('ready', 'Profile "' + name + '" exported');
+  });
+
+  document.getElementById('btnImportProfile').addEventListener('click', () => {
+    document.getElementById('profileImportFile').click();
+  });
+
+  document.getElementById('profileImportFile').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';   // allow re-importing the same file later
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try {
+        data = JSON.parse(reader.result);
+      } catch (err) {
+        updateStatus('error', 'Import failed: not valid JSON');
+        return;
+      }
+
+      // Accept both the versioned envelope and a bare profile object.
+      const raw = data.profile || data;
+      if (!raw || typeof raw.name !== 'string' || !Array.isArray(raw.searchParameters)) {
+        updateStatus('error', 'Import failed: missing profile name or searchParameters');
+        return;
+      }
+
+      // Version check mirrors the VS Code extension: same major = compatible.
+      if (data.profile && data.formatVersion) {
+        const importedMajor = parseInt(String(data.formatVersion).split('.')[0], 10);
+        const currentMajor  = parseInt(PROFILE_FORMAT_VERSION.split('.')[0], 10);
+        if (importedMajor !== currentMajor) {
+          updateStatus('error', 'Import failed: profile format ' + data.formatVersion +
+            ' is incompatible with ' + PROFILE_FORMAT_VERSION);
+          return;
+        }
+      } else if (data.profile && !data.formatVersion) {
+        if (!confirm('This profile file has no version information (older export?). Import anyway?')) return;
+      }
+
+      // Append the file's patterns to the ACTIVE profile (duplicates skipped),
+      // so imports mix with presets, auto-populated, and manual entries.
+      // To restore a saved profile exactly: clear all patterns, then import.
+      const prof = getActiveProfile();
+      const candidates = raw.searchParameters;
+      const unsupported = candidates.filter(p =>
+        p.replacementMode && !Object.values(ReplacementMode).includes(p.replacementMode));
+      const added = mergePatternsInto(prof, candidates);
+      const dupes = candidates.length - added;
+
+      expandedPatterns.clear();
+      renderPatternList();
+      updateStatus('ready', added + ' pattern' + (added === 1 ? '' : 's') +
+        ' added from "' + raw.name + '"' +
+        (dupes ? ' (' + dupes + ' duplicate' + (dupes === 1 ? '' : 's') + ' skipped)' : '') +
+        (unsupported.length ? ' — ' + unsupported.length + ' use modes this tool cannot run and will be skipped' : ''));
+    };
+    reader.onerror = () => updateStatus('error', 'Import failed: could not read file');
+    reader.readAsText(file);
+  });
+
+  // ─── Clear all patterns (reset to blank slate) ───
+  document.getElementById('btnClearPatterns').addEventListener('click', () => {
+    const prof = getActiveProfile();
+    if (prof.searchParameters.length === 0) return;
+    if (!confirm('Remove all ' + prof.searchParameters.length + ' pattern' +
+      (prof.searchParameters.length === 1 ? '' : 's') + ' from "' + prof.name + '"?')) return;
+    prof.searchParameters = [];
+    expandedPatterns.clear();
+    renderPatternList();
+    updateStatus('ready', 'All patterns cleared');
+  });
+
+  // ─── Anchor autofill (quality-of-life; kill switch below) ───
+  // When the OPENING anchor's typed value exactly matches a key in the map,
+  // the CLOSING anchor autofills with its partner - only if currently empty,
+  // never clobbering user input - and focus jumps to the opening SUFFIX field
+  // (the natural next stop, e.g. to type "{figure}" after "\begin").
+  // To disable the feature entirely, set ANCHOR_AUTOFILL_ENABLED = false.
+  // To add pairs, extend ANCHOR_AUTOFILL_MAP.
+  const ANCHOR_AUTOFILL_ENABLED = true;
+  const ANCHOR_AUTOFILL_MAP = { '{': '}', '\\begin': '\\end' };
+
+  function attachAnchorAutofill(openAnchorInput, closeAnchorInput, openSuffixInput, onFill) {
+    if (!ANCHOR_AUTOFILL_ENABLED) return;
+    if (!openAnchorInput || !closeAnchorInput) return;
+    openAnchorInput.addEventListener('input', () => {
+      const partner = ANCHOR_AUTOFILL_MAP[openAnchorInput.value];
+      if (partner === undefined) return;
+      if (closeAnchorInput.value !== '') return;
+      closeAnchorInput.value = partner;
+      if (onFill) onFill(partner);
+      if (openSuffixInput) openSuffixInput.focus();
+    });
+  }
+
+  // ─── Profile scope toggle ───
+  const scopeHeader = document.getElementById('profileScopeHeader');
+  function toggleScope() {
+    const fields = document.getElementById('profileScopeFields');
+    const toggle = document.getElementById('profileScopeToggle');
+    const isExpanding = fields.style.display === 'none';
+    fields.style.display = isExpanding ? '' : 'none';
+    toggle.textContent = isExpanding ? '⌄' : '›';
+    scopeHeader.setAttribute('aria-expanded', isExpanding ? 'true' : 'false');
+  }
+  scopeHeader.addEventListener('click', toggleScope);
+  scopeHeader.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleScope(); }
+  });
+
+  // Save scope on blur
+  ['scopeOpenPrefix','scopeOpenAnchor','scopeOpenSuffix',
+   'scopeClosePrefix','scopeCloseAnchor','scopeCloseSuffix'].forEach(id => {
+    document.getElementById(id).addEventListener('blur', () => {
+      const profile = getActiveProfile();
+      const oA = document.getElementById('scopeOpenAnchor').value.trim();
+      const cA = document.getElementById('scopeCloseAnchor').value.trim();
+      if (oA || cA) {
+        profile.scope = {};
+        if (oA) profile.scope.opening = {
+          prefix: document.getElementById('scopeOpenPrefix').value,
+          anchor: oA,
+          suffix: document.getElementById('scopeOpenSuffix').value,
+        };
+        if (cA) profile.scope.closing = {
+          prefix: document.getElementById('scopeClosePrefix').value,
+          anchor: cA,
+          suffix: document.getElementById('scopeCloseSuffix').value,
+        };
+      } else {
+        profile.scope = null;
+      }
+    });
+  });
+
+  // Anchor autofill on the profile scope fields. No onFill needed: the focus
+  // jump blurs the opening anchor, which fires the blur-save above and reads
+  // the just-autofilled closing anchor from the DOM.
+  attachAnchorAutofill(
+    document.getElementById('scopeOpenAnchor'),
+    document.getElementById('scopeCloseAnchor'),
+    document.getElementById('scopeOpenSuffix'),
+    null);
+
+  // ─── Pattern list rendering ───
+  function renderPatternList() {
+    const profile = getActiveProfile();
+    const patterns = profile.searchParameters;
+    const listEl = document.getElementById('patternList');
+    const countEl = document.getElementById('patternCount');
+    countEl.textContent = '(' + patterns.length + ')';
+
+    if (patterns.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:11px;">No patterns</div>';
+      return;
+    }
+
+    listEl.innerHTML = '';
+    patterns.forEach((pat, i) => {
+      listEl.appendChild(createPatternItem(pat, i));
+    });
+  }
+
+  function createPatternItem(pattern, index) {
+    const item = document.createElement('div');
+    item.className = 'pattern-item';
+    const isExpanded = expandedPatterns.has(index);
+
+    // Header (always shows toggle + summary + delete)
+    const header = document.createElement('div');
+    header.className = 'pattern-item-header';
+
+    const toggle = document.createElement('div');
+    toggle.className = 'pattern-toggle';
+    toggle.textContent = isExpanded ? '⌄' : '›';
+    toggle.onclick = () => { togglePattern(index); };
+
+    const summary = document.createElement('div');
+    summary.className = 'pattern-summary';
+    summary.textContent = getPatternSummaryText(pattern);
+    summary.onclick = () => { togglePattern(index); };
+
+    const del = document.createElement('button');
+    del.className = 'pattern-delete';
+    del.textContent = '×';
+    del.setAttribute('aria-label', 'Delete pattern');
+    del.onclick = (e) => { e.stopPropagation(); deletePattern(index); };
+
+    header.appendChild(toggle);
+    header.appendChild(summary);
+    header.appendChild(del);
+    item.appendChild(header);
+
+    // Expanded fields panel (below header)
+    if (isExpanded) {
+      const fields = document.createElement('div');
+      fields.className = 'pattern-fields';
+      fields.appendChild(createPatternFields(pattern, index));
+      item.appendChild(fields);
+    }
+
+    return item;
+  }
+
+  // Helper: create an input with prototype's CSS classes
+  function mkInput(cls, placeholder, value, onBlur) {
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'pf-input ' + cls;
+    inp.placeholder = placeholder;
+    inp.value = value;
+    inp.setAttribute('aria-label', placeholder);
+    inp.onblur = () => onBlur(inp.value);
+    return inp;
+  }
+
+  function createPatternFields(pattern, index) {
+    const container = document.createElement('div');
+    container.style.cssText = 'display:flex; flex-direction:column; gap:6px;';
+
+    if (pattern.patternType === PatternType.SINGLE_STRING) {
+      // ── Single String: [find] → [replace] + regex ──
+      const row = document.createElement('div');
+      row.className = 'pf-row';
+
+      row.appendChild(mkInput('pf-input-flex', 'Find', pattern.findString || '', v => { pattern.findString = v; }));
+
+      const arrow = document.createElement('span');
+      arrow.className = 'pf-arrow';
+      arrow.textContent = '→';
+      row.appendChild(arrow);
+
+      row.appendChild(mkInput('pf-input-flex', 'Replace', pattern.replaceString || '', v => { pattern.replaceString = v; }));
+
+      const lbl = document.createElement('label');
+      lbl.className = 'pf-checkbox';
+      const chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.checked = pattern.useRegex || false;
+      chk.onchange = () => { pattern.useRegex = chk.checked; };
+      lbl.appendChild(chk);
+      lbl.appendChild(document.createTextNode(' Regex'));
+      row.appendChild(lbl);
+
+      container.appendChild(row);
+
+    } else {
+      // ── Matched Pair ──
+      // Opening row
+      const openRow = document.createElement('div');
+      openRow.className = 'pf-row';
+      const openLbl = document.createElement('span');
+      openLbl.className = 'pf-label';
+      openLbl.textContent = 'O:';
+      openRow.appendChild(openLbl);
+      openRow.appendChild(mkInput('pf-input-flex', 'Prefix',
+        (pattern.opening && pattern.opening.prefix) || '',
+        v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.prefix = v; }));
+      const openAnchorInp = mkInput('pf-input-anchor', 'Anchor',
+        (pattern.opening && pattern.opening.anchor) || '',
+        v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.anchor = v; });
+      openRow.appendChild(openAnchorInp);
+      const openSuffixInp = mkInput('pf-input-flex', 'Suffix',
+        (pattern.opening && pattern.opening.suffix) || '',
+        v => { if (!pattern.opening) pattern.opening = createTagPattern(); pattern.opening.suffix = v; });
+      openRow.appendChild(openSuffixInp);
+      container.appendChild(openRow);
+
+      // Closing row
+      const closeRow = document.createElement('div');
+      closeRow.className = 'pf-row';
+      const closeLbl = document.createElement('span');
+      closeLbl.className = 'pf-label';
+      closeLbl.textContent = 'C:';
+      closeRow.appendChild(closeLbl);
+      closeRow.appendChild(mkInput('pf-input-flex', 'Prefix',
+        (pattern.closing && pattern.closing.prefix) || '',
+        v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.prefix = v; }));
+      const closeAnchorInp = mkInput('pf-input-anchor', 'Anchor',
+        (pattern.closing && pattern.closing.anchor) || '',
+        v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.anchor = v; });
+      closeRow.appendChild(closeAnchorInp);    closeRow.appendChild(mkInput('pf-input-flex', 'Suffix',
+        (pattern.closing && pattern.closing.suffix) || '',
+        v => { if (!pattern.closing) pattern.closing = createTagPattern(); pattern.closing.suffix = v; }));
+      container.appendChild(closeRow);
+
+      // Anchor autofill: typing "{" or "\begin" as the opening anchor fills
+      // the (empty) closing anchor and jumps focus to the opening suffix.
+      // The closing anchor's model field is written here explicitly because
+      // its own blur handler never fires on a programmatic fill.
+      attachAnchorAutofill(openAnchorInp, closeAnchorInp, openSuffixInp, (partner) => {
+        if (!pattern.closing) pattern.closing = createTagPattern();
+        pattern.closing.anchor = partner;
+      });
+
+      // Mode row
+      const modeRow = document.createElement('div');
+      modeRow.className = 'pf-row';
+      modeRow.style.marginTop = '4px';
+
+      const modeLbl = document.createElement('span');
+      modeLbl.style.cssText = 'font-size:10px; color:var(--text-muted); margin-right:4px;';
+      modeLbl.textContent = 'Mode:';
+      modeRow.appendChild(modeLbl);
+
+      const rm = pattern.replacementMode || ReplacementMode.EDIT_TAGS;
+      const modeSel = document.createElement('select');
+      modeSel.className = 'pf-select';
+      modeSel.innerHTML =
+        '<option value="edit_tags"'   + (rm === 'edit_tags'   ? ' selected' : '') + '>Edit Tags</option>' +
+        '<option value="remove_tags"' + (rm === 'remove_tags' ? ' selected' : '') + '>Remove Tags</option>' +
+        '<option value="remove_all"'  + (rm === 'remove_all'  ? ' selected' : '') + '>Remove All</option>';
+      modeSel.onchange = () => { pattern.replacementMode = modeSel.value; renderPatternList(); };
+      modeRow.appendChild(modeSel);
+
+      const regLbl = document.createElement('label');
+      regLbl.className = 'pf-checkbox';
+      const regChk = document.createElement('input');
+      regChk.type = 'checkbox';
+      regChk.checked = pattern.useRegex || false;
+      regChk.onchange = () => { pattern.useRegex = regChk.checked; };
+      regLbl.appendChild(regChk);
+      regLbl.appendChild(document.createTextNode(' Regex'));
+      modeRow.appendChild(regLbl);
+
+      container.appendChild(modeRow);
+
+      // Conditional: edit_tags shows replacement inputs, others show explanation
+      if (rm === 'edit_tags') {
+        const replRow = document.createElement('div');
+        replRow.style.cssText = 'display:flex; flex-direction:column; gap:4px; margin-top:4px;';
+
+        const openReplRow = document.createElement('div');
+        openReplRow.className = 'pf-row';
+        const openReplLbl = document.createElement('span');
+        openReplLbl.style.cssText = 'font-size:10px; color:var(--text-muted); white-space:nowrap; margin-right:4px;';
+        openReplLbl.textContent = 'New Open:';
+        openReplRow.appendChild(openReplLbl);
+        openReplRow.appendChild(mkInput('pf-input-flex', 'Replacement…',
+          (pattern.modifications && pattern.modifications.newOpeningTag) || '',
+          v => { if (!pattern.modifications) pattern.modifications = {}; pattern.modifications.newOpeningTag = v; }));
+        replRow.appendChild(openReplRow);
+
+        const closeReplRow = document.createElement('div');
+        closeReplRow.className = 'pf-row';
+        const closeReplLbl = document.createElement('span');
+        closeReplLbl.style.cssText = 'font-size:10px; color:var(--text-muted); white-space:nowrap; margin-right:4px;';
+        closeReplLbl.textContent = 'New Close:';
+        closeReplRow.appendChild(closeReplLbl);
+        closeReplRow.appendChild(mkInput('pf-input-flex', 'Replacement…',
+          (pattern.modifications && pattern.modifications.newClosingTag) || '',
+          v => { if (!pattern.modifications) pattern.modifications = {}; pattern.modifications.newClosingTag = v; }));
+        replRow.appendChild(closeReplRow);
+
+        container.appendChild(replRow);
+      } else {
+        const note = document.createElement('div');
+        note.className = 'pf-note';
+        note.textContent = rm === 'remove_tags'
+          ? 'Tags removed, content preserved'
+          : 'Tags and content completely removed';
+        container.appendChild(note);
+      }
+    }
+
+    // ── Scope + repeat controls (both pattern types) ──
+    container.appendChild(createPatternScopeSection(pattern, index));
+
+    const repRow = document.createElement('div');
+    repRow.className = 'pf-row';
+    const repLbl = document.createElement('label');
+    repLbl.className = 'pf-checkbox';
+    repLbl.title = 'Re-run this pattern until a pass finds no matches (max 50 passes). Leave OFF for wrapping patterns whose replacement still matches the pattern - those would re-wrap on every pass and stop at the cap.';
+    const repChk = document.createElement('input');
+    repChk.type = 'checkbox';
+    repChk.checked = pattern.repeatUntilStable || false;
+    repChk.onchange = () => { pattern.repeatUntilStable = repChk.checked; };
+    repLbl.appendChild(repChk);
+    repLbl.appendChild(document.createTextNode(' Repeat until stable'));
+    repRow.appendChild(repLbl);
+    container.appendChild(repRow);
+
+    return container;
+  }
+
+  // ─── Per-pattern scope disclosure ───
+  // Mirrors the profile-level Scope section, one per pattern card. Collapsed
+  // by default. Empty fields = INHERIT the profile scope; any anchor filled =
+  // this pattern's scope OVERRIDES the profile scope and is searched against
+  // the whole document. Fields save on blur; an anchor is required to
+  // activate a side (same convention as the profile scope).
+  function createPatternScopeSection(pattern, index) {
+    const section = document.createElement('div');
+    section.className = 'scope-section';
+    section.style.marginTop = '4px';
+
+    const header = document.createElement('div');
+    header.className = 'scope-header';
+    header.setAttribute('role', 'button');
+    header.setAttribute('tabindex', '0');
+    header.setAttribute('aria-expanded', 'false');
+
+    const label = document.createElement('span');
+    const toggle = document.createElement('span');
+    toggle.setAttribute('aria-hidden', 'true');
+    toggle.textContent = '›';
+    header.appendChild(label);
+    header.appendChild(toggle);
+
+    const fields = document.createElement('div');
+    fields.className = 'scope-fields';
+    fields.style.display = 'none';
+
+    const hasTagText = (t) => !!(t && ((t.anchor || '') !== '' || (t.prefix || '') !== '' || (t.suffix || '') !== ''));
+    const refreshLabel = () => {
+      const set = pattern.scope && (hasTagText(pattern.scope.opening) || hasTagText(pattern.scope.closing));
+      label.textContent = set ? 'Scope (set - overrides profile)' : 'Scope (inherits profile)';
+    };
+
+    const inputs = [];
+    const saveScope = () => {
+      const oA = inputs[1].value.trim();
+      const cA = inputs[4].value.trim();
+      if (oA || cA) {
+        pattern.scope = {};
+        if (oA) pattern.scope.opening = { prefix: inputs[0].value, anchor: inputs[1].value, suffix: inputs[2].value };
+        if (cA) pattern.scope.closing = { prefix: inputs[3].value, anchor: inputs[4].value, suffix: inputs[5].value };
+      } else {
+        pattern.scope = null;
+      }
+      refreshLabel();
+    };
+
+    const scopeRow = (rowLabel, tag) => {
+      const row = document.createElement('div');
+      row.className = 'pf-row';
+      const l = document.createElement('span');
+      l.className = 'pf-label';
+      l.textContent = rowLabel;
+      row.appendChild(l);
+      [['pf-input-flex', 'Prefix', 'prefix'], ['pf-input-anchor', 'Anchor', 'anchor'], ['pf-input-flex', 'Suffix', 'suffix']].forEach((d) => {
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'pf-input ' + d[0];
+        inp.placeholder = d[1];
+        inp.setAttribute('aria-label', (rowLabel === 'O:' ? 'Opening' : 'Closing') + ' pattern scope ' + d[2]);
+        inp.value = (tag && tag[d[2]]) || '';
+        inp.onblur = saveScope;
+        inputs.push(inp);
+        row.appendChild(inp);
+      });
+      return row;
+    };
+
+    const sc = pattern.scope || {};
+    fields.appendChild(scopeRow('O:', sc.opening));
+    fields.appendChild(scopeRow('C:', sc.closing));
+
+    // Anchor autofill on the scope rows (inputs: 0-2 = O prefix/anchor/suffix,
+    // 3-5 = C prefix/anchor/suffix). saveScope reads the DOM, so it doubles
+    // as the onFill model sync.
+    attachAnchorAutofill(inputs[1], inputs[4], inputs[2], saveScope);
+
+    const hint = document.createElement('div');
+    hint.className = 'pf-note';
+    hint.textContent = 'Runs the pattern inside EVERY region this scope matches. Blank O: = start of file; blank C: = end of file. Anchor required to activate a side.';
+    fields.appendChild(hint);
+
+    const toggleFields = () => {
+      const expanding = fields.style.display === 'none';
+      fields.style.display = expanding ? '' : 'none';
+      toggle.textContent = expanding ? '⌄' : '›';
+      header.setAttribute('aria-expanded', expanding ? 'true' : 'false');
+    };
+    header.addEventListener('click', toggleFields);
+    header.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFields(); }
+    });
+
+    refreshLabel();
+    section.appendChild(header);
+    section.appendChild(fields);
+    return section;
+  }
+
+  // ─── Toggle / Delete / Add ───
+  function togglePattern(index) {
+    if (expandedPatterns.has(index)) expandedPatterns.delete(index);
+    else expandedPatterns.add(index);
+    renderPatternList();
+  }
+
+  function deletePattern(index) {
+    getActiveProfile().searchParameters.splice(index, 1);
+    const newExp = new Set();
+    expandedPatterns.forEach(i => { if (i < index) newExp.add(i); else if (i > index) newExp.add(i - 1); });
+    expandedPatterns.clear();
+    newExp.forEach(i => expandedPatterns.add(i));
+    renderPatternList();
+  }
+
+  document.getElementById('btnAddPattern').addEventListener('click', () => {
+    const type = document.getElementById('addPatternType').value;
+    const profile = getActiveProfile();
+    profile.searchParameters.push(createSearchParameter({ patternType: type }));
+    expandedPatterns.add(profile.searchParameters.length - 1);
+    renderPatternList();
+  });
+
+  document.getElementById('btnExpandAll').addEventListener('click', () => {
+    getActiveProfile().searchParameters.forEach((_, i) => expandedPatterns.add(i));
+    renderPatternList();
+  });
+
+  document.getElementById('btnCollapseAll').addEventListener('click', () => {
+    expandedPatterns.clear();
+    renderPatternList();
+  });
+
+  // ─── Conversion-time cleanup ───
+  // Single source of truth for the text handed to the conversion engines
+  // (Pandoc WASM, LaTeXML, LuaLaTeX): the editor content, optionally run
+  // through the active cleanup profile first. The editor itself is never
+  // modified here — cleanup applies to a copy of the text.
+  // lastCleanupReplacements records whether the most recent conversion ran on
+  // cleaned (i.e. line-shifted) text, so the log can warn about line drift.
+  let _lastCleanupReplacements = 0;
+  function getSourceForConversion() {
+    _lastCleanupReplacements = 0;
+    const raw = editor.getText();
+    const chk = document.getElementById('chkCleanupOnConvert');
+    if (!chk || !chk.checked) return raw;
+
+    const profile = getActiveProfile();
+    if (!profile || profile.searchParameters.length === 0) return raw;
+
+    const outcome = runProfile(raw, profile);
+    if (outcome.totalMatches > 0) {
+      _lastCleanupReplacements = outcome.totalMatches;
+      console.log('[cleanup] Applied "' + profile.name + '" before conversion: ' +
+        outcome.totalMatches + ' replacement(s)',
+        outcome.perPattern.filter(p => p.matchCount > 0));
+      const cappedPatterns = outcome.perPattern.filter(p => p.capped);
+      if (cappedPatterns.length > 0) {
+        console.warn('[cleanup] Repeat-until-stable hit the pass cap for: ' +
+          cappedPatterns.map(p => p.name).join(', ') +
+          ' - the pattern may re-match its own output; result may be over-processed');
+      }
+      updateStatus('loading', 'Converting… (cleanup: ' + outcome.totalMatches +
+        ' replacement' + (outcome.totalMatches === 1 ? '' : 's') + ' applied)');
+    }
+    return outcome.result;
+  }
+
+  // ─── Run Cleanup (wired to Ace editor) ───
+  document.getElementById('btnRunCleanup').addEventListener('click', () => {
+    const profile = getActiveProfile();
+    if (profile.searchParameters.length === 0) return;
+
+    const source = editor.getText();
+    const outcome = runProfile(source, profile);
+
+    if (outcome.totalMatches > 0) {
+      editor.setText(outcome.result);
+      const summary = outcome.perPattern
+        .filter(p => p.matchCount > 0 || p.capped)
+        .map(p => p.name + ': ' + p.matchCount + (p.capped ? ' (repeat cap hit - check pattern)' : ''))
+        .join(', ');
+      updateStatus('ready', outcome.totalMatches + ' replacement' + (outcome.totalMatches === 1 ? '' : 's') + ' — ' + summary);
+    } else {
+      updateStatus('ready', 'No matches found');
+    }
+  });
+
+  // ─── Auto-populate patterns from pandoc warnings ───
+  function populateCleanupFromWarnings(warnings) {
+    const prof = getActiveProfile();
+    const skipped = warnings.filter(w => w.type === 'SkippedContent' && w.matchedText);
+
+    // Classify each warning into a candidate pattern; mergePatternsInto
+    // handles dedupe against the profile AND within this batch.
+    const candidates = [];
+    const pairExistsFor = (suffix) =>
+      prof.searchParameters.concat(candidates).some(p =>
+        p.patternType === PatternType.MATCHED_PAIR &&
+        p.opening && p.opening.suffix === suffix);
+
+    for (const w of skipped) {
+      const text = w.matchedText;
+
+      // \begin{env} → environment matched pair. EDIT_TAGS with blank
+      // replacements = remove the delimiters, keep the content (what Pandoc
+      // itself does with unknown environments).
+      const envMatch = text.match(/^\\begin\{([^}]+)\}$/);
+      if (envMatch) {
+        const envName = envMatch[1];
+        candidates.push({
+          name: 'Unwrap \\begin{' + envName + '}',
+          patternType: PatternType.MATCHED_PAIR,
+          opening: createTagPattern('', '\\begin', '{' + envName + '}'),
+          closing: createTagPattern('', '\\end', '{' + envName + '}'),
+          replacementMode: ReplacementMode.EDIT_TAGS,
+        });
+        continue;
+      }
+
+      // \end{env} → already covered by the pair created from its \begin
+      // (possibly earlier in this same batch); don't add a redundant
+      // single-string. Falls through only if no such pair exists.
+      const endMatch = text.match(/^\\end\{([^}]+)\}$/);
+      if (endMatch && pairExistsFor('{' + endMatch[1] + '}')) {
+        continue;
+      }
+
+      // \cmd{…} (optionally starred) → command matched pair. When Pandoc
+      // skips a command it deletes the command AND its brace content, so the
+      // rescue default keeps the content: EDIT_TAGS with blank replacement
+      // fields. Matching only the leading "\cmd{" also survives multi-line
+      // arguments truncated by the warning parser — the pair engine
+      // brace-counts the rest itself.
+      const cmdMatch = text.match(/^\\([A-Za-z@]+\*?)\s*\{/);
+      if (cmdMatch) {
+        const cmd = '\\' + cmdMatch[1];
+        candidates.push({
+          name: 'Unwrap ' + cmd + '{…}',
+          patternType: PatternType.MATCHED_PAIR,
+          opening: createTagPattern(cmd, '{', ''),
+          closing: createTagPattern('', '}', ''),
+          replacementMode: ReplacementMode.EDIT_TAGS,
+        });
+        continue;
+      }
+
+      // Bare command / anything else → literal single-string removal.
+      candidates.push({
+        name: 'Remove ' + text,
+        patternType: PatternType.SINGLE_STRING,
+        findString: text,
+        replaceString: '',
+      });
+    }
+
+    const added = mergePatternsInto(prof, candidates);
+    if (added > 0) renderPatternList();
+  }
+
+  // ─── Master render ───
+  function renderCleanupUI() {
+    renderProfileSelect();
+
+    // Populate scope fields
+    const profile = getActiveProfile();
+    document.getElementById('scopeOpenPrefix').value  = (profile.scope && profile.scope.opening && profile.scope.opening.prefix) || '';
+    document.getElementById('scopeOpenAnchor').value  = (profile.scope && profile.scope.opening && profile.scope.opening.anchor) || '';
+    document.getElementById('scopeOpenSuffix').value  = (profile.scope && profile.scope.opening && profile.scope.opening.suffix) || '';
+    document.getElementById('scopeClosePrefix').value = (profile.scope && profile.scope.closing && profile.scope.closing.prefix) || '';
+    document.getElementById('scopeCloseAnchor').value = (profile.scope && profile.scope.closing && profile.scope.closing.anchor) || '';
+    document.getElementById('scopeCloseSuffix').value = (profile.scope && profile.scope.closing && profile.scope.closing.suffix) || '';
+
+    renderPatternList();
+  }
+
+  // Initialize cleanup UI
+  renderCleanupUI();
+
+
+
+  // A getter, not the value: the counter is reassigned on every conversion,
+  // and a plain property would capture only its value at init time.
+  const lastCleanupReplacements = () => _lastCleanupReplacements;
+
+  return { getSourceForConversion, populateCleanupFromWarnings,
+           maybeExportProfileWithOutput, renderCleanupUI,
+           lastCleanupReplacements };
+}

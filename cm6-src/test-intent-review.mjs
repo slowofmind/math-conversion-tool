@@ -1,0 +1,363 @@
+// stage4-review-behaviour.mjs — drives the ACTUAL IntentReview code from
+// index.html inside jsdom, against a real corpus file, with the real
+// scanner and the real CM6 facade. Extracts the module source from
+// index.html rather than reimplementing it, so this tests what ships.
+import { readFileSync, readdirSync, writeFileSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { JSDOM } from 'jsdom';
+
+const PLAT = 'C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion';
+const CORPUS = 'C:/Users/nim022/Desktop/mma-code/000 - Broad range of Math samples/Math_22a_coursepack_tex/TeX - Fall 2024 Math 22a coursepack worksheets';
+
+const dom = new JSDOM(`<!doctype html><html><body>
+  <div id="host"></div>
+  <div class="intent-nav" id="intentNav" hidden role="group" aria-label="Intent findings">
+    <button id="btnIntentPrev"></button>
+    <span class="intent-nav-status" id="intentNavStatus" aria-hidden="true"></span>
+    <button id="btnIntentNext"></button>
+    <button id="btnIntentClear"></button>
+  </div>
+  <div class="sr-only" id="intentLive" role="status" aria-live="polite"></div>
+</body></html>`, { pretendToBeVisual: true });
+
+for (const k of ['window', 'document', 'navigator', 'HTMLElement', 'Element',
+                 'Node', 'Range', 'getComputedStyle', 'DOMParser',
+                 'MutationObserver', 'requestAnimationFrame',
+                 'cancelAnimationFrame']) {
+  if (globalThis[k] === undefined) globalThis[k] = dom.window[k];
+}
+
+const { createEditor } = await import(
+  pathToFileURL(join(PLAT, 'codemirror', 'cm6-editor.js')).href);
+const editor = createEditor(dom.window.document.getElementById('host'),
+  { initialText: '', language: 'latex' });
+globalThis.editor = editor;
+globalThis.updateStatus = () => {};
+
+// The extracted module, imported directly (it used to be lifted out of
+// index.html by string search; the module is now a real file).
+const { initIntentReview } = await import(
+  pathToFileURL(join(PLAT, 'intent', 'intent-review.js')).href);
+const { IntentReview } = initIntentReview({
+  editor,
+  updateStatus: () => {},
+  updateLog: () => {},
+  activateOutputTab: () => {},
+});
+
+// --- real scanner, real vocabulary ---------------------------------------
+const scanTmp = join(PLAT, 'math-conversion', '_scan-probe.mjs');
+writeFileSync(scanTmp, readFileSync(join(PLAT, 'math-conversion', 'intent-scan.js')));
+const B = await import(pathToFileURL(scanTmp).href);
+const vocab = JSON.parse(readFileSync(
+  join(PLAT, 'math-conversion', 'intent-vocabulary.json'), 'utf8'));
+const sv = B.suggestVocabFrom(vocab);
+
+function scan(text) {
+  const r = B.detect(text, sv.groups, new Set(B.groupIdsFrom(vocab)));
+  const f = B.filterFindings(r.kept, sv, { disabled: [] });
+  const pay = f.kept.map(x => B.buildSuggestions(x, text, sv));
+  for (const p of pay) { const lc = B.lineCol(text, p.start); p.line = lc.line; p.col = lc.col; }
+  return pay;
+}
+
+let pass = 0, fail = 0;
+const ok = (n, c, d) => { if (c) { pass++; console.log('   ok   ' + n); }
+  else { fail++; console.log('  FAIL  ' + n + (d !== undefined ? ' :: ' + d : '')); } };
+const D = dom.window.document;
+const marks = () => D.querySelectorAll('.intent-finding').length;
+const current = () => Array.from(D.querySelectorAll('.intent-finding-current'))
+  .map(e => e.textContent).join('');
+const live = () => D.getElementById('intentLive').textContent;
+const statusText = () => D.getElementById('intentNavStatus').textContent;
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
+// The corpus is nested; locate files by name anywhere under the root.
+function findTex(dir, name, out = []) {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) findTex(p, name, out);
+    else if (e.name === name) out.push(p);
+  }
+  return out;
+}
+const locate = (n) => { const h = findTex(CORPUS, n); return h.length ? h[0] : null; };
+
+// The densest real file — the worst case for highlight density.
+const file = locate('02-raisin-games.tex');
+const text = readFileSync(file, 'utf8');
+editor.setText(text);
+const payloads = scan(text);
+console.log(`\n02-raisin-games.tex: ${payloads.length} findings, ${text.split('\n').length} lines\n`);
+
+IntentReview.load(payloads, text);
+await wait(80);
+ok('nav strip revealed', D.getElementById('intentNav').hidden === false);
+// CM6 renders only the viewport. Under jsdom there is no layout, so the
+// initial viewport is minimal and a 295-line file renders almost nothing —
+// marks for off-screen findings legitimately do not exist in the DOM yet.
+// Completeness is asserted on the short document below; here we only check
+// that nothing over-renders.
+ok('rendered marks never exceed the finding count', marks() <= payloads.length,
+   `${marks()} > ${payloads.length}`);
+ok('no current highlight before navigating', current() === '');
+ok('status shows the total', statusText() === payloads.length + ' findings',
+   statusText());
+
+IntentReview.next();
+await wait(60);
+ok('first next() lands on finding 1', statusText() === '1 of ' + payloads.length,
+   statusText());
+ok('current mark covers the finding text',
+   current() === payloads[0].text.split('\n').join(''),
+   `${JSON.stringify(current())} vs ${JSON.stringify(payloads[0].text)}`);
+ok('editor selection moved to the finding',
+   editor.view.state.selection.main.from === payloads[0].start);
+// Once the finding is scrolled into view, BOTH marks must be present over
+// it: the all-findings underline and the current-finding highlight.
+ok('all-findings mark renders alongside the current one', marks() > 0,
+   `${marks()} spans`);
+ok('announcement names the position and a spoken reading',
+   /^Finding 1 of \d+\./.test(live()) && /read as|concept/.test(live()), live());
+
+IntentReview.next();
+await wait(60);
+ok('second next() advances', statusText() === '2 of ' + payloads.length, statusText());
+ok('only ONE current mark at a time',
+   D.querySelectorAll('.intent-finding-current').length >= 1 &&
+   current() === payloads[1].text.split('\n').join(''), current());
+
+IntentReview.prev();
+await wait(60);
+ok('prev() goes back', statusText() === '1 of ' + payloads.length, statusText());
+
+IntentReview.prev();
+await wait(60);
+ok('prev() from the first wraps to the last',
+   statusText() === payloads.length + ' of ' + payloads.length, statusText());
+IntentReview.next();
+await wait(60);
+ok('next() from the last wraps to the first',
+   statusText() === '1 of ' + payloads.length, statusText());
+
+// --- staleness: the author edits after scanning ---------------------------
+editor.replaceRange(0, 0, '% an edit that shifts every offset\n');
+IntentReview.next();
+await wait(60);
+ok('edited document is reported as stale', statusText() === 'edited \u2014 re-scan',
+   statusText());
+ok('stale state is announced, not silently mis-navigated',
+   /changed since the scan/.test(live()), live());
+
+// --- clear ----------------------------------------------------------------
+IntentReview.clear();
+ok('clear removes all marks', marks() === 0);
+ok('clear removes the current mark', current() === '');
+ok('clear hides the nav strip', D.getElementById('intentNav').hidden === true);
+ok('clear resets the count', IntentReview.count === 0);
+
+// --- a short document: every finding really is marked ---------------------
+const SHORT = 'Absolute value $|x|$ and a set $|S|$ and a norm $\\|v\\|$ here.\n';
+editor.setText(SHORT);
+const shortPay = scan(SHORT);
+IntentReview.load(shortPay, SHORT);
+await wait(80);
+ok('short document: a finding was found at all', shortPay.length > 0,
+   String(shortPay.length));
+ok('short document: EVERY finding is marked', marks() === shortPay.length,
+   `${marks()} spans for ${shortPay.length} findings`);
+IntentReview.next();
+await wait(60);
+ok('short document: current mark is correct',
+   current() === shortPay[0].text, `${current()} vs ${shortPay[0].text}`);
+IntentReview.clear();
+ok('short document: clear works', marks() === 0);
+
+// --- a multi-line finding, if the corpus has one --------------------------
+let multi = null;
+for (const f of ['08-more-sets.tex', '13-more-sets.tex', '09-relations.tex',
+                 '15-determinants.tex', '18-vector-spaces.tex']) {
+  const path = locate(f);
+  if (!path) continue;
+  const t = readFileSync(path, 'utf8');
+  const all = scan(t);
+  const p = all.find(x => x.text.includes('\n'));
+  if (p) { multi = { f, t, p, all }; break; }
+}
+if (multi) {
+  editor.setText(multi.t);
+  IntentReview.load(multi.all, multi.t);
+  IntentReview.goTo(multi.all.indexOf(multi.p));
+  await wait(60);
+  ok(`multi-line finding renders correctly (${multi.f})`,
+     current() === multi.p.text.split('\n').join(''),
+     JSON.stringify(current()).slice(0, 80));
+  IntentReview.clear();
+} else {
+  console.log('   --   no multi-line finding in the sampled files (not a failure)');
+}
+
+
+
+// ══════════════════════════════════════════════════════════════════════
+// STAGE 5: apply / skip / undo
+// ══════════════════════════════════════════════════════════════════════
+const panelHTML = `
+  <div class="intent-panel" id="intentPanel">
+    <div id="intentPanelEmpty"></div>
+    <div id="intentPanelBody" hidden>
+      <div id="intentProgress"></div>
+      <h3 id="intentFindingHead"></h3>
+      <div id="intentNotes"></div>
+      <div id="intentChoices" role="radiogroup" aria-labelledby="intentFindingHead"></div>
+      <button id="btnIntentApply"></button>
+      <button id="btnIntentSkip"></button>
+      <button id="btnIntentUndo"></button>
+      <button id="btnIntentRescan"></button>
+    </div>
+  </div>`;
+D.body.insertAdjacentHTML('beforeend', panelHTML);
+
+const choices = () => Array.from(D.querySelectorAll('#intentChoices .intent-cand'));
+const radios = () => Array.from(D.querySelectorAll('input[name="intentCandidate"]'));
+const progress = () => D.getElementById('intentProgress').textContent;
+
+// A document with three DIFFERENT single-bar findings so the arithmetic
+// after an apply is actually exercised (later spans must shift).
+const DOC5 = 'Let $|x|$ be one, $|S|$ another, and $|A|$ a third.\n';
+editor.setText(DOC5);
+let pay5 = scan(DOC5);
+console.log(`\napply fixture: ${pay5.length} findings in ${DOC5.length} chars\n`);
+
+IntentReview.load(pay5, DOC5);
+await wait(60);
+IntentReview.next();
+await wait(60);
+
+ok('panel shows the finding and its readings', choices().length > 0,
+   `${choices().length} candidates`);
+ok('first reading is preselected', radios()[0] && radios()[0].checked === true);
+ok('progress starts with none applied', /0 applied/.test(progress()), progress());
+
+const f0 = IntentReview.findings[0];
+const before5 = editor.getText();
+const cand0 = f0.candidates[0];
+const expected = cand0.rewrite.macroText || cand0.rewrite.wrapText;
+const laterStart = IntentReview.findings[1].start;
+// applyCurrent MUTATES p.end (to the new span) — capture first, or the
+// expectations silently become tautologies.
+const f0Start = f0.start, f0End = f0.end;
+const delta = expected.length - (f0End - f0Start);
+
+IntentReview.applyCurrent();
+await wait(60);
+
+ok('apply wrote the macro/wrap text into the document',
+   editor.getText().includes(expected), expected);
+ok('apply replaced exactly the finding span',
+   editor.getText() === before5.slice(0, f0Start) + expected + before5.slice(f0End),
+   editor.getText().slice(0, 70));
+ok('the applied finding is marked applied',
+   IntentReview.findings[0].status === 'applied',
+   IntentReview.findings[0].status);
+ok('progress counts it', /1 applied/.test(progress()), progress());
+
+// The decisive check: later findings must still point at their own text.
+const f1 = IntentReview.findings[1];
+ok('later finding offsets shifted by the exact delta',
+   f1.start === laterStart + delta, `${f1.start} vs ${laterStart + delta}`);
+ok('later finding offsets still select ITS OWN text',
+   editor.getText().slice(f1.start, f1.end) === f1.text,
+   `${JSON.stringify(editor.getText().slice(f1.start, f1.end))} vs ${JSON.stringify(f1.text)}`);
+ok('review auto-advanced to the next pending finding',
+   IntentReview.findings.indexOf(f1) === 1 && f1.status === 'pending');
+ok('applying does not make the document stale', IntentReview.stale === false);
+// The confirmation and the auto-advance must arrive as ONE utterance. Two
+// announce() calls race and the second replaces the first, so the user
+// would never hear that the apply succeeded.
+ok('apply confirmation survives the auto-advance',
+   /Applied /.test(live()) && /Finding \d+ of \d+/.test(live()), live());
+
+// --- undo -----------------------------------------------------------------
+IntentReview.undoLast();
+await wait(60);
+ok('undo restored the original text', editor.getText() === before5,
+   editor.getText().slice(0, 70));
+ok('undo returned the finding to pending',
+   IntentReview.findings[0].status === 'pending');
+ok('undo reversed the offset shift on later findings',
+   IntentReview.findings[1].start === laterStart,
+   `${IntentReview.findings[1].start} vs ${laterStart}`);
+ok('undo left offsets selecting the right text',
+   editor.getText().slice(f1.start, f1.end) === f1.text);
+ok('progress shows nothing applied again', /0 applied/.test(progress()), progress());
+
+// --- skip -----------------------------------------------------------------
+IntentReview.goTo(0);
+await wait(40);
+const textBeforeSkip = editor.getText();
+IntentReview.skipCurrent();
+await wait(60);
+ok('skip wrote nothing', editor.getText() === textBeforeSkip);
+ok('skip marked the finding skipped',
+   IntentReview.findings[0].status === 'skipped');
+ok('progress counts the skip', /1 skipped/.test(progress()), progress());
+ok('skip announced that nothing was written, AND the next finding',
+   /[Nn]othing was written/.test(live()) && /Finding \d+ of \d+/.test(live()),
+   live());
+
+// A skipped finding must not be re-offered by stepping.
+const visited = new Set();
+for (let i = 0; i < 6; i++) { IntentReview.next(); await wait(20);
+  visited.add(IntentReview.findings.findIndex(p => p.status === 'pending')); }
+ok('stepping never lands on a resolved finding',
+   IntentReview.findings.every((p, i) =>
+     p.status !== 'skipped' || !visited.has(i)));
+
+// --- applying EVERY finding in sequence -----------------------------------
+editor.setText(DOC5);
+pay5 = scan(DOC5);
+IntentReview.load(pay5, DOC5);
+await wait(60);
+let guard = 0;
+IntentReview.next(); await wait(30);
+while (IntentReview.findings.some(p => p.status === 'pending') && guard++ < 20) {
+  IntentReview.applyCurrent();
+  await wait(30);
+}
+const finalText = editor.getText();
+ok('every finding was resolved', IntentReview.findings.every(p => p.status !== 'pending'),
+   JSON.stringify(IntentReview.findings.map(p => p.status)));
+ok('no finding was invalidated by another apply',
+   IntentReview.findings.every(p => p.status !== 'invalidated'),
+   JSON.stringify(IntentReview.findings.map(p => p.status)));
+ok('the document still contains the untouched prose',
+   finalText.startsWith('Let ') && finalText.trimEnd().endsWith('a third.'), finalText);
+console.log('   --   after applying all: ' + JSON.stringify(finalText.trim()));
+
+// --- re-scanning the annotated document must not re-offer the work --------
+const rescan = scan(finalText);
+ok('re-scan does NOT re-offer annotated notation (idempotence)',
+   rescan.length === 0, `${rescan.length} findings still offered`);
+
+// --- staleness blocks apply ----------------------------------------------
+editor.setText(DOC5);
+const pay6 = scan(DOC5);
+IntentReview.load(pay6, DOC5);
+await wait(40);
+IntentReview.next();
+await wait(40);
+editor.replaceRange(0, 0, '% author types something\n');
+const staleText = editor.getText();
+IntentReview.applyCurrent();
+await wait(40);
+ok('apply is refused while the document is stale',
+   editor.getText() === staleText, 'document was modified while stale');
+ok('stale state is reported', IntentReview.stale === true);
+
+IntentReview.clear();
+console.log(`\nreview behaviour: ${pass} passed, ${fail} failed`);
+
+unlinkSync(scanTmp);
+process.exit(fail === 0 ? 0 : 1);

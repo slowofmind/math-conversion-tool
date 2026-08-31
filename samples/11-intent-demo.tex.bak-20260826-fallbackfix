@@ -3,25 +3,13 @@
 \usepackage[margin=1in]{geometry}
 
 % ============================================================================
-% INTENT DEMO (2026-08-09; fallback section corrected 2026-08-26). Every
-% "with intent" expression below uses the custom conversion-time commands
-% (\intent, \iarg, \speakas) or a shortcut macro (\card, \determ, ...)
-% understood by mathjax-bundle-intent.js.
+% INTENT DEMO (2026-08-09). Every "with intent" expression below uses the
+% custom conversion-time commands (\intent, \iarg, \speakas) or a shortcut
+% macro (\card, \determ, ...) understood by mathjax-bundle-intent.js.
 % This file will NOT compile to PDF (the commands exist only at conversion
 % time); it is for the Accessible STEM converter. Each section pairs the
 % plain notation with the annotated form so before/after can be compared in
 % one converted page. Expected speech: see math-conversion/intent-demo-examples.md.
-%
-% THE ESCAPE HATCH (and why the integrity gate does not forbid it):
-% \intent{any-name}{...} accepts ANY concept name, including names in no
-% vocabulary anywhere — unknown names fall back to hyphens-to-spaces plus
-% "of" on the SRE channel (see phrasesFor in intent-inline.js) and are
-% passed through verbatim as the MathML intent attribute, exactly as the
-% MathML 4 spec intends for open-vocabulary function heads. The build's
-% referential-integrity gate constrains something different: a NOTATION
-% GROUP in the vocabulary may not offer a concept that has no record
-% (that would make the suggest tool propose a phantom). Author-typed
-% \intent names are deliberately outside the gate's jurisdiction.
 % ============================================================================
 
 \title{MathML Intent Demonstration}
@@ -89,13 +77,7 @@ override: $\speakas{the golden ratio}{\varphi}$.
 
 \section*{7. Graceful fallback (concept not in any vocabulary)}
 
-An instructor-coined name --- the order of a group, but called by a name
-nobody authored: $\intent{group-size}{\left|\iarg{G}\right|}$ --- speaks
-``group size of G'' via the unknown-name fallback (hyphens become spaces,
-``of'' is supplied). The name used here before 2026-08-26,
-\texttt{order-of-group}, no longer demonstrates fallback: the W3C open-list
-bulk import made it an authored concept, so it now speaks its authored
-phrase ``order of the group G'' --- a nice illustration that yesterday's
-fallback can graduate into today's vocabulary without any document change.
+The order of a group: $\intent{order-of-group}{\left|\iarg{G}\right|}$
+--- speaks ``order of group of G'' even though nobody authored it.
 
 \end{document}

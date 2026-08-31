@@ -12,7 +12,7 @@ import {
   crosshairCursor, highlightActiveLine, scrollPastEnd, Decoration,
 } from "@codemirror/view";
 import { EditorState, Compartment, StateEffect, StateField } from "@codemirror/state";
-import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
+import { history, defaultKeymap, historyKeymap, undo as cmUndo, redo as cmRedo } from "@codemirror/commands";
 import {
   indentOnInput, syntaxHighlighting, defaultHighlightStyle, bracketMatching,
   foldGutter, foldKeymap, indentUnit, LanguageSupport,
@@ -36,7 +36,7 @@ const extraTokenClasses = tagHighlighter([
   { tag: lzTags.bracket, class: "tok-bracket" },
 ]);
 
-export const CM6_BUNDLE_VERSION = "0.3.0";
+export const CM6_BUNDLE_VERSION = "0.4.0";
 
 // ── Language registry ──────────────────────────────────────────────
 // LaTeX: Overleaf's Lezer grammar via codemirror-lang-latex (TeXlyre),
@@ -59,6 +59,16 @@ function languageFor(name) {
 const setLineTints = StateEffect.define();          // [{line, cls}]
 const addHighlight = StateEffect.define();          // {token, ranges, cls}
 const clearHighlight = StateEffect.define();        // token | null (null = all)
+
+// ── Offset-based marks (v0.4) ──────────────────────────────────────
+// The line/col highlights above cannot express a range that SPANS lines,
+// because each range is anchored to one line. Offset marks can, and they
+// MAP THROUGH EDITS: after a replaceRange, every other mark still points
+// at the right text. That is what makes an apply-one-then-continue review
+// loop possible. Kept separate from the line/col machinery so existing
+// callers are untouched.
+const addMarks = StateEffect.define();              // {token, ranges:[{from,to}], cls}
+const clearMarks = StateEffect.define();            // token | null (null = all)
 
 function buildDecoSet(state, tints, highlights) {
   const decos = [];
@@ -103,6 +113,58 @@ function makeDecoField() {
     },
     provide: (f) => EditorView.decorations.from(f),
   });
+}
+
+// Per-editor offset-mark state. Each token owns a DecorationSet; every set
+// is mapped through document changes so marks follow the text they annotate
+// rather than drifting. Returns the field plus a reset() for setText, which
+// rebuilds the document from scratch and would otherwise leave stale marks
+// pointing into a document that no longer exists.
+function makeMarkField() {
+  const sets = new Map();   // token -> DecorationSet
+
+  function union() {
+    const all = [];
+    for (const [, s] of sets) {
+      const it = s.iter();
+      while (it.value) { all.push(it.value.range(it.from, it.to)); it.next(); }
+    }
+    all.sort((a, b) => a.from - b.from || a.to - b.to);
+    return Decoration.set(all, true);
+  }
+
+  const field = StateField.define({
+    create() { return Decoration.none; },
+    update(value, tr) {
+      let dirty = false;
+      if (tr.docChanged && sets.size) {
+        for (const [k, s] of sets) sets.set(k, s.map(tr.changes));
+        dirty = true;
+      }
+      for (const e of tr.effects) {
+        if (e.is(addMarks)) {
+          const deco = Decoration.mark({ class: e.value.cls });
+          const len = tr.state.doc.length;
+          const ranges = e.value.ranges
+            .map((r) => ({ from: Math.max(0, Math.min(r.from, len)),
+                           to: Math.max(0, Math.min(r.to, len)) }))
+            .filter((r) => r.to > r.from)
+            .sort((a, b) => a.from - b.from || a.to - b.to)
+            .map((r) => deco.range(r.from, r.to));
+          sets.set(e.value.token, Decoration.set(ranges, true));
+          dirty = true;
+        } else if (e.is(clearMarks)) {
+          if (e.value === null) sets.clear();
+          else sets.delete(e.value);
+          dirty = true;
+        }
+      }
+      return dirty ? union() : value;
+    },
+    provide: (f) => EditorView.decorations.from(f),
+  });
+
+  return { field, reset: () => sets.clear() };
 }
 
 // ── Completion adapter ─────────────────────────────────────────────
@@ -153,6 +215,7 @@ export function createEditor(containerEl, opts = {}) {
   const wrapComp = new Compartment();
   const compComp = new Compartment();
   const decoField = makeDecoField();
+  const marks = makeMarkField();
   const sources = [];
   // Live config — consulted whenever state is rebuilt (setText), so a
   // rebuild preserves the CURRENT language/readOnly/wrap, not creation-time.
@@ -194,6 +257,7 @@ export function createEditor(containerEl, opts = {}) {
     ]),
     lintGutter(),
     decoField,
+    marks.field,
     theme,
     indentUnit.of("  "),
     EditorState.tabSize.of(2),
@@ -235,6 +299,7 @@ export function createEditor(containerEl, opts = {}) {
     setText(text) {
       // Fresh state = content replaced AND undo history reset
       // (parity with Ace's setValue(text, -1) usage).
+      marks.reset();   // old offsets mean nothing in a new document
       view.setState(EditorState.create({ doc: text, extensions: baseExtensions() }));
     },
 
@@ -313,6 +378,99 @@ export function createEditor(containerEl, opts = {}) {
     clearHighlights(token) {
       view.dispatch({ effects: clearHighlight.of(token ?? null) });
     },
+
+    // ── Offset-based API (v0.4) ────────────────────────────────────
+    // Offsets are 0-based indices into getText(), so a tool that computed
+    // spans against that string (the intent scanner does) can act on them
+    // directly, with no line/col round-trip. Everything here clamps to the
+    // document rather than throwing.
+
+    docLength: () => view.state.doc.length,
+    getRange(from, to) {
+      const len = view.state.doc.length;
+      const f = Math.max(0, Math.min(from, len));
+      const t = Math.max(f, Math.min(to, len));
+      return view.state.doc.sliceString(f, t);
+    },
+    /** offset -> {line, col}, both 1-based (matches the rest of this API). */
+    lineColAt(offset) {
+      const len = view.state.doc.length;
+      const l = view.state.doc.lineAt(Math.max(0, Math.min(offset, len)));
+      return { line: l.number, col: Math.max(0, Math.min(offset, len)) - l.from + 1 };
+    },
+    /** {line, col} (1-based) -> offset. */
+    offsetAt(line, col) { return pos(line, col); },
+
+    /** Replace one span, PRESERVING UNDO HISTORY (unlike setText).
+     *  Returns the span the inserted text now occupies. */
+    replaceRange(from, to, insert) {
+      const len = view.state.doc.length;
+      const f = Math.max(0, Math.min(from, len));
+      const t = Math.max(f, Math.min(to, len));
+      const text = insert == null ? "" : String(insert);
+      view.dispatch({ changes: { from: f, to: t, insert: text } });
+      return { from: f, to: f + text.length };
+    },
+
+    /** Replace several spans as ONE transaction — one undo step, and the
+     *  offsets are all interpreted against the CURRENT document, so the
+     *  caller does not have to apply bottom-up or recompute anything.
+     *  edits: [{from, to, insert}]. Throws on overlapping spans, which
+     *  always indicate a caller bug rather than something to paper over. */
+    replaceRanges(edits) {
+      const len = view.state.doc.length;
+      const norm = edits.map((e) => ({
+        from: Math.max(0, Math.min(e.from, len)),
+        to: Math.max(0, Math.min(e.to, len)),
+        insert: e.insert == null ? "" : String(e.insert),
+      })).map((e) => ({ ...e, to: Math.max(e.from, e.to) }))
+        .sort((a, b) => a.from - b.from || a.to - b.to);
+      for (let i = 1; i < norm.length; i++) {
+        if (norm[i].from < norm[i - 1].to) {
+          throw new Error(
+            `replaceRanges: overlapping spans [${norm[i - 1].from},${norm[i - 1].to}) ` +
+            `and [${norm[i].from},${norm[i].to})`);
+        }
+      }
+      if (norm.length === 0) return 0;
+      view.dispatch({ changes: norm });
+      return norm.length;
+    },
+
+    /** Mark spans that MAY cross line boundaries, and that follow the text
+     *  through later edits. Returns a token for clearMarks.
+     *  ranges: [{from, to}] */
+    markRanges(ranges, className) {
+      const token = "mk-" + Math.random().toString(36).slice(2);
+      view.dispatch({ effects: addMarks.of({
+        token, ranges, cls: className || "cm-facade-mark" }) });
+      return token;
+    },
+    /** token, or omit/null to clear every offset mark. */
+    clearMarks(token) {
+      view.dispatch({ effects: clearMarks.of(token ?? null) });
+    },
+
+    /** Put the selection on a span and scroll it into view. Used to step
+     *  through findings; `focusEditor: false` keeps keyboard focus where it
+     *  is (e.g. in a review panel) while still moving the viewport. */
+    selectRange(from, to, o = {}) {
+      const len = view.state.doc.length;
+      const f = Math.max(0, Math.min(from, len));
+      const t = Math.max(f, Math.min(to == null ? from : to, len));
+      view.dispatch({
+        selection: { anchor: f, head: t },
+        effects: EditorView.scrollIntoView(f, { y: o.y || "center" }),
+      });
+      if (o.focusEditor !== false) view.focus();
+    },
+
+    /** Undo / redo the last transaction. Exposed so a caller that made an
+     *  edit programmatically (an applied annotation) can offer to take it
+     *  back without the user having to focus the editor first. Returns
+     *  true when something was undone/redone. */
+    undo() { return cmUndo(view); },
+    redo() { return cmRedo(view); },
 
     registerCompletionSource(fn) {
       sources.push(fn);

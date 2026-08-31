@@ -5,7 +5,8 @@
   "description": "Builds codemirror/cm6-editor.js (the editor facade bundle) for the Accessible STEM conversion tool. See ../CM6-FACADE-DESIGN.md.",
   "type": "module",
   "scripts": {
-    "build": "esbuild facade.js --bundle --format=esm --minify --target=es2020 --outfile=../codemirror/cm6-editor.js"
+    "build": "esbuild facade.js --bundle --format=esm --minify --target=es2020 --outfile=../codemirror/cm6-editor.js",
+    "test": "node test-asset-urls.mjs && node test-page-load.mjs && node test-facade.mjs && node test-intent-review.mjs && node test-intent-apply.mjs && node test-intent-outoforder.mjs && node test-intent-guard.mjs"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.9",
@@ -16,6 +17,7 @@
     "codemirror-lang-latex": "^0.4.2"
   },
   "devDependencies": {
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.25.0",
+    "jsdom": "^30.0.1"
   }
 }

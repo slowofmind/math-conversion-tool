@@ -36,7 +36,7 @@ the mechanism works ahead of vocabulary coverage.
 |---|---|---|---|---|---|---|---|
 | One-argument wrap (authored concept) | a quantum state | `\left\|\psi\right\rangle` | $\left\|\psi\right\rangle$ | divides psi right angle bracket | `\intent{ket}{\left\|\iarg{\psi}\right\rangle}` | ket psi | Quantum mechanics |
 | Multi-argument wrap with slot labels [b], [c] | bra A ket: three operands, spoken in order | `\left\langle m\middle\|A\middle\|n\right\rangle` | $\left\langle m\middle\|A\middle\|n\right\rangle$ | left angle bracket m times the absolute value of A times n right angle bracket | `\intent{matrix-element}{\left\langle\iarg{m}\middle\|\iarg[b]{A}\middle\|\iarg[c]{n}\right\rangle}` | the matrix element m A n | Quantum mechanics — transitions |
-| Unauthored concept (graceful fallback) | order of a group — name not in any vocabulary yet | `\left\|G\right\|` | $\left\|G\right\|$ | the absolute value of G | `\intent{order-of-group}{\left\|\iarg{G}\right\|}` | order of group of G | Abstract algebra |
+| Unauthored concept (graceful fallback) | order of a group under an instructor-coined name not in any vocabulary (`order-of-group` itself became authored in the 2026-08 W3C bulk import, so it no longer demonstrates fallback) | `\left\|G\right\|` | $\left\|G\right\|$ | the absolute value of G | `\intent{group-size}{\left\|\iarg{G}\right\|}` | group size of G | Abstract algebra |
 | \speakas — exact words, any notation | per-expression escape hatch | `\varphi` | $\varphi$ | phi | `\speakas{the golden ratio}{\varphi}` | the golden ratio | Any course |
 
 Every shortcut macro (\card, \determ, \dotp, ...) is an abbreviation of

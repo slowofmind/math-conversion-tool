@@ -274,9 +274,9 @@ local VOCAB_GROUPS = {
 }
 local VOCAB_ENTRIES = {
   { concept = 'absolute-value', group = 'core-authored', macro = 'abs', json = [==[{"open": "the absolute value of", "close": "", "macro": ["abs", 1, "\\left|\\iarg{#1}\\right|"]}]==], offjson = [==[{"off": true, "macro": ["abs", 1, "\\left|{#1}\\right|"]}]==] },
-  { concept = 'binomial-coefficient', group = 'core-authored', macro = 'binomc', json = [==[{"open": "", "mid1": "choose", "close": "", "macro": ["binomc", 2, "\\binom{\\iarg{#1}}{\\iarg[b]{#2}}"]}]==], offjson = [==[{"off": true, "macro": ["binomc", 2, "\\binom{{#1}}{{#2}}"]}]==] },
-  { concept = 'bra', group = 'core-authored', macro = 'bra', json = [==[{"open": "bra", "close": "", "macro": ["bra", 1, "\\left\\langle\\iarg{#1}\\right|"]}]==], offjson = [==[{"off": true, "macro": ["bra", 1, "\\left\\langle{#1}\\right|"]}]==] },
-  { concept = 'braket', group = 'core-authored', macro = 'braket', json = [==[{"open": "the inner product of", "mid1": "and", "close": "", "macro": ["braket", 2, "\\left\\langle\\iarg{#1}\\middle|\\iarg[b]{#2}\\right\\rangle"]}]==], offjson = [==[{"off": true, "macro": ["braket", 2, "\\left\\langle{#1}\\middle|{#2}\\right\\rangle"]}]==] },
+  { concept = 'binomial-coefficient', group = 'core-authored', macro = 'binomc', json = [==[{"open": "", "mid1": "choose", "close": "", "mc": "binomial", "macro": ["binomc", 2, "\\binom{\\iarg{#1}}{\\iarg[b]{#2}}"]}]==], offjson = [==[{"off": true, "macro": ["binomc", 2, "\\binom{{#1}}{{#2}}"]}]==] },
+  { concept = 'bra', group = 'core-authored', json = [==[{"open": "bra", "close": ""}]==], offjson = [==[{"off": true}]==] },
+  { concept = 'braket', group = 'core-authored', json = [==[{"open": "the inner product of", "mid1": "and", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'cardinality', group = 'core-authored', macro = 'card', json = [==[{"open": "the cardinality of", "close": "", "macro": ["card", 1, "\\left|\\iarg{#1}\\right|"]}]==], offjson = [==[{"off": true, "macro": ["card", 1, "\\left|{#1}\\right|"]}]==] },
   { concept = 'cardinality-of-set-builder', group = 'core-authored', json = [==[{"open": "the number of elements in", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'clebsch-gordan-coefficient', group = 'physics-quantum', macro = 'clebschgordan', json = [==[{"open": "the clebsch gordan coefficient for", "mid1": ",", "mid2": ",", "mid3": ",", "mid4": ",", "mid5": ",", "close": "", "macro": ["clebschgordan", 6, "\\left\\langle \\iarg{#1}\\, \\iarg[b]{#2}\\, \\iarg[c]{#3}\\, \\iarg[d]{#4} \\,\\middle|\\, \\iarg[e]{#5}\\, \\iarg[f]{#6} \\right\\rangle"]}]==], offjson = [==[{"off": true, "macro": ["clebschgordan", 6, "\\left\\langle {#1}\\, {#2}\\, {#3}\\, {#4} \\,\\middle|\\, {#5}\\, {#6} \\right\\rangle"]}]==] },
@@ -289,17 +289,18 @@ local VOCAB_ENTRIES = {
   { concept = 'derivative', group = 'core-authored', macro = 'deriv', json = [==[{"open": "the derivative of", "mid1": "with respect to", "close": "", "macro": ["deriv", 2, "\\frac{d\\iarg{#1}}{d\\iarg[b]{#2}}"]}]==], offjson = [==[{"off": true, "macro": ["deriv", 2, "\\frac{d{#1}}{d{#2}}"]}]==] },
   { concept = 'determinant', group = 'core-authored', macro = 'determ', json = [==[{"open": "the determinant of", "close": "", "macro": ["determ", 1, "\\left|\\iarg{#1}\\right|"]}]==], offjson = [==[{"off": true, "macro": ["determ", 1, "\\left|{#1}\\right|"]}]==] },
   { concept = 'dot-product', group = 'core-authored', macro = 'dotp', json = [==[{"open": "the dot product of", "mid1": "and", "close": "", "macro": ["dotp", 2, "\\iarg{#1}\\cdot\\iarg[b]{#2}"]}]==], offjson = [==[{"off": true, "macro": ["dotp", 2, "{#1}\\cdot{#2}"]}]==] },
-  { concept = 'expectation-value', group = 'core-authored', macro = 'expval', json = [==[{"open": "the expectation value of", "mid1": "in the state", "close": "", "macro": ["expval", 1, "\\left\\langle\\iarg{#1}\\right\\rangle"]}]==], offjson = [==[{"off": true, "macro": ["expval", 1, "\\left\\langle{#1}\\right\\rangle"]}]==] },
+  { concept = 'expectation-value', group = 'core-authored', json = [==[{"open": "the expectation value of", "mid1": "in the state", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'fixed-point', group = 'calculus-analysis', json = [==[{"open": "the fixed point", "close": ""}]==], offjson = [==[{"off": true}]==] },
+  { concept = 'gcd', group = 'core-authored', macro = 'gcdof', json = [==[{"open": "the greatest common divisor of", "mid1": "and", "close": "", "macro": ["gcdof", 2, "\\gcd\\left(\\iarg{#1},\\iarg[b]{#2}\\right)"]}]==], offjson = [==[{"off": true, "macro": ["gcdof", 2, "\\gcd\\left({#1},{#2}\\right)"]}]==] },
   { concept = 'gradient', group = 'calculus-analysis', json = [==[{"open": "the gradient of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'hypergeometric-function', group = 'special-functions', macro = 'hypergeom', json = [==[{"open": "the hypergeometric function of", "mid1": ",", "mid2": ",", "mid3": "and", "close": "", "macro": ["hypergeom", 4, "{}_{2}F_{1}\\left(\\iarg{#1},\\iarg[b]{#2};\\iarg[c]{#3};\\iarg[d]{#4}\\right)"]}]==], offjson = [==[{"off": true, "macro": ["hypergeom", 4, "{}_{2}F_{1}\\left({#1},{#2};{#3};{#4}\\right)"]}]==] },
   { concept = 'inner-product', group = 'core-authored', macro = 'ipof', json = [==[{"open": "the inner product of", "mid1": "and", "close": "", "macro": ["ipof", 2, "\\left\\langle\\iarg{#1},\\iarg[b]{#2}\\right\\rangle"]}]==], offjson = [==[{"off": true, "macro": ["ipof", 2, "\\left\\langle{#1},{#2}\\right\\rangle"]}]==] },
-  { concept = 'ket', group = 'core-authored', macro = 'ket', json = [==[{"open": "ket", "close": "", "macro": ["ket", 1, "\\left|\\iarg{#1}\\right\\rangle"]}]==], offjson = [==[{"off": true, "macro": ["ket", 1, "\\left|{#1}\\right\\rangle"]}]==] },
-  { concept = 'ketbra', group = 'core-authored', macro = 'ketbra', json = [==[{"open": "the outer product of", "mid1": "and", "close": "", "macro": ["ketbra", 2, "\\left|\\iarg{#1}\\right\\rangle\\!\\left\\langle\\iarg[b]{#2}\\right|"]}]==], offjson = [==[{"off": true, "macro": ["ketbra", 2, "\\left|{#1}\\right\\rangle\\!\\left\\langle{#2}\\right|"]}]==] },
+  { concept = 'ket', group = 'core-authored', json = [==[{"open": "ket", "close": ""}]==], offjson = [==[{"off": true}]==] },
+  { concept = 'ketbra', group = 'core-authored', json = [==[{"open": "the outer product of", "mid1": "and", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'lie-derivative', group = 'geometry-topology', macro = 'liederiv', json = [==[{"open": "the lie derivative of", "mid1": "along", "close": "", "order": "ba", "macro": ["liederiv", 2, "\\mathcal{L}_{\\iarg{#1}}\\iarg[b]{#2}"]}]==], offjson = [==[{"off": true, "macro": ["liederiv", 2, "\\mathcal{L}_{{#1}}{#2}"]}]==] },
   { concept = 'line-segment', group = 'core-authored', macro = 'lineseg', json = [==[{"open": "the line segment", "close": "", "macro": ["lineseg", 1, "\\overline{\\iarg{#1}}"]}]==], offjson = [==[{"off": true, "macro": ["lineseg", 1, "\\overline{{#1}}"]}]==] },
   { concept = 'magnitude', group = 'core-authored', macro = 'magn', json = [==[{"open": "the magnitude of", "close": "", "macro": ["magn", 1, "\\left|\\iarg{#1}\\right|"]}]==], offjson = [==[{"off": true, "macro": ["magn", 1, "\\left|{#1}\\right|"]}]==] },
-  { concept = 'matrix-element', group = 'core-authored', macro = 'mel', json = [==[{"open": "the matrix element", "mid1": "", "mid2": "", "close": "", "macro": ["mel", 3, "\\left\\langle\\iarg{#1}\\middle|\\iarg[b]{#2}\\middle|\\iarg[c]{#3}\\right\\rangle"]}]==], offjson = [==[{"off": true, "macro": ["mel", 3, "\\left\\langle{#1}\\middle|{#2}\\middle|{#3}\\right\\rangle"]}]==] },
+  { concept = 'matrix-element', group = 'core-authored', json = [==[{"open": "the matrix element", "mid1": "", "mid2": "", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'mean', group = 'core-authored', macro = 'meanof', json = [==[{"open": "the mean of", "close": "", "macro": ["meanof", 1, "\\overline{\\iarg{#1}}"]}]==], offjson = [==[{"off": true, "macro": ["meanof", 1, "\\overline{{#1}}"]}]==] },
   { concept = 'modulus', group = 'core-authored', macro = 'modulus', json = [==[{"open": "the modulus of", "close": "", "macro": ["modulus", 1, "\\left|\\iarg{#1}\\right|"]}]==], offjson = [==[{"off": true, "macro": ["modulus", 1, "\\left|{#1}\\right|"]}]==] },
   { concept = 'norm', group = 'core-authored', macro = 'norm', json = [==[{"open": "the norm of", "close": "", "macro": ["norm", 1, "\\left\\|\\iarg{#1}\\right\\|"]}]==], offjson = [==[{"off": true, "macro": ["norm", 1, "\\left\\|{#1}\\right\\|"]}]==] },
@@ -308,6 +309,7 @@ local VOCAB_ENTRIES = {
   { concept = 'optimal-solution', group = 'other', json = [==[{"open": "the optimal solution", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'ordered-pair', group = 'core-authored', macro = 'pair', json = [==[{"open": "the ordered pair", "mid1": "comma", "close": "", "macro": ["pair", 2, "\\left(\\iarg{#1},\\iarg[b]{#2}\\right)"]}]==], offjson = [==[{"off": true, "macro": ["pair", 2, "\\left({#1},{#2}\\right)"]}]==] },
   { concept = 'set', group = 'core-authored', macro = 'set', json = [==[{"open": "the set", "close": "", "macro": ["set", 1, "\\left\\{\\iarg{#1}\\right\\}"]}]==], offjson = [==[{"off": true, "macro": ["set", 1, "\\left\\{{#1}\\right\\}"]}]==] },
+  { concept = 'set-complement', group = 'core-authored', macro = 'complementof', json = [==[{"open": "the complement of", "close": "", "macro": ["complementof", 1, "\\overline{\\iarg{#1}}"]}]==], offjson = [==[{"off": true, "macro": ["complementof", 1, "\\overline{{#1}}"]}]==] },
   { concept = 'subscripted-norm', group = 'core-authored', macro = 'normsub', json = [==[{"open": "the", "mid1": "norm of", "close": "", "macro": ["normsub", 2, "\\left\\|\\iarg[b]{#1}\\right\\|_{\\iarg{#2}}"]}]==], offjson = [==[{"off": true, "macro": ["normsub", 2, "\\left\\|{#1}\\right\\|_{{#2}}"]}]==] },
   { concept = 'time-derivative', group = 'calculus-analysis', json = [==[{"open": "the time derivative of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'trace', group = 'core-authored', macro = 'traceof', json = [==[{"open": "the trace of", "close": "", "macro": ["traceof", 1, "\\operatorname{tr}\\left(\\iarg{#1}\\right)"]}]==], offjson = [==[{"off": true, "macro": ["traceof", 1, "\\operatorname{tr}\\left({#1}\\right)"]}]==] },
@@ -470,7 +472,7 @@ local VOCAB_ENTRIES = {
   { concept = 'cologarithm', group = 'algebra-arithmetic', json = [==[{"open": "cologarithm of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'column-vector', group = 'algebra-arithmetic', json = [==[{"open": "column vector with entries", "mid1": ",", "mid2": ",", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'comma-category', group = 'abstract-algebra-category', json = [==[{"open": "comma category of", "mid1": "and", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'commutator', group = 'algebra-arithmetic', macro = 'comm', json = [==[{"open": "commutator of", "mid1": "and", "close": "", "macro": ["comm", 2, "\\left[\\iarg{#1},\\iarg[b]{#2}\\right]"]}]==], offjson = [==[{"off": true, "macro": ["comm", 2, "\\left[{#1},{#2}\\right]"]}]==] },
+  { concept = 'commutator', group = 'algebra-arithmetic', json = [==[{"open": "commutator of", "mid1": "and", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'commutator-subgroup', group = 'algebra-arithmetic', json = [==[{"open": "commutator subgroup of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'companion-lehmer-number', group = 'number-theory', json = [==[{"open": "companion lehmer number of order", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'comparability', group = 'discrete', json = [==[{"open": "", "mid1": "is comparable to", "close": ""}]==], offjson = [==[{"off": true}]==] },
@@ -483,7 +485,7 @@ local VOCAB_ENTRIES = {
   { concept = 'composition', group = 'algebra-arithmetic', json = [==[{"open": "", "mid1": "composed with", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'compound-interest-nominal-rate', group = 'other', json = [==[{"open": "nominal interest rate compounded", "close": "times per year"}]==], offjson = [==[{"off": true}]==] },
   { concept = 'condition-number', group = 'calculus-analysis', json = [==[{"open": "condition number of", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'conditional-expectation', group = 'probability-statistics', macro = 'condexp', json = [==[{"open": "conditional expectation of", "mid1": "given", "close": "", "macro": ["condexp", 2, "\\mathbb{E}\\!\\left[\\iarg{#1}\\,\\middle|\\,\\iarg[b]{#2}\\right]"]}]==], offjson = [==[{"off": true, "macro": ["condexp", 2, "\\mathbb{E}\\!\\left[{#1}\\,\\middle|\\,{#2}\\right]"]}]==] },
+  { concept = 'conditional-expectation', group = 'probability-statistics', json = [==[{"open": "conditional expectation of", "mid1": "given", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'conditional-probability', group = 'probability-statistics', json = [==[{"open": "conditional probability of", "mid1": "given", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'conductor', group = 'algebra-arithmetic', json = [==[{"open": "conductor of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'configuration', group = 'geometry-topology', json = [==[{"open": "configuration", "mid1": "sub", "mid2": ",", "mid3": "sub", "close": ""}]==], offjson = [==[{"off": true}]==] },
@@ -621,7 +623,7 @@ local VOCAB_ENTRIES = {
   { concept = 'epigraph', group = 'calculus-analysis', json = [==[{"open": "epigraph of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'epsilon-number', group = 'other', json = [==[{"open": "epsilon number"}]==], offjson = [==[{"off": true}]==] },
   { concept = 'equalizer', group = 'abstract-algebra-category', json = [==[{"open": "equalizer of", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'equivalence-class', group = 'discrete', macro = 'eqclass', json = [==[{"open": "equivalence class of", "close": "", "macro": ["eqclass", 1, "\\left[\\iarg{#1}\\right]"]}]==], offjson = [==[{"off": true, "macro": ["eqclass", 1, "\\left[{#1}\\right]"]}]==] },
+  { concept = 'equivalence-class', group = 'discrete', json = [==[{"open": "equivalence class of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'equivalence-relation', group = 'discrete', json = [==[{"open": "", "mid1": "is equivalent to", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'equivariant-cohomology', group = 'algebra-arithmetic', json = [==[{"open": "equivariant cohomology of", "mid1": "with coefficients", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'erdos-borwein-constant', group = 'number-theory', json = [==[{"open": "erdos-borwein constant"}]==], offjson = [==[{"off": true}]==] },
@@ -1162,7 +1164,7 @@ local VOCAB_ENTRIES = {
   { concept = 'resolvent-set', group = 'calculus-analysis', json = [==[{"open": "resolvent set of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'restricted-quantifier', group = 'discrete', json = [==[{"open": "for all", "mid1": "satisfying", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'restricted-wreath-product', group = 'abstract-algebra-category', json = [==[{"open": "", "mid1": "restricted wreath product", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'restriction', group = 'core-authored', macro = 'restr', json = [==[{"open": "the restriction of", "mid1": "to", "close": "", "macro": ["restr", 2, "\\left.\\iarg{#1}\\right|_{\\iarg[b]{#2}}"]}]==], offjson = [==[{"off": true, "macro": ["restr", 2, "\\left.{#1}\\right|_{{#2}}"]}]==] },
+  { concept = 'restriction', group = 'discrete', json = [==[{"open": "restriction of", "mid1": "to", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'resultant', group = 'algebra-arithmetic', json = [==[{"open": "resultant of", "mid1": "and", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'rewrite-rule', group = 'discrete', json = [==[{"open": "", "mid1": "rewrites to", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'reynolds-number', group = 'other', json = [==[{"open": "reynolds number"}]==], offjson = [==[{"off": true}]==] },
@@ -1276,7 +1278,7 @@ local VOCAB_ENTRIES = {
   { concept = 'string-concatenation', group = 'discrete', json = [==[{"open": "", "mid1": "concatenated with", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'strong-product', group = 'discrete', json = [==[{"open": "strong product of", "mid1": "and", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'struve-function', group = 'special-functions', json = [==[{"open": "struve function of order", "mid1": "at", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'student-t-distribution', group = 'probability-statistics', json = [==[{"open": "t distribution with", "close": "degrees of freedom"}]==], offjson = [==[{"off": true}]==] },
+  { concept = 'student-t-distribution', group = 'probability-statistics', json = [==[{"open": "student's t-distribution with", "close": "degrees of freedom"}]==], offjson = [==[{"off": true}]==] },
   { concept = 'subfactorial', group = 'discrete', json = [==[{"open": "subfactorial of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'subgroup', group = 'abstract-algebra-category', json = [==[{"open": "", "mid1": "is a subgroup of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'succeeds-or-equals', group = 'discrete', json = [==[{"open": "", "mid1": "succeeds or equals", "close": ""}]==], offjson = [==[{"off": true}]==] },
@@ -1425,17 +1427,6 @@ local VOCAB_ENTRIES = {
   { concept = 'zero-vector', group = 'algebra-arithmetic', json = [==[{"open": "zero vector"}]==], offjson = [==[{"off": true}]==] },
   { concept = 'zeta-function', group = 'number-theory', json = [==[{"open": "zeta function of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'zig-zag-product', group = 'discrete', json = [==[{"open": "zig zag product of", "mid1": "and", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'point', group = 'core-authored', macro = 'pointof', json = [==[{"open": "the point", "mid1": "comma", "close": "", "macro": ["pointof", 2, "\\left(\\iarg{#1},\\iarg[b]{#2}\\right)"]}]==], offjson = [==[{"off": true, "macro": ["pointof", 2, "\\left({#1},{#2}\\right)"]}]==] },
-  { concept = 'greatest-common-divisor', group = 'core-authored', macro = 'gcdof', json = [==[{"open": "the greatest common divisor of", "mid1": "and", "close": "", "macro": ["gcdof", 2, "\\gcd\\left(\\iarg{#1},\\iarg[b]{#2}\\right)"]}]==], offjson = [==[{"off": true, "macro": ["gcdof", 2, "\\gcd\\left({#1},{#2}\\right)"]}]==] },
-  { concept = 'complement', group = 'core-authored', macro = 'complementof', json = [==[{"open": "the complement of", "close": "", "macro": ["complementof", 1, "\\overline{\\iarg{#1}}"]}]==], offjson = [==[{"off": true, "macro": ["complementof", 1, "\\overline{{#1}}"]}]==] },
-  { concept = 'evaluated-at', group = 'core-authored', macro = 'evalat', json = [==[{"open": "", "mid1": "evaluated at", "close": "", "macro": ["evalat", 2, "\\left.\\iarg{#1}\\right|_{\\iarg[b]{#2}}"]}]==], offjson = [==[{"off": true, "macro": ["evalat", 2, "\\left.{#1}\\right|_{{#2}}"]}]==] },
-  { concept = 'evaluate', group = 'core-authored', macro = 'evalfromto', json = [==[{"open": "", "mid1": "evaluated from", "mid2": "to", "close": "", "macro": ["evalfromto", 3, "\\left.\\iarg{#1}\\right|_{\\iarg[b]{#2}}^{\\iarg[c]{#3}}"]}]==], offjson = [==[{"off": true, "macro": ["evalfromto", 3, "\\left.{#1}\\right|_{{#2}}^{{#3}}"]}]==] },
-  { concept = 'augmented-matrix', group = 'core-authored', json = [==[{"open": "", "mid1": "augmented with", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'coherent-information', group = 'core-authored', macro = 'cohinfo', json = [==[{"open": "the coherent information from", "mid1": "to", "close": "", "macro": ["cohinfo", 2, "I\\!\\left(\\iarg{#1}\\rangle\\iarg[b]{#2}\\right)"]}]==], offjson = [==[{"off": true, "macro": ["cohinfo", 2, "I\\!\\left({#1}\\rangle{#2}\\right)"]}]==] },
-  { concept = 'power', group = 'core-authored', json = [==[{"open": "", "mid1": "to the power of", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'prime-notation', group = 'core-authored', json = [==[{"open": "", "close": "prime"}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'row-vector', group = 'core-authored', json = [==[{"open": "the row vector", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'repeating-decimal', group = 'core-authored', json = [==[{"open": "", "mid1": "with repeating digits", "close": ""}]==], offjson = [==[{"off": true}]==] },
 }
 
 -- Assemble the per-document vocabulary and fill the extension's placeholders.
@@ -1772,83 +1763,6 @@ local CUSTOM_EXTENSION_JS = [==[
     });
   }
 
-  // -------------------------------------------------------------------------
-  //  CHEM SHIM — mhchem noise removal, SRE PAYLOAD ONLY (2026-08-30)
-  //
-  //  SRE has no chemistry model. mhchem's output collides with three of its
-  //  heuristics, verified by probe against the golden speech path:
-  //    (a) UNIT GUESS. ClearSpeak's 'unit' annotator marks every implicit
-  //        multiplication as a possible unit, and then speaks UPRIGHT single
-  //        letters from the units dictionary: \ce{N2} -> "Newtons sub 2",
-  //        \ce{5m} -> "meters". Every element symbol is upright, so this fires
-  //        on essentially all chemistry. Fix: drop mathvariant="normal" from
-  //        <mi> inside chemistry payloads only.
-  //    (b) EMPTY NODES. mhchem pads a $...$ math escape with ~ spaces; those
-  //        serialize as whitespace-only <mtext> and are VOICED as "empty" when
-  //        an intent-wrapped relation restructures the parse ("... empty is in
-  //        equilibrium with empty ..."). Fix: drop whitespace-only <mtext>.
-  //    (c) FUNCTION GUESS. mhchem hangs scripts off a zero-width \vphantom{A}
-  //        instead of the element, and SRE reads the orphaned letter as an
-  //        applied function ("normal H OF sub 2"). Fix: re-attach the script to
-  //        the preceding element. This one is STRUCTURAL, so it runs behind
-  //        balanceOk() and is discarded whole if tag counts do not match --
-  //        a malformed payload would kill speech for the whole expression.
-  //
-  //  WHERE: the worker payload only (see wrapWorkerPostMessage). Never the
-  //  rendered tree, never the assistive MathML MathCAT reads, never the
-  //  document. MathCAT infers chemistry natively and must not be touched.
-  //
-  //  GATE: mhchem fingerprints. \ce in data-latex when present, the -mhchem
-  //  font variant on arrows, or the zero-width phantom construction. Genuine
-  //  units written OUTSIDE \ce (5 m + 3 kg) match none of these and keep their
-  //  unit speech -- there is a control fixture asserting exactly that.
-  // -------------------------------------------------------------------------
-  // >>> CHEM SHIM START (extracted verbatim by test/_probe-chemshim-unit.mjs)
-  //  v2 (2026-08-30, after live NVDA test of v1 showed NO effect).
-  //  WHAT THE LIVE CHANNEL ACTUALLY IS: MathJax enriches first and posts
-  //  ENRICHED MathML (item.outputData.mml) to the speech worker, which calls
-  //  SRE.worker.speech(mml, opts); the spoken string is result.label. On that
-  //  path SRE reads the semantic attributes, NOT the presentation markup —
-  //  so v1's mathvariant strip and phantom-restructure were inert. Verified
-  //  by test/_probe-worker-truth2.mjs, which reproduces the live strings.
-  //  THE TWO LEVERS THAT WORK LIVE:
-  //    (a) data-semantic-font="normal" -> drives the units dictionary
-  //        ("Newtons", "normal H"). Removing it inside chemistry restores
-  //        plain letters. NOTE: this is why the gate matters — removing it
-  //        from a genuine unit expression would turn "5 meters" into "5 m".
-  //    (b) whitespace-only <mtext> -> mhchem's ~ padding around a $...$
-  //        escape, voiced as "empty" once an intent-wrapped relation
-  //        restructures the parse.
-  //  Not fixed here: anything requiring pre-enrichment changes.
-  //  v3 adds (c): the "of" adjacency guess. Enrichment decides an element
-  //  letter is a FUNCTION APPLIED to what follows (H2O -> "H of sub 2 O"),
-  //  marking type=appl + role="simple function" and INSERTING an invisible
-  //  function-application <mo>. Probe test/_probe-of-residue.mjs: no single
-  //  edit clears it — all three must go together. Inside chemistry a function
-  //  application is never legitimate, so this is safe behind the gate.
-  var CHEM_FINGERPRINT = /\\ce\{|data-mjx-variant="-mhchem"|<mpadded[^>]*width="0"[^>]*>\s*<mphantom/;
-  var SEM_FONT_NORMAL = /\s*data-semantic-font="normal"/g;
-  var BLANK_MTEXT     = /<mtext\b[^>]*>(?:\s|&#xA0;|&#xa0;|&nbsp;|\u00A0)*<\/mtext>/g;
-  var APPL_MO         = /<mo\b[^>]*data-semantic-role="application"[^>]*>[\s\S]*?<\/mo>/g;
-  var ROLE_SIMPLEFUNC = /data-semantic-role="simple function"/g;
-  var TYPE_APPL       = /data-semantic-type="appl"/g;
-
-  function chemShim(str) {
-    try {
-      var s = String(str);
-      if (!CHEM_FINGERPRINT.test(s)) return str;      // not chemistry: untouched
-      s = s.replace(SEM_FONT_NORMAL, '');             // (a) unit / "normal" guess
-      s = s.replace(BLANK_MTEXT, '');                 // (b) "empty" nodes
-      s = s.replace(ROLE_SIMPLEFUNC, 'data-semantic-role="latinletter"')
-           .replace(TYPE_APPL, 'data-semantic-type="infixop"')
-           .replace(APPL_MO, '');                     // (c) "of" function guess
-      return s;
-    } catch (e) {
-      return str;                                     // never break the channel
-    }
-  }
-  // <<< CHEM SHIM END
-
   // DOM form, for parsed text nodes (literal characters in, literal out).
   var LITERAL_PUA = /[\uE000-\uF8FF]/g;
   function remapChemArrowsDom(el) {
@@ -1895,7 +1809,7 @@ local CUSTOM_EXTENSION_JS = [==[
       webworker.postMessage = function (msg) {
         try {
           if (msg && msg.data && typeof msg.data.mml === 'string') {
-            var fixed = chemShim(remapChemArrows(msg.data.mml));
+            var fixed = remapChemArrows(msg.data.mml);
             if (fixed !== msg.data.mml) {
               msg = Object.assign({}, msg, {
                 data: Object.assign({}, msg.data, { mml: fixed })

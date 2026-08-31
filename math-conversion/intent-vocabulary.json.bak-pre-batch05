@@ -40,7 +40,7 @@
             "other": "Everything the rollup map does not otherwise place."
         },
         "groupNotes": "Rollup groups are the toggle surface (build-time flag and per-document intent-groups: metadata). Entries may also carry a fine-grained \"area\" (from the open-list importer) and \"experimental\": true. \"mathcatName\" records MathCAT's divergent name for the same concept where one exists (see docs/mathcat-vs-open-list-comparison.md); the build MATHCAT_NAMES switch selects which name the intent attribute carries.",
-        "curatedSync": "2026-08-30"
+        "curatedSync": "2026-08-27"
     },
     "notations": [
         {
@@ -1458,12 +1458,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature additive-inverse($value); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "-n prefix minus — negation/subtraction surface, saturated",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature additive-inverse($value); unreviewed."
         },
         {
             "concept": "adiabatic-invariant-first",
@@ -1536,21 +1531,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature adjoint($operator); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=dagger)",
-                "variants": [
-                    {
-                        "spell": "\\dagger",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "joins the star/dagger sup web (batch 02 hermitian-adjoint/convex-conjugate); PRIME variant G' omitted — derivative-owned",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature adjoint($operator); unreviewed."
         },
         {
             "concept": "adjoint-action",
@@ -1569,21 +1550,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature adjoint-action($operator); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens|sub(operator)",
-                "variants": [
-                    {
-                        "spell": "ad",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "reserved in Lie theory; documented both as apply and as sub",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature adjoint-action($operator); unreviewed."
         },
         {
             "concept": "adjoint-representation",
@@ -1602,21 +1569,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature adjoint-representation($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Ad",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "capital Ad — Lie theory sibling of ad",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature adjoint-representation($value); unreviewed."
         },
         {
             "concept": "adjugate",
@@ -1635,21 +1588,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature adjugate($matrix); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "adj",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature adjugate($matrix); unreviewed."
         },
         {
             "concept": "affine-group",
@@ -1705,21 +1644,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "F7",
-                "sigArity": 0,
-                "argShape": "atom",
-                "variants": [
-                    {
-                        "spell": "\\mathbb{A}",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "joins algebraics (batch 04) on blackboard-A — the predicted multi-candidate is now real",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "airy-function-first-kind",
@@ -1804,26 +1729,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature albanese-variety($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Alb",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    },
-                    {
-                        "spell": "A",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "A(·) joins abundance (batch 04)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature albanese-variety($value); unreviewed."
         },
         {
             "concept": "aleph",
@@ -2274,21 +2180,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature antilogarithm($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "antilog",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature antilogarithm($value); unreviewed."
         },
         {
             "concept": "antiparticle",
@@ -2602,21 +2494,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature associator($x,$y,$z); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 3,
-                "argShape": "bracket+2comma",
-                "variants": [
-                    {
-                        "spell": "[",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "bracket 3-tuple — pair with scalar-triple-product bracket form; also just a list surface",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature associator($x,$y,$z); unreviewed."
         },
         {
             "concept": "automorphism-group",
@@ -3236,12 +3114,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature betti-number($index); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "b_k: Latin + plain sub",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature betti-number($index); unreviewed."
         },
         {
             "concept": "bickley-naylor-function",
@@ -3668,21 +3541,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature brauer-group($field); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Br",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "reserved-ish run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature brauer-group($field); unreviewed."
         },
         {
             "concept": "bring-radical",
@@ -3701,21 +3560,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature bring-radical($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "BR",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "niche run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature bring-radical($value); unreviewed."
         },
         {
             "concept": "brun-constant",
@@ -3874,21 +3719,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature cap-product($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\frown",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "frown is rare outside cap product",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature cap-product($x,$y); unreviewed."
         },
         {
             "concept": "carlson-symmetric-form",
@@ -3960,12 +3791,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "bare Omega — sample-space/omega-constant cluster",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "catalan-constant",
@@ -4020,21 +3846,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "F7",
-                "sigArity": 0,
-                "argShape": "atom",
-                "variants": [
-                    {
-                        "spell": "AlgLat",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved category name",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "category-of-sets",
@@ -4227,21 +4039,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature center($group); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Z",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "Z(·) web now 4-way (igusa/selberg/z-function, batch 04)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature center($group); unreviewed."
         },
         {
             "concept": "centralizer",
@@ -4741,12 +4539,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature classifying-space($group); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "BG / mathcal-B G — letter JUXTAPOSITION is multiplication surface; no structural anchor (contrast beatty mathcal-B_r, which has a sub)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature classifying-space($group); unreviewed."
         },
         {
             "concept": "clausen-function",
@@ -4784,21 +4577,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature clifford-algebra($space); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Cl",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "reserved-ish run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature clifford-algebra($space); unreviewed."
         },
         {
             "concept": "clique",
@@ -4913,21 +4692,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature codimension($space); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "codim",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature codimension($space); unreviewed."
         },
         {
             "concept": "cofinality",
@@ -5002,21 +4767,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature coimage($function); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "coim",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature coimage($function); unreviewed."
         },
         {
             "concept": "cokernel",
@@ -5054,21 +4805,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature cologarithm($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "colog",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature cologarithm($value); unreviewed."
         },
         {
             "concept": "column-vector",
@@ -5155,21 +4892,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature commutator-subgroup($group); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 1,
-                "argShape": "bracket+1comma",
-                "variants": [
-                    {
-                        "spell": "[",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "CONTENT-CONDITIONAL: bracket pair with REPEATED argument; joins the [x,y] bracket web; G' and G^{(1)} variants omitted — derivative-owned surfaces",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature commutator-subgroup($group); unreviewed."
         },
         {
             "concept": "companion-lehmer-number",
@@ -5328,21 +5051,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature complexification($space); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=bbC)|sub(=bbC)",
-                "variants": [
-                    {
-                        "spell": "\\mathbb{C}",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "constant-script blackboard-C is distinctive",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature complexification($space); unreviewed."
         },
         {
             "concept": "composition",
@@ -5362,21 +5071,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature composition($f,$g); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\circ",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "dominant circ reading; pair with hadamard-product (matrices) — medium/low split",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature composition($f,$g); unreviewed."
         },
         {
             "concept": "compound-interest-nominal-rate",
@@ -5508,21 +5203,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature conductor($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "\\mathfrak{f}",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "mathfrak-styled apply — distinctive outside algebra it barely exists",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature conductor($value); unreviewed."
         },
         {
             "concept": "configuration",
@@ -5585,26 +5266,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature congruence-relation($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\equiv",
-                        "kind": "cs",
-                        "recognition": "low"
-                    },
-                    {
-                        "spell": "\\cong",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "bare equiv (no pmod — contrast functional-congruence arity 3) collides with identity/definition; cong shared with isomorphism — pair",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature congruence-relation($x,$y); unreviewed."
         },
         {
             "concept": "conjugacy-class",
@@ -5642,31 +5304,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature conjugate-transpose($matrix); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=H)",
-                "variants": [
-                    {
-                        "spell": "H",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    },
-                    {
-                        "spell": "*",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    },
-                    {
-                        "spell": "\\dagger",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "NEAR-DUPLICATE of hermitian-conjugate (same surfaces, same meaning — reconcile, zeta precedent); star/dagger variants join the sup web",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature conjugate-transpose($matrix); unreviewed."
         },
         {
             "concept": "connected-sum",
@@ -5939,21 +5577,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature converse($value); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=smallsmile)",
-                "variants": [
-                    {
-                        "spell": "\\smallsmile",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "exotic relation-converse decoration — rare but distinctive when present",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature converse($value); unreviewed."
         },
         {
             "concept": "converse-graph",
@@ -6467,21 +6091,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature cube-root($value); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 1,
-                "argShape": "root(=3)",
-                "variants": [
-                    {
-                        "spell": "\\sqrt[3]",
-                        "kind": "cs",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "radical-with-constant-index — new shape, reserved surface",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature cube-root($value); unreviewed."
         },
         {
             "concept": "cullen-number",
@@ -6591,21 +6201,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature cup-product($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\smile",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "smile rare outside cup product",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature cup-product($x,$y); unreviewed."
         },
         {
             "concept": "current",
@@ -6761,21 +6357,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dalembert-operator($function); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "prefix-juxta",
-                "variants": [
-                    {
-                        "spell": "\\Box",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "symbol-anchor prefix juxtaposition (new shape — distinct from letter juxtaposition, route-one); Box also modal logic",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dalembert-operator($function); unreviewed."
         },
         {
             "concept": "davenport-constant",
@@ -7148,21 +6730,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature degree-of-polynomial($polynomial); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "deg",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run; bare-juxta form documented — fence-optional prefix flag (batch 02)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature degree-of-polynomial($polynomial); unreviewed."
         },
         {
             "concept": "delannoy-number",
@@ -7202,21 +6770,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dependence-relation($value,$set); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\triangleleft",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "collides with normal-subgroup triangleleft (abstract-algebra batch) — flagged",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dependence-relation($value,$set); unreviewed."
         },
         {
             "concept": "dereference",
@@ -7330,21 +6884,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature diagonal-matrix($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "diag",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature diagonal-matrix($value); unreviewed."
         },
         {
             "concept": "dickman-function",
@@ -7396,26 +6936,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature different-ideal($value); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sub(value)",
-                "variants": [
-                    {
-                        "spell": "\\delta",
-                        "kind": "cs",
-                        "recognition": "low"
-                    },
-                    {
-                        "spell": "\\mathfrak{d}",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "delta_x is dirac-measure's claimed surface (batches 02/03) — multi-candidate pair",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature different-ideal($value); unreviewed."
         },
         {
             "concept": "differential-entropy",
@@ -7596,26 +7117,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dimension($space); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "dim",
-                        "kind": "letters",
-                        "recognition": "high"
-                    },
-                    {
-                        "spell": "[",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "dim reserved; [x] bracket variant joins integer-part/equivalence-class bracket web (batch 04); krull-dimension shares dim — pair",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dimension($space); unreviewed."
         },
         {
             "concept": "dirac-adjoint",
@@ -7796,21 +7298,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature direct-sum($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\oplus",
-                        "kind": "cs",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved symbol",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature direct-sum($x,$y); unreviewed."
         },
         {
             "concept": "directional-derivative",
@@ -8125,21 +7613,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature discrete-valuation($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "\\nu",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "nu generic",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature discrete-valuation($value); unreviewed."
         },
         {
             "concept": "discriminant",
@@ -8158,26 +7632,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature discriminant($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Disc",
-                        "kind": "letters",
-                        "recognition": "high"
-                    },
-                    {
-                        "spell": "\\Delta",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "Delta variant pairs modular-discriminant (batch 04)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature discriminant($value); unreviewed."
         },
         {
             "concept": "disjoint-union",
@@ -8503,21 +7958,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dual-basis($value); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=*)",
-                "variants": [
-                    {
-                        "spell": "*",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "star sup web",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dual-basis($value); unreviewed."
         },
         {
             "concept": "dual-bundle",
@@ -8575,21 +8016,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dual-space($space); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=*)",
-                "variants": [
-                    {
-                        "spell": "*",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "star sup web; V' prime variant omitted — derivative-owned",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature dual-space($space); unreviewed."
         },
         {
             "concept": "duodecimal",
@@ -8608,12 +8035,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature duodecimal($number); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "n_12 / n_z / n_doz — base-subscript notation is saturated by sequence indexing (a_12 = twelfth term)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature duodecimal($number); unreviewed."
         },
         {
             "concept": "e-function",
@@ -9034,21 +8456,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature equivariant-cohomology($space,$coefficients); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(group)+sup(=*)+parens+semicolon",
-                "variants": [
-                    {
-                        "spell": "H",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "multi-script composite — distinctive shape, generic anchor; semicolon-fence flag",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature equivariant-cohomology($space,$coefficients); unreviewed."
         },
         {
             "concept": "erdos-borwein-constant",
@@ -9124,26 +8532,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature essential-extension($submodule,$module); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix-decorated(=e)",
-                "variants": [
-                    {
-                        "spell": "\\subseteq",
-                        "kind": "cs",
-                        "recognition": "low"
-                    },
-                    {
-                        "spell": "\\trianglelefteq",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "decorated-infix new shape; trianglelefteq collides with normal-subgroup (abstract-algebra) — flagged",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature essential-extension($submodule,$module); unreviewed."
         },
         {
             "concept": "essential-infimum",
@@ -9246,21 +8635,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature etale-cohomology($space); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "sub(=et)+sup(=*)+parens",
-                "variants": [
-                    {
-                        "spell": "H",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "constant-script et makes it reserved",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature etale-cohomology($space); unreviewed."
         },
         {
             "concept": "euclid-number",
@@ -9341,21 +8716,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature euler-characteristic($space); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "\\chi",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "joins dirichlet-character (batch 04) — the predicted chi pair is now real; medium as the dominant reading across math",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature euler-characteristic($space); unreviewed."
         },
         {
             "concept": "euler-class",
@@ -9374,21 +8735,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature euler-class($bundle); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "e",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "MISFIRE WARNING: e followed by parens reads as the constant e times an expression in calculus corpora — see buildFlags",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature euler-class($bundle); unreviewed."
         },
         {
             "concept": "euler-constant",
@@ -9669,26 +9016,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature exterior-algebra($space); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "\\Lambda",
-                        "kind": "cs",
-                        "recognition": "low"
-                    },
-                    {
-                        "spell": "\\bigwedge",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "Lambda variant pairs mangoldt (batch 04); bigwedge-apply distinctive",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature exterior-algebra($space); unreviewed."
         },
         {
             "concept": "exterior-derivative",
@@ -9727,21 +9055,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature exterior-product($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\wedge",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "wedge is ALSO logical-and (discrete batch will claim) — big split, flagged",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature exterior-product($x,$y); unreviewed."
         },
         {
             "concept": "f-distribution",
@@ -9784,12 +9098,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature faber-polynomial($number); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "mathrm{P}_n — upright-vs-italic too subtle (cullen precedent); Latin + plain sub in effect",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature faber-polynomial($number); unreviewed."
         },
         {
             "concept": "falling-factorial",
@@ -10046,21 +9355,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature fibonacci-polynomial($number,$value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(index)+parens",
-                "variants": [
-                    {
-                        "spell": "F",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "Bessel shape stays tagged (contrast fibonacci-number route-one, batch 04)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature fibonacci-polynomial($number,$value); unreviewed."
         },
         {
             "concept": "fibre-product",
@@ -10534,21 +9829,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature fractional-part($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "frac",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "claims ONLY frac(x); the braces form {x} omitted — singleton-set surface (saturated, CDF precedent)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature fractional-part($value); unreviewed."
         },
         {
             "concept": "franel-number",
@@ -10710,21 +9991,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature free-monoid($set); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=*)",
-                "variants": [
-                    {
-                        "spell": "*",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "star sup web — this is also the Kleene-star reading (discrete batch)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature free-monoid($set); unreviewed."
         },
         {
             "concept": "free-product",
@@ -10821,21 +10088,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature frobenius-inner-product($a,$b); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 2,
-                "argShape": "langlepair+1comma+sub(=F)",
-                "variants": [
-                    {
-                        "spell": "\\langle",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "constant-sub F makes it reserved; greedy-langle coordination flag (batch 03)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature frobenius-inner-product($a,$b); unreviewed."
         },
         {
             "concept": "frobenius-norm",
@@ -10854,21 +10107,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature frobenius-norm($matrix); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 1,
-                "argShape": "normpair+sub(=F)",
-                "variants": [
-                    {
-                        "spell": "\\|",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "LEGACY COORDINATION: scripted sibling of curated norm",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature frobenius-norm($matrix); unreviewed."
         },
         {
             "concept": "frolicher-nijenhuis-bracket",
@@ -11093,21 +10332,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature galois-group($field); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Gal",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature galois-group($field); unreviewed."
         },
         {
             "concept": "gamma-distribution",
@@ -11373,21 +10598,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature gegenbauer-polynomial($degree,$order,$value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 3,
-                "argShape": "sub(degree)+sup(parenthesized)+parens",
-                "variants": [
-                    {
-                        "spell": "C",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "ortho-poly shape (new): the parenthesized-sup script is the distinctive signal",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature gegenbauer-polynomial($degree,$order,$value); unreviewed."
         },
         {
             "concept": "gelfand-triple",
@@ -11629,21 +10840,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature geometric-genus($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "sub(=g)+parens",
-                "variants": [
-                    {
-                        "spell": "p",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "constant-script g",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature geometric-genus($value); unreviewed."
         },
         {
             "concept": "geometric-integral",
@@ -11707,12 +10904,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature geometric-product($x,$y); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "documented tex is bare juxtaposition XY — multiplication surface, hopeless",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature geometric-product($x,$y); unreviewed."
         },
         {
             "concept": "germ",
@@ -11872,26 +11064,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature gram-determinant($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "G",
-                        "kind": "letters",
-                        "recognition": "low"
-                    },
-                    {
-                        "spell": "\\Gamma",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "Gamma variant collides with pilot gamma-function (same surface) — multi-candidate",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature gram-determinant($value); unreviewed."
         },
         {
             "concept": "gram-matrix",
@@ -11909,12 +11082,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "bare G",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "grassmannian",
@@ -11970,12 +11138,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "bare G",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "group-algebra",
@@ -12133,26 +11296,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature hadamard-product($matrix,$other); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\circ",
-                        "kind": "cs",
-                        "recognition": "low"
-                    },
-                    {
-                        "spell": "\\odot",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "circ pairs composition (medium/low split); odot fairly reserved",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature hadamard-product($matrix,$other); unreviewed."
         },
         {
             "concept": "hahn-polynomial",
@@ -12605,21 +11749,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature height-of-prime-ideal($ideal); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "ht",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature height-of-prime-ideal($ideal); unreviewed."
         },
         {
             "concept": "heisenberg-group",
@@ -12715,26 +11845,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature hermitian-conjugate($matrix); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=H)",
-                "variants": [
-                    {
-                        "spell": "H",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    },
-                    {
-                        "spell": "\\dagger",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "NEAR-DUPLICATE of conjugate-transpose — reconcile (zeta precedent)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature hermitian-conjugate($matrix); unreviewed."
         },
         {
             "concept": "heronian-mean",
@@ -12844,12 +11955,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature hexadecimal($number); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "x_16 / x_hex — base-subscript saturated by indexing (see duodecimal)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature hexadecimal($number); unreviewed."
         },
         {
             "concept": "hilbert-schmidt-norm",
@@ -13108,21 +12214,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature homology-group($number,$space); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(number)+parens",
-                "variants": [
-                    {
-                        "spell": "H",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "H-sub-parens is strongly homology in topology; relative-homology is the arity-3 sibling",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature homology-group($number,$space); unreviewed."
         },
         {
             "concept": "homomorphic-product",
@@ -13413,12 +12505,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature hyperdeterminant($matrix); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "documented ONLY with det(A) and |A| — surfaces owned by determinant; upstream documentation gives it no distinguishing notation",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature hyperdeterminant($matrix); unreviewed."
         },
         {
             "concept": "hyperfactorial",
@@ -13544,12 +12631,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "bare I / I_n — Latin atom and Latin + plain sub; famous but shape-hopeless (fibonacci logic)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "igusa-zeta-function",
@@ -14103,21 +13185,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature inner-automorphism-group($group); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Inn",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature inner-automorphism-group($group); unreviewed."
         },
         {
             "concept": "inner-jordan-measure",
@@ -14267,12 +13335,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature intersection-number($x,$y); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "X cdot Y — multiplication-dot surface, saturated",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature intersection-number($x,$y); unreviewed."
         },
         {
             "concept": "inverse-image",
@@ -14459,26 +13522,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature isomorphism($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\cong",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    },
-                    {
-                        "spell": "\\xrightarrow{\\sim}",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "cong shared with congruence-relation and geometric congruence — isomorphism medium as dominant algebra reading; decorated-arrow variant distinctive",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature isomorphism($x,$y); unreviewed."
         },
         {
             "concept": "isotropy-group",
@@ -14615,21 +13659,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature jacobi-polynomial($degree,$alpha,$beta,$value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 4,
-                "argShape": "sub(degree)+sup(parenthesized)+parens",
-                "variants": [
-                    {
-                        "spell": "P",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "ortho-poly shape",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature jacobi-polynomial($degree,$alpha,$beta,$value); unreviewed."
         },
         {
             "concept": "jacobi-symbol",
@@ -14870,21 +13900,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature jordan-block($size,$eigenvalue); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(size)+parens",
-                "variants": [
-                    {
-                        "spell": "J",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "J sub+parens now 3-way (bessel-j batch 01, jordan-totient batch 04)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature jordan-block($size,$eigenvalue); unreviewed."
         },
         {
             "concept": "jordan-measure",
@@ -15070,21 +14086,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature kernel($function); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "ker",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature kernel($function); unreviewed."
         },
         {
             "concept": "khinchin-constant",
@@ -15285,21 +14287,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature kodaira-dimension($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "\\kappa",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "kappa apply — sibling of kappa_n cumulant (batch 03, F5 sub)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature kodaira-dimension($value); unreviewed."
         },
         {
             "concept": "kolmogorov-complexity",
@@ -15375,21 +14363,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature krawtchouk-polynomial($degree,$value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(degree)+parens",
-                "variants": [
-                    {
-                        "spell": "K",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "pairs modified-bessel K_nu (batch 01) on the K sub+parens surface",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature krawtchouk-polynomial($degree,$value); unreviewed."
         },
         {
             "concept": "kripke-frame",
@@ -15449,21 +14423,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature kronecker-product($a,$b); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\otimes",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "otimes shared with tensor-product — tensor is the dominant reading (medium/low split)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature kronecker-product($a,$b); unreviewed."
         },
         {
             "concept": "kronecker-symbol",
@@ -15516,21 +14476,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature krull-dimension($ring); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "dim",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "SHARES dim with dimension (this batch, high) — undecidable by surface, pair with reconcile note",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature krull-dimension($ring); unreviewed."
         },
         {
             "concept": "kulkarni-nomizu-product",
@@ -15648,21 +14594,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature laguerre-polynomial($degree,$value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(degree)+parens",
-                "variants": [
-                    {
-                        "spell": "L",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "Bessel shape; L generic",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature laguerre-polynomial($degree,$value); unreviewed."
         },
         {
             "concept": "lambert-w-function",
@@ -15974,21 +14906,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature left-composition($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": ";",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "semicolon as deliberate infix — rare; relation-algebra convention",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature left-composition($x,$y); unreviewed."
         },
         {
             "concept": "left-derivative",
@@ -16359,21 +15277,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature lie-superbracket($x,$y); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 2,
-                "argShape": "bracket+1comma",
-                "variants": [
-                    {
-                        "spell": "[",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "bracket-pair web (whitehead, nijenhuis-richardson, commutator-subgroup)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature lie-superbracket($x,$y); unreviewed."
         },
         {
             "concept": "like-charge",
@@ -16455,21 +15359,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature linear-span($set); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "span",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature linear-span($set); unreviewed."
         },
         {
             "concept": "link",
@@ -16588,12 +15478,7 @@
             "order": [
                 "b",
                 "a"
-            ],
-            "signature": {
-                "family": "route-one",
-                "notes": "S^{-1}R — composed inverse-times-juxtaposition (composed-expression rule)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            ]
         },
         {
             "concept": "logarithmic-integral",
@@ -16996,21 +15881,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature macdonald-polynomial($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "sub(=lambda)+parens+semicolon",
-                "variants": [
-                    {
-                        "spell": "P",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "semicolon-fence flag; Greek constant-script",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature macdonald-polynomial($value); unreviewed."
         },
         {
             "concept": "mahalanobis-distance",
@@ -17262,12 +16133,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature matrix-exponential($matrix); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "e^A / exp(A) — surfaces owned by scalar power and exp",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature matrix-exponential($matrix); unreviewed."
         },
         {
             "concept": "matrix-logarithm",
@@ -17286,12 +16152,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature matrix-logarithm($matrix); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "log(A) — surface owned by scalar log",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature matrix-logarithm($matrix); unreviewed."
         },
         {
             "concept": "matsumoto-zeta-function",
@@ -17405,21 +16266,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature meixner-pollaczek-polynomial($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "sub(degree)+sup(parenthesized)+parens+semicolon",
-                "variants": [
-                    {
-                        "spell": "P",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "NEAR-DUPLICATE shape of pollaczek-polynomial — semicolon args distinguish; reconcile note",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature meixner-pollaczek-polynomial($value); unreviewed."
         },
         {
             "concept": "meixner-polynomial",
@@ -18049,21 +16896,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature modulo($value,$modulus); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix-pmod",
-                "variants": [
-                    {
-                        "spell": "mod",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "mod token reserved; arity 2 (contrast functional-congruence arity 3)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature modulo($value,$modulus); unreviewed."
         },
         {
             "concept": "moment",
@@ -18221,21 +17054,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature moore-penrose-inverse($matrix); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=+)",
-                "variants": [
-                    {
-                        "spell": "+",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "MISFIRE WARNING: x^+ is positive-part max(x,0) in analysis — see buildFlags",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature moore-penrose-inverse($matrix); unreviewed."
         },
         {
             "concept": "moore-smith-sequence",
@@ -18345,21 +17164,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature multiplicative-inverse($value); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=-1)",
-                "variants": [
-                    {
-                        "spell": "-1",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "sup(-1) is read as inverse universally but WHICH inverse (multiplicative/function/matrix) is context — low, undecidable; 1/x fraction variant omitted (every fraction)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature multiplicative-inverse($value); unreviewed."
         },
         {
             "concept": "multiplicative-order",
@@ -18378,21 +17183,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature multiplicative-order($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens|sub(value)",
-                "variants": [
-                    {
-                        "spell": "ord",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run; documented both apply and sub",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature multiplicative-order($value); unreviewed."
         },
         {
             "concept": "multiplier-algebra",
@@ -18517,12 +17308,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature mutation($algebra,$element); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "A_y: Latin + plain sub",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature mutation($algebra,$element); unreviewed."
         },
         {
             "concept": "mutual-information",
@@ -18765,21 +17551,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature neron-severi-group($variety); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "NS",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "niche run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature neron-severi-group($variety); unreviewed."
         },
         {
             "concept": "neron-tate-height",
@@ -18841,21 +17613,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature nijenhuis-richardson-bracket($a,$b); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 2,
-                "argShape": "bracket+1comma",
-                "variants": [
-                    {
-                        "spell": "[",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "bracket-pair web",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature nijenhuis-richardson-bracket($a,$b); unreviewed."
         },
         {
             "concept": "nome",
@@ -19008,21 +17766,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature nuclear-norm($matrix); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 1,
-                "argShape": "normpair+sub(=*)",
-                "variants": [
-                    {
-                        "spell": "\\|",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "LEGACY COORDINATION: scripted sibling of curated norm",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature nuclear-norm($matrix); unreviewed."
         },
         {
             "concept": "null-graph",
@@ -19206,21 +17950,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "F7",
-                "sigArity": 0,
-                "argShape": "atom",
-                "variants": [
-                    {
-                        "spell": "\\mathbb{O}",
-                        "kind": "cs",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "blackboard-O reserved; bare O variant omitted (letter atom)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "odds-ratio",
@@ -19479,21 +18209,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature orthogonal($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\perp",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "perp web now 3-way real (independence batch 03, coprime batch 04) — orthogonal medium as the dominant reading",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature orthogonal($x,$y); unreviewed."
         },
         {
             "concept": "orthogonal-group",
@@ -20041,21 +18757,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature permanent($matrix); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "perm",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature permanent($matrix); unreviewed."
         },
         {
             "concept": "permutation",
@@ -20131,26 +18833,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature pfaffian($matrix); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Pf",
-                        "kind": "letters",
-                        "recognition": "high"
-                    },
-                    {
-                        "spell": "pf",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature pfaffian($matrix); unreviewed."
         },
         {
             "concept": "ph",
@@ -20229,21 +18912,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature picard-group($space); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Pic",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature picard-group($space); unreviewed."
         },
         {
             "concept": "planck-constant",
@@ -20466,21 +19135,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature pollaczek-polynomial($degree,$value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(degree)+sup(parenthesized)+parens",
-                "variants": [
-                    {
-                        "spell": "P",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "NEAR-DUPLICATE of meixner-pollaczek shape — reconcile note",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature pollaczek-polynomial($degree,$value); unreviewed."
         },
         {
             "concept": "polygamma-function",
@@ -21155,12 +19810,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature pseudo-inner-product($x,$y); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "(x, y) — parenthesized pair surface (hilbert-symbol precedent)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature pseudo-inner-product($x,$y); unreviewed."
         },
         {
             "concept": "pseudovector",
@@ -21487,12 +20137,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature quadruple-product($a,$b,$c,$d); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "(a x b)·(c x d) — composed expression of cross/dot products",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature quadruple-product($a,$b,$c,$d); unreviewed."
         },
         {
             "concept": "quantum-dilogarithm",
@@ -21786,12 +20431,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature ramification-index($value); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "e_p: Latin + plain sub — e_p is also basis-vector notation everywhere",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature ramification-index($value); unreviewed."
         },
         {
             "concept": "ramp-function",
@@ -21863,31 +20503,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature rank($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "rank",
-                        "kind": "letters",
-                        "recognition": "high"
-                    },
-                    {
-                        "spell": "rk",
-                        "kind": "letters",
-                        "recognition": "high"
-                    },
-                    {
-                        "spell": "r",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "rank/rk reserved; bare r generic",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature rank($value); unreviewed."
         },
         {
             "concept": "real-analytic-eisenstein-series",
@@ -22106,26 +20722,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature reciprocal-polynomial($value); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 1,
-                "argShape": "sup(=*)",
-                "variants": [
-                    {
-                        "spell": "*",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    },
-                    {
-                        "spell": "R",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "star sup web; R-sup rare",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature reciprocal-polynomial($value); unreviewed."
         },
         {
             "concept": "rectangular-function",
@@ -22223,21 +20820,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature relative-homology($degree,$space,$subspace); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 3,
-                "argShape": "sub(degree)+parens",
-                "variants": [
-                    {
-                        "spell": "H",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "arity-3 sibling of homology-group — two parens args separate them",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature relative-homology($degree,$space,$subspace); unreviewed."
         },
         {
             "concept": "renyi-entropy",
@@ -22457,26 +21040,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature resultant($p,$q); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "res",
-                        "kind": "letters",
-                        "recognition": "high"
-                    },
-                    {
-                        "spell": "Res",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "Res also residue (complex analysis) — arity 2 vs residue arity 1-2 partially separates; medium",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature resultant($p,$q); unreviewed."
         },
         {
             "concept": "rewrite-rule",
@@ -23146,21 +21710,7 @@
             "order": [
                 "b",
                 "a"
-            ],
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(direction)+juxta",
-                "variants": [
-                    {
-                        "spell": "comp",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "comp_b reserved in calculus textbooks; the a_b bare-sub variant omitted (generic)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            ]
         },
         {
             "concept": "scalar-triple-product",
@@ -23181,21 +21731,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature scalar-triple-product($a,$b,$c); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 3,
-                "argShape": "bracket+2comma",
-                "variants": [
-                    {
-                        "spell": "[",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "claims ONLY the bracket form (pairs associator); the composed cdot-cross form omitted — composed-expression rule",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature scalar-triple-product($a,$b,$c); unreviewed."
         },
         {
             "concept": "scaled-riemann-theta-function",
@@ -23298,12 +21834,7 @@
             "order": [
                 "b",
                 "a"
-            ],
-            "signature": {
-                "family": "route-one",
-                "notes": "M/A — slash is division surface, saturated",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            ]
         },
         {
             "concept": "schur-multiplier",
@@ -23342,21 +21873,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature schur-polynomial($partition,$variables); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(partition)+parens",
-                "variants": [
-                    {
-                        "spell": "s",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "s_lambda reserved-ish in symmetric functions; s generic",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature schur-polynomial($partition,$variables); unreviewed."
         },
         {
             "concept": "schwartz-space",
@@ -23522,21 +22039,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "F7",
-                "sigArity": 0,
-                "argShape": "atom",
-                "variants": [
-                    {
-                        "spell": "\\mathbb{S}",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "blackboard-S also sphere/sphere-spectrum (geometry-topology) — multi-candidate future",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "selberg-integral",
@@ -23615,21 +22118,7 @@
             "order": [
                 "b",
                 "a"
-            ],
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(predicate)+parens",
-                "variants": [
-                    {
-                        "spell": "\\sigma",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "relational-algebra selection — sigma scripted sibling of the sigma web",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            ]
         },
         {
             "concept": "seminorm",
@@ -23648,12 +22137,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature seminorm($value); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "||x|| / |x| — surfaces owned by curated norm and magnitude (legacy matchers already offer those)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature seminorm($value); unreviewed."
         },
         {
             "concept": "set-of-invertible-maps",
@@ -23672,12 +22156,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature set-of-invertible-maps($value); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "!x prefix bang — the prefix-bang surface is dominated by subfactorial !n (derangements; discrete batch will claim it)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature set-of-invertible-maps($value); unreviewed."
         },
         {
             "concept": "seven-dimensional-cross-product",
@@ -23697,12 +22176,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature seven-dimensional-cross-product($a,$b); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "x times y — the times surface belongs to cross-product/multiplication generally",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature seven-dimensional-cross-product($a,$b); unreviewed."
         },
         {
             "concept": "shannon-entropy",
@@ -23772,21 +22246,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature shimura-variety($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Sh",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "niche run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature shimura-variety($value); unreviewed."
         },
         {
             "concept": "shintani-zeta-function",
@@ -24238,21 +22698,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature socle($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "soc",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature socle($value); unreviewed."
         },
         {
             "concept": "soft-o",
@@ -24404,21 +22850,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature spectral-norm($matrix); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 1,
-                "argShape": "normpair+sub(=2)",
-                "variants": [
-                    {
-                        "spell": "\\|",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "LEGACY COORDINATION: scripted sibling of curated norm; sub 2 is also the L2 norm reading — same speech either way in practice, note for build",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature spectral-norm($matrix); unreviewed."
         },
         {
             "concept": "spectral-radius",
@@ -24507,12 +22939,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature spectrum-of-algebra($value); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "A-hat — hat web NICHE member (see buildFlags hat-web line; unit-vector is the tagged strong member)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature spectrum-of-algebra($value); unreviewed."
         },
         {
             "concept": "spectrum-of-matrix",
@@ -24531,21 +22958,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature spectrum-of-matrix($matrix); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "\\sigma",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "NEAR-DUPLICATE of batch-02 spectrum (both claim sigma of an operator/matrix) — reconcile, zeta precedent; sigma web member",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature spectrum-of-matrix($matrix); unreviewed."
         },
         {
             "concept": "spectrum-of-ring",
@@ -24564,21 +22977,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature spectrum-of-ring($ring); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Spec",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature spectrum-of-ring($ring); unreviewed."
         },
         {
             "concept": "spherical-bessel-function-of-third-kind",
@@ -24847,21 +23246,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature standard-flattening($tensor,$number); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 2,
-                "argShape": "sub(bracketed)",
-                "variants": [
-                    {
-                        "spell": "\\mathbf{A}",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "bracketed-sub decoration is the distinctive signal; anchor is variable — shape-anchored claim",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature standard-flattening($tensor,$number); unreviewed."
         },
         {
             "concept": "stanley-reisner-ideal",
@@ -24880,12 +23265,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature stanley-reisner-ideal($complex); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "I_Delta: Latin anchor + sub — the ruling keys on the ANCHOR alphabet",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature stanley-reisner-ideal($complex); unreviewed."
         },
         {
             "concept": "stanley-reisner-ring",
@@ -24909,21 +23289,7 @@
             "order": [
                 "b",
                 "a"
-            ],
-            "signature": {
-                "family": "F7",
-                "sigArity": 2,
-                "argShape": "composite",
-                "variants": [
-                    {
-                        "spell": "k[\\Delta]",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "CONTENT-CONDITIONAL (cyclotomic-field precedent): the bracket-adjunction surface k[x] is general polynomial-ring; the Delta content makes it Stanley-Reisner",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            ]
         },
         {
             "concept": "star-game",
@@ -25018,21 +23384,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature stiefel-whitney-class($bundle); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "w",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "w(·) pair with winding-number",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature stiefel-whitney-class($bundle); unreviewed."
         },
         {
             "concept": "stieltjes-wigert-polynomial",
@@ -25514,26 +23866,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature symmetric-algebra($module); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Sym",
-                        "kind": "letters",
-                        "recognition": "high"
-                    },
-                    {
-                        "spell": "S",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "Sym reserved; bare S generic",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature symmetric-algebra($module); unreviewed."
         },
         {
             "concept": "symmetric-difference",
@@ -25629,21 +23962,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature szego-polynomial($n,$value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "sub(n)+parens",
-                "variants": [
-                    {
-                        "spell": "\\phi",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "Greek+sub+parens; phi generic",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature szego-polynomial($n,$value); unreviewed."
         },
         {
             "concept": "t-hooft-symbol",
@@ -25904,26 +24223,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature tensor-algebra($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "T",
-                        "kind": "letters",
-                        "recognition": "low"
-                    },
-                    {
-                        "spell": "T^\\bullet",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "T(·) 3-way INSIDE this batch (torsion-submodule, thom-space); bullet-sup variant distinctive",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature tensor-algebra($value); unreviewed."
         },
         {
             "concept": "tensor-product",
@@ -25943,21 +24243,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature tensor-product($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": "\\otimes",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    }
-                ],
-                "notes": "otimes dominant reading; kronecker-product is the matrix-specific sibling (medium/low split)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature tensor-product($x,$y); unreviewed."
         },
         {
             "concept": "tensor-product-of-graphs",
@@ -26001,21 +24287,7 @@
             "order": [
                 "b",
                 "a"
-            ],
-            "signature": {
-                "family": "F5",
-                "sigArity": 2,
-                "argShape": "prescript",
-                "variants": [
-                    {
-                        "spell": "{}^{n}",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "prescripts flag (batch 02); MISFIRE WARNING: collides with isotope prescripts {}^{14}C — chemistry batch; see buildFlags",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            ]
         },
         {
             "concept": "therefore-sign",
@@ -26072,26 +24344,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature thom-space($value); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "Th",
-                        "kind": "letters",
-                        "recognition": "medium"
-                    },
-                    {
-                        "spell": "T",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "T(·) 3-way in this batch",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature thom-space($value); unreviewed."
         },
         {
             "concept": "thompson-group",
@@ -26129,21 +24382,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature to($x,$y); unreviewed.",
-            "signature": {
-                "family": "F4",
-                "sigArity": 2,
-                "argShape": "infix",
-                "variants": [
-                    {
-                        "spell": ":",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "ratio colon — collides with such-that, time notation, type annotation; low",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature to($x,$y); unreviewed."
         },
         {
             "concept": "todd-class",
@@ -26276,21 +24515,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature torsion-submodule($module); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "T",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "T(·) 3-way in this batch",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature torsion-submodule($module); unreviewed."
         },
         {
             "concept": "torsion-tensor",
@@ -26944,21 +25169,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature unit-vector($vector); unreviewed.",
-            "signature": {
-                "family": "F6",
-                "sigArity": 1,
-                "argShape": "accent(hat)",
-                "variants": [
-                    {
-                        "spell": "\\hat",
-                        "kind": "cs",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "hat web member — the strong famous reading alongside fourier/estimator (see buildFlags hat-web line); spectrum-of-algebra stays route-one as the niche member",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature unit-vector($vector); unreviewed."
         },
         {
             "concept": "unitary-group",
@@ -27294,21 +25505,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature vector-projection($vector); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "proj",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run (documented arity 1 as-is, though proj_b(a) is the commoner classroom form — tagged per documentation)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature vector-projection($vector); unreviewed."
         },
         {
             "concept": "vectorization",
@@ -27327,21 +25524,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature vectorization($matrix); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "vec",
-                        "kind": "letters",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "reserved run as an APPLY; \\vec as accent is a different surface",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature vectorization($matrix); unreviewed."
         },
         {
             "concept": "versor",
@@ -27818,21 +26001,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature whitehead-bracket($x,$y); unreviewed.",
-            "signature": {
-                "family": "F2",
-                "sigArity": 2,
-                "argShape": "bracket+1comma",
-                "variants": [
-                    {
-                        "spell": "[",
-                        "kind": "unicode",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "bracket-pair web",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature whitehead-bracket($x,$y); unreviewed."
         },
         {
             "concept": "whitehead-group",
@@ -28040,12 +26209,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature wilson-polynomial($degree); unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "W_n: Latin + plain sub (consistent with woodall/wiener)",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature wilson-polynomial($degree); unreviewed."
         },
         {
             "concept": "wilson-quotient",
@@ -28097,26 +26261,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature winding-number($curve); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 1,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "\\mathcal{N}",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    },
-                    {
-                        "spell": "w",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "mathcal-N distinctive; w pairs stiefel-whitney",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature winding-number($curve); unreviewed."
         },
         {
             "concept": "window-function",
@@ -28351,26 +26496,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature wronskian($f,$g); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 2,
-                "argShape": "parens",
-                "variants": [
-                    {
-                        "spell": "\\mathcal{W}",
-                        "kind": "cs",
-                        "recognition": "medium"
-                    },
-                    {
-                        "spell": "W",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "W arity-2 — lambert/wilson-quotient are arity-1 W(·); arity separates",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature wronskian($f,$g); unreviewed."
         },
         {
             "concept": "wythoff-symbol",
@@ -28461,12 +26587,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "route-one",
-                "notes": "bare Z",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "z-matrix-molecule",
@@ -28526,21 +26647,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature zernike-polynomial($n,$m,$rho,$phi); unreviewed.",
-            "signature": {
-                "family": "F3",
-                "sigArity": 4,
-                "argShape": "sub(n)+sup(m)+parens",
-                "variants": [
-                    {
-                        "spell": "Z",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "full multi-script shape distinctive; Z generic",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature zernike-polynomial($n,$m,$rho,$phi); unreviewed."
         },
         {
             "concept": "zero-ideal",
@@ -28578,26 +26685,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature zero-matrix($m,$n); unreviewed.",
-            "signature": {
-                "family": "F5",
-                "sigArity": 2,
-                "argShape": "sub(dims)",
-                "variants": [
-                    {
-                        "spell": "0",
-                        "kind": "unicode",
-                        "recognition": "medium"
-                    },
-                    {
-                        "spell": "O",
-                        "kind": "letters",
-                        "recognition": "low"
-                    }
-                ],
-                "notes": "digit-anchor with dimension sub is distinctive; O variant collides with orthogonal-group O_n (abstract-algebra) — flagged",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature zero-matrix($m,$n); unreviewed."
         },
         {
             "concept": "zero-morphism",
@@ -28671,26 +26759,7 @@
                 }
             },
             "macro": null,
-            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed.",
-            "signature": {
-                "family": "F7",
-                "sigArity": 0,
-                "argShape": "atom",
-                "variants": [
-                    {
-                        "spell": "\\mathbf{0}",
-                        "kind": "cs",
-                        "recognition": "high"
-                    },
-                    {
-                        "spell": "\\vec{0}",
-                        "kind": "cs",
-                        "recognition": "high"
-                    }
-                ],
-                "notes": "bold/arrowed zero reserved",
-                "provenance": "[CLAUDE 2026-08-27 batch-05] [NICHOLAS"
-            }
+            "notes": "Bulk import from open list (dginev/mathml-intent-open@016575a 2026-08-07); signature None; unreviewed."
         },
         {
             "concept": "zeta-function",

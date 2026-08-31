@@ -4986,12 +4986,11 @@ async function runConversion() {
 
     // Cleanup-on-convert ran over a copy of the source, so warning line
     // numbers refer to the cleaned text, not the editor content.
-    const cleanupCount = lastCleanupReplacements();
-    if (cleanupCount > 0) {
+    if (lastCleanupReplacements > 0) {
       warnings.unshift({
         line: null, column: null, level: 'warn',
-        message: 'Cleanup was applied before conversion (' + cleanupCount +
-          ' replacement' + (cleanupCount === 1 ? '' : 's') +
+        message: 'Cleanup was applied before conversion (' + lastCleanupReplacements +
+          ' replacement' + (lastCleanupReplacements === 1 ? '' : 's') +
           ') — line numbers listed may not match line numbers in the original.',
         matchedText: null, type: 'cleanup'
       });
@@ -5181,24 +5180,15 @@ const { updateLog } = initLogDisplay({ editor });
 // ════════════════════════════════════════════════════════════════════
 // CLEANUP ENGINE — cleanup/cleanup-engine.js
 // ════════════════════════════════════════════════════════════════════
-const { getSourceForConversion, populateCleanupFromWarnings,
-        maybeExportProfileWithOutput, renderCleanupUI,
-        lastCleanupReplacements } = initCleanupEngine({ editor, updateStatus });
+const { getSourceForConversion, populateCleanupFromWarnings, maybeExportProfileWithOutput, renderCleanupUI } = initCleanupEngine({ editor, updateStatus });
 // ════════════════════════════════════════════════════════════════════
 // Smart — cleanup/smart-cleanup.js
 // ════════════════════════════════════════════════════════════════════
-// activateOutputTab is declared further down (it was SECTION 9), so it
-// must be passed lazily: an eager property would be read before the
-// binding exists.
-initSmartCleanup({ editor, updateStatus, updateLog,
-                   activateOutputTab: (...a) => activateOutputTab(...a) });
+initSmartCleanup({ editor, updateStatus, updateLog, activateOutputTab });
 // ════════════════════════════════════════════════════════════════════
 // MathML INTENT — intent/intent-review.js
 // ════════════════════════════════════════════════════════════════════
-const { IntentReview, runIntentScan } = initIntentReview({
-  editor, updateStatus, updateLog,
-  activateOutputTab: (...a) => activateOutputTab(...a),
-});
+const { IntentReview, runIntentScan } = initIntentReview({ editor, updateStatus, updateLog, activateOutputTab });
 // ════════════════════════════════════════════════════════════════════
 // OUTPUT TABS — js/output-tabs.js
 // ════════════════════════════════════════════════════════════════════

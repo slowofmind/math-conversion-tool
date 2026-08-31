@@ -1,0 +1,101 @@
+// _probe-out-of-order.mjs — does applying findings OUT of document order
+// keep the bookkeeping correct? The shift loop skips findings that are no
+// longer 'pending', so an already-applied finding sitting AFTER a later
+// edit would not have its offsets updated. Undo is LIFO so it may never
+// matter — but I would rather know than assume.
+import { readFileSync, writeFileSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { JSDOM } from 'jsdom';
+
+const PLAT = 'C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion';
+const dom = new JSDOM(`<!doctype html><html><body><div id="host"></div>
+  <select id="opt-math"><option value="mathjax-mathml-intent" selected>x</option></select>
+  <div id="intentNav" hidden><span id="intentNavStatus"></span></div>
+  <div id="intentLive"></div>
+  <div id="intentPanel"><div id="intentPanelEmpty"></div>
+  <div id="intentPanelBody" hidden><div id="intentProgress"></div>
+  <h3 id="intentFindingHead"></h3><div id="intentNotes"></div>
+  <div id="intentChoices" role="radiogroup"></div>
+  <button id="btnIntentApply"></button><button id="btnIntentSkip"></button>
+  <button id="btnIntentUndo"></button></div></div>
+</body></html>`, { pretendToBeVisual: true });
+for (const k of ['window', 'document', 'navigator', 'HTMLElement', 'Element',
+                 'Node', 'Range', 'getComputedStyle', 'DOMParser',
+                 'MutationObserver', 'requestAnimationFrame', 'cancelAnimationFrame'])
+  if (globalThis[k] === undefined) globalThis[k] = dom.window[k];
+
+const { createEditor } = await import(
+  pathToFileURL(join(PLAT, 'codemirror', 'cm6-editor.js')).href);
+const editor = createEditor(dom.window.document.getElementById('host'), { initialText: '' });
+globalThis.editor = editor;
+globalThis.updateStatus = () => {};
+globalThis.updateLog = () => {};
+
+// The extracted module, imported directly (it used to be lifted out of
+// index.html by string search; the module is now a real file).
+const { initIntentReview } = await import(
+  pathToFileURL(join(PLAT, 'intent', 'intent-review.js')).href);
+const { IntentReview } = initIntentReview({
+  editor,
+  updateStatus: () => {},
+  updateLog: () => {},
+  activateOutputTab: () => {},
+});
+
+const sp = join(PLAT, 'cm6-src', '_oo-scan.mjs');
+writeFileSync(sp, readFileSync(join(PLAT, 'math-conversion', 'intent-scan.js')));
+const B = await import(pathToFileURL(sp).href);
+const vocab = JSON.parse(readFileSync(
+  join(PLAT, 'math-conversion', 'intent-vocabulary.json'), 'utf8'));
+const sv = B.suggestVocabFrom(vocab);
+const scan = (t) => {
+  const r = B.detect(t, sv.groups, new Set(B.groupIdsFrom(vocab)));
+  const f = B.filterFindings(r.kept, sv, { disabled: [] });
+  const pay = f.kept.map(x => B.buildSuggestions(x, t, sv));
+  for (const p of pay) { const lc = B.lineCol(t, p.start); p.line = lc.line; p.col = lc.col; }
+  return pay;
+};
+
+let pass = 0, fail = 0;
+const ok = (n, c, d) => { if (c) { pass++; console.log('   ok   ' + n); }
+  else { fail++; console.log('  FAIL  ' + n + (d !== undefined ? ' :: ' + d : '')); } };
+
+const DOC = 'A $|x|$ then B $|S|$ then C $|A|$ then D $\\|v\\|$ end.\n';
+editor.setText(DOC);
+const pay = scan(DOC);
+console.log(`\nfindings: ${pay.length}\n`);
+IntentReview.load(pay, DOC);
+
+// Apply the LAST finding first, then the FIRST — out of document order.
+const last = pay.length - 1;
+IntentReview.goTo(last); IntentReview.select(0); IntentReview.applyCurrent();
+const afterLast = editor.getText();
+ok('later finding applied', IntentReview.findings[last].status === 'applied');
+
+IntentReview.goTo(0); IntentReview.select(0); IntentReview.applyCurrent();
+ok('earlier finding applied', IntentReview.findings[0].status === 'applied');
+
+// THE QUESTION: does the already-applied later finding still point at its
+// own annotation, after an edit before it shifted everything?
+const L = IntentReview.findings[last];
+const at = editor.getRange(L.start, L.end);
+ok('already-applied finding still points at its own annotation',
+   at === L.appliedText, `range holds ${JSON.stringify(at)}, expected ${JSON.stringify(L.appliedText)}`);
+
+// Undo twice (LIFO) and confirm we land exactly back on the original.
+IntentReview.undoLast();
+IntentReview.undoLast();
+ok('two undos restore the original document exactly', editor.getText() === DOC,
+   JSON.stringify(editor.getText()));
+ok('both findings pending again',
+   IntentReview.findings.every(p => p.status === 'pending'));
+const drift = IntentReview.findings.filter(
+  p => editor.getRange(p.start, p.end) !== p.text);
+ok('no offsets drifted after the out-of-order undo', drift.length === 0,
+   drift.length ? JSON.stringify(drift[0].text) : '');
+
+console.log(`\nout-of-order: ${pass} passed, ${fail} failed`);
+unlinkSync(sp);   // `mp` went away when this suite stopped lifting the
+                  // module out of index.html and started importing it.
+process.exit(0);

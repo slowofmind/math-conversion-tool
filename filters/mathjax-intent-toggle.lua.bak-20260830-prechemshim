@@ -1276,7 +1276,7 @@ local VOCAB_ENTRIES = {
   { concept = 'string-concatenation', group = 'discrete', json = [==[{"open": "", "mid1": "concatenated with", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'strong-product', group = 'discrete', json = [==[{"open": "strong product of", "mid1": "and", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'struve-function', group = 'special-functions', json = [==[{"open": "struve function of order", "mid1": "at", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'student-t-distribution', group = 'probability-statistics', json = [==[{"open": "t distribution with", "close": "degrees of freedom"}]==], offjson = [==[{"off": true}]==] },
+  { concept = 'student-t-distribution', group = 'probability-statistics', json = [==[{"open": "student's t-distribution with", "close": "degrees of freedom"}]==], offjson = [==[{"off": true}]==] },
   { concept = 'subfactorial', group = 'discrete', json = [==[{"open": "subfactorial of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'subgroup', group = 'abstract-algebra-category', json = [==[{"open": "", "mid1": "is a subgroup of", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'succeeds-or-equals', group = 'discrete', json = [==[{"open": "", "mid1": "succeeds or equals", "close": ""}]==], offjson = [==[{"off": true}]==] },
@@ -1772,83 +1772,6 @@ local CUSTOM_EXTENSION_JS = [==[
     });
   }
 
-  // -------------------------------------------------------------------------
-  //  CHEM SHIM — mhchem noise removal, SRE PAYLOAD ONLY (2026-08-30)
-  //
-  //  SRE has no chemistry model. mhchem's output collides with three of its
-  //  heuristics, verified by probe against the golden speech path:
-  //    (a) UNIT GUESS. ClearSpeak's 'unit' annotator marks every implicit
-  //        multiplication as a possible unit, and then speaks UPRIGHT single
-  //        letters from the units dictionary: \ce{N2} -> "Newtons sub 2",
-  //        \ce{5m} -> "meters". Every element symbol is upright, so this fires
-  //        on essentially all chemistry. Fix: drop mathvariant="normal" from
-  //        <mi> inside chemistry payloads only.
-  //    (b) EMPTY NODES. mhchem pads a $...$ math escape with ~ spaces; those
-  //        serialize as whitespace-only <mtext> and are VOICED as "empty" when
-  //        an intent-wrapped relation restructures the parse ("... empty is in
-  //        equilibrium with empty ..."). Fix: drop whitespace-only <mtext>.
-  //    (c) FUNCTION GUESS. mhchem hangs scripts off a zero-width \vphantom{A}
-  //        instead of the element, and SRE reads the orphaned letter as an
-  //        applied function ("normal H OF sub 2"). Fix: re-attach the script to
-  //        the preceding element. This one is STRUCTURAL, so it runs behind
-  //        balanceOk() and is discarded whole if tag counts do not match --
-  //        a malformed payload would kill speech for the whole expression.
-  //
-  //  WHERE: the worker payload only (see wrapWorkerPostMessage). Never the
-  //  rendered tree, never the assistive MathML MathCAT reads, never the
-  //  document. MathCAT infers chemistry natively and must not be touched.
-  //
-  //  GATE: mhchem fingerprints. \ce in data-latex when present, the -mhchem
-  //  font variant on arrows, or the zero-width phantom construction. Genuine
-  //  units written OUTSIDE \ce (5 m + 3 kg) match none of these and keep their
-  //  unit speech -- there is a control fixture asserting exactly that.
-  // -------------------------------------------------------------------------
-  // >>> CHEM SHIM START (extracted verbatim by test/_probe-chemshim-unit.mjs)
-  //  v2 (2026-08-30, after live NVDA test of v1 showed NO effect).
-  //  WHAT THE LIVE CHANNEL ACTUALLY IS: MathJax enriches first and posts
-  //  ENRICHED MathML (item.outputData.mml) to the speech worker, which calls
-  //  SRE.worker.speech(mml, opts); the spoken string is result.label. On that
-  //  path SRE reads the semantic attributes, NOT the presentation markup —
-  //  so v1's mathvariant strip and phantom-restructure were inert. Verified
-  //  by test/_probe-worker-truth2.mjs, which reproduces the live strings.
-  //  THE TWO LEVERS THAT WORK LIVE:
-  //    (a) data-semantic-font="normal" -> drives the units dictionary
-  //        ("Newtons", "normal H"). Removing it inside chemistry restores
-  //        plain letters. NOTE: this is why the gate matters — removing it
-  //        from a genuine unit expression would turn "5 meters" into "5 m".
-  //    (b) whitespace-only <mtext> -> mhchem's ~ padding around a $...$
-  //        escape, voiced as "empty" once an intent-wrapped relation
-  //        restructures the parse.
-  //  Not fixed here: anything requiring pre-enrichment changes.
-  //  v3 adds (c): the "of" adjacency guess. Enrichment decides an element
-  //  letter is a FUNCTION APPLIED to what follows (H2O -> "H of sub 2 O"),
-  //  marking type=appl + role="simple function" and INSERTING an invisible
-  //  function-application <mo>. Probe test/_probe-of-residue.mjs: no single
-  //  edit clears it — all three must go together. Inside chemistry a function
-  //  application is never legitimate, so this is safe behind the gate.
-  var CHEM_FINGERPRINT = /\\ce\{|data-mjx-variant="-mhchem"|<mpadded[^>]*width="0"[^>]*>\s*<mphantom/;
-  var SEM_FONT_NORMAL = /\s*data-semantic-font="normal"/g;
-  var BLANK_MTEXT     = /<mtext\b[^>]*>(?:\s|&#xA0;|&#xa0;|&nbsp;|\u00A0)*<\/mtext>/g;
-  var APPL_MO         = /<mo\b[^>]*data-semantic-role="application"[^>]*>[\s\S]*?<\/mo>/g;
-  var ROLE_SIMPLEFUNC = /data-semantic-role="simple function"/g;
-  var TYPE_APPL       = /data-semantic-type="appl"/g;
-
-  function chemShim(str) {
-    try {
-      var s = String(str);
-      if (!CHEM_FINGERPRINT.test(s)) return str;      // not chemistry: untouched
-      s = s.replace(SEM_FONT_NORMAL, '');             // (a) unit / "normal" guess
-      s = s.replace(BLANK_MTEXT, '');                 // (b) "empty" nodes
-      s = s.replace(ROLE_SIMPLEFUNC, 'data-semantic-role="latinletter"')
-           .replace(TYPE_APPL, 'data-semantic-type="infixop"')
-           .replace(APPL_MO, '');                     // (c) "of" function guess
-      return s;
-    } catch (e) {
-      return str;                                     // never break the channel
-    }
-  }
-  // <<< CHEM SHIM END
-
   // DOM form, for parsed text nodes (literal characters in, literal out).
   var LITERAL_PUA = /[\uE000-\uF8FF]/g;
   function remapChemArrowsDom(el) {
@@ -1895,7 +1818,7 @@ local CUSTOM_EXTENSION_JS = [==[
       webworker.postMessage = function (msg) {
         try {
           if (msg && msg.data && typeof msg.data.mml === 'string') {
-            var fixed = chemShim(remapChemArrows(msg.data.mml));
+            var fixed = remapChemArrows(msg.data.mml);
             if (fixed !== msg.data.mml) {
               msg = Object.assign({}, msg, {
                 data: Object.assign({}, msg.data, { mml: fixed })
