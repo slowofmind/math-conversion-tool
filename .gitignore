@@ -1,1 +1,6 @@
 desktop.ini 
+
+# Pandoc WASM raw payload: ~56 MB published build artifact.
+# Only the gzipped pandoc-wasm.bin is committed (GitHub Pages serves it).
+# See pandoc-wasm/VERSIONS.md for provenance and update steps.
+pandoc-wasm/pandoc.wasm

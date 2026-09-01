@@ -107,7 +107,7 @@ const wasi = new WASI(args, env, fds, options);
 // (gzip it), update the sha1 cache-buster below, and re-apply this block
 // in place of the upstream instantiateStreaming call.
 // ════════════════════════════════════════════════════════════════════
-const WASM_SHA1 = "81325b24686ba020293da498958982a8caa7a102";
+const WASM_SHA1 = "ea6c0439152ba64cae0978a36d170885813fdd3e";   // pandoc 3.11 (2026-08-28)
 
 async function instantiatePandocWasm(imports) {
   if (typeof DecompressionStream === "function") {
@@ -134,10 +134,21 @@ async function instantiatePandocWasm(imports) {
       );
     }
   }
-  return await WebAssembly.instantiateStreaming(
-    fetch(new URL(`./pandoc.wasm?sha1=${WASM_SHA1}`, import.meta.url)),
-    imports
+  // Raw-wasm fallback. NOTE: pandoc.wasm is deliberately NOT committed to
+  // the repository (see pandoc-wasm/VERSIONS.md), so on a deployed site this
+  // path will 404. It exists for local checkouts that have the raw file.
+  const rawResp = await fetch(
+    new URL(`./pandoc.wasm?sha1=${WASM_SHA1}`, import.meta.url)
   );
+  if (!rawResp.ok) {
+    throw new Error(
+      "[pandoc.js] Could not load Pandoc. The compressed payload " +
+      "pandoc-wasm.bin failed to load, and the raw pandoc.wasm fallback " +
+      `returned ${rawResp.status}. pandoc-wasm.bin is required; regenerate ` +
+      "it with pandoc-wasm/compress-wasm.ps1 if it is missing."
+    );
+  }
+  return await WebAssembly.instantiateStreaming(rawResp, imports);
 }
 // ════════════════════════════════════════════════════════════════════
 // WASM-LOADER-END
