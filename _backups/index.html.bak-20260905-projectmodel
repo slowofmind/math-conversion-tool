@@ -234,106 +234,6 @@
     padding: 10px 12px;
   }
 
-  /* ─── LEFT RAIL TABS (Files / Cleanup) ─── */
-  .rail-tabs {
-    display: flex; flex-shrink: 0;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-secondary);
-  }
-  .rail-tab {
-    flex: 1; background: none; border: none; cursor: pointer;
-    padding: 8px 6px; font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .05em;
-    color: var(--text-muted); border-bottom: 2px solid transparent;
-  }
-  .rail-tab:hover { color: var(--text-primary); }
-  .rail-tab[aria-selected="true"] {
-    color: var(--text-primary); border-bottom-color: var(--harvard-blue);
-  }
-  .rail-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-  .rail-panel { flex: 1; display: none; flex-direction: column; overflow: hidden; }
-  .rail-panel.active { display: flex; }
-
-  /* ─── FILE TREE ─── */
-  .ft-toolbar {
-    display: flex; align-items: center; gap: 6px;
-    padding: 8px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0;
-  }
-  .ft-toolbar select { font-size: 11px; flex: 1; }
-  .ft-summary {
-    padding: 6px 10px; font-size: 11px; color: var(--text-secondary);
-    line-height: 1.4; border-bottom: 1px solid var(--border); flex-shrink: 0;
-  }
-  .ft-host { flex: 1; overflow: auto; padding: 4px 0 8px; }
-  .ft-host ul { list-style: none; margin: 0; padding: 0; }
-  .ft-host ul[role="group"] { padding-left: 14px; }
-  .ft-host li { outline: none; }
-  .ft-row {
-    display: flex; align-items: center; gap: 5px;
-    padding: 2px 10px; font-size: 12px; cursor: default; white-space: nowrap;
-  }
-  .ft-host li:focus > .ft-row {
-    background: var(--bg-elevated); outline: 2px solid var(--accent); outline-offset: -2px;
-  }
-  .ft-host li[aria-selected="true"] > .ft-row { background: var(--bg-tertiary); }
-  .ft-twisty { width: 10px; text-align: center; color: var(--text-muted); font-size: 10px; }
-  .ft-icon { width: 15px; text-align: center; }
-  .ft-label { overflow: hidden; text-overflow: ellipsis; }
-  .ft-badge {
-    font-size: 9px; font-weight: 700; color: var(--harvard-blue);
-    border: 1px solid var(--harvard-blue); border-radius: 3px;
-    padding: 0 3px; margin-left: auto; flex-shrink: 0;
-  }
-  .ft-detail {
-    padding: 6px 10px; font-size: 11px; color: var(--text-muted);
-    border-top: 1px solid var(--border); flex-shrink: 0;
-    word-break: break-all; min-height: 15px;
-  }
-  .ft-empty { padding: 14px 10px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-  /* Excluded rows must be obvious WITHOUT relying on colour alone —
-     the strike-through and the toggle glyph both carry the state. */
-  .ft-excluded > .ft-row .ft-label { color: var(--text-muted); text-decoration: line-through; }
-  .ft-excluded > .ft-row .ft-icon { opacity: .45; }
-  .ft-toggle {
-    background: none; border: none; cursor: pointer; margin-left: auto;
-    color: var(--text-muted); font-size: 12px; line-height: 1;
-    padding: 0 2px; border-radius: 2px; flex-shrink: 0;
-  }
-  .ft-toggle:hover { color: var(--text-primary); background: var(--bg-tertiary); }
-  .ft-toggle.off { color: var(--error); }
-  .ft-toggle.partial { color: var(--warning); }
-  .ft-badge + .ft-toggle { margin-left: 4px; }
-  .ft-revert {
-    display: flex; align-items: center; gap: 5px; flex-shrink: 0;
-    padding: 5px 8px; border-top: 1px solid var(--border);
-    background: var(--bg-secondary);
-  }
-  .ft-revert select { font-size: 10px; flex: 1; min-width: 0; }
-  .ftr-file { font-size: 10px; color: var(--text-muted); max-width: 90px;
-              overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .ftr-file.dirty { color: var(--warning); font-weight: 700; }
-  .ft-dirty-dot { color: var(--warning); font-weight: 700; margin-left: 3px; }
-  .convert-target {
-    font-size: 11px; color: var(--text-secondary); margin-left: 6px;
-    max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .convert-target strong { color: var(--text-primary); font-weight: 700; }
-  .source-viewer-label {
-    padding: 5px 10px; font-size: 11px; background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border); color: var(--text-secondary);
-    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
-  }
-  .source-viewer-label .svl-name { font-weight: 700; color: var(--text-primary); }
-  .source-viewer-label button {
-    margin-left: auto; background: none; border: 1px solid var(--border);
-    color: var(--text-muted); border-radius: 3px; cursor: pointer;
-    font-size: 10px; padding: 1px 6px;
-  }
-  .source-viewer-label button:hover { color: var(--text-primary); }
-  @media (prefers-reduced-motion: reduce) {
-    .sidebar { transition: none; }
-  }
-
   .cleanup-section { margin-bottom: 14px; }
 
   .cleanup-section-label {
@@ -1312,11 +1212,6 @@
 
   <div class="toolbar-group">
     <button class="toolbar-btn primary" id="btnConvert" disabled>Convert</button>
-    <!-- Static text, NOT a live region: read on demand when a user
-         navigates here, silent otherwise. The separate #targetLive
-         region announces only SIDE-EFFECT changes. -->
-    <span class="convert-target" id="convertTargetLabel"></span>
-    <span class="sr-only" id="targetLive" role="status" aria-live="polite" aria-atomic="true"></span>
   </div>
 
   <div class="toolbar-divider"></div>
@@ -2049,52 +1944,12 @@
 <!-- ═══ MAIN AREA ═══ -->
 <main class="main-area" id="mainArea">
 
-  <!-- SIDEBAR: left rail — Files tree + LaTeX Cleanup -->
-  <aside class="sidebar collapsed" id="sidebar" role="complementary" aria-label="Project panel">
+  <!-- SIDEBAR: Cleanup Tool -->
+  <aside class="sidebar collapsed" id="sidebar" role="complementary" aria-label="LaTeX Cleanup">
     <div class="sidebar-header">
-      <span class="sidebar-title" id="railTitle">Project</span>
-      <button class="sidebar-close" id="sidebarClose" aria-label="Close panel">×</button>
+      <span class="sidebar-title">LaTeX Cleanup</span>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close cleanup sidebar">×</button>
     </div>
-
-    <div class="rail-tabs" role="tablist" aria-label="Project panel sections">
-      <button class="rail-tab" id="railtab-files" role="tab" aria-selected="true"
-              aria-controls="railPanelFiles" tabindex="0">Files</button>
-      <button class="rail-tab" id="railtab-cleanup" role="tab" aria-selected="false"
-              aria-controls="railPanelCleanup" tabindex="-1">Cleanup</button>
-    </div>
-
-    <!-- FILES ------------------------------------------------------->
-    <div class="rail-panel active" id="railPanelFiles" role="tabpanel"
-         aria-labelledby="railtab-files">
-      <div class="ft-toolbar">
-        <button class="toolbar-btn" id="ftAddFiles" style="font-size:11px; padding:3px 7px;"
-                title="Add individual files to the project">+ Files</button>
-        <button class="toolbar-btn" id="ftAddFolder" style="font-size:11px; padding:3px 7px;"
-                title="Add a whole project folder">+ Folder</button>
-        <label class="sr-only" for="fileTreeFilter">Filter project files</label>
-        <select id="fileTreeFilter"></select>
-      </div>
-      <!-- Spoken once on entering the tree via aria-describedby. Keep it
-           to one short sentence; never make it a live region. -->
-      <p class="ft-summary" id="fileTreeSummary"></p>
-      <div class="ft-host" id="fileTreeHost"></div>
-      <div class="ft-empty" id="fileTreeEmpty" hidden></div>
-      <div class="ft-detail" id="fileTreeDetail" aria-live="polite"></div>
-      <!-- Acts on the file currently in the EDITOR, not the tree
-           selection — restoring something you are not looking at would
-           be surprising. -->
-      <div class="ft-revert" id="fileTreeRevert" hidden>
-        <span class="ftr-file" id="ftrFile"></span>
-        <button class="toolbar-btn" id="ftCheckpoint" style="font-size:10px; padding:2px 6px;"
-                title="Remember the current state of this file so you can come back to it">Checkpoint</button>
-        <label class="sr-only" for="ftRestore">Restore this file to an earlier state</label>
-        <select id="ftRestore"></select>
-      </div>
-    </div>
-
-    <!-- CLEANUP ----------------------------------------------------->
-    <div class="rail-panel" id="railPanelCleanup" role="tabpanel"
-         aria-labelledby="railtab-cleanup">
     <div class="sidebar-body">
       <!-- Profile selector -->
       <div class="cleanup-section">
@@ -2180,7 +2035,6 @@
 
       <button class="cleanup-run-btn" id="btnRunCleanup">▶ Run Cleanup</button>
     </div>
-    </div>
   </aside>
 
   <!-- CENTER WRAP -->
@@ -2200,7 +2054,6 @@
         </div>
         <div class="sr-only" id="intentLive" role="status" aria-live="polite" aria-atomic="true"></div>
         <button class="toolbar-btn" id="btnSmartCleanup" title="Run automated preprocessing fixes on the source (ordered-list numbering)" style="font-size:12px; padding:3px 10px; margin-right:2px;">✨ Smart Cleanup</button>
-        <button class="toolbar-btn" id="btnFiles" title="Toggle the project files panel" aria-expanded="false" aria-controls="sidebar" style="font-size:12px; padding:3px 10px; margin-right:2px;">📁 Files</button>
         <button class="toolbar-btn" id="btnCleanup" title="Toggle cleanup sidebar" aria-expanded="false" aria-controls="sidebar" style="font-size:12px; padding:3px 10px; margin-right:2px;">🧹 Cleanup</button>
       </div>
       <div class="editor-content">
@@ -2244,7 +2097,6 @@
           </div>
         </div>
         <div class="tab-content" id="tabSource" role="tabpanel" aria-labelledby="outtab-source">
-          <div class="source-viewer-label" id="sourceViewerLabel" hidden></div>
           <div id="outputSource"></div>
         </div>
         <div class="tab-content" id="tabIntent" role="tabpanel" aria-labelledby="outtab-intent">
@@ -2307,106 +2159,6 @@ import { initIntentReview } from './intent/intent-review.js';
 import { initLogDisplay } from './js/log-display.js';
 import { initOutputTabs } from './js/output-tabs.js';
 import { initWarningParser } from './js/warning-parser.js';
-import { initProjectModel } from './project/project-model.js';
-import { initFileTree } from './filetree/file-tree.js';
-
-// ════════════════════════════════════════════════════════════════════
-// PROJECT MODEL (Stage 0) — project/project-model.js
-// The single description of "the project". resourceFiles.auxFiles is
-// now a PROJECTION of this model, rebuilt by syncAuxFiles() after every
-// mutation; every existing call site keeps reading auxFiles unchanged.
-// Design: ../file-tree-design/stage-0-project-model-spec.md
-// ════════════════════════════════════════════════════════════════════
-const projectModel = initProjectModel({ updateStatus: (...a) => updateStatus(...a) });
-
-// Rebuild the compatibility projection. MUST be called after every
-// model mutation and BEFORE anything reads resourceFiles.auxFiles
-// (handlePdfAuxFiles runs immediately after the upload handlers).
-function syncAuxFiles() {
-  resourceFiles.auxFiles = projectModel.toAuxFiles();
-  if (fileTree) fileTree.render({ expandNew: true });
-  refreshConvertTargetLabel();
-  if (typeof refreshCheckpointBar === 'function') refreshCheckpointBar();
-}
-
-// ════════════════════════════════════════════════════════════════════
-// FILE TREE (Stage 1) — filetree/file-tree.js
-// Read-only view of the project model. Re-rendered by syncAuxFiles(),
-// so every intake path refreshes it with no extra call sites.
-// ════════════════════════════════════════════════════════════════════
-const fileTree = initFileTree({
-  getEntries: () => projectModel.listEntries(),
-  getSummaryText: () => projectModel.summaryText(),
-  getTargetPath: () => projectModel.project.convertTargetPath,
-  getFolderState: (dir) => projectModel.folderIncludeState(dir),
-  onOpen: (entry) => openProjectFile(entry),
-  onToggleInclude: (path, kind) => {
-    // Stage 2. Exclusion is STICKY: convert() rebuilds the virtual
-    // filesystem from toAuxFiles() every run, so an excluded file is
-    // simply absent that run — nothing to clean up, nothing to leak.
-    if (kind === 'folder') {
-      const state = projectModel.folderIncludeState(path);
-      const include = state !== 'all';        // mixed -> include all
-      projectModel.setFolderInclude(path, include);
-      updateStatus('ready',
-        `${include ? 'Including' : 'Excluding'} everything in ${path || 'the project'}`);
-    } else {
-      const e = projectModel.getEntry(path);
-      if (!e) return;
-      const include = e.include === false;
-      projectModel.setInclude(path, include);
-      updateStatus('ready',
-        include ? `${path} will be included in conversion`
-                : `${path} will NOT be sent to pandoc — convert again to compare`);
-    }
-    syncAuxFiles();
-    renderAuxFileList();
-  },
-});
-
-// ════════════════════════════════════════════════════════════════════
-// STAGE 3/4 — viewing a file, and choosing what gets converted
-//
-// MIDDLE PATH (agreed 2026-09-05): opening a CONVERTIBLE file also makes
-// it the conversion target. Opening an image or a .sty changes nothing
-// but the viewer, so the same gesture never has a hidden side effect on
-// a file that could not be a target anyway.
-//
-// The target is ALWAYS stated next to the Convert button. Announcement
-// policy: an explicit action needs no announcement (the user just did
-// it), but a SIDE-EFFECT change does — so #targetLive fires only here,
-// where opening a file moved the target.
-// ════════════════════════════════════════════════════════════════════
-
-function refreshConvertTargetLabel() {
-  const el = document.getElementById('convertTargetLabel');
-  if (!el) return;
-  const p = projectModel.project.convertTargetPath;
-  if (!p) { el.textContent = ''; return; }
-  const from = document.getElementById('selFrom').value;
-  const to = document.getElementById('selTo').value;
-  el.innerHTML = `Converting <strong>${p.replace(/[&<>"]/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))}</strong> (${from} → ${to})`;
-  const btn = document.getElementById('btnConvert');
-  if (btn) btn.setAttribute('aria-label', `Convert ${p} to ${to}`);
-}
-
-// Debug hooks — LOCAL DEVELOPMENT ONLY. Gated on hostname so a deployed
-// copy never exposes the project model on window. In the console:
-//   dumpProject()
-if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' ||
-    location.protocol === 'file:') {
-  window.projectModel = projectModel;
-  window.dumpProject = () => {
-  const rows = [...projectModel.project.entries.values()].map(e =>
-    `${e.isMain ? 'MAIN ' : '     '}${e.path}  [${e.role}] src=${e.source} bytes=${e.bytes ? e.bytes.length : (e.text ? 'text:' + e.text.length : 'null')}`);
-  console.log('mainPath           :', projectModel.project.mainPath);
-  console.log('convertTargetPath  :', projectModel.project.convertTargetPath);
-  console.log('entries (' + rows.length + '):\n' + rows.join('\n'));
-  console.log('auxFiles keys      :', Object.keys(resourceFiles.auxFiles));
-  return projectModel.summaryText();
-  };
-}
 
 const editor = createEditor(document.getElementById('aceEditor'), {
   language: 'latex',
@@ -2686,10 +2438,8 @@ function updateStatus(state, text) {
 
 const fileInput = document.getElementById('fileInput');
 
-// Shared file upload handler (used by button upload and drag-and-drop).
-// pathHint carries the project-relative path when the caller knows it
-// (zip import), since a File object only exposes a bare basename.
-async function handleFileUpload(file, pathHint, opts = {}) {
+// Shared file upload handler (used by button upload and drag-and-drop)
+async function handleFileUpload(file) {
   if (!file) return;
 
   // Auto-detect format from extension
@@ -2711,12 +2461,7 @@ async function handleFileUpload(file, pathHint, opts = {}) {
   if (fmt && BINARY_INPUT_FORMATS.includes(fmt)) {
     // Binary input — store as blob, show overlay
     inputBinaryFile = { name: file.name, blob: file };
-    // The main document reaches pandoc as STDIN (or input-files), never
-    // as an entry in the virtual filesystem — the model's isMain flag is
-    // what keeps it out of the auxFiles projection.
-    projectModel.setMainDocument(pathHint || file.name, file, { binary: true });
-    syncAuxFiles();
-    editor.detachDocument();
+    editor.setText('');
     editor.setReadOnly(true);
 
     // Update tab name and track filename
@@ -2743,21 +2488,10 @@ async function handleFileUpload(file, pathHint, opts = {}) {
 
     // Update tab name and track filename (after clear so they aren't overwritten)
     document.getElementById('tabFilename').textContent = file.name;
-    // inputFileName names the OUTPUT file, so it follows the conversion
-    // target — not whatever happens to be open in the editor.
-    if (!opts.keepTarget) {
-      inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
-    }
+    inputFileName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
 
     const text = await file.text();
-    // Register the upload AS A DOCUMENT so it owns an EditorState from
-    // the start. Without this the first switch away has nothing to save
-    // and the file comes back with no undo history.
-    const docId = pathHint || file.name;
-    if (editor.hasDocument(docId)) editor.dropDocument(docId);   // fresh content
-    editor.openDocument(docId, text);
-    projectModel.setMainDocument(docId, text, { keepTarget: !!opts.keepTarget });
-    syncAuxFiles();
+    editor.setText(text);
 
     if (fmt) {
       document.getElementById('selFrom').value = fmt;
@@ -2845,321 +2579,13 @@ editorContent.addEventListener('dragleave', (e) => {
   }
 });
 
-// Walk a dropped directory. The DataTransferItem entry API is the ONLY
-// way to recover folder structure from a drop — dataTransfer.files
-// flattens everything to bare filenames, which would strip the paths
-// that \input and \includegraphics depend on.
-function readDroppedEntry(entry, prefix, out) {
-  return new Promise((resolve) => {
-    if (!entry) return resolve();
-    if (entry.isFile) {
-      entry.file(async (file) => {
-        out.push({ path: prefix + file.name,
-                   bytes: new Uint8Array(await file.arrayBuffer()) });
-        resolve();
-      }, () => resolve());
-    } else if (entry.isDirectory) {
-      const reader = entry.createReader();
-      const all = [];
-      const readBatch = () => reader.readEntries(async (batch) => {
-        if (!batch.length) {
-          // readEntries returns at most 100 at a time; keep going.
-          for (const child of all) {
-            await readDroppedEntry(child, prefix + entry.name + '/', out);
-          }
-          return resolve();
-        }
-        all.push(...batch);
-        readBatch();
-      }, () => resolve());
-      readBatch();
-    } else resolve();
-  });
-}
-
 editorContent.addEventListener('drop', async (e) => {
   e.preventDefault();
   dragCounter = 0;
   editorContent.classList.remove('drag-over');
-
-  const dtItems = e.dataTransfer.items ? [...e.dataTransfer.items] : [];
-  const entries = dtItems
-    .map(it => (it.webkitGetAsEntry ? it.webkitGetAsEntry() : null))
-    .filter(Boolean);
-  const hasDir = entries.some(en => en.isDirectory);
-  const files = [...e.dataTransfer.files];
-
-  // A single dropped file keeps the old behaviour exactly: straight into
-  // the editor (or the zip importer).
-  if (!hasDir && files.length === 1) { await handleFileUpload(files[0]); return; }
-
-  if (hasDir || files.length > 1) {
-    updateStatus('loading', 'Reading dropped files…');
-    const out = [];
-    for (const en of entries) await readDroppedEntry(en, '', out);
-    // Fallback for browsers that gave us no entry objects.
-    if (!out.length) {
-      for (const f of files) {
-        out.push({ path: f.name, bytes: new Uint8Array(await f.arrayBuffer()) });
-      }
-    }
-    await adoptProjectFiles(out, 'drop', hasDir ? 'the dropped folder' : 'the dropped files');
-  }
+  const file = e.dataTransfer.files[0];
+  if (file) await handleFileUpload(file);
 });
-
-// ─── Stage 3/4: open a project file ─────────────────────────────────
-// RULE: the editor always holds the document that will be converted.
-// One source of truth. Conversion therefore always reads the editor,
-// exactly as it did before Stages 3/4 existed.
-//
-// Rejected alternative: keeping the target separate and converting the
-// file's STORED text. That silently ignored unsaved editor edits and
-// let the editor visibly display something other than what was being
-// converted. Do not reintroduce it.
-//
-//   viewable (any text file)  -> opens in the EDITOR, editable
-//   + convertible             -> also becomes the conversion target
-//   viewable, not convertible -> editor only (.sty, .bib); target unchanged
-//   convertible, not viewable -> binary overlay card; becomes target
-//   neither                   -> read-only description card (images)
-function captureEditorIntoModel() {
-  const mp = projectModel.project.mainPath;
-  if (!mp || inputBinaryFile) return;
-  // Write back BEFORE switching, or edits are lost the moment a file
-  // stops being the editor document. This is the first tier of "saving".
-  projectModel.updateText(mp, editor.getText());
-}
-
-// ── Stage 5: checkpoints and revert ────────────────────────────────
-// Acts on the file in the EDITOR. Restore is applied with replaceAll,
-// which is ONE undoable transaction — so restoring is itself undoable
-// and the two mechanisms compose instead of competing. (setText would
-// wipe the history and make a mistaken restore unrecoverable.)
-function refreshCheckpointBar() {
-  const bar = document.getElementById('fileTreeRevert');
-  const nameEl = document.getElementById('ftrFile');
-  const sel = document.getElementById('ftRestore');
-  if (!bar || !sel) return;
-  const mp = projectModel.project.mainPath;
-  if (!mp || inputBinaryFile) { bar.hidden = true; return; }
-  projectModel.updateText(mp, editor.getText());   // so dirty is accurate
-  bar.hidden = false;
-  const dirty = projectModel.isDirty(mp);
-  nameEl.textContent = mp.split('/').pop() + (dirty ? ' •' : '');
-  nameEl.className = 'ftr-file' + (dirty ? ' dirty' : '');
-  nameEl.title = dirty ? `${mp} — edited since upload` : mp;
-
-  const list = projectModel.listCheckpoints(mp);
-  sel.innerHTML = '';
-  const first = document.createElement('option');
-  first.value = '';
-  first.textContent = list.length ? 'Restore…' : 'No restore points';
-  sel.appendChild(first);
-  for (const cp of list) {
-    const o = document.createElement('option');
-    o.value = cp.id;
-    o.textContent = cp.permanent ? cp.label
-      : `${cp.label} (${new Date(cp.at).toLocaleTimeString()})`;
-    sel.appendChild(o);
-  }
-  sel.disabled = list.length === 0;
-}
-
-// Naming a restore point. Replaces window.prompt(), which cannot offer
-// the project-wide option and does not match the rest of the interface.
-// Modelled on showPdfPrompt / showMainFilePrompt.
-function showCheckpointPrompt(fileName, dirtyCount) {
-  return new Promise((resolve) => {
-    const overlay = document.createElement('div');
-    overlay.className = 'pdf-modal-overlay';
-    const projectRow = dirtyCount > 1
-      ? `<label style="display:block;margin:10px 0 0;">
-           <input type="checkbox" id="cpProject">
-           Apply to all ${dirtyCount} changed files, under the same name
-         </label>
-         <p style="font-size:11px;color:var(--text-muted);margin:4px 0 0;">
-           Useful before a change that spans several files, so they can be
-           restored together afterwards.</p>`
-      : '';
-    overlay.innerHTML = `
-      <div class="pdf-modal">
-        <h3>Save a restore point</h3>
-        <p>You can come back to this state later, for
-           <strong>${escapeHtmlText(fileName)}</strong>.</p>
-        <label style="display:block;">
-          <span style="font-size:12px;">Name</span><br>
-          <input type="text" id="cpLabel" style="width:100%;margin-top:3px;"
-                 value="Checkpoint">
-        </label>
-        ${projectRow}
-        <div class="pdf-modal-actions">
-          <button class="pdf-modal-btn" id="cpCancel">Cancel</button>
-          <button class="pdf-modal-btn primary" id="cpOk">Save restore point</button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-    const input = overlay.querySelector('#cpLabel');
-    input.focus();
-    input.select();
-    const done = (value) => { document.body.removeChild(overlay); resolve(value); };
-    overlay.querySelector('#cpOk').addEventListener('click', () => done({
-      label: input.value.trim() || 'Checkpoint',
-      projectWide: !!overlay.querySelector('#cpProject')?.checked,
-    }));
-    overlay.querySelector('#cpCancel').addEventListener('click', () => done(null));
-    overlay.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape') done(null);
-      if (ev.key === 'Enter' && ev.target === input) overlay.querySelector('#cpOk').click();
-    });
-  });
-}
-
-// How many text files differ from their baseline right now.
-function dirtyFileCount() {
-  const mp = projectModel.project.mainPath;
-  if (mp) projectModel.updateText(mp, editor.getText());
-  return projectModel.listEntries().filter(e => projectModel.isDirty(e.path)).length;
-}
-
-document.getElementById('ftCheckpoint')?.addEventListener('click', async () => {
-  const mp = projectModel.project.mainPath;
-  if (!mp) return;
-  projectModel.updateText(mp, editor.getText());
-  const answer = await showCheckpointPrompt(mp, dirtyFileCount());
-  if (!answer) return;
-  if (answer.projectWide) {
-    const stamped = projectModel.checkpointProject(answer.label);
-    refreshCheckpointBar();
-    updateStatus('ready',
-      `Saved "${answer.label}" across ${stamped.length} file${stamped.length === 1 ? '' : 's'}`);
-  } else {
-    const cp = projectModel.addCheckpoint(mp, answer.label);
-    refreshCheckpointBar();
-    updateStatus('ready', cp ? `Saved restore point "${cp.label}" for ${mp}`
-                             : `${mp} cannot be checkpointed`);
-  }
-});
-
-document.getElementById('ftRestore')?.addEventListener('change', (e) => {
-  const id = e.target.value;
-  e.target.selectedIndex = 0;
-  if (!id) return;
-  const mp = projectModel.project.mainPath;
-  const text = projectModel.checkpointText(mp, id);
-  if (text === null) return;
-  if (text === editor.getText()) {
-    updateStatus('ready', 'That restore point matches the current text');
-    return;
-  }
-  editor.replaceAll(text);              // ONE undoable transaction
-  projectModel.updateText(mp, text);
-  syncAuxFiles();
-  refreshCheckpointBar();
-  updateStatus('ready', `Restored ${mp} — press Ctrl+Z to undo the restore`);
-});
-
-async function openProjectFile(entry) {
-  if (!entry) return;
-
-  // Text files: switch the EDITOR's document (v0.5). openDocument keeps
-  // one EditorState per file, so undo history and marks survive the
-  // round trip — setText would discard both.
-  if (entry.viewable) {
-    captureEditorIntoModel();
-    const keepTarget = !entry.convertible;
-    const text = projectModel.getText(entry.path) ?? '';
-    // Reset binary state WITHOUT clearBinaryInput(): that blanks the
-    // editor and would clobber the outgoing document's saved state.
-    if (inputBinaryFile) {
-      inputBinaryFile = null;
-      editor.setReadOnly(false);
-      document.getElementById('binaryInputOverlay').style.display = 'none';
-    }
-    editor.openDocument(entry.path, text);
-    projectModel.setMainDocument(entry.path, editor.getText(), { keepTarget });
-
-    document.getElementById('tabFilename').textContent = entry.name;
-    const reader = READER_BY_EXT[entry.ext];
-    if (!keepTarget) {
-      inputFileName = entry.name.replace(/\.[^.]+$/, '') || 'untitled';
-      if (reader) {
-        document.getElementById('selFrom').value = reader;
-        document.getElementById('statusFormat').textContent = reader;
-        updateExtensions();
-      }
-    }
-    const langMap = { tex: 'latex', latex: 'latex', sty: 'latex', cls: 'latex',
-                      def: 'latex', clo: 'latex', md: 'markdown',
-                      markdown: 'markdown', html: 'html', htm: 'html' };
-    editor.setLanguage(langMap[entry.ext] || 'text');
-
-    syncAuxFiles();
-    const lbl = document.getElementById('sourceViewerLabel');
-    if (lbl) lbl.hidden = true;
-    refreshConvertTargetLabel();
-    refreshCheckpointBar();
-
-    const live = document.getElementById('targetLive');
-    if (keepTarget) {
-      const tgt = projectModel.project.convertTargetPath;
-      if (live) live.textContent = `Editing ${entry.path}. Still converting ${tgt || 'nothing'}.`;
-      updateStatus('ready',
-        `Editing ${entry.path}` + (tgt ? ` · conversion target is still ${tgt}` : ''));
-    } else {
-      if (live) live.textContent = `Now editing and converting ${entry.path}`;
-      updateStatus('ready', projectModel.targetIsFragment()
-        ? `Converting ${entry.path} · no \\documentclass — this looks like a fragment, ` +
-          `so macros defined in the parent preamble will be undefined`
-        : `Converting ${entry.path}`);
-    }
-    return;
-  }
-
-  // Binary but convertible (docx, epub …): the existing overlay card.
-  if (entry.convertible) {
-    captureEditorIntoModel();
-    const bytes = entry.bytes || new Uint8Array();
-    await handleFileUpload(new File([bytes], entry.name), entry.path);
-    const lbl = document.getElementById('sourceViewerLabel');
-    if (lbl) lbl.hidden = true;
-    refreshConvertTargetLabel();
-    refreshCheckpointBar();
-    updateStatus('ready', `Converting ${entry.path}`);
-    return;
-  }
-
-  // Neither viewable nor convertible (images): describe it in the
-  // read-only viewer. The conversion target is deliberately untouched.
-  const label = document.getElementById('sourceViewerLabel');
-  if (entry.viewable) {
-    const text = projectModel.getText(entry.path);
-    if (text === null) {
-      sourceEditor.setText(`[${entry.path} could not be decoded as UTF-8 text.]`);
-      sourceEditor.setLanguage('text');
-    } else {
-      sourceEditor.setText(text);
-      sourceEditor.setLanguage(entry.ext === 'sty' || entry.ext === 'cls' ? 'latex' : 'text');
-    }
-  } else {
-    sourceEditor.setText(
-      `[${entry.path}]\n\n${entry.role === 'image' ? 'Image' : 'Binary'} file — ` +
-      `${entry.bytes ? (entry.bytes.length / 1024).toFixed(1) + ' KB' : 'no data'}.\n` +
-      `This file cannot be shown as text, and cannot be converted on its own.`);
-    sourceEditor.setLanguage('text');
-  }
-  if (label) {
-    label.hidden = false;
-    label.innerHTML =
-      `<span class="svl-name">${escapeHtmlText(entry.path)}</span>` +
-      `<span>${entry.role} · read-only</span>` +
-      `<button type="button" id="svlClose">Show conversion output</button>`;
-    document.getElementById('svlClose').addEventListener('click', () => {
-      label.hidden = true;
-      sourceEditor.setText('');
-    });
-  }
-  activateOutputTab('source');
-}
 
 // ════════════════════════════════════════════════════════════════════
 // WARNING PARSER — js/warning-parser.js
@@ -3469,8 +2895,7 @@ function renderAuxFileList() {
   ).join('');
   list.querySelectorAll('.file-remove').forEach(btn => {
     btn.addEventListener('click', () => {
-      projectModel.removeFile(btn.dataset.aux);
-      syncAuxFiles();
+      delete resourceFiles.auxFiles[btn.dataset.aux];
       renderAuxFileList();
     });
   });
@@ -3480,18 +2905,12 @@ document.getElementById('btnAuxFiles')?.addEventListener('click', () => {
   document.getElementById('auxFileInput').click();
 });
 document.getElementById('auxFileInput')?.addEventListener('change', async (e) => {
-  let replaced = 0;
   for (const file of e.target.files) {
     const content = new Uint8Array(await file.arrayBuffer());
-    const r = projectModel.addFile(file.name, content, { source: 'upload' });
-    if (r.replaced) replaced++;
+    resourceFiles.auxFiles[file.name] = content;
   }
-  syncAuxFiles();
   renderAuxFileList();
   e.target.value = '';
-  if (replaced > 0) {
-    updateStatus('ready', `${replaced} file${replaced === 1 ? '' : 's'} replaced an existing project file`);
-  }
   await handlePdfAuxFiles();
 });
 
@@ -3499,72 +2918,33 @@ document.getElementById('btnAuxDir')?.addEventListener('click', () => {
   document.getElementById('auxDirInput').click();
 });
 document.getElementById('auxDirInput')?.addEventListener('change', async (e) => {
-  const items = [];
+  const topDirs = new Set();
   for (const file of e.target.files) {
-    items.push({ path: file.webkitRelativePath || file.name,
-                 bytes: new Uint8Array(await file.arrayBuffer()) });
+    const path = file.webkitRelativePath || file.name;
+    const content = new Uint8Array(await file.arrayBuffer());
+    resourceFiles.auxFiles[path] = content;
+    const slash = path.indexOf('/');
+    if (slash > 0) topDirs.add(path.slice(0, slash));
   }
-  e.target.value = '';
-  await adoptProjectFiles(items, 'directory', 'the uploaded folder');
-});
-
-// ── Shared project intake ──────────────────────────────────────────
-// Used by the directory picker AND by folder drag-and-drop. Mirrors
-// importProjectZip(): strip a single wrapper folder, pick the main
-// document (prompting when ambiguous), load it into the editor, and
-// route the rest to support files.
-//
-// WHY THE WRAPPER MATTERS: pandoc resolves \input and \usepackage
-// LITERALLY against the filesystem root, and resource-path reaches
-// neither. A wrapper folder therefore breaks the chapters AND the .sty
-// together. (ENGINE-FINDINGS-311.md §6, §9)
-async function adoptProjectFiles(rawItems, source, label) {
-  if (!rawItems.length) return;
-  const wrapper = projectModel.detectWrapper(
-    rawItems.map(i => projectModel.normalisePath(i.path)).filter(Boolean));
-  const strip = (p) => {
-    const n = projectModel.normalisePath(p);
-    if (!n) return n;
-    return wrapper ? n.slice(wrapper.length + 1) : n;
-  };
-  const entries = rawItems
-    .filter(i => !isJunkZipEntry(projectModel.normalisePath(i.path) || ''))
-    .map(i => ({ path: strip(i.path), data: i.bytes }))
-    .filter(i => i.path);
-  if (!entries.length) return;
-
-  // Decide the main document BEFORE mutating state, so a cancelled
-  // prompt leaves the workspace exactly as it was.
-  const det = detectMainTexFile(entries);
-  let mainEntry = det.main;
-  if (!mainEntry && det.candidates.length > 1) {
-    const pick = await showMainFilePrompt(det.candidates.map(x => x.path));
-    if (pick === null) { updateStatus('ready', 'Folder import cancelled'); return; }
-    mainEntry = det.candidates.find(x => x.path === pick);
-  }
-
-  const res = projectModel.addFiles(
-    entries.map(x => ({ path: x.path, bytes: x.data })),
-    { source, stripWrapper: false });
-  syncAuxFiles();
-
-  if (mainEntry) {
-    const baseName = mainEntry.path.split('/').pop();
-    await handleFileUpload(new File([mainEntry.data], baseName), mainEntry.path);
-    if (mainEntry.path.includes('/')) {
-      addToResourcePath(mainEntry.path.slice(0, mainEntry.path.lastIndexOf('/')));
+  // A directory upload keeps the selected folder's own name as the first
+  // path component ("include-test/ws/1/x.tex") while the document refers
+  // to "ws/1/x". Auto-add each uploaded top-level folder to the resource
+  // path so pandoc searches inside it when resolving includes and images.
+  // (Visible in the Media tab's Resource path field; user-editable.)
+  if (topDirs.size > 0) {
+    const rpInput = document.getElementById('opt-resource-path');
+    if (rpInput) {
+      const parts = rpInput.value.trim()
+        ? rpInput.value.trim().split(/[;:]/).filter(Boolean)
+        : ['.'];
+      for (const d of topDirs) if (!parts.includes(d)) parts.push(d);
+      rpInput.value = parts.join(':');
     }
   }
   renderAuxFileList();
-
-  let msg = `Imported ${res.added} file${res.added === 1 ? '' : 's'} from ${label}`;
-  if (wrapper) msg += ` · unwrapped "${wrapper}/"`;
-  msg += mainEntry ? ` · main: ${mainEntry.path}`
-                   : ' · no main .tex found — choose one in the Files panel';
-  if (res.replaced) msg += ` · ${res.replaced} replaced`;
-  updateStatus('ready', msg);
+  e.target.value = '';
   await handlePdfAuxFiles();
-}
+});
 
 // ─── Project zip import (Overleaf transfer, Checkpoint 1) ───────────
 // Reads a .zip entirely in the browser (mirror of buildZip: EOCD →
@@ -3740,39 +3120,29 @@ async function importProjectZip(arrayBuffer, sourceLabel) {
     mainEntry = det.candidates.find(e => e.path === pick);
   }
   const auxEntries = entries.filter(e => e !== mainEntry);
-  // WRAPPER STRIPPING (Stage 0). Detected across ALL entries, including
-  // the main document, so a hand-zipped folder is unwrapped uniformly.
-  // Overleaf zips carry project-relative paths and are left untouched.
-  // Stripping — not resource-path — is what makes \input and \usepackage
-  // resolve, since both are literal and root-relative.
-  // (ENGINE-FINDINGS-311.md §6, §9)
-  const wrapper = projectModel.detectWrapper(
-    entries.map(e => projectModel.normalisePath(e.path)).filter(Boolean));
-  const strip = (p) => {
-    const n = projectModel.normalisePath(p);
-    if (!n) return n;
-    return wrapper ? n.slice(wrapper.length + 1) : n;
-  };
-  projectModel.addFiles(
-    auxEntries.map(e => ({ path: strip(e.path), bytes: e.data })),
-    { source: 'zip', stripWrapper: false });
-  syncAuxFiles();
+  for (const e of auxEntries) resourceFiles.auxFiles[e.path] = e.data;
+  // Wrapper-folder guard: Overleaf zips carry project-relative paths with
+  // no wrapper, but a hand-zipped folder wraps everything in one top
+  // directory — mirror the directory-upload fix and search inside it.
+  const topDirs = new Set();
+  let allNested = entries.length > 0;
+  for (const e of entries) {
+    const slash = e.path.indexOf('/');
+    if (slash > 0) topDirs.add(e.path.slice(0, slash)); else allNested = false;
+  }
+  if (allNested && topDirs.size === 1) addToResourcePath([...topDirs][0]);
   if (mainEntry) {
-    const mainPath = strip(mainEntry.path);
     const baseName = mainEntry.path.split('/').pop();
-    await handleFileUpload(new File([mainEntry.data], baseName), mainPath);
-    // If the main file still lives in a subfolder after unwrapping,
-    // search that folder too — this helps IMAGES, which pandoc does
-    // search for; it cannot help includes.
-    if (mainPath && mainPath.includes('/')) {
-      addToResourcePath(mainPath.slice(0, mainPath.lastIndexOf('/')));
+    await handleFileUpload(new File([mainEntry.data], baseName));
+    // If the main file lives in a subfolder, search that folder too.
+    if (mainEntry.path.includes('/')) {
+      addToResourcePath(mainEntry.path.slice(0, mainEntry.path.lastIndexOf('/')));
     }
   }
   renderAuxFileList();
   const total = auxEntries.length + (mainEntry ? 1 : 0);
   let msg = `Imported ${total} file${total === 1 ? '' : 's'} from ${sourceLabel}`;
-  if (wrapper) msg += ` · unwrapped "${wrapper}/"`;
-  msg += mainEntry ? ` · main: ${strip(mainEntry.path)}` : ' (no main .tex — auxiliary files only)';
+  msg += mainEntry ? ` · main: ${mainEntry.path}` : ' (no main .tex — auxiliary files only)';
   if (parsed.errors.length > 0) {
     msg += ` · ${parsed.errors.length} skipped (see console)`;
     console.warn('Zip import skipped entries:', parsed.errors);
@@ -4658,8 +4028,8 @@ function buildFormatWithExtensions(baseFormat, extState) {
 }
 
 // Update extensions when format dropdowns change
-document.getElementById('selFrom').addEventListener('change', () => { updateExtensions(); refreshConvertTargetLabel(); });
-document.getElementById('selTo').addEventListener('change', () => { updateExtensions(); refreshMathOptions(); refreshConvertTargetLabel(); });
+document.getElementById('selFrom').addEventListener('change', () => { updateExtensions(); });
+document.getElementById('selTo').addEventListener('change', () => { updateExtensions(); refreshMathOptions(); });
 
 // --- Format metadata ---
 const BINARY_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'epub2', 'epub3', 'pdf', 'chunkedhtml'];
@@ -4828,10 +4198,7 @@ let lastOutput = null;  // { blob, filename } — stores last conversion output 
 // Clear binary input state and restore editor
 function clearBinaryInput() {
   inputBinaryFile = null;
-  // detachDocument, NOT setText(''): setText would overwrite the
-  // CURRENT document's saved state with an empty one, losing its text
-  // and undo history when the user switches back to it.
-  editor.detachDocument();
+  editor.setText('');
   editor.setReadOnly(false);
   inputFileName = 'untitled';
   document.getElementById('binaryInputOverlay').style.display = 'none';
@@ -5690,9 +5057,8 @@ async function processPdfAuxFiles(pdfNames) {
       const svgString = await convertPdfToSvg(arrayBuffer);
       const svgName = baseName + '.svg';
       const encoder = new TextEncoder();
-      projectModel.removeFile(pdfName);
-      projectModel.addFile(svgName, encoder.encode(svgString), { source: 'derived' });
-      syncAuxFiles();
+      resourceFiles.auxFiles[svgName] = encoder.encode(svgString);
+      delete resourceFiles.auxFiles[pdfName];
       results.converted++;
       results.details.push(`${pdfName} → ${svgName}`);
     } catch (err) {
@@ -5705,9 +5071,8 @@ async function processPdfAuxFiles(pdfNames) {
         );
         const pngData = await convertPdfToPng(arrayBuffer);
         const pngName = baseName + '.png';
-        projectModel.removeFile(pdfName);
-        projectModel.addFile(pngName, pngData, { source: 'derived' });
-        syncAuxFiles();
+        resourceFiles.auxFiles[pngName] = pngData;
+        delete resourceFiles.auxFiles[pdfName];
         results.converted++;
         results.details.push(`${pdfName} → ${pngName} (raster fallback)`);
       } catch (err2) {
@@ -5778,9 +5143,6 @@ async function runConversion() {
   updateStatus('loading', 'Converting…');
   clearDecorations();
 
-  // The editor ALWAYS holds the document being converted (see
-  // openProjectFile). Conversion therefore reads the editor, unchanged
-  // from before Stages 3/4.
   const sourceText = inputBinaryFile ? null : getSourceForConversion();
 
   try {
@@ -6061,86 +5423,18 @@ const { activateOutputTab } = initOutputTabs();
 // ─── Sidebar toggle ───
 const sidebar = document.getElementById('sidebar');
 const btnCleanup = document.getElementById('btnCleanup');
-const btnFiles = document.getElementById('btnFiles');
 const sidebarClose = document.getElementById('sidebarClose');
 
-// ─── Left rail tabs (Files / Cleanup) ───
-// The rail collapses to zero width so the editor keeps the space; the
-// last-used tab is remembered so reopening returns you where you were.
-const RAIL_KEY = 'atc.rail.tab';
-const railTabs = [
-  ['files',   'railtab-files',   'railPanelFiles',   'Project files'],
-  ['cleanup', 'railtab-cleanup', 'railPanelCleanup', 'LaTeX Cleanup'],
-];
-let railTab = localStorage.getItem(RAIL_KEY) || 'files';
-
-function setRailTab(id, focusPanel) {
-  railTab = railTabs.some(t => t[0] === id) ? id : 'files';
-  try { localStorage.setItem(RAIL_KEY, railTab); } catch {}
-  for (const [key, tabId, panelId, title] of railTabs) {
-    const on = key === railTab;
-    const tab = document.getElementById(tabId);
-    const panel = document.getElementById(panelId);
-    if (tab) {
-      tab.setAttribute('aria-selected', String(on));
-      tab.tabIndex = on ? 0 : -1;
-    }
-    if (panel) panel.classList.toggle('active', on);
-    if (on) document.getElementById('railTitle').textContent = title;
-  }
-  if (railTab === 'files') fileTree.render();
-  if (focusPanel) {
-    const tab = document.getElementById(railTabs.find(t => t[0] === railTab)[1]);
-    if (tab) tab.focus();
-  }
-}
-
-for (const [key, tabId] of railTabs) {
-  document.getElementById(tabId)?.addEventListener('click', () => setRailTab(key));
-}
-// Roving tabindex across the two tabs, per the ARIA tabs pattern.
-document.querySelector('.rail-tabs')?.addEventListener('keydown', (ev) => {
-  if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') return;
-  ev.preventDefault();
-  const i = railTabs.findIndex(t => t[0] === railTab);
-  const next = ev.key === 'ArrowRight' ? (i + 1) % railTabs.length
-                                       : (i - 1 + railTabs.length) % railTabs.length;
-  setRailTab(railTabs[next][0], true);
-});
-
-function setSidebarOpen(open, tab) {
-  sidebar.classList.toggle('collapsed', !open);
-  if (open && tab) setRailTab(tab);
-  for (const [btn, key] of [[btnFiles, 'files'], [btnCleanup, 'cleanup']]) {
-    if (!btn) continue;
-    const active = open && railTab === key;
-    btn.classList.toggle('active', active);
-    btn.setAttribute('aria-expanded', String(open));
-  }
+function toggleSidebar() {
+  sidebar.classList.toggle('collapsed');
+  btnCleanup.classList.toggle('active');
+  const isExpanded = !sidebar.classList.contains('collapsed');
+  btnCleanup.setAttribute('aria-expanded', String(isExpanded));
   // (CM6 self-measures after the CSS transition — no resize call needed)
 }
 
-function toggleSidebar(tab) {
-  const isOpen = !sidebar.classList.contains('collapsed');
-  // Clicking the OTHER tab's button while open switches tabs rather
-  // than closing the panel — closing would be surprising.
-  if (isOpen && tab && railTab !== tab) { setSidebarOpen(true, tab); return; }
-  setSidebarOpen(!isOpen, tab);
-}
-
-btnCleanup.addEventListener('click', () => toggleSidebar('cleanup'));
-btnFiles?.addEventListener('click', () => toggleSidebar('files'));
-sidebarClose.addEventListener('click', () => setSidebarOpen(false));
-setRailTab(railTab);
-
-// Upload entry points inside the Files panel — they reuse the existing
-// hidden inputs, so the Media tab's buttons keep working identically.
-document.getElementById('ftAddFiles')?.addEventListener('click', () => {
-  document.getElementById('auxFileInput').click();
-});
-document.getElementById('ftAddFolder')?.addEventListener('click', () => {
-  document.getElementById('auxDirInput').click();
-});
+btnCleanup.addEventListener('click', toggleSidebar);
+sidebarClose.addEventListener('click', toggleSidebar);
 
 // ─── Layout switching ───
 const outputPanel = document.getElementById('outputPanel');

@@ -36,7 +36,7 @@ const extraTokenClasses = tagHighlighter([
   { tag: lzTags.bracket, class: "tok-bracket" },
 ]);
 
-export const CM6_BUNDLE_VERSION = "0.5.0";
+export const CM6_BUNDLE_VERSION = "0.4.0";
 
 // ── Language registry ──────────────────────────────────────────────
 // LaTeX: Overleaf's Lezer grammar via codemirror-lang-latex (TeXlyre),
@@ -214,16 +214,8 @@ export function createEditor(containerEl, opts = {}) {
   const roComp = new Compartment();
   const wrapComp = new Compartment();
   const compComp = new Compartment();
-  // ── v0.5: decoration state is PER DOCUMENT ───────────────────────
-  // makeDecoField() and makeMarkField() hold their working data in
-  // CLOSURES. One shared pair across several documents would let
-  // chapter 3's diagnostics and intent marks appear on chapter 4 —
-  // invisible while only one document exists, a real bug the moment
-  // two do. Each document therefore owns its own field pair.
-  function makeFields() { return { deco: makeDecoField(), marks: makeMarkField() }; }
-  const docs = new Map();      // id -> { state, fields }
-  let currentId = null;
-  let fields = makeFields();
+  const decoField = makeDecoField();
+  const marks = makeMarkField();
   const sources = [];
   // Live config — consulted whenever state is rebuilt (setText), so a
   // rebuild preserves the CURRENT language/readOnly/wrap, not creation-time.
@@ -241,7 +233,7 @@ export function createEditor(containerEl, opts = {}) {
     },
   });
 
-  const baseExtensions = (f = fields) => [
+  const baseExtensions = () => [
     // Explicit basicSetup equivalent, MINUS autocompletion (that lives in
     // compComp below so setCompletionEnabled(false) truly disables it).
     lineNumbers(), highlightActiveLineGutter(), highlightSpecialChars(),
@@ -264,8 +256,8 @@ export function createEditor(containerEl, opts = {}) {
       ...historyKeymap, ...foldKeymap, ...completionKeymap, ...lintKeymap,
     ]),
     lintGutter(),
-    f.deco,
-    f.marks.field,
+    decoField,
+    marks.field,
     theme,
     indentUnit.of("  "),
     EditorState.tabSize.of(2),
@@ -307,67 +299,8 @@ export function createEditor(containerEl, opts = {}) {
     setText(text) {
       // Fresh state = content replaced AND undo history reset
       // (parity with Ace's setValue(text, -1) usage).
-      fields = makeFields();   // old offsets mean nothing in a new document
+      marks.reset();   // old offsets mean nothing in a new document
       view.setState(EditorState.create({ doc: text, extensions: baseExtensions() }));
-      if (currentId !== null) docs.set(currentId, { state: view.state, fields });
-    },
-
-    // ── Multi-document (v0.5) ──────────────────────────────────────
-    // One EditorState per document, swapped into the single view. This
-    // is the approach CodeMirror's author recommends. The trap it hides
-    // is capturing the state AS IT IS NOW on the way out — reusing the
-    // state a document was created with silently discards every edit.
-    openDocument(id, text) {
-      if (currentId === id) return false;
-      if (currentId !== null && docs.has(currentId)) {
-        docs.get(currentId).state = view.state;     // capture, do not reuse
-      }
-      let rec = docs.get(id);
-      if (!rec) {
-        const f = makeFields();
-        rec = { state: EditorState.create({ doc: text ?? "",
-                                            extensions: baseExtensions(f) }), fields: f };
-        docs.set(id, rec);
-      }
-      fields = rec.fields;
-      currentId = id;
-      view.setState(rec.state);
-      return true;
-    },
-    currentDocumentId: () => currentId,
-    hasDocument: (id) => docs.has(id),
-    // Show an empty scratch view WITHOUT destroying the current
-    // document's saved state. Use this whenever the editor must be
-    // blanked (binary input overlay, reset): plain setText() would
-    // overwrite the outgoing document's record with an empty one,
-    // losing its text and its undo history.
-    detachDocument() {
-      if (currentId !== null && docs.has(currentId)) {
-        docs.get(currentId).state = view.state;
-      }
-      currentId = null;
-      fields = makeFields();
-      view.setState(EditorState.create({ doc: "", extensions: baseExtensions() }));
-    },
-    documentIds: () => [...docs.keys()],
-    dropDocument(id) {
-      if (id === currentId) currentId = null;
-      return docs.delete(id);
-    },
-    // Text of a document that is NOT currently shown, without switching.
-    peekDocument(id) {
-      if (id === currentId) return view.state.doc.toString();
-      const rec = docs.get(id);
-      return rec ? rec.state.doc.toString() : null;
-    },
-
-    // Replace the whole document as ONE undoable transaction. Unlike
-    // setText this preserves undo history, which is what makes
-    // "restore a checkpoint" itself undoable.
-    replaceAll(text) {
-      view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: text },
-      });
     },
 
     getCursor() {

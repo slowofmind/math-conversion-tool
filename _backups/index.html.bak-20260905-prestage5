@@ -303,16 +303,6 @@
   .ft-toggle.off { color: var(--error); }
   .ft-toggle.partial { color: var(--warning); }
   .ft-badge + .ft-toggle { margin-left: 4px; }
-  .ft-revert {
-    display: flex; align-items: center; gap: 5px; flex-shrink: 0;
-    padding: 5px 8px; border-top: 1px solid var(--border);
-    background: var(--bg-secondary);
-  }
-  .ft-revert select { font-size: 10px; flex: 1; min-width: 0; }
-  .ftr-file { font-size: 10px; color: var(--text-muted); max-width: 90px;
-              overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .ftr-file.dirty { color: var(--warning); font-weight: 700; }
-  .ft-dirty-dot { color: var(--warning); font-weight: 700; margin-left: 3px; }
   .convert-target {
     font-size: 11px; color: var(--text-secondary); margin-left: 6px;
     max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -2080,16 +2070,6 @@
       <div class="ft-host" id="fileTreeHost"></div>
       <div class="ft-empty" id="fileTreeEmpty" hidden></div>
       <div class="ft-detail" id="fileTreeDetail" aria-live="polite"></div>
-      <!-- Acts on the file currently in the EDITOR, not the tree
-           selection — restoring something you are not looking at would
-           be surprising. -->
-      <div class="ft-revert" id="fileTreeRevert" hidden>
-        <span class="ftr-file" id="ftrFile"></span>
-        <button class="toolbar-btn" id="ftCheckpoint" style="font-size:10px; padding:2px 6px;"
-                title="Remember the current state of this file so you can come back to it">Checkpoint</button>
-        <label class="sr-only" for="ftRestore">Restore this file to an earlier state</label>
-        <select id="ftRestore"></select>
-      </div>
     </div>
 
     <!-- CLEANUP ----------------------------------------------------->
@@ -2326,7 +2306,6 @@ function syncAuxFiles() {
   resourceFiles.auxFiles = projectModel.toAuxFiles();
   if (fileTree) fileTree.render({ expandNew: true });
   refreshConvertTargetLabel();
-  if (typeof refreshCheckpointBar === 'function') refreshCheckpointBar();
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -2391,13 +2370,9 @@ function refreshConvertTargetLabel() {
   if (btn) btn.setAttribute('aria-label', `Convert ${p} to ${to}`);
 }
 
-// Debug hooks — LOCAL DEVELOPMENT ONLY. Gated on hostname so a deployed
-// copy never exposes the project model on window. In the console:
-//   dumpProject()
-if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' ||
-    location.protocol === 'file:') {
-  window.projectModel = projectModel;
-  window.dumpProject = () => {
+// TEMPORARY debug hook (spec §11.4). Remove before any sharing.
+window.projectModel = projectModel;
+window.dumpProject = () => {
   const rows = [...projectModel.project.entries.values()].map(e =>
     `${e.isMain ? 'MAIN ' : '     '}${e.path}  [${e.role}] src=${e.source} bytes=${e.bytes ? e.bytes.length : (e.text ? 'text:' + e.text.length : 'null')}`);
   console.log('mainPath           :', projectModel.project.mainPath);
@@ -2405,8 +2380,7 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' ||
   console.log('entries (' + rows.length + '):\n' + rows.join('\n'));
   console.log('auxFiles keys      :', Object.keys(resourceFiles.auxFiles));
   return projectModel.summaryText();
-  };
-}
+};
 
 const editor = createEditor(document.getElementById('aceEditor'), {
   language: 'latex',
@@ -2716,7 +2690,7 @@ async function handleFileUpload(file, pathHint, opts = {}) {
     // what keeps it out of the auxFiles projection.
     projectModel.setMainDocument(pathHint || file.name, file, { binary: true });
     syncAuxFiles();
-    editor.detachDocument();
+    editor.setText('');
     editor.setReadOnly(true);
 
     // Update tab name and track filename
@@ -2750,13 +2724,8 @@ async function handleFileUpload(file, pathHint, opts = {}) {
     }
 
     const text = await file.text();
-    // Register the upload AS A DOCUMENT so it owns an EditorState from
-    // the start. Without this the first switch away has nothing to save
-    // and the file comes back with no undo history.
-    const docId = pathHint || file.name;
-    if (editor.hasDocument(docId)) editor.dropDocument(docId);   // fresh content
-    editor.openDocument(docId, text);
-    projectModel.setMainDocument(docId, text, { keepTarget: !!opts.keepTarget });
+    editor.setText(text);
+    projectModel.setMainDocument(pathHint || file.name, text, { keepTarget: !!opts.keepTarget });
     syncAuxFiles();
 
     if (fmt) {
@@ -2930,201 +2899,47 @@ function captureEditorIntoModel() {
   projectModel.updateText(mp, editor.getText());
 }
 
-// ── Stage 5: checkpoints and revert ────────────────────────────────
-// Acts on the file in the EDITOR. Restore is applied with replaceAll,
-// which is ONE undoable transaction — so restoring is itself undoable
-// and the two mechanisms compose instead of competing. (setText would
-// wipe the history and make a mistaken restore unrecoverable.)
-function refreshCheckpointBar() {
-  const bar = document.getElementById('fileTreeRevert');
-  const nameEl = document.getElementById('ftrFile');
-  const sel = document.getElementById('ftRestore');
-  if (!bar || !sel) return;
-  const mp = projectModel.project.mainPath;
-  if (!mp || inputBinaryFile) { bar.hidden = true; return; }
-  projectModel.updateText(mp, editor.getText());   // so dirty is accurate
-  bar.hidden = false;
-  const dirty = projectModel.isDirty(mp);
-  nameEl.textContent = mp.split('/').pop() + (dirty ? ' •' : '');
-  nameEl.className = 'ftr-file' + (dirty ? ' dirty' : '');
-  nameEl.title = dirty ? `${mp} — edited since upload` : mp;
-
-  const list = projectModel.listCheckpoints(mp);
-  sel.innerHTML = '';
-  const first = document.createElement('option');
-  first.value = '';
-  first.textContent = list.length ? 'Restore…' : 'No restore points';
-  sel.appendChild(first);
-  for (const cp of list) {
-    const o = document.createElement('option');
-    o.value = cp.id;
-    o.textContent = cp.permanent ? cp.label
-      : `${cp.label} (${new Date(cp.at).toLocaleTimeString()})`;
-    sel.appendChild(o);
-  }
-  sel.disabled = list.length === 0;
-}
-
-// Naming a restore point. Replaces window.prompt(), which cannot offer
-// the project-wide option and does not match the rest of the interface.
-// Modelled on showPdfPrompt / showMainFilePrompt.
-function showCheckpointPrompt(fileName, dirtyCount) {
-  return new Promise((resolve) => {
-    const overlay = document.createElement('div');
-    overlay.className = 'pdf-modal-overlay';
-    const projectRow = dirtyCount > 1
-      ? `<label style="display:block;margin:10px 0 0;">
-           <input type="checkbox" id="cpProject">
-           Apply to all ${dirtyCount} changed files, under the same name
-         </label>
-         <p style="font-size:11px;color:var(--text-muted);margin:4px 0 0;">
-           Useful before a change that spans several files, so they can be
-           restored together afterwards.</p>`
-      : '';
-    overlay.innerHTML = `
-      <div class="pdf-modal">
-        <h3>Save a restore point</h3>
-        <p>You can come back to this state later, for
-           <strong>${escapeHtmlText(fileName)}</strong>.</p>
-        <label style="display:block;">
-          <span style="font-size:12px;">Name</span><br>
-          <input type="text" id="cpLabel" style="width:100%;margin-top:3px;"
-                 value="Checkpoint">
-        </label>
-        ${projectRow}
-        <div class="pdf-modal-actions">
-          <button class="pdf-modal-btn" id="cpCancel">Cancel</button>
-          <button class="pdf-modal-btn primary" id="cpOk">Save restore point</button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-    const input = overlay.querySelector('#cpLabel');
-    input.focus();
-    input.select();
-    const done = (value) => { document.body.removeChild(overlay); resolve(value); };
-    overlay.querySelector('#cpOk').addEventListener('click', () => done({
-      label: input.value.trim() || 'Checkpoint',
-      projectWide: !!overlay.querySelector('#cpProject')?.checked,
-    }));
-    overlay.querySelector('#cpCancel').addEventListener('click', () => done(null));
-    overlay.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape') done(null);
-      if (ev.key === 'Enter' && ev.target === input) overlay.querySelector('#cpOk').click();
-    });
-  });
-}
-
-// How many text files differ from their baseline right now.
-function dirtyFileCount() {
-  const mp = projectModel.project.mainPath;
-  if (mp) projectModel.updateText(mp, editor.getText());
-  return projectModel.listEntries().filter(e => projectModel.isDirty(e.path)).length;
-}
-
-document.getElementById('ftCheckpoint')?.addEventListener('click', async () => {
-  const mp = projectModel.project.mainPath;
-  if (!mp) return;
-  projectModel.updateText(mp, editor.getText());
-  const answer = await showCheckpointPrompt(mp, dirtyFileCount());
-  if (!answer) return;
-  if (answer.projectWide) {
-    const stamped = projectModel.checkpointProject(answer.label);
-    refreshCheckpointBar();
-    updateStatus('ready',
-      `Saved "${answer.label}" across ${stamped.length} file${stamped.length === 1 ? '' : 's'}`);
-  } else {
-    const cp = projectModel.addCheckpoint(mp, answer.label);
-    refreshCheckpointBar();
-    updateStatus('ready', cp ? `Saved restore point "${cp.label}" for ${mp}`
-                             : `${mp} cannot be checkpointed`);
-  }
-});
-
-document.getElementById('ftRestore')?.addEventListener('change', (e) => {
-  const id = e.target.value;
-  e.target.selectedIndex = 0;
-  if (!id) return;
-  const mp = projectModel.project.mainPath;
-  const text = projectModel.checkpointText(mp, id);
-  if (text === null) return;
-  if (text === editor.getText()) {
-    updateStatus('ready', 'That restore point matches the current text');
-    return;
-  }
-  editor.replaceAll(text);              // ONE undoable transaction
-  projectModel.updateText(mp, text);
-  syncAuxFiles();
-  refreshCheckpointBar();
-  updateStatus('ready', `Restored ${mp} — press Ctrl+Z to undo the restore`);
-});
-
 async function openProjectFile(entry) {
   if (!entry) return;
 
-  // Text files: switch the EDITOR's document (v0.5). openDocument keeps
-  // one EditorState per file, so undo history and marks survive the
-  // round trip — setText would discard both.
-  if (entry.viewable) {
+  // ANY text file opens in the editor — .sty and .bib included. Whether
+  // it also becomes the conversion target is a SEPARATE question,
+  // answered by entry.convertible.
+  if (entry.viewable || entry.convertible) {
     captureEditorIntoModel();
     const keepTarget = !entry.convertible;
-    const text = projectModel.getText(entry.path) ?? '';
-    // Reset binary state WITHOUT clearBinaryInput(): that blanks the
-    // editor and would clobber the outgoing document's saved state.
-    if (inputBinaryFile) {
-      inputBinaryFile = null;
-      editor.setReadOnly(false);
-      document.getElementById('binaryInputOverlay').style.display = 'none';
-    }
-    editor.openDocument(entry.path, text);
-    projectModel.setMainDocument(entry.path, editor.getText(), { keepTarget });
+    const bytes = entry.bytes ||
+      (entry.text != null ? new TextEncoder().encode(entry.text) : new Uint8Array());
+    // Reuse the normal upload path: it already handles binary vs text,
+    // the tab name, inputFileName, selFrom, and setMainDocument.
+    await handleFileUpload(new File([bytes], entry.name), entry.path, { keepTarget });
 
-    document.getElementById('tabFilename').textContent = entry.name;
-    const reader = READER_BY_EXT[entry.ext];
-    if (!keepTarget) {
-      inputFileName = entry.name.replace(/\.[^.]+$/, '') || 'untitled';
-      if (reader) {
-        document.getElementById('selFrom').value = reader;
-        document.getElementById('statusFormat').textContent = reader;
-        updateExtensions();
-      }
-    }
-    const langMap = { tex: 'latex', latex: 'latex', sty: 'latex', cls: 'latex',
-                      def: 'latex', clo: 'latex', md: 'markdown',
-                      markdown: 'markdown', html: 'html', htm: 'html' };
-    editor.setLanguage(langMap[entry.ext] || 'text');
+    // .sty / .cls have no pandoc reader, so handleFileUpload leaves the
+    // editor language alone. LaTeX highlighting is still right for them.
+    if (['sty', 'cls', 'def', 'clo'].includes(entry.ext)) editor.setLanguage('latex');
 
-    syncAuxFiles();
     const lbl = document.getElementById('sourceViewerLabel');
     if (lbl) lbl.hidden = true;
     refreshConvertTargetLabel();
-    refreshCheckpointBar();
 
     const live = document.getElementById('targetLive');
     if (keepTarget) {
+      // Editing a support file: say so, and make clear the target did
+      // NOT move — a silent non-change is as confusing as a silent one.
       const tgt = projectModel.project.convertTargetPath;
       if (live) live.textContent = `Editing ${entry.path}. Still converting ${tgt || 'nothing'}.`;
       updateStatus('ready',
         `Editing ${entry.path}` + (tgt ? ` · conversion target is still ${tgt}` : ''));
     } else {
       if (live) live.textContent = `Now editing and converting ${entry.path}`;
-      updateStatus('ready', projectModel.targetIsFragment()
-        ? `Converting ${entry.path} · no \\documentclass — this looks like a fragment, ` +
-          `so macros defined in the parent preamble will be undefined`
-        : `Converting ${entry.path}`);
+      if (projectModel.targetIsFragment()) {
+        updateStatus('ready',
+          `Converting ${entry.path} · no \\documentclass — this looks like a fragment, ` +
+          `so macros defined in the parent preamble will be undefined`);
+      } else {
+        updateStatus('ready', `Converting ${entry.path}`);
+      }
     }
-    return;
-  }
-
-  // Binary but convertible (docx, epub …): the existing overlay card.
-  if (entry.convertible) {
-    captureEditorIntoModel();
-    const bytes = entry.bytes || new Uint8Array();
-    await handleFileUpload(new File([bytes], entry.name), entry.path);
-    const lbl = document.getElementById('sourceViewerLabel');
-    if (lbl) lbl.hidden = true;
-    refreshConvertTargetLabel();
-    refreshCheckpointBar();
-    updateStatus('ready', `Converting ${entry.path}`);
     return;
   }
 
@@ -4828,10 +4643,7 @@ let lastOutput = null;  // { blob, filename } — stores last conversion output 
 // Clear binary input state and restore editor
 function clearBinaryInput() {
   inputBinaryFile = null;
-  // detachDocument, NOT setText(''): setText would overwrite the
-  // CURRENT document's saved state with an empty one, losing its text
-  // and undo history when the user switches back to it.
-  editor.detachDocument();
+  editor.setText('');
   editor.setReadOnly(false);
   inputFileName = 'untitled';
   document.getElementById('binaryInputOverlay').style.display = 'none';

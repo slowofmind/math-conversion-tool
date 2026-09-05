@@ -44,7 +44,7 @@ function markedText() {
 const flat = (s) => s.split('\n').join('');
 
 console.log(`\ncm6 facade v${CM6_BUNDLE_VERSION}\n`);
-ok('bundle version is 0.4.0', CM6_BUNDLE_VERSION === '0.4.0', CM6_BUNDLE_VERSION);
+ok('bundle version is 0.5.0', CM6_BUNDLE_VERSION === '0.5.0', CM6_BUNDLE_VERSION);
 
 // ── offsets and conversion ────────────────────────────────────────────
 ok('docLength matches the source string', ed.docLength() === DOC.length,
