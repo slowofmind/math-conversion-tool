@@ -4840,7 +4840,7 @@ function needsMathjaxDevice() {
 function ensureMathjaxDevice() {
   if (!_mjxDeviceReady) {
     _mjxDeviceReady = (async () => {
-      const [{ tex2mml, chemConditionDocument }, cond, { rewriteIsotopes }] = await Promise.all([
+      const [{ tex2mml }, cond, { rewriteIsotopes }] = await Promise.all([
         // 2026-08-09: intent-aware bundle (adds \intent/\iarg/\speakas + the
         // vocabulary shortcut macros; no-intent sources convert IDENTICALLY —
         // byte-parity verified). Built by mathjax-intent-extension
@@ -4850,20 +4850,6 @@ function ensureMathjaxDevice() {
         import('./math-conversion/mml-isotopes-browser.js'),
       ]);
       const { conditionForOmml, conditionUniversal } = cond;
-      // CHEM-WIRE BEGIN (2026-09-03): chemistry conditioning for the HTML/EPUB
-      // path. Pre-splits compact \ce formulas ONLY inside authored intent
-      // arguments (MathCAT split bug R1; scope narrowed 2026-09-03 after the
-      // f08 NVDA A/B showed the global split broke phantom subscripts) and
-      // stamps :chemical-formula on chemmark-marked spans. Set
-      // CHEM_CONDITION = false
-      // to disable without unwiring; delete this block + the destructured
-      // chemConditionDocument above to fully remove. Docs:
-      // math-conversion/CHEM-WIRE.md
-      const CHEM_CONDITION = true;
-      const chemCond = (mml) =>
-        (CHEM_CONDITION && typeof chemConditionDocument === 'function')
-          ? chemConditionDocument(mml) : mml;
-      // CHEM-WIRE END
       const xslText = await (await fetch('math-conversion/MML2OMML.XSL')).text();
       const proc = new XSLTProcessor();
       proc.importStylesheet(new DOMParser().parseFromString(xslText, 'application/xml'));
@@ -4882,7 +4868,7 @@ function ensureMathjaxDevice() {
             const mml = tex2mml(it.tex, it.display);
             return batch.target === 'omml'
               ? mmlToOmml(rewriteIsotopes(conditionForOmml(mml)))
-              : chemCond(conditionUniversal(mml)); // CHEM-WIRE: HTML path only
+              : conditionUniversal(mml);
           } catch (e) {
             return batch.target === 'omml' ? OMML_ERR : MML_ERR;
           }

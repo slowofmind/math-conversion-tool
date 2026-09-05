@@ -1572,15 +1572,11 @@ local VOCAB_ENTRIES = {
   { concept = 'partial-negative-charge', group = 'chemistry', json = [==[{"open": "partial negative charge", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'acid-dissociation-constant', group = 'chemistry', json = [==[{"open": "acid dissociation constant", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'base-dissociation-constant', group = 'chemistry', json = [==[{"open": "base dissociation constant", "close": ""}]==], offjson = [==[{"off": true}]==] },
+  { concept = 'solubility-product', group = 'chemistry', json = [==[{"open": "solubility product constant", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'p-k-a', group = 'chemistry', json = [==[{"open": "p K a", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'p-o-h', group = 'chemistry', json = [==[{"open": "p O H", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'standard-enthalpy-of-formation', group = 'chemistry', json = [==[{"open": "standard enthalpy of formation", "close": ""}]==], offjson = [==[{"off": true}]==] },
   { concept = 'standard-enthalpy-of-reaction', group = 'chemistry', json = [==[{"open": "standard enthalpy of reaction", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'solubility-product-constant', group = 'chemistry', json = [==[{"open": "solubility product constant", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'rate-constant', group = 'chemistry', json = [==[{"open": "rate constant", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'half-life', group = 'chemistry', json = [==[{"open": "half-life", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'avogadros-number', group = 'chemistry', json = [==[{"open": "Avogadros number", "close": ""}]==], offjson = [==[{"off": true}]==] },
-  { concept = 'substance', group = 'chemistry', json = [==[{"open": "substance", "close": "", "fixity": "prefix"}]==], offjson = [==[{"off": true}]==] },
 }
 
 -- Assemble the per-document vocabulary and fill the extension's placeholders.
@@ -2394,15 +2390,6 @@ local CUSTOM_EXTENSION_JS = [==[
         var args = arity
           ? '(' + slots.map(function (s) { return '$' + s; }).join(',') + ')'
           : '';
-
-        // Default FIXITY from the vocabulary ('fixity' field): appended to
-        // the MathCAT intent as a W3C property (e.g. substance:prefix($a))
-        // UNLESS the author already supplied a fixity property inline —
-        // the author always wins. MathCAT channel only; ext-* phrasing
-        // already controls SRE word order and is never touched by fixity.
-        if (v0 && v0.fixity && !/:(prefix|postfix|infix|function|silent)\b/.test(props)) {
-          props = props + ':' + v0.fixity;
-        }
 
         var attrs = { intent: cname + props + args }; // MathCAT channel, always
         var expr = concept + args;                    // ext channel: list name

@@ -1,0 +1,111 @@
+# CHEM-WIRE — chemistry conditioning integration (2026-09-03)
+
+Status: WIRED, toggle ON. [CLAUDE] drafted, [NICHOLAS] approved wiring.
+Companion engine + tests live in `mathjax-intent-extension` (000-BBB).
+
+## What this adds
+Two pieces from the intent extension, for the HTML/EPUB output path only:
+1. **chemmark** (MathJax TeX package, inside the bundle): stamps
+   `data-chem` markers on everything `\ce{...}` emits during typesetting,
+   so downstream code knows which MathML came from chemistry.
+2. **chemConditionDocument** (exported by the bundle): post-pass over the
+   serialized MathML that (a) PRE-SPLITS compact formulas so MathCAT's
+   token splitter cannot drop atoms (upstream bug R1: "concentration of
+   cap H" losing the Cl), and (b) STAMPS `:chemical-formula` intent
+   properties on marked spans so MathCAT treats them as chemistry even
+   where its own detection would fail or veto.
+
+## Why
+NVDA gate S1-S8 (2026-09-03 sessions): 4 broken readings rescued, 3
+no-regressions, 1 accepted wording delta. Without this wiring those fixes
+existed only in test pages; platform conversions still read wrong.
+
+## Files touched (all backed up as *.bak-20260903-chemwire)
+- `math-conversion/mathjax-bundle-intent.js` — rebuilt bundle (adds the
+  chemmark package + two exports). Source of truth: extension repo
+  `build/bundle/tex2mml-intent-entry.mjs`; rebuild via `npm run build:bundle`.
+- `index.html` — three edits, all inside/marked CHEM-WIRE comments near
+  `ensureMathjaxDevice` (~line 4842-4872).
+
+## Toggle (disable without unwiring)
+In `index.html`, CHEM-WIRE block: set `const CHEM_CONDITION = false;`.
+Conversion then behaves exactly as before this wiring (the helper becomes
+a pass-through). The chemmark stamps still exist in the MathML but are
+inert attributes; nothing reads them.
+
+## Full undo (three steps, ~2 minutes)
+1. `index.html`: delete the CHEM-WIRE BEGIN..END block, restore the two
+   one-line edits (remove `chemConditionDocument` from the destructure;
+   change `chemCond(conditionUniversal(mml))` back to
+   `conditionUniversal(mml)`), OR just restore
+   `index.html.bak-20260903-chemwire`.
+2. Restore `math-conversion/mathjax-bundle-intent.js.bak-20260903-chemwire`
+   (pre-chemistry bundle) — optional; the new bundle is harmless alone.
+3. Extension repo: restore
+   `build/bundle/tex2mml-intent-entry.mjs.bak-20260903-chemwire` so the
+   next rebuild does not re-add the pieces.
+
+## Scope decisions
+- HTML/EPUB path ONLY. The OMML/Word path (`conditionForOmml` +
+  `rewriteIsotopes`) is deliberately untouched: chemistry conditioning
+  targets screen-reader markup, and the standing chemistry A/B rule says
+  no document-level chemistry change ships to a new surface untested.
+- Runtime A arrow remap (queued, unimplemented): when built, it must run
+  AFTER chemCond and target only accessibility serializations
+  (aria-label + hidden MathML), never the visual tree.
+
+## Testing
+- Automated (extension repo, `000-BBB .../mathjax-intent-extension`):
+  `node test\run-all-suites.cjs` — 6 suites, all green 2026-09-03:
+  chem-arrows 36, chem-conditioning 52, chem-intent-stress 50,
+  chem-pandoc-cli 10 fixtures (REAL pandoc + built Lua filter over
+  `test\fixtures-chem\f01..f10.tex`), roundtrip 1293, vocabulary 1293.
+  Bundle probe: `node test\_probe-bundle-chemwire.mjs` (stamp flows,
+  conditioning runs, plain math byte-untouched).
+- Platform smoke: PASSED 2026-09-03 [NICHOLAS converted, CLAUDE verified].
+  f05 through the real UI: 9 data-chem, 6 :chemical-formula,
+  1 :chemical-equation, :chemical-element on the free element, all six
+  authored intents intact (probe: extension test\_probe-smoke-f05.cjs).
+  Non-chem control (04-calculus-limits) converted with CHEM_CONDITION
+  true then false: fc /b byte-identical; toggle-on output carries zero
+  chem attributes. Toggle restored to true after the test.
+- NVDA listening gates (step 6): DONE 2026-09-03 [NICHOLAS heard, CLAUDE
+  captured]. W7 POSITIVE: authored chemical-state head spoken by Layer C,
+  clean 'aqueous', parity with inferred control -> mathcatName ADOPTED on
+  aqueous. yields mathcatName REJECTED (functional shape silent, leaf shape
+  literal 'chemical arrow operator'); list name 'yields' is the desired
+  reading. W1 italics gate PASSED (f07, no misfires either direction).
+  REGRESSION FOUND AND FIXED: global pre-split broke phantom subscripts
+  (SO3 heard 'plus pre subscript 3'; A/B-confirmed vs toggle-off). Split
+  now scoped to intent-argument subtrees only (the R1 context); R1 repro
+  confirmed fixed by ear ('concentration of cap h cap c-l'). Conditioning
+  suite now 55 assertions covering both scope directions.
+  UPSTREAM: MathCAT mover path skips intent on arrow conditions (f08 line 1,
+  identical with conditioning off) — evidence pile with R1–R6.
+
+## Vocabulary state (same date)
+1,293 concepts after the chemistry import: open-list ten (phrases
+upgraded), Ginev notational tier (isotope, oxidation-number, molarity,
+molality, equilibrium-constant, yields), states (aqueous/solid/liquid/
+gas), variables (enthalpy/entropy/pressure), and 118 element names.
+All PROVISIONAL; elements + variables are author-applied ONLY (policy in
+each entry's notes; groups chemistry-elements / chemistry-variables are
+their kill-switches). Naming lint: no concept name may contain
+":chemical-formula", ":chemical-equation", or "chemical-element" as a
+substring (MathCAT matches intent heads by substring containment).
+
+## Pointers
+- Engine sources: extension `src/chem-marker.mjs`, `src/chem-conditioning.mjs`
+- Deep background: extension `docs/chemistry-architecture-map-2026-09-02.md`,
+  `docs/mathcat-chemistry-source-reference.md`, ecosystem + packages surveys
+  (2026-09-03), `docs/PRECISION-REVIEW-2026-08.md`.
+
+## Route note
+Conditioning runs only where the device transform runs: the baked-MathML
+route (tex2mml in-browser at CONVERSION time). The MathJax-mode route
+(raw TeX shipped to the reader's page, client-side typeset via the Lua
+filter's inline extension) has no conditioning hook, so chem pages meant
+for MathCAT/SRE should be produced via the baked route. Extending
+chemmark to the inline extension is possible but pointless without a
+client-side conditioning pass — noted as future work, not a gap in this
+wiring.
