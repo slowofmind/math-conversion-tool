@@ -1250,8 +1250,8 @@ export function initCleanupEngine(ctx) {
   });
 
   // ─── Conversion-time cleanup ───
-  // Single source of truth for the text handed to the conversion engines
-  // (Pandoc WASM, LaTeXML, LuaLaTeX): the editor content, optionally run
+  // Single source of truth for the text handed to the conversion engine
+  // (Pandoc WASM): the editor content, optionally run
   // through the active cleanup profile first. The editor itself is never
   // modified here — cleanup applies to a copy of the text.
   // lastCleanupReplacements records whether the most recent conversion ran on

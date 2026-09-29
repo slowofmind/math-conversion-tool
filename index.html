@@ -158,16 +158,6 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   }
 
-  /* Pipeline info note below options tabs */
-  .pipeline-note {
-    font-size: 12px;
-    color: var(--text-muted);
-    padding: 4px 12px 6px;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    line-height: 1.5;
-  }
-
   /* ─── MAIN LAYOUT ─── */
   .main-area {
     flex: 1;
@@ -1352,24 +1342,16 @@
 
   <div class="toolbar-divider"></div>
 
-  <!-- ENGINE BUTTONS HIDDEN ==================================================
-       Pandoc is the only engine exposed for now, so the engine selector is
-       hidden rather than deleted. The LaTeXML / LuaLaTeX pipeline code is all
-       still present under the hood; it is simply unreachable from the UI, and
-       the embedded token has been removed (search: TOKEN SLOT).
-
-       The buttons are hidden with a wrapper rather than removed because
-       several addEventListener calls reference these ids directly and would
-       throw at load time if the elements did not exist.
-
-       To restore: delete the style="display:none" below and put a valid PAT
-       in the TOKEN SLOT.
+  <!-- ENGINE SELECTOR (hidden, one choice) ==================================
+       Pandoc is the only engine. The LaTeXML and LuaLaTeX remote pipelines
+       were removed in September 2026; their code is in git history. The
+       selector is kept, hidden, with one choice so an engine can be added
+       back later: its button here, its entries in the maps in
+       setActiveEngine(), and its branch in the Convert dispatch (SECTION 6).
        ==================================================================== -->
   <div class="toolbar-group" style="display:none;" aria-hidden="true">
     <div class="engine-group" role="radiogroup" aria-label="Conversion engine">
       <button class="engine-btn active" id="btnEnginePandoc" role="radio" aria-checked="true" tabindex="-1">Pandoc</button>
-      <button class="engine-btn" id="btnEngineLatexml" role="radio" aria-checked="false" tabindex="-1">LaTeXML</button>
-      <button class="engine-btn" id="btnEngineLualatex" role="radio" aria-checked="false" tabindex="-1">LuaLaTeX</button>
     </div>
   </div>
 
@@ -1440,23 +1422,6 @@
     <button class="options-tab" data-tab="wrapping" role="tab" id="opttab-wrapping" aria-selected="false" aria-controls="panel-wrapping" tabindex="-1">Wrapping</button>
     <button class="options-tab" data-tab="extensions" role="tab" id="opttab-extensions" aria-selected="false" aria-controls="panel-extensions" tabindex="-1">Extensions</button>
   </div>
-
-  <!-- LaTeXML option tabs (hidden by default) -->
-  <div class="options-tabs" id="latexmlOptionsTabs" role="tablist" aria-label="LaTeXML options" style="display:none;">
-    <button class="options-tab active" data-tab="latexml-engine" role="tab">Engine</button>
-    <button class="options-tab" data-tab="latexml-tbd1" role="tab">TBD</button>
-    <button class="options-tab" data-tab="latexml-tbd2" role="tab">TBD</button>
-    <button class="options-tab" data-tab="latexml-tbd3" role="tab">TBD</button>
-  </div>
-  <div class="pipeline-note" id="latexmlNote" style="display:none;">Converts to HTML using LaTeXML via GitHub Actions — may take 1–2 minutes</div>
-
-  <!-- LuaLaTeX option tabs (hidden by default) -->
-  <div class="options-tabs" id="lualatexOptionsTabs" role="tablist" aria-label="LuaLaTeX options" style="display:none;">
-    <button class="options-tab active" data-tab="lualatex-engine" role="tab">Engine</button>
-    <button class="options-tab" data-tab="lualatex-tbd1" role="tab">TBD</button>
-    <button class="options-tab" data-tab="lualatex-tbd2" role="tab">TBD</button>
-  </div>
-  <div class="pipeline-note" id="lualatexNote" style="display:none;">Compiles to PDF using LuaLaTeX/TexLive via GitHub Actions — may take 1–4 minutes</div>
 
   <!-- General -->
   <div class="options-tab-panel active" id="panel-general" role="tabpanel" aria-labelledby="opttab-general">
@@ -2078,39 +2043,6 @@
       </div>
     </div>
   </div>
-
-  <!-- LaTeXML engine panel (placeholder) -->
-  <div class="options-tab-panel" id="panel-latexml-engine" style="display:none;">
-    <div class="options-grid">
-      <div class="opt-group">
-        <label for="opt-latexml-math">Math output:</label>
-        <select id="opt-latexml-math" style="width:auto;">
-          <option value="mathml" selected>MathML (raw)</option>
-          <option value="mathjax4">MathJax 4 (CDN)</option>
-        </select>
-      </div>
-    </div>
-  </div>
-  <div class="options-tab-panel" id="panel-latexml-tbd1" style="display:none;">
-    <div style="padding:8px; color:var(--text-muted); font-size:12px;">Options to be determined.</div>
-  </div>
-  <div class="options-tab-panel" id="panel-latexml-tbd2" style="display:none;">
-    <div style="padding:8px; color:var(--text-muted); font-size:12px;">Options to be determined.</div>
-  </div>
-  <div class="options-tab-panel" id="panel-latexml-tbd3" style="display:none;">
-    <div style="padding:8px; color:var(--text-muted); font-size:12px;">Options to be determined.</div>
-  </div>
-
-  <!-- LuaLaTeX engine panel (placeholder) -->
-  <div class="options-tab-panel" id="panel-lualatex-engine" style="display:none;">
-    <div style="padding:8px; color:var(--text-muted); font-size:12px;">LuaLaTeX engine options to be determined.</div>
-  </div>
-  <div class="options-tab-panel" id="panel-lualatex-tbd1" style="display:none;">
-    <div style="padding:8px; color:var(--text-muted); font-size:12px;">Options to be determined.</div>
-  </div>
-  <div class="options-tab-panel" id="panel-lualatex-tbd2" style="display:none;">
-    <div style="padding:8px; color:var(--text-muted); font-size:12px;">Options to be determined.</div>
-  </div>
 </div>
 
 <!-- ═══ MAIN AREA ═══ -->
@@ -2641,7 +2573,7 @@ async function initPandoc() {
 // Order here IS the display order. Verified on Pandoc 3.10: 'html5' and 'html'
 // are the same writer (byte-identical output), and 'epub' and 'epub3' are the
 // same (package version 3.0). We keep 'html5'/'epub' as the internal values so
-// pandocDefaultTo and the LaTeXML engine path need no changes.
+// pandocDefaultTo needs no change.
 // FULL Pandoc format lists (restored 2026-09-01). The dropdowns now show
 // every format this Pandoc build reports, in Pandoc's own alphabetical order,
 // under Pandoc's own raw names -- no friendly relabelling. This is the
@@ -2806,7 +2738,7 @@ function applyOptionsView() {
 
 // Rebuild the math dropdown for the current output format. Preserves the
 // current selection when still valid, else falls back to the family default
-// (first entry). Unknown formats (e.g. LuaLaTeX 'pdf' mode) are left alone
+// (first entry). Unknown formats are left alone
 // rather than blanked.
 function refreshMathOptions() {
   const sel = document.getElementById('opt-math');
@@ -2978,8 +2910,6 @@ document.getElementById('selSampleFiles').addEventListener('change', async (e) =
     const convertBtn = document.getElementById('btnConvert');
     if (activeEngine === 'pandoc') {
       convertBtn.disabled = !pandocModule;
-    } else {
-      convertBtn.disabled = false;
     }
 
     updateStatus('ready', `Loaded sample: ${filename}`);
@@ -3434,7 +3364,7 @@ function clearDecorations() {
 // ════════════════════════════════════════════════════════════════════
 
 // --- Active engine state ---
-let activeEngine = 'pandoc';  // 'pandoc' | 'latexml' | 'lualatex'
+let activeEngine = 'pandoc';  // the only engine (see ENGINE SELECTOR in the toolbar markup)
 
 // --- Options view switch (replaced the old show/hide toggle) ---
 // The panel is always open now; Core is a single row, so there is nothing
@@ -3476,8 +3406,8 @@ function activateOptionsTab(tab) {
   }
 }
 
-// Attach click + keyboard handlers to all three tab rows
-['pandocOptionsTabs', 'latexmlOptionsTabs', 'lualatexOptionsTabs'].forEach(rowId => {
+// Attach click + keyboard handlers to each engine's tab row (Pandoc's only, for now)
+['pandocOptionsTabs'].forEach(rowId => {
   const row = document.getElementById(rowId);
   if (!row) return;
   row.addEventListener('click', (e) => {
@@ -3516,9 +3446,6 @@ const pandocDefaultTo = 'html5';
 function setActiveEngine(engine) {
   activeEngine = engine;
 
-  // Restore iframe sandbox if switching away from PDF display
-  restoreHtmlPreview();
-
   // Update engine button styling
   document.querySelectorAll('.engine-btn').forEach(b => {
     b.classList.remove('active');
@@ -3526,8 +3453,6 @@ function setActiveEngine(engine) {
   });
   const activeBtn = {
     pandoc: 'btnEnginePandoc',
-    latexml: 'btnEngineLatexml',
-    lualatex: 'btnEngineLualatex',
   }[engine];
   const btn = document.getElementById(activeBtn);
   if (btn) {
@@ -3535,28 +3460,15 @@ function setActiveEngine(engine) {
     btn.setAttribute('aria-checked', 'true');
   }
 
-  // Show/hide tab rows and notes
+  // Show/hide tab rows
   const tabRows = {
     pandoc: 'pandocOptionsTabs',
-    latexml: 'latexmlOptionsTabs',
-    lualatex: 'lualatexOptionsTabs',
-  };
-  const notes = {
-    latexml: 'latexmlNote',
-    lualatex: 'lualatexNote',
   };
 
   Object.values(tabRows).forEach(id => {
     document.getElementById(id).style.display = 'none';
   });
   document.getElementById(tabRows[engine]).style.display = '';
-
-  Object.values(notes).forEach(id => {
-    document.getElementById(id).style.display = 'none';
-  });
-  if (notes[engine]) {
-    document.getElementById(notes[engine]).style.display = '';
-  }
 
   // Hide all option panels, then show the first panel for the active engine
   document.querySelectorAll('.options-tab-panel').forEach(p => {
@@ -3597,28 +3509,6 @@ function setActiveEngine(engine) {
     selTo.value = pandocDefaultTo;
     updateExtensions();
     refreshMathOptions();
-  } else if (engine === 'latexml') {
-    selFrom.value = 'latex';
-    selFrom.disabled = true;
-    selFrom.style.opacity = '0.5';
-    selTo.value = 'html5';
-    selTo.disabled = true;
-    selTo.style.opacity = '0.5';
-  } else if (engine === 'lualatex') {
-    selFrom.value = 'latex';
-    selFrom.disabled = true;
-    selFrom.style.opacity = '0.5';
-    // Temporarily add pdf option if not present
-    let pdfOpt = selTo.querySelector('option[value="pdf"]');
-    if (!pdfOpt) {
-      pdfOpt = document.createElement('option');
-      pdfOpt.value = 'pdf';
-      pdfOpt.textContent = 'pdf';
-      selTo.appendChild(pdfOpt);
-    }
-    selTo.value = 'pdf';
-    selTo.disabled = true;
-    selTo.style.opacity = '0.5';
   }
 
   // Update Convert button state
@@ -3626,21 +3516,14 @@ function setActiveEngine(engine) {
   if (engine === 'pandoc') {
     convertBtn.disabled = !pandocModule;
     convertBtn.textContent = 'Convert';
-  } else {
-    convertBtn.disabled = false;  // Pipeline engines don't need local WASM
-    convertBtn.textContent = engine === 'lualatex' ? 'Compile' : 'Convert';
   }
 
   // Update status format display
-  document.getElementById('statusFormat').textContent =
-    engine === 'pandoc' ? selFrom.value :
-    engine === 'latexml' ? 'LaTeXML' : 'LuaLaTeX';
+  document.getElementById('statusFormat').textContent = selFrom.value;
 }
 
 // Engine button handlers
 document.getElementById('btnEnginePandoc').addEventListener('click', () => setActiveEngine('pandoc'));
-document.getElementById('btnEngineLatexml').addEventListener('click', () => setActiveEngine('latexml'));
-document.getElementById('btnEngineLualatex').addEventListener('click', () => setActiveEngine('lualatex'));
 
 // --- Collected resource files (populated by future tabs) ---
 
@@ -6545,18 +6428,11 @@ async function handlePdfAuxFiles() {
 document.getElementById('btnConvert').addEventListener('click', () => {
   if (activeEngine === 'pandoc') {
     runConversion();
-  } else if (activeEngine === 'latexml') {
-    runLatexmlConversion();
-  } else if (activeEngine === 'lualatex') {
-    runLualatexCompilation();
   }
 });
 
 async function runConversion() {
   if (!pandocModule) return;
-
-  // Restore iframe sandbox in case previous output was a PDF
-  restoreHtmlPreview();
 
   const btn = document.getElementById('btnConvert');
   btn.disabled = true;
@@ -7275,584 +7151,6 @@ document.addEventListener('keydown', (e) => {
     }
   }
 });
-
-// ════════════════════════════════════════════════════════════════════
-// SECTION 12: REMOTE CONVERSION (LaTeXML via GitHub Actions)
-// ════════════════════════════════════════════════════════════════════
-//
-// Architecture:
-//   1. User clicks "LaTeXML" → JS commits .tex to latexml-pipeline-input/ via GitHub API
-//   2. Push triggers the latexml-convert.yml workflow on github.com
-//   3. Workflow runs LaTeXML in Docker, commits HTML output to latexml-pipeline-output/
-//   4. JS polls for workflow completion, then fetches the HTML result
-//   5. Result is displayed in the existing preview/source panels
-//
-// Authentication: requires a GitHub PAT with repo + actions scopes,
-// stored in localStorage after the user enters it once.
-
-const GITHUB_REPO_OWNER = 'slowofmind';
-const GITHUB_REPO_NAME = 'math-conversion-tool';
-const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}`;
-
-// --- PAT management (localStorage + embedded service token) ---
-
-// ============================================================================
-// TOKEN SLOT - intentionally empty.
-// ============================================================================
-// This is where the GitHub Personal Access Token would go IF the Docker-based
-// LaTeXML / LuaLaTeX conversion via GitHub Actions were re-enabled.
-//
-// The pipeline code is all still present and functional; only the token and
-// the engine buttons that reached it have been removed. Restoring the feature
-// means (a) putting a valid fine-grained PAT below, and (b) un-hiding the
-// engine buttons in the toolbar markup (search: ENGINE BUTTONS HIDDEN).
-//
-// Required PAT scopes, limited to the pipeline repo only:
-//     contents:write   commit the .tex file (NOTE: also grants repo read)
-//     actions:read     poll workflow runs, download artifacts
-//
-// SECURITY: anything placed here is readable by every visitor who can load
-// this page - client-side JavaScript cannot hide a secret. The previous token
-// is in git history and should be treated as compromised. Prefer a server-side
-// proxy that holds the credential, or per-user tokens via the right-click
-// prompt (promptForGitHubToken), over embedding one here again.
-//
-// Leave as an empty string to keep the pipeline engines inert.
-const SERVICE_TOKEN = '';
-
-function getGitHubToken() {
-  // User-provided token takes priority over service token
-  return localStorage.getItem('github-pat') || SERVICE_TOKEN || null;
-}
-
-function hasServiceToken() {
-  return SERVICE_TOKEN && SERVICE_TOKEN !== 'PASTE_YOUR_TOKEN_HERE';
-}
-
-function saveGitHubToken(token) {
-  localStorage.setItem('github-pat', token);
-}
-
-function promptForGitHubToken() {
-  const current = localStorage.getItem('github-pat') || '';
-  const token = prompt(
-    'Enter your own GitHub Personal Access Token (PAT) to override the built-in token.\n\n' +
-    'Required scopes: repo, actions\n' +
-    'Generate one at: github.com/settings/tokens\n\n' +
-    'Leave blank and click OK to revert to the built-in token.',
-    current
-  );
-  if (token === null) return null; // cancelled
-  if (token.trim()) {
-    saveGitHubToken(token.trim());
-    return token.trim();
-  } else {
-    // Cleared — remove personal token, fall back to service token
-    localStorage.removeItem('github-pat');
-    return getGitHubToken();
-  }
-}
-
-// --- GitHub API helper ---
-
-async function githubAPI(endpoint, options = {}) {
-  const token = getGitHubToken();
-  if (!token) throw new Error('No GitHub token configured');
-
-  const url = endpoint.startsWith('http')
-    ? endpoint
-    : `${GITHUB_API_BASE}${endpoint}`;
-
-  const resp = await fetch(url, {
-    ...options,
-    headers: {
-      'Authorization': `token ${token}`,
-      'Accept': 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(options.headers || {}),
-    },
-  });
-
-  if (!resp.ok) {
-    const body = await resp.text();
-    throw new Error(`GitHub API ${resp.status}: ${body}`);
-  }
-
-  return resp.json();
-}
-
-// --- Commit a file to the repo via the Contents API ---
-
-async function commitFileToRepo(path, contentString, commitMessage) {
-  // Check if file already exists (need its SHA for update)
-  let existingSha = null;
-  try {
-    const existing = await githubAPI(`/contents/${path}`);
-    existingSha = existing.sha;
-  } catch (_) {
-    // File doesn't exist yet — that's fine
-  }
-
-  // Base64-encode the content (handles UTF-8 correctly)
-  const encoder = new TextEncoder();
-  const bytes = encoder.encode(contentString);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  const base64Content = btoa(binary);
-
-  const body = {
-    message: commitMessage,
-    content: base64Content,
-  };
-  if (existingSha) body.sha = existingSha;
-
-  const result = await githubAPI(`/contents/${path}`, {
-    method: 'PUT',
-    body: JSON.stringify(body),
-  });
-
-  return result.commit.sha;
-}
-
-// --- Poll for workflow run completion ---
-
-async function waitForWorkflowRun(commitSha, timeoutMs = 300000) {
-  const POLL_INTERVAL = 5000;  // 5 seconds between checks
-  const startTime = Date.now();
-
-  // Give GitHub a moment to create the run
-  await new Promise(r => setTimeout(r, 4000));
-
-  while (Date.now() - startTime < timeoutMs) {
-    try {
-      const runs = await githubAPI('/actions/runs?per_page=10&branch=main');
-
-      // Find the run triggered by our specific commit
-      const run = runs.workflow_runs.find(r => r.head_sha === commitSha);
-
-      if (run) {
-        if (run.status === 'completed') {
-          return run;
-        }
-        // Show progress in status bar
-        const elapsed = Math.round((Date.now() - startTime) / 1000);
-        updateStatus('loading', `LaTeXML: ${run.status} (${elapsed}s)…`);
-      } else {
-        updateStatus('loading', 'LaTeXML: waiting for workflow to start…');
-      }
-    } catch (err) {
-      console.warn('Polling error (will retry):', err.message);
-    }
-
-    await new Promise(r => setTimeout(r, POLL_INTERVAL));
-  }
-
-  throw new Error('Workflow timed out after 5 minutes');
-}
-
-// --- Fetch an output file from the repo via Contents API ---
-
-async function fetchRepoFile(path) {
-  const file = await githubAPI(`/contents/${path}`);
-  // Contents API returns base64 — decode it
-  const raw = atob(file.content.replace(/\n/g, ''));
-  // Convert back to UTF-8 string
-  const bytes = new Uint8Array(raw.length);
-  for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
-}
-
-// --- List files in a repo directory ---
-
-async function listRepoDir(path) {
-  try {
-    const items = await githubAPI(`/contents/${path}`);
-    if (Array.isArray(items)) return items.map(i => i.name);
-  } catch (_) {}
-  return [];
-}
-
-// --- Main LaTeXML conversion flow ---
-
-async function runLatexmlConversion() {
-  // Restore iframe sandbox in case previous output was a PDF
-  restoreHtmlPreview();
-
-  // Ensure we have a token (service token or user-provided)
-  let token = getGitHubToken();
-  if (!token) {
-    // No service token and no user token — prompt
-    token = promptForGitHubToken();
-    if (!token) {
-      updateStatus('error', 'GitHub token required for LaTeXML conversion');
-      return;
-    }
-  }
-
-  const btn = document.getElementById('btnConvert');
-  const sourceText = inputBinaryFile ? null : getSourceForConversion();
-
-  if (!sourceText || !sourceText.trim()) {
-    updateStatus('error', 'No LaTeX source to convert');
-    return;
-  }
-
-  // Check that input looks like LaTeX
-  if (!sourceText.includes('\\documentclass') && !sourceText.includes('\\begin{document}')) {
-    const proceed = confirm(
-      'The source does not appear to contain \\documentclass.\n' +
-      'LaTeXML requires a complete LaTeX document. Continue anyway?'
-    );
-    if (!proceed) return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Converting…';
-  clearDecorations();
-
-  // Use a timestamp to create a unique filename and avoid collisions
-  const timestamp = Date.now();
-  const baseName = inputFileName || 'untitled';
-  const texFilename = `${baseName}-${timestamp}.tex`;
-
-  // Determine which output variant to fetch based on dropdown
-  const latexmlMathMode = document.getElementById('opt-latexml-math').value;
-  const variantSuffix = latexmlMathMode === 'mathjax4' ? 'mathjax4' : 'mathml';
-  const variantLabel = latexmlMathMode === 'mathjax4' ? 'MathJax 4' : 'MathML';
-  const expectedOutput = `${baseName}-${timestamp}-${variantSuffix}.html`;
-
-  try {
-    // Step 1: Commit the .tex file to latexml-pipeline-input/
-    updateStatus('loading', 'LaTeXML: uploading source…');
-    const commitSha = await commitFileToRepo(
-      `latexml-pipeline-input/${texFilename}`,
-      sourceText,
-      `LaTeXML: ${baseName}.tex`
-    );
-    console.log('[latexml] Committed latexml-pipeline-input/' + texFilename, 'SHA:', commitSha);
-
-    // Step 2: Wait for the GitHub Actions workflow to complete
-    updateStatus('loading', 'LaTeXML: workflow queued…');
-    const run = await waitForWorkflowRun(commitSha);
-
-    if (run.conclusion !== 'success') {
-      const runUrl = run.html_url;
-      throw new Error(
-        `Workflow ${run.conclusion}. ` +
-        `Check the Actions tab for details: ${runUrl}`
-      );
-    }
-    console.log('[latexml] Workflow completed:', run.html_url);
-
-    // Step 3: Fetch the HTML output
-    updateStatus('loading', 'LaTeXML: fetching results…');
-
-    // The pipeline might take a moment to push output back — poll briefly
-    let outputHtml = null;
-    for (let attempt = 0; attempt < 6; attempt++) {
-      try {
-        // Try the expected filename first
-        outputHtml = await fetchRepoFile(`latexml-pipeline-output/${expectedOutput}`);
-        break;
-      } catch (_) {
-        // Workflow commit might not have propagated yet, or filename differs
-        if (attempt < 5) {
-          await new Promise(r => setTimeout(r, 3000));
-        }
-      }
-    }
-
-    // If exact filename didn't work, scan the directory for our output
-    if (!outputHtml) {
-      const files = await listRepoDir('latexml-pipeline-output');
-      // Look for the selected variant HTML file that matches our base name
-      const match = files.find(f =>
-        f.includes(baseName) && f.includes(variantSuffix) && f.endsWith('.html')
-      );
-      if (match) {
-        outputHtml = await fetchRepoFile(`latexml-pipeline-output/${match}`);
-      }
-    }
-
-    if (!outputHtml) {
-      throw new Error(
-        'Conversion completed but output file not found. ' +
-        'Check the repo\'s latexml-pipeline-output/ folder and the Actions tab.'
-      );
-    }
-
-    // Step 4: Display results in the output panel
-    sourceEditor.setText(outputHtml);
-    sourceEditor.setLanguage('html');
-
-    const previewFrame = document.getElementById('previewFrame');
-    setPreviewHtml(outputHtml, true);   // MathCAT proofing: preview copy only
-
-    // Store for download
-    const blob = new Blob([outputHtml], { type: 'text/html' });
-    const sizeKB = (blob.size / 1024).toFixed(1);
-    const downloadName = `${baseName}-latexml-${variantSuffix}.html`;
-    lastOutput = { blob, filename: downloadName };
-
-    const downloadBtn = document.getElementById('btnDownloadOutput');
-    downloadBtn.textContent = `📥 ${downloadName} (${sizeKB} KB)`;
-    downloadBtn.style.display = '';
-
-    // Show SCORM button for HTML output
-    document.getElementById('btnDownloadScorm').style.display = '';
-
-    // Update log
-    updateLog([{
-      line: null, column: null, level: 'info',
-      message: `LaTeXML conversion complete (${sizeKB} KB, ${variantLabel}). Output: ${downloadName}`,
-      matchedText: null, type: 'latexml-success',
-    }], '');
-
-    updateStatus('ready', `LaTeXML: converted (${sizeKB} KB, ${variantLabel})`);
-
-  } catch (err) {
-    console.error('[latexml] Error:', err);
-    updateStatus('error', `LaTeXML: ${err.message.substring(0, 80)}`);
-    updateLog([{
-      line: null, column: null, level: 'error',
-      message: `LaTeXML conversion failed: ${err.message}`,
-      matchedText: null, type: 'latexml-error',
-    }], '');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Convert';
-  }
-}
-
-// --- Right-click on engine buttons to change PAT (for pipeline engines) ---
-document.getElementById('btnEngineLatexml').addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-  promptForGitHubToken();
-});
-document.getElementById('btnEngineLualatex').addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-  promptForGitHubToken();
-});
-
-
-// ════════════════════════════════════════════════════════════════════
-// SECTION 13: LuaLaTeX COMPILATION (via GitHub Actions)
-// ════════════════════════════════════════════════════════════════════
-//
-// Architecture:
-//   1. User clicks LuaLaTeX → Compile
-//   2. JS commits .tex to lualatex-pipeline-input/ via GitHub API
-//   3. Push triggers lualatex-compile.yml workflow
-//   4. Workflow runs LuaLaTeX in Docker, commits PDF to lualatex-pipeline-output/
-//      (also creates a GitHub Release as backup)
-//   5. JS polls for workflow completion, then fetches the PDF
-//   6. PDF fetched via Contents API with raw media type (no base64)
-//   7. PDF displayed in the preview iframe using browser's built-in PDF viewer
-
-// --- Fetch a binary file from the repo as raw bytes (no base64) ---
-
-async function fetchRepoFileRaw(path) {
-  const token = getGitHubToken();
-  if (!token) throw new Error('No GitHub token configured');
-
-  const url = `${GITHUB_API_BASE}/contents/${path}`;
-  const resp = await fetch(url, {
-    headers: {
-      'Authorization': `token ${token}`,
-      'Accept': 'application/vnd.github.raw',
-      'X-GitHub-Api-Version': '2022-11-28',
-    },
-  });
-
-  if (!resp.ok) {
-    throw new Error(`Failed to fetch ${path}: ${resp.status} ${resp.statusText}`);
-  }
-
-  return await resp.arrayBuffer();
-}
-
-// --- Display a PDF in the preview iframe ---
-
-function displayPdfInPreview(pdfArrayBuffer, filename) {
-  const blob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
-  const blobUrl = URL.createObjectURL(blob);
-
-  const previewFrame = document.getElementById('previewFrame');
-
-  // Remove sandbox to allow browser's built-in PDF viewer to work.
-  // This is safe because PDF blob URLs cannot execute scripts or access the parent page.
-  previewFrame.removeAttribute('sandbox');
-  clearPreviewHtml();   // MathCAT proofing: not HTML
-
-  // Clear any srcdoc and set src to the blob URL
-  previewFrame.removeAttribute('srcdoc');
-  previewFrame.src = blobUrl;
-
-  // Store the blob URL for cleanup when switching away
-  previewFrame._pdfBlobUrl = blobUrl;
-}
-
-// --- Restore iframe to HTML mode (re-enable sandbox) ---
-
-function restoreHtmlPreview() {
-  const previewFrame = document.getElementById('previewFrame');
-  // Clean up any PDF blob URL
-  if (previewFrame._pdfBlobUrl) {
-    URL.revokeObjectURL(previewFrame._pdfBlobUrl);
-    previewFrame._pdfBlobUrl = null;
-  }
-  // Restore sandbox for safe HTML rendering
-  previewFrame.setAttribute('sandbox', 'allow-scripts');
-  previewFrame.removeAttribute('src');
-}
-
-// --- Main LuaLaTeX compilation flow ---
-
-async function runLualatexCompilation() {
-  // Restore iframe sandbox in case previous output was a PDF
-  restoreHtmlPreview();
-
-  // Ensure we have a token (service token or user-provided)
-  let token = getGitHubToken();
-  if (!token) {
-    token = promptForGitHubToken();
-    if (!token) {
-      updateStatus('error', 'GitHub token required for LuaLaTeX compilation');
-      return;
-    }
-  }
-
-  const btn = document.getElementById('btnConvert');
-  const sourceText = inputBinaryFile ? null : getSourceForConversion();
-
-  if (!sourceText || !sourceText.trim()) {
-    updateStatus('error', 'No LaTeX source to compile');
-    return;
-  }
-
-  // Check that input looks like LaTeX
-  if (!sourceText.includes('\\documentclass') && !sourceText.includes('\\begin{document}')) {
-    const proceed = confirm(
-      'The source does not appear to contain \\documentclass.\n' +
-      'LuaLaTeX requires a complete LaTeX document. Continue anyway?'
-    );
-    if (!proceed) return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Compiling…';
-  clearDecorations();
-
-  // Use a timestamp to create a unique filename and avoid collisions
-  const timestamp = Date.now();
-  const baseName = inputFileName || 'untitled';
-  const texFilename = `${baseName}-${timestamp}.tex`;
-  const expectedPdf = `${baseName}-${timestamp}.pdf`;
-
-  try {
-    // Step 1: Commit the .tex file to lualatex-pipeline-input/
-    updateStatus('loading', 'LuaLaTeX: uploading source…');
-    const commitSha = await commitFileToRepo(
-      `lualatex-pipeline-input/${texFilename}`,
-      sourceText,
-      `LuaLaTeX: ${baseName}.tex`
-    );
-    console.log('[lualatex] Committed lualatex-pipeline-input/' + texFilename, 'SHA:', commitSha);
-
-    // Step 2: Wait for the GitHub Actions workflow to complete
-    updateStatus('loading', 'LuaLaTeX: workflow queued…');
-    const run = await waitForWorkflowRun(commitSha, 480000);  // 8 min timeout for compilation
-
-    if (run.conclusion !== 'success') {
-      const runUrl = run.html_url;
-      throw new Error(
-        `Workflow ${run.conclusion}. ` +
-        `Check the Actions tab for details: ${runUrl}`
-      );
-    }
-    console.log('[lualatex] Workflow completed:', run.html_url);
-
-    // Step 3: Fetch the PDF from lualatex-pipeline-output/ via raw Contents API
-    updateStatus('loading', 'LuaLaTeX: fetching PDF…');
-
-    let pdfData = null;
-    // Poll briefly — the workflow's commit may take a moment to propagate
-    for (let attempt = 0; attempt < 8; attempt++) {
-      try {
-        pdfData = await fetchRepoFileRaw(`lualatex-pipeline-output/${expectedPdf}`);
-        break;
-      } catch (_) {
-        if (attempt < 7) {
-          await new Promise(r => setTimeout(r, 3000));
-        }
-      }
-    }
-
-    // If exact filename didn't work, scan the directory
-    if (!pdfData) {
-      const files = await listRepoDir('lualatex-pipeline-output');
-      const match = files.find(f =>
-        f.includes(baseName) && f.endsWith('.pdf')
-      );
-      if (match) {
-        pdfData = await fetchRepoFileRaw(`lualatex-pipeline-output/${match}`);
-      }
-    }
-
-    if (!pdfData) {
-      throw new Error(
-        'Compilation completed but PDF not found. ' +
-        'Check the repo\'s lualatex-pipeline-output/ folder and the Actions tab.'
-      );
-    }
-
-    const sizeKB = (pdfData.byteLength / 1024).toFixed(1);
-    console.log(`[lualatex] Downloaded ${expectedPdf}: ${sizeKB} KB`);
-
-    // Step 4: Display PDF in preview panel
-    displayPdfInPreview(pdfData, expectedPdf);
-
-    // Update source editor with compilation info
-    sourceEditor.setText(
-      `% LuaLaTeX compilation complete\n` +
-      `% Output: ${expectedPdf} (${sizeKB} KB)\n` +
-      `% The PDF is displayed in the Preview tab.`
-    );
-
-    // Store for download
-    const blob = new Blob([pdfData], { type: 'application/pdf' });
-    const downloadName = `${baseName}.pdf`;
-    lastOutput = { blob, filename: downloadName };
-
-    const downloadBtn = document.getElementById('btnDownloadOutput');
-    downloadBtn.textContent = `📥 ${downloadName} (${sizeKB} KB)`;
-    downloadBtn.style.display = '';
-
-    // Hide SCORM button (not applicable for PDF)
-    document.getElementById('btnDownloadScorm').style.display = 'none';
-
-    // Update log
-    updateLog([{
-      line: null, column: null, level: 'info',
-      message: `LuaLaTeX compilation complete (${sizeKB} KB). Output: ${downloadName}`,
-      matchedText: null, type: 'lualatex-success',
-    }], '');
-
-    updateStatus('ready', `LuaLaTeX: compiled (${sizeKB} KB)`);
-
-  } catch (err) {
-    console.error('[lualatex] Error:', err);
-    updateStatus('error', `LuaLaTeX: ${err.message.substring(0, 80)}`);
-    updateLog([{
-      line: null, column: null, level: 'error',
-      message: `LuaLaTeX compilation failed: ${err.message}`,
-      matchedText: null, type: 'lualatex-error',
-    }], '');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Compile';
-  }
-}
 
 
 // ════════════════════════════════════════════════════════════════════

@@ -5,9 +5,7 @@ that converts faculty-authored LaTeX course materials into accessible HTML,
 DOCX, and (eventually) EPUB. The emphasis is on math accessibility: output
 carries MathML that works with screen readers and other assistive technology.
 The tool runs almost entirely client-side — the conversion engine (Pandoc,
-compiled to WebAssembly) executes in the user's browser — with optional
-remote pipelines (LaTeXML, LuaLaTeX) reached through GitHub Actions for
-files that need deeper LaTeX support or PDF output.
+compiled to WebAssembly) executes in the user's browser.
 
 The project combines original work with several open-source components. The
 two inventories below separate them; `THIRD-PARTY-NOTICES.md` gives the full
@@ -33,8 +31,6 @@ License (see `LICENSE`):
 - The Overleaf transfer bookmarklet, its installation page
   (`bookmarklet-install.html`), and the development harness
   (`dev-overleaf-harness.html`)
-- The GitHub Actions workflows (`.github/workflows/`) that drive the remote
-  LaTeXML and LuaLaTeX pipelines
 - Local patches to the third-party `pandoc.js` wrapper (documented at the
   top of that file)
 - The sample LaTeX files in `samples/`
@@ -60,21 +56,11 @@ Included in this repository:
   redistributable under that project's license; the notices file discusses
   how far that extends to this file.
 
-Used remotely for testing purposes, but not distributed here: **LaTeXML**
-(public domain, NIST) and **latexml-oxide** (CC0) as alternate conversion
-engines run in Docker via GitHub Actions, with **TeX Live** (an aggregate of
-free licenses) inside those Docker images. These arrangements exist for
-internal testing only and will change before wider sharing: the LuaLaTeX
-(PDF) pipeline and its Docker image will be removed entirely, and whether
-LaTeXML is retained as a comparison engine is still undecided. The GitHub
-Action currently runs from the developer's personal account, with an access
-token embedded in `index.html` for testing; that token will be removed
-before the repository is shared beyond legal review and internal testing,
-and if a Docker-based conversion Action is retained, credentials will be
-handled outside this repository. **BusyTeX via texlyre-busytex**
-(AGPL-3.0-or-later) is planned for future in-browser processing of LaTeX
-code-based images included in source files; unlike the remote engines, it
-will be distributed as part of this repository once integrated.
+**BusyTeX via texlyre-busytex** (AGPL-3.0-or-later) is planned for future
+in-browser processing of LaTeX code-based images included in source files;
+it will be distributed as part of this repository once integrated. The
+earlier remote pipelines (LaTeXML and LuaLaTeX, run in Docker through GitHub
+Actions) were removed in September 2026 and remain in git history.
 
 ## Licensing
 
