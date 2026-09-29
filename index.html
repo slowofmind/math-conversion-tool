@@ -2884,6 +2884,14 @@ fileInput.addEventListener('change', async (e) => {
 });
 
 // ─── Sample files dropdown ───
+// A sample goes in exactly as an upload does: handleFileUpload() adds it to
+// the project at the top level, gives it its own editor document, makes it
+// the file being edited and converted, and redraws the file tree. A .zip
+// (a sample PROJECT) is sent by handleFileUpload() to the zip importer, so
+// a zipped project needs only an <option> in #selSampleFiles.
+// Until 2026-09-28 the text went straight into the editor with setText(),
+// leaving the project's previous main file in place: the next save-back
+// then copied the sample's text into that file.
 document.getElementById('selSampleFiles').addEventListener('change', async (e) => {
   const path = e.target.value;
   if (!path) return;
@@ -2891,20 +2899,8 @@ document.getElementById('selSampleFiles').addEventListener('change', async (e) =
   try {
     const resp = await fetch(path);
     if (!resp.ok) throw new Error(`Failed to load ${path}: ${resp.status}`);
-    const text = await resp.text();
-
-    // Clear any binary state and load into editor
-    clearBinaryInput();
-
     const filename = path.split('/').pop();
-    document.getElementById('tabFilename').textContent = filename;
-    inputFileName = filename.replace(/\.[^.]+$/, '') || 'untitled';
-
-    editor.setText(text);
-    editor.setLanguage('latex');
-    document.getElementById('selFrom').value = 'latex';
-    document.getElementById('statusFormat').textContent = 'LaTeX';
-    updateExtensions();
+    await handleFileUpload(new File([await resp.blob()], filename));
 
     // Ensure Convert button reflects current engine state
     const convertBtn = document.getElementById('btnConvert');
@@ -2912,7 +2908,8 @@ document.getElementById('selSampleFiles').addEventListener('change', async (e) =
       convertBtn.disabled = !pandocModule;
     }
 
-    updateStatus('ready', `Loaded sample: ${filename}`);
+    // The zip importer writes its own summary; do not overwrite it.
+    if (!/\.zip$/i.test(filename)) updateStatus('ready', `Loaded sample: ${filename}`);
   } catch (err) {
     console.error('Failed to load sample file:', err);
     updateStatus('error', `Failed to load sample: ${err.message}`);
