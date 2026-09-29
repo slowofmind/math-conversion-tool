@@ -1,0 +1,75 @@
+{
+ "meta": {
+  "generatedBy": "nvda_reference.py",
+  "nvda": "release-2026.2",
+  "synth": "oneCore",
+  "source": "https://raw.githubusercontent.com/nvaccess/nvda/release-2026.2/source/mathPres/MathCAT/speech.py"
+ },
+ "rows": [
+  {
+   "name": "plain-content",
+   "ssml": "x is equal to y",
+   "viewerRaw": "   x is equal to y      "
+  },
+  {
+   "name": "break",
+   "ssml": "a b <break time='384ms'/> c d",
+   "viewerRaw": "   a b         c d      "
+  },
+  {
+   "name": "char-a",
+   "ssml": "<say-as interpret-as='characters'>a</say-as>  plus 1",
+   "viewerRaw": "   eigh         plus 1      "
+  },
+  {
+   "name": "char-other",
+   "ssml": "<say-as interpret-as='characters'>x</say-as>",
+   "viewerRaw": "   x      "
+  },
+  {
+   "name": "char-capital-A",
+   "ssml": "<say-as interpret-as='characters'>A</say-as> and <say-as interpret-as='characters'>a</say-as>",
+   "viewerRaw": "   A        and         eigh      "
+  },
+  {
+   "name": "prosody-pitch",
+   "ssml": "<prosody pitch='130%'><say-as interpret-as='characters'>B</say-as></prosody> equals",
+   "viewerRaw": "   B        equals      "
+  },
+  {
+   "name": "prosody-rate-volume",
+   "ssml": "<prosody volume='80%' rate='120%'> fast words </prosody> slow",
+   "viewerRaw": "   fast words         slow      "
+  },
+  {
+   "name": "phoneme",
+   "ssml": "the <phoneme alphabet='ipa' ph='ˈlɛd'>lead</phoneme> pipe",
+   "viewerRaw": "   the         pipe      "
+  },
+  {
+   "name": "audio-beep",
+   "ssml": "<audio src='beep.mp4'>beep</audio> start",
+   "viewerRaw": "   start      "
+  },
+  {
+   "name": "unknown-tag",
+   "ssml": "<mark name='id-3'/> marked <emphasis>word</emphasis>",
+   "viewerRaw": "   marked         word      "
+  },
+  {
+   "name": "no-space-before-tag",
+   "ssml": "end<break time='10ms'/>next",
+   "viewerRaw": "   end        next      "
+  },
+  {
+   "name": "multi-space",
+   "ssml": "  lots   of    space  ",
+   "viewerRaw": "     lots   of    space        "
+  },
+  {
+   "name": "empty",
+   "ssml": "",
+   "viewerRaw": " "
+  }
+ ]
+}

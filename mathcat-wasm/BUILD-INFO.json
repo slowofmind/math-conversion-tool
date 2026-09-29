@@ -1,0 +1,25 @@
+{
+  "schema": "mathcat-wasm/build-info/1",
+  "mathcatVersion": "0.7.2",
+  "mathcatCrateChecksum": "aef27f37ac8973ed30869945f130d4790e8961f931f2c50fd23faabffe5308d3",
+  "matchesNVDA": "release-2026.2",
+  "nvdaMathcatCommit": "808cbe3e7dc407dba927e38e171c85a1348f2c8e",
+  "gates": {
+    "G1_rules": "pass",
+    "G2_version": "pass",
+    "G3_bin_roundtrip": "pass"
+  },
+  "wasm": {
+    "sha1": "2c450eaa6adcc7b9a44f55ff2a2cfdbbee02025a",
+    "sha256": "d397aca1c4fbea0398dbb28265ea11c76e2cd83c3af1fd137f23e88112e6695f",
+    "bytes": 3366192,
+    "binBytes": 1945428
+  },
+  "toolchain": {
+    "rustc": "rustc 1.91.1 (ed61e7d7e 2025-11-07) (built from a source tarball)",
+    "wasmBindgen": "0.2.128",
+    "linker": "wasm-ld-20",
+    "buildStd": true
+  },
+  "builtAt": "2026-09-25T17:59:15Z"
+}

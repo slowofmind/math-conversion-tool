@@ -1,0 +1,28 @@
+# Thin JS-facing wrapper over MathCAT's public Rust interface.
+# Plan: PLAN-MATHCAT-SPEECH-PROOFING.md, section 2.2 (M9: speech functions only).
+[package]
+name = "mathcat_wasm"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# Pinned to the MathCAT inside NVDA 2026.2 (plan F1). Change only via the
+# section 7 procedure; the rules gate in build-container.sh checks the pin.
+mathcat = { version = "=0.7.2", features = ["include-zip"] }
+# Must equal the wasm-bindgen CLI version used by build-container.sh.
+wasm-bindgen = "=0.2.128"
+
+# Build-script fix (plan Appendix A): mathcat 0.7.2's build.rs writes DEFLATE
+# zips when the target is wasm, but its build-time zip dependency enables only
+# bzip2. Declaring the same zip major here unifies the deflate feature in.
+# The major version must match MathCAT's (5.x for 0.7.2, 6.x for 0.7.5).
+[build-dependencies]
+zip = { version = "5.1", default-features = false, features = ["deflate", "bzip2"] }
+
+[profile.release]
+lto = true
+opt-level = "z"

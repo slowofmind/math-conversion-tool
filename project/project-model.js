@@ -381,12 +381,60 @@ export function initProjectModel({ updateStatus } = {}) {
   // wiring it in is the whole of Stage 2.
   function toAuxFiles() {
     const out = {};
+    // PLAN-9 step D, the preprocess swap. With no stand-ins this loop does
+    // exactly what it did before step D (judgement call 76).
+    const standIns = preprocessStandIns();
+    const standing = new Set(standIns.values());
     for (const e of project.entries.values()) {
       if (e.isMain) continue;          // stdin, never a file
+      const pp = standIns.get(e.path);
+      if (pp) {                        // an original with a stand-in (call 75)
+        if (e.include === false) continue;   // excluded: nothing, no -pp either
+        out[e.path] = pp.include === false ? e.bytes : pp.bytes;
+        continue;
+      }
       if (e.include === false) continue;   // Stage 2: excluded this run
+      if (standing.has(e)) continue;       // served under its original's name
       out[e.path] = e.bytes;
     }
     return out;
+  }
+
+  // ── PLAN-9 step D: which -pp file stands in for which original ────
+  // From latex-preprocess: PLAN-9-INTO-THE-PLATFORM.md step D, and
+  // HANDOFF-V2-REBUILD.md sections 26.1 and 27.4, judgement calls 73-77.
+  // Returns original path -> the -pp entry whose bytes are served under
+  // the original's name. EMPTY unless the conversion target is tagged
+  // `preprocessed` AND has a -pp name (73). An entry stands in only if it
+  // is tagged, is NOT the editor file (77), and an original of the same
+  // name without -pp, extension kept, sits in the SAME folder and is NOT
+  // itself tagged (74).
+  function preprocessStandIns() {
+    const map = new Map();
+    const target = project.entries.get(project.convertTargetPath);
+    if (!target || target.source !== 'preprocessed') return map;
+    if (ppOriginalName(target.name) === null) return map;
+    for (const e of project.entries.values()) {
+      if (e.source !== 'preprocessed' || e.isMain) continue;
+      const orig = ppOriginalName(e.name);
+      if (orig === null) continue;
+      const o = project.entries.get(e.dir ? e.dir + '/' + orig : orig);
+      if (!o || o.source === 'preprocessed') continue;
+      map.set(o.path, e);
+    }
+    return map;
+  }
+
+  // A -pp name: the part before the last '.', found as extOf finds it,
+  // ends in -pp with something before it. Returns the original's name,
+  // -pp removed and the extension kept, so macros-pp.sty never stands in
+  // for macros.tex (74); null for any other name.
+  function ppOriginalName(name) {
+    const i = name.lastIndexOf('.');
+    const stem = i <= 0 ? name : name.slice(0, i);
+    const tail = i <= 0 ? '' : name.slice(i);
+    if (stem.length <= 3 || !stem.endsWith('-pp')) return null;
+    return stem.slice(0, -3) + tail;
   }
 
   // ── Stage 2: include / exclude ────────────────────────────────────

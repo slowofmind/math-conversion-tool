@@ -179,8 +179,8 @@
   /* ─── SIDEBAR (Cleanup Tool) ─── */
   .sidebar {
     width: var(--sidebar-width);
-    min-width: var(--sidebar-width);
-    max-width: var(--sidebar-width);
+    min-width: 200px;
+    max-width: 560px;
     background: var(--bg-secondary);
     border-right: 1px solid var(--border);
     display: flex;
@@ -234,7 +234,7 @@
     padding: 10px 12px;
   }
 
-  /* ─── LEFT RAIL TABS (Files / Cleanup) ─── */
+  /* ─── LEFT RAIL TABS (Files / Prepare / Cleanup) ─── */
   .rail-tabs {
     display: flex; flex-shrink: 0;
     border-bottom: 1px solid var(--border);
@@ -556,6 +556,46 @@
   .editor-tab:hover { color: var(--text-secondary); }
   .editor-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); background: var(--bg-primary); }
 
+  /* The open file's name. A LABEL, not a tab and not a control: it used to
+     be a <button> with no click handler, i.e. a focus stop that did
+     nothing. If several files are ever open at once this becomes a real
+     tablist; until then it is text. */
+  .editor-filename {
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
+    padding: 5px 12px 5px 6px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 40%;
+  }
+
+  /* ─── Prepare panel: ordered steps, each with state and one action ─── */
+  .prep-intro { font-size: 11.5px; color: var(--text-muted); line-height: 1.45;
+    margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle); }
+  .prep-step { border: 1px solid var(--border); border-left: 3px solid var(--border);
+    border-radius: 4px; background: var(--bg-primary); padding: 8px 10px; margin-bottom: 8px; }
+  .prep-head { display: flex; align-items: baseline; gap: 6px; }
+  .prep-num { font-family: 'Roboto Mono', monospace; font-size: 10px;
+    font-weight: 700; color: var(--text-muted); }
+  .prep-title { font-size: 12.5px; font-weight: 500; }
+  .prep-status { font-size: 11px; color: var(--text-secondary);
+    margin: 3px 0 7px; line-height: 1.4; }
+  .prep-count { font-size: 11.5px; font-weight: 500; color: var(--text-primary);
+    margin: 4px 0 1px; line-height: 1.4; }
+  .prep-count-none { font-weight: 400; color: var(--text-muted); }
+  .prep-btn { font-family: 'Roboto', sans-serif; font-size: 11.5px;
+    padding: 4px 12px; background: var(--bg-tertiary); color: var(--text-primary);
+    border: 1px solid var(--border); border-radius: 3px; cursor: pointer; }
+  .prep-btn:hover { background: var(--bg-elevated); }
+  .prep-btn[disabled] { opacity: .5; cursor: default; }
+  .prep-more { font-size: 11px; color: var(--text-muted); font-style: italic;
+    text-align: center; padding: 6px 0; }
+  .prep-foot { border-top: 1px solid var(--border-subtle); padding-top: 8px; }
+  .prep-link { font-size: 11px; color: var(--accent); background: none;
+    border: none; text-decoration: underline; cursor: pointer; padding: 2px 0; }
+
   .editor-content { flex: 1; position: relative; overflow: hidden; border-left: 3px solid var(--harvard-crimson); transition: box-shadow 0.15s; }
   .editor-content.drag-over { box-shadow: inset 0 0 0 3px var(--harvard-blue); }
 
@@ -754,6 +794,27 @@
   }
   .resize-gutter:hover, .resize-gutter.dragging { background: var(--accent-dim); }
   .resize-gutter.horizontal { height: 5px; width: 100%; cursor: row-resize; }
+  /* While a divider is being dragged, stop the preview iframe from
+     hit-testing pointer events, and stop selection flicker app-wide. */
+  body.resizing { user-select: none; -webkit-user-select: none; }
+  body.resizing iframe { pointer-events: none; }
+
+  /* ─── SIDEBAR RESIZE GUTTER ─── */
+  .sidebar-gutter {
+    width: 5px;
+    background: var(--bg-secondary);
+    cursor: col-resize;
+    flex-shrink: 0;
+    z-index: 10;
+    transition: background 0.1s;
+  }
+  .sidebar-gutter:hover,
+  .sidebar-gutter.dragging { background: var(--accent-dim); }
+  .sidebar-gutter:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  /* No handle while the panel is closed. */
+  .sidebar.collapsed + .sidebar-gutter { display: none; }
+  /* The panel animates its own open/close; that lags during a drag. */
+  body.resizing .sidebar { transition: none; }
 
   /* ─── OUTPUT PANEL ─── */
   .output-panel {
@@ -812,6 +873,8 @@
   }
   .output-tab-action:hover { color: var(--text-primary); border-color: var(--text-muted); }
   #btnDownloadOutput { color: var(--harvard-blue); border-color: var(--harvard-blue); }
+  #mathSubtitlesBox { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-primary); }
+  #selMathSubtitles { width: auto; font-size: 12px; }
   #btnDownloadOutput:hover { background: var(--harvard-blue); color: #fff; }
   #btnDownloadScorm { color: var(--harvard-blue); border-color: var(--harvard-blue); font-size: 11px; }
   #btnDownloadScorm:hover { background: var(--harvard-blue); color: #fff; }
@@ -1329,6 +1392,11 @@
     </select>
   </div>
 
+  <!-- "Experimental image handling" and "Convert PDFs to SVG" MOVED to the
+       Prepare tab of the left rail (2026-09-09). The top toolbar now holds
+       only things that act on the CONVERSION; the left rail holds things
+       that act on the INPUTS. Same ids, same handlers. -->
+
   <a class="toolbar-link" href="bookmarklet-install.html" target="_blank" rel="noopener" title="Install the bookmarklet that sends Overleaf projects to this tool">Overleaf setup</a>
 
   <span class="toolbar-spacer"></span>
@@ -1487,14 +1555,13 @@
         <button class="upload-btn" id="btnAuxDir">Upload Directory</button>
         <input type="file" id="auxDirInput" webkitdirectory style="display:none;" aria-label="Upload auxiliary directory">
       </div>
-      <div class="opt-group">
-        <label for="opt-pdf-image-mode">PDF image conversion:</label>
-        <select id="opt-pdf-image-mode" style="width:110px;">
-          <option value="prompt" selected>Prompt</option>
-          <option value="auto">Auto</option>
-          <option value="off">Off</option>
-        </select>
-      </div>
+      <!-- RETIRED 2026-09-09: "PDF image conversion" (opt-pdf-image-mode)
+           governed conversion AT INTAKE. Conversion is now a manual action
+           ("Convert PDFs to SVG" in the toolbar) covering uploaded AND
+           extracted PDFs in one pass, so this control described a thing that
+           no longer happens. handlePdfAuxFiles()/showPdfPrompt() are now dead
+           code and are left in place, marked, rather than removed blind.
+           See pdf-conversion-design/DESIGN.md. -->
     </div>
     <div class="opt-file-list" id="auxFileList"></div>
   </div>
@@ -2059,6 +2126,8 @@
     <div class="rail-tabs" role="tablist" aria-label="Project panel sections">
       <button class="rail-tab" id="railtab-files" role="tab" aria-selected="true"
               aria-controls="railPanelFiles" tabindex="0">Files</button>
+      <button class="rail-tab" id="railtab-prepare" role="tab" aria-selected="false"
+              aria-controls="railPanelPrepare" tabindex="-1">Prepare</button>
       <button class="rail-tab" id="railtab-cleanup" role="tab" aria-selected="false"
               aria-controls="railPanelCleanup" tabindex="-1">Cleanup</button>
     </div>
@@ -2089,6 +2158,95 @@
                 title="Remember the current state of this file so you can come back to it">Checkpoint</button>
         <label class="sr-only" for="ftRestore">Restore this file to an earlier state</label>
         <select id="ftRestore"></select>
+      </div>
+    </div>
+
+    <!-- PREPARE ----------------------------------------------------->
+    <!-- Steps that get a project ready to convert. These four actions used
+         to be scattered across the top toolbar and the editor bar, where a
+         horizontal strip of same-weight buttons could show neither order nor
+         state. *** ORDER IS LOAD-BEARING: extraction CREATES the PDFs that
+         step 2 converts, so step 1 must come first. *** Each button keeps its
+         id, so every handler that binds by getElementById still binds. -->
+    <div class="rail-panel" id="railPanelPrepare" role="tabpanel"
+         aria-labelledby="railtab-prepare">
+      <div class="sidebar-body">
+      <p class="prep-intro">Steps that get a project ready to convert. Run them
+        in order — extracting figures drawn in code creates the PDFs that
+        step 2 converts.</p>
+
+      <div class="prep-step">
+        <div class="prep-head"><span class="prep-num">1</span>
+          <span class="prep-title">Figures drawn in code</span></div>
+        <p class="prep-count" id="prepCountImages">Not checked yet.</p>
+        <p class="prep-status" id="imgHandlingHint">Downloads a LaTeX engine so
+          figures drawn in code (TikZ, PGFPlots) can be extracted. Nothing is
+          downloaded until you press this.</p>
+        <button type="button" class="prep-btn" id="btnImageHandling"
+                title="Download the experimental code-based image toolchain (about 120 MB, stored in your browser)"
+                aria-describedby="imgHandlingHint">Experimental image handling</button>
+      </div>
+
+      <div class="prep-step">
+        <div class="prep-head"><span class="prep-num">2</span>
+          <span class="prep-title">PDF images</span></div>
+        <p class="prep-count" id="prepCountPdfs">Not checked yet.</p>
+        <p class="prep-status" id="convertPdfsHint">Converts uploaded and
+          extracted PDF images to SVG, keeps the PDFs, and rewrites the
+          \includegraphics references in your source. Browsers cannot display
+          a PDF figure. Nothing happens until you press this.</p>
+        <button type="button" class="prep-btn" id="btnConvertPdfs"
+                title="Convert every PDF image in the project to SVG and update the references in your source"
+                aria-describedby="convertPdfsHint">Convert PDFs to SVG</button>
+      </div>
+
+      <div class="prep-step">
+        <div class="prep-head"><span class="prep-num">3</span>
+          <span class="prep-title">Source cleanup</span></div>
+        <p class="prep-status" id="smartCleanupHint">Automated preprocessing
+          fixes on the source. Currently ordered-list numbering: lists that
+          resume after an interruption, which Pandoc would otherwise restart
+          at 1.</p>
+        <button type="button" class="prep-btn" id="btnSmartCleanup"
+                title="Run automated preprocessing fixes on the source (ordered-list numbering)"
+                aria-describedby="smartCleanupHint">✨ Smart Cleanup</button>
+      </div>
+
+      <div class="prep-step">
+        <div class="prep-head"><span class="prep-num">4</span>
+          <span class="prep-title">Math notation review</span></div>
+        <p class="prep-status" id="intentScanHint">Finds math notation whose
+          meaning is ambiguous to a screen reader and lets you hear how each
+          reading would sound. Findings are highlighted in the editor; the
+          ◀ ▶ controls beside the file name step through them.</p>
+        <button type="button" class="prep-btn" id="btnIntentScan"
+                title="Find math notation whose meaning is ambiguous to a screen reader, and hear what each reading would sound like"
+                aria-describedby="intentScanHint">🔎 Intent Scan</button>
+      </div>
+
+      <div class="prep-step">
+        <div class="prep-head"><span class="prep-num">5</span>
+          <span class="prep-title">LaTeX preprocessing</span></div>
+        <p class="prep-status" id="preprocessHint">Runs the LaTeX
+          preprocessor on the project. If it changes anything, it saves -pp
+          copies of the changed files beside them, and of your main file
+          (main.tex becomes main-pp.tex), then converts that copy. Your
+          original files are never changed; if nothing changes, the original
+          is converted. The report opens in the Preprocess tab.</p>
+        <button type="button" class="prep-btn" id="btnPreprocess"
+                title="Run the LaTeX preprocessor, save -pp copies of what it changes, and convert them; your original files are not changed"
+                aria-describedby="preprocessHint">Preprocess &amp; convert</button>
+      </div>
+
+      <p class="prep-more">further preparation steps land here</p>
+
+      <!-- A DISCOVERABLE route to cache removal. Shift+click on the button
+           above still works, but it was advertised only in the last line of a
+           confirm dialog and a real user was never going to find it. -->
+      <div class="prep-foot">
+        <button type="button" class="prep-link" id="btnRemoveToolchain"
+                title="Delete the downloaded image-handling components from this browser">Remove downloaded components (about 120 MB)</button>
+      </div>
       </div>
     </div>
 
@@ -2183,15 +2341,22 @@
     </div>
   </aside>
 
+  <div class="sidebar-gutter" id="sidebarGutter" role="separator"
+       aria-orientation="vertical" aria-label="Resize project panel"
+       aria-valuemin="200" aria-valuemax="560" aria-valuenow="300"
+       tabindex="0"></div>
+
   <!-- CENTER WRAP -->
   <div class="center-wrap" id="centerWrap">
 
     <!-- EDITOR -->
     <div class="editor-area" id="editorArea">
       <div class="editor-tabs">
-        <button class="editor-tab active" id="tabFilename">untitled.tex</button>
+        <button class="toolbar-btn" id="btnProject" title="Show or hide the project panel"
+                aria-expanded="false" aria-controls="sidebar"
+                style="font-size:12px; padding:3px 10px;">☰ Project</button>
+        <span class="editor-filename"><span class="sr-only">Editing file: </span><span id="tabFilename">untitled.tex</span></span>
         <span style="flex:1;"></span>
-        <button class="toolbar-btn" id="btnIntentScan" title="Find math notation whose meaning is ambiguous to a screen reader, and hear what each reading would sound like" style="font-size:12px; padding:3px 10px; margin-right:2px;">🔎 Intent Scan</button>
         <div class="intent-nav" id="intentNav" hidden role="group" aria-label="Intent findings">
           <button class="toolbar-btn" id="btnIntentPrev" style="font-size:12px; padding:3px 8px;" title="Previous finding (Shift+F2)" aria-label="Previous intent finding">◀</button>
           <span class="intent-nav-status" id="intentNavStatus" aria-hidden="true"></span>
@@ -2199,9 +2364,6 @@
           <button class="toolbar-btn" id="btnIntentClear" style="font-size:12px; padding:3px 8px;" title="Clear the highlighted findings" aria-label="Clear intent findings">✕</button>
         </div>
         <div class="sr-only" id="intentLive" role="status" aria-live="polite" aria-atomic="true"></div>
-        <button class="toolbar-btn" id="btnSmartCleanup" title="Run automated preprocessing fixes on the source (ordered-list numbering)" style="font-size:12px; padding:3px 10px; margin-right:2px;">✨ Smart Cleanup</button>
-        <button class="toolbar-btn" id="btnFiles" title="Toggle the project files panel" aria-expanded="false" aria-controls="sidebar" style="font-size:12px; padding:3px 10px; margin-right:2px;">📁 Files</button>
-        <button class="toolbar-btn" id="btnCleanup" title="Toggle cleanup sidebar" aria-expanded="false" aria-controls="sidebar" style="font-size:12px; padding:3px 10px; margin-right:2px;">🧹 Cleanup</button>
       </div>
       <div class="editor-content">
         <div id="aceEditor"></div>
@@ -2227,8 +2389,10 @@
         <button class="output-tab" data-tab="log" role="tab" id="outtab-log" aria-selected="false" aria-controls="tabLog" tabindex="-1">Log <span id="logBadge"></span></button>
         <button class="output-tab" data-tab="source" role="tab" id="outtab-source" aria-selected="false" aria-controls="tabSource" tabindex="-1">Source</button>
         <button class="output-tab" data-tab="intent" role="tab" id="outtab-intent" aria-selected="false" aria-controls="tabIntent" tabindex="-1">Intent</button>
+        <button class="output-tab" data-tab="preprocess" role="tab" id="outtab-preprocess" aria-selected="false" aria-controls="tabPreprocess" tabindex="-1">Preprocess</button>
         <button class="output-tab-action" id="btnDownloadOutput" title="Download output" aria-label="Download output" style="display:none;">📥 Download</button>
         <button class="output-tab-action" id="btnDownloadScorm" title="Download as SCORM package for Canvas LMS" aria-label="Download as SCORM package" style="display:none;">📦 SCORM</button>
+        <span id="mathSubtitlesBox" style="display:none;" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles"><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
         <span class="output-tab-spacer"></span>
         <button class="output-tab-action" id="btnOutputClose" title="Hide panel" aria-label="Close output panel">×</button>
       </div>
@@ -2269,6 +2433,13 @@
             </div>
           </div>
         </div>
+        <div class="tab-content" id="tabPreprocess" role="tabpanel" aria-labelledby="outtab-preprocess">
+          <div id="preprocessNote" style="color: var(--text-muted); padding: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;">
+            Press <strong>Preprocess &amp; convert</strong>, step 5 in Prepare,
+            to run the LaTeX preprocessor. Its report shows here.
+          </div>
+          <pre id="preprocessReport" hidden style="margin: 0; padding: 16px; white-space: pre-wrap; font-size: 12px;"></pre>
+        </div>
       </div>
     </div>
 
@@ -2304,6 +2475,8 @@ import { createEditor } from './codemirror/cm6-editor.js';
 import { initCleanupEngine } from './cleanup/cleanup-engine.js';
 import { initSmartCleanup } from './cleanup/smart-cleanup.js';
 import { initIntentReview } from './intent/intent-review.js';
+import { initMathCATProof } from './js/mathcat-proof.js';
+import { initPreprocess } from './js/preprocess.js';
 import { initLogDisplay } from './js/log-display.js';
 import { initOutputTabs } from './js/output-tabs.js';
 import { initWarningParser } from './js/warning-parser.js';
@@ -3058,6 +3231,19 @@ document.getElementById('ftRestore')?.addEventListener('change', (e) => {
   updateStatus('ready', `Restored ${mp} — press Ctrl+Z to undo the restore`);
 });
 
+// READER_BY_EXT — the Pandoc reader a file opened from the tree gets
+// (openProjectFile, below; call 101, session 61). An exact copy of
+// handleFileUpload's formatMap, entry for entry and in its order. The file
+// tree used this name from its first commit and never defined it, so every
+// text file opened from the tree threw at the lookup. F8 in
+// cm6-src/test-preprocess-page.mjs keeps the two the same.
+const READER_BY_EXT = Object.freeze({
+  'tex': 'latex', 'latex': 'latex', 'md': 'markdown', 'markdown': 'markdown',
+  'html': 'html', 'htm': 'html', 'rst': 'rst', 'org': 'org', 'typ': 'typst',
+  'txt': 'markdown', 'docx': 'docx', 'odt': 'odt', 'pptx': 'pptx',
+  'epub': 'epub', 'fb2': 'fb2', 'ipynb': 'ipynb',
+});
+
 async function openProjectFile(entry) {
   if (!entry) return;
 
@@ -3158,7 +3344,7 @@ async function openProjectFile(entry) {
       sourceEditor.setText('');
     });
   }
-  activateOutputTab('source');
+  activateOutputTab(document.getElementById('outtab-source'));
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -3492,7 +3678,8 @@ document.getElementById('auxFileInput')?.addEventListener('change', async (e) =>
   if (replaced > 0) {
     updateStatus('ready', `${replaced} file${replaced === 1 ? '' : 's'} replaced an existing project file`);
   }
-  await handlePdfAuxFiles();
+  // INTAKE CONVERSION REMOVED 2026-09-09 — conversion is a manual action
+  // now; see pdf-conversion-design/DESIGN.md §1. Was: handlePdfAuxFiles()
 });
 
 document.getElementById('btnAuxDir')?.addEventListener('click', () => {
@@ -3563,7 +3750,8 @@ async function adoptProjectFiles(rawItems, source, label) {
                    : ' · no main .tex found — choose one in the Files panel';
   if (res.replaced) msg += ` · ${res.replaced} replaced`;
   updateStatus('ready', msg);
-  await handlePdfAuxFiles();
+  // INTAKE CONVERSION REMOVED 2026-09-09 — conversion is a manual action
+  // now; see pdf-conversion-design/DESIGN.md §1. Was: handlePdfAuxFiles()
 }
 
 // ─── Project zip import (Overleaf transfer, Checkpoint 1) ───────────
@@ -3778,7 +3966,8 @@ async function importProjectZip(arrayBuffer, sourceLabel) {
     console.warn('Zip import skipped entries:', parsed.errors);
   }
   updateStatus('ready', msg);
-  await handlePdfAuxFiles();
+  // INTAKE CONVERSION REMOVED 2026-09-09 — conversion is a manual action
+  // now; see pdf-conversion-design/DESIGN.md §1. Was: handlePdfAuxFiles()
 }
 
 // ─── Overleaf transfer receiver (Checkpoint 2) ───────────────────────
@@ -3794,6 +3983,525 @@ const OVERLEAF_ORIGINS = ['https://www.overleaf.com', 'https://overleaf.com'];
 if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
   OVERLEAF_ORIGINS.push(location.origin);
 }
+
+// ─── Experimental image handling (BusyTeX) ───────────────────────────
+// Provisional UI. The loader and the extraction modules are deliberately
+// independent of how this is presented, so replacing this control later is
+// a UI change rather than an untangling job. See
+// memoize-integration/DESIGN.md, Stage 2.
+//
+// *** NOTHING BUSYTEX-SHAPED IS REFERENCED UNTIL THE USER CLICKS. *** The
+// module is imported dynamically inside the handler. A headless test asserts
+// zero BusyTeX network requests on page load; it guards this promise.
+(function setupImageHandling() {
+  const btn = document.getElementById('btnImageHandling');
+  if (!btn) return;
+  let mod = null;                    // the loader module, once imported
+
+  const setLabel = (text, busy) => {
+    btn.textContent = text;
+    btn.disabled = !!busy;
+    btn.setAttribute('aria-busy', busy ? 'true' : 'false');
+  };
+
+  async function ensureModule() {
+    if (!mod) mod = await import('./image-extraction/busytex-loader.js');
+    return mod;
+  }
+
+  async function doLoad(m) {
+    setLabel('Loading image handling…', true);
+    try {
+      await m.load({
+        basePath: new URL('./image-extraction/core/busytex', location.href).pathname,
+        tier: 'basic',
+        onProgress: (phase) => {
+          if (phase === 'fetching-pipeline') setLabel('Fetching engine…', true);
+          else if (phase === 'initialising') setLabel('Unpacking TeX Live…', true);
+        },
+      });
+      setLabel('Image handling: ready', false);
+      updateStatus('ready', 'Image handling loaded. Extraction actions arrive in the next stage.');
+    } catch (err) {
+      setLabel('Image handling: failed', false);
+      updateStatus('error', 'Could not load image handling: ' + (err && err.message ? err.message : err));
+    }
+  }
+
+  // STAGE 3: compile the conversion target with memoize and REPORT.
+  // Nothing is written and no file is modified — splitting arrives in
+  // Stage 4, rewriting in Stage 5.
+  async function runCompileOnly(m) {
+    // *** Flush the editor into the model FIRST. *** The editor is the live
+    // copy of project.mainPath; without this we would compile the text as it
+    // was when the file was opened and silently ignore every unsaved edit.
+    // Same convention openProjectFile follows before switching documents.
+    try { captureEditorIntoModel(); }
+    catch (e) { console.warn('[extraction] captureEditorIntoModel failed', e); }
+
+    const run = await import('./image-extraction/extraction-run.js');
+    // the model exports its state object; the target lives on it
+    const target = projectModel.project && projectModel.project.convertTargetPath;
+    if (!target) { updateStatus('error', 'No conversion target selected.'); return; }
+
+    const getText = p => { const e = projectModel.getEntry(p); return e ? projectModel.getText(p) : null; };
+    const listPaths = () => projectModel.listEntries().map(e => e.path);
+    const getBytes = p => { const e = projectModel.getEntry(p); return e ? e.bytes : null; };
+
+    const resolved = run.resolveCompileTarget(target, getText, listPaths);
+    if (!resolved.ok) { updateStatus('error', resolved.reason); return; }
+
+    setLabel('Compiling…', true);
+    updateStatus('loading', 'Compiling ' + resolved.masterPath + ' with memoize…');
+    let rep;
+    try {
+      rep = await run.compileForExtraction({
+        engine: m.getEngine(), runner: m.getRunner(),
+        masterPath: resolved.masterPath, getText, listPaths, getBytes,
+        onProgress: (phase) => setLabel(phase === 'harvesting' ? 'Harvesting…' : 'Compiling…', true),
+      });
+    } catch (err) {
+      setLabel('Image handling: ready', false);
+      updateStatus('error', 'Extraction failed: ' + (err && err.message ? err.message : err));
+      return;
+    }
+    window.__lastExtraction = rep;          // for inspection during testing
+    // Report which module COPIES are live — a stale cached module is
+    // otherwise indistinguishable from a missing fix.
+    console.info('[extraction] loaded module versions', rep.moduleVersions);
+    // Any early exit below must leave a TERMINAL value on every downstream
+    // global, so a refusal is distinguishable from work still in progress.
+    const bail = (why) => {
+      const stop = { ok: false, notReached: true, reason: why };
+      if (window.__lastSplit === undefined) window.__lastSplit = stop;
+      if (window.__lastPlan === undefined) window.__lastPlan = stop;
+      if (window.__lastApply === undefined) window.__lastApply = stop;
+      if (window.__lastConvert === undefined) window.__lastConvert = stop;
+    };
+    if (!rep.ok) {
+      setLabel('Image handling: ready', false);
+      bail('compile failed');
+      updateStatus('error', 'Compile failed: ' + (rep.firstError || rep.error || 'unknown'));
+      console.warn('[extraction] report', rep);
+      return;
+    }
+
+    // STAGE 4: split the extern pages and write per-figure PDFs into the
+    // project. ADDS files; modifies none. Source rewriting is Stage 5.
+    setLabel('Writing figures…', true);
+    let split;
+    try {
+      split = await run.splitAndWrite({
+        report: rep,
+        projectPaths: listPaths(),
+        hasFile: p => !!projectModel.getEntry(p),
+        addFile: (p, bytes, opts) => projectModel.addFile(p, bytes, opts),
+        onProgress: (phase, d) => {
+          if (d && d.n) setLabel(`Writing figure ${d.n}/${d.total}…`, true);
+        },
+      });
+    } catch (err) {
+      const msg = (err && err.message ? err.message : String(err));
+      // record the failure so callers and tests can SEE it; an invisible
+      // failure is worse than a visible one
+      window.__lastSplit = { ok: false, error: msg, threw: true,
+        stack: String(err && err.stack || '').slice(0, 800),
+        written: [], collisions: [], skipped: [] };
+      setLabel('Image handling: ready', false);
+      updateStatus('error', 'Splitting failed: ' + msg);
+      console.error('[extraction] split threw', err);
+      return;
+    }
+    window.__lastSplit = split;
+    if (typeof syncAuxFiles === 'function') syncAuxFiles();
+    if (typeof refreshFileTree === 'function') { try { refreshFileTree(); } catch {} }
+
+    setLabel('Image handling: ready', false);
+    if (!split.ok) {
+      bail('figures not written');
+      updateStatus('error', 'Figures not written: ' + (split.error || 'unknown'));
+      console.warn('[extraction] split', split);
+      return;
+    }
+    rep.writtenFigures = split.written;
+
+    // ── STAGE 5: dry run, confirm, then rewrite ────────────────────────
+    // Runs over the WHOLE PROJECT — every file the compiled master actually
+    // reached. Files not reached produce no figures and stay untouched.
+    setLabel('Planning changes…', true);
+    let plan;
+    try {
+      plan = await run.planRewrite({
+        report: rep, getText, projectPaths: listPaths(),
+        masterName: (rep.masterPath || 'main.tex').replace(/^.*\//, ''),
+      });
+    } catch (err) {
+      const msg = err && err.message ? err.message : String(err);
+      window.__lastPlan = { ok: false, error: msg, threw: true, files: [] };
+      setLabel('Image handling: ready', false);
+      updateStatus('error', 'Planning failed: ' + msg);
+      console.error('[extraction] plan threw', err);
+      return;
+    }
+    window.__lastPlan = plan;
+    setLabel('Image handling: ready', false);
+
+    if (!plan.ok) {
+      bail('plan refused');
+      updateStatus('error', 'No changes made: ' + (plan.error || 'refused') +
+        '. The figure PDFs were still written.');
+      console.warn('[extraction] plan', plan);
+      return;
+    }
+
+    const summary =
+      `${split.written.length} figure PDF(s) written.\n\n` +
+      `The following will be commented out and replaced with \\includegraphics:\n\n` +
+      run.describePlan(plan) +
+      `\n\nOK to apply. Revert restores the source text only — the extracted ` +
+      `images stay in the project.`;
+    if (!confirm(summary)) {
+      bail('user declined');
+      updateStatus('ready', 'No source changes made. The figure PDFs are in the project.');
+      return;
+    }
+
+    let applied;
+    try {
+      applied = run.applyRewrite(plan, {
+        updateText: (p, t) => projectModel.updateText(p, t),
+        checkpointProject: (lbl) => projectModel.checkpointProject(lbl),
+        replaceInEditor: (p, t) => {
+          // The editor is the LIVE copy of whichever file is
+          // project.mainPath; captureEditorIntoModel() writes it back over
+          // the model on the next switch. If we update only the model, the
+          // rewrite is silently discarded. replaceAll is one undoable
+          // transaction, so this composes with undo.
+          try {
+            if (projectModel.project.mainPath === p && editor && editor.replaceAll) {
+              editor.replaceAll(t);
+              return true;
+            }
+          } catch (e) { console.warn('[extraction] replaceInEditor failed', e); }
+          return false;
+        },
+        label: 'Figure extraction',
+      });
+    } catch (err) {
+      const msg = err && err.message ? err.message : String(err);
+      window.__lastApply = { ok: false, error: msg, threw: true, applied: [] };
+      updateStatus('error', 'Applying failed: ' + msg);
+      return;
+    }
+    window.__lastApply = applied;
+    if (typeof syncAuxFiles === 'function') syncAuxFiles();
+    if (typeof refreshFileTree === 'function') { try { refreshFileTree(); } catch {} }
+
+    if (!applied.ok) {
+      bail('nothing applied');
+      updateStatus('error', 'Nothing applied: ' + (applied.error || 'unknown'));
+      return;
+    }
+    // ── STAGE 6: convert the extracted PDFs to SVG via the existing
+    // MuPDF chain. processPdfAuxFiles is the right entry point —
+    // handlePdfAuxFiles runs only at intake from the upload handlers.
+    // Policy is explicit so it can change later without touching the
+    // extraction code (see DEFAULT_FIGURE_POLICY).
+    setLabel('Converting figures…', true);
+    let conv;
+    try {
+      conv = await run.convertExtractedFigures({
+        written: split.written,
+        convert: (names) => processPdfAuxFiles(names),
+        getBytes: p => { const e = projectModel.getEntry(p); return e ? e.bytes : null; },
+        addFile: (p, b, opts) => projectModel.addFile(p, b, opts),
+        hasFile: p => !!projectModel.getEntry(p),
+        policy: window.__figurePolicy || run.DEFAULT_FIGURE_POLICY,
+        onProgress: (phase, d) => {
+          if (d && d.count) setLabel(`Converting ${d.count} figure(s)…`, true);
+        },
+      });
+    } catch (err) {
+      const msg = err && err.message ? err.message : String(err);
+      window.__lastConvert = { ok: false, error: msg, threw: true,
+        converted: 0, failed: 0, details: [] };
+      setLabel('Image handling: ready', false);
+      updateStatus('error', 'Figure conversion failed: ' + msg);
+      console.error('[extraction] convert threw', err);
+      return;
+    }
+    window.__lastConvert = conv;
+    if (typeof refreshPrepareStatus === 'function') { try { refreshPrepareStatus(); } catch {} }
+    if (typeof syncAuxFiles === 'function') syncAuxFiles();
+    if (typeof renderAuxFileList === 'function') { try { renderAuxFileList(); } catch {} }
+    if (typeof refreshFileTree === 'function') { try { refreshFileTree(); } catch {} }
+    setLabel('Image handling: ready', false);
+
+    const convNote = conv.skipped ? 'PDFs left unconverted (policy).'
+      : conv.ok ? `converted ${conv.converted} to SVG.`
+                : `${conv.failed} failed to convert.`;
+    updateStatus(conv.ok ? 'ready' : 'error',
+      `Wrote ${split.written.length} figure(s), rewrote ` +
+      `${applied.applied.length} source file(s) (${plan.totalEdits} replaced), ` +
+      convNote + ' Revert restores source text only; the images remain.');
+    console.info('[extraction] report', rep, 'split', split, 'plan', plan,
+      'applied', applied, 'convert', conv);
+  }
+
+  async function actionsDialog(m) {
+    const cached = await m.isCached();
+    const msg = 'Image handling is loaded.\n\n' +
+      (cached ? 'The TeX Live data is cached in this browser, so it will not download again.\n\n' : '') +
+      'OK — extract figures from the current conversion target (compiles only; ' +
+      'nothing is written yet).\n' +
+      'Cancel — do nothing.\n\n' +
+      'To remove the downloaded components, hold Shift and press this button.';
+    if (!confirm(msg)) return;
+    await runCompileOnly(m);
+  }
+
+  async function removeDialog(m) {
+    if (!confirm('Remove the downloaded image-handling components?\n\n' +
+                 'They will download again next time you use this feature.')) return;
+    const r = await m.removeCache();
+    setLabel('Experimental image handling', false);
+    updateStatus(r.removed ? 'ready' : 'error',
+      r.removed ? 'Downloaded components removed.'
+                : 'Could not remove components: ' + (r.reason || 'unknown'));
+  }
+
+  // Discoverable route to the same removal the Shift+click hides.
+  // ensureModule() only imports the small loader; it downloads nothing.
+  document.getElementById('btnRemoveToolchain')?.addEventListener('click', async () => {
+    await removeDialog(await ensureModule());
+  });
+
+  // *** Capture shiftKey AT ENTRY from the event PARAMETER. *** window.event
+  // is unset after an await, so reading it below the await was luck.
+  btn.addEventListener('click', async (ev) => {
+    const wantsRemove = !!(ev && ev.shiftKey);
+    const m = await ensureModule();
+    if (m.isLoaded()) {
+      if (wantsRemove) await removeDialog(m);
+      else await actionsDialog(m);
+      return;
+    }
+
+    const cached = await m.isCached();
+    const size = m.ASSET_SIZE_MB;
+    const msg = cached
+      ? 'Load the experimental image-handling engine?\n\n' +
+        'It is already cached in this browser, so nothing will be downloaded.\n\n' +
+        'This is experimental and only affects figures drawn in code (TikZ, PGFPlots).'
+      : 'Download the experimental image-handling engine?\n\n' +
+        'About ' + size + ' MB. It is stored in your browser so it only downloads once.\n' +
+        'Clearing your browsing data (cookies and site data) will remove it, and you\n' +
+        'can remove it yourself from this button afterwards.\n\n' +
+        'This is experimental and only affects figures drawn in code (TikZ, PGFPlots).';
+    if (!confirm(msg)) return;
+    await doLoad(m);
+  });
+})();
+
+// ════════════════════════════════════════════════════════════════════
+// PDF -> SVG conversion, DECOUPLED. One manual action over EVERY .pdf in the
+// project -- uploaded and extracted alike, because that indistinguishability
+// is the whole point. See pdf-conversion-design/DESIGN.md.
+//
+// *** THE LOAD-BEARING RULE (DESIGN.md 2 and 6). We KEEP the .pdf, therefore
+// the source reference MUST be rewritten. resolve-image-paths.lua repairs an
+// extension ONLY when the path does not resolve, so a kept .pdf makes it bail
+// and that image reaches HTML as <img src="*.pdf">, which no browser renders.
+// Per reference, exactly one of:
+//     rewrite the reference and KEEP the pdf
+//     leave the reference and DROP the pdf   (restores the filter fallback)
+// NEVER leave both. That is why a REFUSED reference gets its PDF dropped. ***
+// ════════════════════════════════════════════════════════════════════
+(function setupPdfConversion() {
+  const btn = document.getElementById('btnConvertPdfs');
+  if (!btn) return;
+  const BASE = 'Convert PDFs to SVG';
+  const setLabel = (t, busy) => { btn.textContent = t; btn.disabled = !!busy; };
+  const paths = (re) => {
+    try {
+      return projectModel.listEntries().map(e => e.path).filter(p => re.test(p));
+    } catch { return []; }
+  };
+  const baseOf = (p) => (String(p).match(/([^/\\]+)$/) || [, p])[1];
+
+  btn.addEventListener('click', async () => {
+    // The editor is authoritative for the open file: read it back BEFORE
+    // planning, or an unsaved edit is invisible. This was a bug once.
+    try { captureEditorIntoModel(); }
+    catch (e) { console.warn('[pdf-convert] captureEditorIntoModel failed', e); }
+
+    const pdfs = paths(/\.pdf$/i);
+    if (!pdfs.length) {
+      window.__lastPdfConvert = { ok: true, nothingToDo: true, converted: 0 };
+      updateStatus('ready', 'No PDF images in this project - nothing to convert.');
+      return;
+    }
+
+    // *** RE-RUN SKIP. Because the .pdf is now KEPT, a converted PDF is still
+    // present on the next run and would be reconverted -- wasted work that
+    // overwrites identical SVGs. Skip any PDF that already has a sibling .svg.
+    // DESIGN.md section 5 required this and named the cause: the accident that
+    // used to provide it for free was the .pdf being deleted.
+    //
+    // *** STALENESS, KNOWN AND NOT DETECTABLE HERE: project entries carry no
+    // timestamps, so if extraction re-runs and overwrites a PDF, its stale SVG
+    // cannot be told from a current one, and skipping would preserve the WRONG
+    // image. Until there is a "reconvert" option, deleting the .svg forces a
+    // rebuild. This is stated in the dialog rather than hidden. ***
+    const stem = (p) => p.replace(/\.(pdf|svg)$/i, '');
+    const svgStems = new Set(paths(/\.svg$/i).map(stem));
+    const toConvert = pdfs.filter(p => !svgStems.has(stem(p)));
+    const already = pdfs.filter(p => svgStems.has(stem(p)));
+
+    let refs;
+    try { refs = await import('./pdf-conversion/pdf-refs.js'); }
+    catch (e) {
+      window.__lastPdfConvert = { ok: false, error: 'module load failed' };
+      updateStatus('error', 'Could not load the PDF conversion module.');
+      console.error('[pdf-convert]', e);
+      return;
+    }
+
+    // Plan the reference rewrites across every .tex BEFORE converting.
+    const plans = [];
+    for (const p of paths(/\.tex$/i)) {
+      const text = projectModel.getText(p);
+      if (text == null) continue;
+      const r = refs.planReferenceRewrites(text, pdfs);
+      if (r.edits.length || r.refusals.length)
+        plans.push({ path: p, text: text, edits: r.edits, refusals: r.refusals });
+    }
+
+    // Which PDFs must be DROPPED? Only those whose reference we refused AND
+    // could still identify. A refusal we cannot map to a file (an
+    // extension-less or macro-built reference) is REPORTED, not acted on --
+    // guessing which PDF it meant is exactly what this project does not do.
+    const drop = new Set();
+    for (const pl of plans) {
+      for (const rf of pl.refusals) {
+        if (!rf.ref) continue;
+        const want = baseOf(rf.ref).toLowerCase();
+        const hits = pdfs.filter(p => baseOf(p).toLowerCase() === want);
+        if (hits.length === 1) drop.add(hits[0]);
+      }
+    }
+
+    const totalEdits = plans.reduce((n, p) => n + p.edits.length, 0);
+    const totalRefusals = plans.reduce((n, p) => n + p.refusals.length, 0);
+    const filesTouched = plans.filter(p => p.edits.length).length;
+
+    const refusalLines = plans.flatMap(p => p.refusals.map(r =>
+      '  ' + p.path + ':' + r.line + '  ' + (r.ref || '(no argument)') +
+      ' - ' + r.reason)).slice(0, 12);
+    const summary =
+      toConvert.length + ' PDF image(s) will be converted to SVG' +
+      (already.length
+        ? ' (' + already.length + ' already have an SVG and are skipped; ' +
+          'delete the SVG to force a rebuild)'
+        : '') + '.\n\n' +
+      'The PDFs are KEPT, and ' + totalEdits + ' \\includegraphics reference(s) ' +
+      'in ' + filesTouched + ' file(s) will change from .pdf to .svg.\n\n' +
+      (totalRefusals
+        ? totalRefusals + ' reference(s) cannot be rewritten safely and will be ' +
+          'left alone:\n' + refusalLines.join('\n') + '\n\n' +
+          drop.size + ' PDF(s) will be REMOVED rather than kept, so those ' +
+          'references still resolve when you convert.\n\n'
+        : '') +
+      'One checkpoint is taken, so this can be reverted.';
+    if (!confirm(summary)) {
+      window.__lastPdfConvert = { ok: false, declined: true };
+      updateStatus('ready', 'No changes made.');
+      return;
+    }
+
+    setLabel('Converting PDFs...', true);
+
+    // Capture bytes BEFORE conversion: processPdfAuxFiles REPLACES the .pdf
+    // entry with the .svg, so "keep the PDF" means re-adding it afterwards.
+    const bytes = new Map();
+    const noBytes = [];
+    for (const p of toConvert) {
+      const b = resourceFiles.auxFiles[p];
+      if (b) bytes.set(p, b); else noBytes.push(p);
+    }
+
+    let conv = { converted: 0, failed: 0, details: [] };
+    try { if (toConvert.length) conv = await processPdfAuxFiles(toConvert); }
+    catch (e) {
+      setLabel(BASE, false);
+      const msg = (e && e.message) ? e.message : String(e);
+      window.__lastPdfConvert = { ok: false, error: msg, threw: true };
+      updateStatus('error', 'PDF conversion failed: ' + msg);
+      console.error('[pdf-convert]', e);
+      return;
+    }
+
+    // Re-add every KEPT pdf. A pdf whose bytes we never found is reported,
+    // not silently lost -- it simply stays converted-and-removed.
+    let kept = 0, dropped = 0;
+    for (const entry of bytes) {
+      const p = entry[0], b = entry[1];
+      if (drop.has(p)) { dropped++; continue; }
+      try { projectModel.addFile(p, b, { source: 'derived' }); kept++; }
+      catch (e) { console.warn('[pdf-convert] could not keep ' + p, e); }
+    }
+    // A SKIPPED pdf was never removed by the converter, so honouring a drop
+    // for one needs an explicit removal.
+    for (const p of already) {
+      if (!drop.has(p)) continue;
+      try { projectModel.removeFile(p); dropped++; }
+      catch (e) { console.warn('[pdf-convert] could not drop ' + p, e); }
+    }
+
+    // Apply the reference rewrites under ONE checkpoint for the whole batch.
+    let rewritten = 0;
+    if (totalEdits) {
+      try { projectModel.checkpointProject('Before PDF to SVG reference rewrite'); }
+      catch (e) { console.warn('[pdf-convert] checkpoint failed', e); }
+      for (const pl of plans) {
+        if (!pl.edits.length) continue;
+        const next = refs.applyReferenceRewrites(pl.text, pl.edits);
+        try {
+          projectModel.updateText(pl.path, next);
+          // The editor holds the LIVE copy of project.mainPath; updating only
+          // the model means captureEditorIntoModel() later overwrites this
+          // rewrite with stale text. replaceAll is ONE undoable transaction.
+          if (projectModel.project.mainPath === pl.path &&
+              editor && editor.replaceAll) editor.replaceAll(next);
+          rewritten += pl.edits.length;
+        } catch (e) {
+          console.warn('[pdf-convert] rewrite failed for ' + pl.path, e);
+        }
+      }
+    }
+
+    if (typeof syncAuxFiles === 'function') { try { syncAuxFiles(); } catch {} }
+    if (typeof renderAuxFileList === 'function') { try { renderAuxFileList(); } catch {} }
+    if (typeof refreshFileTree === 'function') { try { refreshFileTree(); } catch {} }
+    setLabel(BASE, false);
+
+    window.__lastPdfConvert = {
+      ok: conv.failed === 0, converted: conv.converted, failed: conv.failed,
+      kept: kept, dropped: dropped, rewritten: rewritten,
+      alreadyConverted: already.length, skippedPaths: already,
+      refusals: totalRefusals, bytesMissing: noBytes, details: conv.details,
+    };
+    updateStatus(conv.failed ? 'error' : 'ready',
+      'Converted ' + conv.converted + ' PDF(s) to SVG' +
+      (conv.failed ? ', ' + conv.failed + ' failed' : '') +
+      (already.length ? ', skipped ' + already.length + ' already converted' : '') +
+      '; kept ' + kept + ', removed ' + dropped +
+      '; rewrote ' + rewritten + ' reference(s)' +
+      (totalRefusals ? ', ' + totalRefusals + ' left alone' : '') + '.');
+    console.info('[pdf-convert]', window.__lastPdfConvert, plans);
+    if (typeof refreshPrepareStatus === 'function') { try { refreshPrepareStatus(); } catch {} }
+  });
+})();
 
 (function setupOverleafReceiver() {
   if (!location.hash.includes('overleaf-import')) return;
@@ -4100,11 +4808,84 @@ local function clean_svg(svg_text)
   return svg_text
 end
 
+--- Counter guaranteeing a unique prefix per inlined figure.
+local ns_counter = 0
+
+--- Build an id-safe prefix from an image path.
+--- The whole path is sanitised (not just the basename) so two figures
+--- with the same filename in different folders still differ. Only
+--- [A-Za-z0-9_-] survives, keeping ids EPUB-legal.
+local function make_id_prefix(src)
+  local stem = src:gsub("%.[^%.]*$", "")
+  stem = stem:gsub("[^A-Za-z0-9_%-]", "-")
+  stem = stem:gsub("^%-+", "")
+  stem = stem:gsub("%-+$", "")
+  if stem == "" then stem = "fig" end
+  ns_counter = ns_counter + 1
+  return stem .. "-n" .. ns_counter .. "-"
+end
+
+--- Prefix every id in an SVG and fix up internal references.
+---
+--- Every SVG generator names its parts assuming the file stands alone
+--- and restarts its counters per file, so two figures both define
+--- "clip1" or "prefig-__clipPath-0". Inlining puts them in one shared
+--- namespace, and url(#clip1) then resolves to whichever came first,
+--- cropping the second figure with the first figure's window or
+--- rendering the first figure's glyphs. Only shows up with two or more
+--- inlined figures on a page.
+---
+--- References are rewritten ONLY where this document defines the
+--- target, so genuine external links are left alone.
+local function namespace_svg_ids(svg_text, src)
+  local ids = {}
+  local n = 0
+  for id in svg_text:gmatch('%sid%s*=%s*"([^"]+)"') do
+    if not ids[id] then ids[id] = true; n = n + 1 end
+  end
+  for id in svg_text:gmatch("%sid%s*=%s*'([^']+)'") do
+    if not ids[id] then ids[id] = true; n = n + 1 end
+  end
+
+  if n == 0 then return svg_text end
+
+  local prefix = make_id_prefix(src)
+
+  -- Rewrite the definitions. The leading %s prevents matching
+  -- xml:id, data-id, and similar attributes.
+  svg_text = svg_text:gsub('(%sid%s*=%s*")([^"]+)(")', function(a, id, b)
+    return a .. prefix .. id .. b
+  end)
+  svg_text = svg_text:gsub("(%sid%s*=%s*')([^']+)(')", function(a, id, b)
+    return a .. prefix .. id .. b
+  end)
+
+  -- url(#foo) -- clip-path, mask, fill, stroke, filter, marker-*
+  svg_text = svg_text:gsub("url%(%s*#([^%)%s]+)%s*%)", function(id)
+    if ids[id] then return "url(#" .. prefix .. id .. ")" end
+    return nil
+  end)
+
+  -- href="#foo" and xlink:href="#foo" -- <use>, <textPath>, <animate>
+  svg_text = svg_text:gsub('(href%s*=%s*")#([^"]+)(")', function(a, id, b)
+    if ids[id] then return a .. "#" .. prefix .. id .. b end
+    return nil
+  end)
+  svg_text = svg_text:gsub("(href%s*=%s*')#([^']+)(')", function(a, id, b)
+    if ids[id] then return a .. "#" .. prefix .. id .. b end
+    return nil
+  end)
+
+  return svg_text
+end
+
 --- Build an inline SVG wrapped in a <span> with accessibility attributes.
 --- The span carries role="img" and aria-label so screen readers
 --- announce it like a regular image with alt text.
 local function inline_svg(svg_text, alt_text, el)
   svg_text = clean_svg(svg_text)
+  -- Prefix ids so multiple inlined figures cannot collide
+  svg_text = namespace_svg_ids(svg_text, el.src)
 
   -- Build width/height style from image attributes if present
   local style_parts = {}
@@ -4143,8 +4924,13 @@ function Image(el)
     return nil
   end
 
-  -- Get alt text from the image caption
+  -- Get alt text from the image caption.
+  -- Pandoc substitutes the literal string "image" when \includegraphics
+  -- has no alt= key, which would otherwise be announced as "image" by a
+  -- screen reader. Treat that placeholder as absent. A real alt= in the
+  -- LaTeX source arrives here as the caption and overrides it.
   local alt_text = pandoc.utils.stringify(el.caption)
+  if alt_text == "image" then alt_text = "" end
 
   -- Handle SVG: inline as raw markup
   if is_svg(el.src) then
@@ -5916,6 +6702,7 @@ async function runConversion() {
       downloadBtn.textContent = `📥 ${outName} (${sizeKB} KB)`;
       downloadBtn.style.display = '';
       scormBtn.style.display = 'none';
+      clearPreviewHtml();   // MathCAT proofing: not HTML
 
       sourceEditor.setText(`[Binary output: ${outName} (${sizeKB} KB)]\nUse the download button to save this file.`);
 
@@ -5969,7 +6756,7 @@ async function runConversion() {
       sourceEditor.setText(outputText);
 
       const previewFrame = document.getElementById('previewFrame');
-      previewFrame.srcdoc = outputText;
+      setPreviewHtml(outputText, /\.html?$/i.test(outFileName));   // MathCAT proofing: preview copy only
 
       const blob = new Blob([outputText], { type: 'text/plain' });
       const sizeKB = (blob.size / 1024).toFixed(1);
@@ -6051,6 +6838,92 @@ const { IntentReview, runIntentScan } = initIntentReview({
   activateOutputTab: (...a) => activateOutputTab(...a),
 });
 // ════════════════════════════════════════════════════════════════════
+// MATHCAT SPEECH PROOFING — js/mathcat-proof.js
+// ════════════════════════════════════════════════════════════════════
+// Plan: PLAN-MATHCAT-SPEECH-PROOFING.md (2.7); PLAN-MATHCAT-NAVIGATION.md 3.9 and N46. The
+// "Math subtitles" drop-down chooses Hidden, MathCat or MathJax for the preview only;
+// lastOutput / Download / SCORM always use the untouched HTML string.
+const mathcatProof = initMathCATProof({
+  getPreviewFrame: () => document.getElementById('previewFrame'),
+  updateLog: (level, text) => console.info('[MathCAT proofing]', text),
+  onEngineLoad: (p) => {   // N46 B, C: said only when a MathCAT load really starts
+    updateStatus('loading', 'Loading MathCAT…');
+    p.then(() => updateStatus('ready', 'MathCAT ready: ' + mathcatProof.label() + '.'),
+      (err) => updateStatus('error', 'MathCAT could not start: ' + (err && err.message ? err.message : err)));
+  },
+});
+const mathSubtitlesSel = document.getElementById('selMathSubtitles');
+const MATH_SUBTITLE_NAMES = { hide: 'Hidden', mathcat: 'MathCat', mathjax: 'MathJax' };
+let lastPreviewHtml = null;   // last HTML put in the preview, untouched; null when not HTML
+let previewSeq = 0;           // of two previews prepared at once, only the newer is written (sitting 12, point 2)
+async function setPreviewHtml(html, isHtml) {
+  const seq = ++previewSeq;
+  lastPreviewHtml = isHtml ? html : null;
+  const box = document.getElementById('mathSubtitlesBox');
+  let copy = html;
+  if (isHtml) {
+    try { copy = await mathcatProof.preparePreview(html); box.style.display = ''; }
+    catch (err) {   // sitting 12, point 3: the preview as converted, the control hidden, one log line
+      copy = html; box.style.display = 'none';
+      console.info('[MathCAT proofing]', 'helper not added to the preview: ' + (err && err.message ? err.message : err));
+    }
+  } else {
+    box.style.display = 'none';
+  }
+  if (seq !== previewSeq) return;
+  document.getElementById('previewFrame').srcdoc = copy;
+}
+function clearPreviewHtml() {
+  ++previewSeq;
+  lastPreviewHtml = null;
+  document.getElementById('mathSubtitlesBox').style.display = 'none';
+}
+mathcatProof.onChoice((info) => {   // the drop-down follows the setting; it is never disabled (N46 C)
+  mathSubtitlesSel.value = info.choice;
+  mathSubtitlesSel.querySelector('option[value="mathjax"]').disabled = info.mathjax !== true;
+  if (info.source === 'page') {     // sitting 12, point 5: a change made inside the preview
+    updateStatus('ready', 'Math subtitles: ' + MATH_SUBTITLE_NAMES[info.choice] + ', changed in the preview.');
+  }
+});
+mathSubtitlesSel.addEventListener('change', () => {   // N46 A: the platform script waits for a pause
+  mathcatProof.choose(mathSubtitlesSel.value).catch(() => { /* reported through onEngineLoad */ });
+});
+// ════════════════════════════════════════════════════════════════════
+// LATEX PREPROCESSING — js/preprocess.js (latex-preprocess PLAN-9, step F)
+// ════════════════════════════════════════════════════════════════════
+// Prepare's step 5. The tool is the preprocess/ copy, made only by the
+// latex-preprocess tool's v2/platform-copy.mjs and never edited here. It
+// and its table load on the first press and are kept for the session:
+// dynamic imports, never a static one, so a page never pressed loads
+// neither. The report is plain text in the Preprocess tab, with no live
+// region. activateOutputTab is declared further down and wants the tab
+// element, so showReport reaches it only when it runs.
+function showReport(text) {
+  const report = document.getElementById('preprocessReport');
+  report.textContent = text;
+  report.hidden = false;
+  document.getElementById('preprocessNote').hidden = true;
+  activateOutputTab(document.getElementById('outtab-preprocess'));
+}
+async function loadTable() {
+  const res = await fetch('preprocess/data/pandoc-latex-reader-index.json');
+  if (!res.ok) throw new Error('the preprocessor table did not load: HTTP ' + res.status);
+  return res.json();
+}
+async function loadTool() {
+  const [run, capability, report] = await Promise.all([
+    import('./preprocess/v2/run.mjs'),
+    import('./preprocess/v2/capability.mjs'),
+    import('./preprocess/v2/report.mjs'),
+  ]);
+  return { ...run, ...capability, ...report };
+}
+const { run: runPreprocess } = initPreprocess({
+  model: projectModel, editor, openProjectFile, syncAuxFiles, runConversion,
+  showReport, updateLog, updateStatus, loadTable, loadTool,
+});
+document.getElementById('btnPreprocess').addEventListener('click', () => runPreprocess());
+// ════════════════════════════════════════════════════════════════════
 // OUTPUT TABS — js/output-tabs.js
 // ════════════════════════════════════════════════════════════════════
 const { activateOutputTab } = initOutputTabs();
@@ -6060,8 +6933,9 @@ const { activateOutputTab } = initOutputTabs();
 
 // ─── Sidebar toggle ───
 const sidebar = document.getElementById('sidebar');
-const btnCleanup = document.getElementById('btnCleanup');
-const btnFiles = document.getElementById('btnFiles');
+// ONE entry point. The rail's own tabs choose the panel; this button only
+// opens and closes, returning to whichever tab was last used.
+const btnProject = document.getElementById('btnProject');
 const sidebarClose = document.getElementById('sidebarClose');
 
 // ─── Left rail tabs (Files / Cleanup) ───
@@ -6070,9 +6944,78 @@ const sidebarClose = document.getElementById('sidebarClose');
 const RAIL_KEY = 'atc.rail.tab';
 const railTabs = [
   ['files',   'railtab-files',   'railPanelFiles',   'Project files'],
+  ['prepare', 'railtab-prepare', 'railPanelPrepare', 'Prepare'],
   ['cleanup', 'railtab-cleanup', 'railPanelCleanup', 'LaTeX Cleanup'],
 ];
 let railTab = localStorage.getItem(RAIL_KEY) || 'files';
+
+
+// ─── Prepare panel: the two statuses that can be computed HONESTLY ───
+// Steps 3 and 4 deliberately have NO status. Previewing "how many lists use
+// [resume]" or "how much notation is ambiguous" costs exactly as much as
+// running the action, so a preview would be a second run, and a fabricated
+// number would be worse than an empty line.
+//
+// These are STATIC TEXT read on demand, never live regions: they change as a
+// side effect of other work and would otherwise interrupt. Recomputed when
+// the Prepare panel is opened and after an action that can change them.
+const CODE_FIGURE_RE =
+  /\\begin\{(?:tikzpicture|pgfpicture|axis|tikzcd|circuitikz|forest)\}|\\tikz\b/;
+
+function refreshPrepareStatus() {
+  const set = (id, text, muted) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text;
+    el.classList.toggle('prep-count-none', !!muted);
+  };
+
+  // Editor-authoritative: the open file's unsaved text is the real text.
+  // Forgetting this was a bug twice elsewhere in this file.
+  if (typeof captureEditorIntoModel === 'function') {
+    try { captureEditorIntoModel(); } catch {}
+  }
+
+  let entries = [];
+  try { entries = projectModel.listEntries(); } catch { entries = []; }
+  if (!entries.length) {
+    set('prepCountImages', 'No project loaded.', true);
+    set('prepCountPdfs', 'No project loaded.', true);
+    return;
+  }
+
+  // Step 1 — a TEXT SCAN, not a compile. It reports what the source LOOKS
+  // like; only extraction can say what is actually there. Comments are
+  // stripped first so a commented-out figure is not counted.
+  const tex = entries.filter(e => /\.tex$/i.test(e.path));
+  let withCode = 0;
+  for (const e of tex) {
+    let t = '';
+    try { t = projectModel.getText(e.path) || ''; } catch {}
+    if (CODE_FIGURE_RE.test(t.replace(/(^|[^\\])%.*$/gm, '$1'))) withCode++;
+  }
+  set('prepCountImages',
+    !tex.length
+      ? 'No LaTeX source in the project.'
+      : withCode
+        ? withCode + ' of ' + tex.length + ' source file(s) appear to contain figures drawn in code.'
+        : 'None of the ' + tex.length + ' source file(s) appear to contain figures drawn in code.',
+    withCode === 0);
+
+  // Step 2 — cheap and exact: count .pdf entries and their .svg siblings.
+  // *** It says "has an SVG beside it", NOT "converted". *** Entries carry
+  // no timestamps, so an SVG older than its PDF cannot be told from a
+  // current one; claiming "converted" would state more than we know.
+  const pdfs = entries.filter(e => /\.pdf$/i.test(e.path)).map(e => e.path);
+  const have = new Set(entries.map(e => e.path.toLowerCase()));
+  const withSvg = pdfs.filter(p => have.has(p.replace(/\.pdf$/i, '.svg').toLowerCase())).length;
+  set('prepCountPdfs',
+    !pdfs.length
+      ? 'No PDF images in the project.'
+      : pdfs.length + ' PDF image(s); ' + withSvg + ' already have an SVG beside them and will be skipped.'
+        + (withSvg ? ' Delete an SVG to have it rebuilt.' : ''),
+    pdfs.length === 0);
+}
 
 function setRailTab(id, focusPanel) {
   railTab = railTabs.some(t => t[0] === id) ? id : 'files';
@@ -6089,6 +7032,7 @@ function setRailTab(id, focusPanel) {
     if (on) document.getElementById('railTitle').textContent = title;
   }
   if (railTab === 'files') fileTree.render();
+  if (railTab === 'prepare') refreshPrepareStatus();
   if (focusPanel) {
     const tab = document.getElementById(railTabs.find(t => t[0] === railTab)[1]);
     if (tab) tab.focus();
@@ -6098,7 +7042,7 @@ function setRailTab(id, focusPanel) {
 for (const [key, tabId] of railTabs) {
   document.getElementById(tabId)?.addEventListener('click', () => setRailTab(key));
 }
-// Roving tabindex across the two tabs, per the ARIA tabs pattern.
+// Roving tabindex across the tabs, per the ARIA tabs pattern.
 document.querySelector('.rail-tabs')?.addEventListener('keydown', (ev) => {
   if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') return;
   ev.preventDefault();
@@ -6111,11 +7055,9 @@ document.querySelector('.rail-tabs')?.addEventListener('keydown', (ev) => {
 function setSidebarOpen(open, tab) {
   sidebar.classList.toggle('collapsed', !open);
   if (open && tab) setRailTab(tab);
-  for (const [btn, key] of [[btnFiles, 'files'], [btnCleanup, 'cleanup']]) {
-    if (!btn) continue;
-    const active = open && railTab === key;
-    btn.classList.toggle('active', active);
-    btn.setAttribute('aria-expanded', String(open));
+  if (btnProject) {
+    btnProject.classList.toggle('active', open);
+    btnProject.setAttribute('aria-expanded', String(open));
   }
   // (CM6 self-measures after the CSS transition — no resize call needed)
 }
@@ -6128,8 +7070,8 @@ function toggleSidebar(tab) {
   setSidebarOpen(!isOpen, tab);
 }
 
-btnCleanup.addEventListener('click', () => toggleSidebar('cleanup'));
-btnFiles?.addEventListener('click', () => toggleSidebar('files'));
+// No tab argument: reopening returns to the remembered tab.
+btnProject?.addEventListener('click', () => toggleSidebar());
 sidebarClose.addEventListener('click', () => setSidebarOpen(false));
 setRailTab(railTab);
 
@@ -6198,13 +7140,30 @@ document.getElementById('btnOutputClose').addEventListener('click', () => setLay
 // ─── Resize gutter drag ───
 let isResizing = false;
 
-resizeGutter.addEventListener('mousedown', (e) => {
+// Pointer events + setPointerCapture keep every move and release bound to
+// the gutter even when the cursor crosses the preview iframe. With plain
+// mouse events the iframe swallows them, the parent never sees mouseup, and
+// the divider keeps following the cursor after the button is released.
+function endResize() {
+  if (!isResizing) return;
+  isResizing = false;
+  resizeGutter.classList.remove('dragging');
+  document.body.classList.remove('resizing');
+  document.body.style.cursor = '';
+}
+
+resizeGutter.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0) return;
   isResizing = true;
   resizeGutter.classList.add('dragging');
+  document.body.classList.add('resizing');
+  document.body.style.cursor =
+    outputPanel.classList.contains('bottom-mode') ? 'row-resize' : 'col-resize';
+  try { resizeGutter.setPointerCapture(e.pointerId); } catch (_) {}
   e.preventDefault();
 });
 
-document.addEventListener('mousemove', (e) => {
+resizeGutter.addEventListener('pointermove', (e) => {
   if (!isResizing) return;
   const rect = centerWrap.getBoundingClientRect();
   const isBottom = outputPanel.classList.contains('bottom-mode');
@@ -6228,12 +7187,79 @@ document.addEventListener('mousemove', (e) => {
   }
 });
 
-document.addEventListener('mouseup', () => {
-  if (isResizing) {
-    isResizing = false;
-    resizeGutter.classList.remove('dragging');
+resizeGutter.addEventListener('pointerup', endResize);
+resizeGutter.addEventListener('pointercancel', endResize);
+resizeGutter.addEventListener('lostpointercapture', endResize);
+// Safety net: a release anywhere, or the window losing focus, ends the drag.
+window.addEventListener('pointerup', endResize);
+window.addEventListener('blur', endResize);
+
+// ─── Sidebar (project panel) resize ───
+// Same pointer-capture pattern as the editor/preview gutter above.
+const sidebarEl     = document.getElementById('sidebar');
+const sidebarGutter = document.getElementById('sidebarGutter');
+const SIDEBAR_MIN = 200, SIDEBAR_MAX = 560;
+let isSidebarResizing = false;
+
+function setSidebarWidth(px, persist) {
+  const w = Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, Math.round(px)));
+  sidebarEl.style.width = w + 'px';
+  sidebarGutter.setAttribute('aria-valuenow', String(w));
+  if (persist) {
+    try { localStorage.setItem('sidebar-width', String(w)); } catch (_) {}
   }
+  return w;
+}
+
+function endSidebarResize() {
+  if (!isSidebarResizing) return;
+  isSidebarResizing = false;
+  sidebarGutter.classList.remove('dragging');
+  document.body.classList.remove('resizing');
+  document.body.style.cursor = '';
+  setSidebarWidth(sidebarEl.getBoundingClientRect().width, true);
+}
+
+sidebarGutter.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0) return;
+  isSidebarResizing = true;
+  sidebarGutter.classList.add('dragging');
+  document.body.classList.add('resizing');
+  document.body.style.cursor = 'col-resize';
+  try { sidebarGutter.setPointerCapture(e.pointerId); } catch (_) {}
+  e.preventDefault();
 });
+
+sidebarGutter.addEventListener('pointermove', (e) => {
+  if (!isSidebarResizing) return;
+  setSidebarWidth(e.clientX - sidebarEl.getBoundingClientRect().left, false);
+});
+
+sidebarGutter.addEventListener('pointerup', endSidebarResize);
+sidebarGutter.addEventListener('pointercancel', endSidebarResize);
+sidebarGutter.addEventListener('lostpointercapture', endSidebarResize);
+window.addEventListener('pointerup', endSidebarResize);
+window.addEventListener('blur', endSidebarResize);
+
+// Keyboard: arrows nudge (Shift = coarse), Home/End jump to the bounds.
+sidebarGutter.addEventListener('keydown', (e) => {
+  const cur  = sidebarEl.getBoundingClientRect().width;
+  const step = e.shiftKey ? 48 : 16;
+  let next = null;
+  if      (e.key === 'ArrowLeft')  next = cur - step;
+  else if (e.key === 'ArrowRight') next = cur + step;
+  else if (e.key === 'Home')       next = SIDEBAR_MIN;
+  else if (e.key === 'End')        next = SIDEBAR_MAX;
+  if (next === null) return;
+  setSidebarWidth(next, true);
+  e.preventDefault();
+});
+
+// Restore the width chosen last time.
+try {
+  const savedW = parseInt(localStorage.getItem('sidebar-width'), 10);
+  if (savedW) setSidebarWidth(savedW, false);
+} catch (_) {}
 
 // ════════════════════════════════════════════════════════════════════
 // SECTION 11: KEYBOARD SHORTCUTS
@@ -6560,7 +7586,7 @@ async function runLatexmlConversion() {
     sourceEditor.setLanguage('html');
 
     const previewFrame = document.getElementById('previewFrame');
-    previewFrame.srcdoc = outputHtml;
+    setPreviewHtml(outputHtml, true);   // MathCAT proofing: preview copy only
 
     // Store for download
     const blob = new Blob([outputHtml], { type: 'text/html' });
@@ -6656,6 +7682,7 @@ function displayPdfInPreview(pdfArrayBuffer, filename) {
   // Remove sandbox to allow browser's built-in PDF viewer to work.
   // This is safe because PDF blob URLs cannot execute scripts or access the parent page.
   previewFrame.removeAttribute('sandbox');
+  clearPreviewHtml();   // MathCAT proofing: not HTML
 
   // Clear any srcdoc and set src to the blob URL
   previewFrame.removeAttribute('srcdoc');

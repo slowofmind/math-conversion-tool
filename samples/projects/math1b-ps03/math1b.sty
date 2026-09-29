@@ -1,0 +1,19 @@
+%% math1b.sty -- shared macros for Math 1b problem sets
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{math1b}[2026/09/01 v1.2 Math 1b problem set macros]
+
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{graphicx}
+
+%% Upright differential with the spacing this course uses: \dd{x} -> \,dx
+\newcommand{\dd}[1]{\,\mathrm{d}#1}
+
+%% Absolute value
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+
+%% Problem heading
+\newcommand{\problem}[1]{\subsection*{Problem #1}}
+
+%% Hint paragraph
+\newcommand{\hint}[1]{\par\smallskip\noindent\textit{Hint.} #1}

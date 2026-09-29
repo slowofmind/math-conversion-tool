@@ -4,3 +4,12 @@ desktop.ini
 # Only the gzipped pandoc-wasm.bin is committed (GitHub Pages serves it).
 # See pandoc-wasm/VERSIONS.md for provenance and update steps.
 pandoc-wasm/pandoc.wasm
+
+# BusyTeX engine + TeX Live basic tier: ~120 MB of published build artifacts
+# (busytex.wasm 31 MB, texlive-basic.data 86.6 MB). UNTRACKED FOR NOW.
+# These are within GitHub's 100 MB per-file limit — the reason to hold is
+# that git history is permanent, so each future replacement would leave the
+# old copy in .git forever. Track them only once the version is pinned.
+# Fetch/refresh with: npx texlyre-busytex download-assets
+# See memoize-integration/DESIGN.md sec.3 for the tier decision.
+image-extraction/core/

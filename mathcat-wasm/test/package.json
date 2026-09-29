@@ -1,0 +1,14 @@
+{
+  "name": "mathcat-wasm-tests",
+  "private": true,
+  "type": "module",
+  "description": "Tests for mathcat-wasm/ and js/mathcat-proof*.js (plan section 5, Phase B).",
+  "scripts": {
+    "test": "node run-all.mjs"
+  },
+  "devDependencies": {
+    "@mathjax/src": "4.1.3",
+    "jsdom": "30.1.1",
+    "mathjax": "4.1.3"
+  }
+}

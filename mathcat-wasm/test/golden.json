@@ -1,0 +1,210 @@
+{
+ "meta": {
+  "generatedBy": "nvda_reference.py",
+  "nvda": "release-2026.2",
+  "synth": "oneCore",
+  "source": "https://raw.githubusercontent.com/nvaccess/nvda/release-2026.2/source/mathPres/MathCAT/speech.py"
+ },
+ "rows": [
+  {
+   "name": "quadratic",
+   "mathml": "<math display=\"block\"><mi>x</mi><mo>=</mo><mfrac><mrow><mo>&#x2212;</mo><mi>b</mi><mo>&#xB1;</mo><msqrt><msup><mi>b</mi><mn>2</mn></msup><mo>&#x2212;</mo><mn>4</mn><mi>a</mi><mi>c</mi></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>",
+   "ssml": "<say-as interpret-as='characters'>x</say-as>  is equal to <break time='384ms'/> the fraction with numerator <break time='400ms'/> negative <say-as interpret-as='characters'>b</say-as>  plus or minus <break time='128ms'/> the square root of <say-as interpret-as='characters'>b</say-as> squared  minus  4   <say-as interpret-as='characters'>a</say-as>   <say-as interpret-as='characters'>c</say-as> <break time='800ms'/>and denominator 2   <say-as interpret-as='characters'>a</say-as> <break time='800ms'/>",
+   "error": null,
+   "viewerRaw": "   x         is equal to         the fraction with numerator         negative         b         plus or minus         the square root of         b        squared  minus  4           eigh                  c        and denominator 2           eigh      ",
+   "nvdaMathml": "<math xml:lang=\"en\"><mi>x</mi><mo>=</mo><mfrac><mrow><mo>&#x2212;</mo><mi>b</mi><mo>&#xB1;</mo><msqrt><msup><mi>b</mi><mn>2</mn></msup><mo>&#x2212;</mo><mn>4</mn><mi>a</mi><mi>c</mi></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   x         is equal to         the fraction with numerator         negative         b         plus or minus         the square root of         b        squared  minus  4           eigh                  c        and denominator 2           eigh      "
+  },
+  {
+   "name": "integral-mspace",
+   "mathml": "<math><msubsup><mo>&#x222B;</mo><mn>0</mn><mn>1</mn></msubsup><msup><mi>x</mi><mn>2</mn></msup><mspace width=\"0.2em\"></mspace><mi>d</mi><mi>x</mi><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></math>",
+   "ssml": "the integral from 0 to 1 of <break time='128ms'/> <say-as interpret-as='characters'>x</say-as> squared   <say-as interpret-as='characters'>d</say-as>   <say-as interpret-as='characters'>x</say-as> <break time='256ms'/> is equal to  1 third",
+   "error": null,
+   "viewerRaw": "   the integral from 0 to 1 of         x        squared           d                  x        is equal to  1 third      ",
+   "nvdaMathml": "<math xml:lang=\"en\"><msubsup><mo>&#x222B;</mo><mn>0</mn><mn>1</mn></msubsup><msup><mi>x</mi><mn>2</mn></msup><mspace width=\"0.2em\"></mspace><mi>d</mi><mi>x</mi><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   the integral from 0 to 1 of         x        squared           d                  x        is equal to  1 third      "
+  },
+  {
+   "name": "sum-limits",
+   "mathml": "<math display=\"block\"><munderover><mo>&#x2211;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>k</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mo stretchy=\"false\">(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy=\"false\">)</mo></mrow><mn>2</mn></mfrac></math>",
+   "ssml": "the sum from <say-as interpret-as='characters'>k</say-as>  is equal to  1 to <say-as interpret-as='characters'>n</say-as> of  <say-as interpret-as='characters'>k</say-as> <break time='128ms'/> is equal to <break time='256ms'/> the fraction with numerator <break time='400ms'/> <say-as interpret-as='characters'>n</say-as>  times  open paren  <say-as interpret-as='characters'>n</say-as>  plus  1  close paren <break time='400ms'/> and denominator 2 <break time='800ms'/>",
+   "error": null,
+   "viewerRaw": "   the sum from         k         is equal to  1 to         n        of          k        is equal to         the fraction with numerator         n         times  open paren          n         plus  1  close paren         and denominator 2       ",
+   "nvdaMathml": "<math xml:lang=\"en\"><munderover><mo>&#x2211;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>k</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mo stretchy=\"false\">(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy=\"false\">)</mo></mrow><mn>2</mn></mfrac></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   the sum from         k         is equal to  1 to         n        of          k        is equal to         the fraction with numerator         n         times  open paren          n         plus  1  close paren         and denominator 2       "
+  },
+  {
+   "name": "derivative",
+   "mathml": "<math><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup></math>",
+   "ssml": "<say-as interpret-as='characters'>d</say-as>   <say-as interpret-as='characters'>y</say-as> over <say-as interpret-as='characters'>d</say-as>   <say-as interpret-as='characters'>x</say-as>  is equal to  3   <say-as interpret-as='characters'>x</say-as> squared",
+   "error": null,
+   "viewerRaw": "   d                  y        over         d                  x         is equal to  3           x        squared      ",
+   "nvdaMathml": "<math xml:lang=\"en\"><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   d                  y        over         d                  x         is equal to  3           x        squared      "
+  },
+  {
+   "name": "pair-no-intent",
+   "mathml": "<math><mo stretchy=\"false\">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy=\"false\">)</mo></math>",
+   "ssml": "open paren  <say-as interpret-as='characters'>a</say-as>  comma <break time='200ms'/>  <say-as interpret-as='characters'>b</say-as>  close paren",
+   "error": null,
+   "viewerRaw": "   open paren          eigh         comma                  b         close paren      ",
+   "nvdaMathml": "<math xml:lang=\"en\"><mo stretchy=\"false\">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy=\"false\">)</mo></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   open paren          eigh         comma                  b         close paren      "
+  },
+  {
+   "name": "pair-intent-inner",
+   "mathml": "<math><mrow intent=\"open-interval($a,$b)\"><mo>(</mo><mi arg=\"a\">a</mi><mo>,</mo><mi arg=\"b\">b</mi><mo>)</mo></mrow></math>",
+   "ssml": "the interval from <say-as interpret-as='characters'>a</say-as> to <say-as interpret-as='characters'>b</say-as> <break time='200ms'/> not including <say-as interpret-as='characters'>a</say-as> or <say-as interpret-as='characters'>b</say-as>",
+   "error": null,
+   "viewerRaw": "   the interval from         eigh        to         b        not including         eigh        or         b      ",
+   "nvdaMathml": "<math xml:lang=\"en\"><mrow intent=\"open-interval($a,$b)\"><mo>(</mo><mi arg=\"a\">a</mi><mo>,</mo><mi arg=\"b\">b</mi><mo>)</mo></mrow></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   the interval from         eigh        to         b        not including         eigh        or         b      "
+  },
+  {
+   "name": "pair-intent-root",
+   "mathml": "<math intent=\"open-interval($a,$b)\"><mo>(</mo><mi arg=\"a\">a</mi><mo>,</mo><mi arg=\"b\">b</mi><mo>)</mo></math>",
+   "ssml": "the interval from <say-as interpret-as='characters'>a</say-as> to <say-as interpret-as='characters'>b</say-as> <break time='200ms'/> not including <say-as interpret-as='characters'>a</say-as> or <say-as interpret-as='characters'>b</say-as>",
+   "error": null,
+   "viewerRaw": "   the interval from         eigh        to         b        not including         eigh        or         b      ",
+   "nvdaMathml": "<math xml:lang=\"en\"><mo>(</mo><mi arg=\"a\">a</mi><mo>,</mo><mi arg=\"b\">b</mi><mo>)</mo></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   open paren          eigh         comma                  b         close paren      "
+  },
+  {
+   "name": "capitals",
+   "mathml": "<math><mi>A</mi><mo>+</mo><mi>B</mi><mo>=</mo><mi>C</mi></math>",
+   "ssml": "<prosody pitch='30%'><say-as interpret-as='characters'>a</say-as></prosody>  plus    <prosody pitch='30%'><say-as interpret-as='characters'>b</say-as></prosody>  is equal to    <prosody pitch='30%'><say-as interpret-as='characters'>c</say-as></prosody>",
+   "error": null,
+   "viewerRaw": "   eigh         plus            b         is equal to            c      ",
+   "nvdaMathml": "<math xml:lang=\"en\"><mi>A</mi><mo>+</mo><mi>B</mi><mo>=</mo><mi>C</mi></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   eigh         plus            b         is equal to            c      "
+  },
+  {
+   "name": "matrix-2x2",
+   "mathml": "<math><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>",
+   "ssml": "the 2 by 2 matrix <break time='800ms'/>row 1 <break time='400ms'/> 1 <break time='200ms'/> 2 <break time='400ms'/>row 2 <break time='400ms'/> 3 <break time='200ms'/> 4 <break time='800ms'/>",
+   "error": null,
+   "viewerRaw": "   the 2 by 2 matrix         row 1         1         2         row 2         3         4       ",
+   "nvdaMathml": "<math xml:lang=\"en\"><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   the 2 by 2 matrix         row 1         1         2         row 2         3         4       "
+  },
+  {
+   "name": "chem-h2o-plain",
+   "mathml": "<math><msub><mi mathvariant=\"normal\">H</mi><mn>2</mn></msub><mi mathvariant=\"normal\">O</mi></math>",
+   "ssml": "<prosody pitch='30%'><say-as interpret-as='characters'>h</say-as></prosody> <break time='200ms'/> sub 2     <prosody pitch='30%'><say-as interpret-as='characters'>o</say-as></prosody> <break time='200ms'/>",
+   "error": null,
+   "viewerRaw": "   h        sub 2             o      ",
+   "nvdaMathml": "<math xml:lang=\"en\"><msub><mi mathvariant=\"normal\">H</mi><mn>2</mn></msub><mi mathvariant=\"normal\">O</mi></math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   h        sub 2             o      "
+  },
+  {
+   "name": "malformed",
+   "mathml": "<math><mfrac><mi>a</mi></math>",
+   "ssml": null,
+   "error": "Invalid MathML input:\n<math><mfrac><mi>a</mi></math>\nError is: XML parsing error at 25: {MismatchedElementEndName}\n",
+   "viewerRaw": null,
+   "nvdaMathml": "<math xml:lang=\"en\"><mfrac><mi>a</mi></math>",
+   "nvdaError": "Invalid MathML input:\n<math xml:lang=\"en\"><mfrac><mi>a</mi></math>\nError is: XML parsing error at 39: {MismatchedElementEndName}\n",
+   "nvdaViewerRaw": null
+  },
+  {
+   "name": "intent-card",
+   "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\card{S}\">\n  <mrow intent=\"cardinality($a)\" ext-intent=\"cardinality($a)\" ext-arity=\"1\" ext-open=\"the cardinality of\" ext-close=\"\" data-latex=\"\\intent{cardinality}{\\left|\\iarg{S}\\right|}\">\n    <mrow data-mjx-texclass=\"INNER\" data-latex=\"\\left|\\iarg{S}\\right|\">\n      <mo data-mjx-texclass=\"OPEN\" data-latex=\"\\left|\">|</mo>\n      <mi data-latex=\"\\iarg{S}\" arg=\"a\" ext-argname=\"a\">S</mi>\n      <mo data-mjx-texclass=\"CLOSE\" data-latex=\"\\right|\">|</mo>\n    </mrow>\n  </mrow>\n</math>",
+   "ssml": "cardinality of    <prosody pitch='30%'><say-as interpret-as='characters'>s</say-as></prosody>",
+   "error": null,
+   "viewerRaw": "   cardinality of            s      ",
+   "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow intent=\"cardinality($a)\" ext-intent=\"cardinality($a)\" ext-arity=\"1\" ext-open=\"the cardinality of\" ext-close=\"\" data-latex=\"\\intent{cardinality}{\\left|\\iarg{S}\\right|}\">\n    <mrow data-mjx-texclass=\"INNER\" data-latex=\"\\left|\\iarg{S}\\right|\">\n      <mo data-mjx-texclass=\"OPEN\" data-latex=\"\\left|\">|</mo>\n      <mi data-latex=\"\\iarg{S}\" arg=\"a\" ext-argname=\"a\">S</mi>\n      <mo data-mjx-texclass=\"CLOSE\" data-latex=\"\\right|\">|</mo>\n    </mrow>\n  </mrow>\n</math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   cardinality of            s      "
+  },
+  {
+   "name": "intent-norm",
+   "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\norm{v}\">\n  <mrow intent=\"norm($a)\" ext-intent=\"norm($a)\" ext-arity=\"1\" ext-open=\"the norm of\" ext-close=\"\" data-latex=\"\\intent{norm}{\\left\\|\\iarg{v}\\right\\|}\">\n    <mrow data-mjx-texclass=\"INNER\" data-latex=\"\\left\\|\\iarg{v}\\right\\|\">\n      <mo data-mjx-texclass=\"OPEN\" data-latex=\"\\left\\|\">&#x2016;</mo>\n      <mi data-latex=\"\\iarg{v}\" arg=\"a\" ext-argname=\"a\">v</mi>\n      <mo data-mjx-texclass=\"CLOSE\" data-latex=\"\\right\\|\">&#x2016;</mo>\n    </mrow>\n  </mrow>\n</math>",
+   "ssml": "norm of  <say-as interpret-as='characters'>v</say-as>",
+   "error": null,
+   "viewerRaw": "   norm of          v      ",
+   "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow intent=\"norm($a)\" ext-intent=\"norm($a)\" ext-arity=\"1\" ext-open=\"the norm of\" ext-close=\"\" data-latex=\"\\intent{norm}{\\left\\|\\iarg{v}\\right\\|}\">\n    <mrow data-mjx-texclass=\"INNER\" data-latex=\"\\left\\|\\iarg{v}\\right\\|\">\n      <mo data-mjx-texclass=\"OPEN\" data-latex=\"\\left\\|\">&#x2016;</mo>\n      <mi data-latex=\"\\iarg{v}\" arg=\"a\" ext-argname=\"a\">v</mi>\n      <mo data-mjx-texclass=\"CLOSE\" data-latex=\"\\right\\|\">&#x2016;</mo>\n    </mrow>\n  </mrow>\n</math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   norm of          v      "
+  },
+  {
+   "name": "intent-openint",
+   "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\openint{a}{b}\">\n  <mrow intent=\"open-interval($a,$b)\" ext-intent=\"open-interval($a,$b)\" ext-arity=\"2\" ext-open=\"the open interval from\" ext-close=\"\" ext-mid1=\"to\" data-latex=\"\\intent{open-interval}{\\left(\\iarg{a},\\iarg[b]{b}\\right)}\">\n    <mrow data-mjx-texclass=\"INNER\" data-latex=\"\\left(\\iarg{a},\\iarg[b]{b}\\right)\">\n      <mo data-mjx-texclass=\"OPEN\" data-latex=\"\\left(\">(</mo>\n      <mi data-latex=\"\\iarg{a}\" arg=\"a\" ext-argname=\"a\">a</mi>\n      <mo data-latex=\",\">,</mo>\n      <mi data-latex=\"\\iarg[b]{b}\" arg=\"b\" ext-argname=\"b\">b</mi>\n      <mo data-mjx-texclass=\"CLOSE\" data-latex=\"\\right)\">)</mo>\n    </mrow>\n  </mrow>\n</math>",
+   "ssml": "the interval from <say-as interpret-as='characters'>a</say-as> to <say-as interpret-as='characters'>b</say-as> <break time='200ms'/> not including <say-as interpret-as='characters'>a</say-as> or <say-as interpret-as='characters'>b</say-as>",
+   "error": null,
+   "viewerRaw": "   the interval from         eigh        to         b        not including         eigh        or         b      ",
+   "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow intent=\"open-interval($a,$b)\" ext-intent=\"open-interval($a,$b)\" ext-arity=\"2\" ext-open=\"the open interval from\" ext-close=\"\" ext-mid1=\"to\" data-latex=\"\\intent{open-interval}{\\left(\\iarg{a},\\iarg[b]{b}\\right)}\">\n    <mrow data-mjx-texclass=\"INNER\" data-latex=\"\\left(\\iarg{a},\\iarg[b]{b}\\right)\">\n      <mo data-mjx-texclass=\"OPEN\" data-latex=\"\\left(\">(</mo>\n      <mi data-latex=\"\\iarg{a}\" arg=\"a\" ext-argname=\"a\">a</mi>\n      <mo data-latex=\",\">,</mo>\n      <mi data-latex=\"\\iarg[b]{b}\" arg=\"b\" ext-argname=\"b\">b</mi>\n      <mo data-mjx-texclass=\"CLOSE\" data-latex=\"\\right)\">)</mo>\n    </mrow>\n  </mrow>\n</math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   the interval from         eigh        to         b        not including         eigh        or         b      "
+  },
+  {
+   "name": "intent-closedint",
+   "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\closedint{a}{b}\">\n  <mrow intent=\"closed-interval($a,$b)\" ext-intent=\"closed-interval($a,$b)\" ext-arity=\"2\" ext-open=\"the closed interval from\" ext-close=\"\" ext-mid1=\"to\" data-latex=\"\\intent{closed-interval}{\\left[\\iarg{a},\\iarg[b]{b}\\right]}\">\n    <mrow data-mjx-texclass=\"INNER\" data-latex=\"\\left[\\iarg{a},\\iarg[b]{b}\\right]\">\n      <mo data-mjx-texclass=\"OPEN\" data-latex=\"\\left[\">[</mo>\n      <mi data-latex=\"\\iarg{a}\" arg=\"a\" ext-argname=\"a\">a</mi>\n      <mo data-latex=\",\">,</mo>\n      <mi data-latex=\"\\iarg[b]{b}\" arg=\"b\" ext-argname=\"b\">b</mi>\n      <mo data-mjx-texclass=\"CLOSE\" data-latex=\"\\right]\">]</mo>\n    </mrow>\n  </mrow>\n</math>",
+   "ssml": "the interval from <say-as interpret-as='characters'>a</say-as> to <say-as interpret-as='characters'>b</say-as> <break time='200ms'/> including <say-as interpret-as='characters'>a</say-as> and <say-as interpret-as='characters'>b</say-as>",
+   "error": null,
+   "viewerRaw": "   the interval from         eigh        to         b        including         eigh        and         b      ",
+   "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow intent=\"closed-interval($a,$b)\" ext-intent=\"closed-interval($a,$b)\" ext-arity=\"2\" ext-open=\"the closed interval from\" ext-close=\"\" ext-mid1=\"to\" data-latex=\"\\intent{closed-interval}{\\left[\\iarg{a},\\iarg[b]{b}\\right]}\">\n    <mrow data-mjx-texclass=\"INNER\" data-latex=\"\\left[\\iarg{a},\\iarg[b]{b}\\right]\">\n      <mo data-mjx-texclass=\"OPEN\" data-latex=\"\\left[\">[</mo>\n      <mi data-latex=\"\\iarg{a}\" arg=\"a\" ext-argname=\"a\">a</mi>\n      <mo data-latex=\",\">,</mo>\n      <mi data-latex=\"\\iarg[b]{b}\" arg=\"b\" ext-argname=\"b\">b</mi>\n      <mo data-mjx-texclass=\"CLOSE\" data-latex=\"\\right]\">]</mo>\n    </mrow>\n  </mrow>\n</math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   the interval from         eigh        to         b        including         eigh        and         b      "
+  },
+  {
+   "name": "intent-braket",
+   "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\braket{a}{b}\">\n  <mrow data-latex=\"{}\">\n    <mo data-mjx-texclass=\"OPEN\" stretchy=\"false\">&#x27E8;</mo>\n    <mi data-latex=\"a\">a</mi>\n    <mo data-mjx-texclass=\"CLOSE\" stretchy=\"false\">&#x27E9;</mo>\n  </mrow>\n  <mrow data-mjx-texclass=\"ORD\" data-latex=\"{b}\">\n    <mi data-latex=\"b\">b</mi>\n  </mrow>\n</math>",
+   "ssml": "left angle bracket  <say-as interpret-as='characters'>a</say-as>  right angle bracket <break time='128ms'/>  <say-as interpret-as='characters'>b</say-as>",
+   "error": null,
+   "viewerRaw": "   left angle bracket          eigh         right angle bracket                  b      ",
+   "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow data-latex=\"{}\">\n    <mo data-mjx-texclass=\"OPEN\" stretchy=\"false\">&#x27E8;</mo>\n    <mi data-latex=\"a\">a</mi>\n    <mo data-mjx-texclass=\"CLOSE\" stretchy=\"false\">&#x27E9;</mo>\n  </mrow>\n  <mrow data-mjx-texclass=\"ORD\" data-latex=\"{b}\">\n    <mi data-latex=\"b\">b</mi>\n  </mrow>\n</math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   left angle bracket          eigh         right angle bracket                  b      "
+  },
+  {
+   "name": "intent-ketbra",
+   "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\ketbra{a}{b}\">\n  <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\vert {a} \\rangle\\langle {b} \\vert}\">\n    <mo data-mjx-texclass=\"ORD\" fence=\"false\" stretchy=\"false\" data-latex=\"\\vert\">|</mo>\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"{a}\">\n      <mi data-latex=\"a\">a</mi>\n    </mrow>\n    <mo fence=\"false\" stretchy=\"false\" data-latex=\"\\rangle\">&#x27E9;</mo>\n    <mo fence=\"false\" stretchy=\"false\" data-latex=\"\\langle\">&#x27E8;</mo>\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"{b}\">\n      <mi data-latex=\"b\">b</mi>\n    </mrow>\n    <mo data-mjx-texclass=\"ORD\" fence=\"false\" stretchy=\"false\" data-latex=\"\\vert\">|</mo>\n  </mrow>\n</math>",
+   "ssml": "vertical line  <say-as interpret-as='characters'>a</say-as>  right angle bracket <break time='128ms'/>  left angle bracket  <say-as interpret-as='characters'>b</say-as>  vertical line",
+   "error": null,
+   "viewerRaw": "   vertical line          eigh         right angle bracket          left angle bracket          b         vertical line      ",
+   "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\vert {a} \\rangle\\langle {b} \\vert}\">\n    <mo data-mjx-texclass=\"ORD\" fence=\"false\" stretchy=\"false\" data-latex=\"\\vert\">|</mo>\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"{a}\">\n      <mi data-latex=\"a\">a</mi>\n    </mrow>\n    <mo fence=\"false\" stretchy=\"false\" data-latex=\"\\rangle\">&#x27E9;</mo>\n    <mo fence=\"false\" stretchy=\"false\" data-latex=\"\\langle\">&#x27E8;</mo>\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"{b}\">\n      <mi data-latex=\"b\">b</mi>\n    </mrow>\n    <mo data-mjx-texclass=\"ORD\" fence=\"false\" stretchy=\"false\" data-latex=\"\\vert\">|</mo>\n  </mrow>\n</math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   vertical line          eigh         right angle bracket          left angle bracket          b         vertical line      "
+  },
+  {
+   "name": "intent-conj",
+   "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\conj{z}\">\n  <mrow intent=\"complex-conjugate($a)\" ext-intent=\"complex-conjugate($a)\" ext-arity=\"1\" ext-open=\"the complex conjugate of\" ext-close=\"\" data-latex=\"\\intent{complex-conjugate}{\\overline{\\iarg{z}}}\">\n    <mover data-latex=\"\\overline{\\iarg{z}}\">\n      <mi data-latex=\"\\iarg{z}\" arg=\"a\" ext-argname=\"a\">z</mi>\n      <mo accent=\"true\">&#x2015;</mo>\n    </mover>\n  </mrow>\n</math>",
+   "ssml": "complex conjugate of  <say-as interpret-as='characters'>z</say-as>",
+   "error": null,
+   "viewerRaw": "   complex conjugate of          z      ",
+   "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow intent=\"complex-conjugate($a)\" ext-intent=\"complex-conjugate($a)\" ext-arity=\"1\" ext-open=\"the complex conjugate of\" ext-close=\"\" data-latex=\"\\intent{complex-conjugate}{\\overline{\\iarg{z}}}\">\n    <mover data-latex=\"\\overline{\\iarg{z}}\">\n      <mi data-latex=\"\\iarg{z}\" arg=\"a\" ext-argname=\"a\">z</mi>\n      <mo accent=\"true\">&#x2015;</mo>\n    </mover>\n  </mrow>\n</math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   complex conjugate of          z      "
+  },
+  {
+   "name": "intent-transp",
+   "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\transp{A}\">\n  <mrow intent=\"transpose($a)\" ext-intent=\"transpose($a)\" ext-arity=\"1\" ext-open=\"the transpose of\" ext-close=\"\" data-latex=\"\\intent{transpose}{{\\iarg{A}}^{\\mathsf{T}}}\">\n    <msup data-latex=\"{\\iarg{A}}^{\\mathsf{T}}\">\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\iarg{A}}\">\n        <mi data-latex=\"\\iarg{A}\" arg=\"a\" ext-argname=\"a\">A</mi>\n      </mrow>\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\mathsf{T}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathsf{T}\">\n          <mi mathvariant=\"sans-serif\" data-latex=\"T\">T</mi>\n        </mrow>\n      </mrow>\n    </msup>\n  </mrow>\n</math>",
+   "ssml": "<prosody pitch='30%'><say-as interpret-as='characters'>a</say-as></prosody> transpose",
+   "error": null,
+   "viewerRaw": "   eigh        transpose      ",
+   "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow intent=\"transpose($a)\" ext-intent=\"transpose($a)\" ext-arity=\"1\" ext-open=\"the transpose of\" ext-close=\"\" data-latex=\"\\intent{transpose}{{\\iarg{A}}^{\\mathsf{T}}}\">\n    <msup data-latex=\"{\\iarg{A}}^{\\mathsf{T}}\">\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\iarg{A}}\">\n        <mi data-latex=\"\\iarg{A}\" arg=\"a\" ext-argname=\"a\">A</mi>\n      </mrow>\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\mathsf{T}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathsf{T}\">\n          <mi mathvariant=\"sans-serif\" data-latex=\"T\">T</mi>\n        </mrow>\n      </mrow>\n    </msup>\n  </mrow>\n</math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   eigh        transpose      "
+  },
+  {
+   "name": "intent-ce-h2o",
+   "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\ce{H2O}\">\n  <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\intentCeMark{{\\mathrm{H}{\\vphantom{A}}_{\\smash[t]{2}}\\mathrm{O}}}\" data-chem=\"ce\">\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathrm{H}\">\n      <mi mathvariant=\"normal\" data-latex=\"H\">H</mi>\n    </mrow>\n    <msub data-latex=\"{\\vphantom{A}}_{\\smash[t]{2}}\">\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\vphantom{A}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\vphantom{A}\">\n          <mpadded width=\"0\">\n            <mphantom>\n              <mi data-latex=\"A\">A</mi>\n            </mphantom>\n          </mpadded>\n        </mrow>\n      </mrow>\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\smash[t]{2}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\smash[t]{2}\">\n          <mpadded height=\"0\">\n            <mn data-latex=\"2\">2</mn>\n          </mpadded>\n        </mrow>\n      </mrow>\n    </msub>\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathrm{O}\">\n      <mi mathvariant=\"normal\" data-latex=\"O\">O</mi>\n    </mrow>\n  </mrow>\n</math>",
+   "ssml": "<prosody pitch='30%'><say-as interpret-as='characters'>h</say-as></prosody> <break time='200ms'/> sub 2 <break time='200ms'/>     <prosody pitch='30%'><say-as interpret-as='characters'>o</say-as></prosody> <break time='200ms'/>",
+   "error": null,
+   "viewerRaw": "   h        sub 2                     o      ",
+   "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\intentCeMark{{\\mathrm{H}{\\vphantom{A}}_{\\smash[t]{2}}\\mathrm{O}}}\" data-chem=\"ce\">\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathrm{H}\">\n      <mi mathvariant=\"normal\" data-latex=\"H\">H</mi>\n    </mrow>\n    <msub data-latex=\"{\\vphantom{A}}_{\\smash[t]{2}}\">\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\vphantom{A}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\vphantom{A}\">\n          <mpadded width=\"0\">\n            <mphantom>\n              <mi data-latex=\"A\">A</mi>\n            </mphantom>\n          </mpadded>\n        </mrow>\n      </mrow>\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\smash[t]{2}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\smash[t]{2}\">\n          <mpadded height=\"0\">\n            <mn data-latex=\"2\">2</mn>\n          </mpadded>\n        </mrow>\n      </mrow>\n    </msub>\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathrm{O}\">\n      <mi mathvariant=\"normal\" data-latex=\"O\">O</mi>\n    </mrow>\n  </mrow>\n</math>",
+   "nvdaError": null,
+   "nvdaViewerRaw": "   h        sub 2                     o      "
+  }
+ ]
+}

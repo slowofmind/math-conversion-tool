@@ -1,0 +1,54 @@
+[
+ {
+  "name": "plain-content",
+  "ssml": "x is equal to y"
+ },
+ {
+  "name": "break",
+  "ssml": "a b <break time='384ms'/> c d"
+ },
+ {
+  "name": "char-a",
+  "ssml": "<say-as interpret-as='characters'>a</say-as>  plus 1"
+ },
+ {
+  "name": "char-other",
+  "ssml": "<say-as interpret-as='characters'>x</say-as>"
+ },
+ {
+  "name": "char-capital-A",
+  "ssml": "<say-as interpret-as='characters'>A</say-as> and <say-as interpret-as='characters'>a</say-as>"
+ },
+ {
+  "name": "prosody-pitch",
+  "ssml": "<prosody pitch='130%'><say-as interpret-as='characters'>B</say-as></prosody> equals"
+ },
+ {
+  "name": "prosody-rate-volume",
+  "ssml": "<prosody volume='80%' rate='120%'> fast words </prosody> slow"
+ },
+ {
+  "name": "phoneme",
+  "ssml": "the <phoneme alphabet='ipa' ph='ˈlɛd'>lead</phoneme> pipe"
+ },
+ {
+  "name": "audio-beep",
+  "ssml": "<audio src='beep.mp4'>beep</audio> start"
+ },
+ {
+  "name": "unknown-tag",
+  "ssml": "<mark name='id-3'/> marked <emphasis>word</emphasis>"
+ },
+ {
+  "name": "no-space-before-tag",
+  "ssml": "end<break time='10ms'/>next"
+ },
+ {
+  "name": "multi-space",
+  "ssml": "  lots   of    space  "
+ },
+ {
+  "name": "empty",
+  "ssml": ""
+ }
+]

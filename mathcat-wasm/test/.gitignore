@@ -1,0 +1,3 @@
+# Dev-only test dependencies (npm install here). Kept local to this folder
+# because the repo-root .gitignore has mixed line endings and was left untouched.
+node_modules/
