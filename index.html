@@ -112,6 +112,33 @@
   .toolbar-btn.primary { background: var(--harvard-blue); border-color: var(--harvard-blue); color: #fff; }
   .toolbar-btn.primary:hover { background: var(--harvard-blue-dark); }
   .toolbar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  /* Upload split button (toolbar): Upload Files, plus a ▾ menu with Upload Folder */
+  .upload-split { position: relative; display: inline-flex; }
+  .upload-split-main { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+  .upload-split-toggle { border-top-left-radius: 0; border-bottom-left-radius: 0;
+    margin-left: -1px; padding-left: 7px; padding-right: 7px; }
+  .upload-menu { position: absolute; top: 100%; left: 0; z-index: 1000; min-width: 100%;
+    margin: 3px 0 0; padding: 4px 0; list-style: none; background: var(--bg-primary);
+    color: var(--text-primary); border: 1px solid var(--border); border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18); font-size: 13px; }
+  .upload-menu[hidden] { display: none; }
+  .upload-menu [role="menuitem"] { padding: 6px 14px; white-space: nowrap; cursor: pointer;
+    outline: 2px solid transparent; }
+  .upload-menu [role="menuitem"]:hover,
+  .upload-menu [role="menuitem"]:focus { background: var(--accent); color: #fff; }
+  .upload-menu [role="separator"] { height: 1px; margin: 4px 0; background: var(--border); }
+  /* Sample picker (a native <dialog>, opened from the Upload ▾ menu) */
+  .sample-picker { width: min(360px, calc(100vw - 40px)); max-height: calc(100vh - 80px);
+    overflow: auto; padding: 18px 20px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg-primary); color: var(--text-primary);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); font-family: 'Roboto', sans-serif; font-size: 13px; }
+  .sample-picker::backdrop { background: rgba(0, 0, 0, 0.35); }
+  .sample-picker h2 { margin: 0 0 6px; font-size: 16px; }
+  .sample-picker-note { margin: 0 0 10px; color: var(--text-secondary); }
+  .sample-picker fieldset { margin: 0 0 10px; padding: 0; border: none; }
+  .sample-picker legend { margin-bottom: 4px; padding: 0; font-weight: 600; }
+  .sample-picker label { display: block; padding: 3px 0; cursor: pointer; }
+  .sample-picker-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 
   .toolbar-select {
     font-family: 'Roboto', sans-serif;
@@ -224,25 +251,31 @@
     padding: 10px 12px;
   }
 
-  /* ─── LEFT RAIL TABS (Files / Prepare / Cleanup) ─── */
-  .rail-tabs {
-    display: flex; flex-shrink: 0;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-secondary);
-  }
-  .rail-tab {
-    flex: 1; background: none; border: none; cursor: pointer;
-    padding: 8px 6px; font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .05em;
-    color: var(--text-muted); border-bottom: 2px solid transparent;
-  }
-  .rail-tab:hover { color: var(--text-primary); }
-  .rail-tab[aria-selected="true"] {
-    color: var(--text-primary); border-bottom-color: var(--harvard-blue);
-  }
-  .rail-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-  .rail-panel { flex: 1; display: none; flex-direction: column; overflow: hidden; }
-  .rail-panel.active { display: flex; }
+  /* ─── LEFT RAIL SECTIONS (replaced the tabs 2026-09-29) ─── collapsible,
+     several open at once, open ones share the height, as in VS Code's Explorer */
+  .rail-sections { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .rail-section { flex: 0 0 auto; display: flex; flex-direction: column; min-height: 0;
+    border-bottom: 1px solid var(--border); }
+  .rail-section.open { flex: 1 1 0; }
+  .rail-section-heading { margin: 0; font: inherit; }
+  .rail-section-toggle { display: flex; align-items: center; gap: 6px; width: 100%;
+    padding: 6px 10px; border: none; background: var(--bg-secondary);
+    color: var(--text-secondary); font-family: 'Roboto', sans-serif; font-size: 12px;
+    font-weight: 600; text-align: left; cursor: pointer; }
+  .rail-section-toggle:hover { color: var(--text-primary); }
+  .rail-section-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .rail-chevron { display: inline-block; width: 10px; transition: transform 0.15s; }
+  .rail-section-toggle[aria-expanded="true"] .rail-chevron { transform: rotate(90deg); }
+  .rail-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+  .rail-panel[hidden] { display: none; }
+  /* Dividers between open sections, dragged like VS Code's sashes */
+  .rail-sash { flex: 0 0 5px; margin: -2px 0; position: relative; z-index: 2;
+    cursor: row-resize; touch-action: none; }
+  .rail-sash[hidden] { display: none; }
+  .rail-sash:hover, .rail-sash.dragging { background: var(--accent-dim); }
+  .rail-sash:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px;
+    background: var(--accent-dim); }
+  @media (prefers-reduced-motion: reduce) { .rail-chevron { transition: none; } }
 
   /* ─── FILE TREE ─── */
   .ft-toolbar {
@@ -1281,7 +1314,41 @@
 </head>
 <body>
 
-<input type="file" id="fileInput" accept=".tex,.latex,.md,.html,.rst,.org,.txt,.docx,.odt,.pptx,.epub,.fb2,.ipynb,.typ,.zip" aria-label="Upload document file">
+<input type="file" id="fileInput" multiple aria-label="Upload files">
+<input type="file" id="auxDirInput" webkitdirectory style="display:none;" aria-label="Upload a folder">
+<!-- Sample picker: opened from the Upload ▾ menu (a native <dialog>; see openSamplePicker) -->
+<dialog class="sample-picker" id="samplePicker" aria-labelledby="samplePickerTitle">
+  <form method="dialog">
+    <h2 id="samplePickerTitle">Open a Sample</h2>
+    <p class="sample-picker-note">The sample is added to the current project.</p>
+    <fieldset>
+      <legend>Math documents</legend>
+      <label><input type="radio" name="sample" value="samples/01-precalculus-algebra.tex" checked> Precalculus</label>
+      <label><input type="radio" name="sample" value="samples/02-linear-algebra-matrices.tex"> Linear algebra</label>
+      <label><input type="radio" name="sample" value="samples/03-intro-proofs.tex"> Proofs</label>
+      <label><input type="radio" name="sample" value="samples/04a-calculus-derivatives.tex"> Derivatives</label>
+      <label><input type="radio" name="sample" value="samples/04-calculus-limits.tex"> Limits</label>
+      <label><input type="radio" name="sample" value="samples/05-integration-techniques.tex"> Integration</label>
+      <label><input type="radio" name="sample" value="samples/06-multivariable-calculus.tex"> Multivariable calculus</label>
+      <label><input type="radio" name="sample" value="samples/07-differential-equations.tex"> Differential equations</label>
+    </fieldset>
+    <fieldset>
+      <legend>Known problems</legend>
+      <label><input type="radio" name="sample" value="samples/08-chain-rule-colorbox.tex"> Color boxes (xcolor)</label>
+      <label><input type="radio" name="sample" value="samples/09-diffcoeff-derivatives.tex"> The diffcoeff package</label>
+      <label><input type="radio" name="sample" value="samples/10-undefined-macros.tex"> Undefined macros</label>
+    </fieldset>
+    <fieldset>
+      <legend>Projects</legend>
+      <label><input type="radio" name="sample" value="samples/12-image-handling-demo.zip"> Images drawn in code and PDF images</label>
+      <label><input type="radio" name="sample" value="samples/13-workbook-demo.zip"> A complete workbook</label>
+    </fieldset>
+    <div class="sample-picker-actions">
+      <button type="button" class="pdf-modal-btn" id="samplePickerCancel">Cancel</button>
+      <button type="submit" class="pdf-modal-btn primary" value="open">Open</button>
+    </div>
+  </form>
+</dialog>
 
 <!-- ═══ TITLE BAR ═══ -->
 <div class="title-bar">
@@ -1292,31 +1359,19 @@
 <div class="toolbar" role="toolbar" aria-label="Main toolbar">
 
   <div class="toolbar-group">
-    <button class="toolbar-btn" id="btnUpload" title="Upload file" aria-label="Upload file">📄 Upload</button>
-    <select class="toolbar-select" id="selSampleFiles" aria-label="Load a sample file" style="min-width:110px;">
-      <option value="" selected disabled>Sample Files</option>
-      <optgroup label="── Clean (texmath / MathML) ──">
-        <option value="samples/01-precalculus-algebra.tex">Precalculus: Algebra</option>
-        <option value="samples/02-linear-algebra-matrices.tex">Linear Algebra: Matrices</option>
-        <option value="samples/03-intro-proofs.tex">Intro to Proofs</option>
-        <option value="samples/04a-calculus-derivatives.tex">Calculus: Derivatives</option>
-      </optgroup>
-      <optgroup label="── Requires MathJax ──">
-        <option value="samples/04-calculus-limits.tex">Calculus: Limits &amp; Continuity</option>
-        <option value="samples/05-integration-techniques.tex">Integration Techniques</option>
-        <option value="samples/06-multivariable-calculus.tex">Multivariable Calculus</option>
-        <option value="samples/07-differential-equations.tex">Differential Equations</option>
-      </optgroup>
-      <optgroup label="── Known Conversion Issues ──">
-        <option value="samples/08-chain-rule-colorbox.tex">Chain Rule (xcolor / fcolorbox)</option>
-        <option value="samples/09-diffcoeff-derivatives.tex">Derivatives (diffcoeff pkg)</option>
-        <option value="samples/10-undefined-macros.tex">Undefined Custom Macros</option>
-      </optgroup>
-      <optgroup label="── Additional Examples ──">
-        <option value="samples/12-image-handling-demo.zip">Working with code-based and existing PDF images</option>
-        <option value="samples/13-workbook-demo.zip">Converting a complete workbook</option>
-      </optgroup>
-    </select>
+    <div class="upload-split">
+      <button class="toolbar-btn upload-split-main" id="btnUpload" type="button"
+              title="Upload a document, a .zip project, or support files"><span aria-hidden="true">📄</span> Upload Files</button>
+      <button class="toolbar-btn upload-split-toggle" id="btnUploadMenu" type="button"
+              aria-haspopup="menu" aria-expanded="false" aria-controls="uploadMenu"
+              aria-label="More ways to add files" title="More ways to add files"><span aria-hidden="true">▾</span></button>
+      <ul class="upload-menu" id="uploadMenu" role="menu" aria-label="Add files" hidden>
+        <li role="menuitem" tabindex="-1" data-action="files">Upload Files</li>
+        <li role="menuitem" tabindex="-1" data-action="folder">Upload Folder</li>
+        <li role="separator"></li>
+        <li role="menuitem" tabindex="-1" data-action="sample">Open a Sample</li>
+      </ul>
+    </div>
   </div>
 
   <div class="toolbar-divider"></div>
@@ -1515,13 +1570,7 @@
         <input type="text" id="opt-resource-path" placeholder=".:images" style="width:180px;">
       </div>
       <div class="opt-file-upload">
-        <span>Auxiliary files:</span>
-        <button class="upload-btn" id="btnAuxFiles">Upload Files</button>
-        <input type="file" id="auxFileInput" multiple style="display:none;" aria-label="Upload auxiliary files">
-      </div>
-      <div class="opt-file-upload">
-        <button class="upload-btn" id="btnAuxDir">Upload Directory</button>
-        <input type="file" id="auxDirInput" webkitdirectory style="display:none;" aria-label="Upload auxiliary directory">
+        <span>Auxiliary files (add them with Upload Files in the toolbar):</span>
       </div>
       <!-- RETIRED 2026-09-09: "PDF image conversion" (opt-pdf-image-mode)
            governed conversion AT INTAKE. Conversion is now a manual action
@@ -2058,23 +2107,16 @@
       <button class="sidebar-close" id="sidebarClose" aria-label="Close panel">×</button>
     </div>
 
-    <div class="rail-tabs" role="tablist" aria-label="Project panel sections">
-      <button class="rail-tab" id="railtab-files" role="tab" aria-selected="true"
-              aria-controls="railPanelFiles" tabindex="0">Files</button>
-      <button class="rail-tab" id="railtab-prepare" role="tab" aria-selected="false"
-              aria-controls="railPanelPrepare" tabindex="-1">Prepare</button>
-      <button class="rail-tab" id="railtab-cleanup" role="tab" aria-selected="false"
-              aria-controls="railPanelCleanup" tabindex="-1">Cleanup</button>
-    </div>
-
-    <!-- FILES ------------------------------------------------------->
-    <div class="rail-panel active" id="railPanelFiles" role="tabpanel"
+    <div class="rail-sections">
+    <!-- PROJECT FILES ------------------------------------------------>
+    <div class="rail-section open">
+      <h2 class="rail-section-heading">
+        <button type="button" class="rail-section-toggle" id="railtab-files"
+                aria-expanded="true" aria-controls="railPanelFiles"><span class="rail-chevron" aria-hidden="true">▸</span>Project Files</button>
+      </h2>
+    <div class="rail-panel" id="railPanelFiles" role="region"
          aria-labelledby="railtab-files">
       <div class="ft-toolbar">
-        <button class="toolbar-btn" id="ftAddFiles" style="font-size:11px; padding:3px 7px;"
-                title="Add individual files to the project">+ Files</button>
-        <button class="toolbar-btn" id="ftAddFolder" style="font-size:11px; padding:3px 7px;"
-                title="Add a whole project folder">+ Folder</button>
         <label class="sr-only" for="fileTreeFilter">Filter project files</label>
         <select id="fileTreeFilter"></select>
       </div>
@@ -2095,6 +2137,7 @@
         <select id="ftRestore"></select>
       </div>
     </div>
+    </div>
 
     <!-- PREPARE ----------------------------------------------------->
     <!-- Steps that get a project ready to convert. These four actions used
@@ -2103,7 +2146,12 @@
          state. *** ORDER IS LOAD-BEARING: extraction CREATES the PDFs that
          step 2 converts, so step 1 must come first. *** Each button keeps its
          id, so every handler that binds by getElementById still binds. -->
-    <div class="rail-panel" id="railPanelPrepare" role="tabpanel"
+    <div class="rail-section">
+      <h2 class="rail-section-heading">
+        <button type="button" class="rail-section-toggle" id="railtab-prepare"
+                aria-expanded="false" aria-controls="railPanelPrepare"><span class="rail-chevron" aria-hidden="true">▸</span>File Preparation</button>
+      </h2>
+    <div class="rail-panel" id="railPanelPrepare" role="region" hidden
          aria-labelledby="railtab-prepare">
       <div class="sidebar-body">
       <p class="prep-intro">Steps that get a project ready to convert. Run them
@@ -2184,9 +2232,15 @@
       </div>
       </div>
     </div>
+    </div>
 
     <!-- CLEANUP ----------------------------------------------------->
-    <div class="rail-panel" id="railPanelCleanup" role="tabpanel"
+    <div class="rail-section">
+      <h2 class="rail-section-heading">
+        <button type="button" class="rail-section-toggle" id="railtab-cleanup"
+                aria-expanded="false" aria-controls="railPanelCleanup"><span class="rail-chevron" aria-hidden="true">▸</span>Cleanup</button>
+      </h2>
+    <div class="rail-panel" id="railPanelCleanup" role="region" hidden
          aria-labelledby="railtab-cleanup">
     <div class="sidebar-body">
       <!-- Profile selector -->
@@ -2272,6 +2326,8 @@
       </div>
 
       <button class="cleanup-run-btn" id="btnRunCleanup">▶ Run Cleanup</button>
+    </div>
+    </div>
     </div>
     </div>
   </aside>
@@ -2882,23 +2938,134 @@ document.getElementById('btnUpload').addEventListener('click', () => {
 });
 
 fileInput.addEventListener('change', async (e) => {
-  await handleFileUpload(e.target.files[0]);
+  const files = [...e.target.files];   // copy first: clearing the input empties the list
   fileInput.value = '';
+  await uploadFiles(files);
 });
 
-// ─── Sample files dropdown ───
+// ─── Upload Files (toolbar) ───
+// The same routing as dropping files on the editor, with one difference: a
+// single SUPPORT file (image, .sty, .cls, .bib, PDF, ...) is added to the
+// project without becoming the main document.
+//   one document or .zip -> handleFileUpload(): into the editor as the main
+//                           document, the zip importer, or binary input;
+//   one other file       -> addSupportFiles(): added, nothing opened;
+//   several files        -> adoptProjectFiles(): a main document only if one
+//                           clearly is (asks when several are), the rest as
+//                           support files; otherwise the current main stays.
+// Until 2026-09-29 this button took one document only; "+ Files" / "+ Folder"
+// (Files panel) and "Upload Files" / "Upload Directory" (Options > Media) did
+// the rest. All upload now starts here; Upload Folder is in the ▾ menu.
+const DOCUMENT_UPLOAD_EXTS = ['tex', 'latex', 'md', 'html', 'rst', 'org', 'txt',
+  'docx', 'odt', 'pptx', 'epub', 'fb2', 'ipynb', 'typ', 'zip'];
+
+async function uploadFiles(files) {
+  if (!files.length) return;
+  if (files.length === 1) {
+    const name = files[0].name, dot = name.lastIndexOf('.');
+    const ext = dot < 0 ? '' : name.slice(dot + 1).toLowerCase();
+    if (DOCUMENT_UPLOAD_EXTS.includes(ext)) { await handleFileUpload(files[0]); return; }
+    await addSupportFiles(files);
+    return;
+  }
+  const items = [];
+  for (const f of files) items.push({ path: f.name, bytes: new Uint8Array(await f.arrayBuffer()) });
+  await adoptProjectFiles(items, 'upload', 'the uploaded files');
+}
+
+// Add files to the project as support files: nothing opens and the main
+// document does not change (formerly the "+ Files" / Media "Upload Files"
+// handler). INTAKE CONVERSION REMOVED 2026-09-09: conversion is a manual
+// action; see pdf-conversion-design/DESIGN.md §1. Was: handlePdfAuxFiles().
+async function addSupportFiles(files) {
+  let replaced = 0;
+  for (const file of files) {
+    const content = new Uint8Array(await file.arrayBuffer());
+    const r = projectModel.addFile(file.name, content, { source: 'upload' });
+    if (r.replaced) replaced++;
+  }
+  syncAuxFiles();
+  renderAuxFileList();
+  const what = files.length === 1 ? files[0].name : `${files.length} files`;
+  updateStatus('ready', `Added ${what} to the project` +
+    (replaced ? ` · ${replaced} replaced an existing file` : ''));
+}
+
+// ─── Upload menu (the ▾ beside Upload Files) ───
+// ARIA menu-button pattern. Enter, Space or Down Arrow on ▾ opens the menu on
+// its first item (Up Arrow: its last); Up/Down move, Home/End jump, Enter or
+// Space chooses, Escape closes and returns focus to ▾; Tab, a click outside,
+// or focus leaving the menu closes it.
+(function setupUploadMenu() {
+  const toggle = document.getElementById('btnUploadMenu');
+  const menu = document.getElementById('uploadMenu');
+  if (!toggle || !menu) return;
+  const items = [...menu.querySelectorAll('[role="menuitem"]')];
+  let pressingToggle = false;   // a press on ▾ must not count as "focus left"
+  const open = (i) => {
+    menu.hidden = false;
+    toggle.setAttribute('aria-expanded', 'true');
+    items[(i + items.length) % items.length].focus();
+  };
+  const close = (refocus) => {
+    if (menu.hidden) return;
+    menu.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+    if (refocus) toggle.focus();
+  };
+  const choose = (item) => {
+    close(true);
+    if (item.dataset.action === 'folder') document.getElementById('auxDirInput').click();
+    else if (item.dataset.action === 'sample') openSamplePicker();
+    else fileInput.click();
+  };
+  toggle.addEventListener('pointerdown', () => { pressingToggle = true; });
+  toggle.addEventListener('click', () => {
+    pressingToggle = false;
+    if (menu.hidden) open(0); else close(true);
+  });
+  toggle.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); open(0); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); open(items.length - 1); }
+  });
+  menu.addEventListener('keydown', (e) => {
+    const i = items.indexOf(document.activeElement);
+    const go = (j) => { e.preventDefault(); items[(j + items.length) % items.length].focus(); };
+    if (e.key === 'ArrowDown') go(i + 1);
+    else if (e.key === 'ArrowUp') go(i - 1);
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(items.length - 1);
+    else if (e.key === 'Enter') { e.preventDefault(); if (i >= 0) choose(items[i]); }
+    else if (e.key === ' ') e.preventDefault();   // chosen on keyup, below
+    else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+    else if (e.key === 'Tab') close(false);
+  });
+  // Space chooses on keyup: choosing on keydown would move focus to ▾ first,
+  // and a Space keyup on a button presses it, reopening the menu.
+  menu.addEventListener('keyup', (e) => {
+    const i = items.indexOf(document.activeElement);
+    if (e.key === ' ' && i >= 0) { e.preventDefault(); choose(items[i]); }
+  });
+  menu.addEventListener('focusout', (e) => {
+    if (pressingToggle) return;
+    if (!menu.contains(e.relatedTarget) && e.relatedTarget !== toggle) close(false);
+  });
+  items.forEach((it) => it.addEventListener('click', () => choose(it)));
+  document.addEventListener('pointerdown', (e) => {
+    if (!menu.hidden && !menu.contains(e.target) && !toggle.contains(e.target)) close(false);
+  });
+})();
+
+// ─── Samples ───
 // A sample goes in exactly as an upload does: handleFileUpload() adds it to
 // the project at the top level, gives it its own editor document, makes it
 // the file being edited and converted, and redraws the file tree. A .zip
 // (a sample PROJECT) is sent by handleFileUpload() to the zip importer, so
-// a zipped project needs only an <option> in #selSampleFiles.
+// a zipped project needs only a line in the sample picker (#samplePicker).
 // Until 2026-09-28 the text went straight into the editor with setText(),
 // leaving the project's previous main file in place: the next save-back
 // then copied the sample's text into that file.
-document.getElementById('selSampleFiles').addEventListener('change', async (e) => {
-  const path = e.target.value;
-  if (!path) return;
-
+async function loadSample(path) {
   try {
     const resp = await fetch(path);
     if (!resp.ok) throw new Error(`Failed to load ${path}: ${resp.status}`);
@@ -2917,9 +3084,28 @@ document.getElementById('selSampleFiles').addEventListener('change', async (e) =
     console.error('Failed to load sample file:', err);
     updateStatus('error', `Failed to load sample: ${err.message}`);
   }
+}
 
-  // Reset dropdown so the same file can be re-selected
-  e.target.selectedIndex = 0;
+// The sample picker (Upload ▾ > Open a Sample) is a native <dialog>:
+// showModal() keeps focus inside, Escape closes it, and focus goes back to
+// where it was. Moving through the list loads nothing; Open (or Enter) loads
+// the chosen sample. It replaced the toolbar's Sample Files drop-down on
+// 2026-09-29: that took toolbar width, and on Windows its arrow keys loaded
+// each sample in turn.
+const samplePicker = document.getElementById('samplePicker');
+let samplePickerReturn = null;
+function openSamplePicker() {
+  if (!samplePicker || samplePicker.open) return;
+  samplePickerReturn = document.activeElement;
+  samplePicker.returnValue = '';
+  samplePicker.showModal();
+}
+document.getElementById('samplePickerCancel')?.addEventListener('click', () => samplePicker.close('cancel'));
+samplePicker?.addEventListener('close', () => {
+  if (document.activeElement === document.body && samplePickerReturn) samplePickerReturn.focus();
+  if (samplePicker.returnValue !== 'open') return;
+  const chosen = samplePicker.querySelector('input[name="sample"]:checked');
+  if (chosen) loadSample(chosen.value);
 });
 
 // ─── Drag-and-drop file upload onto editor ───
@@ -3545,29 +3731,7 @@ function renderAuxFileList() {
   });
 }
 
-document.getElementById('btnAuxFiles')?.addEventListener('click', () => {
-  document.getElementById('auxFileInput').click();
-});
-document.getElementById('auxFileInput')?.addEventListener('change', async (e) => {
-  let replaced = 0;
-  for (const file of e.target.files) {
-    const content = new Uint8Array(await file.arrayBuffer());
-    const r = projectModel.addFile(file.name, content, { source: 'upload' });
-    if (r.replaced) replaced++;
-  }
-  syncAuxFiles();
-  renderAuxFileList();
-  e.target.value = '';
-  if (replaced > 0) {
-    updateStatus('ready', `${replaced} file${replaced === 1 ? '' : 's'} replaced an existing project file`);
-  }
-  // INTAKE CONVERSION REMOVED 2026-09-09 — conversion is a manual action
-  // now; see pdf-conversion-design/DESIGN.md §1. Was: handlePdfAuxFiles()
-});
-
-document.getElementById('btnAuxDir')?.addEventListener('click', () => {
-  document.getElementById('auxDirInput').click();
-});
+// Upload Folder (the toolbar's ▾ menu) -> the shared project intake below.
 document.getElementById('auxDirInput')?.addEventListener('change', async (e) => {
   const items = [];
   for (const file of e.target.files) {
@@ -6809,21 +6973,33 @@ const { activateOutputTab } = initOutputTabs();
 
 // ─── Sidebar toggle ───
 const sidebar = document.getElementById('sidebar');
-// ONE entry point. The rail's own tabs choose the panel; this button only
-// opens and closes, returning to whichever tab was last used.
+// ONE entry point. The sections' own headers open and close them; this
+// button only shows and hides the panel, which keeps them as they were.
 const btnProject = document.getElementById('btnProject');
 const sidebarClose = document.getElementById('sidebarClose');
 
-// ─── Left rail tabs (Files / Cleanup) ───
-// The rail collapses to zero width so the editor keeps the space; the
-// last-used tab is remembered so reopening returns you where you were.
-const RAIL_KEY = 'atc.rail.tab';
-const railTabs = [
-  ['files',   'railtab-files',   'railPanelFiles',   'Project files'],
-  ['prepare', 'railtab-prepare', 'railPanelPrepare', 'Prepare'],
-  ['cleanup', 'railtab-cleanup', 'railPanelCleanup', 'LaTeX Cleanup'],
+// ─── Left rail sections (Project Files / File Preparation / Cleanup) ───
+// Collapsible sections in the manner of VS Code's Explorer, built as the
+// ARIA accordion pattern: each header is a button inside a heading, with
+// aria-expanded; its panel is a region labelled by it. Several can be open
+// at once, and open sections share the height. Which are open is remembered.
+// These replaced the Files / Prepare / Cleanup tabs on 2026-09-29 (the
+// file-tree worklog's parked "tabs vs. vertical accordion" question). The
+// panels keep their ids: other code, and the preprocessor's page test, find
+// them by id.
+const RAIL_OPEN_KEY = 'atc.rail.open';
+const railSections = [
+  ['files',   'railtab-files',   'railPanelFiles'],
+  ['prepare', 'railtab-prepare', 'railPanelPrepare'],
+  ['cleanup', 'railtab-cleanup', 'railPanelCleanup'],
 ];
-let railTab = localStorage.getItem(RAIL_KEY) || 'files';
+const railOpen = (() => {
+  try {
+    const v = JSON.parse(localStorage.getItem(RAIL_OPEN_KEY));
+    if (Array.isArray(v)) return new Set(v.filter(k => railSections.some(s => s[0] === k)));
+  } catch {}
+  return new Set(['files']);
+})();
 
 
 // ─── Prepare panel: the two statuses that can be computed HONESTLY ───
@@ -6893,44 +7069,51 @@ function refreshPrepareStatus() {
     pdfs.length === 0);
 }
 
-function setRailTab(id, focusPanel) {
-  railTab = railTabs.some(t => t[0] === id) ? id : 'files';
-  try { localStorage.setItem(RAIL_KEY, railTab); } catch {}
-  for (const [key, tabId, panelId, title] of railTabs) {
-    const on = key === railTab;
-    const tab = document.getElementById(tabId);
-    const panel = document.getElementById(panelId);
-    if (tab) {
-      tab.setAttribute('aria-selected', String(on));
-      tab.tabIndex = on ? 0 : -1;
-    }
-    if (panel) panel.classList.toggle('active', on);
-    if (on) document.getElementById('railTitle').textContent = title;
+function setRailSection(key, open, focusHeader) {
+  const s = railSections.find(t => t[0] === key);
+  if (!s) return;
+  const head = document.getElementById(s[1]);
+  const panel = document.getElementById(s[2]);
+  if (open) railOpen.add(key); else railOpen.delete(key);
+  try { localStorage.setItem(RAIL_OPEN_KEY, JSON.stringify([...railOpen])); } catch {}
+  if (head) head.setAttribute('aria-expanded', String(open));
+  if (panel) {
+    panel.hidden = !open;
+    panel.closest('.rail-section')?.classList.toggle('open', open);
   }
-  if (railTab === 'files') fileTree.render();
-  if (railTab === 'prepare') refreshPrepareStatus();
-  if (focusPanel) {
-    const tab = document.getElementById(railTabs.find(t => t[0] === railTab)[1]);
-    if (tab) tab.focus();
-  }
+  layoutRailSections();
+  if (open) refreshRailSection(key);
+  if (focusHeader && head) head.focus();
 }
 
-for (const [key, tabId] of railTabs) {
-  document.getElementById(tabId)?.addEventListener('click', () => setRailTab(key));
+// What a section needs each time it is shown: the tree drawn, the File
+// Preparation counts recomputed (static text, recomputed on demand; above).
+function refreshRailSection(key) {
+  if (key === 'files') fileTree.render();
+  if (key === 'prepare') refreshPrepareStatus();
 }
-// Roving tabindex across the tabs, per the ARIA tabs pattern.
-document.querySelector('.rail-tabs')?.addEventListener('keydown', (ev) => {
-  if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') return;
+
+for (const [key, headId] of railSections) {
+  document.getElementById(headId)?.addEventListener('click', () => setRailSection(key, !railOpen.has(key)));
+}
+// Up/Down/Home/End move between the section headers (the accordion pattern's
+// optional keys), only while a header has focus: the tree and the fields
+// inside the sections keep their own keys. Tab goes through everything.
+document.querySelector('.rail-sections')?.addEventListener('keydown', (ev) => {
+  if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(ev.key)) return;
+  const heads = railSections.map(t => document.getElementById(t[1])).filter(Boolean);
+  const i = heads.indexOf(document.activeElement);
+  if (i < 0) return;
   ev.preventDefault();
-  const i = railTabs.findIndex(t => t[0] === railTab);
-  const next = ev.key === 'ArrowRight' ? (i + 1) % railTabs.length
-                                       : (i - 1 + railTabs.length) % railTabs.length;
-  setRailTab(railTabs[next][0], true);
+  const j = ev.key === 'Home' ? 0 : ev.key === 'End' ? heads.length - 1
+          : ev.key === 'ArrowDown' ? (i + 1) % heads.length : (i - 1 + heads.length) % heads.length;
+  heads[j].focus();
 });
 
-function setSidebarOpen(open, tab) {
+function setSidebarOpen(open, section) {
   sidebar.classList.toggle('collapsed', !open);
-  if (open && tab) setRailTab(tab);
+  if (open && section) setRailSection(section, true);
+  else if (open && railOpen.has('prepare')) refreshPrepareStatus();
   if (btnProject) {
     btnProject.classList.toggle('active', open);
     btnProject.setAttribute('aria-expanded', String(open));
@@ -6938,27 +7121,134 @@ function setSidebarOpen(open, tab) {
   // (CM6 self-measures after the CSS transition — no resize call needed)
 }
 
-function toggleSidebar(tab) {
+function toggleSidebar(section) {
   const isOpen = !sidebar.classList.contains('collapsed');
-  // Clicking the OTHER tab's button while open switches tabs rather
+  // Asking for a section while the panel is open opens that section rather
   // than closing the panel — closing would be surprising.
-  if (isOpen && tab && railTab !== tab) { setSidebarOpen(true, tab); return; }
-  setSidebarOpen(!isOpen, tab);
+  if (isOpen && section) { setSidebarOpen(true, section); return; }
+  setSidebarOpen(!isOpen, section);
 }
 
-// No tab argument: reopening returns to the remembered tab.
+// ─── Dividers between open sections (VS Code's "sashes") ───
+// Each open section except the last open one has a divider below it; dragging
+// it moves height between that section and the next open section below. Each
+// divider is a focusable separator, like the sidebar's own width divider:
+// Up/Down move it 16 px (with Shift, 48 px), Home/End as far as it goes, and
+// Enter or a double-click shares that height equally again. Sizes are flex
+// weights, remembered between visits.
+const RAIL_SIZES_KEY = 'atc.rail.sizes';
+const RAIL_MIN_PX = 80;   // no open section is made smaller than this, header included
+const railSizes = (() => {
+  try {
+    const v = JSON.parse(localStorage.getItem(RAIL_SIZES_KEY));
+    if (v && typeof v === 'object' && !Array.isArray(v)) return v;
+  } catch {}
+  return {};
+})();
+const railSectionEl = (key) =>
+  document.getElementById(railSections.find(t => t[0] === key)[2])?.closest('.rail-section');
+const railName = (key) =>
+  (document.getElementById(railSections.find(t => t[0] === key)[1])?.textContent || key).replace('▸', '').trim();
+const railWeight = (key) => (railSizes[key] > 0 ? railSizes[key] : 1);
+const saveRailSizes = () => { try { localStorage.setItem(RAIL_SIZES_KEY, JSON.stringify(railSizes)); } catch {} };
+// Divider i sits below section i. It is active only if section i is open and
+// a section below it is open; it then resizes section i and that next one.
+function railPair(i) {
+  if (!railOpen.has(railSections[i][0])) return null;
+  for (let k = i + 1; k < railSections.length; k++)
+    if (railOpen.has(railSections[k][0])) return [railSections[i][0], railSections[k][0]];
+  return null;
+}
+function layoutRailSections() {
+  for (const [key] of railSections) {
+    const el = railSectionEl(key);
+    if (el) el.style.flex = railOpen.has(key) ? `${railWeight(key)} 1 0px` : '';
+  }
+  railSashes.forEach((sash, i) => {
+    const pair = railPair(i);
+    sash.hidden = !pair;
+    if (!pair) return;
+    const pct = Math.round(100 * railWeight(pair[0]) / (railWeight(pair[0]) + railWeight(pair[1])));
+    sash.setAttribute('aria-label', `Resize ${railName(pair[0])} and ${railName(pair[1])}`);
+    sash.setAttribute('aria-controls', pair.map(k => railSections.find(t => t[0] === k)[2]).join(' '));
+    sash.setAttribute('aria-valuenow', String(pct));
+    sash.setAttribute('aria-valuetext', `${railName(pair[0])} ${pct} percent`);
+  });
+}
+// Heights and total weight of a pair, measured when a drag or key press starts.
+function railPairStart(pair) {
+  return { ha: railSectionEl(pair[0]).getBoundingClientRect().height,
+           hb: railSectionEl(pair[1]).getBoundingClientRect().height,
+           w: railWeight(pair[0]) + railWeight(pair[1]) };
+}
+// Move the divider dy px from where it started (s), keeping the pair's total
+// weight and splitting it as the new heights split.
+function resizeRailPair(pair, dy, s) {
+  const total = s.ha + s.hb, min = Math.min(RAIL_MIN_PX, total / 2);
+  const na = Math.max(Math.min(s.ha + dy, total - min), min);
+  railSizes[pair[0]] = s.w * na / total;
+  railSizes[pair[1]] = s.w * (total - na) / total;
+  layoutRailSections();
+}
+function equaliseRailPair(pair) {
+  railSizes[pair[0]] = railSizes[pair[1]] = (railWeight(pair[0]) + railWeight(pair[1])) / 2;
+  layoutRailSections();
+  saveRailSizes();
+}
+const railSashes = railSections.slice(0, -1).map(([key], i) => {
+  const sash = document.createElement('div');
+  sash.className = 'rail-sash';
+  sash.setAttribute('role', 'separator');
+  sash.setAttribute('aria-orientation', 'horizontal');
+  sash.setAttribute('aria-valuemin', '0');
+  sash.setAttribute('aria-valuemax', '100');
+  sash.tabIndex = 0;
+  sash.hidden = true;
+  railSectionEl(key)?.after(sash);
+  sash.addEventListener('pointerdown', (e) => {
+    const pair = railPair(i);
+    if (!pair || e.button !== 0) return;
+    e.preventDefault();
+    try { sash.setPointerCapture(e.pointerId); } catch (_) {}
+    sash.classList.add('dragging');
+    document.body.classList.add('resizing');
+    document.body.style.cursor = 'row-resize';
+    const s = railPairStart(pair), y0 = e.clientY;
+    const move = (ev) => resizeRailPair(pair, ev.clientY - y0, s);
+    const ends = ['pointerup', 'pointercancel', 'lostpointercapture'];
+    const up = () => {
+      sash.classList.remove('dragging');
+      document.body.classList.remove('resizing');
+      document.body.style.cursor = '';
+      sash.removeEventListener('pointermove', move);
+      for (const t of ends) sash.removeEventListener(t, up);
+      saveRailSizes();
+    };
+    sash.addEventListener('pointermove', move);
+    for (const t of ends) sash.addEventListener(t, up);
+  });
+  sash.addEventListener('dblclick', () => { const pair = railPair(i); if (pair) equaliseRailPair(pair); });
+  // Keyboard, as the sidebar's width divider: arrows nudge (Shift = coarse),
+  // Home/End go as far as allowed; Enter shares the height equally again.
+  sash.addEventListener('keydown', (e) => {
+    const pair = railPair(i);
+    if (!pair) return;
+    if (e.key === 'Enter') { e.preventDefault(); equaliseRailPair(pair); return; }
+    const step = e.shiftKey ? 48 : 16;
+    const dy = { ArrowUp: -step, ArrowDown: step, Home: -1e6, End: 1e6 }[e.key];
+    if (dy === undefined) return;
+    e.preventDefault();
+    resizeRailPair(pair, dy, railPairStart(pair));
+    saveRailSizes();
+  });
+  return sash;
+});
+
+// No argument: reopening shows the sections as they were left.
 btnProject?.addEventListener('click', () => toggleSidebar());
 sidebarClose.addEventListener('click', () => setSidebarOpen(false));
-setRailTab(railTab);
-
-// Upload entry points inside the Files panel — they reuse the existing
-// hidden inputs, so the Media tab's buttons keep working identically.
-document.getElementById('ftAddFiles')?.addEventListener('click', () => {
-  document.getElementById('auxFileInput').click();
-});
-document.getElementById('ftAddFolder')?.addEventListener('click', () => {
-  document.getElementById('auxDirInput').click();
-});
+for (const [key] of railSections) setRailSection(key, railOpen.has(key));
+try { localStorage.removeItem('atc.rail.tab'); } catch {}   // the old tabs' key
 
 // ─── Layout switching ───
 const outputPanel = document.getElementById('outputPanel');
