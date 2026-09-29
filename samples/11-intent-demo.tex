@@ -31,7 +31,7 @@
 \begin{document}
 \maketitle
 
-\section*{1. One notation, many meanings: vertical bars}
+\subsection*{1. One notation, many meanings: vertical bars}
 
 Plain (a screen reader must guess --- all four read as absolute value):
 the number $|x|$, the set size $|S|$, the matrix $|A|$, the vector length
@@ -41,7 +41,7 @@ Annotated (each now speaks its own meaning):
 absolute value $\abs{x}$, cardinality $\card{S}$, determinant $\determ{A}$,
 magnitude $\magn{\vec{F}}$.
 
-\section*{2. Products that all say ``times''}
+\subsection*{2. Products that all say ``times''}
 
 Plain: work is $W = \vec{F}\cdot\vec{d}$ and torque involves
 $\vec{r}\times\vec{F}$.
@@ -49,7 +49,7 @@ $\vec{r}\times\vec{F}$.
 Annotated: work is $W = \dotp{\vec{F}}{\vec{d}}$ and torque involves
 $\crossp{\vec{r}}{\vec{F}}$.
 
-\section*{3. Nonlinear dynamics (APMTH 108 notation)}
+\subsection*{3. Nonlinear dynamics}
 
 Plain: consider $\dot{x} = 4x^2 - 16$ with fixed point $x^*$.
 
@@ -59,7 +59,7 @@ with fixed point $\intent{fixed-point}{{\iarg{x}}^*}$.
 In optimization the same star means the optimizer:
 $\intent{optimal-solution}{{\iarg{x}}^*}$.
 
-\section*{4. Quantum mechanics (wrap form, multiple operands)}
+\subsection*{4. Quantum mechanics (wrap form, multiple operands)}
 
 Plain: the state $\left|\psi\right\rangle$, the overlap
 $\left\langle\phi\middle|\psi\right\rangle$, and the matrix element
@@ -71,23 +71,22 @@ $\intent{braket}{\left\langle\iarg{\phi}\middle|\iarg[b]{\psi}\right\rangle}$,
 and the matrix element
 $\intent{matrix-element}{\left\langle\iarg{m}\middle|\iarg[b]{A}\middle|\iarg[c]{n}\right\rangle}$.
 
-\section*{5. Chemistry and applied notation}
+\subsection*{5. Chemistry and applied notation}
 
-Plain: at equilibrium the bracket notation $[\mathrm{HCl}]$ collides with
-the interval $[0,1]$; the gradient is $\nabla f$.
+Plain: at equilibrium the bracket notation $[\mathrm{HCl}]$ collides withthe interval $[0,1]$; the gradient is $\nabla f$.
 
 Annotated: the concentration
 $\intent{concentration}{\left[\iarg{\mathrm{HCl}}\right]}$ versus the closed
 interval $\closedint{0}{1}$; the gradient
 $\intent{gradient}{\nabla\iarg{f}}$.
 
-\section*{6. Calculus shortcuts and the escape hatch}
+\subsection*{6. Calculus shortcuts and the escape hatch}
 
 Annotated only: the derivative $\deriv{y}{x}$, the integral
 $\defint{a}{b}{f(x)}{x}$, ``n choose k'' $\binomc{n}{k}$, and a literal
 override: $\speakas{the golden ratio}{\varphi}$.
 
-\section*{7. Graceful fallback (concept not in any vocabulary)}
+\subsection*{7. Graceful fallback (concept not in any vocabulary)}
 
 An instructor-coined name --- the order of a group, but called by a name
 nobody authored: $\intent{group-size}{\left|\iarg{G}\right|}$ --- speaks

@@ -4,24 +4,88 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{xfrac}
 
+%% ==================================================================
+%% UNDEFINED CUSTOM MACROS: A PRACTICE FILE
+%% ==================================================================
 %%
-%% NOTE: This file uses macros that would normally be defined in an
-%% external style file (e.g., worksheet-setup.tex or course-macros.sty).
-%% These macros are NOT defined in this preamble, so Pandoc will not
-%% recognize them. They include:
+%% WHAT IS A MACRO?
+%% A macro is a shortcut command that an author makes up, such as \R
+%% for the symbol for the real numbers. Authors usually define their
+%% macros in a separate course file (for example course-macros.sty).
+%% That file is not included here, so the converter does not know what
+%% most of the shortcut commands in this problem set mean.
 %%
-%%   \R, \Z, \N, \C, \Q   → blackboard-bold number sets
-%%   \ds                   → \displaystyle
-%%   \Span                 → \operatorname{span}
-%%   \rank                 → \operatorname{rank}
-%%   \rref                 → \operatorname{rref}
-%%   \im                   → \operatorname{im}
-%%   \sgn                  → \operatorname{sgn}
-%%   \grstep               → Gaussian row reduction arrow
-%%   \amatrix              → augmented matrix environment
-%%   \nicefrac             → \sfrac (from xfrac)
-%%   \blankbox             → blank answer box
+%% WHAT GOES WRONG
+%% When the converter meets a command it does not know, the output
+%% shows the command itself, often in red (for example \Span), instead
+%% of the math it stands for.
 %%
+%% THE FIX
+%% Define each macro here, in the preamble: the part of the file before
+%% \begin{document}. The converter reads these definitions and replaces
+%% each shortcut with its meaning before it converts the math.
+%%
+%% HOW TO PRACTISE
+%%   1. Convert this file to HTML and look at the output. \R is already
+%%      defined below, so it shows the real-numbers symbol. \Z, \N, \C
+%%      and \Q are not defined yet, so they still show as commands.
+%%   2. Type a definition for one command in the "Your turn" list,
+%%      copying the example that matches it.
+%%   3. Convert again. When a definition is right, that command stops
+%%      appearing in the output and the math shows instead.
+%%   A line that starts with % is a comment, and the converter ignores
+%%   it. To switch on a commented-out example, delete the % at its start.
+%% ==================================================================
+
+% ---- EXAMPLE 1 (switched on): a shortcut for a symbol ----------------
+% Pattern: \newcommand{\shortcut}{what it stands for}
+\newcommand{\R}{\mathbb{R}}
+
+% ---- EXAMPLE 2 (switched off): the name of an operator --------------
+% Operator names such as rank are printed in upright letters.
+% Delete the % at the start of the next line to switch it on.
+% \DeclareMathOperator{\rank}{rank}
+
+% ---- EXAMPLE 3 (switched off): a shortcut that takes an argument ----
+% [1] means the command takes one argument, and #1 marks where that
+% argument goes. So \grstep{R_2 - 2R_1} becomes an arrow with
+% R_2 - 2R_1 written above it.
+% \newcommand{\grstep}[1]{\xrightarrow{#1}}
+
+% ---- YOUR TURN: type a definition for each of these -----------------
+%   \Z \N \C \Q   the integers, natural numbers, complex numbers and
+%                 rational numbers: \mathbb{Z}, \mathbb{N}, \mathbb{C}
+%                 and \mathbb{Q}. Copy Example 1.
+%   \ds           display style, which makes sums and fractions full
+%                 size: \displaystyle. Copy Example 1.
+%   \Span \rref   the operator names span, rref, im and sgn.
+%   \im \sgn      Copy Example 2.
+%   \nicefrac     a fraction written with a slash, used as
+%                 \nicefrac{1}{\lambda}. It takes two arguments, so
+%                 write [2], and use #1/#2 for "first over second".
+%                 Copy Example 3. (Do not use \sfrac here: the
+%                 converter does not know that command either.)
+%                 Depending on the math setting, \nicefrac may already
+%                 look right; defining it makes it work under all of
+%                 them.
+%   \blankbox     a box to write an answer in, used as
+%                 \blankbox{2in}{0.5in}. The converter cannot draw an
+%                 empty box, but it keeps words. Give it two arguments
+%                 and make it print [answer box], ignoring both
+%                 arguments. Copy Example 3.
+%
+% Type your definitions on the lines below.
+
+
+
+% ---- CANNOT BE FIXED HERE -------------------------------------------
+%   amatrix       the augmented matrices in problem 3. The converter
+%                 adds hidden grouping commands around any environment
+%                 defined in the preamble, and the math converters
+%                 cannot read them, so no definition here will work.
+%                 The fix is to rewrite each matrix in the body as a
+%                 plain array, for example
+%                 \left(\begin{array}{ccc|c} ... \end{array}\right)
 
 \newtheorem*{theorem}{Theorem}
 \newtheorem*{definition}{Definition}
@@ -31,9 +95,8 @@
 \begin{document}
 
 \begin{center}
-  {\large\textbf{Math 22a --- Linear Algebra}} \\[4pt]
-  \textbf{Problem Set 8: Vector Spaces and Eigenvalues} \\[2pt]
-  Fall 2025
+  {\large\textbf{Linear Algebra}} \\[4pt]
+  \textbf{Problem Set 8: Vector Spaces and Eigenvalues}
 \end{center}
 
 \bigskip
