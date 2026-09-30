@@ -2151,34 +2151,13 @@
     <div class="rail-panel" id="railPanelPrepare" role="region" hidden
          aria-labelledby="railtab-prepare">
       <div class="sidebar-body">
-      <p class="prep-intro">Steps that get a project ready to convert. Run them
-        in order — extracting figures drawn in code creates the PDFs that
-        step 2 converts.</p>
-
+      <!-- The button alone: no number, title, count or explanation; all status goes to the status bar (Nicholas, 2026-09-30). -->
       <div class="prep-step">
-        <div class="prep-head"><span class="prep-num">1</span>
-          <span class="prep-title">Figures drawn in code</span></div>
-        <p class="prep-count" id="prepCountImages">Not checked yet.</p>
-        <p class="prep-status" id="imgHandlingHint">Extracts figures drawn in
-          code (TikZ, PGFPlots) from the conversion target, using a LaTeX engine
-          that downloads in the background once the page is ready (about
-          122 MB on a first visit; most of it stays in your browser).</p>
-        <button type="button" class="prep-btn" id="btnImageHandling"
-                title="Extract figures drawn in code (TikZ, PGFPlots) from the conversion target"
-                aria-describedby="imgHandlingHint">Experimental image handling</button>
+        <button type="button" class="prep-btn" id="btnImageHandling">TikZ images</button>
       </div>
 
       <div class="prep-step">
-        <div class="prep-head"><span class="prep-num">2</span>
-          <span class="prep-title">PDF images</span></div>
-        <p class="prep-count" id="prepCountPdfs">Not checked yet.</p>
-        <p class="prep-status" id="convertPdfsHint">Converts uploaded and
-          extracted PDF images to SVG, keeps the PDFs, and rewrites the
-          \includegraphics references in your source. Browsers cannot display
-          a PDF figure. Nothing happens until you press this.</p>
-        <button type="button" class="prep-btn" id="btnConvertPdfs"
-                title="Convert every PDF image in the project to SVG and update the references in your source"
-                aria-describedby="convertPdfsHint">Convert PDFs to SVG</button>
+        <button type="button" class="prep-btn" id="btnConvertPdfs">PDF images</button>
       </div>
 
       <div class="prep-step">
@@ -4045,10 +4024,19 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
   if (!btn) return;
   let mod = null;                    // the loader module, once imported
 
-  const setLabel = (text, busy) => {
-    btn.textContent = text;
+  // The button's text never changes. Nicholas, 2026-09-30: "there doesn't need to
+  // be any 'ready' associated with the button; everything status related should go
+  // through the status bar." While busy the button is disabled and the progress
+  // text goes to the status bar. Not busy says nothing here: the outcome, or an
+  // error, follows through updateStatus, and the background prepare (which only
+  // ever un-busies) stays silent, as step 3 decided.
+  const setBusy = (busy) => {
     btn.disabled = !!busy;
     btn.setAttribute('aria-busy', busy ? 'true' : 'false');
+  };
+  const setLabel = (text, busy) => {
+    setBusy(busy);
+    if (busy) updateStatus('loading', text);
   };
 
   async function ensureModule() {
@@ -4061,7 +4049,7 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
   // Resolves true once the engine is ready. load() waits for a background
   // prepare that is still running, and initialises in full after a failed one.
   async function doLoad(m) {
-    setLabel('Loading image handling…', true);
+    setLabel('Loading the LaTeX engine…', true);
     try {
       await m.load({
         basePath: basePath(),
@@ -4113,7 +4101,8 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       rep = await run.compileForExtraction({
         engine: m.getEngine(), runner: m.getRunner(),
         masterPath: resolved.masterPath, getText, listPaths, getBytes,
-        onProgress: (phase) => setLabel(phase === 'harvesting' ? 'Harvesting…' : 'Compiling…', true),
+        // Only harvesting is reported, so "Compiling <file> with memoize…" stays up meanwhile.
+        onProgress: (phase) => { if (phase === 'harvesting') setLabel('Harvesting…', true); },
       });
     } catch (err) {
       setLabel('Image handling: ready', false);
@@ -4306,18 +4295,19 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
   // ── Background prepare (plan step 3, decision 2026-09-30) ─────────────
   // Starts once Pandoc WASM is ready. Nothing goes to the status bar: it is a
   // live region (role="status"), and a background download must not speak.
-  // A failure shows on the button, whose press then retries in full.
+  // A failure is silent too (console only); the button's text never changes, and
+  // a press retries in full and reports through the status bar.
   async function startPrepare() {
     try {
       const m = await ensureModule();
       await m.prepare({ basePath: basePath(), tier: 'basic' });   // never rejects
       if (m.getPrepareStatus() === 'failed' && m.getStatus() === 'idle') {
-        setLabel('Image handling: download failed (press to retry)', false);
+        setBusy(false);
         console.warn('[image handling] background prepare failed:', m.getPrepareError());
       }
     } catch (err) {        // the loader module itself did not load
       if (!mod || mod.getStatus() === 'idle')
-        setLabel('Image handling: download failed (press to retry)', false);
+        setBusy(false);
       console.warn('[image handling] could not start the background prepare:', err);
     }
   }
@@ -4341,7 +4331,7 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     } catch (err) {
       setLabel('Image handling: failed', false);
       updateStatus('error', 'Could not load image handling: ' + (err && err.message ? err.message : err));
-    } finally { running = false; }
+    } finally { running = false; setBusy(false); }
   });
 })();
 
@@ -4362,8 +4352,14 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
 (function setupPdfConversion() {
   const btn = document.getElementById('btnConvertPdfs');
   if (!btn) return;
-  const BASE = 'Convert PDFs to SVG';
-  const setLabel = (t, busy) => { btn.textContent = t; btn.disabled = !!busy; };
+  // As for "TikZ images": the button's text never changes (Nicholas, 2026-09-30);
+  // while busy it is disabled and the progress text goes to the status bar.
+  const BASE = 'PDF images';
+  const setLabel = (t, busy) => {
+    btn.disabled = !!busy;
+    btn.setAttribute('aria-busy', busy ? 'true' : 'false');
+    if (busy) updateStatus('loading', t);
+  };
   const paths = (re) => {
     try {
       return projectModel.listEntries().map(e => e.path).filter(p => re.test(p));
@@ -6376,9 +6372,16 @@ async function loadMuPDF() {
   }
   mupdfLoading = true;
   try {
+    // Put back what the status bar said before, not "Pandoc … ready": MuPDF is often loaded in
+    // the middle of an operation (a PDF conversion) that is still running. Only if our own
+    // message is still showing, so a newer message is never overwritten.
+    const dotEl = document.getElementById('statusDot'), txtEl = document.getElementById('statusText');
+    const prevState = (dotEl.className.match(/\b(ready|loading|error)\b/) || [, 'ready'])[1];
+    const prevText = txtEl.textContent;
     updateStatus('loading', 'Loading MuPDF WASM…');
     mupdfModule = await import('./image-processing/mupdf.js');
-    updateStatus('ready', `Pandoc WASM ${pandocVersion} ready`);
+    if (txtEl.textContent === 'Loading MuPDF WASM…')
+      updateStatus(prevState, prevText || `Pandoc WASM ${pandocVersion} ready`);
     return mupdfModule;
   } catch (err) {
     console.error('Failed to load MuPDF:', err);
