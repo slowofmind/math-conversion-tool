@@ -5,11 +5,26 @@ desktop.ini
 # See pandoc-wasm/VERSIONS.md for provenance and update steps.
 pandoc-wasm/pandoc.wasm
 
-# BusyTeX engine + TeX Live basic tier: ~120 MB of published build artifacts
-# (busytex.wasm 31 MB, texlive-basic.data 86.6 MB). UNTRACKED FOR NOW.
-# These are within GitHub's 100 MB per-file limit — the reason to hold is
-# that git history is permanent, so each future replacement would leave the
-# old copy in .git forever. Track them only once the version is pinned.
-# Fetch/refresh with: npx texlyre-busytex download-assets
-# See memoize-integration/DESIGN.md sec.3 for the tier decision.
-image-extraction/core/
+# BusyTeX engine + TeX Live basic tier, release 1.4.0: exactly these 11 files are
+# tracked, 128,262,451 bytes in all (busytex.wasm 32.5 MB, texlive-basic.data 92.8 MB,
+# each under GitHub's 100 MB per-file limit). GitHub Pages must serve them or image
+# handling cannot start. Everything else in core/ stays ignored (biber, other tiers).
+# Tracked since 2026-09-30, once the version was pinned (BUSYTEX_VERSION in
+# image-extraction/busytex-loader.js). Git history is permanent: replace these files
+# only together with that pin, and all from the same release.
+# Project notes: auto-image-handling/NOTE-AUTO-IMAGE-HANDLING.md (plan steps 1 and 5)
+# and memoize-integration/DESIGN.md sec.3 (the tier decision).
+image-extraction/core/*
+!image-extraction/core/busytex/
+image-extraction/core/busytex/*
+!image-extraction/core/busytex/busytex.js
+!image-extraction/core/busytex/busytex.wasm
+!image-extraction/core/busytex/busytex_biber.js
+!image-extraction/core/busytex/busytex_pipeline.js
+!image-extraction/core/busytex/busytex_worker.js
+!image-extraction/core/busytex/texlive-basic.data
+!image-extraction/core/busytex/texlive-basic.js
+!image-extraction/core/busytex/texlive-basic.js.providespackage.txt
+!image-extraction/core/busytex/texlive-basic.profile
+!image-extraction/core/busytex/texlive-basic.txt
+!image-extraction/core/busytex/versions.txt

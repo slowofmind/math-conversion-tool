@@ -615,9 +615,6 @@
   .prep-btn[disabled] { opacity: .5; cursor: default; }
   .prep-more { font-size: 11px; color: var(--text-muted); font-style: italic;
     text-align: center; padding: 6px 0; }
-  .prep-foot { border-top: 1px solid var(--border-subtle); padding-top: 8px; }
-  .prep-link { font-size: 11px; color: var(--accent); background: none;
-    border: none; text-decoration: underline; cursor: pointer; padding: 2px 0; }
 
   .editor-content { flex: 1; position: relative; overflow: hidden; border-left: 3px solid var(--harvard-crimson); transition: box-shadow 0.15s; }
   .editor-content.drag-over { box-shadow: inset 0 0 0 3px var(--harvard-blue); }
@@ -2162,11 +2159,12 @@
         <div class="prep-head"><span class="prep-num">1</span>
           <span class="prep-title">Figures drawn in code</span></div>
         <p class="prep-count" id="prepCountImages">Not checked yet.</p>
-        <p class="prep-status" id="imgHandlingHint">Downloads a LaTeX engine so
-          figures drawn in code (TikZ, PGFPlots) can be extracted. Nothing is
-          downloaded until you press this.</p>
+        <p class="prep-status" id="imgHandlingHint">Extracts figures drawn in
+          code (TikZ, PGFPlots) from the conversion target, using a LaTeX engine
+          that downloads in the background once the page is ready (about
+          122 MB on a first visit; most of it stays in your browser).</p>
         <button type="button" class="prep-btn" id="btnImageHandling"
-                title="Download the experimental code-based image toolchain (about 120 MB, stored in your browser)"
+                title="Extract figures drawn in code (TikZ, PGFPlots) from the conversion target"
                 aria-describedby="imgHandlingHint">Experimental image handling</button>
       </div>
 
@@ -2222,14 +2220,6 @@
       </div>
 
       <p class="prep-more">further preparation steps land here</p>
-
-      <!-- A DISCOVERABLE route to cache removal. Shift+click on the button
-           above still works, but it was advertised only in the last line of a
-           confirm dialog and a real user was never going to find it. -->
-      <div class="prep-foot">
-        <button type="button" class="prep-link" id="btnRemoveToolchain"
-                title="Delete the downloaded image-handling components from this browser">Remove downloaded components (about 120 MB)</button>
-      </div>
       </div>
     </div>
     </div>
@@ -2619,6 +2609,12 @@ async function initPandoc() {
     ALL_INPUT_FORMATS  = await mod.query({ query: 'input-formats' });
     ALL_OUTPUT_FORMATS = await mod.query({ query: 'output-formats' });
     applyOptionsView();   // populates From/To/Math and loads extensions
+
+    // Work that waits for Pandoc to be ready: the background BusyTeX prepare
+    // (setupImageHandling). A flag as well as the event, so a listener that
+    // arrives late still starts.
+    window.__pandocReady = true;
+    window.dispatchEvent(new Event('pandoc-ready'));
 
   } catch (err) {
     console.error('Failed to load pandoc.wasm:', err);
@@ -4037,9 +4033,13 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
 // a UI change rather than an untangling job. See
 // memoize-integration/DESIGN.md, Stage 2.
 //
-// *** NOTHING BUSYTEX-SHAPED IS REFERENCED UNTIL THE USER CLICKS. *** The
-// module is imported dynamically inside the handler. A headless test asserts
-// zero BusyTeX network requests on page load; it guards this promise.
+// *** NOTHING BUSYTEX-SHAPED IS REFERENCED BEFORE PANDOC IS READY. *** Since
+// 2026-09-30 (auto-image-handling\NOTE-AUTO-IMAGE-HANDLING.md, plan step 3)
+// the engine prepares in the background once Pandoc WASM is ready, and one
+// press of the button runs the extraction. The loader module is imported
+// dynamically, at that point or at the first press. The headless test that
+// asserted zero BusyTeX requests on page load is to assert none before Pandoc
+// is ready (plan step 4).
 (function setupImageHandling() {
   const btn = document.getElementById('btnImageHandling');
   if (!btn) return;
@@ -4056,22 +4056,30 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     return mod;
   }
 
+  const basePath = () => new URL('./image-extraction/core/busytex', location.href).pathname;
+
+  // Resolves true once the engine is ready. load() waits for a background
+  // prepare that is still running, and initialises in full after a failed one.
   async function doLoad(m) {
     setLabel('Loading image handling…', true);
     try {
       await m.load({
-        basePath: new URL('./image-extraction/core/busytex', location.href).pathname,
+        basePath: basePath(),
         tier: 'basic',
         onProgress: (phase) => {
-          if (phase === 'fetching-pipeline') setLabel('Fetching engine…', true);
+          if (phase === 'waiting-for-prepare') setLabel('Waiting for the engine download…', true);
+          else if (phase === 'fetching-pipeline') setLabel('Fetching engine…', true);
           else if (phase === 'initialising') setLabel('Unpacking TeX Live…', true);
+          // 'downloading' is ignored: it fires hundreds of times, and a label
+          // that changes on a focused button can be re-announced.
         },
       });
       setLabel('Image handling: ready', false);
-      updateStatus('ready', 'Image handling loaded. Extraction actions arrive in the next stage.');
+      return true;
     } catch (err) {
       setLabel('Image handling: failed', false);
       updateStatus('error', 'Could not load image handling: ' + (err && err.message ? err.message : err));
+      return false;
     }
   }
 
@@ -4295,58 +4303,45 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       'applied', applied, 'convert', conv);
   }
 
-  async function actionsDialog(m) {
-    const cached = await m.isCached();
-    const msg = 'Image handling is loaded.\n\n' +
-      (cached ? 'The TeX Live data is cached in this browser, so it will not download again.\n\n' : '') +
-      'OK — extract figures from the current conversion target (compiles only; ' +
-      'nothing is written yet).\n' +
-      'Cancel — do nothing.\n\n' +
-      'To remove the downloaded components, hold Shift and press this button.';
-    if (!confirm(msg)) return;
-    await runCompileOnly(m);
-  }
-
-  async function removeDialog(m) {
-    if (!confirm('Remove the downloaded image-handling components?\n\n' +
-                 'They will download again next time you use this feature.')) return;
-    const r = await m.removeCache();
-    setLabel('Experimental image handling', false);
-    updateStatus(r.removed ? 'ready' : 'error',
-      r.removed ? 'Downloaded components removed.'
-                : 'Could not remove components: ' + (r.reason || 'unknown'));
-  }
-
-  // Discoverable route to the same removal the Shift+click hides.
-  // ensureModule() only imports the small loader; it downloads nothing.
-  document.getElementById('btnRemoveToolchain')?.addEventListener('click', async () => {
-    await removeDialog(await ensureModule());
-  });
-
-  // *** Capture shiftKey AT ENTRY from the event PARAMETER. *** window.event
-  // is unset after an await, so reading it below the await was luck.
-  btn.addEventListener('click', async (ev) => {
-    const wantsRemove = !!(ev && ev.shiftKey);
-    const m = await ensureModule();
-    if (m.isLoaded()) {
-      if (wantsRemove) await removeDialog(m);
-      else await actionsDialog(m);
-      return;
+  // ── Background prepare (plan step 3, decision 2026-09-30) ─────────────
+  // Starts once Pandoc WASM is ready. Nothing goes to the status bar: it is a
+  // live region (role="status"), and a background download must not speak.
+  // A failure shows on the button, whose press then retries in full.
+  async function startPrepare() {
+    try {
+      const m = await ensureModule();
+      await m.prepare({ basePath: basePath(), tier: 'basic' });   // never rejects
+      if (m.getPrepareStatus() === 'failed' && m.getStatus() === 'idle') {
+        setLabel('Image handling: download failed (press to retry)', false);
+        console.warn('[image handling] background prepare failed:', m.getPrepareError());
+      }
+    } catch (err) {        // the loader module itself did not load
+      if (!mod || mod.getStatus() === 'idle')
+        setLabel('Image handling: download failed (press to retry)', false);
+      console.warn('[image handling] could not start the background prepare:', err);
     }
+  }
+  if (window.__pandocReady) startPrepare();
+  else window.addEventListener('pandoc-ready', startPrepare, { once: true });
 
-    const cached = await m.isCached();
-    const size = m.ASSET_SIZE_MB;
-    const msg = cached
-      ? 'Load the experimental image-handling engine?\n\n' +
-        'It is already cached in this browser, so nothing will be downloaded.\n\n' +
-        'This is experimental and only affects figures drawn in code (TikZ, PGFPlots).'
-      : 'Download the experimental image-handling engine?\n\n' +
-        'About ' + size + ' MB. It is stored in your browser so it only downloads once.\n' +
-        'Clearing your browsing data (cookies and site data) will remove it, and you\n' +
-        'can remove it yourself from this button afterwards.\n\n' +
-        'This is experimental and only affects figures drawn in code (TikZ, PGFPlots).';
-    if (!confirm(msg)) return;
-    await doLoad(m);
+  // ── The button: one press runs the extraction ─────────────────────────
+  // No download or "extract figures?" dialog any more; the only confirm left
+  // is Stage 5's list of what will be commented out. Loading waits for the
+  // background prepare, or retries it if it failed. The Shift+click removal
+  // and "Remove downloaded components" are retired: with the automatic
+  // download, removal would only re-download on the next visit.
+  let running = false;
+  btn.addEventListener('click', async () => {
+    if (running) return;
+    running = true;
+    try {
+      const m = await ensureModule();
+      if (!m.isLoaded() && !(await doLoad(m))) return;
+      await runCompileOnly(m);
+    } catch (err) {
+      setLabel('Image handling: failed', false);
+      updateStatus('error', 'Could not load image handling: ' + (err && err.message ? err.message : err));
+    } finally { running = false; }
   });
 })();
 

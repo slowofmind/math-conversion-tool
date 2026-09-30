@@ -1,29 +1,41 @@
 // busytex-loader.js — on-demand loading of the BusyTeX engine and TeX Live
 // data package.
 //
-// *** PRINCIPLE 1 OF THE INTEGRATION DESIGN: NOTHING HERE RUNS ON PAGE LOAD. ***
+// *** PRINCIPLE 1, AS REVISED 2026-09-30: NOTHING HERE RUNS AT MODULE SCOPE. ***
 // No top-level fetch, no top-level import of the pipeline, no side effects at
-// module scope. A user who never presses the button must not be able to tell
-// this exists. There is a headless test asserting zero BusyTeX network
-// requests on page load; it is the guard on that promise.
+// module scope; only prepare() and load() fetch anything, and only when called.
+// Until 2026-09-30 the engine loaded only when a user pressed the button. Then
+// Nicholas decided: "I want for busytex to download automatically in the
+// background after index.html and the other main features download." So the
+// platform starts prepare() once Pandoc WASM is ready (plan step 3 in
+// auto-image-handling\NOTE-AUTO-IMAGE-HANDLING.md), and the headless test that
+// asserts zero BusyTeX requests on page load becomes "none before Pandoc is
+// ready" (plan step 4).
 //
-// Tier decision (see DESIGN.md sec.3): texlive-basic (86.6 MB) + the remote
+// Tier decision (see DESIGN.md sec.3): texlive-basic (88.5 MB in 1.4.0) + the remote
 // endpoint + a map-line bundle. basic produces BYTE-IDENTICAL output to
 // recommended on a real document, fits GitHub's 100 MB per-file limit, and
 // initialises faster. The cost is ~13 s more per cold compile from streaming
 // ~233 files instead of ~87.
 
-export const BUSYTEX_LOADER_VERSION = '0.1.0';
+export const BUSYTEX_LOADER_VERSION = '0.2.0';
+
+/** The BusyTeX release this loader is pinned to. The library (PIPELINE_URL)
+ *  and the engine files in image-extraction/core/busytex/ must come from the
+ *  SAME release: each library version expects its own release's files (the
+ *  1.4.0 worker requires busytex_biber.js, which 1.2.0 did not have). Change
+ *  both together; see NOTE-AUTO-IMAGE-HANDLING.md, plan step 1. */
+export const BUSYTEX_VERSION = '1.4.0';
 
 /** Approximate download, for the confirmation dialog. */
-export const ASSET_SIZE_MB = 120;      // wasm 31 + texlive-basic.data 86.6 + loader ~2
+export const ASSET_SIZE_MB = 122;      // 1.4.0: wasm 31.0 + texlive-basic.data 88.5 + the rest 2.8
 
 /** Emscripten's own cache database — see the data package loader source:
  *  var DB_NAME = "EM_PRELOAD_CACHE"; indexedDB.open(DB_NAME, DB_VERSION).
  *  Deleting it is how "remove downloaded components" works. */
 export const CACHE_DB_NAME = 'EM_PRELOAD_CACHE';
 
-const PIPELINE_URL = 'https://cdn.jsdelivr.net/npm/texlyre-busytex@1/+esm';
+const PIPELINE_URL = `https://cdn.jsdelivr.net/npm/texlyre-busytex@${BUSYTEX_VERSION}/+esm`;
 const DEFAULT_ENDPOINT = 'https://texlive2026.texlyre.org';
 const DEFAULT_TIER = 'basic';
 
@@ -35,11 +47,22 @@ const state = {
   loadedAt: null,
 };
 
+// The background prepare (see prepare() below). Kept apart from `state`: a
+// prepare never leaves an engine behind, only a warm browser cache.
+const prep = {
+  status: 'idle',       // idle | preparing | done | failed | skipped
+  promise: null,        // set once: a prepare runs at most once per page
+  error: null,
+  ms: null,
+};
+
 export function getStatus() { return state.status; }
 export function isLoaded() { return state.status === 'ready'; }
 export function getError() { return state.error; }
 export function getEngine() { return state.engine; }
 export function getRunner() { return state.runner; }
+export function getPrepareStatus() { return prep.status; }
+export function getPrepareError() { return prep.error; }
 
 /**
  * Is the data package already cached from a previous visit? Read-only —
@@ -70,7 +93,64 @@ export async function isCached() {
 }
 
 /**
- * Load the engine. Called ONLY from an explicit user action.
+ * Background prepare: initialise the engine once so that the browser keeps
+ * what it downloads (the TeX Live data package in IndexedDB, the engine files
+ * in its HTTP cache), then terminate the worker to free its memory. load()
+ * then starts from cache. Decision 2026-09-30: "Cached and started on demand
+ * seems fine; we can change it later if it turns out to be a problem".
+ *
+ * Always a real initialisation, never a cache check: the library's
+ * isPackageCached() matches by FILE NAME, so it would call an older release's
+ * data current. The data package's own loader compares package_uuid (the
+ * SHA-256 of the .data file) and downloads afresh on a mismatch.
+ *
+ * Runs at most once per page; later calls return the same promise. Skipped if
+ * load() has already started. Never rejects: a failure is recorded
+ * (getPrepareStatus, getPrepareError) and load() then initialises in full.
+ * @param {object} opts  as for load()
+ * @returns {Promise<void>}
+ */
+export function prepare({ basePath, tier = DEFAULT_TIER,
+                          onProgress = () => {} } = {}) {
+  if (prep.promise) return prep.promise;
+  if (state.status !== 'idle') {             // the button got there first
+    prep.status = 'skipped';
+    prep.promise = Promise.resolve();
+    return prep.promise;
+  }
+  prep.status = 'preparing';
+  prep.promise = (async () => {
+    const t0 = (globalThis.performance || Date).now();
+    let runner = null;
+    try {
+      onProgress('fetching-pipeline');
+      const { BusyTexRunner } = await import(/* webpackIgnore: true */ PIPELINE_URL);
+      onProgress('initialising', { tier });
+      runner = new BusyTexRunner({
+        busytexBasePath: basePath,
+        verbose: false,
+        preloadDataPackages: [`${basePath}/texlive-${tier}.js`],
+        onDownloadProgress: (p) => onProgress('downloading', p),
+      });
+      await runner.initialize(true);          // true = run in a Web Worker
+      prep.ms = Math.round((globalThis.performance || Date).now() - t0);
+      prep.status = 'done';
+      onProgress('prepared', { ms: prep.ms });
+    } catch (err) {
+      prep.status = 'failed';
+      prep.error = String(err && err.message ? err.message : err);
+      onProgress('prepare-failed', { error: prep.error });
+    } finally {
+      try { if (runner) runner.terminate(); } catch { /* best effort */ }
+    }
+  })();
+  return prep.promise;
+}
+
+/**
+ * Load the engine, when the user presses the button. If a background
+ * prepare() is still running this waits for it, so nothing downloads twice;
+ * if the prepare failed, this full initialisation is the retry.
  * @param {object} opts
  * @param {string} opts.basePath   directory holding busytex.wasm + the tier
  * @param {string} opts.tier       'basic' (default) | 'recommended'
@@ -85,6 +165,10 @@ export async function load({ basePath, tier = DEFAULT_TIER,
   const t0 = (globalThis.performance || Date).now();
 
   try {
+    if (prep.status === 'preparing') {       // it never rejects; see prepare()
+      onProgress('waiting-for-prepare');
+      await prep.promise;
+    }
     onProgress('fetching-pipeline');
     const { BusyTexRunner, PdfLatex } = await import(/* webpackIgnore: true */ PIPELINE_URL);
 
@@ -93,6 +177,7 @@ export async function load({ basePath, tier = DEFAULT_TIER,
       busytexBasePath: basePath,
       verbose: false,
       preloadDataPackages: [`${basePath}/texlive-${tier}.js`],
+      onDownloadProgress: (p) => onProgress('downloading', p),
     });
     await runner.initialize(true);            // true = run in a Web Worker
 
