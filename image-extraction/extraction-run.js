@@ -13,8 +13,9 @@ import { discoverFigureEnvironments, findCommandCandidates,
          maskComments } from './latex-scanner.js';
 import { mapLineBlock } from './map-lines.js';
 import { defaultEndpoint } from './busytex-loader.js';
+import { maskForDetection, detectCodeFigures } from './code-figure-detect.js';
 
-export const EXTRACTION_RUN_VERSION = '0.5.0';
+export const EXTRACTION_RUN_VERSION = '0.9.0';
 
 /**
  * Versions of the modules ACTUALLY LOADED in this page. A browser can serve
@@ -26,7 +27,7 @@ export async function loadedVersions() {
   const out = { 'extraction-run.js': EXTRACTION_RUN_VERSION };
   const mods = ['mmz-parser.js', 'mmz-inject.js', 'mmz-match.js',
                 'mmz-rewrite.js', 'mmz-split.js', 'latex-scanner.js',
-                'figure-extractor.js'];
+                'figure-extractor.js', 'code-figure-detect.js'];
   await Promise.all(mods.map(async n => {
     try {
       const m = await import('./' + n);
@@ -37,6 +38,92 @@ export async function loadedVersions() {
 }
 
 const EARLY_BLOCK = '\\usepackage[extract=no]{memoize}';
+
+/**
+ * The early block for one master (step 5). The engine compiles every master at the ROOT
+ * (ENGINE-FINDINGS-311), so a document in a subfolder cannot find the files beside it by the
+ * names its author wrote (\input{part}, \includegraphics{pic}): measured "File `part.tex' not
+ * found" (code-image-detection\_work\s5\probe-subfolder). LaTeX also searches \input@path, so a
+ * master in a folder gets that folder there, then the root. A folder name TeX cannot carry in a
+ * macro (# % \ { }) gets no line rather than a broken one.
+ */
+export function earlyBlockFor(masterPath) {
+  const slash = String(masterPath || '').lastIndexOf('/');
+  if (slash === -1) return EARLY_BLOCK;
+  const dir = masterPath.slice(0, slash + 1);
+  if (/[#%\\{}]/.test(dir)) return EARLY_BLOCK;
+  return EARLY_BLOCK + '\n\\makeatletter\\def\\input@path{{' + dir + '}{}}\\makeatother';
+}
+
+/** The project files a master pulls in, followed through what THEY pull in: \input (braced, or
+ *  TeX's \input name), \include, \subfile, \includestandalone, \import, \subimport. Names are
+ *  tried from the root and from the master's folder (the \input@path above), with and without
+ *  .tex. Comments and verbatim are masked first: a commented-out \input reaches nothing. */
+function reachedFrom(master, byPath) {
+  const norm = p => {
+    const out = [];
+    for (const s of p.replace(/\\/g, '/').split('/')) {
+      if (s === '' || s === '.') continue;
+      if (s === '..') out.pop(); else out.push(s);
+    }
+    return out.join('/');
+  };
+  const dirOf = p => (p.includes('/') ? p.slice(0, p.lastIndexOf('/') + 1) : '');
+  const mdir = dirOf(master);
+  const find = (bases, name) => {
+    for (const b of bases) for (const c of [name, name + '.tex']) { const q = norm(b + c); if (byPath.has(q)) return q; }
+    return null;
+  };
+  const seen = new Set([master]), queue = [master];
+  while (queue.length) {
+    const p = queue.shift();
+    let m = byPath.get(p) || '';
+    try { m = maskForDetection(m); } catch { /* scan unmasked */ }
+    const hits = [];
+    for (const x of m.matchAll(/\\(?:input|include|subfile|includestandalone)\s*(?:\[[^\]]*\])?\s*\{([^{}]+)\}/g))
+      hits.push(find(['', mdir], x[1].trim()));
+    for (const x of m.matchAll(/\\input\s+([^\s{}\\%]+)/g)) hits.push(find(['', mdir], x[1].trim()));
+    for (const x of m.matchAll(/\\(sub)?import\*?\s*\{([^{}]*)\}\s*\{([^{}]+)\}/g))
+      hits.push(find([x[1] ? dirOf(p) + x[2].trim() : x[2].trim(), mdir + x[2].trim()], x[3].trim()));
+    for (const q of hits) if (q && !seen.has(q)) { seen.add(q); queue.push(q); }
+  }
+  return seen;
+}
+
+/**
+ * STEP 5: which documents of a project to compile for figure extraction, in project order.
+ * A master's count is its own figures plus those of every file it pulls in (the detection
+ * module's counts); a subfile is compiled through its master; each master once; a master with
+ * nothing to extract is skipped WITHOUT compiling. Fragments with figures no master pulls in are
+ * reported. Pure: the caller recounts before each compile, since earlier ones rewrite files.
+ * @param {Array<{path: string, text: string}>} files  every text file, editor text already in
+ * @returns {{ documents: Array<{path, figures, reaches}>, skipped: Array<{path, reason}>,
+ *             unreached: Array<{path, figures}>, detection: object }}
+ */
+export function planDocuments(files) {
+  const list = (files || []).filter(f => f && typeof f.path === 'string' && typeof f.text === 'string');
+  const det = detectCodeFigures(list);
+  const byPath = new Map(list.map(f => [f.path, f.text]));
+  const count = new Map(det.byFile.map(f => [f.path, f.count]));
+  const all = list.map(f => f.path);
+  const masters = [], skipped = [];
+  for (const d of det.documents) {
+    const r = resolveCompileTarget(d, p => (byPath.has(p) ? byPath.get(p) : null), () => all);
+    if (!r.ok) { skipped.push({ path: d, reason: r.reason }); continue; }
+    if (!masters.includes(r.masterPath)) masters.push(r.masterPath);
+  }
+  const documents = [], reachedAll = new Set();
+  for (const m of masters) {
+    const reach = reachedFrom(m, byPath);
+    for (const p of reach) reachedAll.add(p);
+    const figures = [...reach].reduce((a, p) => a + (count.get(p) || 0), 0);
+    if (figures > 0) documents.push({ path: m, figures, reaches: [...reach].filter(p => p !== m) });
+    else skipped.push({ path: m, reason: 'no figures drawn in code' });
+  }
+  const unreached = det.byFile.filter(f => f.count > 0 && f.role === 'fragment' && !reachedAll.has(f.path))
+    .map(f => ({ path: f.path, figures: f.count }));
+  return { documents, skipped, unreached, detection: det };
+}
 
 /**
  * tcolorbox draws its own frame with TikZ, so a decorated box becomes a
@@ -76,6 +163,35 @@ export function usesTcolorbox(texts) {
   return false;
 }
 /**
+ * Built-in drawing environments memoize does NOT capture by itself, registered only when the
+ * project uses them (code-image-detection step 2). forest is captured by default and so needs
+ * no line, but it must be CLAIMED like these: before 0.6.0 a forest tree arrived as an
+ * unclaimed extern and the whole file was refused.
+ * MEASURED (code-image-detection\_work\tools-probe8, local TeX Live): with all three registered
+ * nothing else changes. tikzpicture, \tikz, forest, pgfplots, a figure inside a tcolorbox,
+ * eso-pic's background, the background package's overlay and an enhanced tcolorbox skin are
+ * captured exactly as before (the mixed document: 5 externs -> 9, the 4 new ones only).
+ */
+export const REGISTER_WHEN_PRESENT = ['picture', 'pgfpicture', 'circuitikz'];
+/** tikz-cd needs `verbatim`: a plain registration breaks TikZ's matrix cells (probe 2026-09-30),
+ *  and it is added only when the guard allows (step 3; see buildLateBlock). */
+export const TIKZCD_REGISTRATION = '\\mmzset{auto={tikzcd}{memoize, verbatim}}';
+
+/** Which built-in drawing environments the project's text uses ANYWHERE, comments and verbatim
+ *  blocks aside (the detection module's masking). Definitions count too: a command that draws a
+ *  picture needs the registration as much as a picture written directly. */
+export function builtinDrawingEnvs(texts) {
+  const found = new Set();
+  const RE = /\\begin\s*\{(picture|pgfpicture|circuitikz|forest)\}/g;
+  for (const t of texts || []) {
+    let m = t;
+    try { m = maskForDetection(t); } catch { /* scan unmasked */ }
+    for (const x of String(m).matchAll(RE)) found.add(x[1]);
+  }
+  return found;
+}
+
+/**
  * P3: the late block registers the figure environments memoize must hook.
  * `tikzangle` and `tikzcalibratedcircle` are Ma/Mb-specific — hardcoding
  * them would register environments a different document never defines, so
@@ -83,7 +199,13 @@ export function usesTcolorbox(texts) {
  * discoverFigureEnvironments finds \newenvironment / \NewEnviron whose body
  * contains a figure hint (tikzpicture, \begin{axis}).
  */
-export function buildLateBlock(texts) {
+export function buildLateBlock(items) {
+  // Strings (the original form) or { path, text } objects (0.6.0).
+  const texts = (items || []).map(t => typeof t === 'string' ? t : String((t && t.text) || ''));
+  // ...and with paths, for the tikz-cd guard (it judges a style file differently)
+  const files = (items || []).map((t, i) => typeof t === 'string'
+    ? { path: `text-${i + 1}.tex`, text: t }
+    : { path: String((t && t.path) || `text-${i + 1}.tex`), text: String((t && t.text) || '') });
   const names = new Set();
 
   // pass 1: commands whose bodies draw (e.g. \@tikzanglecommand, \axes)
@@ -157,8 +279,21 @@ export function buildLateBlock(texts) {
   }
   for (const n of [...names].sort())
     lines.push(`\\mmzset{auto={${n}}{memoize}}`);
-  return { block: lines.join('\n'), environments: [...names].sort(),
-           suppressions };
+  // Built-ins after everything that was there before, so a project that uses none of them gets
+  // the block it always got (gate: test-capture.mjs, part A).
+  const present = builtinDrawingEnvs(texts);
+  const registered = REGISTER_WHEN_PRESENT.filter(n => present.has(n));
+  for (const n of registered) lines.push(`\\mmzset{auto={${n}}{memoize}}`);
+  // tikz-cd (step 3): only when the detection module's guard finds every diagram in the project
+  // in surroundings measured safe (code-figure-detect.js; NOTE 2026-10-01). Last, for the same
+  // reason as the built-ins. mmz-rewrite.js's figures-in-math rule places its images.
+  let tikzcd = null;
+  try { tikzcd = detectCodeFigures(files).tikzcd; } catch { /* no registration */ }
+  if (tikzcd && tikzcd.capturable) { lines.push(TIKZCD_REGISTRATION); registered.push('tikzcd'); }
+  const claimable = new Set([...names, ...registered]);
+  if (present.has('forest')) claimable.add('forest');
+  return { block: lines.join('\n'), environments: [...claimable].sort(),
+           registered, suppressions, tikzcd };
 }
 
 /**
@@ -247,20 +382,24 @@ export async function compileForExtraction(o) {
   // P3: discover figure environments across the WHOLE project — a figure
   // macro or environment may be defined in any .sty, not the main file.
   const paths = listPaths();
-  const styTexts = paths.filter(p => /\.(sty|cls|tex)$/i.test(p))
-    .map(p => getText(p)).filter(Boolean);
+  const styTexts = paths.filter(p => /\.(sty|cls|tex|ltx|tikz|pgf)$/i.test(p))
+    .map(p => ({ path: p, text: getText(p) })).filter(f => f.text);
   const late = buildLateBlock(styTexts);
   report.environments = late.environments;
   report.suppressions = late.suppressions;
+  report.registered = late.registered;
+  report.tikzcd = late.tikzcd;
 
   // map lines go with the late block: after the document's own packages, so
   // nothing can overwrite them, and before \begin{document}.
   const lateFull = late.block + '\n' + mapLineBlock();
-  const { injected, insertions } = buildInjected(original, EARLY_BLOCK, lateFull);
+  // a master in a subfolder searches its own folder too (step 5; earlyBlockFor)
+  const early = earlyBlockFor(masterPath);
+  const { injected, insertions } = buildInjected(original, early, lateFull);
   report.insertions = insertions.map(i => ({ at: i.at, len: i.len }));
   // planRewrite must rebuild the IDENTICAL injected text to get the same
   // offset map, so record the exact blocks used.
-  report.earlyBlock = EARLY_BLOCK;
+  report.earlyBlock = early;
   report.lateBlock = lateFull;
 
   // P1: every file goes into the virtual FS at its PROJECT-RELATIVE path.
@@ -337,21 +476,36 @@ export async function compileForExtraction(o) {
 }
 
 /**
+ * Where an extracted figure goes (step 4): beside its source file, named after it, numbered per
+ * file. ('worksheets/12/ws 12.tex', 3) -> 'worksheets/12/ws-12-fig-03.pdf'. In the file name,
+ * anything other than letters, digits, _ and - becomes a hyphen (spaces, dots, brackets), so the
+ * name is safe in \includegraphics, in URLs and on every file system.
+ */
+export function figurePath(srcPath, n) {
+  const slash = srcPath.lastIndexOf('/');
+  const dir = slash === -1 ? '' : srcPath.slice(0, slash);
+  const stem = srcPath.slice(slash + 1).replace(/\.[^.]*$/, '')
+    .replace(/[^A-Za-z0-9_-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'figure';
+  const name = `${stem}-fig-${String(n).padStart(2, '0')}.pdf`;
+  return dir ? dir + '/' + name : name;
+}
+
+/**
  * STAGE 4: split the extern pages into per-figure PDFs and write them into
  * the project model. ADDS files; modifies none. Source rewriting is Stage 5.
  *
- * Placement (decided 2026-09-06): ALONGSIDE THE SOURCE FILE, numbered
- * PER FILE. A figure from worksheets/12/ws12.tex becomes
- * worksheets/12/dc-fig-001.pdf. Per-file numbering REQUIRES per-file
- * placement — global numbering would be required for a flat root, and the
- * two cannot be mixed.
+ * Placement (decided 2026-09-06): ALONGSIDE THE SOURCE FILE. Names (step 4,
+ * decided 2026-09-30): after the source file, numbered per file, counting only
+ * the figures extracted from it: worksheets/12/ws12.tex gives
+ * worksheets/12/ws12-fig-01.pdf, ws12-fig-02.pdf ... (figurePath). Two
+ * documents sharing a folder no longer collide (dc-fig-001 did, before 0.8.0).
  *
  * @param {object} o
  * @param {object} o.report      the report from compileForExtraction
  * @param {function} o.addFile   (path, bytes, opts) -> void
  * @param {function} o.hasFile   (path) -> boolean
  * @param {function} [o.onProgress]
- * @param {boolean} [o.overwrite] permit replacing existing dc-fig-*.pdf
+ * @param {boolean} [o.overwrite] permit replacing existing figure PDFs of the same names
  */
 export async function splitAndWrite(o) {
   const { report, addFile, hasFile, projectPaths = [],
@@ -408,32 +562,36 @@ export async function splitAndWrite(o) {
     onProgress: (n, total) => onProgress('splitting', { n, total }),
   });
 
-  // Per-file numbering restarts at 001 in each directory. Per-file numbering
-  // REQUIRES per-file placement; global numbering would be required for a
-  // flat root, and the two cannot be mixed.
-  const perDir = new Map();
+  // Names and ALL OR NOTHING (step 4): every figure's name is worked out, and checked against the
+  // project, BEFORE anything is written. One taken name, or one figure that failed to split, and
+  // nothing is written at all: before 0.8.0 the free names were written first, so a refused run
+  // left orphan PDFs behind (5 in the September timing test).
+  const perFile = new Map(), planned = [], taken = new Set();
   for (const r of results) {
     if (r.error) { out.skipped.push({ id: r.id, reason: r.error }); continue; }
     const srcPath = pageFile.get(r.page) || report.masterPath || '';
-    const dir = srcPath.includes('/') ? srcPath.slice(0, srcPath.lastIndexOf('/')) : '';
-    const n = (perDir.get(dir) || 0) + 1;
-    perDir.set(dir, n);
-    const name = 'dc-fig-' + String(n).padStart(3, '0') + '.pdf';
-    const path = dir ? dir + '/' + name : name;
-
-    if (hasFile(path) && !overwrite) { out.collisions.push(path); continue; }
-    addFile(path, r.bytes, { source: 'derived' });
-    out.written.push({ id: r.id, path, page: r.page, bytes: r.bytes.length,
-      sourceFile: srcPath || null,
-      sizeCheck: r.sizeCheck, confidence: r.confidence || null });
+    const n = (perFile.get(srcPath) || 0) + 1;
+    perFile.set(srcPath, n);
+    const path = figurePath(srcPath, n);
+    if ((hasFile(path) && !overwrite) || taken.has(path)) out.collisions.push(path);
+    taken.add(path);
+    planned.push({ r, path, srcPath });
+  }
+  if (!out.collisions.length && !out.skipped.length) {
+    for (const { r, path, srcPath } of planned) {
+      addFile(path, r.bytes, { source: 'derived' });
+      out.written.push({ id: r.id, path, name: path.replace(/^.*\//, '').replace(/\.pdf$/i, ''),
+        page: r.page, bytes: r.bytes.length, sourceFile: srcPath || null,
+        sizeCheck: r.sizeCheck, confidence: r.confidence || null });
+    }
   }
 
   out.ok = out.collisions.length === 0 && out.skipped.length === 0;
   if (out.collisions.length)
     out.error = out.collisions.length + ' file(s) already exist: ' +
-      out.collisions.slice(0, 3).join(', ');
+      out.collisions.slice(0, 3).join(', ') + '; nothing written';
   else if (out.skipped.length)
-    out.error = out.skipped.length + ' extern(s) failed to split';
+    out.error = out.skipped.length + ' extern(s) failed to split; nothing written';
   return out;
 }
 
@@ -459,7 +617,7 @@ export async function splitAndWrite(o) {
 export async function planRewrite(o) {
   const { report, getText, projectPaths = [], masterName = 'main.tex' } = o;
   const plan = { ok: false, error: null, files: [], untouched: [],
-                 totalEdits: 0, warnings: [] };
+                 totalEdits: 0, warnings: [], notes: [] };
   if (!report || !report.ok) { plan.error = 'compile did not succeed'; return plan; }
   if (!report.harvest || !report.harvest.synctex) {
     plan.error = 'no SyncTeX harvested — cannot attribute figures to files';
@@ -537,6 +695,11 @@ export async function planRewrite(o) {
         const w = (report.writtenFigures || []).find(x => x.id === id);
         return w ? w.path : id + '.pdf';
       },
+      // the name the user sees in the marker comment and the notes (step 4)
+      labelOf: id => {
+        const w = (report.writtenFigures || []).find(x => x.id === id);
+        return w && w.name ? w.name : id;
+      },
     });
     // *** Suppression-aware diagnosis. If suppression WAS injected and a
     // tcolorbox skin still appears, the suppression is INCOMPLETE - an
@@ -575,8 +738,11 @@ export async function planRewrite(o) {
       opaqueWarnings: res.report.warnings || [],
       untouchedClaims: (res.report.untouched || []).length,
       newText: res.rewritten,
+      notes: (res.report.notes || []).map(n => ({ ...n, path,
+        line: original.slice(0, n.at).split('\n').length })),
     });
     plan.totalEdits += (res.report.edits || []).length;
+    for (const n of plan.files[plan.files.length - 1].notes) plan.notes.push({ ...n, text: noteText(n) });
   }
 
   plan.untouched = projectPaths.filter(p => /\.tex$/i.test(p) &&
@@ -586,6 +752,16 @@ export async function planRewrite(o) {
     plan.error = plan.files.filter(f => !f.ok)
       .map(f => `${f.path}: ${f.reason || 'refused'}`).join('; ') || 'nothing to rewrite';
   return plan;
+}
+
+/** One sentence for the user about a figure in math (mmz-rewrite.js 1.1.0, step 3). */
+export function noteText(n) {
+  const where = `${n.path} line ${n.line}`;
+  if (n.kind === 'label')
+    return `${n.id} (${where}) replaced its whole equation, and its label ` +
+      `${(n.labels || []).join(', ')} went with it: references to it will not resolve.`;
+  return `${n.id} (${where}) is inside math with other content (${n.math}), so its image ` +
+    `will not show: move it out of the math by hand.`;
 }
 
 /** Human-readable dry run — the D7 per-file list of what will be commented out. */
@@ -607,6 +783,7 @@ export function describePlan(plan) {
   if (plan.untouched.length)
     L.push(`\nNot reached by this compile, left untouched: ${plan.untouched.join(', ')}`);
   for (const w of plan.warnings) L.push('NOTE ' + w);
+  for (const n of plan.notes || []) L.push('NOTE ' + n.text);
   return L.join('\n');
 }
 

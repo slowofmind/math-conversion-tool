@@ -4074,7 +4074,10 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
   // STAGE 3: compile the conversion target with memoize and REPORT.
   // Nothing is written and no file is modified — splitting arrives in
   // Stage 4, rewriting in Stage 5.
-  async function runCompileOnly(m) {
+  // opts (step 5): masterPath, a document to run instead of the conversion target;
+  // noConfirm, skip the dry-run confirmation (runProject asks once up front); checkpoint, one
+  // shared checkpoint function for a multi-document run.
+  async function runCompileOnly(m, opts = {}) {
     // *** Flush the editor into the model FIRST. *** The editor is the live
     // copy of project.mainPath; without this we would compile the text as it
     // was when the file was opened and silently ignore every unsaved edit.
@@ -4084,7 +4087,7 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
 
     const run = await import('./image-extraction/extraction-run.js');
     // the model exports its state object; the target lives on it
-    const target = projectModel.project && projectModel.project.convertTargetPath;
+    const target = opts.masterPath || (projectModel.project && projectModel.project.convertTargetPath);
     if (!target) { updateStatus('error', 'No conversion target selected.'); return; }
 
     const getText = p => { const e = projectModel.getEntry(p); return e ? projectModel.getText(p) : null; };
@@ -4204,7 +4207,7 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       run.describePlan(plan) +
       `\n\nOK to apply. Revert restores the source text only — the extracted ` +
       `images stay in the project.`;
-    if (!confirm(summary)) {
+    if (!opts.noConfirm && !confirm(summary)) {
       bail('user declined');
       updateStatus('ready', 'No source changes made. The figure PDFs are in the project.');
       return;
@@ -4214,7 +4217,7 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     try {
       applied = run.applyRewrite(plan, {
         updateText: (p, t) => projectModel.updateText(p, t),
-        checkpointProject: (lbl) => projectModel.checkpointProject(lbl),
+        checkpointProject: opts.checkpoint || ((lbl) => projectModel.checkpointProject(lbl)),
         replaceInEditor: (p, t) => {
           // The editor is the LIVE copy of whichever file is
           // project.mainPath; captureEditorIntoModel() writes it back over
@@ -4287,9 +4290,87 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     updateStatus(conv.ok ? 'ready' : 'error',
       `Wrote ${split.written.length} figure(s), rewrote ` +
       `${applied.applied.length} source file(s) (${plan.totalEdits} replaced), ` +
-      convNote + ' Revert restores source text only; the images remain.');
+      convNote + ' Revert restores source text only; the images remain.' +
+      ((plan.notes || []).length ? ' ' + plan.notes.map(n => n.text).join(' ') : ''));
     console.info('[extraction] report', rep, 'split', split, 'plan', plan,
       'applied', applied, 'convert', conv);
+  }
+
+  // ── STEP 5 (code-image-detection): every document in the project ────────
+  // Which documents: extraction-run.js planDocuments (a document whose own text, or a file it
+  // pulls in, holds a figure; a subfile through its master; each master once). None or one:
+  // the single-document run as before, with its own dry-run confirmation. Several (decided
+  // 2026-10-01, option b): ONE confirmation up front, then each document in turn (compile,
+  // write, plan, apply) under ONE checkpoint, so one Revert undoes the run. Each document is
+  // counted afresh before it compiles, so a file two documents share is extracted once, by the
+  // first. Outcomes are read from the terminal globals runCompileOnly leaves (see its bail()).
+  // window.__lastProject: null while a run is going, its result when done.
+  async function runProject(m) {
+    window.__lastProject = null;
+    const result = { documents: [] };
+    try {
+      try { captureEditorIntoModel(); }
+      catch (e) { console.warn('[extraction] captureEditorIntoModel failed', e); }
+      const run = await import('./image-extraction/extraction-run.js');
+      const files = () => projectModel.listEntries().map(e => e.path)
+        .map(p => ({ path: p, text: projectModel.getText(p) })).filter(f => typeof f.text === 'string');
+      const plan = run.planDocuments(files());
+      result.plan = plan;
+      if (plan.documents.length <= 1) {
+        result.single = true;
+        await runCompileOnly(m, plan.documents.length ? { masterPath: plan.documents[0].path } : {});
+        return;
+      }
+      const n = plan.documents.length;
+      const ask = `Extract the figures drawn in code from ${n} documents, one after another?\n\n` +
+        plan.documents.map(d => `  ${d.path}: ${d.figures} figure(s)`).join('\n') +
+        (plan.unreached.length ? '\n\nNo document includes ' + plan.unreached.map(u => u.path).join(', ') +
+          ', so its figures stay as code.' : '') +
+        '\n\nEach document is compiled in turn; its figures are written beside their source files and ' +
+        'the source is rewritten to use them. Revert restores the source text of the whole run; the ' +
+        'extracted images stay in the project.';
+      if (!confirm(ask)) { result.declined = true; updateStatus('ready', 'No figures extracted.'); return; }
+      let cp = null;
+      const checkpoint = (lbl) => cp || (cp = projectModel.checkpointProject(lbl));
+      for (let i = 0; i < n; i++) {
+        const d = plan.documents[i];
+        try { captureEditorIntoModel(); } catch {}
+        if (!run.planDocuments(files()).documents.some(x => x.path === d.path)) {
+          result.documents.push({ path: d.path, skipped: true });
+          continue;
+        }
+        for (const k of ['__lastExtraction', '__lastSplit', '__lastPlan', '__lastApply', '__lastConvert']) window[k] = undefined;
+        updateStatus('loading', `Document ${i + 1} of ${n}: ${d.path}…`);
+        let threw = null;
+        try { await runCompileOnly(m, { masterPath: d.path, noConfirm: true, checkpoint }); }
+        catch (err) { threw = err && err.message ? err.message : String(err); }
+        const rep = window.__lastExtraction, split = window.__lastSplit, pl = window.__lastPlan, ap = window.__lastApply;
+        const why = threw ? 'failed: ' + threw
+          : !rep ? 'not compiled'
+          : !rep.ok ? 'compile failed: ' + (rep.firstError || rep.error || 'unknown')
+          : split && !split.ok ? (split.error || 'figures not written')
+          : pl && !pl.ok ? 'no changes made: ' + (pl.error || 'refused') + '; its figure PDFs were written'
+          : ap && !ap.ok ? 'not applied: ' + (ap.error || ap.reason || 'unknown') : null;
+        result.documents.push({ path: d.path, ok: !why, why, figures: split && split.written ? split.written.length : 0,
+          files: ap && ap.applied ? ap.applied.map(a => a.path) : [], notes: pl && pl.notes ? pl.notes : [] });
+      }
+      result.checkpoint = !!cp;
+      const ok = result.documents.filter(r => r.ok), failed = result.documents.filter(r => r.why),
+            skipped = result.documents.filter(r => r.skipped);
+      const figs = ok.reduce((a, r) => a + r.figures, 0);
+      const rewritten = new Set(ok.flatMap(r => r.files)).size;
+      const notes = ok.flatMap(r => r.notes.map(x => x.text));
+      if (typeof refreshFileTree === 'function') { try { refreshFileTree(); } catch {} }
+      updateStatus(failed.length ? 'error' : 'ready',
+        `Extracted ${figs} figure(s) from ${ok.length} of ${n} document(s) and rewrote ${rewritten} source file(s).` +
+        (skipped.length ? ` Nothing left to extract in ${skipped.map(r => r.path).join(', ')}: an earlier document took its figures.` : '') +
+        (failed.length ? ` Not extracted: ${failed.map(r => `${r.path} (${r.why})`).join('; ')}.` : '') +
+        (plan.unreached.length ? ` No document includes ${plan.unreached.map(u => u.path).join(', ')}, so its figures stay as code.` : '') +
+        (notes.length ? ' ' + notes.join(' ') : '') +
+        (ok.length ? ' Revert restores the source text of the whole run; the images remain.' : ''));
+    } finally {
+      window.__lastProject = result;
+    }
   }
 
   // ── Background prepare (plan step 3, decision 2026-09-30) ─────────────
@@ -4327,7 +4408,7 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     try {
       const m = await ensureModule();
       if (!m.isLoaded() && !(await doLoad(m))) return;
-      await runCompileOnly(m);
+      await runProject(m);
     } catch (err) {
       setLabel('Image handling: failed', false);
       updateStatus('error', 'Could not load image handling: ' + (err && err.message ? err.message : err));
@@ -6593,6 +6674,51 @@ document.getElementById('btnConvert').addEventListener('click', () => {
   }
 });
 
+// ── Project paths: conversion copies (project/project-paths.js) ─────────
+// Pandoc's LaTeX reader resolves \input-family targets, and the Lua filters image paths,
+// from the project ROOT only (project-paths\NOTE-PROJECT-PATHS.md). So the document being
+// converted (stdin: the model's mainPath, which is the editor's document) and the files it reaches
+// are given with each such path written from the root, resolved as TeX would from the document's
+// folder (then its enclosing folders). Read exactly as Pandoc would be served them: the auxFiles
+// projection, -pp stand-ins included. Copies go into `files` under their own paths, for THIS
+// conversion only: the editor, the project and warning line numbers are unchanged. LaTeX input
+// only. Result left in window.__lastPaths (null when it did not run). Flag, don't fail: on any
+// error the conversion goes ahead exactly as before.
+async function conversionPathCopies(sourceText, files) {
+  window.__lastPaths = null;
+  const master = projectModel.project.mainPath;
+  const from = document.getElementById('selFrom').value.split(/[+-]/)[0];
+  if (typeof sourceText !== 'string' || !master || from !== 'latex') return sourceText;
+  try {
+    const { conversionCopies } = await import('./project/project-paths.js');
+    const aux = resourceFiles.auxFiles || {};
+    const TEXT_EXT = /\.(tex|ltx|sty|cls|tikz|pgf)$/i;
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    const blobTexts = new Map();       // a Blob cannot be read synchronously: read those first
+    for (const [p, b] of Object.entries(aux)) {
+      if (b instanceof Blob && TEXT_EXT.test(p)) { try { blobTexts.set(p, await b.text()); } catch {} }
+    }
+    const getText = (p) => {
+      if (p === master) return sourceText;
+      if (!TEXT_EXT.test(p)) return null;
+      if (blobTexts.has(p)) return blobTexts.get(p);
+      const b = aux[p];
+      if (typeof b === 'string') return b;
+      if (!b) return null;
+      try { return decoder.decode(b instanceof Uint8Array ? b : new Uint8Array(b)); } catch { return null; }
+    };
+    const r = conversionCopies({ master, paths: [...new Set([...Object.keys(files), master])], getText });
+    for (const [p, t] of r.copies) files[p] = new Blob([t], { type: 'text/plain' });
+    window.__lastPaths = { master, copies: [...r.copies.keys()], changes: r.changes, unresolved: r.unresolved, ms: r.ms };
+    if (r.changes.length) console.log(`Project paths: ${r.changes.length} path(s) written from the root for this conversion, ${r.copies.size} file(s) copied`, r.changes);
+    if (r.unresolved.length) console.warn('Project paths: not resolved', r.unresolved);
+    return r.main;
+  } catch (e) {
+    console.warn('Project paths: skipped (' + e.message + '); converting as before');
+    return sourceText;
+  }
+}
+
 async function runConversion() {
   if (!pandocModule) return;
 
@@ -6613,6 +6739,8 @@ async function runConversion() {
 
     const options = buildOptions();
     const files = buildFiles();
+    // Project paths: the text Pandoc reads, and copies of what it reaches (see conversionPathCopies).
+    const pandocText = await conversionPathCopies(sourceText, files);
     const outFileName = options['output-file'];
     const baseToFmt = document.getElementById('selTo').value.split(/[+-]/)[0];
     const isBinaryOutput = BINARY_FORMATS.includes(baseToFmt);
@@ -6629,7 +6757,7 @@ async function runConversion() {
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
-        result = await pandocModule.convert(options, sourceText, files);
+        result = await pandocModule.convert(options, pandocText, files);
         if (attempt > 0) console.log(`Conversion succeeded after ${attempt} placeholder(s)`);
         break; // success
       } catch (convErr) {
