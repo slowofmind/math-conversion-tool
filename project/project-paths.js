@@ -11,9 +11,9 @@ import { maskForDetection } from '../image-extraction/code-figure-detect.js';
 export const MODULE_VERSION = '1.0.0';
 
 // \input-family commands are followed (their targets are read too); the rest are only rewritten.
-const CMD = /\\(input|include|subfile|subimport|import|includegraphics|includesvg|lstinputlisting|inputminted|graphicspath)(?![A-Za-z@])/g;
+const CMD = /\\(input|includestandalone|include|subfile|subimport|import|includegraphics|includesvg|lstinputlisting|inputminted|graphicspath)(?![A-Za-z@])/g;
 const TWO_ARGS = new Set(['import', 'subimport', 'inputminted']);
-const TEX_KIND = new Set(['input', 'include', 'subfile']);
+const TEX_KIND = new Set(['input', 'include', 'subfile', 'includestandalone']);
 const IMAGE_KIND = new Set(['includegraphics', 'includesvg']);
 // graphicx's own list, plus .svg and .gif (PDF images and the Resolve filter).
 const IMG_EXTS = ['', '.pdf', '.png', '.jpg', '.jpeg', '.svg', '.gif', '.mps', '.jbig2', '.jb2',
@@ -27,6 +27,19 @@ const dirOf = p => p.slice(0, p.lastIndexOf('/') + 1);              // '' at the
 const asBase = d => (d ? d.replace(/\/?$/, '/') : '');
 const hasExt = p => /\.[A-Za-z0-9]+$/.test(p.slice(p.lastIndexOf('/') + 1));
 const lineAt = (text, i) => { let n = 1; for (let k = 0; k < i; k++) if (text.charCodeAt(k) === 10) n++; return n; };
+
+/**
+ * The folders a document's references are looked for in, before the root: its own folder, then
+ * (enclosing on, the default) each folder enclosing it, nearest first. 'a/b/doc.tex' -> ['a/b/', 'a/'];
+ * a document at the root -> []. Conversion uses it here; the extraction run gives the compile the
+ * same list as \input@path (image-extraction/extraction-run.js earlyBlockFor).
+ */
+export function searchFolders(master, { enclosing = true } = {}) {
+  const D = dirOf(String(master || ''));
+  const out = D ? [D] : [];
+  if (enclosing) for (let d = dirOf(D.slice(0, -1)); d; d = dirOf(d.slice(0, -1))) out.push(d);
+  return out;
+}
 
 /** 'a/./b/../c' -> 'a/c'; null when it climbs out of the project or is absolute. */
 function norm(p) {
@@ -137,8 +150,7 @@ export function conversionCopies({ master, paths, getText, enclosing = true }) {
   const t0 = now();
   const S = new Set(paths);
   const D = dirOf(master);
-  const ANC = [];                                      // 'a/b/c/' -> ['a/b/', 'a/']
-  if (enclosing) for (let d = dirOf(D.slice(0, -1)); d; d = dirOf(d.slice(0, -1))) ANC.push(d);
+  const ANC = searchFolders(master, { enclosing }).slice(1);   // enclosing folders, nearest first
   const texFile = c => (!hasExt(c) && S.has(c + '.tex')) ? c + '.tex' : S.has(c) ? c : S.has(c + '.tex') ? c + '.tex' : null;
   const imageFound = c => IMG_EXTS.some(e => S.has(c + e))
     || (/\.pdf$/i.test(c) && ['.svg', '.png'].some(e => S.has(c.replace(/\.pdf$/i, e))));

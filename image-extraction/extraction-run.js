@@ -14,8 +14,9 @@ import { discoverFigureEnvironments, findCommandCandidates,
 import { mapLineBlock } from './map-lines.js';
 import { defaultEndpoint } from './busytex-loader.js';
 import { maskForDetection, detectCodeFigures } from './code-figure-detect.js';
+import { conversionCopies, searchFolders } from '../project/project-paths.js';
 
-export const EXTRACTION_RUN_VERSION = '0.9.0';
+export const EXTRACTION_RUN_VERSION = '0.10.0';
 
 /**
  * Versions of the modules ACTUALLY LOADED in this page. A browser can serve
@@ -34,6 +35,8 @@ export async function loadedVersions() {
       out[n] = m.MODULE_VERSION || '(unmarked)';
     } catch (e) { out[n] = 'FAILED: ' + (e && e.message ? e.message : e); }
   }));
+  try { out['project-paths.js'] = (await import('../project/project-paths.js')).MODULE_VERSION || '(unmarked)'; }
+  catch (e) { out['project-paths.js'] = 'FAILED: ' + (e && e.message ? e.message : e); }
   return out;
 }
 
@@ -44,50 +47,29 @@ const EARLY_BLOCK = '\\usepackage[extract=no]{memoize}';
  * (ENGINE-FINDINGS-311), so a document in a subfolder cannot find the files beside it by the
  * names its author wrote (\input{part}, \includegraphics{pic}): measured "File `part.tex' not
  * found" (code-image-detection\_work\s5\probe-subfolder). LaTeX also searches \input@path, so a
- * master in a folder gets that folder there, then the root. A folder name TeX cannot carry in a
- * macro (# % \ { }) gets no line rather than a broken one.
+ * master in a folder gets that folder there, then each folder enclosing it, nearest first (project-
+ * paths step 4: an Overleaf snapshot compiled from a project folder above the document), then the
+ * root: the same folders, in the same order, that conversion uses (project/project-paths.js
+ * searchFolders). The compile still starts at the root, so a name present BOTH at the root and in
+ * a folder would be read from the root; measured on the corpus: 0 of 1,539 references
+ * (project-paths\_work\corpus-order). A folder name TeX cannot carry in a macro (# % \ { }),
+ * anywhere in the list, gets no line rather than a broken one.
  */
 export function earlyBlockFor(masterPath) {
-  const slash = String(masterPath || '').lastIndexOf('/');
-  if (slash === -1) return EARLY_BLOCK;
-  const dir = masterPath.slice(0, slash + 1);
-  if (/[#%\\{}]/.test(dir)) return EARLY_BLOCK;
-  return EARLY_BLOCK + '\n\\makeatletter\\def\\input@path{{' + dir + '}{}}\\makeatother';
+  const folders = searchFolders(masterPath);
+  if (!folders.length || folders.some(d => /[#%\\{}]/.test(d))) return EARLY_BLOCK;
+  return EARLY_BLOCK + '\n\\makeatletter\\def\\input@path{' + folders.map(d => '{' + d + '}').join('') + '{}}\\makeatother';
 }
 
-/** The project files a master pulls in, followed through what THEY pull in: \input (braced, or
- *  TeX's \input name), \include, \subfile, \includestandalone, \import, \subimport. Names are
- *  tried from the root and from the master's folder (the \input@path above), with and without
- *  .tex. Comments and verbatim are masked first: a commented-out \input reaches nothing. */
+/** The project files a master pulls in, followed through what THEY pull in, by the paths module's
+ *  rule (project/project-paths.js; project-paths step 4), the one conversion uses, so extraction and
+ *  conversion agree on what each document reaches: \input (braced, or TeX's \input name), \include,
+ *  \subfile, \includestandalone, \import, \subimport; the document's folder, then each enclosing
+ *  folder, then the root (the compile is given the same folders: earlyBlockFor). Comments and
+ *  verbatim are masked first: a commented-out \input reaches nothing. */
 function reachedFrom(master, byPath) {
-  const norm = p => {
-    const out = [];
-    for (const s of p.replace(/\\/g, '/').split('/')) {
-      if (s === '' || s === '.') continue;
-      if (s === '..') out.pop(); else out.push(s);
-    }
-    return out.join('/');
-  };
-  const dirOf = p => (p.includes('/') ? p.slice(0, p.lastIndexOf('/') + 1) : '');
-  const mdir = dirOf(master);
-  const find = (bases, name) => {
-    for (const b of bases) for (const c of [name, name + '.tex']) { const q = norm(b + c); if (byPath.has(q)) return q; }
-    return null;
-  };
-  const seen = new Set([master]), queue = [master];
-  while (queue.length) {
-    const p = queue.shift();
-    let m = byPath.get(p) || '';
-    try { m = maskForDetection(m); } catch { /* scan unmasked */ }
-    const hits = [];
-    for (const x of m.matchAll(/\\(?:input|include|subfile|includestandalone)\s*(?:\[[^\]]*\])?\s*\{([^{}]+)\}/g))
-      hits.push(find(['', mdir], x[1].trim()));
-    for (const x of m.matchAll(/\\input\s+([^\s{}\\%]+)/g)) hits.push(find(['', mdir], x[1].trim()));
-    for (const x of m.matchAll(/\\(sub)?import\*?\s*\{([^{}]*)\}\s*\{([^{}]+)\}/g))
-      hits.push(find([x[1] ? dirOf(p) + x[2].trim() : x[2].trim(), mdir + x[2].trim()], x[3].trim()));
-    for (const q of hits) if (q && !seen.has(q)) { seen.add(q); queue.push(q); }
-  }
-  return seen;
+  return new Set(conversionCopies({ master, paths: [...byPath.keys()],
+    getText: p => (byPath.has(p) ? byPath.get(p) : null) }).reached);
 }
 
 /**

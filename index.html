@@ -2151,9 +2151,12 @@
     <div class="rail-panel" id="railPanelPrepare" role="region" hidden
          aria-labelledby="railtab-prepare">
       <div class="sidebar-body">
-      <!-- The button alone: no number, title, count or explanation; all status goes to the status bar (Nicholas, 2026-09-30). -->
+      <!-- The button alone: no number, title, count or explanation; all status goes to the status bar (Nicholas, 2026-09-30).
+           Under it, the automatic checkbox, starting on (Nicholas, 2026-09-30; code-image-detection step 6). -->
       <div class="prep-step">
         <button type="button" class="prep-btn" id="btnImageHandling">TikZ images</button>
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:6px;">
+          <input type="checkbox" id="chkAutoTikz" checked> Extract automatically after upload</label>
       </div>
 
       <div class="prep-step">
@@ -2915,7 +2918,7 @@ document.getElementById('btnUpload').addEventListener('click', () => {
 fileInput.addEventListener('change', async (e) => {
   const files = [...e.target.files];   // copy first: clearing the input empties the list
   fileInput.value = '';
-  await uploadFiles(files);
+  try { await uploadFiles(files); } finally { codeFigureCheckAfterUpload(); }
 });
 
 // ─── Upload Files (toolbar) ───
@@ -3046,6 +3049,7 @@ async function loadSample(path) {
     if (!resp.ok) throw new Error(`Failed to load ${path}: ${resp.status}`);
     const filename = path.split('/').pop();
     await handleFileUpload(new File([await resp.blob()], filename));
+    codeFigureCheckAfterUpload();
 
     // Ensure Convert button reflects current engine state
     const convertBtn = document.getElementById('btnConvert');
@@ -3155,7 +3159,7 @@ editorContent.addEventListener('drop', async (e) => {
 
   // A single dropped file keeps the old behaviour exactly: straight into
   // the editor (or the zip importer).
-  if (!hasDir && files.length === 1) { await handleFileUpload(files[0]); return; }
+  if (!hasDir && files.length === 1) { await handleFileUpload(files[0]); codeFigureCheckAfterUpload(); return; }
 
   if (hasDir || files.length > 1) {
     updateStatus('loading', 'Reading dropped files…');
@@ -3168,6 +3172,7 @@ editorContent.addEventListener('drop', async (e) => {
       }
     }
     await adoptProjectFiles(out, 'drop', hasDir ? 'the dropped folder' : 'the dropped files');
+    codeFigureCheckAfterUpload();
   }
 });
 
@@ -3715,6 +3720,7 @@ document.getElementById('auxDirInput')?.addEventListener('change', async (e) => 
   }
   e.target.value = '';
   await adoptProjectFiles(items, 'directory', 'the uploaded folder');
+  codeFigureCheckAfterUpload();
 });
 
 // ── Shared project intake ──────────────────────────────────────────
@@ -4019,6 +4025,9 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
 // dynamically, at that point or at the first press. The headless test that
 // asserted zero BusyTeX requests on page load is to assert none before Pandoc
 // is ready (plan step 4).
+// Set inside setupImageHandling: the upload routes call it once an upload is in
+// (code-image-detection step 6).
+let codeFigureCheckAfterUpload = () => {};
 (function setupImageHandling() {
   const btn = document.getElementById('btnImageHandling');
   if (!btn) return;
@@ -4305,7 +4314,8 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
   // counted afresh before it compiles, so a file two documents share is extracted once, by the
   // first. Outcomes are read from the terminal globals runCompileOnly leaves (see its bail()).
   // window.__lastProject: null while a run is going, its result when done.
-  async function runProject(m) {
+  // opts.automatic (step 6): an automatic run after an upload asks nothing (no confirmation).
+  async function runProject(m, opts = {}) {
     window.__lastProject = null;
     const result = { documents: [] };
     try {
@@ -4318,7 +4328,8 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       result.plan = plan;
       if (plan.documents.length <= 1) {
         result.single = true;
-        await runCompileOnly(m, plan.documents.length ? { masterPath: plan.documents[0].path } : {});
+        await runCompileOnly(m, Object.assign(plan.documents.length ? { masterPath: plan.documents[0].path } : {},
+          opts.automatic ? { noConfirm: true } : {}));
         return;
       }
       const n = plan.documents.length;
@@ -4329,7 +4340,7 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
         '\n\nEach document is compiled in turn; its figures are written beside their source files and ' +
         'the source is rewritten to use them. Revert restores the source text of the whole run; the ' +
         'extracted images stay in the project.';
-      if (!confirm(ask)) { result.declined = true; updateStatus('ready', 'No figures extracted.'); return; }
+      if (!opts.automatic && !confirm(ask)) { result.declined = true; updateStatus('ready', 'No figures extracted.'); return; }
       let cp = null;
       const checkpoint = (lbl) => cp || (cp = projectModel.checkpointProject(lbl));
       for (let i = 0; i < n; i++) {
@@ -4402,18 +4413,64 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
   // and "Remove downloaded components" are retired: with the automatic
   // download, removal would only re-download on the next visit.
   let running = false;
-  btn.addEventListener('click', async () => {
+  async function extractNow(opts = {}) {
     if (running) return;
     running = true;
     try {
       const m = await ensureModule();
       if (!m.isLoaded() && !(await doLoad(m))) return;
-      await runProject(m);
+      await runProject(m, opts);
     } catch (err) {
       setLabel('Image handling: failed', false);
       updateStatus('error', 'Could not load image handling: ' + (err && err.message ? err.message : err));
     } finally { running = false; setBusy(false); }
-  });
+  }
+  btn.addEventListener('click', () => extractNow());
+
+  // ── Automatic extraction after an upload (code-image-detection step 6) ──
+  // Decided (code-image-detection\NOTE-CODE-IMAGE-DETECTION.md, 2026-09-30): a checkbox next to
+  // TikZ images, starting ON. The upload routes call ONE function (codeFigureCheckAfterUpload),
+  // debounced so a main file followed by its .sty files is one event. Box ticked and figures found:
+  // exactly what the button runs (extractNow), with NO pop-up, reported in the status bar (Revert
+  // remains). Unticked: the status bar gives the count. Nothing found: no message. It listens to
+  // uploads only, so an extraction's own writes cannot set it off, and it never runs while an
+  // extraction runs: it waits and checks again. The count is the button's own plan
+  // (extraction-run.js planDocuments): the figures a press would extract.
+  // window.__lastAutoCheck after each check: { figures, notCaptured, documents, automatic, runs }.
+  const chkAuto = document.getElementById('chkAutoTikz');
+  const AUTO_DELAY_MS = 1500;
+  let autoTimer = null, autoRuns = 0;
+  function scheduleCodeFigureCheck() {
+    clearTimeout(autoTimer);
+    autoTimer = setTimeout(checkAfterUpload, AUTO_DELAY_MS);
+  }
+  async function checkAfterUpload() {
+    autoTimer = null;
+    if (running) { scheduleCodeFigureCheck(); return; }        // after the running extraction
+    let plan;
+    try {
+      try { captureEditorIntoModel(); } catch {}
+      const run = await import('./image-extraction/extraction-run.js');
+      plan = run.planDocuments(projectModel.listEntries().map(e => e.path)
+        .map(p => ({ path: p, text: projectModel.getText(p) })).filter(f => typeof f.text === 'string'));
+    } catch (err) { console.warn('[image handling] check after upload failed:', err); return; }
+    const n = plan.documents.reduce((a, d) => a + d.figures, 0);
+    const cd = (plan.detection && plan.detection.notCaptured && plan.detection.notCaptured.tikzcd) || 0;
+    const automatic = !!(chkAuto && chkAuto.checked);
+    window.__lastAutoCheck = { figures: n, notCaptured: cd, documents: plan.documents.length, automatic, runs: ++autoRuns };
+    const cdNote = cd ? ` ${cd} commutative diagram${cd > 1 ? 's' : ''} cannot be extracted yet${n ? '' : ' and stay' + (cd > 1 ? '' : 's') + ' as code'}.` : '';
+    if (n && automatic) {
+      await extractNow({ automatic: true });
+      if (cdNote) {                                              // added to the run's own report
+        const dot = document.getElementById('statusDot'), txt = document.getElementById('statusText');
+        updateStatus((dot && dot.className.split(' ')[1]) || 'ready', (txt ? txt.textContent : '') + cdNote);
+      }
+      return;
+    }
+    if (n) updateStatus('ready', `${n} figure${n > 1 ? 's' : ''} drawn in code found. Press TikZ images to extract ${n > 1 ? 'them' : 'it'}.` + cdNote);
+    else if (cd) updateStatus('ready', cdNote.trim());
+  }
+  codeFigureCheckAfterUpload = scheduleCodeFigureCheck;
 })();
 
 // ════════════════════════════════════════════════════════════════════
@@ -6719,6 +6776,75 @@ async function conversionPathCopies(sourceText, files) {
   }
 }
 
+// ── Project paths: what could not be followed (plan step 5) ──────────────
+// One entry per reference conversionPathCopies could not resolve (window.__lastPaths), in the SAME
+// warnings list Pandoc's go to ({ line, column, level, message, matchedText, type }). Reported
+// only: the output is not marked (Nicholas, 2026-10-01; a visible note may come later, as a Lua
+// filter). Measured on the platform (busytex-tikz-harness\test-paths-report.mjs, first run):
+// Pandoc already warns for an include it cannot load, but places a NESTED file's line in the
+// editor's document; so an entry for an unloadable include REPLACES Pandoc's for the same name.
+// Pandoc expands macros it knows in \input paths and reports a failure itself, so a path built by
+// a macro is information only. Pandoc says nothing about a missing image. The Resolve Image Paths
+// filter, when on, may still find an image by its file name at the top of the project: its own
+// candidate list (index.html, BUILT_IN_FILTERS) is applied here to the files served, and such an
+// image is information, not missing. An image already listed as a placeholder is not repeated.
+// Returns the number of warnings added (the status bar says how many could not be followed).
+function conversionPathWarnings(warnings, files, placeholderFiles) {
+  const paths = window.__lastPaths;
+  if (!paths || !paths.unresolved || !paths.unresolved.length) return 0;
+  const IMAGE = new Set(['\\includegraphics', '\\includesvg']);
+  const served = new Set(Object.keys(files));
+  const byName = (src) => {            // the Resolve Image Paths filter's candidates, in its order
+    const base = src.split('/').pop();
+    const swap = (p, e) => (/\.[^.]+$/.test(p) ? p.replace(/\.[^.]+$/, '.' + e) : p);
+    const pdf = /\.pdf$/i.test(src), c = [];
+    if (pdf) c.push(swap(src, 'svg'), swap(src, 'png'));
+    c.push(base);
+    if (pdf) c.push(swap(base, 'svg'), swap(base, 'png'));
+    else for (const e of ['png', 'jpg', 'jpeg', 'svg', 'gif', 'webp']) { const s = swap(base, e); if (s !== base) c.push(s); }
+    return c.find(p => served.has(p)) || null;
+  };
+  const where = 'no file of that name in the project (looked beside the converted document, in the folders enclosing it, and at the top)';
+  const added = [], dropInclude = new Set();
+  for (const u of paths.unresolved) {
+    const ref = `${u.command}{${u.ref}}`;
+    const inEditor = u.file === paths.master;
+    const at = inEditor ? '' : ` in ${u.file}, line ${u.line}`;
+    const image = IMAGE.has(u.command);
+    let level = 'warn', message;
+    if (/definition/.test(u.why)) {
+      level = 'info';
+      message = `${ref}${at} is inside a definition; the places that use it were not checked.`;
+    } else if (/macro/.test(u.why)) {
+      level = 'info';
+      message = `${ref}${at}: its path is built by a macro, so it was not checked here. ` + (image
+        ? 'Pandoc expands macros it knows; an image it then cannot find is not reported.'
+        : 'Pandoc expands macros it knows, and reports a file it then cannot load.');
+    } else if (image) {
+      if (placeholderFiles.includes(u.ref)) continue;
+      const found = builtInState['resolve-image-paths'] ? byName(u.ref) : null;
+      if (found) {
+        level = 'info';
+        message = `${ref}${at}: no file at that path; the Resolve Image Paths filter used ${found}, a file of the same name at the top of the project. Check that it is the right image.`;
+      } else {
+        message = `Could not find the image ${ref}${at}: ${where}. The image is missing from the output.`;
+      }
+    } else {
+      message = `Could not follow ${ref}${at}: ${where}. Its text is not in the output.`;
+      dropInclude.add(u.ref);
+      if (!/\.[A-Za-z0-9]+$/.test(u.ref.split('/').pop())) dropInclude.add(u.ref + '.tex');
+    }
+    added.push({ line: inEditor ? u.line : null, column: null, level, message,
+      matchedText: inEditor ? u.ref : null, type: 'project-paths' });
+  }
+  for (let i = warnings.length - 1; i >= 0; i--) {     // Pandoc's own entry for the same include
+    const m = /^Could not load include file: (.*)$/.exec(warnings[i].message || '');
+    if (m && dropInclude.has(m[1].trim())) warnings.splice(i, 1);
+  }
+  warnings.push(...added);
+  return added.filter(w => w.level === 'warn').length;
+}
+
 async function runConversion() {
   if (!pandocModule) return;
 
@@ -6808,6 +6934,9 @@ async function runConversion() {
         matchedText: null, type: 'placeholder'
       });
     }
+
+    // Project paths: what could not be followed (see conversionPathWarnings).
+    const pathWarnCount = conversionPathWarnings(warnings, files, placeholderFiles);
 
     // Apply editor decorations (only for text input)
     if (!inputBinaryFile) applyDecorations(warnings);
@@ -6961,7 +7090,8 @@ async function runConversion() {
     const statusMsg = placeholderFiles.length > 0
       ? `Converted ${options.from} → ${options.to} (${placeholderFiles.length} placeholder${placeholderFiles.length > 1 ? 's' : ''}) (${pandocVersion})`
       : `Converted ${options.from} → ${options.to} (${pandocVersion})`;
-    updateStatus('ready', statusMsg);
+    updateStatus('ready', statusMsg + (pathWarnCount
+      ? ` — ${pathWarnCount} reference${pathWarnCount > 1 ? 's' : ''} could not be followed; see the warnings list` : ''));
 
   } catch (err) {
     console.error('Conversion error:', err);
