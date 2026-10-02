@@ -2161,6 +2161,8 @@
 
       <div class="prep-step">
         <button type="button" class="prep-btn" id="btnConvertPdfs">PDF images</button>
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:6px;">
+          <input type="checkbox" id="chkAutoPdf" checked> Convert automatically after upload</label>
       </div>
 
       <div class="prep-step">
@@ -4028,6 +4030,9 @@ if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
 // Set inside setupImageHandling: the upload routes call it once an upload is in
 // (code-image-detection step 6).
 let codeFigureCheckAfterUpload = () => {};
+// Set inside setupPdfConversion (auto-pdf-conversion): the sequence's PDF stage, and whether a
+// conversion is running.
+let convertPdfsAutomatically = null, pdfConvertRunning = () => false;
 (function setupImageHandling() {
   const btn = document.getElementById('btnImageHandling');
   if (!btn) return;
@@ -4425,50 +4430,111 @@ let codeFigureCheckAfterUpload = () => {};
       updateStatus('error', 'Could not load image handling: ' + (err && err.message ? err.message : err));
     } finally { running = false; setBusy(false); }
   }
-  btn.addEventListener('click', () => extractNow());
+  btn.addEventListener('click', () => manualThenPdf());
 
-  // ── Automatic extraction after an upload (code-image-detection step 6) ──
-  // Decided (code-image-detection\NOTE-CODE-IMAGE-DETECTION.md, 2026-09-30): a checkbox next to
-  // TikZ images, starting ON. The upload routes call ONE function (codeFigureCheckAfterUpload),
-  // debounced so a main file followed by its .sty files is one event. Box ticked and figures found:
-  // exactly what the button runs (extractNow), with NO pop-up, reported in the status bar (Revert
-  // remains). Unticked: the status bar gives the count. Nothing found: no message. It listens to
-  // uploads only, so an extraction's own writes cannot set it off, and it never runs while an
-  // extraction runs: it waits and checks again. The count is the button's own plan
-  // (extraction-run.js planDocuments): the figures a press would extract.
-  // window.__lastAutoCheck after each check: { figures, notCaptured, documents, automatic, runs }.
+  // ── After an upload: code figures, then PDF images (code-image-detection step 6, ──────
+  //    auto-pdf-conversion, NOTE-AUTO-PDF-CONVERSION.md, signed off 2026-10-01) ──────
+  // A checkbox next to TikZ images and one under PDF images, both starting ON. The upload routes call
+  // ONE function (codeFigureCheckAfterUpload), debounced so a main file followed by its .sty files is
+  // one event. Then a SEQUENCE: (1) code figures: box ticked and figures found, exactly what the button
+  // runs (extractNow), no pop-up, and WAITED FOR; unticked, the count; (2) PDF images IN USE (the paths
+  // module's pdfsInUse; memoize's figures included, the rewriter having just referenced them): box
+  // ticked, converted with no pop-up (convertPdfsAutomatically), sharing the extraction's checkpoint
+  // when that extraction applied changes, so one Revert undoes both; unticked, the count. One report
+  // for the sequence; nothing found, no message; the PDF stage runs even if extraction fails. Uploads
+  // only, so neither stage's own writes set it off; never while an extraction or a conversion runs
+  // (it waits and checks again). A manual TikZ press is followed by the same PDF stage when the PDF
+  // box is ticked (manualThenPdf). Test hooks: window.__lastAutoCheck after the figure count;
+  // window.__lastAutoSequence null while a sequence runs, { report } when done.
   const chkAuto = document.getElementById('chkAutoTikz');
   const AUTO_DELAY_MS = 1500;
+  const POLICY = ', PDFs left unconverted (policy).';   // the extraction report's phrase, dropped when PDFs follow
   let autoTimer = null, autoRuns = 0;
   function scheduleCodeFigureCheck() {
     clearTimeout(autoTimer);
     autoTimer = setTimeout(checkAfterUpload, AUTO_DELAY_MS);
   }
+  const statusNow = () => {
+    const dot = document.getElementById('statusDot'), txt = document.getElementById('statusText');
+    return { level: (dot && dot.className.split(' ')[1]) || 'ready', text: txt ? txt.textContent : '' };
+  };
+  // Did the extraction just run apply its changes (and so take its checkpoint)?
+  const extractionApplied = () => !!((window.__lastProject && window.__lastProject.checkpoint) ||
+    (window.__lastApply && window.__lastApply.ok));
+  // The PDF stage. Returns { text, level } or null (nothing to do, or a conversion already running).
+  async function pdfStage({ chained }) {
+    if (!convertPdfsAutomatically) return null;
+    try { captureEditorIntoModel(); } catch {}
+    const pp = await import('./project/project-paths.js');
+    const all = projectModel.listEntries().map(e => e.path);
+    const inUse = pp.pdfsInUse({ paths: all, getText: p => projectModel.getText(p),
+      byName: !!builtInState['resolve-image-paths'] }).pdfs;
+    const svg = new Set(all.filter(p => /\.svg$/i.test(p)).map(p => p.replace(/\.svg$/i, '')));
+    const todo = inUse.filter(p => !svg.has(p.replace(/\.pdf$/i, '')));
+    if (!todo.length) return null;
+    const box = document.getElementById('chkAutoPdf');
+    if (!box || !box.checked) return { level: 'ready',
+      text: `${todo.length} PDF image${todo.length > 1 ? 's' : ''} can be converted to SVG. Press PDF images to convert ${todo.length > 1 ? 'them' : 'it'}.` };
+    window.__lastPdfConvert = undefined;
+    await convertPdfsAutomatically({ only: inUse, shareCheckpoint: chained });
+    const r = window.__lastPdfConvert;
+    if (!r) return null;
+    return { level: r.ok ? 'ready' : 'error', text: r.message || (r.error ? 'PDF conversion failed: ' + r.error : '') };
+  }
   async function checkAfterUpload() {
     autoTimer = null;
-    if (running) { scheduleCodeFigureCheck(); return; }        // after the running extraction
-    let plan;
+    if (running || pdfConvertRunning()) { scheduleCodeFigureCheck(); return; }   // after what is running
+    window.__lastAutoSequence = null;
+    const seq = { report: '' };
     try {
-      try { captureEditorIntoModel(); } catch {}
-      const run = await import('./image-extraction/extraction-run.js');
-      plan = run.planDocuments(projectModel.listEntries().map(e => e.path)
-        .map(p => ({ path: p, text: projectModel.getText(p) })).filter(f => typeof f.text === 'string'));
-    } catch (err) { console.warn('[image handling] check after upload failed:', err); return; }
-    const n = plan.documents.reduce((a, d) => a + d.figures, 0);
-    const cd = (plan.detection && plan.detection.notCaptured && plan.detection.notCaptured.tikzcd) || 0;
-    const automatic = !!(chkAuto && chkAuto.checked);
-    window.__lastAutoCheck = { figures: n, notCaptured: cd, documents: plan.documents.length, automatic, runs: ++autoRuns };
-    const cdNote = cd ? ` ${cd} commutative diagram${cd > 1 ? 's' : ''} cannot be extracted yet${n ? '' : ' and stay' + (cd > 1 ? '' : 's') + ' as code'}.` : '';
-    if (n && automatic) {
-      await extractNow({ automatic: true });
-      if (cdNote) {                                              // added to the run's own report
-        const dot = document.getElementById('statusDot'), txt = document.getElementById('statusText');
-        updateStatus((dot && dot.className.split(' ')[1]) || 'ready', (txt ? txt.textContent : '') + cdNote);
+      const parts = [];
+      let level = 'ready', chained = false, plan = null;
+      try {
+        try { captureEditorIntoModel(); } catch {}
+        const run = await import('./image-extraction/extraction-run.js');
+        plan = run.planDocuments(projectModel.listEntries().map(e => e.path)
+          .map(p => ({ path: p, text: projectModel.getText(p) })).filter(f => typeof f.text === 'string'));
+      } catch (err) { console.warn('[image handling] check after upload failed:', err); }
+      if (plan) {
+        const n = plan.documents.reduce((a, d) => a + d.figures, 0);
+        const cd = (plan.detection && plan.detection.notCaptured && plan.detection.notCaptured.tikzcd) || 0;
+        const automatic = !!(chkAuto && chkAuto.checked);
+        window.__lastAutoCheck = { figures: n, notCaptured: cd, documents: plan.documents.length, automatic, runs: ++autoRuns };
+        const cdNote = cd ? ` ${cd} commutative diagram${cd > 1 ? 's' : ''} cannot be extracted yet${n ? '' : ' and stay' + (cd > 1 ? '' : 's') + ' as code'}.` : '';
+        if (n && automatic) {
+          window.__lastApply = undefined;
+          await extractNow({ automatic: true });
+          chained = extractionApplied();
+          const s = statusNow();
+          level = s.level;
+          const pdfFollows = !!(document.getElementById('chkAutoPdf') || {}).checked;
+          parts.push((pdfFollows ? s.text.split(POLICY).join('.') : s.text) + cdNote);
+        } else if (n) {
+          parts.push(`${n} figure${n > 1 ? 's' : ''} drawn in code found. Press TikZ images to extract ${n > 1 ? 'them' : 'it'}.` + cdNote);
+        } else if (cd) parts.push(cdNote.trim());
       }
-      return;
-    }
-    if (n) updateStatus('ready', `${n} figure${n > 1 ? 's' : ''} drawn in code found. Press TikZ images to extract ${n > 1 ? 'them' : 'it'}.` + cdNote);
-    else if (cd) updateStatus('ready', cdNote.trim());
+      const pdf = await pdfStage({ chained });
+      if (pdf && pdf.text) { parts.push(pdf.text); if (pdf.level === 'error') level = 'error'; }
+      seq.report = parts.join(' ');
+      if (seq.report) updateStatus(level, seq.report);
+    } finally { window.__lastAutoSequence = seq; }
+  }
+  // The TikZ images button: the extraction, then (PDF box ticked) the same PDF stage.
+  async function manualThenPdf() {
+    if (running) return;
+    window.__lastApply = undefined;
+    await extractNow();
+    if (!(document.getElementById('chkAutoPdf') || {}).checked) return;
+    window.__lastAutoSequence = null;
+    const seq = { manual: true, report: '' };
+    try {
+      const chained = extractionApplied(), s = statusNow();
+      const pdf = await pdfStage({ chained });
+      if (pdf && pdf.text) {
+        seq.report = s.text.split(POLICY).join('.') + ' ' + pdf.text;
+        updateStatus(pdf.level === 'error' ? 'error' : s.level, seq.report);
+      }
+    } finally { window.__lastAutoSequence = seq; }
   }
   codeFigureCheckAfterUpload = scheduleCodeFigureCheck;
 })();
@@ -4505,16 +4571,17 @@ let codeFigureCheckAfterUpload = () => {};
   };
   const baseOf = (p) => (String(p).match(/([^/\\]+)$/) || [, p])[1];
 
-  btn.addEventListener('click', async () => {
+  async function convertPdfsBody(opts = {}) {
     // The editor is authoritative for the open file: read it back BEFORE
     // planning, or an unsaved edit is invisible. This was a bug once.
     try { captureEditorIntoModel(); }
     catch (e) { console.warn('[pdf-convert] captureEditorIntoModel failed', e); }
 
-    const pdfs = paths(/\.pdf$/i);
+    // opts.only (auto-pdf-conversion): the PDFs in use, from the after-upload sequence; the button: every PDF.
+    const pdfs = opts.only ? opts.only.filter(p => paths(/\.pdf$/i).includes(p)) : paths(/\.pdf$/i);
     if (!pdfs.length) {
       window.__lastPdfConvert = { ok: true, nothingToDo: true, converted: 0 };
-      updateStatus('ready', 'No PDF images in this project - nothing to convert.');
+      if (!opts.automatic) updateStatus('ready', 'No PDF images in this project - nothing to convert.');
       return;
     }
 
@@ -4589,7 +4656,7 @@ let codeFigureCheckAfterUpload = () => {};
           'references still resolve when you convert.\n\n'
         : '') +
       'One checkpoint is taken, so this can be reverted.';
-    if (!confirm(summary)) {
+    if (!opts.automatic && !confirm(summary)) {   // automatic (the sequence): no pop-up
       window.__lastPdfConvert = { ok: false, declined: true };
       updateStatus('ready', 'No changes made.');
       return;
@@ -4637,8 +4704,11 @@ let codeFigureCheckAfterUpload = () => {};
     // Apply the reference rewrites under ONE checkpoint for the whole batch.
     let rewritten = 0;
     if (totalEdits) {
-      try { projectModel.checkpointProject('Before PDF to SVG reference rewrite'); }
-      catch (e) { console.warn('[pdf-convert] checkpoint failed', e); }
+      // opts.shareCheckpoint: following an extraction that took its checkpoint, so one Revert undoes both.
+      if (!opts.shareCheckpoint) {
+        try { projectModel.checkpointProject('Before PDF to SVG reference rewrite'); }
+        catch (e) { console.warn('[pdf-convert] checkpoint failed', e); }
+      }
       for (const pl of plans) {
         if (!pl.edits.length) continue;
         const next = refs.applyReferenceRewrites(pl.text, pl.edits);
@@ -4667,16 +4737,27 @@ let codeFigureCheckAfterUpload = () => {};
       alreadyConverted: already.length, skippedPaths: already,
       refusals: totalRefusals, bytesMissing: noBytes, details: conv.details,
     };
-    updateStatus(conv.failed ? 'error' : 'ready',
+    window.__lastPdfConvert.message =
       'Converted ' + conv.converted + ' PDF(s) to SVG' +
       (conv.failed ? ', ' + conv.failed + ' failed' : '') +
       (already.length ? ', skipped ' + already.length + ' already converted' : '') +
       '; kept ' + kept + ', removed ' + dropped +
       '; rewrote ' + rewritten + ' reference(s)' +
-      (totalRefusals ? ', ' + totalRefusals + ' left alone' : '') + '.');
+      (totalRefusals ? ', ' + totalRefusals + ' left alone' : '') + '.';
+    if (!opts.automatic) updateStatus(conv.failed ? 'error' : 'ready', window.__lastPdfConvert.message);
     console.info('[pdf-convert]', window.__lastPdfConvert, plans);
     if (typeof refreshPrepareStatus === 'function') { try { refreshPrepareStatus(); } catch {} }
-  });
+  }
+  // One run at a time, button or sequence (auto-pdf-conversion).
+  let pdfRunning = false;
+  async function convertPdfsNow(opts = {}) {
+    if (pdfRunning) return;
+    pdfRunning = true;
+    try { return await convertPdfsBody(opts); } finally { pdfRunning = false; }
+  }
+  btn.addEventListener('click', () => convertPdfsNow());
+  convertPdfsAutomatically = (o = {}) => convertPdfsNow({ automatic: true, ...o });
+  pdfConvertRunning = () => pdfRunning;
 })();
 
 (function setupOverleafReceiver() {

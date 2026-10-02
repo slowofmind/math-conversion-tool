@@ -16,7 +16,7 @@ import { defaultEndpoint } from './busytex-loader.js';
 import { maskForDetection, detectCodeFigures } from './code-figure-detect.js';
 import { conversionCopies, searchFolders } from '../project/project-paths.js';
 
-export const EXTRACTION_RUN_VERSION = '0.10.0';
+export const EXTRACTION_RUN_VERSION = '0.11.0';
 
 /**
  * Versions of the modules ACTUALLY LOADED in this page. A browser can serve
@@ -40,7 +40,15 @@ export async function loadedVersions() {
   return out;
 }
 
-const EARLY_BLOCK = '\\usepackage[extract=no]{memoize}';
+// The compile cannot include an SVG ("Unknown graphics extension: .svg"), and PDF images (the button, or
+// the after-upload sequence) rewrites a reference to the .svg while KEEPING the .pdf beside it. So the
+// compile is told to use the kept PDF for an .svg reference: declared when graphics loads, or at once if
+// it already is (this block sits before the document's own packages). Compile only: the source,
+// conversion and the copies Pandoc reads are unchanged. A reference whose PDF was removed still fails,
+// as before. Measured: auto-pdf-conversion\_work\probe-svgrule*.mjs (local TeX Live and BusyTeX).
+const SVG_RULE = '\\makeatletter\\def\\atc@svgrule{\\DeclareGraphicsRule{.svg}{pdf}{.pdf}{\\noexpand\\Gin@base.pdf}}' +
+  '\\@ifpackageloaded{graphics}{\\atc@svgrule}{\\AddToHook{package/graphics/after}{\\atc@svgrule}}\\makeatother';
+const EARLY_BLOCK = '\\usepackage[extract=no]{memoize}\n' + SVG_RULE;
 
 /**
  * The early block for one master (step 5). The engine compiles every master at the ROOT

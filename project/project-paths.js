@@ -144,7 +144,8 @@ function graphicsDirs(text, refs) {
  * and before the root (documents compiled from a project folder above them, as in Overleaf
  * snapshots; subfiles whose paths are written from their main file's folder).
  * Returns { main, copies: Map(path -> text; only reached files that change), changes: [{ file,
- * line, command, from, to }], unresolved: [{ file, line, command, ref, why }], reached, ms }.
+ * line, command, from, to }], unresolved: [{ file, line, command, ref, why }], reached, images:
+ * [{ file, line, command, ref, path }] (every image reference that resolved), ms }.
  */
 export function conversionCopies({ master, paths, getText, enclosing = true }) {
   const t0 = now();
@@ -212,7 +213,7 @@ export function conversionCopies({ master, paths, getText, enclosing = true }) {
   const imageBases = [D, ...ANC, ''].flatMap(b => [b, ...gpDirs.map(g => norm(b + g)).filter(n => n !== null).map(asBase)]);
 
   // 3. Resolve images and listings; rewrite each reached file.
-  const copies = new Map();
+  const copies = new Map(), images = [];
   let main = textOf(master);
   for (const p of reached) {
     const text = textOf(p);
@@ -228,6 +229,7 @@ export function conversionCopies({ master, paths, getText, enclosing = true }) {
       const res = image ? resolve(ref, [ib, ...imageBases], imageFound) : resolve(ref, [ib, D, ...ANC, ''], plainFound);
       if (!res) { report(p, text, r, ref, 'not found'); continue; }
       r.res = res; r.ref = ref;
+      if (image) images.push({ file: p, line: lineAt(text, r.start), command: '\\' + r.cmd, ref, path: res.written });
     }
     const edits = [];
     for (const r of refsOf.get(p)) {
@@ -243,5 +245,41 @@ export function conversionCopies({ master, paths, getText, enclosing = true }) {
     for (const [a, b, s] of edits.sort((x, y) => y[0] - x[0])) out = out.slice(0, a) + s + out.slice(b);
     if (p === master) main = out; else copies.set(p, out);
   }
-  return { main, copies, changes, unresolved, reached, ms: Math.round((now() - t0) * 10) / 10 };
+  return { main, copies, changes, unresolved, reached, images, ms: Math.round((now() - t0) * 10) / 10 };
+}
+
+/**
+ * The PDFs some document in the project uses as an image (auto-pdf-conversion, decision 1): every
+ * document (a file with \documentclass) followed through what it pulls in, by the rule conversion
+ * uses; then every .tex file no document reaches, on its own (it could be converted by itself). A
+ * resolved image reference uses a PDF when the path written names an existing .pdf, or names no
+ * extension and the .pdf is there (graphicx tries .pdf first). Comments, verbatim and paths built by
+ * macros never count (they are not resolved). byName (the platform passes it when the Resolve Image
+ * Paths filter is on): an unresolved reference ending .pdf also uses the PDF of that FILE NAME at the
+ * top of the project, as that filter falls back (after its full-path .svg/.png swaps); a reference
+ * with no extension is never found that way. Returns { pdfs: sorted paths, ms }.
+ */
+export function pdfsInUse({ paths, getText, enclosing = true, byName = false }) {
+  const t0 = now();
+  const S = new Set(paths), used = new Set(), covered = new Set();
+  const texs = paths.filter(p => /\.(tex|ltx)$/i.test(p) && typeof getText(p) === 'string');
+  const isDoc = p => /\\documentclass/.test(maskForDetection(getText(p)));
+  const collect = master => {
+    const r = conversionCopies({ master, paths, getText, enclosing });
+    for (const q of r.reached) covered.add(q);
+    for (const im of r.images) {
+      const w = im.path;
+      if (/\.pdf$/i.test(w)) { if (S.has(w)) used.add(w); }
+      else if (!hasExt(w)) { for (const e of ['.pdf', '.PDF']) if (S.has(w + e)) { used.add(w + e); break; } }
+    }
+    if (byName) for (const u of r.unresolved) {        // the Resolve Image Paths filter's file-name fallback
+      if (!/includegraphics|includesvg/.test(u.command) || !/not found/.test(u.why) || !/\.pdf$/i.test(u.ref)) continue;
+      if (S.has(u.ref.replace(/\.pdf$/i, '.svg')) || S.has(u.ref.replace(/\.pdf$/i, '.png'))) continue;   // its swaps come first
+      const base = u.ref.split('/').pop();
+      if (S.has(base)) used.add(base);
+    }
+  };
+  for (const p of texs) if (isDoc(p)) collect(p);
+  for (const p of texs) if (!covered.has(p)) collect(p);
+  return { pdfs: [...used].sort(), ms: Math.round((now() - t0) * 10) / 10 };
 }
