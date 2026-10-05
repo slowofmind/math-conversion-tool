@@ -34,7 +34,12 @@
 // a definition body, a \DeclareOption body or an \ifthenelse. A command-hook
 // build finds the top-level definition and not one use — session 18 ran that
 // version first and kept its output in _work\_s18-fixture-before.txt.
-import { readDefinition, readArguments, isDefinitionForm } from "../definition.mjs";
+import { readDefinition, isDefinitionForm } from "../definition.mjs";
+// Session 63 (PLAN-7 E15, decision 5.2a): the loop that finds every use of a
+// name in every file of the chain now lives in v2/expand.mjs, shared with
+// the expander; this transform consumes it. Its 37 assertions are the proof
+// the lift was faithful.
+import { visitUses, siteOf as at } from "../expand.mjs";
 
 // Letters only: no @, so no catcode hazard wherever a call site sits.
 export const DEFAULT_MARKER = "EndMarkZZ";
@@ -82,12 +87,7 @@ export function terminatorOf(def) {
 // single control word \vfillEndMarkZZ. Session 18, from the engine probe.
 export const needsSpaceBefore = (prev) => !!prev && prev.kind === "ControlWord";
 
-const lineOf = (tokens, k) => {
-  let n = 1;
-  for (let i = 0; i < k && i < tokens.length; i++) if (tokens[i].kind === "Newline") n++;
-  return n;
-};
-const at = (file, tokens, k) => file + ":" + lineOf(tokens, k);
+// lineOf and at moved to v2/expand.mjs (lineOf, siteOf) at session 63.
 
 // ROUND 1 records; ROUND 2 acts. The chain is only complete once every file
 // has been seen, and a rewrite must never land in file 1 for a definition
@@ -164,26 +164,20 @@ export function createMarkerRewrite({ marker = DEFAULT_MARKER } = {}) {
         was: tokens[ti].text, site: at(file, tokens, ti),
         replacement: (needsSpaceBefore(tokens[ti - 1]) ? " " : "") + marker });
       const list = [mk(home.file, home.tokens, home.termIndex)];
-      let bad = null;
 
       // Every use, in every file of the chain, wherever it sits — the whole
       // token array, so a use inside a body or a \DeclareOption is found.
       // readArguments reads it by the definition's own Slot list; a site it
-      // refuses refuses the definition.
-      for (const f of b.files) {
-        for (let k = 0; k < f.tokens.length && !bad; k++) {
-          const t = f.tokens[k];
-          if (t.kind !== "ControlWord" || t.name !== name) continue;
-          if (f.file === home.file && k === home.nameIndex) continue;   // the definition's own name
-          const r = readArguments(f.tokens, k + 1, home.params);
-          if (!r) { bad = at(f.file, f.tokens, k); break; }
-          const a = r.args[home.term.slotIndex];
-          if (!a) { bad = at(f.file, f.tokens, k); break; }
-          list.push(mk(f.file, f.tokens, Math.max(a.open, a.close + 1)));
-          k = r.next - 1;                                     // never read inside a span twice
-        }
-        if (bad) break;
-      }
+      // refuses refuses the definition. The loop is the shared visitor in
+      // v2/expand.mjs (session 63, E15); the definition's own name is skipped.
+      const { bad } = visitUses(b.files,
+        { name, params: home.params, skip: (file, k) => file === home.file && k === home.nameIndex },
+        ({ file, tokens, k, args }) => {
+          const a = args[home.term.slotIndex];
+          if (!a) return at(file, tokens, k);                 // a readable site with no such slot: refuse
+          list.push(mk(file, tokens, Math.max(a.open, a.close + 1)));
+          return null;
+        });
       if (bad) {
         refuse("author-error", "left " + cs + " alone: the use at " + bad + " cannot be read — " +
           "no " + home.term.tokens[0].text + " closes it. Rewriting the definition without that " +
