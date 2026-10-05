@@ -1,0 +1,256 @@
+/*
+  canvas.css  (version 1; first published as scorm-canvas.css version 1)
+  Harvard ATC, Accessible STEM Project
+
+  Makes a Pandoc HTML document shown inside a Canvas SCORM frame look like a
+  native Canvas page. Values come from measuring canvas.harvard.edu on
+  2026-09-30 (atc-canvas-measure report).
+
+  Used INSTEAD of Pandoc's built-in styles. Pandoc's styles centre the text in
+  a narrow 36em column with 50px padding, which is what made SCORM pages look
+  like a letter-size sheet floating inside Canvas.
+
+  Fonts: Canvas's own copy of Lato cannot reach inside the frame (the frame is
+  served from a different site), so the page loads Lato from the same CDN that
+  already serves MathJax, with the four @import lines below. They must stay
+  before every other rule. If the CDN is unreachable, text falls back to
+  Helvetica or Arial, as it would in Canvas.
+
+  Platform use (2026-10-05): the "Canvas" choice in the Styling drop-down,
+  put into each page by filters/styling.lua. Choosing it also shifts
+  headings down one level. Like every stylesheet in this folder, it never
+  centres the page body with automatic margins (see standalone.css).
+*/
+
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/lato@5.3.0/400.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/lato@5.3.0/400-italic.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/lato@5.3.0/700.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/lato@5.3.0/700-italic.css");
+
+/* ---- Page ------------------------------------------------------------- */
+
+html {
+  background: #ffffff;           /* Canvas page background */
+  color: #273540;                /* Canvas text colour */
+  font-size: 100%;               /* 16px, same as Canvas */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  /* Canvas already puts padding around the frame, so the document adds
+     almost none. The few pixels on each side stop keyboard focus outlines
+     from being cut off at the frame's edge. */
+  padding: 4px 6px 24px;
+  font-family: "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #273540;
+  overflow-wrap: break-word;
+}
+
+/* Canvas shows the page title above the frame, so the document's own title
+   block (title, author, date) would repeat it. Hidden from everyone,
+   including screen readers, so the title is not announced twice. */
+#title-block-header {
+  display: none;
+}
+
+/* ---- Headings: regular weight, as in Canvas --------------------------- */
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 6px 0;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.5;
+  color: #273540;
+}
+/* Canvas reserves h1 for the page title, so content normally starts at h2.
+   If a document still contains h1 headings, they get one step up from h2. */
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.8rem; }        /* 28.8px */
+h3 { font-size: 1.5rem; }        /* 24px */
+h4 { font-size: 1.125rem; }      /* 18px */
+h5 { font-size: 1rem; }          /* 16px */
+h6 { font-size: 0.75rem; }       /* 12px */
+
+/* ---- Text ------------------------------------------------------------- */
+
+p {
+  margin: 12px 0;
+}
+
+a,
+a:visited {
+  color: #09508c;                /* Canvas link colour */
+  text-decoration: underline;
+}
+a:hover {
+  color: #09487e;
+}
+
+strong, b { font-weight: 700; }
+
+sub, sup {
+  line-height: 0;                /* keeps footnote marks from spreading lines apart */
+}
+
+:focus-visible {
+  outline: 2px solid #0a5a9e;    /* Canvas brand blue */
+  outline-offset: 2px;
+}
+
+/* ---- Lists ------------------------------------------------------------ */
+
+ul, ol {
+  margin: 0 0 6px 25px;
+  padding: 0;
+}
+li > ul,
+li > ol {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+/* Pandoc puts each list item's text in a paragraph. A little less space
+   than between ordinary paragraphs keeps problem parts grouped. */
+li > p {
+  margin: 6px 0;
+}
+/* No list-style rules here on purpose: Pandoc marks lettered and roman
+   lists with a type attribute, and a CSS rule would override it. */
+
+/* ---- Quotes, code, rules ---------------------------------------------- */
+
+blockquote {
+  margin: 0 0 20px;
+  padding: 0 0 0 15px;
+  border-left: 5px solid #e8eaec;
+  color: #273540;
+}
+
+code {
+  padding: 2px 4px;
+  border: 1px solid #e8eaec;
+  border-radius: 6px;
+  background: #f2f4f4;
+  color: #c71f23;
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-size: 0.75rem;
+}
+
+pre {
+  margin: 0 0 12px;
+  padding: 9px;
+  border: 1px solid #e8eaec;
+  border-radius: 6px;
+  background: #f2f4f4;
+  color: #273540;
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+hr {
+  height: 0;
+  margin: 20px 0;
+  border: 0;
+  border-top: 1px solid #e8eaec;
+}
+
+/* ---- Tables ----------------------------------------------------------- */
+/* Canvas's bare default has no borders at all. These light borders match
+   tables made with Canvas's table button and are easier to read. The table
+   keeps its normal display type, so screen readers still treat it as a
+   table. */
+
+table {
+  margin: 12px 0;
+  border-collapse: collapse;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+caption {
+  caption-side: top;
+  padding-bottom: 6px;
+  text-align: center;
+}
+th, td {
+  padding: 4px 8px;
+  border: 1px solid #c7cdd1;
+  vertical-align: top;
+}
+th {
+  font-weight: 700;
+  background: #f5f5f5;
+}
+
+/* ---- Images and figures ----------------------------------------------- */
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+/* Scales figures made as SVG, but leaves alone any SVG that MathJax uses
+   for math, whose sizes MathJax sets itself. */
+svg:not(mjx-container svg) {
+  max-width: 100%;
+  height: auto;
+}
+figure {
+  margin: 12px 0;
+}
+figcaption {
+  margin-top: 6px;
+  font-size: 0.875rem;
+  color: #47535c;
+}
+
+/* ---- Math ------------------------------------------------------------- */
+/* A displayed equation too wide for the frame scrolls sideways on its own,
+   instead of widening the whole page. */
+mjx-container[display="true"],
+math[display="block"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* ---- Footnotes -------------------------------------------------------- */
+
+section.footnotes {
+  margin-top: 24px;
+  font-size: 0.875rem;
+}
+
+/* ---- Small Pandoc helpers, kept from Pandoc's own stylesheet ----------- */
+
+span.smallcaps { font-variant: small-caps; }
+div.columns { display: flex; gap: min(4vw, 1.5em); }
+div.column { flex: auto; overflow-x: auto; }
+div.hanging-indent { margin-left: 1.5em; text-indent: -1.5em; }
+ul.task-list[class] { list-style: none; }
+ul.task-list li input[type="checkbox"] {
+  font-size: inherit;
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+#TOC li { list-style: none; }
+#TOC ul { padding-left: 1.3em; }
+#TOC > ul { padding-left: 0; margin-left: 0; }
+
+/* ---- Print ------------------------------------------------------------ */
+
+@media print {
+  html, body { background: #ffffff; color: #000000; }
+  a { color: #000000; }
+}

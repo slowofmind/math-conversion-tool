@@ -2756,14 +2756,25 @@ function Pandoc(doc)
     head[#head + 1] = TOGGLE_STYLE
     head[#head + 1] = TOGGLE_SCRIPT
   end
-  if FIX_MENU_CSS then
+  -- The menu fix can be switched per document with the metadata field
+  -- mjx-menu-fix (true/false). The platform's styling filter (styling.lua)
+  -- sets it to false, because its stylesheets never centre the body, so
+  -- the bug cannot occur. Not set: FIX_MENU_CSS decides, as before.
+  local fix_menu = FIX_MENU_CSS
+  local mv = doc.meta['mjx-menu-fix']
+  if type(mv) == 'boolean' then
+    fix_menu = mv
+  elseif mv ~= nil then
+    fix_menu = pandoc.utils.stringify(mv):lower() == 'true'
+  end
+  if fix_menu then
     head[#head + 1] = MENU_FIX_STYLE
   end
   append_header_includes(doc.meta, head)
 
   -- 3. Menu fix, markup half: wrap the document content in the centered
   --    column the CSS above styles.
-  if FIX_MENU_CSS then
+  if fix_menu then
     doc.blocks = pandoc.Blocks({
       pandoc.Div(doc.blocks, pandoc.Attr(MENU_FIX_ID)),
     })

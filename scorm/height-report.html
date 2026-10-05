@@ -1,0 +1,40 @@
+<script>
+/* ATC SCORM height report (version 1).
+   Canvas sizes a SCORM frame from settings saved in the page, so this
+   document tells the surrounding windows how tall it is. The ATC
+   "Fix SCORM frames" bookmark listens for atc.documentHeight; Canvas's own
+   lti.frameResize is sent too, in case Canvas ever starts honouring it.
+   It reports again whenever its height changes, for example on zoom. */
+(function () {
+  'use strict';
+  var MARGIN = 16;
+  var lastSent = 0;
+  function send() {
+    var h = Math.ceil(document.body.getBoundingClientRect().height) + MARGIN;
+    if (Math.abs(h - lastSent) < 2) { return; }
+    lastSent = h;
+    var messages = [
+      { subject: 'atc.documentHeight', height: h, title: document.title },
+      { subject: 'lti.frameResize', height: h }
+    ];
+    var w = window;
+    for (var i = 0; i < 10 && w.parent && w.parent !== w; i++) {
+      w = w.parent;
+      for (var j = 0; j < messages.length; j++) {
+        try { w.postMessage(messages[j], '*'); } catch (e) { /* ignore */ }
+      }
+    }
+  }
+  function start() {
+    send();
+    if (window.MathJax && MathJax.startup && MathJax.startup.promise) { MathJax.startup.promise.then(send); }
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(send); }
+    window.addEventListener('load', send);
+    if (window.ResizeObserver) {
+      var timer = null;
+      new ResizeObserver(function () { clearTimeout(timer); timer = setTimeout(send, 200); }).observe(document.body);
+    }
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', start); } else { start(); }
+})();
+</script>

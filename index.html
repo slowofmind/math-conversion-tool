@@ -898,6 +898,13 @@
   #btnDownloadOutput:hover { background: var(--harvard-blue); color: #fff; }
   #btnDownloadScorm { color: var(--harvard-blue); border-color: var(--harvard-blue); font-size: 11px; }
   #btnDownloadScorm:hover { background: var(--harvard-blue); color: #fff; }
+  /* Unavailable Download/SCORM (2026-10-05): stay visible and in the Tab order,
+     greyed out; setActionAvailable() sets aria-disabled="true". The dashed
+     border is a cue that does not rely on colour. #666 on #f5f5f5 is 5.27:1. */
+  #btnDownloadOutput[aria-disabled="true"], #btnDownloadOutput[aria-disabled="true"]:hover,
+  #btnDownloadScorm[aria-disabled="true"], #btnDownloadScorm[aria-disabled="true"]:hover {
+    color: var(--text-muted); background: none; border: 1px dashed var(--border); cursor: not-allowed;
+  }
 
   .output-body { flex: 1; overflow: auto; background: var(--bg-primary); }
 
@@ -1459,6 +1466,8 @@
        second label pointing at the same id once the control moves in. -->
   <div id="coreOptions">
     <label class="core-label">Math rendering: <span id="core-slot-math"></span></label>
+    <label class="core-label"><span class="style-label-text">Styling</span>: <span id="core-slot-style"></span></label>
+    <span class="core-note" id="styleNote" role="status"></span>
     <span class="core-note" id="coreViewNote" role="status" aria-live="polite"></span>
   </div>
 
@@ -1633,6 +1642,15 @@
           <option value="mathjax4">MathJax (script tag)</option>
           <option value="katex">KaTeX</option>
           <option value="plain">Unicode</option>
+        </select>
+      </div>
+      <div class="opt-group" id="pandoc-slot-style">
+        <label for="opt-style"><span class="style-label-text">Styling</span>:</label>
+        <select id="opt-style" style="width:auto;" aria-describedby="styleNote">
+          <!-- Rebuilt at runtime by refreshStyleOptions() to match the
+               selected output format. Initial entries: the HTML list. -->
+          <option value="standalone" selected>Standalone</option>
+          <option value="canvas">Canvas</option>
         </select>
       </div>
     </div>
@@ -2355,12 +2373,17 @@
         <button class="output-tab" data-tab="source" role="tab" id="outtab-source" aria-selected="false" aria-controls="tabSource" tabindex="-1">Source</button>
         <button class="output-tab" data-tab="intent" role="tab" id="outtab-intent" aria-selected="false" aria-controls="tabIntent" tabindex="-1">Intent</button>
         <button class="output-tab" data-tab="preprocess" role="tab" id="outtab-preprocess" aria-selected="false" aria-controls="tabPreprocess" tabindex="-1">Preprocess</button>
-        <button class="output-tab-action" id="btnDownloadOutput" title="Download output" aria-label="Download output" style="display:none;">📥 Download</button>
-        <button class="output-tab-action" id="btnDownloadScorm" title="Download as SCORM package for Canvas LMS" aria-label="Download as SCORM package" style="display:none;">📦 SCORM</button>
+        <button class="output-tab-action" id="btnDownloadOutput" title="Convert a document first." data-title-available="Download output" aria-label="Download output" aria-disabled="true" aria-describedby="btnDownloadOutputWhy">📥 Download</button>
+        <button class="output-tab-action" id="btnDownloadScorm" title="Convert a document first." data-title-available="Download as SCORM package for Canvas LMS" aria-label="Download as SCORM package" aria-disabled="true" aria-describedby="btnDownloadScormWhy">📦 SCORM</button>
         <span id="mathSubtitlesBox" style="display:none;" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles"><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
         <span class="output-tab-spacer"></span>
         <button class="output-tab-action" id="btnOutputClose" title="Hide panel" aria-label="Close output panel">×</button>
       </div>
+      <!-- Why Download/SCORM is unavailable: read as the button's description
+           (aria-describedby). Hidden, so never shown or read on its own;
+           setActionAvailable() keeps the text current. -->
+      <span id="btnDownloadOutputWhy" hidden>Convert a document first.</span>
+      <span id="btnDownloadScormWhy" hidden>Convert a document first.</span>
       <div class="output-body">
         <div class="tab-content active" id="tabPreview" role="tabpanel" aria-labelledby="outtab-preview">
           <iframe id="previewFrame" sandbox="allow-scripts" title="HTML preview"></iframe>
@@ -2729,6 +2752,120 @@ const MATH_METHODS = {
 // previous family's list on screen.
 const MATH_METHODS_NA = [['', 'Not applicable for this output format']];
 
+// ── Styling (decided 2026-10-05) ────────────────────────────────────
+// The "Styling" drop-down after Math rendering. Like MATH_METHODS, its list
+// follows the output format. Each HTML entry names a stylesheet in ./styles/;
+// filters/styling.lua puts it into every page (Chunked HTML included) and
+// switches Pandoc's own styles off. Rule for every stylesheet listed: never
+// centre the page body with automatic margins plus a maximum width (that is
+// what breaks MathJax's right-click submenus); styling.lua relies on it to
+// switch the intent filter's menu fix off. To add a style: put the file in
+// ./styles/ and add one line here. DOCX shows the same control as
+// "Reference document"; its list is a placeholder until reference documents
+// are added (an entry without `file` applies nothing).
+const STYLES = {
+  html: [
+    { id: 'standalone', label: 'Standalone', file: 'standalone.css' },
+    { id: 'canvas', label: 'Canvas', file: 'canvas.css', headingShift: 1,
+      note: 'Canvas style: headings start at level 2, as on a Canvas page.' }
+  ],
+  docx: [
+    { id: 'pandoc-default', label: 'Pandoc default' }
+  ]
+};
+const STYLE_LABELS = { html: 'Styling', docx: 'Reference document' };
+const STYLES_NA = [{ id: '', label: 'Not applicable for this output format' }];
+const STYLE_FILES_URL = './styles/';
+const STYLING_FILTER_URL = './filters/styling.lua';
+const STYLING_FILTER_NAME = '_atc-styling.lua';
+const STYLE_SHEET_NAME = 'atc-style-sheet.css';   // the file name styling.lua reads
+const stylingAssets = { filter: null, css: {} };   // fetched once, then reused
+let styleShiftSetTo = null;                        // heading shift a style set, if any
+
+// The style entry an id means for an output format, or null.
+function styleEntryFor(fmt, id) {
+  const fam = mathFamilyFor(fmt);
+  const list = (fam && STYLES[fam]) || [];
+  return list.find(s => s.id === id) || null;
+}
+
+// The HTML stylesheet entry this conversion applies, or null.
+function activeStyle() {
+  const fmt = document.getElementById('selTo')?.value;
+  const e = styleEntryFor(fmt, document.getElementById('opt-style')?.value);
+  return (e && e.file && mathFamilyFor(fmt) === 'html') ? e : null;
+}
+
+// Heading-shift rule (decided 2026-10-05: choosing Canvas shifts headings
+// automatically). current = the "Shift heading level by" value now; want =
+// the chosen style's headingShift (none: falsy); setTo = the value a style
+// set earlier (null if none). Never overrides a value chosen by hand.
+// Returns { value, setTo }.
+function nextHeadingShift(current, want, setTo) {
+  if (want) {
+    if (current === '0') return { value: String(want), setTo: String(want) };
+    if (current === setTo) return { value: current, setTo };
+    return { value: current, setTo: null };
+  }
+  if (setTo && current === setTo) return { value: '0', setTo: null };
+  return { value: current, setTo: null };
+}
+
+// Show the chosen style's note, and set or undo its heading shift.
+function applyStyleSideEffects() {
+  const fmt = document.getElementById('selTo')?.value;
+  const e = styleEntryFor(fmt, document.getElementById('opt-style')?.value);
+  const shiftEl = document.getElementById('opt-shift-heading');
+  if (shiftEl) {
+    const r = nextHeadingShift(shiftEl.value, e && e.headingShift, styleShiftSetTo);
+    shiftEl.value = r.value;
+    styleShiftSetTo = r.setTo;
+  }
+  const note = document.getElementById('styleNote');
+  if (note) note.textContent = (e && e.note) || '';
+}
+
+// Rebuild the Styling drop-down for the current output format, as
+// refreshMathOptions does for math. Keeps the choice when still offered.
+function refreshStyleOptions() {
+  const sel = document.getElementById('opt-style');
+  if (!sel) return;
+  const fam = mathFamilyFor(document.getElementById('selTo')?.value);
+  const applicable = !!(fam && STYLES[fam]);
+  const list = applicable ? STYLES[fam] : STYLES_NA;
+  const prev = sel.value;
+  sel.innerHTML = '';
+  for (const s of list) {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.label;
+    sel.appendChild(opt);
+  }
+  sel.value = list.some(s => s.id === prev) ? prev : list[0].id;
+  sel.disabled = !applicable;
+  const text = STYLE_LABELS[fam] || 'Styling';
+  document.querySelectorAll('.style-label-text').forEach(el => { el.textContent = text; });
+  applyStyleSideEffects();
+}
+
+// Fetch styling.lua and a style's stylesheet (once each). No style: nothing.
+async function ensureStylingAssets(entry) {
+  if (!entry || !entry.file) return;
+  if (!stylingAssets.filter) {
+    const r = await fetch(STYLING_FILTER_URL);
+    if (!r.ok) throw new Error(STYLING_FILTER_URL + ' not found (HTTP ' + r.status + ')');
+    stylingAssets.filter = await r.text();
+  }
+  if (!stylingAssets.css[entry.file]) {
+    const url = STYLE_FILES_URL + entry.file;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(url + ' not found (HTTP ' + r.status + ')');
+    stylingAssets.css[entry.file] = await r.text();
+  }
+}
+
+document.getElementById('opt-style')?.addEventListener('change', applyStyleSideEffects);
+
 // Move a control into a container without cloning it, so there is never a
 // second copy of the selection.
 function relocateControl(id, targetId) {
@@ -2746,6 +2883,7 @@ function applyOptionsView() {
   panel.classList.toggle('view-pandoc', !core);
 
   relocateControl('opt-math', core ? 'core-slot-math' : 'pandoc-slot-math');
+  relocateControl('opt-style', core ? 'core-slot-style' : 'pandoc-slot-style');
 
   const selTo = document.getElementById('selTo');
   const selMath = document.getElementById('opt-math');
@@ -2800,6 +2938,7 @@ function refreshMathOptions() {
   sel.disabled = !applicable;
   const lbl = document.querySelector('label[for="opt-math"]');
   if (lbl) lbl.style.opacity = applicable ? '' : '0.55';
+  refreshStyleOptions();   // the Styling list follows the output format too
 }
 
 function populateFormats(selectId, formats, defaultVal, labels) {
@@ -5884,8 +6023,8 @@ function clearBinaryInput() {
 document.getElementById('btnClearBinary').addEventListener('click', clearBinaryInput);
 
 // Download button handler
-document.getElementById('btnDownloadOutput').addEventListener('click', () => {
-  if (!lastOutput) return;
+document.getElementById('btnDownloadOutput').addEventListener('click', (e) => {
+  if (isActionUnavailable(e.currentTarget) || !lastOutput) return;
   // Clean up previous URL if any
   if (lastOutput.objectUrl) URL.revokeObjectURL(lastOutput.objectUrl);
   const url = URL.createObjectURL(lastOutput.blob);
@@ -5904,11 +6043,59 @@ document.getElementById('btnDownloadOutput').addEventListener('click', () => {
 // This bypasses Canvas LMS script restrictions, allowing MathJax to run.
 
 /**
+ * Whether the SCORM button is offered for a conversion's output format
+ * (base format, extensions already stripped). Decided 2026-10-05: single-page
+ * HTML (HTML, HTML5, HTML4) with ANY math method; Chunked HTML added the same
+ * day (Pandoc's zip is opened and repackaged; see makeScormPackage). Slide
+ * formats also write .html files but are deliberately not offered.
+ */
+function scormAvailableFor(baseFmt) {
+  return ['html', 'html5', 'html4', 'chunkedhtml'].includes(baseFmt);
+}
+
+/** Why SCORM is unavailable for an output format (for the greyed-out button). */
+function scormUnavailableReason(baseFmt) {
+  return 'SCORM packages are made from HTML or Chunked HTML output. Convert to one of those to make one.';
+}
+
+/**
+ * Make an output action button (Download, SCORM) available or unavailable.
+ * Decided 2026-10-05: grey out rather than hide. An unavailable button stays
+ * visible and in the Tab order with aria-disabled="true"; its reason goes in
+ * the hidden <span id="(button id)Why"> that describes it, and in its tooltip.
+ * aria-disabled does not block clicks, so each click handler checks
+ * isActionUnavailable() first. The available tooltip is data-title-available.
+ */
+function setActionAvailable(btn, available, reason) {
+  if (!btn) return;
+  const why = document.getElementById(btn.id + 'Why');
+  if (available) {
+    btn.removeAttribute('aria-disabled');
+    btn.removeAttribute('aria-describedby');
+    btn.title = btn.dataset.titleAvailable || '';
+    if (why) why.textContent = '';
+  } else {
+    btn.setAttribute('aria-disabled', 'true');
+    if (why) { why.textContent = reason; btn.setAttribute('aria-describedby', why.id); }
+    btn.title = reason;
+  }
+}
+
+function isActionUnavailable(btn) {
+  return !!btn && btn.getAttribute('aria-disabled') === 'true';
+}
+
+/**
  * Build an uncompressed ZIP file from an array of {name, data} entries.
  * data must be Uint8Array. Returns a Uint8Array of the complete zip.
  */
-function buildZip(entries) {
+function buildZip(entries, when = new Date()) {
   const enc = new TextEncoder();
+  // Every entry is stamped with `when` as an MS-DOS date and time (the zip
+  // format's own, 2-second resolution). Until 2026-10-05 these were left at
+  // zero, which is not a valid date.
+  const dosTime = (when.getHours() << 11) | (when.getMinutes() << 5) | (when.getSeconds() >> 1);
+  const dosDate = ((when.getFullYear() - 1980) << 9) | ((when.getMonth() + 1) << 5) | when.getDate();
   const localHeaders = [];
   const centralHeaders = [];
   let offset = 0;
@@ -5931,6 +6118,8 @@ function buildZip(entries) {
     lv.setUint32(0, 0x04034b50, true);  // signature
     lv.setUint16(4, 20, true);          // version needed
     lv.setUint16(8, 0, true);           // compression: STORE
+    lv.setUint16(10, dosTime, true);    // modification time
+    lv.setUint16(12, dosDate, true);    // modification date
     lv.setUint32(14, crc, true);        // crc-32
     lv.setUint32(18, data.length, true); // compressed size
     lv.setUint32(22, data.length, true); // uncompressed size
@@ -5945,7 +6134,9 @@ function buildZip(entries) {
     cv.setUint32(0, 0x02014b50, true);   // signature
     cv.setUint16(4, 20, true);           // version made by
     cv.setUint16(6, 20, true);           // version needed
-    cv.setUint16(12, 0, true);           // compression: STORE
+    cv.setUint16(10, 0, true);           // compression: STORE
+    cv.setUint16(12, dosTime, true);     // modification time
+    cv.setUint16(14, dosDate, true);     // modification date
     cv.setUint32(16, crc, true);
     cv.setUint32(20, data.length, true);
     cv.setUint32(24, data.length, true);
@@ -5981,13 +6172,107 @@ function buildZip(entries) {
 }
 
 /**
- * Generate a SCORM 2004 imsmanifest.xml for a single HTML asset.
+ * The name a SCORM package goes by (decided 2026-10-05): the document's title
+ * metadata if it has any, otherwise the file name. Pandoc writes a title block
+ * (<h1 class="title">) only when there is title metadata; without it, the page
+ * <title> is just "-" for text sent on stdin, as the platform sends it.
+ * The name becomes the Canvas page name, which the Fix SCORM frames
+ * bookmarklet also offers as the frame's title.
  */
-function generateScormManifest(title) {
+function scormPackageName(htmlText, fileBase) {
+  const hasTitle = /<h1 class="title"/i.test(htmlText);
+  const m = htmlText.match(/<title>([\s\S]*?)<\/title>/i);
+  const title = (hasTitle && m) ? m[1]
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
+    .replace(/&#39;|&#x27;/g, "'").replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ').trim() : '';
+  return title || fileBase;
+}
+
+/**
+ * Adds the height-report script (scorm/height-report.html) to a SCORM page,
+ * just before </body>. The script tells the windows around the page how tall
+ * it is; the Fix SCORM frames bookmarklet uses that to size Canvas's frame.
+ * Added to SCORM packages only, so ordinary HTML downloads stay unchanged.
+ */
+function addScormHeightReport(htmlText, scriptHtml) {
+  const i = htmlText.lastIndexOf('</body>');
+  return i < 0 ? htmlText + scriptHtml : htmlText.slice(0, i) + scriptHtml + htmlText.slice(i);
+}
+
+const SCORM_HEIGHT_REPORT_URL = './scorm/height-report.html';
+
+/**
+ * Every file in a zip (folder entries skipped), as [{ name, data }] with data
+ * a Uint8Array, in the zip's own order. Uses JSZip, which the page already
+ * loads for EPUB work. Opens Pandoc's Chunked HTML zip for SCORM packaging.
+ */
+async function readZipFiles(bytes) {
+  const JSZipCtor = window.JSZip;
+  if (!JSZipCtor) throw new Error('JSZip unavailable');
+  const zin = await JSZipCtor.loadAsync(bytes);
+  const out = [];
+  for (const entry of Object.values(zin.files)) {
+    if (entry.dir) continue;
+    out.push({ name: entry.name, data: await entry.async('uint8array') });
+  }
+  return out;
+}
+
+/**
+ * A SCORM package (zip bytes) from a list of files [{ name, data }]: the one
+ * page of single-page HTML, or every file of Pandoc's Chunked HTML zip
+ * (decided 2026-10-05). imsmanifest.xml goes at the top level and lists every
+ * file, launch page first; one already in the list is replaced. heightScript,
+ * if given, goes before </body> in every .html page. Entries are dated `when`.
+ * Throws if the launch page is missing, so no broken package is made.
+ */
+function makeScormPackage({ name, files, launch, heightScript, when }) {
+  const enc = new TextEncoder();
+  const dec = new TextDecoder();
+  const content = files.filter(f => f.name !== 'imsmanifest.xml').map(f =>
+    (heightScript && /\.html?$/i.test(f.name))
+      ? { name: f.name, data: enc.encode(addScormHeightReport(dec.decode(f.data), heightScript)) }
+      : f);
+  const first = content.find(f => f.name === launch);
+  if (!first) throw new Error('launch page ' + launch + ' is not in the output');
+  const ordered = [first, ...content.filter(f => f !== first)];
+  const manifest = generateScormManifest({
+    identifier: scormIdentifier(name),
+    title: name,
+    files: ordered.map(f => f.name),
+    launch
+  });
+  return buildZip([{ name: 'imsmanifest.xml', data: enc.encode(manifest) }, ...ordered], when);
+}
+
+/**
+ * Manifest identifier (decided 2026-10-05): the package name + "SCORM".
+ * The schema types it as an XML ID, so accents are dropped, any run of
+ * characters other than letters, digits, "." "_" "-" becomes one "-", and a
+ * name that would start with a digit (or other non-letter) gets a leading "_".
+ * Two documents with the same title get the same identifier (accepted).
+ */
+function scormIdentifier(name) {
+  const base = String(name || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^[-.]+|[-.]+$/g, '') || 'document';
+  return (/^[A-Za-z_]/.test(base) ? '' : '_') + base + '-SCORM';
+}
+
+/**
+ * SCORM 2004 imsmanifest.xml for a package of web files. Takes a list of
+ * files (2026-10-05) so Chunked HTML can reuse it: every file goes in the one
+ * resource, and `launch` is the page Canvas opens. Canvas reads the manifest
+ * once, at import: it sets the page name, not the page's look.
+ */
+function generateScormManifest({ identifier, title, files, launch }) {
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const fileLines = files.map((f) => `      <file href="${esc(f)}"/>`).join('\n');
   return `<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
           xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"
-          identifier="harvard-atc-pandoc-scorm"
+          identifier="${esc(identifier)}"
           version="1.0">
   <metadata>
     <schema>ADL SCORM</schema>
@@ -5995,59 +6280,70 @@ function generateScormManifest(title) {
   </metadata>
   <organizations>
     <organization identifier="org1">
-      <title>${title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</title>
+      <title>${esc(title)}</title>
       <item identifier="item1" identifierref="resource1">
-        <title>${title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</title>
+        <title>${esc(title)}</title>
       </item>
     </organization>
   </organizations>
   <resources>
-    <resource identifier="resource1" type="webcontent" adlcp:scormType="asset" href="index.html">
-      <file href="index.html"/>
+    <resource identifier="resource1" type="webcontent" adlcp:scormType="asset" href="${esc(launch)}">
+${fileLines}
     </resource>
   </resources>
 </manifest>`;
 }
 
 // SCORM download button handler
-document.getElementById('btnDownloadScorm').addEventListener('click', () => {
-  if (!lastOutput) return;
+document.getElementById('btnDownloadScorm').addEventListener('click', async (e) => {
+  if (isActionUnavailable(e.currentTarget) || !lastOutput) return;
+  try {
+    // The files to package: the one page of single-page HTML, or every file
+    // in Pandoc's Chunked HTML zip (opened with JSZip).
+    const bytes = new Uint8Array(await lastOutput.blob.arrayBuffer());
+    const isZip = /\.zip$/i.test(lastOutput.filename);
+    const files = isZip ? await readZipFiles(bytes) : [{ name: 'index.html', data: bytes }];
+    const launchFile = files.find(f => f.name === 'index.html');
+    if (!launchFile) throw new Error('the output has no index.html at its top level');
 
-  const enc = new TextEncoder();
+    // Package name: the title metadata if any, else the file name; the
+    // identifier is that name + "SCORM" (see scormPackageName, scormIdentifier).
+    const baseName = lastOutput.filename.replace(/\.\w+$/, '');
+    const name = scormPackageName(new TextDecoder().decode(launchFile.data), baseName);
 
-  // Get the HTML content
-  const htmlBlob = lastOutput.blob;
-  const reader = new FileReader();
-  reader.onload = () => {
-    const htmlBytes = new Uint8Array(reader.result);
+    // Height report for the Fix SCORM frames bookmarklet: single-page output
+    // only (decided 2026-10-05). In a Chunked HTML package the bookmarklet
+    // would measure the short first page and longer sections would scroll;
+    // without the script it falls back to a tall suggested height, which
+    // fitted every page in Nicholas's Canvas test. Flag, don't fail: without
+    // the script the package still works.
+    let heightScript = '';
+    if (!isZip) {
+      try {
+        const r = await fetch(SCORM_HEIGHT_REPORT_URL);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        heightScript = await r.text();
+      } catch (err) {
+        console.warn('SCORM: height report not added (' + SCORM_HEIGHT_REPORT_URL + '):', err);
+      }
+    }
 
-    // Extract title from the HTML for the manifest
-    const htmlText = new TextDecoder().decode(htmlBytes);
-    const titleMatch = htmlText.match(/<title>([\s\S]*?)<\/title>/i);
-    const title = titleMatch ? titleMatch[1].trim() : lastOutput.filename.replace(/\.\w+$/, '');
-
-    // Build the manifest
-    const manifestXml = generateScormManifest(title);
-    const manifestBytes = enc.encode(manifestXml);
-
-    // Create the zip
-    const zipData = buildZip([
-      { name: 'imsmanifest.xml', data: manifestBytes },
-      { name: 'index.html', data: htmlBytes }
-    ]);
+    // Manifest listing every file, all entries dated now (see makeScormPackage)
+    const zipData = makeScormPackage({ name, files, launch: 'index.html', heightScript, when: new Date() });
 
     // Trigger download
     const blob = new Blob([zipData], { type: 'application/zip' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const baseName = lastOutput.filename.replace(/\.\w+$/, '');
     a.download = `${baseName}-scorm.zip`;
     a.click();
     URL.revokeObjectURL(url);
     maybeExportProfileWithOutput();
-  };
-  reader.readAsArrayBuffer(htmlBlob);
+  } catch (err) {
+    console.error('SCORM package failed:', err);
+    updateStatus('error', 'SCORM package not made: ' + (err && err.message ? err.message : err));
+  }
 });
 
 // 1x1 transparent PNG placeholder for missing images
@@ -6399,6 +6695,9 @@ function buildOptions() {
         }
       }
     }
+    // Styling filter (Styling drop-down). Before the intent filter, which
+    // reads the mjx-menu-fix setting the styling filter leaves in the metadata.
+    if (activeStyle()) filterNames.push(STYLING_FILTER_NAME);
     // Intent/SRE filter — MUST precede the device filter: _mjx-math.lua
     // replaces every Math element with a placeholder RawInline, so anything
     // running after it sees no math and injects nothing.
@@ -6452,6 +6751,12 @@ function buildFiles() {
   // MathJax device filter content (docx→OMML / html→MathML)
   if (needsMathjaxDevice()) raw['_mjx-math.lua'] = new Blob([MJX_MATH_LUA], { type: 'text/plain' });
   // Intent/SRE filter source, fetched from ./filters/ (not embedded)
+  // Styling filter and the chosen stylesheet, fetched from ./filters/ and ./styles/
+  const chosenStyle = activeStyle();
+  if (chosenStyle && stylingAssets.filter && stylingAssets.css[chosenStyle.file]) {
+    raw[STYLING_FILTER_NAME] = new Blob([stylingAssets.filter], { type: 'text/plain' });
+    raw[STYLE_SHEET_NAME] = new Blob([stylingAssets.css[chosenStyle.file]], { type: 'text/css' });
+  }
   if (needsIntentFilter() && intentFilterSource) raw[INTENT_FILTER_NAME] = new Blob([intentFilterSource], { type: 'text/plain' });
   // Thorium preset: virtual header carrying the MathJax bootstrap
   if (isThoriumPreset() && thoriumAssets.headHtml) raw[THORIUM_HEAD_NAME] = new Blob([thoriumAssets.headHtml], { type: 'text/html' });
@@ -6944,6 +7249,8 @@ async function runConversion() {
     if (isThoriumPreset()) { updateStatus('loading', 'Loading Thorium EPUB assets…'); await ensureThoriumAssets(); }
     if (needsIntentFilter()) { updateStatus('loading', 'Loading intent/SRE filter…'); await ensureIntentFilter(); }
 
+    // Styling drop-down: fetch styling.lua and the chosen stylesheet (no style: nothing)
+    await ensureStylingAssets(activeStyle());
     const options = buildOptions();
     const files = buildFiles();
     // Project paths: the text Pandoc reads, and copies of what it reaches (see conversionPathCopies).
@@ -7076,8 +7383,8 @@ async function runConversion() {
 
       lastOutput = { blob, filename: outName };
       downloadBtn.textContent = `📥 ${outName} (${sizeKB} KB)`;
-      downloadBtn.style.display = '';
-      scormBtn.style.display = 'none';
+      setActionAvailable(downloadBtn, true);
+      setActionAvailable(scormBtn, scormAvailableFor(baseToFmt), scormUnavailableReason(baseToFmt));
       clearPreviewHtml();   // MathCAT proofing: not HTML
 
       sourceEditor.setText(`[Binary output: ${outName} (${sizeKB} KB)]\nUse the download button to save this file.`);
@@ -7138,11 +7445,12 @@ async function runConversion() {
       const sizeKB = (blob.size / 1024).toFixed(1);
       lastOutput = { blob, filename: outFileName };
       downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
-      downloadBtn.style.display = '';
+      setActionAvailable(downloadBtn, true);
 
-      // Show SCORM download option only for HTML output with MathJax 4
-      const isHtmlOutput = /\.html?$/i.test(outFileName);
-      scormBtn.style.display = (isHtmlOutput && mathMethod === 'mathjax4') ? '' : 'none';
+      // SCORM: available for single-page HTML output, any math method (see
+      // scormAvailableFor); greyed out otherwise. baseToFmt was read when this
+      // conversion started, so a later change to the dropdowns doesn't count.
+      setActionAvailable(scormBtn, scormAvailableFor(baseToFmt), scormUnavailableReason(baseToFmt));
     }
 
     // Auto-populate cleanup patterns from warnings (user-toggleable)
