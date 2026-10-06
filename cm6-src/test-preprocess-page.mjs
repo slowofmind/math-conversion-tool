@@ -41,11 +41,16 @@ ok('it is a module script', scripts[0]?.getAttribute('type') === 'module');
 const prep = doc.getElementById('railPanelPrepare');
 ok('the Prepare panel is there', !!prep);
 const steps = prep ? [...prep.querySelectorAll('.prep-step')] : [];
-// Steps 1-2 have been their buttons alone since 2026-09-30 (Nicholas: no number, title, count or
-// explanation), so a step is known by its title, else by its button's text (updated 2026-10-06).
+// Since 2026-10-06 the two image buttons are in an "Images" accordion at the top of the panel
+// (Nicholas), before the three numbered steps (they were steps 1-2, buttons alone).
 const titles = steps.map((s) => text(s.querySelector('.prep-title') || s.querySelector('.prep-btn')));
-const FOUR = ['TikZ images', 'PDF images', 'Source cleanup', 'Math notation review'];
-ok('its first four steps, in order', FOUR.every((t, i) => titles[i] === t), titles.join(' | '));
+const imgPanel = doc.getElementById('prepImagesPanel');
+const imgBtns = imgPanel ? [...imgPanel.querySelectorAll('button')].map((b) => b.id + '=' + text(b)).join(',') : '';
+ok('the Images accordion comes first: "TikZ to PDF", then "PDF to SVG"',
+  !!prep && prep.querySelector('.sidebar-body')?.firstElementChild === doc.getElementById('prepImages')
+  && imgBtns === 'btnImageHandling=TikZ to PDF,btnConvertPdfs=PDF to SVG', imgBtns);
+const THREE = ['Source cleanup', 'Math notation review', 'LaTeX preprocessing'];
+ok('then the three steps, in order', THREE.every((t, i) => titles[i] === t), titles.join(' | '));
 const tabs = [...doc.querySelectorAll('#selOutputView option')].map((o) => o.getAttribute('value'));
 ok('the Output view options are Output, Code, Preprocess, Log (revised 2026-10-06; Intent moved to the sidebar)',
   tabs.join(',') === 'preview,source,preprocess,log', tabs.join(' | '));
@@ -59,12 +64,13 @@ for (const a of [A_IMPORT, A_MATHCAT, A_PP_SECTION, A_TABS])
   ok('the script holds, once: ' + a, count(js, a) === 1, String(count(js, a)));
 
 // ── F2, call 87: the fifth Prepare step ───────────────────────────────
-group('F2 call 87: step 5, LaTeX preprocessing');
-const s5 = steps[4] || null;
-ok('there are five Prepare steps', steps.length === 5, String(steps.length));
-ok('step 5 follows step 4 directly', !!s5 && s5.previousElementSibling === steps[3]);
-ok('its number is 5', text(s5?.querySelector('.prep-num')) === '5', text(s5?.querySelector('.prep-num')));
-ok('its title is "LaTeX preprocessing"', titles[4] === 'LaTeX preprocessing', titles[4]);
+// (Step 5 until 2026-10-06; now step 3, after the Images accordion took the image steps.)
+group('F2 call 87: step 3, LaTeX preprocessing');
+const s5 = steps[2] || null;
+ok('there are three Prepare steps', steps.length === 3, String(steps.length));
+ok('it follows step 2 directly', !!s5 && s5.previousElementSibling === steps[1]);
+ok('its number is 3', text(s5?.querySelector('.prep-num')) === '3', text(s5?.querySelector('.prep-num')));
+ok('its title is "LaTeX preprocessing"', titles[2] === 'LaTeX preprocessing', titles[2]);
 const btns = s5 ? [...s5.querySelectorAll('button')] : [];
 const btn = btns[0] || null;
 ok('it holds exactly one button', btns.length === 1, String(btns.length));

@@ -643,6 +643,25 @@
     border: 1px solid var(--border); border-radius: 3px; cursor: pointer; }
   .prep-btn:hover { background: var(--bg-elevated); }
   .prep-btn[disabled] { opacity: .5; cursor: default; }
+  /* Images (2026-10-06): an accordion inside File Preparation. Compact rows: a button with
+     the Tools button's font size and padding, its Autoconvert box beside it. The grid gives
+     both buttons the width of the wider, so the boxes line up. More rows can follow. */
+  .prep-accordion { border: 1px solid var(--border); border-left: 3px solid var(--border);
+    border-radius: 4px; background: var(--bg-primary); margin-bottom: 8px; }
+  .prep-accordion-heading { margin: 0; font: inherit; }
+  .prep-accordion-toggle { display: flex; align-items: center; gap: 6px; width: 100%;
+    padding: 6px 10px; border: none; border-radius: 4px; background: none;
+    color: var(--text-primary); font-family: 'Roboto', sans-serif; font-size: 12.5px;
+    font-weight: 500; text-align: left; cursor: pointer; }
+  .prep-accordion-toggle:hover { background: var(--bg-elevated); }
+  .prep-accordion-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .prep-accordion-toggle[aria-expanded="true"] .rail-chevron { transform: rotate(90deg); }
+  .prep-accordion-panel { display: grid; grid-template-columns: max-content max-content;
+    gap: 6px 10px; align-items: center; justify-content: start; padding: 0 10px 8px; }
+  .prep-accordion-panel[hidden] { display: none; }
+  .image-row { display: contents; }
+  .prep-btn.image-btn { font-size: 12px; padding: 3px 10px; }
+  .image-auto { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
   .prep-more { font-size: 11px; color: var(--text-muted); font-style: italic;
     text-align: center; padding: 6px 0; }
 
@@ -2265,7 +2284,7 @@
          to be scattered across the top toolbar and the editor bar, where a
          horizontal strip of same-weight buttons could show neither order nor
          state. *** ORDER IS LOAD-BEARING: extraction CREATES the PDFs that
-         step 2 converts, so step 1 must come first. *** Each button keeps its
+         "PDF to SVG" converts, so "TikZ to PDF" must come first (both now in Images, 2026-10-06). *** Each button keeps its
          id, so every handler that binds by getElementById still binds. -->
     <div class="rail-section">
       <h2 class="rail-section-heading">
@@ -2275,22 +2294,34 @@
     <div class="rail-panel" id="railPanelPrepare" role="region" hidden
          aria-labelledby="railtab-prepare">
       <div class="sidebar-body">
-      <!-- The button alone: no number, title, count or explanation; all status goes to the status bar (Nicholas, 2026-09-30).
-           Under it, the automatic checkbox, starting on (Nicholas, 2026-09-30; code-image-detection step 6). -->
-      <div class="prep-step">
-        <button type="button" class="prep-btn" id="btnImageHandling">TikZ images</button>
-        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:6px;">
-          <input type="checkbox" id="chkAutoTikz" checked> Extract automatically after upload</label>
+      <!-- IMAGES (Nicholas, 2026-10-06): its own accordion inside File Preparation, first. Each
+           row: the button alone (no number, title, count or explanation; all status goes to the
+           status bar, Nicholas 2026-09-30), sized like Tools, then its "Autoconvert" checkbox,
+           starting on (code-image-detection step 6; auto-pdf-conversion). Each checkbox's name
+           adds screen-reader-only words, so the two are told apart. *** ORDER IS LOAD-BEARING:
+           "TikZ to PDF" CREATES the PDFs that "PDF to SVG" converts. *** Rows to come go after
+           these two. Ids kept: the handlers and the BusyTeX gates use them. -->
+      <div class="prep-accordion" id="prepImages">
+        <h3 class="prep-accordion-heading">
+          <button type="button" class="prep-accordion-toggle" id="prepImagesToggle"
+                  aria-expanded="true" aria-controls="prepImagesPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Images</button>
+        </h3>
+        <div class="prep-accordion-panel" id="prepImagesPanel" role="region" aria-labelledby="prepImagesToggle">
+          <div class="image-row">
+            <button type="button" class="prep-btn image-btn" id="btnImageHandling">TikZ to PDF</button>
+            <label class="image-auto"><input type="checkbox" id="chkAutoTikz" checked> Autoconvert<span class="sr-only"> TikZ to PDF after upload</span></label>
+          </div>
+          <div class="image-row">
+            <button type="button" class="prep-btn image-btn" id="btnConvertPdfs">PDF to SVG</button>
+            <label class="image-auto"><input type="checkbox" id="chkAutoPdf" checked> Autoconvert<span class="sr-only"> PDF to SVG after upload</span></label>
+          </div>
+        </div>
       </div>
 
-      <div class="prep-step">
-        <button type="button" class="prep-btn" id="btnConvertPdfs">PDF images</button>
-        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:6px;">
-          <input type="checkbox" id="chkAutoPdf" checked> Convert automatically after upload</label>
-      </div>
+      <!-- (The "PDF images" step moved into Images, above, 2026-10-06.) -->
 
       <div class="prep-step">
-        <div class="prep-head"><span class="prep-num">3</span>
+        <div class="prep-head"><span class="prep-num">1</span>
           <span class="prep-title">Source cleanup</span></div>
         <p class="prep-status" id="smartCleanupHint">Automated preprocessing
           fixes on the source. Currently ordered-list numbering: lists that
@@ -2302,7 +2333,7 @@
       </div>
 
       <div class="prep-step">
-        <div class="prep-head"><span class="prep-num">4</span>
+        <div class="prep-head"><span class="prep-num">2</span>
           <span class="prep-title">Math notation review</span></div>
         <p class="prep-status" id="intentScanHint">Finds math notation whose
           meaning is ambiguous to a screen reader and lets you hear how each
@@ -2352,7 +2383,7 @@
       </div>
 
       <div class="prep-step">
-        <div class="prep-head"><span class="prep-num">5</span>
+        <div class="prep-head"><span class="prep-num">3</span>
           <span class="prep-title">LaTeX preprocessing</span></div>
         <p class="prep-status" id="preprocessHint">Runs the LaTeX
           preprocessor on the project. If it changes anything, it saves -pp
@@ -2575,7 +2606,7 @@
              and its findings navigation (2026-10-06). -->
         <div class="tab-content" id="tabPreprocess">
           <div id="preprocessNote" style="color: var(--text-muted); padding: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;">
-            Press <strong>Preprocess &amp; convert</strong>, step 5 in Prepare,
+            Press <strong>Preprocess &amp; convert</strong>, step 3 in File Preparation,
             to run the LaTeX preprocessor. Its report shows here.
           </div>
           <pre id="preprocessReport" hidden style="margin: 0; padding: 16px; white-space: pre-wrap; font-size: 12px;"></pre>
@@ -4936,7 +4967,7 @@ let convertPdfsAutomatically = null, pdfConvertRunning = () => false;
     if (!todo.length) return null;
     const box = document.getElementById('chkAutoPdf');
     if (!box || !box.checked) return { level: 'ready',
-      text: `${todo.length} PDF image${todo.length > 1 ? 's' : ''} can be converted to SVG. Press PDF images to convert ${todo.length > 1 ? 'them' : 'it'}.` };
+      text: `${todo.length} PDF image${todo.length > 1 ? 's' : ''} can be converted to SVG. Press "PDF to SVG" to convert ${todo.length > 1 ? 'them' : 'it'}.` };
     window.__lastPdfConvert = undefined;
     await convertPdfsAutomatically({ only: inUse, shareCheckpoint: chained });
     const r = window.__lastPdfConvert;
@@ -4972,7 +5003,7 @@ let convertPdfsAutomatically = null, pdfConvertRunning = () => false;
           const pdfFollows = !!(document.getElementById('chkAutoPdf') || {}).checked;
           parts.push((pdfFollows ? s.text.split(POLICY).join('.') : s.text) + cdNote);
         } else if (n) {
-          parts.push(`${n} figure${n > 1 ? 's' : ''} drawn in code found. Press TikZ images to extract ${n > 1 ? 'them' : 'it'}.` + cdNote);
+          parts.push(`${n} figure${n > 1 ? 's' : ''} drawn in code found. Press "TikZ to PDF" to convert ${n > 1 ? 'them' : 'it'}.` + cdNote);
         } else if (cd) parts.push(cdNote.trim());
       }
       const pdf = await pdfStage({ chained });
@@ -5018,9 +5049,9 @@ let convertPdfsAutomatically = null, pdfConvertRunning = () => false;
 (function setupPdfConversion() {
   const btn = document.getElementById('btnConvertPdfs');
   if (!btn) return;
-  // As for "TikZ images": the button's text never changes (Nicholas, 2026-09-30);
+  // As for "TikZ to PDF": the button's text never changes (Nicholas, 2026-09-30);
   // while busy it is disabled and the progress text goes to the status bar.
-  const BASE = 'PDF images';
+  const BASE = 'PDF to SVG';   // the button's label (was "PDF images" until 2026-10-06)
   const setLabel = (t, busy) => {
     btn.disabled = !!busy;
     btn.setAttribute('aria-busy', busy ? 'true' : 'false');
@@ -8346,6 +8377,24 @@ document.querySelector('.rail-sections')?.addEventListener('keydown', (ev) => {
           : ev.key === 'ArrowDown' ? (i + 1) % heads.length : (i - 1 + heads.length) % heads.length;
   heads[j].focus();
 });
+
+// ─── Images: an accordion inside File Preparation (2026-10-06, Nicholas) ───
+// Starts open; remembers the reader's choice, as the sidebar's sections do.
+function initPrepImages() {
+  const toggle = document.getElementById('prepImagesToggle');
+  const panel = document.getElementById('prepImagesPanel');
+  if (!toggle || !panel) return;
+  const show = (open) => { toggle.setAttribute('aria-expanded', String(open)); panel.hidden = !open; };
+  let open = true;
+  try { open = localStorage.getItem('atc.prep.images') !== 'closed'; } catch {}
+  show(open);
+  toggle.addEventListener('click', () => {
+    const next = toggle.getAttribute('aria-expanded') !== 'true';
+    show(next);
+    try { localStorage.setItem('atc.prep.images', next ? 'open' : 'closed'); } catch {}
+  });
+}
+initPrepImages();
 
 function setSidebarOpen(open, section) {
   // The Tools button moves into the sidebar header while the panel is open, and back to
