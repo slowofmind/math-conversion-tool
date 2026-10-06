@@ -895,7 +895,9 @@
   .output-tab.active { color: var(--text-primary); border-bottom-color: var(--harvard-blue); }
 
   .output-tab-spacer { flex: 1; }
-  #selOutputView { width: auto; font-size: 12px; margin: 0 6px 0 4px; }
+  /* "View" label + drop-down (2026-10-06), laid out like #mathSubtitlesBox. */
+  #outputViewBox { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-primary); margin: 0 6px 0 4px; }
+  #selOutputView { width: auto; font-size: 12px; }
 
   .output-tab-action {
     font-size: 12px;
@@ -1470,9 +1472,9 @@
   <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
-    <button class="toolbar-btn active" id="btnLayoutSide" title="Preview: right side" aria-label="Side-by-side layout" aria-pressed="true">◫</button>
-    <button class="toolbar-btn" id="btnLayoutBottom" title="Preview: bottom" aria-label="Bottom layout" aria-pressed="false">⬓</button>
-    <button class="toolbar-btn" id="btnLayoutHide" title="Hide preview" aria-label="Hide preview" aria-pressed="false">▣</button>
+    <button class="toolbar-btn active" id="btnLayoutSide" title="Output: right side" aria-label="Side-by-side layout" aria-pressed="true">◫</button>
+    <button class="toolbar-btn" id="btnLayoutBottom" title="Output: bottom" aria-label="Bottom layout" aria-pressed="false">⬓</button>
+    <button class="toolbar-btn" id="btnLayoutHide" title="Hide output" aria-label="Hide output" aria-pressed="false">▣</button>
   </div>
 </div>
 
@@ -2395,13 +2397,16 @@
            row above the preview; see output-panel-ui\NOTE-OUTPUT-PANEL-UI.md). Intent is listed
            until it moves to the left sidebar. js/output-tabs.js switches the views. -->
       <div class="output-tabs">
-        <select id="selOutputView" aria-label="Output view">
-          <option value="preview" selected>Preview</option>
-          <option value="source">Source</option>
+        <!-- "View" (2026-10-06): a visible label, which is also the drop-down's spoken name; the
+             preview option reads "Output" and the source option "Code". Option values are unchanged. -->
+        <span id="outputViewBox"><label for="selOutputView">View</label>
+        <select id="selOutputView">
+          <option value="preview" selected>Output</option>
+          <option value="source">Code</option>
           <option value="preprocess">Preprocess</option>
           <option value="log">Log</option>
           <option value="intent">Intent</option>
-        </select>
+        </select></span>
         <span id="mathSubtitlesBox" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles" aria-disabled="true" aria-describedby="selMathSubtitlesWhy" title="Convert a document to HTML first."><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
         <span class="output-tab-spacer"></span>
         <button class="output-tab-action" id="btnDownloadOutput" title="Convert a document first." data-title-available="Download output" aria-label="Download output" aria-disabled="true" aria-describedby="btnDownloadOutputWhy">Download</button>
@@ -2416,7 +2421,7 @@
       <span id="selMathSubtitlesWhy" hidden>Convert a document to HTML first.</span>
       <div class="output-body">
         <div class="tab-content active" id="tabPreview">
-          <iframe id="previewFrame" sandbox="allow-scripts" title="HTML preview"></iframe>
+          <iframe id="previewFrame" sandbox="allow-scripts" title="HTML output"></iframe>
         </div>
         <div class="tab-content" id="tabLog" aria-live="polite">
           <div class="log-container" id="logContainer">
@@ -2432,7 +2437,7 @@
             <div class="source-viewer-label" id="sourceViewerLabel" hidden></div>
             <span class="source-bar-spacer"></span>
             <span class="source-copy-status" id="sourceCopyStatus" role="status"></span>
-            <button type="button" class="output-tab-action" id="btnCopySource" title="Nothing to copy yet. Convert a document first." data-title-available="Copy all the text in the Source view" aria-disabled="true" aria-describedby="btnCopySourceWhy">Copy all</button>
+            <button type="button" class="output-tab-action" id="btnCopySource" title="Nothing to copy yet. Convert a document first." data-title-available="Copy all the text in the Code view" aria-disabled="true" aria-describedby="btnCopySourceWhy">Copy all</button>
           </div>
           <span id="btnCopySourceWhy" hidden>Nothing to copy yet. Convert a document first.</span>
           <div id="outputSource"></div>
@@ -2625,7 +2630,7 @@ const editor = createEditor(document.getElementById('aceEditor'), {
 const sourceEditor = createEditor(document.getElementById('outputSource'), {
   language: 'html',
   readOnly: true,
-  ariaLabel: 'Output source viewer',
+  ariaLabel: 'Code viewer',
   fontSize: '13px',
   fontFamily: "'Roboto Mono', monospace",
   lineWrap: true,
