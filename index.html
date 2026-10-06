@@ -2763,11 +2763,14 @@ const MATH_METHODS_NA = [['', 'Not applicable for this output format']];
 // ./styles/ and add one line here. DOCX shows the same control as
 // "Reference document"; its list is a placeholder until reference documents
 // are added (an entry without `file` applies nothing).
+// embedImages (decided 2026-10-05): when the chosen style changes to one that
+// sets it, the Embed Images filter is switched to that value; a hand change
+// in the Pandoc options sticks until the style changes again (nextEmbedImages).
 const STYLES = {
   html: [
-    { id: 'standalone', label: 'Standalone', file: 'standalone.css' },
-    { id: 'canvas', label: 'Canvas', file: 'canvas.css', headingShift: 1,
-      note: 'Canvas style: headings start at level 2, as on a Canvas page.' }
+    { id: 'standalone', label: 'Standalone', file: 'standalone.css', embedImages: true },
+    { id: 'canvas', label: 'Canvas', file: 'canvas.css', headingShift: 1, embedImages: false,
+      note: 'Canvas style: headings start at level 2, as on a Canvas page, and images stay separate files (Embed Images is off; it can be switched back on in the Pandoc options).' }
   ],
   docx: [
     { id: 'pandoc-default', label: 'Pandoc default' }
@@ -2781,6 +2784,7 @@ const STYLING_FILTER_NAME = '_atc-styling.lua';
 const STYLE_SHEET_NAME = 'atc-style-sheet.css';   // the file name styling.lua reads
 const stylingAssets = { filter: null, css: {} };   // fetched once, then reused
 let styleShiftSetTo = null;                        // heading shift a style set, if any
+let styleImagesPrevId;                             // style at the last refresh; undefined until the first
 
 // The style entry an id means for an output format, or null.
 function styleEntryFor(fmt, id) {
@@ -2811,7 +2815,19 @@ function nextHeadingShift(current, want, setTo) {
   return { value: current, setTo: null };
 }
 
-// Show the chosen style's note, and set or undo its heading shift.
+// Embed Images rule (decided 2026-10-05). prevId = the style chosen at the
+// last refresh (undefined: none yet); entry = the style now; current = the
+// filter's state now. Changes it only when the style changed and the new
+// style says what it wants (embedImages); otherwise keeps current, so a hand
+// change sticks. Returns the state to use.
+function nextEmbedImages(prevId, entry, current) {
+  if (prevId === undefined || !entry || typeof entry.embedImages !== 'boolean') return current;
+  if (entry.id === prevId) return current;
+  return entry.embedImages;
+}
+
+// Show the chosen style's note, set or undo its heading shift, and switch
+// Embed Images when the style changes.
 function applyStyleSideEffects() {
   const fmt = document.getElementById('selTo')?.value;
   const e = styleEntryFor(fmt, document.getElementById('opt-style')?.value);
@@ -2820,6 +2836,24 @@ function applyStyleSideEffects() {
     const r = nextHeadingShift(shiftEl.value, e && e.headingShift, styleShiftSetTo);
     shiftEl.value = r.value;
     styleShiftSetTo = r.setTo;
+  }
+  // Embed Images follows the style when the style changes (see
+  // nextEmbedImages). Skipped on the first refresh, which can run while the
+  // page is still loading, before the filter list exists.
+  const styleId = e ? e.id : '';
+  if (styleImagesPrevId === undefined) {
+    styleImagesPrevId = styleId;
+  } else if (styleId !== styleImagesPrevId) {
+    try {
+      const want = nextEmbedImages(styleImagesPrevId, e, !!builtInState['embed-images']);
+      if (want !== !!builtInState['embed-images']) {
+        builtInState['embed-images'] = want;
+        renderLuaFiltersList();
+      }
+    } catch (err) {
+      console.warn('Styling: could not switch Embed Images:', err);
+    }
+    styleImagesPrevId = styleId;
   }
   const note = document.getElementById('styleNote');
   if (note) note.textContent = (e && e.note) || '';
@@ -6247,6 +6281,33 @@ function makeScormPackage({ name, files, launch, heightScript, when }) {
 }
 
 /**
+ * The image files a single HTML page points to, taken from the files the
+ * conversion gave Pandoc (kept as lastOutput.files), as [{ name, data }]
+ * with the page's own relative paths, so they can sit beside it in a SCORM
+ * package (decided 2026-10-05; needed when Embed Images is off, as with the
+ * Canvas style). Skips data: URIs and full or root-relative URLs. A path
+ * the file set lacks, or one that climbs out of the page's folder (..), is
+ * returned in `missing`. Chunked HTML does not need this: Pandoc's zip
+ * already carries its images.
+ */
+async function collectPageImages(htmlText, files) {
+  const found = [], missing = [], seen = new Set();
+  for (const m of htmlText.matchAll(/<img\b[^>]*?\bsrc\s*=\s*"([^"]+)"/gi)) {
+    const src = m[1].replace(/&amp;/g, '&');
+    if (/^[a-z][a-z0-9+.-]*:/i.test(src) || src.startsWith('/') || src.startsWith('#')) continue;
+    let path = src.split(/[?#]/)[0];
+    try { path = decodeURI(path); } catch {}
+    path = path.replace(/^\.\//, '');
+    if (seen.has(path)) continue;
+    seen.add(path);
+    const blob = files && !path.split('/').includes('..') ? files[path] : null;
+    if (!blob) { missing.push(path); continue; }
+    found.push({ name: path, data: new Uint8Array(await blob.arrayBuffer()) });
+  }
+  return { found, missing };
+}
+
+/**
  * Manifest identifier (decided 2026-10-05): the package name + "SCORM".
  * The schema types it as an XML ID, so accents are dropped, any run of
  * characters other than letters, digits, "." "_" "-" becomes one "-", and a
@@ -6328,6 +6389,16 @@ document.getElementById('btnDownloadScorm').addEventListener('click', async (e) 
       }
     }
 
+    // Images a single page points to (Embed Images off, e.g. Canvas style),
+    // from the files the conversion gave Pandoc, at the same paths. Chunked
+    // HTML needs nothing here: Pandoc's zip already carries its images.
+    let missingImages = [];
+    if (!isZip) {
+      const images = await collectPageImages(new TextDecoder().decode(launchFile.data), lastOutput.files);
+      files.push(...images.found);
+      missingImages = images.missing;
+    }
+
     // Manifest listing every file, all entries dated now (see makeScormPackage)
     const zipData = makeScormPackage({ name, files, launch: 'index.html', heightScript, when: new Date() });
 
@@ -6340,6 +6411,11 @@ document.getElementById('btnDownloadScorm').addEventListener('click', async (e) 
     a.click();
     URL.revokeObjectURL(url);
     maybeExportProfileWithOutput();
+    if (missingImages.length) {   // flag, don't fail: the package is made without them
+      console.warn('SCORM: images not packaged:', missingImages);
+      updateStatus('ready', 'SCORM package made, but ' + missingImages.length
+        + ' image(s) could not be added: ' + missingImages.join(', '));
+    }
   } catch (err) {
     console.error('SCORM package failed:', err);
     updateStatus('error', 'SCORM package not made: ' + (err && err.message ? err.message : err));
@@ -7381,7 +7457,7 @@ async function runConversion() {
 
       const sizeKB = (blob.size / 1024).toFixed(1);
 
-      lastOutput = { blob, filename: outName };
+      lastOutput = { blob, filename: outName, files };
       downloadBtn.textContent = `📥 ${outName} (${sizeKB} KB)`;
       setActionAvailable(downloadBtn, true);
       setActionAvailable(scormBtn, scormAvailableFor(baseToFmt), scormUnavailableReason(baseToFmt));
@@ -7443,7 +7519,7 @@ async function runConversion() {
 
       const blob = new Blob([outputText], { type: 'text/plain' });
       const sizeKB = (blob.size / 1024).toFixed(1);
-      lastOutput = { blob, filename: outFileName };
+      lastOutput = { blob, filename: outFileName, files };
       downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
       setActionAvailable(downloadBtn, true);
 
