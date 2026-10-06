@@ -153,6 +153,10 @@
   }
 
   .toolbar-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+  /* Input-format box (2026-10-06): lays out as if the wrapper were not there;
+     hidden in the core view (see applyOptionsView). */
+  #fromBox { display: contents; }
+  #fromBox[hidden] { display: none; }
 
   /* ─── ENGINE SWITCHER ─── */
   .engine-group {
@@ -1424,7 +1428,12 @@
   <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
-    <span class="toolbar-label">From:</span>
+    <!-- Input format (2026-10-06, Nicholas): hidden in the core view, which is for
+         LaTeX input only; shown, labelled "Input:", in the full Pandoc options view,
+         where other input formats are chosen. It still works while hidden: it starts
+         at LaTeX, follows the file that is opened (.md, .docx ...), and every
+         conversion reads it. applyOptionsView() shows/hides #fromBox. -->
+    <span id="fromBox" hidden><span class="toolbar-label">Input:</span>
     <select class="toolbar-select" id="selFrom" aria-label="Input format">
       <option value="latex">latex</option>
       <option value="markdown">markdown</option>
@@ -1432,8 +1441,8 @@
       <option value="rst">rst</option>
       <option value="org">org</option>
       <option value="typst">typst</option>
-    </select>
-    <span class="toolbar-label" style="margin-left:4px;">To:</span>
+    </select></span>
+    <span class="toolbar-label" style="margin-left:4px;">Output:</span>
     <select class="toolbar-select" id="selTo" aria-label="Output format">
       <option value="html5" selected>html5</option>
       <option value="html">html</option>
@@ -1462,10 +1471,10 @@
 
   <div class="toolbar-group">
     <button class="toolbar-btn primary" id="btnConvert" disabled>Convert</button>
-    <!-- Static text, NOT a live region: read on demand when a user
-         navigates here, silent otherwise. The separate #targetLive
-         region announces only SIDE-EFFECT changes. -->
-    <span class="convert-target" id="convertTargetLabel"></span>
+    <!-- The visible "Converting <file> (from → to)" message that sat here was
+         removed (2026-10-06, Nicholas: redundant). The Convert button's spoken
+         name still names the target ("Convert main.tex to html5"), and
+         #targetLive below still announces SIDE-EFFECT target changes. -->
     <span class="sr-only" id="targetLive" role="status" aria-live="polite" aria-atomic="true"></span>
   </div>
 
@@ -1963,7 +1972,7 @@
     </details>
     <!-- Chunked HTML -->
     <details class="fmt-section">
-      <summary>Chunked HTML</summary>
+      <summary>HTML (multipage)</summary>
       <div class="fmt-section-body">
       <div class="options-grid">
         <div class="opt-group">
@@ -2611,21 +2620,23 @@ const fileTree = initFileTree({
 // but the viewer, so the same gesture never has a hidden side effect on
 // a file that could not be a target anyway.
 //
-// The target is ALWAYS stated next to the Convert button. Announcement
-// policy: an explicit action needs no announcement (the user just did
-// it), but a SIDE-EFFECT change does — so #targetLive fires only here,
-// where opening a file moved the target.
+// The target used to be stated in visible text next to the Convert button;
+// that message was removed on 2026-10-06 (Nicholas: "Let's remove it for
+// now." — redundant in the common case). The target is still in the Convert
+// button's spoken name, the project panel's summary line, and the status
+// bar when a file is opened. Announcement policy (unchanged): an explicit
+// action needs no announcement (the user just did it), but a SIDE-EFFECT
+// change does — so #targetLive fires only here, where opening a file moved
+// the target.
 // ════════════════════════════════════════════════════════════════════
 
+// Name kept so its callers do not change. Since 2026-10-06 it only keeps
+// the Convert button's spoken name in step with the target and the output
+// format; there is no visible message any more.
 function refreshConvertTargetLabel() {
-  const el = document.getElementById('convertTargetLabel');
-  if (!el) return;
   const p = projectModel.project.convertTargetPath;
-  if (!p) { el.textContent = ''; return; }
-  const from = document.getElementById('selFrom').value;
+  if (!p) return;
   const to = document.getElementById('selTo').value;
-  el.innerHTML = `Converting <strong>${p.replace(/[&<>"]/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))}</strong> (${from} → ${to})`;
   const btn = document.getElementById('btnConvert');
   if (btn) btn.setAttribute('aria-label', `Convert ${p} to ${to}`);
 }
@@ -2733,15 +2744,21 @@ let ALL_OUTPUT_FORMATS = [];
 
 // ── Options views ────────────────────────────────────────────────
 // 'core'   : the curated interface, and the default.
-// 'pandoc' : everything this build offers, under Pandoc's own raw names.
+// 'pandoc' : everything this build offers, under Pandoc's own raw names
+//            (except chunkedhtml, shown as "HTML (multipage)" in both views).
 // A view is a descriptor, not a separate code path: switching repopulates
 // the same three <select> elements rather than swapping in different ones.
 const CORE_INPUT  = ['latex', 'markdown'];
-const CORE_OUTPUT = ['html5', 'docx', 'chunkedhtml', 'epub'];
+// EPUB left the core list on 2026-10-06 (Nicholas); it stays in the full view.
+// Order (Nicholas, same day): HTML, HTML (multipage), then DOCX.
+const CORE_OUTPUT = ['html5', 'chunkedhtml', 'docx'];
 const CORE_LABELS = {
   'latex': 'LaTeX', 'markdown': 'Markdown',
-  'html5': 'HTML', 'docx': 'DOCX', 'chunkedhtml': 'Chunked HTML', 'epub': 'EPUB'
+  'html5': 'HTML', 'docx': 'DOCX', 'chunkedhtml': 'HTML (multipage)'
 };
+// The full view shows Pandoc's own names, except chunkedhtml, which reads
+// "HTML (multipage)" in both views (2026-10-06, Nicholas).
+const PANDOC_OUTPUT_LABELS = { 'chunkedhtml': 'HTML (multipage)' };
 
 let optionsView = 'core';
 
@@ -2997,6 +3014,12 @@ function applyOptionsView() {
   relocateControl('opt-math', core ? 'core-slot-math' : 'pandoc-slot-math');
   relocateControl('opt-style', core ? 'core-slot-style' : 'pandoc-slot-style');
 
+  // Input format: hidden in the core view (LaTeX input only), shown as
+  // "Input:" in the full Pandoc options view (2026-10-06, Nicholas). While
+  // hidden it still works: conversions read it, and it follows opened files.
+  const fromBox = document.getElementById('fromBox');
+  if (fromBox) fromBox.hidden = core;
+
   const selTo = document.getElementById('selTo');
   const selMath = document.getElementById('opt-math');
   const beforeTo = selTo.value;
@@ -3007,7 +3030,7 @@ function applyOptionsView() {
     populateFormats('selTo', keepAvailable(CORE_OUTPUT, ALL_OUTPUT_FORMATS), 'html5', CORE_LABELS);
   } else {
     populateFormats('selFrom', ALL_INPUT_FORMATS, 'latex', null);
-    populateFormats('selTo', filterFormats(ALL_OUTPUT_FORMATS, OUTPUT_FORMAT_EXCLUDE), 'html5', null);
+    populateFormats('selTo', filterFormats(ALL_OUTPUT_FORMATS, OUTPUT_FORMAT_EXCLUDE), 'html5', PANDOC_OUTPUT_LABELS);
   }
   refreshMathOptions();
 
@@ -6202,7 +6225,7 @@ function scormAvailableFor(baseFmt) {
 
 /** Why SCORM is unavailable for an output format (for the greyed-out button). */
 function scormUnavailableReason(baseFmt) {
-  return 'SCORM packages are made from HTML or Chunked HTML output. Convert to one of those to make one.';
+  return 'SCORM packages are made from HTML or HTML (multipage) output. Convert to one of those to make one.';
 }
 
 /**
