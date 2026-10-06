@@ -656,8 +656,9 @@
   .prep-accordion-toggle:hover { background: var(--bg-elevated); }
   .prep-accordion-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .prep-accordion-toggle[aria-expanded="true"] .rail-chevron { transform: rotate(90deg); }
-  .prep-accordion-panel { display: grid; grid-template-columns: max-content max-content;
-    gap: 6px 10px; align-items: center; justify-content: start; padding: 0 10px 8px; }
+  .prep-accordion-panel { padding: 0 10px 8px; }
+  .prep-accordion-panel.prep-grid { display: grid; grid-template-columns: max-content max-content;
+    gap: 6px 10px; align-items: center; justify-content: start; }
   .prep-accordion-panel[hidden] { display: none; }
   .image-row { display: contents; }
   .prep-btn.image-btn { font-size: 12px; padding: 3px 10px; }
@@ -778,7 +779,7 @@
   .intent-nav { display: flex; align-items: center; gap: 3px; margin-right: 2px; }
   .intent-nav[hidden] { display: none; }
   /* In the sidebar, below the Intent Scan button (2026-10-06). */
-  .prep-step .intent-nav { margin-top: 6px; margin-right: 0; }
+  .prep-accordion .intent-nav { margin-top: 6px; margin-right: 0; }
   .intent-nav-status {
     font-size: 11px;
     color: var(--text-secondary);
@@ -833,8 +834,8 @@
     margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
   /* In the sidebar step, below the findings navigation (2026-10-06). Spacing
      to be revisited later (Nicholas). */
-  .prep-step .intent-panel { height: auto; overflow: visible; padding: 8px 0 0; font-size: 12px; }
-  .prep-step .intent-panel-actions { flex-wrap: wrap; }
+  .prep-accordion .intent-panel { height: auto; overflow: visible; padding: 8px 0 0; font-size: 12px; }
+  .prep-accordion .intent-panel-actions { flex-wrap: wrap; }
 
   /* Scan report (2026-10-06; was written to the Log). */
   .intent-report { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
@@ -2303,10 +2304,10 @@
            these two. Ids kept: the handlers and the BusyTeX gates use them. -->
       <div class="prep-accordion" id="prepImages">
         <h3 class="prep-accordion-heading">
-          <button type="button" class="prep-accordion-toggle" id="prepImagesToggle"
+          <button type="button" class="prep-accordion-toggle" id="prepImagesToggle" data-store="atc.prep.images"
                   aria-expanded="true" aria-controls="prepImagesPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Images</button>
         </h3>
-        <div class="prep-accordion-panel" id="prepImagesPanel" role="region" aria-labelledby="prepImagesToggle">
+        <div class="prep-accordion-panel prep-grid" id="prepImagesPanel" role="region" aria-labelledby="prepImagesToggle">
           <div class="image-row">
             <button type="button" class="prep-btn image-btn" id="btnImageHandling">TikZ to PDF</button>
             <label class="image-auto"><input type="checkbox" id="chkAutoTikz" checked> Autoconvert<span class="sr-only"> TikZ to PDF after upload</span></label>
@@ -2320,21 +2321,29 @@
 
       <!-- (The "PDF images" step moved into Images, above, 2026-10-06.) -->
 
-      <div class="prep-step">
-        <div class="prep-head"><span class="prep-num">1</span>
-          <span class="prep-title">Source cleanup</span></div>
-        <p class="prep-status" id="smartCleanupHint">Automated preprocessing
-          fixes on the source. Currently ordered-list numbering: lists that
-          resume after an interruption, which Pandoc would otherwise restart
-          at 1.</p>
-        <button type="button" class="prep-btn" id="btnSmartCleanup"
-                title="Run automated preprocessing fixes on the source (ordered-list numbering)"
-                aria-describedby="smartCleanupHint">✨ Smart Cleanup</button>
+      <!-- LATEX PREPROCESSING (Nicholas, 2026-10-06): an accordion, right after Images; for now the
+           button alone, no hint or tooltip ("It only needs to have the button right now"). Options
+           and checkboxes for related features come later, beside or below it. What it does (-pp
+           copies; originals never changed) is said in the Preprocess view's note. Id kept:
+           js/preprocess.js binds it. -->
+      <div class="prep-accordion" id="prepPreprocess">
+        <h3 class="prep-accordion-heading">
+          <button type="button" class="prep-accordion-toggle" id="prepPreprocessToggle" data-store="atc.prep.preprocess"
+                  aria-expanded="true" aria-controls="prepPreprocessPanel"><span class="rail-chevron" aria-hidden="true">▸</span>LaTeX preprocessing</button>
+        </h3>
+        <div class="prep-accordion-panel" id="prepPreprocessPanel" role="region" aria-labelledby="prepPreprocessToggle">
+          <button type="button" class="prep-btn" id="btnPreprocess">Process file</button>
+        </div>
       </div>
 
-      <div class="prep-step">
-        <div class="prep-head"><span class="prep-num">2</span>
-          <span class="prep-title">Math notation review</span></div>
+      <!-- MATH NOTATION REVIEW (Nicholas, 2026-10-06): an accordion; contents unchanged. Closing it
+           releases F2 / Shift+F2 (intent-review.js: #intentNav inside anything [hidden]). -->
+      <div class="prep-accordion" id="prepReview">
+        <h3 class="prep-accordion-heading">
+          <button type="button" class="prep-accordion-toggle" id="prepReviewToggle" data-store="atc.prep.review"
+                  aria-expanded="true" aria-controls="prepReviewPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Math notation review</button>
+        </h3>
+        <div class="prep-accordion-panel" id="prepReviewPanel" role="region" aria-labelledby="prepReviewToggle">
         <p class="prep-status" id="intentScanHint">Finds math notation whose
           meaning is ambiguous to a screen reader and lets you hear how each
           reading would sound. Findings are highlighted in the editor; the
@@ -2380,23 +2389,28 @@
           <h3 class="intent-report-head" id="intentReportHead">Scan report</h3>
           <ul class="intent-report-list" id="intentReportList" aria-labelledby="intentReportHead"></ul>
         </div>
+        </div>
       </div>
 
-      <div class="prep-step">
-        <div class="prep-head"><span class="prep-num">3</span>
-          <span class="prep-title">LaTeX preprocessing</span></div>
-        <p class="prep-status" id="preprocessHint">Runs the LaTeX
-          preprocessor on the project. If it changes anything, it saves -pp
-          copies of the changed files beside them, and of your main file
-          (main.tex becomes main-pp.tex), then converts that copy. Your
-          original files are never changed; if nothing changes, the original
-          is converted. The report opens in the Preprocess view.</p>
-        <button type="button" class="prep-btn" id="btnPreprocess"
-                title="Run the LaTeX preprocessor, save -pp copies of what it changes, and convert them; your original files are not changed"
-                aria-describedby="preprocessHint">Preprocess &amp; convert</button>
+      <!-- SOURCE CLEANUP (Nicholas, 2026-10-06): an accordion, last; contents unchanged. Temporary:
+           it goes once LaTeX preprocessing does more. -->
+      <div class="prep-accordion" id="prepSourceCleanup">
+        <h3 class="prep-accordion-heading">
+          <button type="button" class="prep-accordion-toggle" id="prepSourceCleanupToggle" data-store="atc.prep.cleanup"
+                  aria-expanded="true" aria-controls="prepSourceCleanupPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Source cleanup</button>
+        </h3>
+        <div class="prep-accordion-panel" id="prepSourceCleanupPanel" role="region" aria-labelledby="prepSourceCleanupToggle">
+        <p class="prep-status" id="smartCleanupHint">Automated preprocessing
+          fixes on the source. Currently ordered-list numbering: lists that
+          resume after an interruption, which Pandoc would otherwise restart
+          at 1.</p>
+        <button type="button" class="prep-btn" id="btnSmartCleanup"
+                title="Run automated preprocessing fixes on the source (ordered-list numbering)"
+                aria-describedby="smartCleanupHint">✨ Smart Cleanup</button>
+        </div>
       </div>
 
-      <p class="prep-more">further preparation steps land here</p>
+      <!-- (The "further preparation steps land here" line was removed 2026-10-06.) -->
       </div>
     </div>
     </div>
@@ -2606,8 +2620,8 @@
              and its findings navigation (2026-10-06). -->
         <div class="tab-content" id="tabPreprocess">
           <div id="preprocessNote" style="color: var(--text-muted); padding: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;">
-            Press <strong>Preprocess &amp; convert</strong>, step 3 in File Preparation,
-            to run the LaTeX preprocessor. Its report shows here.
+            Press <strong>Process file</strong> (LaTeX preprocessing, in File Preparation)
+            to run the LaTeX preprocessor. If it changes anything, it saves -pp copies of the changed files, and of your main file (main.tex becomes main-pp.tex), then converts that copy; your original files are never changed. Its report shows here.
           </div>
           <pre id="preprocessReport" hidden style="margin: 0; padding: 16px; white-space: pre-wrap; font-size: 12px;"></pre>
         </div>
@@ -8378,23 +8392,27 @@ document.querySelector('.rail-sections')?.addEventListener('keydown', (ev) => {
   heads[j].focus();
 });
 
-// ─── Images: an accordion inside File Preparation (2026-10-06, Nicholas) ───
-// Starts open; remembers the reader's choice, as the sidebar's sections do.
-function initPrepImages() {
-  const toggle = document.getElementById('prepImagesToggle');
-  const panel = document.getElementById('prepImagesPanel');
-  if (!toggle || !panel) return;
-  const show = (open) => { toggle.setAttribute('aria-expanded', String(open)); panel.hidden = !open; };
-  let open = true;
-  try { open = localStorage.getItem('atc.prep.images') !== 'closed'; } catch {}
-  show(open);
-  toggle.addEventListener('click', () => {
-    const next = toggle.getAttribute('aria-expanded') !== 'true';
-    show(next);
-    try { localStorage.setItem('atc.prep.images', next ? 'open' : 'closed'); } catch {}
-  });
+// ─── File Preparation's accordions (2026-10-06, Nicholas): Images, LaTeX preprocessing,
+// Math notation review, Source cleanup ───
+// Each starts open and remembers the reader's choice under its toggle's data-store key
+// (Images keeps 'atc.prep.images', which it used first), as the sidebar's sections do.
+function initPrepAccordions() {
+  for (const toggle of document.querySelectorAll('.prep-accordion-toggle')) {
+    const panel = document.getElementById(toggle.getAttribute('aria-controls'));
+    const key = toggle.dataset.store;
+    if (!panel) continue;
+    const show = (open) => { toggle.setAttribute('aria-expanded', String(open)); panel.hidden = !open; };
+    let open = true;
+    try { if (key) open = localStorage.getItem(key) !== 'closed'; } catch {}
+    show(open);
+    toggle.addEventListener('click', () => {
+      const next = toggle.getAttribute('aria-expanded') !== 'true';
+      show(next);
+      try { if (key) localStorage.setItem(key, next ? 'open' : 'closed'); } catch {}
+    });
+  }
 }
-initPrepImages();
+initPrepAccordions();
 
 function setSidebarOpen(open, section) {
   // The Tools button moves into the sidebar header while the panel is open, and back to

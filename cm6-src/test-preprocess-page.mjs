@@ -41,16 +41,16 @@ ok('it is a module script', scripts[0]?.getAttribute('type') === 'module');
 const prep = doc.getElementById('railPanelPrepare');
 ok('the Prepare panel is there', !!prep);
 const steps = prep ? [...prep.querySelectorAll('.prep-step')] : [];
-// Since 2026-10-06 the two image buttons are in an "Images" accordion at the top of the panel
-// (Nicholas), before the three numbered steps (they were steps 1-2, buttons alone).
-const titles = steps.map((s) => text(s.querySelector('.prep-title') || s.querySelector('.prep-btn')));
+// Since 2026-10-06 (Nicholas) File Preparation is four accordions, in this order, with no numbered
+// steps: Images ("TikZ to PDF", then "PDF to SVG"), LaTeX preprocessing, Math notation review,
+// Source cleanup (temporary; it will go once preprocessing does more).
+const accs = prep ? [...prep.querySelectorAll('.sidebar-body > .prep-accordion')] : [];
+const accTitles = accs.map((a) => text(a.querySelector('.prep-accordion-toggle')).replace(/^▸/, ''));
+ok('four accordions, in order', accTitles.join(' | ') === 'Images | LaTeX preprocessing | Math notation review | Source cleanup', accTitles.join(' | '));
+ok('no numbered steps left', steps.length === 0 && !prep?.querySelector('.prep-num'), String(steps.length));
 const imgPanel = doc.getElementById('prepImagesPanel');
 const imgBtns = imgPanel ? [...imgPanel.querySelectorAll('button')].map((b) => b.id + '=' + text(b)).join(',') : '';
-ok('the Images accordion comes first: "TikZ to PDF", then "PDF to SVG"',
-  !!prep && prep.querySelector('.sidebar-body')?.firstElementChild === doc.getElementById('prepImages')
-  && imgBtns === 'btnImageHandling=TikZ to PDF,btnConvertPdfs=PDF to SVG', imgBtns);
-const THREE = ['Source cleanup', 'Math notation review', 'LaTeX preprocessing'];
-ok('then the three steps, in order', THREE.every((t, i) => titles[i] === t), titles.join(' | '));
+ok('Images: "TikZ to PDF", then "PDF to SVG"', imgBtns === 'btnImageHandling=TikZ to PDF,btnConvertPdfs=PDF to SVG', imgBtns);
 const tabs = [...doc.querySelectorAll('#selOutputView option')].map((o) => o.getAttribute('value'));
 ok('the Output view options are Output, Code, Preprocess, Log (revised 2026-10-06; Intent moved to the sidebar)',
   tabs.join(',') === 'preview,source,preprocess,log', tabs.join(' | '));
@@ -64,27 +64,24 @@ for (const a of [A_IMPORT, A_MATHCAT, A_PP_SECTION, A_TABS])
   ok('the script holds, once: ' + a, count(js, a) === 1, String(count(js, a)));
 
 // ── F2, call 87: the fifth Prepare step ───────────────────────────────
-// (Step 5 until 2026-10-06; now step 3, after the Images accordion took the image steps.)
-group('F2 call 87: step 3, LaTeX preprocessing');
-const s5 = steps[2] || null;
-ok('there are three Prepare steps', steps.length === 3, String(steps.length));
-ok('it follows step 2 directly', !!s5 && s5.previousElementSibling === steps[1]);
-ok('its number is 3', text(s5?.querySelector('.prep-num')) === '3', text(s5?.querySelector('.prep-num')));
-ok('its title is "LaTeX preprocessing"', titles[2] === 'LaTeX preprocessing', titles[2]);
+// (Step 5, then step 3, until 2026-10-06; now the "LaTeX preprocessing" accordion, right after
+// Images, holding only its button "Process file", with no hint or tooltip: Nicholas. What it does
+// (works on -pp copies; originals never changed) is now said in the Preprocess view's note.)
+group('F2 call 87: the LaTeX preprocessing accordion and its "Process file" button');
+const s5 = doc.getElementById('prepPreprocessPanel');
+ok('it comes right after Images', accs[0]?.id === 'prepImages' && !!s5 && !!accs[1]?.contains(s5), accs.map((a) => a.id).join(','));
 const btns = s5 ? [...s5.querySelectorAll('button')] : [];
 const btn = btns[0] || null;
 ok('it holds exactly one button', btns.length === 1, String(btns.length));
 ok('a prep-btn of type button', !!btn && btn.classList.contains('prep-btn') && btn.getAttribute('type') === 'button');
-ok('labelled "Preprocess & convert"', text(btn) === 'Preprocess & convert', text(btn));
+ok('labelled "Process file"', text(btn) === 'Process file', text(btn));
 const bid = btn?.id || '';
 ok('with an id no other element has', !!bid && doc.querySelectorAll('[id="' + bid + '"]').length === 1, bid);
-const hid = btn?.getAttribute('aria-describedby') || '';
-const hint = hid ? doc.getElementById(hid) : null;
-ok('described by a hint inside step 5',
-  !!hint && !!s5 && s5.contains(hint) && hint.classList.contains('prep-status'), hid);
-const h = text(hint);
-for (const w of ['copies', 'main-pp.tex', 'original', 'Preprocess view'])
-  ok('the hint mentions ' + w, h.includes(w), h.slice(0, 80));
+ok('no hint, description or tooltip', !!btn && !btn.hasAttribute('aria-describedby') && !btn.hasAttribute('title')
+  && !s5?.querySelector('.prep-status') && !doc.getElementById('preprocessHint'));
+const h = text(doc.getElementById('preprocessNote'));
+for (const w of ['Process file', 'copies', 'main-pp.tex', 'original'])
+  ok('the Preprocess view\'s note mentions ' + w, h.includes(w), h.slice(0, 80));
 
 // ── F3, call 88: the Preprocess tab, after Intent, and its panel ──────
 group('F3 call 88, revised 2026-10-06: Preprocess in the Output view drop-down, and its panel');
@@ -103,7 +100,7 @@ ok('a view area (tab-content) without tab roles', !!panel &&
 ok('it comes directly after the Code view area (the Intent view moved to the sidebar, 2026-10-06)',
   !!panel && panel.previousElementSibling === doc.getElementById('tabSource'));
 ok('until the first press it holds a note naming the button',
-  text(panel).includes('Preprocess & convert'), text(panel).slice(0, 80));
+  text(panel).includes('Process file'), text(panel).slice(0, 80));   // the button's name since 2026-10-06 (was "Preprocess & convert")
 
 // ── F5, call 90: no live region on the report ─────────────────────────
 group('F5 call 90: no live region in the Preprocess panel');
