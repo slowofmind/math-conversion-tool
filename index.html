@@ -127,18 +127,16 @@
   .upload-menu [role="menuitem"]:hover,
   .upload-menu [role="menuitem"]:focus { background: var(--accent); color: #fff; }
   .upload-menu [role="separator"] { height: 1px; margin: 4px 0; background: var(--border); }
-  /* Sample picker (a native <dialog>, opened from the Upload ▾ menu) */
-  .sample-picker { width: min(360px, calc(100vw - 40px)); max-height: calc(100vh - 80px);
-    overflow: auto; padding: 18px 20px; border: 1px solid var(--border); border-radius: 8px;
-    background: var(--bg-primary); color: var(--text-primary);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); font-family: 'Roboto', sans-serif; font-size: 13px; }
-  .sample-picker::backdrop { background: rgba(0, 0, 0, 0.35); }
-  .sample-picker h2 { margin: 0 0 6px; font-size: 16px; }
-  .sample-picker-note { margin: 0 0 10px; color: var(--text-secondary); }
-  .sample-picker fieldset { margin: 0 0 10px; padding: 0; border: none; }
-  .sample-picker legend { margin-bottom: 4px; padding: 0; font-weight: 600; }
-  .sample-picker label { display: block; padding: 3px 0; cursor: pointer; }
-  .sample-picker-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+  /* Samples submenu (2026-10-06): "Open a Sample ▸" in the Upload ▾ menu opens a second
+     .upload-menu beside the first. It replaced the sample picker dialog. */
+  .upload-menu-sub { position: relative; }
+  .upload-menu-sub > [role="menuitem"] { display: flex; align-items: center; gap: 18px; }
+  .upload-menu .submenu-arrow { margin-left: auto; font-size: 11px; }
+  .upload-menu-sub > [role="menuitem"][aria-expanded="true"]:not(:focus) { background: var(--border); }
+  .upload-menu .sample-menu { top: -5px; left: 100%; margin: 0 0 0 2px; min-width: 0;
+    max-height: calc(100vh - 120px); overflow-y: auto; }
+  .upload-menu .menu-group-label { padding: 6px 14px 2px; font-size: 11.5px; font-weight: 600;
+    color: var(--text-secondary); cursor: default; }
 
   .toolbar-select {
     font-family: 'Roboto', sans-serif;
@@ -943,6 +941,18 @@
   #btnDownloadOutput:hover { background: var(--harvard-blue); color: #fff; }
   #btnDownloadScorm { color: var(--harvard-blue); border-color: var(--harvard-blue); font-size: 11px; }
   #btnDownloadScorm:hover { background: var(--harvard-blue); color: #fff; }
+  /* SCORM split button (2026-10-06, Nicholas): 📦 SCORM + ▾, like Upload Files. The menu opens
+     under ▾, aligned to the right edge, with the Upload menu's look (.upload-menu). ▾ is always
+     usable, so it stays blue while 📦 SCORM itself is greyed out. */
+  .scorm-split { position: relative; display: inline-flex; margin-right: 4px; }
+  .scorm-split #btnDownloadScorm { margin-right: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+  .scorm-split-toggle { margin: 0 0 0 -1px; padding: 3px 5px; font-size: 11px; color: var(--harvard-blue);
+    border-color: var(--harvard-blue); border-top-left-radius: 0; border-bottom-left-radius: 0; }
+  .scorm-split-toggle:hover { background: var(--harvard-blue); color: #fff; }
+  .upload-menu.scorm-menu { left: auto; right: 0; min-width: 0; }
+  .scorm-menu [role="menuitem"][aria-disabled="true"] { color: var(--text-muted); cursor: not-allowed; }
+  .scorm-menu [role="menuitem"][aria-disabled="true"]:hover,
+  .scorm-menu [role="menuitem"][aria-disabled="true"]:focus { background: var(--border); color: var(--text-primary); }
   /* Unavailable Download/SCORM (2026-10-05): stay visible and in the Tab order,
      greyed out; setActionAvailable() sets aria-disabled="true". The dashed
      border is a cue that does not rely on colour. #666 on #f5f5f5 is 5.27:1. */
@@ -1365,39 +1375,8 @@
 
 <input type="file" id="fileInput" multiple aria-label="Upload files">
 <input type="file" id="auxDirInput" webkitdirectory style="display:none;" aria-label="Upload a folder">
-<!-- Sample picker: opened from the Upload ▾ menu (a native <dialog>; see openSamplePicker) -->
-<dialog class="sample-picker" id="samplePicker" aria-labelledby="samplePickerTitle">
-  <form method="dialog">
-    <h2 id="samplePickerTitle">Open a Sample</h2>
-    <p class="sample-picker-note">The sample is added to the current project.</p>
-    <fieldset>
-      <legend>Math documents</legend>
-      <label><input type="radio" name="sample" value="samples/01-precalculus-algebra.tex" checked> Precalculus</label>
-      <label><input type="radio" name="sample" value="samples/02-linear-algebra-matrices.tex"> Linear algebra</label>
-      <label><input type="radio" name="sample" value="samples/03-intro-proofs.tex"> Proofs</label>
-      <label><input type="radio" name="sample" value="samples/04a-calculus-derivatives.tex"> Derivatives</label>
-      <label><input type="radio" name="sample" value="samples/04-calculus-limits.tex"> Limits</label>
-      <label><input type="radio" name="sample" value="samples/05-integration-techniques.tex"> Integration</label>
-      <label><input type="radio" name="sample" value="samples/06-multivariable-calculus.tex"> Multivariable calculus</label>
-      <label><input type="radio" name="sample" value="samples/07-differential-equations.tex"> Differential equations</label>
-    </fieldset>
-    <fieldset>
-      <legend>Known problems</legend>
-      <label><input type="radio" name="sample" value="samples/08-chain-rule-colorbox.tex"> Color boxes (xcolor)</label>
-      <label><input type="radio" name="sample" value="samples/09-diffcoeff-derivatives.tex"> The diffcoeff package</label>
-      <label><input type="radio" name="sample" value="samples/10-undefined-macros.tex"> Undefined macros</label>
-    </fieldset>
-    <fieldset>
-      <legend>Projects</legend>
-      <label><input type="radio" name="sample" value="samples/12-image-handling-demo.zip"> Images drawn in code and PDF images</label>
-      <label><input type="radio" name="sample" value="samples/13-workbook-demo.zip"> A complete workbook</label>
-    </fieldset>
-    <div class="sample-picker-actions">
-      <button type="button" class="pdf-modal-btn" id="samplePickerCancel">Cancel</button>
-      <button type="submit" class="pdf-modal-btn primary" value="open">Open</button>
-    </div>
-  </form>
-</dialog>
+<!-- The "Open a Sample" dialog was here until 2026-10-06; the samples are now a
+     submenu of the Upload ▾ menu (#sampleMenu). -->
 
 <!-- ═══ TITLE BAR ═══ -->
 <div class="title-bar">
@@ -1418,7 +1397,43 @@
         <li role="menuitem" tabindex="-1" data-action="files">Upload Files</li>
         <li role="menuitem" tabindex="-1" data-action="folder">Upload Folder</li>
         <li role="separator"></li>
-        <li role="menuitem" tabindex="-1" data-action="sample">Open a Sample</li>
+        <!-- Samples submenu (2026-10-06, Nicholas): replaced the "Open a Sample" dialog,
+             whose radio buttons were one Tab stop and, with NVDA in browse mode, could not
+             be arrowed through. Right arrow, Enter, Space or a click opens it (never hover);
+             Up/Down move; Enter, Space or a click loads the sample at once; Left or Escape
+             go back. Keys and clicks: setupUploadMenu. The group headings are hidden from
+             screen readers because they already name their groups. -->
+        <li role="none" class="upload-menu-sub">
+          <span role="menuitem" tabindex="-1" data-action="sample" id="sampleMenuItem"
+                aria-haspopup="menu" aria-expanded="false" aria-controls="sampleMenu"
+                title="The sample is added to the current project">Open a Sample<span class="submenu-arrow" aria-hidden="true">▸</span></span>
+          <div class="upload-menu sample-menu" id="sampleMenu" role="menu" aria-label="Samples" hidden>
+            <div role="group" aria-labelledby="sampleGroupMath">
+              <div class="menu-group-label" id="sampleGroupMath" aria-hidden="true">Math documents</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/01-precalculus-algebra.tex">Precalculus</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/02-linear-algebra-matrices.tex">Linear algebra</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/03-intro-proofs.tex">Proofs</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/04a-calculus-derivatives.tex">Derivatives</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/04-calculus-limits.tex">Limits</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/05-integration-techniques.tex">Integration</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/06-multivariable-calculus.tex">Multivariable calculus</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/07-differential-equations.tex">Differential equations</div>
+            </div>
+            <div role="separator"></div>
+            <div role="group" aria-labelledby="sampleGroupProblems">
+              <div class="menu-group-label" id="sampleGroupProblems" aria-hidden="true">Known problems</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/08-chain-rule-colorbox.tex">Color boxes (xcolor)</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/09-diffcoeff-derivatives.tex">The diffcoeff package</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/10-undefined-macros.tex">Undefined macros</div>
+            </div>
+            <div role="separator"></div>
+            <div role="group" aria-labelledby="sampleGroupProjects">
+              <div class="menu-group-label" id="sampleGroupProjects" aria-hidden="true">Projects</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/12-image-handling-demo.zip">Images drawn in code and PDF images</div>
+              <div role="menuitem" tabindex="-1" data-sample="samples/13-workbook-demo.zip">A complete workbook</div>
+            </div>
+          </div>
+        </li>
         <li role="separator"></li>
         <li role="menuitem" tabindex="-1" data-action="overleaf" title="Install the bookmarklet that sends Overleaf projects to this tool">Overleaf Setup<span class="sr-only"> (opens in a new tab)</span> <span aria-hidden="true">↗</span></li>
       </ul>
@@ -2257,7 +2272,7 @@
           meaning is ambiguous to a screen reader and lets you hear how each
           reading would sound. Findings are highlighted in the editor; the
           ◀ ▶ controls below this button step through them (F2 and Shift+F2
-          work from anywhere).</p>
+          work from anywhere while these controls are showing).</p>
         <button type="button" class="prep-btn" id="btnIntentScan"
                 title="Find math notation whose meaning is ambiguous to a screen reader, and hear what each reading would sound like"
                 aria-describedby="intentScanHint">🔎 Intent Scan</button>
@@ -2474,7 +2489,19 @@
         <span id="mathSubtitlesBox" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles" aria-disabled="true" aria-describedby="selMathSubtitlesWhy" title="Convert a document to HTML first."><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
         <span class="output-tab-spacer"></span>
         <button class="output-tab-action" id="btnDownloadOutput" title="Convert a document first." data-title-available="Download output" aria-label="Download output" aria-disabled="true" aria-describedby="btnDownloadOutputWhy">Download</button>
-        <button class="output-tab-action" id="btnDownloadScorm" title="Convert a document first." data-title-available="Download as SCORM package for Canvas LMS" aria-label="Download as SCORM package" aria-disabled="true" aria-describedby="btnDownloadScormWhy">📦 SCORM</button>
+        <!-- SCORM split button (2026-10-06, Nicholas): 📦 SCORM is unchanged; ▾ opens a menu with
+             "Download as SCORM package" (the same action; greyed with the same reason while it is
+             unavailable) and "Canvas Frame Fix" (install-fix-scorm-frames.html, the bookmarklet
+             instructions, in a new tab). Keys and clicks: setupScormMenu. -->
+        <span class="scorm-split">
+          <button class="output-tab-action" id="btnDownloadScorm" title="Convert a document first." data-title-available="Download as SCORM package for Canvas LMS" aria-label="Download as SCORM package" aria-disabled="true" aria-describedby="btnDownloadScormWhy">📦 SCORM</button><button class="output-tab-action scorm-split-toggle" id="btnScormMenu" type="button"
+                  aria-haspopup="menu" aria-expanded="false" aria-controls="scormMenu"
+                  aria-label="More SCORM options" title="More SCORM options"><span aria-hidden="true">▾</span></button>
+          <ul class="upload-menu scorm-menu" id="scormMenu" role="menu" aria-label="SCORM" hidden>
+            <li role="menuitem" tabindex="-1" data-action="download">Download as SCORM package</li>
+            <li role="menuitem" tabindex="-1" data-action="framefix" title="How to install and use the bookmarklet that fixes SCORM frames on Canvas pages">Canvas Frame Fix<span class="sr-only"> (opens in a new tab)</span><span aria-hidden="true"> ↗</span></li>
+          </ul>
+        </span>
         <button class="output-tab-action" id="btnOutputClose" title="Hide panel" aria-label="Close output panel">×</button>
       </div>
       <!-- Why Download/SCORM is unavailable: read as the button's description
@@ -3254,9 +3281,142 @@ async function addSupportFiles(files) {
   const toggle = document.getElementById('btnUploadMenu');
   const menu = document.getElementById('uploadMenu');
   if (!toggle || !menu) return;
-  const items = [...menu.querySelectorAll('[role="menuitem"]')];
+  // The menu's own items. The samples submenu (#sampleMenu, 2026-10-06) sits inside it,
+  // but has its own items and keys (below); it replaced the sample picker dialog.
+  const items = [...menu.querySelectorAll('[role="menuitem"]')].filter((it) => it.closest('[role="menu"]') === menu);
+  const subItem = document.getElementById('sampleMenuItem');
+  const sub = document.getElementById('sampleMenu');
+  const subItems = sub ? [...sub.querySelectorAll('[role="menuitem"]')] : [];
   let pressingToggle = false;   // a press on ▾ must not count as "focus left"
+  const openSub = () => {
+    if (!sub || !subItem) return;
+    sub.hidden = false;
+    subItem.setAttribute('aria-expanded', 'true');
+    subItems[0]?.focus();
+  };
+  const closeSub = (refocus) => {
+    if (!sub || sub.hidden) return;
+    sub.hidden = true;
+    subItem.setAttribute('aria-expanded', 'false');
+    if (refocus) subItem.focus();
+  };
   const open = (i) => {
+    menu.hidden = false;
+    toggle.setAttribute('aria-expanded', 'true');
+    items[(i + items.length) % items.length].focus();
+  };
+  const close = (refocus) => {
+    if (menu.hidden) return;
+    closeSub(false);
+    menu.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+    if (refocus) toggle.focus();
+  };
+  const choose = (item) => {
+    // "Open a Sample" opens the samples submenu (clicked again, closes it).
+    if (item === subItem) { if (sub && !sub.hidden) closeSub(true); else openSub(); return; }
+    close(true);
+    if (item.dataset.action === 'folder') document.getElementById('auxDirInput').click();
+    else if (item.dataset.action === 'overleaf') window.open('bookmarklet-install.html', '_blank', 'noopener');
+    else fileInput.click();
+  };
+  toggle.addEventListener('pointerdown', () => { pressingToggle = true; });
+  toggle.addEventListener('click', () => {
+    pressingToggle = false;
+    if (menu.hidden) open(0); else close(true);
+  });
+  toggle.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); open(0); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); open(items.length - 1); }
+  });
+  menu.addEventListener('keydown', (e) => {
+    if (sub && sub.contains(e.target)) return;   // the submenu's own keys, below
+    const i = items.indexOf(document.activeElement);
+    const go = (j) => { e.preventDefault(); closeSub(false); items[(j + items.length) % items.length].focus(); };
+    if (e.key === 'ArrowDown') go(i + 1);
+    else if (e.key === 'ArrowUp') go(i - 1);
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(items.length - 1);
+    else if (e.key === 'ArrowRight' && items[i] === subItem) { e.preventDefault(); openSub(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (i >= 0) choose(items[i]); }
+    else if (e.key === ' ') e.preventDefault();   // chosen on keyup, below
+    else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+    else if (e.key === 'Tab') close(false);
+  });
+  // Space chooses on keyup: choosing on keydown would move focus to ▾ first,
+  // and a Space keyup on a button presses it, reopening the menu.
+  menu.addEventListener('keyup', (e) => {
+    if (sub && sub.contains(e.target)) return;
+    const i = items.indexOf(document.activeElement);
+    if (e.key === ' ' && i >= 0) { e.preventDefault(); choose(items[i]); }
+  });
+  menu.addEventListener('focusout', (e) => {
+    if (pressingToggle) return;
+    if (!menu.contains(e.relatedTarget) && e.relatedTarget !== toggle) close(false);
+  });
+  items.forEach((it) => it.addEventListener('click', () => choose(it)));
+  // The samples submenu: Up/Down/Home/End move (headings are not items, so they are
+  // skipped); Enter, or Space on key up (as above), loads the sample at once and closes
+  // both menus; Left or Escape go back to "Open a Sample"; Tab closes both menus.
+  const chooseSample = (it) => { close(true); loadSample(it.dataset.sample); };
+  if (sub) {
+    sub.addEventListener('keydown', (e) => {
+      const i = subItems.indexOf(document.activeElement);
+      const n = subItems.length;
+      const go = (j) => { e.preventDefault(); subItems[(j + n) % n].focus(); };
+      if (e.key === 'ArrowDown') go(i + 1);
+      else if (e.key === 'ArrowUp') go(i - 1);
+      else if (e.key === 'Home') go(0);
+      else if (e.key === 'End') go(n - 1);
+      else if (e.key === 'ArrowLeft' || e.key === 'Escape') { e.preventDefault(); closeSub(true); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (i >= 0) chooseSample(subItems[i]); }
+      else if (e.key === ' ') e.preventDefault();
+      else if (e.key === 'Tab') close(false);
+    });
+    sub.addEventListener('keyup', (e) => {
+      const i = subItems.indexOf(document.activeElement);
+      if (e.key === ' ' && i >= 0) { e.preventDefault(); chooseSample(subItems[i]); }
+    });
+    subItems.forEach((it) => it.addEventListener('click', () => chooseSample(it)));
+  }
+  // A press on a heading or a divider must not take focus out of the menu (that would close it).
+  menu.addEventListener('mousedown', (e) => { if (!e.target.closest('[role="menuitem"]')) e.preventDefault(); });
+  document.addEventListener('pointerdown', (e) => {
+    if (!menu.hidden && !menu.contains(e.target) && !toggle.contains(e.target)) close(false);
+  });
+})();
+
+// ─── SCORM ▾ menu (2026-10-06, Nicholas) ───
+// 📦 SCORM is a split button like Upload Files. Its ▾ menu: "Download as SCORM package"
+// does what 📦 SCORM does (it clicks it, so the same checks run) and, while SCORM is
+// unavailable, is greyed with the button's reason (checked each time the menu opens);
+// "Canvas Frame Fix" opens the bookmarklet instructions (install-fix-scorm-frames.html)
+// in a new tab. ▾ is always usable: the instructions help before any conversion.
+// Keys as in the Upload menu: Down/Up on ▾ open at the first/last item; Up, Down, Home,
+// End move; Enter, or Space on key up, chooses; Escape closes (focus back on ▾); Tab
+// closes. A greyed item can be reached but does nothing.
+(function setupScormMenu() {
+  const toggle = document.getElementById('btnScormMenu');
+  const menu = document.getElementById('scormMenu');
+  const scormBtn = document.getElementById('btnDownloadScorm');
+  if (!toggle || !menu || !scormBtn) return;
+  const items = [...menu.querySelectorAll('[role="menuitem"]')];
+  const dl = menu.querySelector('[data-action="download"]');
+  let pressingToggle = false;   // a press on ▾ must not count as "focus left"
+  const sync = () => {
+    if (!dl) return;
+    if (isActionUnavailable(scormBtn)) {
+      dl.setAttribute('aria-disabled', 'true');
+      dl.setAttribute('aria-describedby', 'btnDownloadScormWhy');
+      dl.title = scormBtn.title;
+    } else {
+      dl.removeAttribute('aria-disabled');
+      dl.removeAttribute('aria-describedby');
+      dl.removeAttribute('title');
+    }
+  };
+  const open = (i) => {
+    sync();
     menu.hidden = false;
     toggle.setAttribute('aria-expanded', 'true');
     items[(i + items.length) % items.length].focus();
@@ -3268,11 +3428,10 @@ async function addSupportFiles(files) {
     if (refocus) toggle.focus();
   };
   const choose = (item) => {
+    if (item.getAttribute('aria-disabled') === 'true') return;
     close(true);
-    if (item.dataset.action === 'folder') document.getElementById('auxDirInput').click();
-    else if (item.dataset.action === 'sample') openSamplePicker();
-    else if (item.dataset.action === 'overleaf') window.open('bookmarklet-install.html', '_blank', 'noopener');
-    else fileInput.click();
+    if (item.dataset.action === 'download') scormBtn.click();
+    else if (item.dataset.action === 'framefix') window.open('install-fix-scorm-frames.html', '_blank', 'noopener');
   };
   toggle.addEventListener('pointerdown', () => { pressingToggle = true; });
   toggle.addEventListener('click', () => {
@@ -3291,12 +3450,10 @@ async function addSupportFiles(files) {
     else if (e.key === 'Home') go(0);
     else if (e.key === 'End') go(items.length - 1);
     else if (e.key === 'Enter') { e.preventDefault(); if (i >= 0) choose(items[i]); }
-    else if (e.key === ' ') e.preventDefault();   // chosen on keyup, below
+    else if (e.key === ' ') e.preventDefault();
     else if (e.key === 'Escape') { e.preventDefault(); close(true); }
     else if (e.key === 'Tab') close(false);
   });
-  // Space chooses on keyup: choosing on keydown would move focus to ▾ first,
-  // and a Space keyup on a button presses it, reopening the menu.
   menu.addEventListener('keyup', (e) => {
     const i = items.indexOf(document.activeElement);
     if (e.key === ' ' && i >= 0) { e.preventDefault(); choose(items[i]); }
@@ -3316,7 +3473,7 @@ async function addSupportFiles(files) {
 // the project at the top level, gives it its own editor document, makes it
 // the file being edited and converted, and redraws the file tree. A .zip
 // (a sample PROJECT) is sent by handleFileUpload() to the zip importer, so
-// a zipped project needs only a line in the sample picker (#samplePicker).
+// a zipped project needs only a line in the samples submenu (#sampleMenu).
 // Until 2026-09-28 the text went straight into the editor with setText(),
 // leaving the project's previous main file in place: the next save-back
 // then copied the sample's text into that file.
@@ -3342,27 +3499,12 @@ async function loadSample(path) {
   }
 }
 
-// The sample picker (Upload ▾ > Open a Sample) is a native <dialog>:
-// showModal() keeps focus inside, Escape closes it, and focus goes back to
-// where it was. Moving through the list loads nothing; Open (or Enter) loads
-// the chosen sample. It replaced the toolbar's Sample Files drop-down on
-// 2026-09-29: that took toolbar width, and on Windows its arrow keys loaded
-// each sample in turn.
-const samplePicker = document.getElementById('samplePicker');
-let samplePickerReturn = null;
-function openSamplePicker() {
-  if (!samplePicker || samplePicker.open) return;
-  samplePickerReturn = document.activeElement;
-  samplePicker.returnValue = '';
-  samplePicker.showModal();
-}
-document.getElementById('samplePickerCancel')?.addEventListener('click', () => samplePicker.close('cancel'));
-samplePicker?.addEventListener('close', () => {
-  if (document.activeElement === document.body && samplePickerReturn) samplePickerReturn.focus();
-  if (samplePicker.returnValue !== 'open') return;
-  const chosen = samplePicker.querySelector('input[name="sample"]:checked');
-  if (chosen) loadSample(chosen.value);
-});
+// The samples are a submenu of the Upload ▾ menu (#sampleMenu; keys and clicks in
+// setupUploadMenu above). Moving through it loads nothing; Enter, Space or a click
+// loads the chosen sample at once. History: a toolbar Sample Files drop-down until
+// 2026-09-29 (it took toolbar width, and on Windows its arrow keys loaded each sample
+// in turn); then a dialog of radio buttons until 2026-10-06 (Nicholas could not arrow
+// or tab through it: one Tab stop, and NVDA's browse mode reads with the arrows).
 
 // ─── Drag-and-drop file upload onto editor ───
 const editorContent = document.querySelector('.editor-content');
@@ -6372,6 +6514,152 @@ function addScormHeightReport(htmlText, scriptHtml) {
 
 const SCORM_HEIGHT_REPORT_URL = './scorm/height-report.html';
 
+// ─── Measuring a multi-page SCORM package (2026-10-06, Nicholas: "Let's try Option 1") ───
+// One Canvas frame shows every page of a multi-page package, so the frame has to fit the
+// tallest page. When the package is made, every page is opened out of sight and measured at
+// these widths: the bookmarklet sizes for 800 px, or for a narrower Canvas column. The tallest
+// height at each width goes into every page (window.ATC_SCORM_TALLEST), and the page's height
+// report (scorm/height-report.html, version 2) gives the bookmarklet the figure for its width.
+// Every 50 px from 1200 to 400. Heights do not move one way as the column changes: a style can
+// change at a set width (Pandoc's own style shrinks its padding and type below 600 px), and
+// figures sized as a share of the width make a page TALLER on a wider column (Canvas test,
+// 2026-10-06). So the report takes the tallest figure at the frame's width or any wider one,
+// and figures stop growing at SCORM_FIGURE_CAP (below), well inside 1200 px.
+const SCORM_MEASURE_WIDTHS = [1200, 1150, 1100, 1050, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400];
+const SCORM_REFERENCE_WIDTH = 800;   // the bookmarklet sizes for this, or for a narrower column
+
+// Figures sized as a share of the width (Pandoc writes style="width:60.0%") grow with the
+// column, so a page with figures gets taller on a wide screen and the Canvas frame comes up
+// short (2026-10-06, Nicholas: "proceed with your recommendation"). In SCORM packages only,
+// each such figure also gets a max-width: the same share of SCORM_FIGURE_CAP px. It scales as
+// before until its container is that wide (a column of about 900 px in the Canvas style), then
+// stops growing, keeping its proportions. Text is untouched, and so are HTML downloads.
+const SCORM_FIGURE_CAP = 700;
+function capScaledFigures(html) {
+  return html.replace(/<img\b[^>]*>/gi, (tag) => {
+    const m = tag.match(/\bstyle\s*=\s*(["'])([^"']*)\1/i);
+    if (!m || /max-width\s*:/i.test(m[2])) return tag;
+    const w = m[2].match(/(?:^|;)\s*width\s*:\s*([\d.]+)%/i);
+    if (!w) return tag;
+    const px = Math.round(parseFloat(w[1]) / 100 * SCORM_FIGURE_CAP);
+    const sep = /;\s*$/.test(m[2]) ? '' : ';';
+    return tag.replace(m[0], 'style=' + m[1] + m[2] + sep + 'max-width:' + px + 'px' + m[1]);
+  });
+}
+const SCORM_IMAGE_MIME = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', svg: 'image/svg+xml', webp: 'image/webp' };
+
+function bytesToDataUrl(data, mime) {
+  let bin = '';
+  for (let i = 0; i < data.length; i += 0x8000) bin += String.fromCharCode.apply(null, data.subarray(i, i + 0x8000));
+  return 'data:' + mime + ';base64,' + btoa(bin);
+}
+
+/**
+ * A measuring copy of a page with its own images put in as data: URLs, so a srcdoc frame
+ * (which has no address to load them from) lays them out at their real size. Only images
+ * that are files in the package; everything else is left alone. Never packaged.
+ */
+function inlinePackageImages(html, files) {
+  const byName = new Map(files.map((f) => [f.name.replace(/^\.\//, ''), f]));
+  return html.replace(/(<img\b[^>]*?\bsrc\s*=\s*)(["'])([^"']*)\2/gi, (m, pre, q, src) => {
+    if (/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(src)) return m;
+    let key = src.replace(/^\.\//, '').split(/[?#]/)[0];
+    try { key = decodeURIComponent(key); } catch { /* keep it as written */ }
+    const f = byName.get(key);
+    const mime = SCORM_IMAGE_MIME[(key.split('.').pop() || '').toLowerCase()];
+    return f && mime ? pre + q + bytesToDataUrl(f.data, mime) + q : m;
+  });
+}
+
+// The helper put into each measuring copy (never packaged): once the page has loaded and its
+// math and fonts are done, it answers each 'atc.measure' with the body's height. Timers rather
+// than animation frames, which browsers pause in frames nobody can see.
+const SCORM_MEASURE_SCRIPT = '<script>(function () {'
+  + 'var loaded = new Promise(function (r) { if (document.readyState === "complete") { r(); } else { window.addEventListener("load", function () { r(); }); } });'
+  + 'function ready() { return loaded.then(function () { return Promise.all([window.MathJax && window.MathJax.startup && window.MathJax.startup.promise,'
+  + ' document.fonts && document.fonts.ready]).catch(function () {}); }); }'
+  + 'window.addEventListener("message", function (e) { var d = e.data; if (!d || d.subject !== "atc.measure") { return; }'
+  + ' ready().then(function () { return new Promise(function (r) { var t0 = Date.now(); (function poll() {'
+  + ' if (Math.abs(window.innerWidth - d.width) <= 1 || Date.now() - t0 > 2000) { setTimeout(r, 60); } else { setTimeout(poll, 30); } })(); }); }).then(function () {'
+  + ' parent.postMessage({ subject: "atc.measured", step: d.step, height: Math.ceil(document.body.getBoundingClientRect().height) }, "*"); }); });'
+  + 'ready().then(function () { parent.postMessage({ subject: "atc.measureReady" }, "*"); });'
+  + '})();<\/script>';
+
+/**
+ * The tallest page of a multi-page SCORM package at each width in SCORM_MEASURE_WIDTHS, as
+ * { pages, measured, heights: { 800: px, ... } } (body heights; the report adds its margin),
+ * or null if no page could be measured. One page at a time; a page that does not answer in
+ * time is skipped (and named in the console).
+ */
+async function measureScormPages(files) {
+  const dec = new TextDecoder();
+  const pages = files.filter((f) => /\.html?$/i.test(f.name));
+  const heights = {};
+  let measured = 0;
+  for (const p of pages) {
+    const html = inlinePackageImages(dec.decode(p.data), files);
+    const at = html.toLowerCase().lastIndexOf('</body>');
+    const doc = at < 0 ? html + SCORM_MEASURE_SCRIPT : html.slice(0, at) + SCORM_MEASURE_SCRIPT + html.slice(at);
+    const got = await measureOnePage(doc);
+    if (!got) { console.warn('SCORM: page not measured:', p.name); continue; }
+    measured++;
+    for (const w of SCORM_MEASURE_WIDTHS) if (got[w] > (heights[w] || 0)) heights[w] = got[w];
+  }
+  return measured ? { pages: pages.length, measured, heights } : null;
+}
+
+/**
+ * Opens one measuring copy and reads its body height at each width. The frame runs the page's
+ * own scripts (so math is drawn) but is sandboxed without allow-same-origin, so it cannot reach
+ * this page, and inert, so it takes no focus and screen readers skip it. It sits inside the
+ * window, transparent and behind the page, because browsers pause frames placed out of view.
+ * Resolves { width: height } or null on a time-out.
+ */
+function measureOnePage(doc) {
+  return new Promise((resolve) => {
+    const f = document.createElement('iframe');
+    f.setAttribute('sandbox', 'allow-scripts');
+    f.setAttribute('inert', '');
+    f.setAttribute('aria-hidden', 'true');
+    f.title = 'Measuring a page for Canvas';
+    // Very tall, as the bookmarklet makes the frame while measuring, so the page has no
+    // scroll bar of its own to narrow it.
+    f.style.cssText = 'position:fixed;left:0;top:0;height:20000px;border:0;opacity:0;pointer-events:none;z-index:-1;';
+    const out = {};
+    let step = -1, timer = 0, done = false;
+    const finish = (good) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      window.removeEventListener('message', onMessage);
+      f.remove();
+      resolve(good ? out : null);
+    };
+    const next = () => {
+      step++;
+      if (step >= SCORM_MEASURE_WIDTHS.length) { finish(true); return; }
+      f.style.width = SCORM_MEASURE_WIDTHS[step] + 'px';
+      clearTimeout(timer);
+      timer = setTimeout(() => finish(false), 10000);
+      f.contentWindow.postMessage({ subject: 'atc.measure', step, width: SCORM_MEASURE_WIDTHS[step] }, '*');
+    };
+    function onMessage(e) {
+      if (e.source !== f.contentWindow || !e.data) return;
+      if (e.data.subject === 'atc.measureReady' && step === -1) next();
+      else if (e.data.subject === 'atc.measured' && e.data.step === step) {
+        const h = Number(e.data.height);
+        if (Number.isFinite(h) && h > 0) out[SCORM_MEASURE_WIDTHS[step]] = Math.ceil(h);
+        next();
+      }
+    }
+    window.addEventListener('message', onMessage);
+    timer = setTimeout(() => finish(false), 30000);   // loading, math and fonts
+    f.style.width = SCORM_MEASURE_WIDTHS[0] + 'px';
+    f.srcdoc = doc;
+    document.body.appendChild(f);
+  });
+}
+
 /**
  * Every file in a zip (folder entries skipped), as [{ name, data }] with data
  * a Uint8Array, in the zip's own order. Uses JSZip, which the page already
@@ -6508,31 +6796,48 @@ document.getElementById('btnDownloadScorm').addEventListener('click', async (e) 
     const baseName = lastOutput.filename.replace(/\.\w+$/, '');
     const name = scormPackageName(new TextDecoder().decode(launchFile.data), baseName);
 
-    // Height report for the Fix SCORM frames bookmarklet: single-page output
-    // only (decided 2026-10-05). In a Chunked HTML package the bookmarklet
-    // would measure the short first page and longer sections would scroll;
-    // without the script it falls back to a tall suggested height, which
-    // fitted every page in Nicholas's Canvas test. Flag, don't fail: without
-    // the script the package still works.
+    // Height report for the Fix SCORM frames bookmarklet. A single page reports its own
+    // height. A multi-page package (2026-10-06, Nicholas: "Let's try Option 1"; until then it
+    // had no script, decided 2026-10-05) is measured now, every page, and the tallest heights
+    // go before the script in every page, so the bookmarklet sizes the one Canvas frame to fit
+    // every page. Flag, don't fail: without the script, or if no page could be measured, the
+    // package still works and the bookmarklet suggests a height to adjust.
     let heightScript = '';
-    if (!isZip) {
-      try {
-        const r = await fetch(SCORM_HEIGHT_REPORT_URL);
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        heightScript = await r.text();
-      } catch (err) {
-        console.warn('SCORM: height report not added (' + SCORM_HEIGHT_REPORT_URL + '):', err);
-      }
+    try {
+      const r = await fetch(SCORM_HEIGHT_REPORT_URL);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      heightScript = await r.text();
+    } catch (err) {
+      console.warn('SCORM: height report not added (' + SCORM_HEIGHT_REPORT_URL + '):', err);
     }
-
     // Images a single page points to (Embed Images off, e.g. Canvas style),
     // from the files the conversion gave Pandoc, at the same paths. Chunked
     // HTML needs nothing here: Pandoc's zip already carries its images.
+    // Collected before measuring, so the measured page shows them.
     let missingImages = [];
     if (!isZip) {
       const images = await collectPageImages(new TextDecoder().decode(launchFile.data), lastOutput.files);
       files.push(...images.found);
       missingImages = images.missing;
+    }
+
+    // Figures stop growing past a set width, in every page (see capScaledFigures).
+    for (const f of files) {
+      if (/\.html?$/i.test(f.name)) f.data = new TextEncoder().encode(capScaledFigures(new TextDecoder().decode(f.data)));
+    }
+
+    // Every package is measured, single pages too (2026-10-06): a page with figures can be
+    // taller on a wider column than at the width the bookmarklet measures, so a page's own
+    // live report is not enough. If measuring fails, a single page still reports its own
+    // height; a multi-page package gets no script (the bookmarklet suggests a height).
+    let tallest = null;
+    if (heightScript) {
+      const n = files.filter((f) => /\.html?$/i.test(f.name)).length;
+      updateStatus('loading', 'Measuring ' + (n === 1 ? 'the page' : n + ' pages') + ' for Canvas…');
+      tallest = await measureScormPages(files);
+      heightScript = tallest
+        ? '<script>window.ATC_SCORM_TALLEST = ' + JSON.stringify(tallest) + ';<\/script>\n' + heightScript
+        : (isZip ? '' : heightScript);
     }
 
     // Manifest listing every file, all entries dated now (see makeScormPackage)
@@ -6547,6 +6852,17 @@ document.getElementById('btnDownloadScorm').addEventListener('click', async (e) 
     a.click();
     URL.revokeObjectURL(url);
     maybeExportProfileWithOutput();
+    if (tallest) {
+      // What the bookmarklet will set on a column of SCORM_REFERENCE_WIDTH: the tallest at that
+      // width or any wider one (the report adds its 16 px margin).
+      // (from the widest measured width not wider than 780 px: the report leaves 20 px for a scroll bar)
+      const fromW = Math.max(...SCORM_MEASURE_WIDTHS.filter((w) => w <= SCORM_REFERENCE_WIDTH - 20));
+      const forCanvas = Math.max(...SCORM_MEASURE_WIDTHS.filter((w) => w >= fromW).map((w) => tallest.heights[w] || 0));
+      updateStatus('ready', 'SCORM package made. Height for Canvas: ' + forCanvas + ' px (a column ' + SCORM_REFERENCE_WIDTH
+        + ' px wide or wider' + (tallest.pages > 1 ? '; ' + tallest.measured + ' of ' + tallest.pages + ' pages measured' : '') + ').');
+    } else if (isZip) {
+      updateStatus('ready', 'SCORM package made, but its pages could not be measured, so Canvas Frame Fix will suggest a height to adjust.');
+    }
     if (missingImages.length) {   // flag, don't fail: the package is made without them
       console.warn('SCORM: images not packaged:', missingImages);
       updateStatus('ready', 'SCORM package made, but ' + missingImages.length

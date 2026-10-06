@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fix SCORM frames: bookmarklet</title>
+<!-- Fonts: the computer's own (2026-10-06, Nicholas); the page loads nothing from the web. -->
+<style>
+  :root {
+    --ink: #1f2a33;
+    --ink-soft: #4a5660;
+    --paper: #ffffff;
+    --mist: #f3f5f7;
+    --rule: #d4d9de;
+    --crimson: #a51c30;
+    --navy: #2b426e;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 400 1.0625rem/1.6 var(--sans);
+  }
+  main {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 4rem;
+  }
+  h1 {
+    margin: 0 0 .75rem;
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+  h2 {
+    margin: 2.75rem 0 .75rem;
+    font-size: 1.3125rem;
+    line-height: 1.3;
+    font-weight: 700;
+  }
+  p { margin: 0 0 1rem; }
+  a { color: var(--navy); text-underline-offset: .15em; }
+  code { font-family: var(--mono); font-size: .92em; }
+  kbd {
+    font-family: var(--mono);
+    font-size: .85em;
+    padding: .05em .35em;
+    border: 1px solid var(--rule);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: var(--mist);
+  }
+  .lede { color: var(--ink-soft); }
+
+  /* The bookmarks bar: the one thing on this page you act on. */
+  .bar {
+    margin: 2rem 0 .5rem;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .bar-chrome {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .55rem .9rem;
+    background: var(--mist);
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-soft);
+    font-size: .875rem;
+  }
+  .bar-chrome .dot {
+    width: .7rem; height: .7rem; border-radius: 50%;
+    background: var(--rule);
+  }
+  .bar-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem .9rem;
+  }
+  .bookmark {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .55rem 1rem .55rem .8rem;
+    border-radius: 6px;
+    background: var(--crimson);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: grab;
+  }
+  .bookmark svg { flex: none; }
+  .bookmark:active { cursor: grabbing; }
+  .bookmark:focus-visible,
+  button:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible {
+    outline: 3px solid var(--navy);
+    outline-offset: 2px;
+  }
+  .bar-hint { color: var(--ink-soft); font-size: .9375rem; }
+  .click-note {
+    min-height: 1.6em;
+    margin: .25rem 0 0;
+    font-size: .9375rem;
+    color: var(--crimson);
+  }
+
+  ol.steps { padding-left: 1.4rem; margin: 0 0 1rem; }
+  ol.steps > li { margin: 0 0 .9rem; padding-left: .25rem; }
+  ol.steps > li::marker { font-weight: 700; }
+
+  .panel {
+    margin: .75rem 0 1rem;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: var(--mist);
+  }
+  .panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .5rem .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .panel-head label, .panel-head span { font-weight: 600; font-size: .9375rem; }
+  .panel pre, .panel textarea {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: .75rem;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: 400 .8125rem/1.5 var(--mono);
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .panel textarea {
+    height: 6.5rem;
+    resize: vertical;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  button.copy {
+    min-height: 2.25rem;
+    padding: .35rem .9rem;
+    border: 1px solid var(--navy);
+    border-radius: 5px;
+    background: var(--paper);
+    color: var(--navy);
+    font: 600 .875rem/1.2 var(--sans);
+    cursor: pointer;
+  }
+  button.copy:hover { background: var(--navy); color: #fff; }
+  .copy-status { font-size: .875rem; color: var(--ink-soft); }
+
+  .aside {
+    margin: 1.25rem 0 0;
+    padding: .9rem 1rem;
+    border-left: 4px solid var(--navy);
+    background: var(--mist);
+  }
+  .aside p:last-child { margin-bottom: 0; }
+
+  @media (max-width: 30rem) {
+    main { padding-top: 2rem; }
+    h1 { font-size: 1.625rem; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Fix SCORM frames</h1>
+  <p class="lede">A bookmark for Canvas Pages that show an imported SCORM package. It sets the frame to fill
+  the column, to be tall enough for the document, and to have a title for screen readers. It shows you the
+  changes first and saves only when you choose Save.</p>
+
+  <div class="bar">
+    <div class="bar-chrome" aria-hidden="true">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span>Bookmarks bar</span>
+    </div>
+    <div class="bar-body">
+      <a id="bm-link" class="bookmark" href="javascript:!function()%7Bvar%20e%3Dfunction()%7B%22use%20strict%22%3Bvar%20e%3D%5B%22give%20this%20a%20real%2C%20specific%20name%22%5D%2Ct%3D%2F%3Ciframe%5Cb(%3F%3A%5B%5E%3E%22'%5D%7C%22%5B%5E%22%5D*%22%7C'%5B%5E'%5D*')*%3E%2Fgi%2Cn%3D%2F(%5B%5E%5Cs%22'%3E%5C%2F%3D%5D%2B)(%3F%3A%5Cs*%3D%5Cs*(%3F%3A%22(%5B%5E%22%5D*)%22%7C'(%5B%5E'%5D*)'%7C(%5B%5E%5Cs%22'%3D%3C%3E%60%5D%2B)))%3F%2Fg%2Ca%3D%7Bamp%3A%22%26%22%2Cquot%3A'%22'%2Capos%3A%22'%22%2Clt%3A%22%3C%22%2Cgt%3A%22%3E%22%2Cnbsp%3A%22%5Cxa0%22%7D%3Bfunction%20i(e)%7Breturn%20e.replace(%2F%26(%23x%5B0-9a-f%5D%2B%7C%23%5Cd%2B%7C%5Ba-z%5D%2B)%3B%2Fgi%2Cfunction(e%2Ct)%7Bif(%22%23%22%3D%3D%3Dt%5B0%5D)%7Bvar%20n%3D%22x%22%3D%3D%3Dt%5B1%5D%7C%7C%22X%22%3D%3D%3Dt%5B1%5D%3FparseInt(t.slice(2)%2C16)%3AparseInt(t.slice(1)%2C10)%3Breturn%20isFinite(n)%3FString.fromCodePoint(n)%3Ae%7Dvar%20i%3Da%5Bt.toLowerCase()%5D%3Breturn%20void%200%3D%3D%3Di%3Fe%3Ai%7D)%7Dfunction%20r(e)%7Breturn%20String(e).replace(%2F%26%2Fg%2C%22%26amp%3B%22).replace(%2F%22%2Fg%2C%22%26quot%3B%22).replace(%2F%3C%2Fg%2C%22%26lt%3B%22).replace(%2F%3E%2Fg%2C%22%26gt%3B%22)%7Dfunction%20o(e)%7Bvar%20t%2Ca%3De.replace(%2F%5E%3Ciframe%5Cb%2Fi%2C%22%22).slice(0%2C-1)%2Cr%3D%5B%5D%3Bfor(n.lastIndex%3D0%3Bt%3Dn.exec(a)%3B)%7Bvar%20o%3Dvoid%200!%3D%3Dt%5B2%5D%3Ft%5B2%5D%3Avoid%200!%3D%3Dt%5B3%5D%3Ft%5B3%5D%3Avoid%200!%3D%3Dt%5B4%5D%3Ft%5B4%5D%3Anull%3Br.push(%7Bname%3At%5B1%5D.toLowerCase()%2Craw%3At%5B0%5D%2Cvalue%3Anull%3D%3D%3Do%3F%22%22%3Ai(o)%7D)%7Dreturn%20r%7Dfunction%20s(e%2Ct)%7Bfor(var%20n%3D0%3Bn%3Ce.length%3Bn%2B%2B)if(e%5Bn%5D.name%3D%3D%3Dt)return%20e%5Bn%5D.value%3Breturn%20null%7Dfunction%20l(e)%7Bif(!e%7C%7C!%2F%5C%2Fexternal_tools%5C%2Fretrieve%5Cb%2F.test(e))return%20null%3Bvar%20t%3De.indexOf(%22%3F%22)%3Bif(t%3C0)return%20null%3Bvar%20n%3Dnull%3Bif(e.slice(t%2B1).split(%22%23%22)%5B0%5D.split(%22%26%22).forEach(function(e)%7Bvar%20t%3De.indexOf(%22%3D%22)%3Bif(t%3E0%26%26%22url%22%3D%3D%3De.slice(0%2Ct))%7Bvar%20a%3De.slice(t%2B1)%3Btry%7Bn%3DdecodeURIComponent(a.replace(%2F%5C%2B%2Fg%2C%22%20%22))%7Dcatch(e)%7Bn%3Da%7D%7D%7D)%2C!n%7C%7C!%2Fscone%7Cinsops%2Fi.test(n))return%20null%3Bvar%20a%3D%2F%5C%2Fpackages%5C%2F(%5Cd%2B)%2F.exec(n)%3Breturn%7BlaunchUrl%3An%2CpackageId%3Aa%3Fa%5B1%5D%3Anull%7D%7Dfunction%20d(e)%7Bvar%20n%2Ca%3D%5B%5D%3Bfor(t.lastIndex%3D0%3Bn%3Dt.exec(e)%3B)%7Bvar%20i%3Do(n%5B0%5D)%2Cr%3Ds(i%2C%22src%22)%2Cd%3Dl(r)%3Bd%26%26a.push(%7Bstart%3An.index%2Cend%3An.index%2Bn%5B0%5D.length%2Ctag%3An%5B0%5D%2Cattrs%3Ai%2Csrc%3Ar%2CpackageId%3Ad.packageId%2Cwidth%3As(i%2C%22width%22)%2Cheight%3As(i%2C%22height%22)%2Ctitle%3As(i%2C%22title%22)%2Cstyle%3As(i%2C%22style%22)%7D)%7Dreturn%20a%7Dfunction%20c(t)%7Bvar%20n%3D(t%7C%7C%22%22).trim().toLowerCase()%3Breturn%22%22%3D%3D%3Dn%7C%7C-1!%3D%3De.indexOf(n)%7Dfunction%20u(e%2Ct)%7Bvar%20n%3DObject.keys(t)%3Bif(!n.length)return%20e.tag%3Bvar%20a%3D%7B%7D%2Ci%3D%5B%5D%3Breturn%20e.attrs.forEach(function(e)%7Bif(Object.prototype.hasOwnProperty.call(t%2Ce.name))%7Bif(a%5Be.name%5D)return%3Ba%5Be.name%5D%3D!0%2Ci.push(e.name%2B'%3D%22'%2Br(t%5Be.name%5D)%2B'%22')%7Delse%20i.push(e.raw)%7D)%2Cn.forEach(function(e)%7Ba%5Be%5D%7C%7Ci.push(e%2B'%3D%22'%2Br(t%5Be%5D)%2B'%22')%7D)%2C%22%3Ciframe%20%22%2Bi.join(%22%20%22)%2B%22%3E%22%7Dreturn%7BfindFrames%3Ad%2CscormInfo%3Al%2CsuggestedTitle%3Afunction(e%2Ct%2Cn%2Ca)%7Bif(!c(e.title))return%20e.title%3Bvar%20i%3D(t%7C%7C%22%22).trim()%7C%7C%22SCORM%20content%22%3Breturn%20a%3E1%3Fi%2B%22%20(%22%2B(n%2B1)%2B%22%20of%20%22%2Ba%2B%22)%22%3Ai%7D%2CisPlaceholderTitle%3Ac%2CplanFor%3Afunction(e%2Ct)%7Bvar%20n%2Ca%2Ci%3D%7B%7D%3Breturn%22100%25%22!%3D%3De.width%26%26(i.width%3D%22100%25%22)%2Cvoid%200!%3D%3Dt.height%26%26e.height!%3D%3DString(t.height)%26%26(i.height%3DString(t.height))%2Cvoid%200!%3D%3Dt.title%26%26e.title!%3D%3Dt.title%26%26(i.title%3Dt.title)%2C(e.style%7C%7C%22%22).split(%22%3B%22).some(function(e)%7Bvar%20t%3De.indexOf(%22%3A%22)%3Bif(t%3C0)return!1%3Bvar%20n%3De.slice(0%2Ct).trim().toLowerCase()%2Ca%3De.slice(t%2B1).trim().toLowerCase()%3Breturn(%22border%22%3D%3D%3Dn%7C%7C%22border-width%22%3D%3D%3Dn%7C%7C%22border-style%22%3D%3D%3Dn)%26%26%2F%5E(0(px)%3F%7Cnone)%5Cb%2F.test(a)%7D)%7C%7C(i.style%3D(n%3De.style%2C(a%3D(n%7C%7C%22%22).split(%22%3B%22).map(function(e)%7Breturn%20e.trim()%7D).filter(function(e)%7Breturn%20e%26%26!%2F%5Eborder(-%5Ba-z-%5D%2B)%3F%5Cs*%3A%2Fi.test(e)%7D)).push(%22border%3A%200%22)%2Ca.join(%22%3B%20%22)%2B%22%3B%22))%2Ci%7D%2CbuildTag%3Au%2Crewrite%3Afunction(e%2Ct%2Cn)%7Bvar%20a%3D%22%22%2Ci%3D0%3Breturn%20t.forEach(function(t%2Cr)%7Ba%2B%3De.slice(i%2Ct.start)%2Bu(t%2Cn%5Br%5D%7C%7C%7B%7D)%2Ci%3Dt.end%7D)%2Ca%2Be.slice(i)%7D%2Cverify%3Afunction(e%2Ct)%7Bvar%20n%3Dd(e)%2Ca%3D%5B%5D%3Breturn%20n.length!%3D%3Dt.length%3F(a.push(%22Expected%20%22%2Bt.length%2B%22%20SCORM%20frame(s)%20after%20saving%2C%20found%20%22%2Bn.length%2B%22.%22)%2Ca)%3A(t.forEach(function(e%2Ct)%7Bvar%20i%3Dn%5Bt%5D%3B%22100%25%22!%3D%3Di.width%26%26a.push(%22Frame%20%22%2B(t%2B1)%2B%22%20width%20is%20%22%2Bi.width%2B%22%2C%20not%20100%25.%22)%2Cvoid%200!%3D%3De.height%26%26i.height!%3D%3DString(e.height)%26%26a.push(%22Frame%20%22%2B(t%2B1)%2B%22%20height%20is%20%22%2Bi.height%2B%22%2C%20not%20%22%2Be.height%2B%22.%22)%2Cvoid%200!%3D%3De.title%26%26i.title!%3D%3De.title%26%26a.push(%22Frame%20%22%2B(t%2B1)%2B'%20title%20is%20%22'%2Bi.title%2B'%22%2C%20not%20%22'%2Be.title%2B'%22.')%7D)%2Ca)%7D%7D%7D()%3B!function()%7B%22use%20strict%22%3Bvar%20t%3De%2Cn%3D%22atc-fix-dialog%22%2Ca%3Ddocument.getElementById(n)%2Ci%3Da%26%26a.atcReturnFocus%7C%7Cdocument.activeElement%3Ba%26%26(a.atcCleanup%26%26a.atcCleanup()%2Ca.remove())%3Bvar%20r%3D%5B%5D%3Bfunction%20o()%7Bfor(%3Br.length%3B)try%7Br.pop()()%7Dcatch(e)%7B%7D%7Dvar%20s%3Ddocument.createElement(%22dialog%22)%3Bs.id%3Dn%2Cs.atcReturnFocus%3Di%2Cs.atcCleanup%3Do%2Cs.setAttribute(%22aria-labelledby%22%2Cn%2B%22-title%22)%3Bvar%20l%3D%22%23%22%2Bn%2Cd%3Ddocument.createElement(%22style%22)%3Bd.textContent%3D%5Bl%2B'%7Bbox-sizing%3Aborder-box%3Bwidth%3Amin(40rem%2Ccalc(100vw%20-%202rem))%3Bmax-height%3Acalc(100vh%20-%202rem)%3Boverflow%3Aauto%3Bmargin%3Aauto%3Bpadding%3A1.25rem%201.5rem%201rem%3Bborder%3A1px%20solid%20%235c6770%3Bborder-radius%3A8px%3Bbackground%3A%23fff%3Bcolor%3A%231f2a33%3Bbox-shadow%3A0%2010px%2030px%20rgba(15%2C23%2C31%2C.3)%3Bfont%3A400%201rem%2F1.5%20system-ui%2C-apple-system%2C%22Segoe%20UI%22%2CRoboto%2CHelvetica%2CArial%2Csans-serif%3Btext-align%3Aleft%7D'%2Cl%2B%22%3A%3Abackdrop%7Bbackground%3Argba(15%2C23%2C31%2C.5)%7D%22%2Cl%2B%22%20h2%7Bmargin%3A0%200%20.5rem%3Bpadding%3A0%3Bfont-family%3Ainherit%3Bfont-size%3A1.25rem%3Bfont-weight%3A700%3Bline-height%3A1.3%3Bcolor%3A%231f2a33%7D%22%2Cl%2B%22%20p%7Bmargin%3A0%200%20.6rem%7D%22%2Cl%2B%22%20fieldset%7Bmargin%3A.75rem%200%3Bpadding%3A.6rem%20.9rem%20.3rem%3Bborder%3A1px%20solid%20%23c7cdd1%3Bborder-radius%3A6px%7D%22%2Cl%2B%22%20legend%7Bpadding%3A0%20.3rem%3Bfont-weight%3A700%7D%22%2Cl%2B%22%20.atc-field%7Bmargin%3A.5rem%200%20.75rem%7D%22%2Cl%2B%22%20label%7Bdisplay%3Ablock%3Bmargin%3A0%200%20.2rem%3Bfont-weight%3A600%7D%22%2Cl%2B%22%20input%7Bbox-sizing%3Aborder-box%3Bwidth%3A100%25%3Bmin-height%3A2.4rem%3Bmargin%3A0%3Bpadding%3A.35rem%20.55rem%3Bborder%3A1px%20solid%20%235c6770%3Bborder-radius%3A4px%3Bbackground%3A%23fff%3Bcolor%3A%231f2a33%3Bfont%3Ainherit%7D%22%2Cl%2B%22%20input%5Btype%3Dnumber%5D%7Bwidth%3A10rem%7D%22%2Cl%2B%22%20input%5Baria-invalid%3Dtrue%5D%7Bborder%3A2px%20solid%20%23c71f23%7D%22%2Cl%2B%22%20.atc-hint%7Bmargin%3A.25rem%200%200%3Bfont-size%3A.875rem%3Bcolor%3A%2347535c%7D%22%2Cl%2B%22%20.atc-actions%7Bdisplay%3Aflex%3Bflex-wrap%3Awrap%3Bgap%3A.5rem%3Bmargin-top%3A.9rem%7D%22%2Cl%2B%22%20button%7Bmin-height%3A2.5rem%3Bpadding%3A.45rem%201rem%3Bborder-radius%3A5px%3Bcursor%3Apointer%3Bfont-family%3Ainherit%3Bfont-size%3A.9375rem%3Bfont-weight%3A600%3Bline-height%3A1.2%7D%22%2Cl%2B%22%20button%5Bdisabled%5D%7Bopacity%3A.55%3Bcursor%3Adefault%7D%22%2Cl%2B%22%20.atc-primary%7Bbackground%3A%23a51c30%3Bborder%3A1px%20solid%20%23a51c30%3Bcolor%3A%23fff%7D%22%2Cl%2B%22%20.atc-secondary%7Bbackground%3A%23fff%3Bborder%3A1px%20solid%20%235c6770%3Bcolor%3A%231f2a33%7D%22%2Cl%2B%22%20button%3Afocus-visible%2C%22%2Bl%2B%22%20input%3Afocus-visible%7Boutline%3A3px%20solid%20%232b426e%3Boutline-offset%3A2px%7D%22%2Cl%2B%22%20.atc-status%7Bmin-height%3A1.5em%3Bmargin%3A.6rem%200%200%3Bfont-size%3A.9375rem%7D%22%2Cl%2B%22%20.atc-status.atc-error%7Bcolor%3A%23c71f23%3Bfont-weight%3A600%7D%22%5D.join(%22%5Cn%22)%2Cs.appendChild(d)%3Bvar%20c%3Dm(%22h2%22%2C%7Bid%3An%2B%22-title%22%7D%2C%22Fix%20SCORM%20frames%22)%2Cu%3Dm(%22div%22)%2Ch%3Dm(%22p%22%2C%7Bclass%3A%22atc-status%22%2Crole%3A%22status%22%7D)%2Cp%3Dm(%22div%22%2C%7Bclass%3A%22atc-actions%22%7D)%2Cf%3Dm(%22button%22%2C%7Btype%3A%22button%22%2Cclass%3A%22atc-primary%22%7D%2C%22Save%20changes%22)%2Cg%3Dm(%22button%22%2C%7Btype%3A%22button%22%2Cclass%3A%22atc-secondary%22%7D%2C%22Cancel%22)%3Bfunction%20m(e%2Ct%2Cn)%7Bvar%20a%3Ddocument.createElement(e)%3Breturn%20Object.keys(t%7C%7C%7B%7D).forEach(function(e)%7Ba.setAttribute(e%2Ct%5Be%5D)%7D)%2Cvoid%200!%3D%3Dn%26%26(a.textContent%3Dn)%2Ca%7Df.hidden%3D!0%2Cp.appendChild(f)%2Cp.appendChild(g)%2Cs.appendChild(c)%2Cs.appendChild(u)%2Cs.appendChild(p)%2Cs.appendChild(h)%2Cg.addEventListener(%22click%22%2Cfunction()%7Bs.close()%7D)%2Cs.addEventListener(%22close%22%2Cfunction()%7Bo()%2Cs.remove()%2Ci%26%26%22function%22%3D%3Dtypeof%20i.focus%26%26document.contains(i)%26%26i.focus()%7D)%2Cdocument.body.appendChild(s)%2Cs.showModal()%2Cg.focus()%3Bvar%20v%3D0%3Bfunction%20b(e%2Ct)%7Bvar%20n%3D%2B%2Bv%3Bh.className%3D%22atc-status%22%2B(t%3F%22%20atc-error%22%3A%22%22)%2Ch.textContent%3D%22%22%2CsetTimeout(function()%7Bn%3D%3D%3Dv%26%26(h.textContent%3De)%7D%2C50)%7Dfunction%20w(e%2Ct)%7Bc.textContent%3De%2Cu.textContent%3D%22%22%2Cu.appendChild(m(%22p%22%2C%7B%7D%2Ct))%2Cf.hidden%3D!0%2Cg.textContent%3D%22Close%22%2Cg.className%3D%22atc-primary%22%2Cv%2B%2B%2Ch.textContent%3D%22%22%2Cg.focus()%7Dvar%20C%3D%22object%22%3D%3Dtypeof%20window.ENV%26%26window.ENV%3Fwindow.ENV%3Anull%2Cy%3D!!C%7C%7C!!document.querySelector(%22%23application.ic-app%2C%20.ic-app%22)%2Cx%3D%2F%5C%2Fpages%5C%2F%5B%5E%2F%5D%2B%5C%2Fedit%5Cb%2F.test(location.pathname)%7C%7C%2F%5C%2Fpages%5C%2Fnew%5Cb%2F.test(location.pathname)%7C%7C!!document.querySelector(%22iframe%23wiki_page_body_ifr%2C%20.tox-edit-area%20iframe%22)%3Bif(y)if(x)w(%22Open%20the%20page%2C%20not%20the%20editor%22%2C%22You%20are%20in%20the%20page%20editor.%20Save%20or%20cancel%2C%20then%20click%20the%20bookmark%20on%20the%20page%20itself.%22)%3Belse%7Bvar%20k%3D%2F%5C%2Fcourses%5C%2F(%5Cd%2B)%5C%2Fpages%5C%2F(%5B%5E%2F%3F%23%5D%2B)%2F.exec(location.pathname)%2CS%3DC%26%26C.COURSE_ID%7C%7Ck%26%26k%5B1%5D%7C%7C(%2F%5C%2Fcourses%5C%2F(%5Cd%2B)%2F.exec(location.pathname)%7C%7C%5B%5D)%5B1%5D%2CE%3DC%26%26C.WIKI_PAGE%26%26C.WIKI_PAGE.url%7C%7Ck%26%26decodeURIComponent(k%5B2%5D)%3Bif(S%26%26E)%7Bvar%20T%3D%22%2Fapi%2Fv1%2Fcourses%2F%22%2BencodeURIComponent(S)%2B%22%2Fpages%2F%22%2BencodeURIComponent(E)%2CO%3Dnull%2CR%3D%5B%5D%2CI%3D%5B%5D%3Bb(%22Reading%20the%20page%20from%20Canvas...%22)%2CN(%22GET%22).then(function(e)%7Bif(O%3De%2C%22block_editor%22%3D%3D%3De.editor%7C%7Ce.block_editor_attributes)return%20w(%22Block%20editor%20page%22%2C%22This%20page%20uses%20Canvas's%20newer%20block%20editor%2C%20which%20this%20bookmark%20does%20not%20handle%20yet.%22)%2Cnull%3Bif(!(R%3Dt.findFrames(e.body%7C%7C%22%22)).length)return%20w(%22No%20SCORM%20frames%20on%20this%20page%22%2C%22This%20page%20has%20no%20frames%20showing%20an%20imported%20SCORM%20package%2C%20so%20there%20is%20nothing%20to%20change.%22)%2Cnull%3Bvar%20n%3Ddocument.querySelector(%22%23wiki_page_show%20.show-content%2C%20.show-content.user_content%2C%20.user_content%22)%7C%7Cdocument%2Ca%3DArray.prototype.filter.call(n.querySelectorAll(%22iframe%22)%2Cfunction(e)%7Breturn!!t.scormInfo(e.getAttribute(%22src%22)%7C%7C%22%22)%7D)%2Ci%3DR.map(function(e%2Cn)%7Bvar%20i%3De.packageId%26%26a.filter(function(n)%7Bvar%20a%3Dt.scormInfo(n.getAttribute(%22src%22))%3Breturn%20a%26%26a.packageId%3D%3D%3De.packageId%7D)%3Breturn%20i%26%261%3D%3D%3Di.length%3Fi%5B0%5D%3Aa%5Bn%5D%7C%7Cnull%7D)%3Breturn%20b(%22Measuring%20the%20document%22%2B(R.length%3E1%3F%22s%22%3A%22%22)%2B%22.%20The%20frame%20briefly%20changes%20width.%22)%2Cfunction(e)%7Breturn%20new%20Promise(function(t)%7Bif(e.filter(Boolean).length)%7Bvar%20n%3D%5B%5B%5D%2C%5B%5D%5D%2Ca%3D%5B%5D%2Ci%3D%5B%5B%5D%2C%5B%5D%5D%2Co%3D0%2Cs%3D0%2Cl%3D!1%2Cd%3De.map(function(e)%7Breturn%20e%3F%7Bwidth%3Ae.style.width%2Cheight%3Ae.style.height%7D%3Anull%7D)%3Bwindow.addEventListener(%22message%22%2Cp)%2Cr.push(function()%7Bl%3D!0%2Cwindow.removeEventListener(%22message%22%2Cp)%2Cf()%7D)%2Ce.forEach(function(e)%7Be%26%26%22lazy%22%3D%3D%3De.getAttribute(%22loading%22)%26%26e.setAttribute(%22loading%22%2C%22eager%22)%7D)%3Bvar%20c%3De.filter(Boolean)%5B0%5D.parentElement.getBoundingClientRect().width%2Cu%3DMath.max(200%2CMath.min(800%2CMath.floor(c)))%2Ch%3DMath.round(u%2F2)%3Bo%3D0%2Cm(h)%2Cg(function()%7Bo%3D1%2Cm(u)%2Cg(function()%7Bl%3D!0%2Cwindow.removeEventListener(%22message%22%2Cp)%2Cf()%2Ct(e.map(function(e%2Ct)%7Bvar%20r%3Dvoid%200!%3D%3Dn%5B1%5D%5Bt%5D%3Fn%5B1%5D%5Bt%5D%3An%5B0%5D%5Bt%5D%3Bif(void%200%3D%3D%3Dr)return%20null%3Bvar%20o%3Dfunction(e%2Ct)%7Bvar%20n%3DNumber(t)%3Bif(!isFinite(n)%7C%7Cn%3C%3D0%7C%7Cn%3Ee)return%200%3Bvar%20a%3DMath.round(e-n)%3Breturn%20a%3C%3D400%3Fa%3A0%7D(2e4%2Cvoid%200!%3D%3Di%5B1%5D%5Bt%5D%3Fi%5B1%5D%5Bt%5D%3Ai%5B0%5D%5Bt%5D)%3Breturn%7Bheight%3Ar%2Bo%2Cwidth%3Au%2Cpages%3Aa%5Bt%5D%7C%7C1%2Cgap%3Ao%7D%7D))%7D)%7D)%7Delse%20t(e.map(function()%7Breturn%20null%7D))%3Bfunction%20p(t)%7Bvar%20r%3Dt.data%3Bif(%22string%22%3D%3Dtypeof%20r)try%7Br%3DJSON.parse(r)%7Dcatch(e)%7Breturn%7Dif(r%26%26%22atc.documentHeight%22%3D%3D%3Dr.subject)%7Bvar%20l%3DNumber(r.height)%3Bif(!(!isFinite(l)%7C%7Cl%3C20%7C%7Cl%3E2e5))%7Bvar%20d%3Dfunction(t)%7Bfor(var%20n%3Dt%2Ca%3D0%3Ba%3C12%26%26n%3Ba%2B%2B)%7Bfor(var%20i%3D0%3Bi%3Ce.length%3Bi%2B%2B)if(e%5Bi%5D%26%26e%5Bi%5D.contentWindow%3D%3D%3Dn)return%20i%3Bvar%20r%3Btry%7Br%3Dn.parent%7Dcatch(e)%7Breturn-1%7Dif(!r%7C%7Cr%3D%3D%3Dn)return-1%3Bn%3Dr%7Dreturn-1%7D(t.source)%3Bif(!(d%3C0))%7Bn%5Bo%5D%5Bd%5D%3DMath.ceil(l)%2CNumber(r.pages)%3E1%26%26(a%5Bd%5D%3DNumber(r.pages))%3Bvar%20c%3DNumber(r.viewport)%3BisFinite(c)%26%26c%3E0%26%26(i%5Bo%5D%5Bd%5D%3Dc)%2Cs%3DDate.now()%7D%7D%7D%7Dfunction%20f()%7Be.forEach(function(e%2Ct)%7Be%26%26(e.style.width%3Dd%5Bt%5D.width%2Ce.style.height%3Dd%5Bt%5D.height)%7D)%7Dfunction%20g(t)%7Bvar%20a%3DDate.now()%3B!function%20i()%7Bif(!l)%7Bvar%20r%3De.every(function(e%2Ct)%7Breturn!e%7C%7Cvoid%200!%3D%3Dn%5Bo%5D%5Bt%5D%7D)%2Cd%3DDate.now()-s%3E500%3Br%26%26d%7C%7CDate.now()-a%3E3e3%3Ft()%3AsetTimeout(i%2C100)%7D%7D()%7Dfunction%20m(t)%7Be.forEach(function(e)%7Be%26%26(e.style.width%3Dt%2B%22px%22%2Ce.style.height%3D%2220000px%22)%7D)%7D%7D)%7D(i)%7D).then(function(e)%7Be%26%26function(e)%7Bu.textContent%3D%22%22%2Cc.textContent%3DR.length%3E1%3F%22Fix%20%22%2BR.length%2B%22%20SCORM%20frames%22%3A%22Fix%20the%20SCORM%20frame%22%2Cu.appendChild(m(%22p%22%2C%7B%7D%2C%22These%20settings%20are%20saved%20into%20the%20page.%20Canvas%20keeps%20the%20previous%20version%20in%20the%20page%20history.%22))%2CI%3DR.map(function(a%2Ci)%7Bvar%20r%3Dm(%22fieldset%22)%3Br.appendChild(m(%22legend%22%2C%7B%7D%2CR.length%3E1%3F%22Frame%20%22%2B(i%2B1)%2B%22%20of%20%22%2BR.length%3A%22The%20SCORM%20frame%22))%2Cr.appendChild(m(%22p%22%2C%7B%7D%2C%22100%25%22%3D%3D%3Da.width%3F%22Width%3A%20already%20fills%20the%20column.%22%3A%22Width%3A%20%22%2B(a.width%7C%7C%22not%20set%22)%2B%22%20now%3B%20will%20fill%20the%20column%20(100%25).%22))%3Bvar%20o%3De%5Bi%5D%2Cs%3Do%3Fo.height%3Aa.height%26%26%221000%22!%3D%3Da.height%26%26%2F%5E%5Cd%2B%24%2F.test(a.height)%3FNumber(a.height)%3A2400%2Cl%3Dn%2B%22-h%22%2Bi%2Cd%3Dm(%22div%22%2C%7Bclass%3A%22atc-field%22%7D)%3Bd.appendChild(m(%22label%22%2C%7Bfor%3Al%7D%2C%22Height%20in%20pixels%22))%3Bvar%20c%3Dm(%22input%22%2C%7Bid%3Al%2Ctype%3A%22number%22%2Cmin%3AString(100)%2Cmax%3AString(3e4)%2Cstep%3A%221%22%2Cinputmode%3A%22numeric%22%2C%22aria-describedby%22%3Al%2B%22-hint%22%7D)%3Bc.value%3DString(s)%2Cd.appendChild(c)%2Cd.appendChild(m(%22p%22%2C%7Bid%3Al%2B%22-hint%22%2Cclass%3A%22atc-hint%22%7D%2Co%3F(o.pages%3E1%3F%22The%20tallest%20of%20this%20package's%20%22%2Bo.pages%2B%22%20pages%20at%20%22%2Bo.width%2B%22%20px%20wide%2C%20measured%20when%20the%20package%20was%20made%2C%20so%20every%20page%20fits%20there%20and%20on%20wider%20screens%3B%20shorter%20pages%20have%20blank%20space%20below.%20Now%3A%20%22%3A%22Measured%20from%20the%20document%20at%20%22%2Bo.width%2B%22%20px%20wide%2C%20so%20it%20fits%20there%20and%20on%20wider%20screens.%20Now%3A%20%22)%2B(a.height%7C%7C%22not%20set%22)%2B%22.%22%2B(o.gap%3E0%3F%22%20This%20includes%20%22%2Bo.gap%2B%22%20px%20for%20the%20Canvas%20SCORM%20player%20around%20the%20document.%22%3A%22%22)%3A%22This%20package%20does%20not%20report%20its%20height%2C%20so%20this%20is%20a%20suggestion.%20Scroll%20inside%20the%20frame%20to%20judge%20the%20length%3B%20blank%20space%20below%20a%20short%20document%20is%20harmless.%20Now%3A%20%22%2B(a.height%7C%7C%22not%20set%22)%2B%22.%22))%2Cr.appendChild(d)%3Bvar%20h%3Dn%2B%22-t%22%2Bi%2Cp%3Dm(%22div%22%2C%7Bclass%3A%22atc-field%22%7D)%3Bp.appendChild(m(%22label%22%2C%7Bfor%3Ah%7D%2C%22Frame%20title%20(what%20screen%20readers%20announce)%22))%3Bvar%20f%3Dm(%22input%22%2C%7Bid%3Ah%2Ctype%3A%22text%22%2Cmaxlength%3A%22200%22%2C%22aria-describedby%22%3Ah%2B%22-hint%22%7D)%3Breturn%20f.value%3Dt.suggestedTitle(a%2CO.title%2Ci%2CR.length)%2Cp.appendChild(f)%2Cp.appendChild(m(%22p%22%2C%7Bid%3Ah%2B%22-hint%22%2Cclass%3A%22atc-hint%22%7D%2C%22Now%3A%20%22%2B(t.isPlaceholderTitle(a.title)%3Fa.title%3F'%22'%2Ba.title%2B'%22%20(a%20placeholder)'%3A%22no%20title%22%3A'%22'%2Ba.title%2B'%22')%2B%22.%22))%2Cr.appendChild(p)%2Cu.appendChild(r)%2C%7Bheight%3Ac%2Ctitle%3Af%7D%7D)%2Cf.hidden%3D!1%2Cf.disabled%3D!1%2Cg.textContent%3D%22Cancel%22%2Cb(%22%22)%2CI%5B0%5D.height.focus()%7D(e)%7D).catch(function(e)%7Bw(%22Could%20not%20read%20the%20page%22%2CM(e))%7D)%2Cf.addEventListener(%22click%22%2Cfunction()%7Bvar%20e%3Dfunction()%7Bfor(var%20e%3D%5B%5D%2Ct%3D0%3Bt%3CI.length%3Bt%2B%2B)%7Bvar%20n%3DI%5Bt%5D.height%2Ca%3DI%5Bt%5D.title%3Bn.removeAttribute(%22aria-invalid%22)%2Ca.removeAttribute(%22aria-invalid%22)%3Bvar%20i%3DNumber(n.value)%3Bif(!%2F%5E%5Cd%2B%24%2F.test(n.value.trim())%7C%7Ci%3C100%7C%7Ci%3E3e4)return%20n.setAttribute(%22aria-invalid%22%2C%22true%22)%2Cn.focus()%2Cb(%22Height%20must%20be%20a%20whole%20number%20from%20100%20to%2030000.%22%2C!0)%2Cnull%3Bvar%20r%3Da.value.trim()%3Bif(!r)return%20a.setAttribute(%22aria-invalid%22%2C%22true%22)%2Ca.focus()%2Cb(%22Every%20frame%20needs%20a%20title%2C%20so%20screen%20readers%20can%20announce%20it.%22%2C!0)%2Cnull%3Be.push(%7Bheight%3Ai%2Ctitle%3Ar%7D)%7Dreturn%20e%7D()%3Be%26%26(f.disabled%3D!0%2Cg.disabled%3D!0%2Cb(%22Saving...%22)%2CN(%22GET%22).then(function(n)%7Bvar%20a%3Dt.findFrames(n.body%7C%7C%22%22)%3Bif(n.updated_at!%3D%3DO.updated_at%7C%7Ca.length!%3D%3DR.length)%7Bvar%20i%3Dnew%20Error(%22changed%22)%3Bthrow%20i.changed%3D!0%2Ci%7Dvar%20r%3Da.map(function(n%2Ca)%7Breturn%20t.planFor(n%2Ce%5Ba%5D)%7D)%2Co%3Dt.rewrite(n.body%2Ca%2Cr)%3Breturn%20o%3D%3D%3Dn.body%3F%22unchanged%22%3AN(%22PUT%22%2C%7Bwiki_page%3A%7Bbody%3Ao%7D%7D).then(function(n)%7Breturn%20t.verify(n.body%7C%7C%22%22%2Ce)%7D)%7D).then(function(e)%7Breturn%20g.disabled%3D!1%2C%22unchanged%22%3D%3D%3De%3F(b(%22Nothing%20needed%20changing%3B%20the%20frame%22%2B(R.length%3E1%3F%22s%20were%22%3A%22%20was%22)%2B%22%20already%20set%20this%20way.%22)%2Cg.textContent%3D%22Close%22%2Cvoid%20g.focus())%3Ae.length%3F(b(%22Saved%2C%20but%20Canvas%20altered%20some%20settings%3A%20%22%2Be.join(%22%20%22)%2B%22%20Reload%20the%20page%20to%20see%20the%20result.%22%2C!0)%2Cg.textContent%3D%22Close%22%2Cvoid%20g.focus())%3A(b(%22Saved.%20Reloading%20the%20page...%22)%2Co()%2Cvoid%20setTimeout(function()%7Blocation.reload()%7D%2C1200))%7D).catch(function(e)%7Bf.disabled%3D!1%2Cg.disabled%3D!1%2Cb(e.changed%3F%22This%20page%20changed%20in%20Canvas%20after%20the%20dialog%20opened%2C%20so%20nothing%20was%20saved.%20Close%20this%2C%20reload%20the%20page%20and%20try%20again.%22%3A%22Nothing%20was%20saved.%20%22%2BM(e)%2C!0)%7D))%7D)%7Delse%20w(%22Not%20a%20Canvas%20Page%22%2C%22This%20works%20on%20Canvas%20Pages.%20Open%20the%20page%20that%20shows%20the%20SCORM%20package%20(Pages%2C%20then%20its%20title)%20and%20click%20the%20bookmark%20again.%22)%7Delse%20w(%22Not%20a%20Canvas%20page%22%2C%22This%20page%20does%20not%20look%20like%20Canvas.%20Open%20the%20Canvas%20Page%20that%20shows%20the%20SCORM%20package%20and%20click%20the%20bookmark%20again.%22)%3Bfunction%20N(e%2Ct)%7Bvar%20n%2Ca%3D%7Bmethod%3Ae%2Ccredentials%3A%22same-origin%22%2Cheaders%3A%7BAccept%3A%22application%2Fjson%22%2C%22X-Requested-With%22%3A%22XMLHttpRequest%22%7D%7D%3Breturn%20t%26%26(a.headers%5B%22Content-Type%22%5D%3D%22application%2Fjson%22%2Ca.headers%5B%22X-CSRF-Token%22%5D%3D(n%3D%2F(%3F%3A%5E%7C%3B%5Cs*)_csrf_token%3D(%5B%5E%3B%5D%2B)%2F.exec(document.cookie))%3FdecodeURIComponent(n%5B1%5D)%3A%22%22%2Ca.body%3DJSON.stringify(t))%2Cfetch(T%2Ca).then(function(e)%7Breturn%20e.text().then(function(t)%7Bvar%20n%3Dnull%3Btry%7Bn%3DJSON.parse(t.replace(%2F%5Ewhile%5C(1%5C)%3B%2F%2C%22%22))%7Dcatch(e)%7Bn%3Dnull%7Dif(!e.ok)%7Bvar%20a%3Dnew%20Error(%22HTTP%20%22%2Be.status)%3Bthrow%20a.status%3De.status%2Ca.data%3Dn%2Ca%7Dif(!n)throw%20new%20Error(%22Canvas%20sent%20something%20that%20was%20not%20page%20data.%22)%3Breturn%20n%7D)%7D)%7Dfunction%20M(e)%7Breturn%20401%3D%3D%3De.status%7C%7C403%3D%3D%3De.status%3F%22Canvas%20refused%20(HTTP%20%22%2Be.status%2B%22).%20Your%20role%20may%20not%20allow%20editing%20this%20page.%22%3A422%3D%3D%3De.status%26%26e.data%26%26-1!%3D%3DJSON.stringify(e.data).indexOf(%22uthenticity%22)%3F%22Canvas%20rejected%20the%20request's%20security%20token.%20Reload%20the%20page%20and%20try%20again.%22%3A404%3D%3D%3De.status%3F%22Canvas%20could%20not%20find%20this%20page%20through%20its%20API%20(HTTP%20404).%22%3Ae.status%3F%22Canvas%20returned%20an%20error%20(HTTP%20%22%2Be.status%2B%22).%22%3A%22Could%20not%20reach%20Canvas%3A%20%22%2Be.message%7D%7D()%7D()%3Bvoid%200%3B">
+        <svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true" focusable="false">
+          <path d="M1 1h12v16l-6-4.2L1 17z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+        </svg>Fix SCORM frames</a>
+      <span class="bar-hint">Drag this to your bookmarks bar.</span>
+    </div>
+  </div>
+  <p id="click-note" class="click-note" role="status"></p>
+
+  <h2>1. Install the bookmark</h2>
+  <p>Show your bookmarks bar with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>, then drag the crimson
+  button above onto it.</p>
+  <p>If you would rather not drag, copy the bookmark code below and create the bookmark by hand.
+  In Chrome, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd>, open the menu at the top right and choose
+  Add new bookmark. In Edge, go to <code>edge://favorites</code> and choose Add favorite.
+  Name it <strong>Fix SCORM frames</strong> and paste the code as the URL.</p>
+  <div class="panel">
+    <div class="panel-head">
+      <label for="bm-code">Bookmark code</label>
+      <span>
+        <span class="copy-status" id="bm-code-status" role="status"></span>
+        <button type="button" class="copy" data-copy="bm-code" data-status="bm-code-status">Copy bookmark code</button>
+      </span>
+    </div>
+    <textarea id="bm-code" readonly spellcheck="false">javascript:!function()%7Bvar%20e%3Dfunction()%7B%22use%20strict%22%3Bvar%20e%3D%5B%22give%20this%20a%20real%2C%20specific%20name%22%5D%2Ct%3D%2F%3Ciframe%5Cb(%3F%3A%5B%5E%3E%22'%5D%7C%22%5B%5E%22%5D*%22%7C'%5B%5E'%5D*')*%3E%2Fgi%2Cn%3D%2F(%5B%5E%5Cs%22'%3E%5C%2F%3D%5D%2B)(%3F%3A%5Cs*%3D%5Cs*(%3F%3A%22(%5B%5E%22%5D*)%22%7C'(%5B%5E'%5D*)'%7C(%5B%5E%5Cs%22'%3D%3C%3E%60%5D%2B)))%3F%2Fg%2Ca%3D%7Bamp%3A%22%26%22%2Cquot%3A'%22'%2Capos%3A%22'%22%2Clt%3A%22%3C%22%2Cgt%3A%22%3E%22%2Cnbsp%3A%22%5Cxa0%22%7D%3Bfunction%20i(e)%7Breturn%20e.replace(%2F%26(%23x%5B0-9a-f%5D%2B%7C%23%5Cd%2B%7C%5Ba-z%5D%2B)%3B%2Fgi%2Cfunction(e%2Ct)%7Bif(%22%23%22%3D%3D%3Dt%5B0%5D)%7Bvar%20n%3D%22x%22%3D%3D%3Dt%5B1%5D%7C%7C%22X%22%3D%3D%3Dt%5B1%5D%3FparseInt(t.slice(2)%2C16)%3AparseInt(t.slice(1)%2C10)%3Breturn%20isFinite(n)%3FString.fromCodePoint(n)%3Ae%7Dvar%20i%3Da%5Bt.toLowerCase()%5D%3Breturn%20void%200%3D%3D%3Di%3Fe%3Ai%7D)%7Dfunction%20r(e)%7Breturn%20String(e).replace(%2F%26%2Fg%2C%22%26amp%3B%22).replace(%2F%22%2Fg%2C%22%26quot%3B%22).replace(%2F%3C%2Fg%2C%22%26lt%3B%22).replace(%2F%3E%2Fg%2C%22%26gt%3B%22)%7Dfunction%20o(e)%7Bvar%20t%2Ca%3De.replace(%2F%5E%3Ciframe%5Cb%2Fi%2C%22%22).slice(0%2C-1)%2Cr%3D%5B%5D%3Bfor(n.lastIndex%3D0%3Bt%3Dn.exec(a)%3B)%7Bvar%20o%3Dvoid%200!%3D%3Dt%5B2%5D%3Ft%5B2%5D%3Avoid%200!%3D%3Dt%5B3%5D%3Ft%5B3%5D%3Avoid%200!%3D%3Dt%5B4%5D%3Ft%5B4%5D%3Anull%3Br.push(%7Bname%3At%5B1%5D.toLowerCase()%2Craw%3At%5B0%5D%2Cvalue%3Anull%3D%3D%3Do%3F%22%22%3Ai(o)%7D)%7Dreturn%20r%7Dfunction%20s(e%2Ct)%7Bfor(var%20n%3D0%3Bn%3Ce.length%3Bn%2B%2B)if(e%5Bn%5D.name%3D%3D%3Dt)return%20e%5Bn%5D.value%3Breturn%20null%7Dfunction%20l(e)%7Bif(!e%7C%7C!%2F%5C%2Fexternal_tools%5C%2Fretrieve%5Cb%2F.test(e))return%20null%3Bvar%20t%3De.indexOf(%22%3F%22)%3Bif(t%3C0)return%20null%3Bvar%20n%3Dnull%3Bif(e.slice(t%2B1).split(%22%23%22)%5B0%5D.split(%22%26%22).forEach(function(e)%7Bvar%20t%3De.indexOf(%22%3D%22)%3Bif(t%3E0%26%26%22url%22%3D%3D%3De.slice(0%2Ct))%7Bvar%20a%3De.slice(t%2B1)%3Btry%7Bn%3DdecodeURIComponent(a.replace(%2F%5C%2B%2Fg%2C%22%20%22))%7Dcatch(e)%7Bn%3Da%7D%7D%7D)%2C!n%7C%7C!%2Fscone%7Cinsops%2Fi.test(n))return%20null%3Bvar%20a%3D%2F%5C%2Fpackages%5C%2F(%5Cd%2B)%2F.exec(n)%3Breturn%7BlaunchUrl%3An%2CpackageId%3Aa%3Fa%5B1%5D%3Anull%7D%7Dfunction%20d(e)%7Bvar%20n%2Ca%3D%5B%5D%3Bfor(t.lastIndex%3D0%3Bn%3Dt.exec(e)%3B)%7Bvar%20i%3Do(n%5B0%5D)%2Cr%3Ds(i%2C%22src%22)%2Cd%3Dl(r)%3Bd%26%26a.push(%7Bstart%3An.index%2Cend%3An.index%2Bn%5B0%5D.length%2Ctag%3An%5B0%5D%2Cattrs%3Ai%2Csrc%3Ar%2CpackageId%3Ad.packageId%2Cwidth%3As(i%2C%22width%22)%2Cheight%3As(i%2C%22height%22)%2Ctitle%3As(i%2C%22title%22)%2Cstyle%3As(i%2C%22style%22)%7D)%7Dreturn%20a%7Dfunction%20c(t)%7Bvar%20n%3D(t%7C%7C%22%22).trim().toLowerCase()%3Breturn%22%22%3D%3D%3Dn%7C%7C-1!%3D%3De.indexOf(n)%7Dfunction%20u(e%2Ct)%7Bvar%20n%3DObject.keys(t)%3Bif(!n.length)return%20e.tag%3Bvar%20a%3D%7B%7D%2Ci%3D%5B%5D%3Breturn%20e.attrs.forEach(function(e)%7Bif(Object.prototype.hasOwnProperty.call(t%2Ce.name))%7Bif(a%5Be.name%5D)return%3Ba%5Be.name%5D%3D!0%2Ci.push(e.name%2B'%3D%22'%2Br(t%5Be.name%5D)%2B'%22')%7Delse%20i.push(e.raw)%7D)%2Cn.forEach(function(e)%7Ba%5Be%5D%7C%7Ci.push(e%2B'%3D%22'%2Br(t%5Be%5D)%2B'%22')%7D)%2C%22%3Ciframe%20%22%2Bi.join(%22%20%22)%2B%22%3E%22%7Dreturn%7BfindFrames%3Ad%2CscormInfo%3Al%2CsuggestedTitle%3Afunction(e%2Ct%2Cn%2Ca)%7Bif(!c(e.title))return%20e.title%3Bvar%20i%3D(t%7C%7C%22%22).trim()%7C%7C%22SCORM%20content%22%3Breturn%20a%3E1%3Fi%2B%22%20(%22%2B(n%2B1)%2B%22%20of%20%22%2Ba%2B%22)%22%3Ai%7D%2CisPlaceholderTitle%3Ac%2CplanFor%3Afunction(e%2Ct)%7Bvar%20n%2Ca%2Ci%3D%7B%7D%3Breturn%22100%25%22!%3D%3De.width%26%26(i.width%3D%22100%25%22)%2Cvoid%200!%3D%3Dt.height%26%26e.height!%3D%3DString(t.height)%26%26(i.height%3DString(t.height))%2Cvoid%200!%3D%3Dt.title%26%26e.title!%3D%3Dt.title%26%26(i.title%3Dt.title)%2C(e.style%7C%7C%22%22).split(%22%3B%22).some(function(e)%7Bvar%20t%3De.indexOf(%22%3A%22)%3Bif(t%3C0)return!1%3Bvar%20n%3De.slice(0%2Ct).trim().toLowerCase()%2Ca%3De.slice(t%2B1).trim().toLowerCase()%3Breturn(%22border%22%3D%3D%3Dn%7C%7C%22border-width%22%3D%3D%3Dn%7C%7C%22border-style%22%3D%3D%3Dn)%26%26%2F%5E(0(px)%3F%7Cnone)%5Cb%2F.test(a)%7D)%7C%7C(i.style%3D(n%3De.style%2C(a%3D(n%7C%7C%22%22).split(%22%3B%22).map(function(e)%7Breturn%20e.trim()%7D).filter(function(e)%7Breturn%20e%26%26!%2F%5Eborder(-%5Ba-z-%5D%2B)%3F%5Cs*%3A%2Fi.test(e)%7D)).push(%22border%3A%200%22)%2Ca.join(%22%3B%20%22)%2B%22%3B%22))%2Ci%7D%2CbuildTag%3Au%2Crewrite%3Afunction(e%2Ct%2Cn)%7Bvar%20a%3D%22%22%2Ci%3D0%3Breturn%20t.forEach(function(t%2Cr)%7Ba%2B%3De.slice(i%2Ct.start)%2Bu(t%2Cn%5Br%5D%7C%7C%7B%7D)%2Ci%3Dt.end%7D)%2Ca%2Be.slice(i)%7D%2Cverify%3Afunction(e%2Ct)%7Bvar%20n%3Dd(e)%2Ca%3D%5B%5D%3Breturn%20n.length!%3D%3Dt.length%3F(a.push(%22Expected%20%22%2Bt.length%2B%22%20SCORM%20frame(s)%20after%20saving%2C%20found%20%22%2Bn.length%2B%22.%22)%2Ca)%3A(t.forEach(function(e%2Ct)%7Bvar%20i%3Dn%5Bt%5D%3B%22100%25%22!%3D%3Di.width%26%26a.push(%22Frame%20%22%2B(t%2B1)%2B%22%20width%20is%20%22%2Bi.width%2B%22%2C%20not%20100%25.%22)%2Cvoid%200!%3D%3De.height%26%26i.height!%3D%3DString(e.height)%26%26a.push(%22Frame%20%22%2B(t%2B1)%2B%22%20height%20is%20%22%2Bi.height%2B%22%2C%20not%20%22%2Be.height%2B%22.%22)%2Cvoid%200!%3D%3De.title%26%26i.title!%3D%3De.title%26%26a.push(%22Frame%20%22%2B(t%2B1)%2B'%20title%20is%20%22'%2Bi.title%2B'%22%2C%20not%20%22'%2Be.title%2B'%22.')%7D)%2Ca)%7D%7D%7D()%3B!function()%7B%22use%20strict%22%3Bvar%20t%3De%2Cn%3D%22atc-fix-dialog%22%2Ca%3Ddocument.getElementById(n)%2Ci%3Da%26%26a.atcReturnFocus%7C%7Cdocument.activeElement%3Ba%26%26(a.atcCleanup%26%26a.atcCleanup()%2Ca.remove())%3Bvar%20r%3D%5B%5D%3Bfunction%20o()%7Bfor(%3Br.length%3B)try%7Br.pop()()%7Dcatch(e)%7B%7D%7Dvar%20s%3Ddocument.createElement(%22dialog%22)%3Bs.id%3Dn%2Cs.atcReturnFocus%3Di%2Cs.atcCleanup%3Do%2Cs.setAttribute(%22aria-labelledby%22%2Cn%2B%22-title%22)%3Bvar%20l%3D%22%23%22%2Bn%2Cd%3Ddocument.createElement(%22style%22)%3Bd.textContent%3D%5Bl%2B'%7Bbox-sizing%3Aborder-box%3Bwidth%3Amin(40rem%2Ccalc(100vw%20-%202rem))%3Bmax-height%3Acalc(100vh%20-%202rem)%3Boverflow%3Aauto%3Bmargin%3Aauto%3Bpadding%3A1.25rem%201.5rem%201rem%3Bborder%3A1px%20solid%20%235c6770%3Bborder-radius%3A8px%3Bbackground%3A%23fff%3Bcolor%3A%231f2a33%3Bbox-shadow%3A0%2010px%2030px%20rgba(15%2C23%2C31%2C.3)%3Bfont%3A400%201rem%2F1.5%20system-ui%2C-apple-system%2C%22Segoe%20UI%22%2CRoboto%2CHelvetica%2CArial%2Csans-serif%3Btext-align%3Aleft%7D'%2Cl%2B%22%3A%3Abackdrop%7Bbackground%3Argba(15%2C23%2C31%2C.5)%7D%22%2Cl%2B%22%20h2%7Bmargin%3A0%200%20.5rem%3Bpadding%3A0%3Bfont-family%3Ainherit%3Bfont-size%3A1.25rem%3Bfont-weight%3A700%3Bline-height%3A1.3%3Bcolor%3A%231f2a33%7D%22%2Cl%2B%22%20p%7Bmargin%3A0%200%20.6rem%7D%22%2Cl%2B%22%20fieldset%7Bmargin%3A.75rem%200%3Bpadding%3A.6rem%20.9rem%20.3rem%3Bborder%3A1px%20solid%20%23c7cdd1%3Bborder-radius%3A6px%7D%22%2Cl%2B%22%20legend%7Bpadding%3A0%20.3rem%3Bfont-weight%3A700%7D%22%2Cl%2B%22%20.atc-field%7Bmargin%3A.5rem%200%20.75rem%7D%22%2Cl%2B%22%20label%7Bdisplay%3Ablock%3Bmargin%3A0%200%20.2rem%3Bfont-weight%3A600%7D%22%2Cl%2B%22%20input%7Bbox-sizing%3Aborder-box%3Bwidth%3A100%25%3Bmin-height%3A2.4rem%3Bmargin%3A0%3Bpadding%3A.35rem%20.55rem%3Bborder%3A1px%20solid%20%235c6770%3Bborder-radius%3A4px%3Bbackground%3A%23fff%3Bcolor%3A%231f2a33%3Bfont%3Ainherit%7D%22%2Cl%2B%22%20input%5Btype%3Dnumber%5D%7Bwidth%3A10rem%7D%22%2Cl%2B%22%20input%5Baria-invalid%3Dtrue%5D%7Bborder%3A2px%20solid%20%23c71f23%7D%22%2Cl%2B%22%20.atc-hint%7Bmargin%3A.25rem%200%200%3Bfont-size%3A.875rem%3Bcolor%3A%2347535c%7D%22%2Cl%2B%22%20.atc-actions%7Bdisplay%3Aflex%3Bflex-wrap%3Awrap%3Bgap%3A.5rem%3Bmargin-top%3A.9rem%7D%22%2Cl%2B%22%20button%7Bmin-height%3A2.5rem%3Bpadding%3A.45rem%201rem%3Bborder-radius%3A5px%3Bcursor%3Apointer%3Bfont-family%3Ainherit%3Bfont-size%3A.9375rem%3Bfont-weight%3A600%3Bline-height%3A1.2%7D%22%2Cl%2B%22%20button%5Bdisabled%5D%7Bopacity%3A.55%3Bcursor%3Adefault%7D%22%2Cl%2B%22%20.atc-primary%7Bbackground%3A%23a51c30%3Bborder%3A1px%20solid%20%23a51c30%3Bcolor%3A%23fff%7D%22%2Cl%2B%22%20.atc-secondary%7Bbackground%3A%23fff%3Bborder%3A1px%20solid%20%235c6770%3Bcolor%3A%231f2a33%7D%22%2Cl%2B%22%20button%3Afocus-visible%2C%22%2Bl%2B%22%20input%3Afocus-visible%7Boutline%3A3px%20solid%20%232b426e%3Boutline-offset%3A2px%7D%22%2Cl%2B%22%20.atc-status%7Bmin-height%3A1.5em%3Bmargin%3A.6rem%200%200%3Bfont-size%3A.9375rem%7D%22%2Cl%2B%22%20.atc-status.atc-error%7Bcolor%3A%23c71f23%3Bfont-weight%3A600%7D%22%5D.join(%22%5Cn%22)%2Cs.appendChild(d)%3Bvar%20c%3Dm(%22h2%22%2C%7Bid%3An%2B%22-title%22%7D%2C%22Fix%20SCORM%20frames%22)%2Cu%3Dm(%22div%22)%2Ch%3Dm(%22p%22%2C%7Bclass%3A%22atc-status%22%2Crole%3A%22status%22%7D)%2Cp%3Dm(%22div%22%2C%7Bclass%3A%22atc-actions%22%7D)%2Cf%3Dm(%22button%22%2C%7Btype%3A%22button%22%2Cclass%3A%22atc-primary%22%7D%2C%22Save%20changes%22)%2Cg%3Dm(%22button%22%2C%7Btype%3A%22button%22%2Cclass%3A%22atc-secondary%22%7D%2C%22Cancel%22)%3Bfunction%20m(e%2Ct%2Cn)%7Bvar%20a%3Ddocument.createElement(e)%3Breturn%20Object.keys(t%7C%7C%7B%7D).forEach(function(e)%7Ba.setAttribute(e%2Ct%5Be%5D)%7D)%2Cvoid%200!%3D%3Dn%26%26(a.textContent%3Dn)%2Ca%7Df.hidden%3D!0%2Cp.appendChild(f)%2Cp.appendChild(g)%2Cs.appendChild(c)%2Cs.appendChild(u)%2Cs.appendChild(p)%2Cs.appendChild(h)%2Cg.addEventListener(%22click%22%2Cfunction()%7Bs.close()%7D)%2Cs.addEventListener(%22close%22%2Cfunction()%7Bo()%2Cs.remove()%2Ci%26%26%22function%22%3D%3Dtypeof%20i.focus%26%26document.contains(i)%26%26i.focus()%7D)%2Cdocument.body.appendChild(s)%2Cs.showModal()%2Cg.focus()%3Bvar%20v%3D0%3Bfunction%20b(e%2Ct)%7Bvar%20n%3D%2B%2Bv%3Bh.className%3D%22atc-status%22%2B(t%3F%22%20atc-error%22%3A%22%22)%2Ch.textContent%3D%22%22%2CsetTimeout(function()%7Bn%3D%3D%3Dv%26%26(h.textContent%3De)%7D%2C50)%7Dfunction%20w(e%2Ct)%7Bc.textContent%3De%2Cu.textContent%3D%22%22%2Cu.appendChild(m(%22p%22%2C%7B%7D%2Ct))%2Cf.hidden%3D!0%2Cg.textContent%3D%22Close%22%2Cg.className%3D%22atc-primary%22%2Cv%2B%2B%2Ch.textContent%3D%22%22%2Cg.focus()%7Dvar%20C%3D%22object%22%3D%3Dtypeof%20window.ENV%26%26window.ENV%3Fwindow.ENV%3Anull%2Cy%3D!!C%7C%7C!!document.querySelector(%22%23application.ic-app%2C%20.ic-app%22)%2Cx%3D%2F%5C%2Fpages%5C%2F%5B%5E%2F%5D%2B%5C%2Fedit%5Cb%2F.test(location.pathname)%7C%7C%2F%5C%2Fpages%5C%2Fnew%5Cb%2F.test(location.pathname)%7C%7C!!document.querySelector(%22iframe%23wiki_page_body_ifr%2C%20.tox-edit-area%20iframe%22)%3Bif(y)if(x)w(%22Open%20the%20page%2C%20not%20the%20editor%22%2C%22You%20are%20in%20the%20page%20editor.%20Save%20or%20cancel%2C%20then%20click%20the%20bookmark%20on%20the%20page%20itself.%22)%3Belse%7Bvar%20k%3D%2F%5C%2Fcourses%5C%2F(%5Cd%2B)%5C%2Fpages%5C%2F(%5B%5E%2F%3F%23%5D%2B)%2F.exec(location.pathname)%2CS%3DC%26%26C.COURSE_ID%7C%7Ck%26%26k%5B1%5D%7C%7C(%2F%5C%2Fcourses%5C%2F(%5Cd%2B)%2F.exec(location.pathname)%7C%7C%5B%5D)%5B1%5D%2CE%3DC%26%26C.WIKI_PAGE%26%26C.WIKI_PAGE.url%7C%7Ck%26%26decodeURIComponent(k%5B2%5D)%3Bif(S%26%26E)%7Bvar%20T%3D%22%2Fapi%2Fv1%2Fcourses%2F%22%2BencodeURIComponent(S)%2B%22%2Fpages%2F%22%2BencodeURIComponent(E)%2CO%3Dnull%2CR%3D%5B%5D%2CI%3D%5B%5D%3Bb(%22Reading%20the%20page%20from%20Canvas...%22)%2CN(%22GET%22).then(function(e)%7Bif(O%3De%2C%22block_editor%22%3D%3D%3De.editor%7C%7Ce.block_editor_attributes)return%20w(%22Block%20editor%20page%22%2C%22This%20page%20uses%20Canvas's%20newer%20block%20editor%2C%20which%20this%20bookmark%20does%20not%20handle%20yet.%22)%2Cnull%3Bif(!(R%3Dt.findFrames(e.body%7C%7C%22%22)).length)return%20w(%22No%20SCORM%20frames%20on%20this%20page%22%2C%22This%20page%20has%20no%20frames%20showing%20an%20imported%20SCORM%20package%2C%20so%20there%20is%20nothing%20to%20change.%22)%2Cnull%3Bvar%20n%3Ddocument.querySelector(%22%23wiki_page_show%20.show-content%2C%20.show-content.user_content%2C%20.user_content%22)%7C%7Cdocument%2Ca%3DArray.prototype.filter.call(n.querySelectorAll(%22iframe%22)%2Cfunction(e)%7Breturn!!t.scormInfo(e.getAttribute(%22src%22)%7C%7C%22%22)%7D)%2Ci%3DR.map(function(e%2Cn)%7Bvar%20i%3De.packageId%26%26a.filter(function(n)%7Bvar%20a%3Dt.scormInfo(n.getAttribute(%22src%22))%3Breturn%20a%26%26a.packageId%3D%3D%3De.packageId%7D)%3Breturn%20i%26%261%3D%3D%3Di.length%3Fi%5B0%5D%3Aa%5Bn%5D%7C%7Cnull%7D)%3Breturn%20b(%22Measuring%20the%20document%22%2B(R.length%3E1%3F%22s%22%3A%22%22)%2B%22.%20The%20frame%20briefly%20changes%20width.%22)%2Cfunction(e)%7Breturn%20new%20Promise(function(t)%7Bif(e.filter(Boolean).length)%7Bvar%20n%3D%5B%5B%5D%2C%5B%5D%5D%2Ca%3D%5B%5D%2Ci%3D%5B%5B%5D%2C%5B%5D%5D%2Co%3D0%2Cs%3D0%2Cl%3D!1%2Cd%3De.map(function(e)%7Breturn%20e%3F%7Bwidth%3Ae.style.width%2Cheight%3Ae.style.height%7D%3Anull%7D)%3Bwindow.addEventListener(%22message%22%2Cp)%2Cr.push(function()%7Bl%3D!0%2Cwindow.removeEventListener(%22message%22%2Cp)%2Cf()%7D)%2Ce.forEach(function(e)%7Be%26%26%22lazy%22%3D%3D%3De.getAttribute(%22loading%22)%26%26e.setAttribute(%22loading%22%2C%22eager%22)%7D)%3Bvar%20c%3De.filter(Boolean)%5B0%5D.parentElement.getBoundingClientRect().width%2Cu%3DMath.max(200%2CMath.min(800%2CMath.floor(c)))%2Ch%3DMath.round(u%2F2)%3Bo%3D0%2Cm(h)%2Cg(function()%7Bo%3D1%2Cm(u)%2Cg(function()%7Bl%3D!0%2Cwindow.removeEventListener(%22message%22%2Cp)%2Cf()%2Ct(e.map(function(e%2Ct)%7Bvar%20r%3Dvoid%200!%3D%3Dn%5B1%5D%5Bt%5D%3Fn%5B1%5D%5Bt%5D%3An%5B0%5D%5Bt%5D%3Bif(void%200%3D%3D%3Dr)return%20null%3Bvar%20o%3Dfunction(e%2Ct)%7Bvar%20n%3DNumber(t)%3Bif(!isFinite(n)%7C%7Cn%3C%3D0%7C%7Cn%3Ee)return%200%3Bvar%20a%3DMath.round(e-n)%3Breturn%20a%3C%3D400%3Fa%3A0%7D(2e4%2Cvoid%200!%3D%3Di%5B1%5D%5Bt%5D%3Fi%5B1%5D%5Bt%5D%3Ai%5B0%5D%5Bt%5D)%3Breturn%7Bheight%3Ar%2Bo%2Cwidth%3Au%2Cpages%3Aa%5Bt%5D%7C%7C1%2Cgap%3Ao%7D%7D))%7D)%7D)%7Delse%20t(e.map(function()%7Breturn%20null%7D))%3Bfunction%20p(t)%7Bvar%20r%3Dt.data%3Bif(%22string%22%3D%3Dtypeof%20r)try%7Br%3DJSON.parse(r)%7Dcatch(e)%7Breturn%7Dif(r%26%26%22atc.documentHeight%22%3D%3D%3Dr.subject)%7Bvar%20l%3DNumber(r.height)%3Bif(!(!isFinite(l)%7C%7Cl%3C20%7C%7Cl%3E2e5))%7Bvar%20d%3Dfunction(t)%7Bfor(var%20n%3Dt%2Ca%3D0%3Ba%3C12%26%26n%3Ba%2B%2B)%7Bfor(var%20i%3D0%3Bi%3Ce.length%3Bi%2B%2B)if(e%5Bi%5D%26%26e%5Bi%5D.contentWindow%3D%3D%3Dn)return%20i%3Bvar%20r%3Btry%7Br%3Dn.parent%7Dcatch(e)%7Breturn-1%7Dif(!r%7C%7Cr%3D%3D%3Dn)return-1%3Bn%3Dr%7Dreturn-1%7D(t.source)%3Bif(!(d%3C0))%7Bn%5Bo%5D%5Bd%5D%3DMath.ceil(l)%2CNumber(r.pages)%3E1%26%26(a%5Bd%5D%3DNumber(r.pages))%3Bvar%20c%3DNumber(r.viewport)%3BisFinite(c)%26%26c%3E0%26%26(i%5Bo%5D%5Bd%5D%3Dc)%2Cs%3DDate.now()%7D%7D%7D%7Dfunction%20f()%7Be.forEach(function(e%2Ct)%7Be%26%26(e.style.width%3Dd%5Bt%5D.width%2Ce.style.height%3Dd%5Bt%5D.height)%7D)%7Dfunction%20g(t)%7Bvar%20a%3DDate.now()%3B!function%20i()%7Bif(!l)%7Bvar%20r%3De.every(function(e%2Ct)%7Breturn!e%7C%7Cvoid%200!%3D%3Dn%5Bo%5D%5Bt%5D%7D)%2Cd%3DDate.now()-s%3E500%3Br%26%26d%7C%7CDate.now()-a%3E3e3%3Ft()%3AsetTimeout(i%2C100)%7D%7D()%7Dfunction%20m(t)%7Be.forEach(function(e)%7Be%26%26(e.style.width%3Dt%2B%22px%22%2Ce.style.height%3D%2220000px%22)%7D)%7D%7D)%7D(i)%7D).then(function(e)%7Be%26%26function(e)%7Bu.textContent%3D%22%22%2Cc.textContent%3DR.length%3E1%3F%22Fix%20%22%2BR.length%2B%22%20SCORM%20frames%22%3A%22Fix%20the%20SCORM%20frame%22%2Cu.appendChild(m(%22p%22%2C%7B%7D%2C%22These%20settings%20are%20saved%20into%20the%20page.%20Canvas%20keeps%20the%20previous%20version%20in%20the%20page%20history.%22))%2CI%3DR.map(function(a%2Ci)%7Bvar%20r%3Dm(%22fieldset%22)%3Br.appendChild(m(%22legend%22%2C%7B%7D%2CR.length%3E1%3F%22Frame%20%22%2B(i%2B1)%2B%22%20of%20%22%2BR.length%3A%22The%20SCORM%20frame%22))%2Cr.appendChild(m(%22p%22%2C%7B%7D%2C%22100%25%22%3D%3D%3Da.width%3F%22Width%3A%20already%20fills%20the%20column.%22%3A%22Width%3A%20%22%2B(a.width%7C%7C%22not%20set%22)%2B%22%20now%3B%20will%20fill%20the%20column%20(100%25).%22))%3Bvar%20o%3De%5Bi%5D%2Cs%3Do%3Fo.height%3Aa.height%26%26%221000%22!%3D%3Da.height%26%26%2F%5E%5Cd%2B%24%2F.test(a.height)%3FNumber(a.height)%3A2400%2Cl%3Dn%2B%22-h%22%2Bi%2Cd%3Dm(%22div%22%2C%7Bclass%3A%22atc-field%22%7D)%3Bd.appendChild(m(%22label%22%2C%7Bfor%3Al%7D%2C%22Height%20in%20pixels%22))%3Bvar%20c%3Dm(%22input%22%2C%7Bid%3Al%2Ctype%3A%22number%22%2Cmin%3AString(100)%2Cmax%3AString(3e4)%2Cstep%3A%221%22%2Cinputmode%3A%22numeric%22%2C%22aria-describedby%22%3Al%2B%22-hint%22%7D)%3Bc.value%3DString(s)%2Cd.appendChild(c)%2Cd.appendChild(m(%22p%22%2C%7Bid%3Al%2B%22-hint%22%2Cclass%3A%22atc-hint%22%7D%2Co%3F(o.pages%3E1%3F%22The%20tallest%20of%20this%20package's%20%22%2Bo.pages%2B%22%20pages%20at%20%22%2Bo.width%2B%22%20px%20wide%2C%20measured%20when%20the%20package%20was%20made%2C%20so%20every%20page%20fits%20there%20and%20on%20wider%20screens%3B%20shorter%20pages%20have%20blank%20space%20below.%20Now%3A%20%22%3A%22Measured%20from%20the%20document%20at%20%22%2Bo.width%2B%22%20px%20wide%2C%20so%20it%20fits%20there%20and%20on%20wider%20screens.%20Now%3A%20%22)%2B(a.height%7C%7C%22not%20set%22)%2B%22.%22%2B(o.gap%3E0%3F%22%20This%20includes%20%22%2Bo.gap%2B%22%20px%20for%20the%20Canvas%20SCORM%20player%20around%20the%20document.%22%3A%22%22)%3A%22This%20package%20does%20not%20report%20its%20height%2C%20so%20this%20is%20a%20suggestion.%20Scroll%20inside%20the%20frame%20to%20judge%20the%20length%3B%20blank%20space%20below%20a%20short%20document%20is%20harmless.%20Now%3A%20%22%2B(a.height%7C%7C%22not%20set%22)%2B%22.%22))%2Cr.appendChild(d)%3Bvar%20h%3Dn%2B%22-t%22%2Bi%2Cp%3Dm(%22div%22%2C%7Bclass%3A%22atc-field%22%7D)%3Bp.appendChild(m(%22label%22%2C%7Bfor%3Ah%7D%2C%22Frame%20title%20(what%20screen%20readers%20announce)%22))%3Bvar%20f%3Dm(%22input%22%2C%7Bid%3Ah%2Ctype%3A%22text%22%2Cmaxlength%3A%22200%22%2C%22aria-describedby%22%3Ah%2B%22-hint%22%7D)%3Breturn%20f.value%3Dt.suggestedTitle(a%2CO.title%2Ci%2CR.length)%2Cp.appendChild(f)%2Cp.appendChild(m(%22p%22%2C%7Bid%3Ah%2B%22-hint%22%2Cclass%3A%22atc-hint%22%7D%2C%22Now%3A%20%22%2B(t.isPlaceholderTitle(a.title)%3Fa.title%3F'%22'%2Ba.title%2B'%22%20(a%20placeholder)'%3A%22no%20title%22%3A'%22'%2Ba.title%2B'%22')%2B%22.%22))%2Cr.appendChild(p)%2Cu.appendChild(r)%2C%7Bheight%3Ac%2Ctitle%3Af%7D%7D)%2Cf.hidden%3D!1%2Cf.disabled%3D!1%2Cg.textContent%3D%22Cancel%22%2Cb(%22%22)%2CI%5B0%5D.height.focus()%7D(e)%7D).catch(function(e)%7Bw(%22Could%20not%20read%20the%20page%22%2CM(e))%7D)%2Cf.addEventListener(%22click%22%2Cfunction()%7Bvar%20e%3Dfunction()%7Bfor(var%20e%3D%5B%5D%2Ct%3D0%3Bt%3CI.length%3Bt%2B%2B)%7Bvar%20n%3DI%5Bt%5D.height%2Ca%3DI%5Bt%5D.title%3Bn.removeAttribute(%22aria-invalid%22)%2Ca.removeAttribute(%22aria-invalid%22)%3Bvar%20i%3DNumber(n.value)%3Bif(!%2F%5E%5Cd%2B%24%2F.test(n.value.trim())%7C%7Ci%3C100%7C%7Ci%3E3e4)return%20n.setAttribute(%22aria-invalid%22%2C%22true%22)%2Cn.focus()%2Cb(%22Height%20must%20be%20a%20whole%20number%20from%20100%20to%2030000.%22%2C!0)%2Cnull%3Bvar%20r%3Da.value.trim()%3Bif(!r)return%20a.setAttribute(%22aria-invalid%22%2C%22true%22)%2Ca.focus()%2Cb(%22Every%20frame%20needs%20a%20title%2C%20so%20screen%20readers%20can%20announce%20it.%22%2C!0)%2Cnull%3Be.push(%7Bheight%3Ai%2Ctitle%3Ar%7D)%7Dreturn%20e%7D()%3Be%26%26(f.disabled%3D!0%2Cg.disabled%3D!0%2Cb(%22Saving...%22)%2CN(%22GET%22).then(function(n)%7Bvar%20a%3Dt.findFrames(n.body%7C%7C%22%22)%3Bif(n.updated_at!%3D%3DO.updated_at%7C%7Ca.length!%3D%3DR.length)%7Bvar%20i%3Dnew%20Error(%22changed%22)%3Bthrow%20i.changed%3D!0%2Ci%7Dvar%20r%3Da.map(function(n%2Ca)%7Breturn%20t.planFor(n%2Ce%5Ba%5D)%7D)%2Co%3Dt.rewrite(n.body%2Ca%2Cr)%3Breturn%20o%3D%3D%3Dn.body%3F%22unchanged%22%3AN(%22PUT%22%2C%7Bwiki_page%3A%7Bbody%3Ao%7D%7D).then(function(n)%7Breturn%20t.verify(n.body%7C%7C%22%22%2Ce)%7D)%7D).then(function(e)%7Breturn%20g.disabled%3D!1%2C%22unchanged%22%3D%3D%3De%3F(b(%22Nothing%20needed%20changing%3B%20the%20frame%22%2B(R.length%3E1%3F%22s%20were%22%3A%22%20was%22)%2B%22%20already%20set%20this%20way.%22)%2Cg.textContent%3D%22Close%22%2Cvoid%20g.focus())%3Ae.length%3F(b(%22Saved%2C%20but%20Canvas%20altered%20some%20settings%3A%20%22%2Be.join(%22%20%22)%2B%22%20Reload%20the%20page%20to%20see%20the%20result.%22%2C!0)%2Cg.textContent%3D%22Close%22%2Cvoid%20g.focus())%3A(b(%22Saved.%20Reloading%20the%20page...%22)%2Co()%2Cvoid%20setTimeout(function()%7Blocation.reload()%7D%2C1200))%7D).catch(function(e)%7Bf.disabled%3D!1%2Cg.disabled%3D!1%2Cb(e.changed%3F%22This%20page%20changed%20in%20Canvas%20after%20the%20dialog%20opened%2C%20so%20nothing%20was%20saved.%20Close%20this%2C%20reload%20the%20page%20and%20try%20again.%22%3A%22Nothing%20was%20saved.%20%22%2BM(e)%2C!0)%7D))%7D)%7Delse%20w(%22Not%20a%20Canvas%20Page%22%2C%22This%20works%20on%20Canvas%20Pages.%20Open%20the%20page%20that%20shows%20the%20SCORM%20package%20(Pages%2C%20then%20its%20title)%20and%20click%20the%20bookmark%20again.%22)%7Delse%20w(%22Not%20a%20Canvas%20page%22%2C%22This%20page%20does%20not%20look%20like%20Canvas.%20Open%20the%20Canvas%20Page%20that%20shows%20the%20SCORM%20package%20and%20click%20the%20bookmark%20again.%22)%3Bfunction%20N(e%2Ct)%7Bvar%20n%2Ca%3D%7Bmethod%3Ae%2Ccredentials%3A%22same-origin%22%2Cheaders%3A%7BAccept%3A%22application%2Fjson%22%2C%22X-Requested-With%22%3A%22XMLHttpRequest%22%7D%7D%3Breturn%20t%26%26(a.headers%5B%22Content-Type%22%5D%3D%22application%2Fjson%22%2Ca.headers%5B%22X-CSRF-Token%22%5D%3D(n%3D%2F(%3F%3A%5E%7C%3B%5Cs*)_csrf_token%3D(%5B%5E%3B%5D%2B)%2F.exec(document.cookie))%3FdecodeURIComponent(n%5B1%5D)%3A%22%22%2Ca.body%3DJSON.stringify(t))%2Cfetch(T%2Ca).then(function(e)%7Breturn%20e.text().then(function(t)%7Bvar%20n%3Dnull%3Btry%7Bn%3DJSON.parse(t.replace(%2F%5Ewhile%5C(1%5C)%3B%2F%2C%22%22))%7Dcatch(e)%7Bn%3Dnull%7Dif(!e.ok)%7Bvar%20a%3Dnew%20Error(%22HTTP%20%22%2Be.status)%3Bthrow%20a.status%3De.status%2Ca.data%3Dn%2Ca%7Dif(!n)throw%20new%20Error(%22Canvas%20sent%20something%20that%20was%20not%20page%20data.%22)%3Breturn%20n%7D)%7D)%7Dfunction%20M(e)%7Breturn%20401%3D%3D%3De.status%7C%7C403%3D%3D%3De.status%3F%22Canvas%20refused%20(HTTP%20%22%2Be.status%2B%22).%20Your%20role%20may%20not%20allow%20editing%20this%20page.%22%3A422%3D%3D%3De.status%26%26e.data%26%26-1!%3D%3DJSON.stringify(e.data).indexOf(%22uthenticity%22)%3F%22Canvas%20rejected%20the%20request's%20security%20token.%20Reload%20the%20page%20and%20try%20again.%22%3A404%3D%3D%3De.status%3F%22Canvas%20could%20not%20find%20this%20page%20through%20its%20API%20(HTTP%20404).%22%3Ae.status%3F%22Canvas%20returned%20an%20error%20(HTTP%20%22%2Be.status%2B%22).%22%3A%22Could%20not%20reach%20Canvas%3A%20%22%2Be.message%7D%7D()%7D()%3Bvoid%200%3B</textarea>
+  </div>
+
+  <h2>2. Use it</h2>
+  <ol class="steps">
+    <li>Import the SCORM package as a Page, as usual.</li>
+    <li>Open that page. It needs to be the page itself, not the editor.</li>
+    <li>Click <strong>Fix SCORM frames</strong> in your bookmarks bar. For a moment the frame changes width
+    while the bookmark measures the document.</li>
+    <li>Check the dialog. It shows the width it will set, a height, and a title. You can change the height
+    and the title.</li>
+    <li>Choose <strong>Save changes</strong>. The page saves and reloads.</li>
+  </ol>
+
+  <h2>What it changes</h2>
+  <p>Only the frames that show SCORM packages, and only three settings on each: width (to fill the column),
+  height, and title. It also removes the frame's border. Everything else on the page is left exactly as it
+  was, including any other frames such as videos. Nothing is saved until you choose Save.</p>
+  <p>It saves through Canvas with your own login, so it can only change pages you could edit yourself.
+  Before saving it reads the page again, and if anyone changed the page since the dialog opened, it stops
+  without saving.</p>
+
+  <h2>Where the height comes from</h2>
+  <p>Packages made with the new SCORM output report their own height. The bookmark measures them with the
+  frame set to 800 pixels wide, a typical laptop column, so the frame fits there and on anything wider.
+  On a wide screen that leaves some blank space below the document, which on a white page is barely noticeable.</p>
+  <p>A multi-page package (pages with Next and Previous links) shows every page in the same frame,
+  so it reports the height of its tallest page, measured when the platform made the package. Every
+  page then fits, and shorter pages have some blank space below.</p>
+  <p>The bookmark also measures the space Canvas's SCORM player takes around the document, and adds
+  it to the height.</p>
+  <p>Older packages cannot report their height. For those the dialog suggests a number for you to adjust.
+  Scrolling inside the frame first shows how long the document is.</p>
+
+  <h2>Undoing a change</h2>
+  <p>Canvas keeps every saved version of a page. On the page, open the options menu (the three dots), choose
+  <strong>View Page History</strong>, select the earlier version and restore it.</p>
+
+  <div class="aside">
+    <p>This works on Canvas Pages. SCORM packages imported as assignments, and pages made with Canvas's newer
+    block editor, are not handled yet. The bookmark says so if it meets one.</p>
+  </div>
+</main>
+
+<script>
+  // Clicking the bookmark here would only measure this page, so explain instead.
+  document.getElementById('bm-link').addEventListener('click', function (e) {
+    e.preventDefault();
+    var note = document.getElementById('click-note');
+    note.textContent = '';
+    setTimeout(function () {
+      note.textContent = 'That would run the bookmark on this page. Drag it to your bookmarks bar, then use it on a Canvas page.';
+    }, 50);
+  });
+
+  // Copy buttons.
+  Array.prototype.forEach.call(document.querySelectorAll('button.copy'), function (btn) {
+    btn.addEventListener('click', function () {
+      var source = document.getElementById(btn.getAttribute('data-copy'));
+      var status = document.getElementById(btn.getAttribute('data-status'));
+      var text = source.tagName === 'TEXTAREA' ? source.value : source.textContent;
+      function say(msg) {
+        status.textContent = '';
+        setTimeout(function () { status.textContent = msg; }, 50);
+      }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+        ta.remove();
+        btn.focus();
+        say(ok ? 'Copied' : 'Copy blocked: select the text and press Ctrl+C');
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function () { say('Copied'); }, fallback);
+      } else {
+        fallback();
+      }
+    });
+  });
+</script>
+</body>
+</html>

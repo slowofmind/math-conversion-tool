@@ -41,16 +41,21 @@ ok('it is a module script', scripts[0]?.getAttribute('type') === 'module');
 const prep = doc.getElementById('railPanelPrepare');
 ok('the Prepare panel is there', !!prep);
 const steps = prep ? [...prep.querySelectorAll('.prep-step')] : [];
-const titles = steps.map((s) => text(s.querySelector('.prep-title')));
-const FOUR = ['Figures drawn in code', 'PDF images', 'Source cleanup', 'Math notation review'];
+// Steps 1-2 have been their buttons alone since 2026-09-30 (Nicholas: no number, title, count or
+// explanation), so a step is known by its title, else by its button's text (updated 2026-10-06).
+const titles = steps.map((s) => text(s.querySelector('.prep-title') || s.querySelector('.prep-btn')));
+const FOUR = ['TikZ images', 'PDF images', 'Source cleanup', 'Math notation review'];
 ok('its first four steps, in order', FOUR.every((t, i) => titles[i] === t), titles.join(' | '));
 const tabs = [...doc.querySelectorAll('#selOutputView option')].map((o) => o.getAttribute('value'));
 ok('the Output view options are Output, Code, Preprocess, Log (revised 2026-10-06; Intent moved to the sidebar)',
   tabs.join(',') === 'preview,source,preprocess,log', tabs.join(' | '));
 const A_IMPORT = "import { initMathCATProof } from './js/mathcat-proof.js';";
-const A_LISTEN = "document.getElementById('btnMathCATProof').addEventListener('click'";
+// MathCAT's start-up call. The committed page never had a btnMathCATProof button; MathCAT is driven
+// by the "Math subtitles" drop-down (updated 2026-10-06; was a btnMathCATProof click listener).
+const A_MATHCAT = 'const mathcatProof = initMathCATProof({';
+const A_PP_SECTION = '// LATEX PREPROCESSING — js/preprocess.js';
 const A_TABS = '// OUTPUT TABS — js/output-tabs.js';
-for (const a of [A_IMPORT, A_LISTEN, A_TABS])
+for (const a of [A_IMPORT, A_MATHCAT, A_PP_SECTION, A_TABS])
   ok('the script holds, once: ' + a, count(js, a) === 1, String(count(js, a)));
 
 // ── F2, call 87: the fifth Prepare step ───────────────────────────────
@@ -115,7 +120,8 @@ ok("on the line after MathCAT's import", ia >= 0 && jl[ia + 1] === B_IMPORT, jl[
 const pc = js.indexOf('initPreprocess(');
 ok('the start-up call, once', count(js, 'initPreprocess(') === 1, String(count(js, 'initPreprocess(')));
 ok("after MathCAT's block, before the output tabs are made",
-  js.indexOf(A_LISTEN) >= 0 && pc > js.indexOf(A_LISTEN) && pc < js.indexOf(A_TABS));
+  js.indexOf(A_MATHCAT) >= 0 && js.indexOf(A_MATHCAT) < js.indexOf(A_PP_SECTION)
+  && pc > js.indexOf(A_PP_SECTION) && pc < js.indexOf(A_TABS));
 const call = pc >= 0 ? js.slice(pc, js.indexOf(A_TABS)) : '';
 for (const k of ['model', 'editor', 'openProjectFile', 'syncAuxFiles', 'runConversion',
   'showReport', 'updateLog', 'updateStatus', 'loadTable', 'loadTool'])

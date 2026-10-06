@@ -1,20 +1,61 @@
 <script>
-/* ATC SCORM height report (version 1).
+/* ATC SCORM height report (version 4).
    Canvas sizes a SCORM frame from settings saved in the page, so this
    document tells the surrounding windows how tall it is. The ATC
    "Fix SCORM frames" bookmark listens for atc.documentHeight; Canvas's own
    lti.frameResize is sent too, in case Canvas ever starts honouring it.
-   It reports again whenever its height changes, for example on zoom. */
+   It reports again whenever its height changes, for example on zoom.
+   Version 2 (2026-10-06): a multi-page package also carries
+   window.ATC_SCORM_TALLEST, set by the platform when it made the package:
+   its tallest page's height at several widths. One Canvas frame shows every
+   page, so the report gives the tallest page's height for the frame's
+   current width: the larger of the figures for the two measured widths
+   around it (heights do not always grow as a page narrows, because a style
+   can change at a set width), never less than this page's own height, and
+   says how many pages there are.
+   Version 3 (2026-10-06): every report also gives the page's viewport
+   height (window.innerHeight), and a new viewport alone is reported again.
+   While the bookmarklet measures, it makes Canvas's frame 20000 px tall, so
+   20000 minus this is the room Canvas's launch page and SCORM player take
+   around the page; the bookmarklet adds it to the height.
+   Version 4 (2026-10-06): figures sized as a share of the width make a page
+   taller on a wider column (Canvas fills the column), so the figure used is
+   the tallest at the frame's width OR ANY WIDER measured width. Every package
+   now carries the measurements, single pages too, and its figures stop
+   growing at a set width, so columns wider than those measured are shorter.
+   It sizes for 20 px (SCROLLBAR) narrower than the frame: a scroll bar that
+   appears even briefly (say while fonts load) narrows the page by its width
+   and makes it taller, and the browser can keep it if the page then only
+   fits without it (found in a replay of the workbook sample, 2026-10-06). */
 (function () {
   'use strict';
   var MARGIN = 16;
-  var lastSent = 0;
+  var SCROLLBAR = 20;   // size for this much narrower than the frame (see above)
+  var lastSent = 0, lastViewport = 0;
+  var T = window.ATC_SCORM_TALLEST || null;
+  function tallestFor(width) {
+    if (!T || !T.heights) { return 0; }
+    var widths = [];
+    for (var k in T.heights) { if (Number(T.heights[k]) > 0) { widths.push(Number(k)); } }
+    if (!widths.length) { return 0; }
+    widths.sort(function (a, b) { return a - b; });
+    var start = 0;   // the widest measured width not wider than the frame (else the narrowest)
+    for (var j = 0; j < widths.length; j++) { if (widths[j] <= width + 1) { start = j; } }
+    var best = 0;
+    for (var k2 = start; k2 < widths.length; k2++) { best = Math.max(best, Number(T.heights[widths[k2]])); }
+    return best + MARGIN;
+  }
   function send() {
-    var h = Math.ceil(document.body.getBoundingClientRect().height) + MARGIN;
-    if (Math.abs(h - lastSent) < 2) { return; }
+    var own = Math.ceil(document.body.getBoundingClientRect().height) + MARGIN;
+    var h = Math.max(own, tallestFor(document.documentElement.clientWidth - SCROLLBAR));
+    var vp = Math.round(window.innerHeight || 0);
+    if (Math.abs(h - lastSent) < 2 && Math.abs(vp - lastViewport) < 2) { return; }
     lastSent = h;
+    lastViewport = vp;
+    var report = { subject: 'atc.documentHeight', height: h, title: document.title, viewport: vp, version: 3 };
+    if (T) { report.pages = T.pages; }
     var messages = [
-      { subject: 'atc.documentHeight', height: h, title: document.title },
+      report,
       { subject: 'lti.frameResize', height: h }
     ];
     var w = window;
@@ -30,6 +71,8 @@
     if (window.MathJax && MathJax.startup && MathJax.startup.promise) { MathJax.startup.promise.then(send); }
     if (document.fonts && document.fonts.ready) { document.fonts.ready.then(send); }
     window.addEventListener('load', send);
+    var resizeTimer = null;
+    window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(send, 200); });
     if (window.ResizeObserver) {
       var timer = null;
       new ResizeObserver(function () { clearTimeout(timer); timer = setTimeout(send, 200); }).observe(document.body);

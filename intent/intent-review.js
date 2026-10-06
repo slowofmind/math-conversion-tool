@@ -747,12 +747,34 @@ export function initIntentReview(ctx) {
       }
     });
 
-    // F2 / Shift+F2 step through findings from anywhere. Function keys are
-    // safe globally: CM6 already claims F8 (next diagnostic) and Alt+Arrow
-    // (move line), and browsers claim Alt+Left/Right for history.
+    // F2 / Shift+F2 step through findings from anywhere on the page, but only
+    // while the project panel (the left sidebar holding the ◀ ▶ controls) is
+    // open. Function keys are otherwise safe globally: CM6 already claims F8
+    // (next diagnostic) and Alt+Arrow (move line), and browsers claim
+    // Alt+Left/Right for history.
+    //
+    // Closing the panel RELEASES both keys (2026-10-06, Nicholas: "I would
+    // like for you to change things so that F2 and Shift+F2 are released when
+    // the sidebar is closed"): they are not taken, so the browser and
+    // assistive technology get them. Findings and highlights stay; reopening
+    // the panel brings the keys back. index.html's setSidebarOpen() closes the
+    // panel by adding the class "collapsed" to .sidebar.
+    //
+    // Extended the same day (Nicholas: "adjust things so that the keys are
+    // also released when that section is collapsed"): collapsing the File
+    // Preparation section, which holds the controls, releases them too.
+    // index.html's setRailSection() collapses a section by setting hidden on
+    // its panel. So the rule is: released while the ◀ ▶ controls are out of
+    // sight, inside a closed panel or a hidden element. (#intentNav is itself
+    // hidden only when there are no findings, and the handler has returned
+    // before asking.) Pages without a sidebar (the tests' stand-ins) never
+    // release.
+    const keysReleased = () =>
+      !!document.getElementById('intentNav')?.closest('.sidebar.collapsed, [hidden]');
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'F2' || e.ctrlKey || e.metaKey || e.altKey) return;
       if (IntentReview.count === 0) return;
+      if (keysReleased()) return;
       e.preventDefault();
       if (e.shiftKey) IntentReview.prev(); else IntentReview.next();
     });
@@ -783,7 +805,7 @@ export function initIntentReview(ctx) {
   // isHtmlFamily() — widening later is a one-line change in one place.
   //
   // NOTE THE VALUES: the tool's internal identifier for HTML output is
-  // 'html5' (see OUTPUT_FORMAT_ALLOW in index.html), NOT 'html'. Listing
+  // 'html5' (see CORE_OUTPUT in index.html), NOT 'html'. Listing
   // only 'html' silently disabled the feature for every user.
   const INTENT_OUTPUT_FORMATS = ['html5', 'html', 'html4'];
 

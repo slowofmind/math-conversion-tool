@@ -135,9 +135,13 @@ const DOC = 'Distance $|x|$, set $|S|$, and divisibility $3 \\mid 12$ here.\n';
 // index.html so the fixture cannot drift from the app again.
 {
   const indexHtml = readFileSync(join(PLAT, 'index.html'), 'utf8');
-  const m = indexHtml.match(/const OUTPUT_FORMAT_ALLOW = \[([^\]]+)\]/);
-  ok('found OUTPUT_FORMAT_ALLOW in index.html', !!m);
+  // The output drop-down's list was OUTPUT_FORMAT_ALLOW until 2026-09-05 (commit a7e3341); it is
+  // now CORE_OUTPUT. Updated 2026-10-06, with a check that the list is not empty, so the
+  // comparison below cannot silently check nothing again.
+  const m = indexHtml.match(/const CORE_OUTPUT = \[([^\]]+)\]/);
+  ok('found CORE_OUTPUT in index.html', !!m);
   const real = m ? m[1].split(',').map(s => s.trim().replace(/['"]/g, '')) : [];
+  ok('CORE_OUTPUT lists formats', real.length > 0, JSON.stringify(real));
   const defaultTo = (indexHtml.match(/const pandocDefaultTo = '([^']+)'/) || [])[1];
   ok('index.html default output format found', !!defaultTo, String(defaultTo));
 
