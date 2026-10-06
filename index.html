@@ -1393,6 +1393,8 @@
         <li role="menuitem" tabindex="-1" data-action="folder">Upload Folder</li>
         <li role="separator"></li>
         <li role="menuitem" tabindex="-1" data-action="sample">Open a Sample</li>
+        <li role="separator"></li>
+        <li role="menuitem" tabindex="-1" data-action="overleaf" title="Install the bookmarklet that sends Overleaf projects to this tool">Overleaf Setup<span class="sr-only"> (opens in a new tab)</span> <span aria-hidden="true">↗</span></li>
       </ul>
     </div>
   </div>
@@ -1445,24 +1447,27 @@
     <span class="sr-only" id="targetLive" role="status" aria-live="polite" aria-atomic="true"></span>
   </div>
 
-  <div class="toolbar-divider"></div>
-
-  <div class="toolbar-group">
-    <label class="sr-only" for="selOptionsView">Options view</label>
-    <select class="options-view-select" id="selOptionsView" title="Which set of options to show" aria-controls="optionsPanel">
-      <option value="core" selected>Core options</option>
-      <option value="pandoc">Show all Pandoc options</option>
-    </select>
-  </div>
+  <!-- The options-view drop-down ("Show core options") moved to the right end of the
+       toolbar, just before the preview layout buttons (2026-10-06). -->
 
   <!-- "Experimental image handling" and "Convert PDFs to SVG" MOVED to the
        Prepare tab of the left rail (2026-09-09). The top toolbar now holds
        only things that act on the CONVERSION; the left rail holds things
        that act on the INPUTS. Same ids, same handlers. -->
 
-  <a class="toolbar-link" href="bookmarklet-install.html" target="_blank" rel="noopener" title="Install the bookmarklet that sends Overleaf projects to this tool">Overleaf setup</a>
+  <!-- "Overleaf setup" moved to the end of the Upload Files menu (2026-10-06). -->
 
   <span class="toolbar-spacer"></span>
+
+  <div class="toolbar-group">
+    <label class="sr-only" for="selOptionsView">Options view</label>
+    <select class="options-view-select" id="selOptionsView" title="Which set of options to show" aria-controls="optionsPanel">
+      <option value="core" selected>Show core options</option>
+      <option value="pandoc">Show all Pandoc options</option>
+    </select>
+  </div>
+
+  <div class="toolbar-divider"></div>
 
   <div class="toolbar-group">
     <button class="toolbar-btn active" id="btnLayoutSide" title="Preview: right side" aria-label="Side-by-side layout" aria-pressed="true">◫</button>
@@ -3203,6 +3208,7 @@ async function addSupportFiles(files) {
     close(true);
     if (item.dataset.action === 'folder') document.getElementById('auxDirInput').click();
     else if (item.dataset.action === 'sample') openSamplePicker();
+    else if (item.dataset.action === 'overleaf') window.open('bookmarklet-install.html', '_blank', 'noopener');
     else fileInput.click();
   };
   toggle.addEventListener('pointerdown', () => { pressingToggle = true; });
