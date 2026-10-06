@@ -4,60 +4,48 @@
 // initOutputTabs(ctx) rather than reached for as globals, so this module can be
 // imported and tested on its own — see cm6-src/test-*.mjs.
 //
-// Everything below is the original code, moved verbatim.
+// 2026-10-06: rewritten for one "Output view" drop-down (#selOutputView) instead
+// of five tabs (decided by Nicholas; see output-panel-ui\NOTE-OUTPUT-PANEL-UI.md).
 
 export function initOutputTabs(ctx) {
   // ════════════════════════════════════════════════════════════════════
   // SECTION 9: OUTPUT TABS
   // ════════════════════════════════════════════════════════════════════
 
-  // Output tabs (with ARIA tab pattern)
-  const outputTabList = document.querySelector('.output-tabs[role="tablist"]');
-  const outputTabs = [...document.querySelectorAll('.output-tab[data-tab]')];
+  // Output views: one drop-down, #selOutputView (Preview, Source, Preprocess,
+  // Log, Intent). activateOutputTab keeps its name so callers barely change;
+  // it takes a view name ('log'), and for safety an old tab id ('outtab-log')
+  // or an element with such an id. Unknown names change nothing. Programmatic
+  // switches still move focus to the drop-down, as the tabs did (kept for
+  // now, decided 2026-10-06).
+  const viewSelect = document.getElementById('selOutputView');
+  const VIEWS = ['preview', 'source', 'preprocess', 'log', 'intent'];
 
-  function activateOutputTab(tab) {
-    outputTabs.forEach(t => {
-      t.classList.remove('active');
-      t.setAttribute('aria-selected', 'false');
-      t.setAttribute('tabindex', '-1');
-    });
+  function viewName(x) {
+    const s = typeof x === 'string' ? x : (x && x.id) || '';
+    const v = s.replace(/^outtab-/, '');
+    return VIEWS.includes(v) ? v : null;
+  }
+
+  function showView(v) {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-    tab.classList.add('active');
-    tab.setAttribute('aria-selected', 'true');
-    tab.setAttribute('tabindex', '0');
-    tab.focus();
-
-    const target = 'tab' + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1);
-    document.getElementById(target).classList.add('active');
-
+    const area = document.getElementById('tab' + v.charAt(0).toUpperCase() + v.slice(1));
+    if (area) area.classList.add('active');
     // (CM6 self-measures on visibility change — no resize call needed)
   }
 
-  outputTabs.forEach(tab => {
-    tab.addEventListener('click', () => activateOutputTab(tab));
-  });
+  function activateOutputTab(x) {
+    const v = viewName(x);
+    if (!v || !viewSelect) return;
+    viewSelect.value = v;
+    showView(v);
+    viewSelect.focus();
+  }
 
-  // Arrow key navigation for output tabs
-  if (outputTabList) {
-    outputTabList.addEventListener('keydown', (e) => {
-      const current = outputTabs.indexOf(e.target);
-      if (current < 0) return;
-      let next;
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        next = outputTabs[(current + 1) % outputTabs.length];
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        next = outputTabs[(current - 1 + outputTabs.length) % outputTabs.length];
-      } else if (e.key === 'Home') {
-        e.preventDefault();
-        next = outputTabs[0];
-      } else if (e.key === 'End') {
-        e.preventDefault();
-        next = outputTabs[outputTabs.length - 1];
-      }
-      if (next) activateOutputTab(next);
+  if (viewSelect) {
+    viewSelect.addEventListener('change', () => {
+      const v = viewName(viewSelect.value);
+      if (v) showView(v);
     });
   }
 

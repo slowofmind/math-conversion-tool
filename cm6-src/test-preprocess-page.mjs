@@ -44,9 +44,9 @@ const steps = prep ? [...prep.querySelectorAll('.prep-step')] : [];
 const titles = steps.map((s) => text(s.querySelector('.prep-title')));
 const FOUR = ['Figures drawn in code', 'PDF images', 'Source cleanup', 'Math notation review'];
 ok('its first four steps, in order', FOUR.every((t, i) => titles[i] === t), titles.join(' | '));
-const tabs = [...doc.querySelectorAll('.output-tab[data-tab]')].map((b) => b.dataset.tab);
-ok('the output tabs begin Preview, Log, Source, Intent',
-  ['preview', 'log', 'source', 'intent'].every((t, i) => tabs[i] === t), tabs.join(' | '));
+const tabs = [...doc.querySelectorAll('#selOutputView option')].map((o) => o.getAttribute('value'));
+ok('the Output view options are Preview, Source, Preprocess, Log, Intent (revised 2026-10-06)',
+  ['preview', 'source', 'preprocess', 'log', 'intent'].every((t, i) => tabs[i] === t), tabs.join(' | '));
 const A_IMPORT = "import { initMathCATProof } from './js/mathcat-proof.js';";
 const A_LISTEN = "document.getElementById('btnMathCATProof').addEventListener('click'";
 const A_TABS = '// OUTPUT TABS — js/output-tabs.js';
@@ -72,25 +72,23 @@ const hint = hid ? doc.getElementById(hid) : null;
 ok('described by a hint inside step 5',
   !!hint && !!s5 && s5.contains(hint) && hint.classList.contains('prep-status'), hid);
 const h = text(hint);
-for (const w of ['copies', 'main-pp.tex', 'original', 'Preprocess tab'])
+for (const w of ['copies', 'main-pp.tex', 'original', 'Preprocess view'])
   ok('the hint mentions ' + w, h.includes(w), h.slice(0, 80));
 
 // ── F3, call 88: the Preprocess tab, after Intent, and its panel ──────
-group('F3 call 88: the Preprocess tab, after Intent, and its panel');
-const ptabs = [...doc.querySelectorAll('.output-tab[data-tab="preprocess"]')];
-const tab = ptabs[0] || null;
-ok('exactly one output tab for preprocess', ptabs.length === 1, String(ptabs.length));
-ok('it comes directly after the Intent tab',
-  !!tab && doc.getElementById('outtab-intent')?.nextElementSibling === tab);
-ok('a tab, labelled "Preprocess"', tab?.getAttribute('role') === 'tab' && text(tab) === 'Preprocess', text(tab));
-ok('not selected, and out of the tab order until chosen',
-  tab?.getAttribute('aria-selected') === 'false' && tab?.getAttribute('tabindex') === '-1');
+group('F3 call 88, revised 2026-10-06: Preprocess in the Output view drop-down, and its panel');
+const vsel = doc.getElementById('selOutputView');
+const popts = vsel ? [...vsel.querySelectorAll('option[value="preprocess"]')] : [];
+const tab = popts[0] || null;
+ok('exactly one Output view option for preprocess', popts.length === 1, String(popts.length));
+ok('it comes directly after Source (order confirmed 2026-10-06)',
+  !!tab && tab.previousElementSibling?.getAttribute('value') === 'source');
+ok('an option labelled "Preprocess"', !!tab && text(tab) === 'Preprocess', tab ? text(tab) : '');
+ok('not the default view', !!tab && !tab.hasAttribute('selected'));
 const panel = doc.getElementById('tabPreprocess');
 ok('the panel output-tabs.js looks for, tabPreprocess, is there', !!panel);
-ok('the tab controls it', !!tab && tab.getAttribute('aria-controls') === 'tabPreprocess');
-ok('a tabpanel labelled by the tab', !!panel && !!tab && !!tab.id &&
-  panel.classList.contains('tab-content') && panel.getAttribute('role') === 'tabpanel' &&
-  panel.getAttribute('aria-labelledby') === tab.id);
+ok('a view area (tab-content) without tab roles', !!panel &&
+  panel.classList.contains('tab-content') && !panel.hasAttribute('role'));
 ok('it comes directly after the Intent panel',
   !!panel && panel.previousElementSibling === doc.getElementById('tabIntent'));
 ok('until the first press it holds a note naming the button',

@@ -54,18 +54,12 @@ export function initLogDisplay(ctx) {
       container.appendChild(entry);
     }
 
-    // Update badge
-    const badge = document.getElementById('logBadge');
+    // Log count: only in the Log option of the Output view drop-down. The count
+    // shown beside the drop-down was removed on 2026-10-06 (Nicholas: confusing
+    // there now that the Log tab is gone).
     const total = warnings.length;
-    const hasError = warnings.some(w => w.level === 'error');
-    const hasWarn = warnings.some(w => w.level === 'warn');
-    if (total > 0) {
-      badge.className = 'log-badge ' + (hasError ? 'error' : hasWarn ? 'warn' : 'info');
-      badge.textContent = total;
-    } else {
-      badge.className = '';
-      badge.textContent = '';
-    }
+    const logOption = document.querySelector('#selOutputView option[value="log"]');
+    if (logOption) logOption.textContent = total > 0 ? `Log (${total})` : 'Log';
   }
 
 

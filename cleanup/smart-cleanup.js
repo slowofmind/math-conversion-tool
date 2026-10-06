@@ -447,8 +447,7 @@ export function initSmartCleanup(ctx) {
     }
 
     updateLog(logs);
-    const logTab = document.getElementById('outtab-log');
-    if (logTab && typeof activateOutputTab === 'function') activateOutputTab(logTab);
+    if (typeof activateOutputTab === 'function') activateOutputTab('log');
 
     updateStatus('ready', totalChanges > 0
       ? 'Smart Cleanup: ' + totalChanges + ' list' + (totalChanges === 1 ? '' : 's') +

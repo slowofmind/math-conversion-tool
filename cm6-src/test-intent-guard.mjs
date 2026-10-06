@@ -279,29 +279,17 @@ ok('a clean document switches methods without interruption',
 // Verified against the REAL tab ids parsed out of index.html, so an id
 // rename cannot leave this passing while the app misbehaves.
 {
+  // Revised 2026-10-06: the output views are one drop-down (#selOutputView);
+  // activateOutputTab now takes a view name. Checked against the REAL option
+  // values parsed out of index.html.
   const indexHtml = readFileSync(join(PLAT, 'index.html'), 'utf8');
-  const ids = [...indexHtml.matchAll(/id="(outtab-[a-z]+)"/g)].map(m => m[1]);
-  ok('index.html has an Intent output tab', ids.includes('outtab-intent'),
-     JSON.stringify(ids));
-  ok('index.html has a Log output tab', ids.includes('outtab-log'));
-
-  // Rebuild the fixture's tab strip from the real ids.
-  const strip = D.createElement('div');
-  for (const id of ids) {
-    const b = D.createElement('button');
-    b.id = id;
-    b.setAttribute('aria-selected', 'false');
-    strip.appendChild(b);
-  }
-  D.body.appendChild(strip);
+  const sel = (indexHtml.match(/<select id="selOutputView"[^>]*>([\s\S]*?)<\/select>/) || [])[1] || '';
+  const views = [...sel.matchAll(/<option value="([a-z]+)"/g)].map(m => m[1]);
+  ok('index.html has an Intent output view', views.includes('intent'), JSON.stringify(views));
+  ok('index.html has a Log output view', views.includes('log'));
 
   let activated = null;
-  activateOutputTabSpy.fn = (t) => {
-    activated = t && t.id;
-    for (const id of ids) {
-      D.getElementById(id).setAttribute('aria-selected', String(id === activated));
-    }
-  };
+  activateOutputTabSpy.fn = (v) => { activated = typeof v === 'string' ? v : (v && v.id) || null; };
 
   setSel(to(), 'html5');
   setSel(math(), 'mathjax-mathml-intent');
@@ -311,10 +299,8 @@ ok('a clean document switches methods without interruption',
   activated = null;
   await runIntentScan();
   await wait(60);
-  ok('a scan with findings activates the Intent tab',
-     activated === 'outtab-intent', String(activated));
-  ok('the Intent tab is marked selected',
-     D.getElementById('outtab-intent').getAttribute('aria-selected') === 'true');
+  ok('a scan with findings activates the Intent view',
+     activated === 'intent', String(activated));
 
   // A document with NOTHING to review should stay on the Log, which is
   // where the explanation of what was searched lives.
@@ -322,8 +308,8 @@ ok('a clean document switches methods without interruption',
   activated = null;
   await runIntentScan();
   await wait(60);
-  ok('a scan with no findings activates the Log tab instead',
-     activated === 'outtab-log', String(activated));
+  ok('a scan with no findings activates the Log view instead',
+     activated === 'log', String(activated));
 }
 
 console.log(`\nintent guard: ${pass} passed, ${fail} failed`);

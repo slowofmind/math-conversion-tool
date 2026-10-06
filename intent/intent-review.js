@@ -208,11 +208,8 @@ export function initIntentReview(ctx) {
     // that is Intent — the review panel is where the work happens, and the
     // per-finding detail is all there. With nothing to review, Intent has
     // only an empty state, so the Log (which explains what was searched)
-    // is more use. Fall back to the Log if the Intent tab is ever absent.
-    const wantTab = res.payloads.length > 0 ? 'outtab-intent' : 'outtab-log';
-    const tab = document.getElementById(wantTab)
-             || document.getElementById('outtab-log');
-    if (tab && typeof activateOutputTab === 'function') activateOutputTab(tab);
+    // is more use. (2026-10-06: views are named options of one drop-down.)
+    if (typeof activateOutputTab === 'function') activateOutputTab(res.payloads.length > 0 ? 'intent' : 'log');
 
     updateStatus('ready', res.payloads.length > 0
       ? 'Intent scan: ' + res.payloads.length + ' finding'

@@ -353,6 +353,21 @@
     font-size: 10px; padding: 1px 6px;
   }
   .source-viewer-label button:hover { color: var(--text-primary); }
+  /* Source view bar (2026-10-06): a little taller than the old label strip; holds the
+     project-file label (left) and "Copy all" (right). */
+  .source-bar {
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0; min-height: 36px;
+    padding: 4px 10px; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  }
+  .source-bar .source-viewer-label { padding: 0; background: none; border-bottom: 0; flex: 1; min-width: 0; }
+  .source-bar .source-viewer-label[hidden] { display: none; }
+  .source-bar-spacer { flex: 1; }
+  .source-bar .source-viewer-label:not([hidden]) + .source-bar-spacer { display: none; }
+  .source-copy-status { font-size: 11px; color: var(--text-secondary); }
+  #btnCopySource { font-size: 11px; }
+  #btnCopySource[aria-disabled="true"], #btnCopySource[aria-disabled="true"]:hover {
+    color: var(--text-muted); background: none; border: 1px dashed var(--border); cursor: not-allowed;
+  }
   @media (prefers-reduced-motion: reduce) {
     .sidebar { transition: none; }
   }
@@ -880,6 +895,7 @@
   .output-tab.active { color: var(--text-primary); border-bottom-color: var(--harvard-blue); }
 
   .output-tab-spacer { flex: 1; }
+  #selOutputView { width: auto; font-size: 12px; margin: 0 6px 0 4px; }
 
   .output-tab-action {
     font-size: 12px;
@@ -895,6 +911,9 @@
   #btnDownloadOutput { color: var(--harvard-blue); border-color: var(--harvard-blue); }
   #mathSubtitlesBox { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-primary); }
   #selMathSubtitles { width: auto; font-size: 12px; }
+  /* Unavailable (2026-10-06): visible, greyed, still reachable with Tab (see setPreviewHtml). */
+  #selMathSubtitles[aria-disabled="true"] { color: var(--text-muted); border-style: dashed; cursor: not-allowed; }
+  #mathSubtitlesBox:has(#selMathSubtitles[aria-disabled="true"]) label { color: var(--text-muted); }
   #btnDownloadOutput:hover { background: var(--harvard-blue); color: #fff; }
   #btnDownloadScorm { color: var(--harvard-blue); border-color: var(--harvard-blue); font-size: 11px; }
   #btnDownloadScorm:hover { background: var(--harvard-blue); color: #fff; }
@@ -2215,7 +2234,7 @@
           copies of the changed files beside them, and of your main file
           (main.tex becomes main-pp.tex), then converts that copy. Your
           original files are never changed; if nothing changes, the original
-          is converted. The report opens in the Preprocess tab.</p>
+          is converted. The report opens in the Preprocess view.</p>
         <button type="button" class="prep-btn" id="btnPreprocess"
                 title="Run the LaTeX preprocessor, save -pp copies of what it changes, and convert them; your original files are not changed"
                 aria-describedby="preprocessHint">Preprocess &amp; convert</button>
@@ -2367,16 +2386,21 @@
 
     <!-- OUTPUT PANEL -->
     <div class="output-panel" id="outputPanel">
-      <div class="output-tabs" role="tablist" aria-label="Output view">
-        <button class="output-tab active" data-tab="preview" role="tab" id="outtab-preview" aria-selected="true" aria-controls="tabPreview" tabindex="0">Preview</button>
-        <button class="output-tab" data-tab="log" role="tab" id="outtab-log" aria-selected="false" aria-controls="tabLog" tabindex="-1">Log <span id="logBadge"></span></button>
-        <button class="output-tab" data-tab="source" role="tab" id="outtab-source" aria-selected="false" aria-controls="tabSource" tabindex="-1">Source</button>
-        <button class="output-tab" data-tab="intent" role="tab" id="outtab-intent" aria-selected="false" aria-controls="tabIntent" tabindex="-1">Intent</button>
-        <button class="output-tab" data-tab="preprocess" role="tab" id="outtab-preprocess" aria-selected="false" aria-controls="tabPreprocess" tabindex="-1">Preprocess</button>
-        <button class="output-tab-action" id="btnDownloadOutput" title="Convert a document first." data-title-available="Download output" aria-label="Download output" aria-disabled="true" aria-describedby="btnDownloadOutputWhy">📥 Download</button>
-        <button class="output-tab-action" id="btnDownloadScorm" title="Convert a document first." data-title-available="Download as SCORM package for Canvas LMS" aria-label="Download as SCORM package" aria-disabled="true" aria-describedby="btnDownloadScormWhy">📦 SCORM</button>
-        <span id="mathSubtitlesBox" style="display:none;" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles"><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
+      <!-- One "Output view" drop-down instead of five tabs (decided 2026-10-06, to declutter the
+           row above the preview; see output-panel-ui\NOTE-OUTPUT-PANEL-UI.md). Intent is listed
+           until it moves to the left sidebar. js/output-tabs.js switches the views. -->
+      <div class="output-tabs">
+        <select id="selOutputView" aria-label="Output view">
+          <option value="preview" selected>Preview</option>
+          <option value="source">Source</option>
+          <option value="preprocess">Preprocess</option>
+          <option value="log">Log</option>
+          <option value="intent">Intent</option>
+        </select>
+        <span id="mathSubtitlesBox" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles" aria-disabled="true" aria-describedby="selMathSubtitlesWhy" title="Convert a document to HTML first."><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
         <span class="output-tab-spacer"></span>
+        <button class="output-tab-action" id="btnDownloadOutput" title="Convert a document first." data-title-available="Download output" aria-label="Download output" aria-disabled="true" aria-describedby="btnDownloadOutputWhy">Download</button>
+        <button class="output-tab-action" id="btnDownloadScorm" title="Convert a document first." data-title-available="Download as SCORM package for Canvas LMS" aria-label="Download as SCORM package" aria-disabled="true" aria-describedby="btnDownloadScormWhy">📦 SCORM</button>
         <button class="output-tab-action" id="btnOutputClose" title="Hide panel" aria-label="Close output panel">×</button>
       </div>
       <!-- Why Download/SCORM is unavailable: read as the button's description
@@ -2384,22 +2408,31 @@
            setActionAvailable() keeps the text current. -->
       <span id="btnDownloadOutputWhy" hidden>Convert a document first.</span>
       <span id="btnDownloadScormWhy" hidden>Convert a document first.</span>
+      <span id="selMathSubtitlesWhy" hidden>Convert a document to HTML first.</span>
       <div class="output-body">
-        <div class="tab-content active" id="tabPreview" role="tabpanel" aria-labelledby="outtab-preview">
+        <div class="tab-content active" id="tabPreview">
           <iframe id="previewFrame" sandbox="allow-scripts" title="HTML preview"></iframe>
         </div>
-        <div class="tab-content" id="tabLog" role="tabpanel" aria-labelledby="outtab-log" aria-live="polite">
+        <div class="tab-content" id="tabLog" aria-live="polite">
           <div class="log-container" id="logContainer">
             <div style="color: var(--text-muted); padding: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;">
               Run a conversion to see log output.
             </div>
           </div>
         </div>
-        <div class="tab-content" id="tabSource" role="tabpanel" aria-labelledby="outtab-source">
-          <div class="source-viewer-label" id="sourceViewerLabel" hidden></div>
+        <div class="tab-content" id="tabSource">
+          <!-- Source view bar (2026-10-06): the project-file label (when a file is open) and
+               "Copy all", which copies all the text in the Source view. -->
+          <div class="source-bar">
+            <div class="source-viewer-label" id="sourceViewerLabel" hidden></div>
+            <span class="source-bar-spacer"></span>
+            <span class="source-copy-status" id="sourceCopyStatus" role="status"></span>
+            <button type="button" class="output-tab-action" id="btnCopySource" title="Nothing to copy yet. Convert a document first." data-title-available="Copy all the text in the Source view" aria-disabled="true" aria-describedby="btnCopySourceWhy">Copy all</button>
+          </div>
+          <span id="btnCopySourceWhy" hidden>Nothing to copy yet. Convert a document first.</span>
           <div id="outputSource"></div>
         </div>
-        <div class="tab-content" id="tabIntent" role="tabpanel" aria-labelledby="outtab-intent">
+        <div class="tab-content" id="tabIntent">
           <div class="intent-panel" id="intentPanel">
             <div class="intent-panel-empty" id="intentPanelEmpty">
               Run <strong>🔎 Intent Scan</strong> to find math whose meaning is
@@ -2421,7 +2454,7 @@
             </div>
           </div>
         </div>
-        <div class="tab-content" id="tabPreprocess" role="tabpanel" aria-labelledby="outtab-preprocess">
+        <div class="tab-content" id="tabPreprocess">
           <div id="preprocessNote" style="color: var(--text-muted); padding: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;">
             Press <strong>Preprocess &amp; convert</strong>, step 5 in Prepare,
             to run the LaTeX preprocessor. Its report shows here.
@@ -3593,9 +3626,11 @@ async function openProjectFile(entry) {
     if (text === null) {
       sourceEditor.setText(`[${entry.path} could not be decoded as UTF-8 text.]`);
       sourceEditor.setLanguage('text');
+      setSourceCopyable(false, 'This file could not be read as text, so there is nothing to copy.');
     } else {
       sourceEditor.setText(text);
       sourceEditor.setLanguage(entry.ext === 'sty' || entry.ext === 'cls' ? 'latex' : 'text');
+      setSourceCopyable(true);
     }
   } else {
     sourceEditor.setText(
@@ -3603,6 +3638,7 @@ async function openProjectFile(entry) {
       `${entry.bytes ? (entry.bytes.length / 1024).toFixed(1) + ' KB' : 'no data'}.\n` +
       `This file cannot be shown as text, and cannot be converted on its own.`);
     sourceEditor.setLanguage('text');
+    setSourceCopyable(false, 'This file is not text, so there is nothing to copy.');
   }
   if (label) {
     label.hidden = false;
@@ -3613,9 +3649,10 @@ async function openProjectFile(entry) {
     document.getElementById('svlClose').addEventListener('click', () => {
       label.hidden = true;
       sourceEditor.setText('');
+      setSourceCopyable(false, SOURCE_COPY_EMPTY);
     });
   }
-  activateOutputTab(document.getElementById('outtab-source'));
+  activateOutputTab('source');
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -6056,6 +6093,36 @@ function clearBinaryInput() {
 
 document.getElementById('btnClearBinary').addEventListener('click', clearBinaryInput);
 
+// Copy all (Source view bar, 2026-10-06): copies all the text in the Source
+// view, not just the lines on screen. Available only when that text is real
+// text (converted output, or an opened project text file); greyed out
+// otherwise, like Download and SCORM. The result is shown and announced in
+// #sourceCopyStatus (role=status) and clears itself after a few seconds.
+const SOURCE_COPY_EMPTY = 'Nothing to copy yet. Convert a document first.';
+let sourceCopyStatusTimer = null;
+function setSourceCopyable(available, reason) {
+  setActionAvailable(document.getElementById('btnCopySource'), available, reason);
+}
+function showSourceCopyStatus(msg) {
+  const el = document.getElementById('sourceCopyStatus');
+  if (!el) return;
+  el.textContent = msg;
+  clearTimeout(sourceCopyStatusTimer);
+  sourceCopyStatusTimer = setTimeout(() => { el.textContent = ''; }, 4000);
+}
+document.getElementById('btnCopySource').addEventListener('click', async (e) => {
+  if (isActionUnavailable(e.currentTarget)) return;
+  const text = sourceEditor.getText();
+  try {
+    await navigator.clipboard.writeText(text);
+    const lines = text === '' ? 0 : text.split('\n').length;
+    showSourceCopyStatus('Copied ' + lines + (lines === 1 ? ' line' : ' lines'));
+  } catch (err) {
+    console.warn('Copy all failed:', err);
+    showSourceCopyStatus('Could not copy: the browser did not allow access to the clipboard.');
+  }
+});
+
 // Download button handler
 document.getElementById('btnDownloadOutput').addEventListener('click', (e) => {
   if (isActionUnavailable(e.currentTarget) || !lastOutput) return;
@@ -7458,12 +7525,14 @@ async function runConversion() {
       const sizeKB = (blob.size / 1024).toFixed(1);
 
       lastOutput = { blob, filename: outName, files };
-      downloadBtn.textContent = `📥 ${outName} (${sizeKB} KB)`;
+      downloadBtn.textContent = 'Download';
+      downloadBtn.dataset.titleAvailable = `Download ${outName} (${sizeKB} KB)`;
       setActionAvailable(downloadBtn, true);
       setActionAvailable(scormBtn, scormAvailableFor(baseToFmt), scormUnavailableReason(baseToFmt));
       clearPreviewHtml();   // MathCAT proofing: not HTML
 
       sourceEditor.setText(`[Binary output: ${outName} (${sizeKB} KB)]\nUse the download button to save this file.`);
+      setSourceCopyable(false, 'Binary output has no text to copy. Use Download to save the file.');
 
       const previewFrame = document.getElementById('previewFrame');
       previewFrame.srcdoc = `<body style="background:#f5f5f5;color:#1e2124;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
@@ -7513,6 +7582,7 @@ async function runConversion() {
       }
 
       sourceEditor.setText(outputText);
+      setSourceCopyable(true);
 
       const previewFrame = document.getElementById('previewFrame');
       setPreviewHtml(outputText, /\.html?$/i.test(outFileName));   // MathCAT proofing: preview copy only
@@ -7520,7 +7590,8 @@ async function runConversion() {
       const blob = new Blob([outputText], { type: 'text/plain' });
       const sizeKB = (blob.size / 1024).toFixed(1);
       lastOutput = { blob, filename: outFileName, files };
-      downloadBtn.textContent = `📥 ${outFileName} (${sizeKB} KB)`;
+      downloadBtn.textContent = 'Download';
+      downloadBtn.dataset.titleAvailable = `Download ${outFileName} (${sizeKB} KB)`;
       setActionAvailable(downloadBtn, true);
 
       // SCORM: available for single-page HTML output, any math method (see
@@ -7617,19 +7688,25 @@ const mathSubtitlesSel = document.getElementById('selMathSubtitles');
 const MATH_SUBTITLE_NAMES = { hide: 'Hidden', mathcat: 'MathCat', mathjax: 'MathJax' };
 let lastPreviewHtml = null;   // last HTML put in the preview, untouched; null when not HTML
 let previewSeq = 0;           // of two previews prepared at once, only the newer is written (sitting 12, point 2)
+// Math subtitles control (decided 2026-10-06): always visible; greyed out with
+// the Download/SCORM pattern (aria-disabled, reason read as its description,
+// still reachable with Tab) while the preview has no HTML for it to act on.
+// Until then it was hidden in those cases (sitting 12, point 3).
+const SUBTITLES_NO_PREVIEW = 'Convert a document to HTML first.';
+let subtitlesChoice = mathSubtitlesSel.value;   // the setting, to undo a change made while unavailable
 async function setPreviewHtml(html, isHtml) {
   const seq = ++previewSeq;
   lastPreviewHtml = isHtml ? html : null;
-  const box = document.getElementById('mathSubtitlesBox');
   let copy = html;
   if (isHtml) {
-    try { copy = await mathcatProof.preparePreview(html); box.style.display = ''; }
-    catch (err) {   // sitting 12, point 3: the preview as converted, the control hidden, one log line
-      copy = html; box.style.display = 'none';
+    try { copy = await mathcatProof.preparePreview(html); setActionAvailable(mathSubtitlesSel, true); }
+    catch (err) {   // sitting 12, point 3: the preview as converted, the control unavailable, one log line
+      copy = html;
+      setActionAvailable(mathSubtitlesSel, false, 'Math subtitles could not be added to this preview.');
       console.info('[MathCAT proofing]', 'helper not added to the preview: ' + (err && err.message ? err.message : err));
     }
   } else {
-    box.style.display = 'none';
+    setActionAvailable(mathSubtitlesSel, false, 'Math subtitles need an HTML preview. ' + SUBTITLES_NO_PREVIEW);
   }
   if (seq !== previewSeq) return;
   document.getElementById('previewFrame').srcdoc = copy;
@@ -7637,17 +7714,30 @@ async function setPreviewHtml(html, isHtml) {
 function clearPreviewHtml() {
   ++previewSeq;
   lastPreviewHtml = null;
-  document.getElementById('mathSubtitlesBox').style.display = 'none';
+  setActionAvailable(mathSubtitlesSel, false, SUBTITLES_NO_PREVIEW);
 }
-mathcatProof.onChoice((info) => {   // the drop-down follows the setting; it is never disabled (N46 C)
+// The drop-down follows the setting (N46 C); since 2026-10-06 it is greyed
+// out only while the preview has no HTML (see above).
+mathcatProof.onChoice((info) => {
   mathSubtitlesSel.value = info.choice;
+  subtitlesChoice = info.choice;
   mathSubtitlesSel.querySelector('option[value="mathjax"]').disabled = info.mathjax !== true;
   if (info.source === 'page') {     // sitting 12, point 5: a change made inside the preview
     updateStatus('ready', 'Math subtitles: ' + MATH_SUBTITLE_NAMES[info.choice] + ', changed in the preview.');
   }
 });
-mathSubtitlesSel.addEventListener('change', () => {   // N46 A: the platform script waits for a pause
+// N46 A: the platform script waits for a pause. While unavailable, a change
+// is undone (the keydown and mousedown guards below normally prevent one).
+mathSubtitlesSel.addEventListener('change', () => {
+  if (isActionUnavailable(mathSubtitlesSel)) { mathSubtitlesSel.value = subtitlesChoice; return; }
+  subtitlesChoice = mathSubtitlesSel.value;
   mathcatProof.choose(mathSubtitlesSel.value).catch(() => { /* reported through onEngineLoad */ });
+});
+mathSubtitlesSel.addEventListener('keydown', (e) => {
+  if (isActionUnavailable(mathSubtitlesSel) && e.key !== 'Tab') e.preventDefault();
+});
+mathSubtitlesSel.addEventListener('mousedown', (e) => {
+  if (isActionUnavailable(mathSubtitlesSel)) e.preventDefault();
 });
 // ════════════════════════════════════════════════════════════════════
 // LATEX PREPROCESSING — js/preprocess.js (latex-preprocess PLAN-9, step F)
@@ -7656,7 +7746,7 @@ mathSubtitlesSel.addEventListener('change', () => {   // N46 A: the platform scr
 // latex-preprocess tool's v2/platform-copy.mjs and never edited here. It
 // and its table load on the first press and are kept for the session:
 // dynamic imports, never a static one, so a page never pressed loads
-// neither. The report is plain text in the Preprocess tab, with no live
+// neither. The report is plain text in the Preprocess view, with no live
 // region. activateOutputTab is declared further down and wants the tab
 // element, so showReport reaches it only when it runs.
 function showReport(text) {
@@ -7664,7 +7754,7 @@ function showReport(text) {
   report.textContent = text;
   report.hidden = false;
   document.getElementById('preprocessNote').hidden = true;
-  activateOutputTab(document.getElementById('outtab-preprocess'));
+  activateOutputTab('preprocess');
 }
 async function loadTable() {
   const res = await fetch('preprocess/data/pandoc-latex-reader-index.json');

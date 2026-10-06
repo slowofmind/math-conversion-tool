@@ -82,7 +82,7 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
   function stop(reason) {
     showReport('Preprocess stopped: ' + reason);
     updateLog([{ level: 'error', message: 'Preprocess stopped: ' + reason }]);
-    updateStatus('error', 'Preprocess stopped. See the Preprocess tab.');
+    updateStatus('error', 'Preprocess stopped. See the Preprocess view.');
     return false;
   }
 
