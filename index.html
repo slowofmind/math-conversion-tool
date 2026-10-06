@@ -76,7 +76,12 @@
 
   /* ─── TOOLBAR (controls) ─── */
   .toolbar {
-    height: var(--toolbar-height);
+    /* A minimum, not a fixed height, and wrapping (2026-10-06): with Math conversion and
+       Styling in it the toolbar needs ~1250 px, so in a narrower window it continues on a
+       second line instead of running off the right edge. */
+    min-height: var(--toolbar-height);
+    flex-wrap: wrap;
+    row-gap: 6px;
     background: #ffffff;
     border-bottom: 1px solid var(--border);
     display: flex;
@@ -219,7 +224,10 @@
   }
 
   .sidebar-header {
-    padding: 10px 12px;
+    /* 32 px tall like the editor bar, 12 px from the left like the toolbar, so the Tools
+       button is in the same place whether the panel is open or closed (2026-10-06). */
+    padding: 0 12px;
+    height: 32px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -246,6 +254,11 @@
     border-radius: 3px;
   }
   .sidebar-close:hover { color: var(--text-primary); background: var(--bg-elevated); }
+  /* Tools (#btnProject), 2026-10-06: a flex item of whichever bar holds it. In the editor bar
+     it sits 12 px from the left, like Upload Files (4 px bar padding + 8 px). */
+  #toolsSlotEditor, #toolsSlotSidebar { display: contents; }
+  #btnProject { font-size: 12px; padding: 3px 10px; }
+  #toolsSlotEditor > #btnProject { margin-left: 8px; }
 
   .sidebar-body {
     flex: 1;
@@ -1096,6 +1109,17 @@
     gap: 6px;
   }
   .core-note { font-size: 12px; color: var(--text-muted); font-style: italic; }
+  /* Math conversion + Styling in the toolbar (2026-10-06), core view only; the selects
+     look like the toolbar's own while they are there. */
+  #coreToolbarOptions { display: contents; }
+  #coreToolbarOptions[hidden] { display: none; }
+  .core-tool-label { display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; white-space: nowrap; }
+  .core-tool-label select { font-family: 'Roboto', sans-serif; font-size: 13px; padding: 4px 8px;
+    border: 1px solid var(--border); border-radius: 4px; background: #ffffff; color: var(--text-primary); cursor: pointer; }
+  /* The core row now holds only the two notes: no height (and no border under the
+     toolbar) while both are empty. Still rendered, so its live region keeps working. */
+  #coreOptions:not(:has(.core-note:not(:empty))) { padding: 0; }
+  #optionsPanel.view-core:not(:has(.core-note:not(:empty))) { border-bottom: none; }
   .options-view-select {
     font-family: var(--font-ui);
     font-size: 13px;
@@ -1467,6 +1491,14 @@
       <option value="epub">epub</option>
       <option value="typst">typst</option>
     </select>
+    <!-- Math conversion and Styling (moved up from the core options row, 2026-10-06,
+         Nicholas): between Output and Convert. Core view only: in the full Pandoc view
+         the two controls move to their tabs (relocateControl) and this span is hidden
+         (applyOptionsView). Each label wraps its slot instead of using for=, as before. -->
+    <span id="coreToolbarOptions">
+      <label class="toolbar-label core-tool-label">Math conversion: <span id="core-slot-math"></span></label>
+      <label class="toolbar-label core-tool-label"><span class="style-label-text">Styling</span>: <span id="core-slot-style"></span></label>
+    </span>
   </div>
 
   <div class="toolbar-divider"></div>
@@ -1534,9 +1566,10 @@
        visible in both views, so they are repopulated but never moved.
        The label wraps its slot instead of using for=, which avoids a
        second label pointing at the same id once the control moves in. -->
+  <!-- Since 2026-10-06 the Math conversion and Styling slots are in the toolbar
+       (#coreToolbarOptions); this row keeps the two notes, and takes no space while
+       both are empty. -->
   <div id="coreOptions">
-    <label class="core-label">Math rendering: <span id="core-slot-math"></span></label>
-    <label class="core-label"><span class="style-label-text">Styling</span>: <span id="core-slot-style"></span></label>
     <span class="core-note" id="styleNote" role="status"></span>
     <span class="core-note" id="coreViewNote" role="status" aria-live="polite"></span>
   </div>
@@ -1705,9 +1738,10 @@
         <select id="opt-math" style="width:auto;">
           <!-- Rebuilt at runtime by refreshMathOptions() to match the
                selected output format. These initial entries are the
-               HTML-family list, matching the default output (html5). -->
-          <option value="mathjax-mathml" selected>MathML (Enhanced)</option>
-          <option value="mathjax-mathml-intent">MathML (with intent + SRE)</option>
+               HTML-family list, matching the default output (html5); the
+               selected one, MathML (+ MathJax), is the default (2026-10-06). -->
+          <option value="mathjax-mathml">MathML</option>
+          <option value="mathjax-mathml-intent" selected>MathML (+ MathJax)</option>
           <option value="mathml">MathML (texmath)</option>
           <option value="mathjax4">MathJax (script tag)</option>
           <option value="katex">KaTeX</option>
@@ -2186,9 +2220,11 @@
 <main class="main-area" id="mainArea">
 
   <!-- SIDEBAR: left rail — Files tree + LaTeX Cleanup -->
-  <aside class="sidebar collapsed" id="sidebar" role="complementary" aria-label="Project panel">
+  <aside class="sidebar collapsed" id="sidebar" role="complementary" aria-label="Tools panel">
     <div class="sidebar-header">
-      <span class="sidebar-title" id="railTitle">Project</span>
+      <!-- While the panel is open the Tools button (#btnProject) sits here, where the title
+           "Project" was, at the same place on screen as in the editor bar (2026-10-06). -->
+      <span id="toolsSlotSidebar"></span>
       <button class="sidebar-close" id="sidebarClose" aria-label="Close panel">×</button>
     </div>
 
@@ -2433,7 +2469,7 @@
   </aside>
 
   <div class="sidebar-gutter" id="sidebarGutter" role="separator"
-       aria-orientation="vertical" aria-label="Resize project panel"
+       aria-orientation="vertical" aria-label="Resize Tools panel"
        aria-valuemin="200" aria-valuemax="560" aria-valuenow="300"
        tabindex="0"></div>
 
@@ -2443,9 +2479,11 @@
     <!-- EDITOR -->
     <div class="editor-area" id="editorArea">
       <div class="editor-tabs">
-        <button class="toolbar-btn" id="btnProject" title="Show or hide the project panel"
-                aria-expanded="false" aria-controls="sidebar"
-                style="font-size:12px; padding:3px 10px;">☰ Project</button>
+        <!-- Tools (was "☰ Project"; 2026-10-06, Nicholas). The same button moves into the
+             sidebar header while the panel is open (setSidebarOpen). Its id stays btnProject:
+             the BusyTeX gate tests click it by id. -->
+        <span id="toolsSlotEditor"><button class="toolbar-btn" id="btnProject" title="Show or hide the Tools panel"
+                aria-expanded="false" aria-controls="sidebar">Tools</button></span>
         <span class="editor-filename"><span class="sr-only">Editing file: </span><span id="tabFilename">untitled.tex</span></span>
         <span style="flex:1;"></span>
         <!-- The intent findings navigation (◀ count ▶ ✕) moved to the sidebar, below the
@@ -2830,34 +2868,34 @@ const MATH_DOCX = [
   ['',             'OMML (default texmath)']
 ];
 const MATH_EPUB = [
-  ['mathjax-mathml', 'MathML (Enhanced)'],
+  ['mathjax-mathml', 'MathML'],
   ['mathml',         'MathML (texmath)'],
   ['epub-thorium',   'EPUB for Thorium Reader']
 ];
 
-// Core view.
-//   'no-convert' leaves the LaTeX untouched AND adds no script tag. Adding a
-//   script reference becomes its own checkbox, so conversion and script
-//   insertion stop being the same decision. Core-only for now.
+// Core view (2026-10-06, Nicholas): "MathML (+ MathJax)" first, so it is the default (a
+// list's first entry is also what comes back after switching from DOCX to HTML), then
+// "MathML". texmath is offered in the full Pandoc view only. 'no-convert' (it left the
+// LaTeX untouched and added no script tag) was removed from the interface; the code that
+// handles it is kept.
 //   'mathjax-mathml-intent' is a temporary combined entry; it is the only way
 //   to get the config, script, intent extension, toggle and menu-fix CSS until
 //   those become separate controls. Retire it only once they exist.
 const MATH_METHODS_CORE = {
   html: [
-    ['mathjax-mathml',        'MathML (Enhanced)'],
-    ['mathjax-mathml-intent', 'MathML (with intent + SRE)'],
-    ['mathml',                'MathML (texmath)'],
-    ['no-convert',            'No conversion']
+    ['mathjax-mathml-intent', 'MathML (+ MathJax)'],
+    ['mathjax-mathml',        'MathML']
   ],
   docx: MATH_DOCX,
   epub: MATH_EPUB
 };
 
-// Full Pandoc view: recognisable names for people who know Pandoc's flags.
+// Full Pandoc view: recognisable names for people who know Pandoc's flags. The first two
+// are named as in the core view (2026-10-06); the order and the rest are unchanged.
 const MATH_METHODS = {
   html: [
-    ['mathjax-mathml',        'MathML (Enhanced)'],
-    ['mathjax-mathml-intent', 'MathML (with intent + SRE)'],
+    ['mathjax-mathml',        'MathML'],
+    ['mathjax-mathml-intent', 'MathML (+ MathJax)'],
     ['mathml',                'MathML (texmath)'],
     ['mathjax4',              'MathJax (script tag)'],
     ['katex',                 'KaTeX'],
@@ -3046,6 +3084,9 @@ function applyOptionsView() {
   // hidden it still works: conversions read it, and it follows opened files.
   const fromBox = document.getElementById('fromBox');
   if (fromBox) fromBox.hidden = core;
+  // Math conversion + Styling sit in the toolbar in the core view only (2026-10-06).
+  const coreTools = document.getElementById('coreToolbarOptions');
+  if (coreTools) coreTools.hidden = !core;
 
   const selTo = document.getElementById('selTo');
   const selMath = document.getElementById('opt-math');
@@ -8307,7 +8348,28 @@ document.querySelector('.rail-sections')?.addEventListener('keydown', (ev) => {
 });
 
 function setSidebarOpen(open, section) {
+  // The Tools button moves into the sidebar header while the panel is open, and back to
+  // the editor bar when it closes (2026-10-06), keeping keyboard focus if it had it.
+  let refocus = false;
+  if (btnProject) {
+    const slot = document.getElementById(open ? 'toolsSlotSidebar' : 'toolsSlotEditor');
+    if (slot && btnProject.parentElement !== slot) {
+      refocus = document.activeElement === btnProject;
+      slot.appendChild(btnProject);
+    }
+  }
   sidebar.classList.toggle('collapsed', !open);
+  // Focus after the class change. An opening panel still counts as hidden for a frame or
+  // two (measured in Chrome: visible by the 2nd frame), so try again each frame, for up to
+  // about half a second, but only while focus is still lost (on the page itself).
+  if (refocus) {
+    let tries = 0;
+    const again = () => {
+      btnProject.focus();
+      if (document.activeElement !== btnProject && document.activeElement === document.body && ++tries < 30) requestAnimationFrame(again);
+    };
+    again();
+  }
   if (open && section) setRailSection(section, true);
   else if (open && railOpen.has('prepare')) refreshPrepareStatus();
   if (btnProject) {
@@ -8442,7 +8504,7 @@ const railSashes = railSections.slice(0, -1).map(([key], i) => {
 
 // No argument: reopening shows the sections as they were left.
 btnProject?.addEventListener('click', () => toggleSidebar());
-sidebarClose.addEventListener('click', () => setSidebarOpen(false));
+sidebarClose.addEventListener('click', () => { setSidebarOpen(false); btnProject?.focus(); });
 for (const [key] of railSections) setRailSection(key, railOpen.has(key));
 try { localStorage.removeItem('atc.rail.tab'); } catch {}   // the old tabs' key
 

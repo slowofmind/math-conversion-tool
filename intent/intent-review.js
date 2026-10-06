@@ -828,8 +828,8 @@ export function initIntentReview(ctx) {
     sel.dispatchEvent(new Event('change', { bubbles: true }));
     selfSwitching = false;
     lastMathValue = INTENT_MATH_METHOD;
-    const msg = 'Math rendering method switched to "MathML (custom MathJax '
-      + 'conversion + SRE speech)" \u2014 ' + why;
+    const msg = 'Math conversion switched to "MathML (+ MathJax)'
+      + '" \u2014 ' + why;
     addToReport({ line: null, column: null, level: 'info', type: 'intent-scan',
       matchedText: null, message: msg });
     // The caller may prefer to fold this into its OWN announcement: the
@@ -878,8 +878,8 @@ export function initIntentReview(ctx) {
     const p = document.createElement('p');
     p.style.cssText = 'margin:0 0 12px; font-size:13px; line-height:1.5;';
     p.textContent = count + ' annotation' + (count === 1 ? '' : 's')
-      + ' have been applied. They only render with the custom MathJax '
-      + 'method. Under another method the annotated math will fail to '
+      + ' have been applied. They only render with MathML (+ MathJax). '
+      + 'Under another method the annotated math will fail to '
       + 'render, not just lose its spoken description.';
     dlg.appendChild(p);
 
@@ -895,7 +895,7 @@ export function initIntentReview(ctx) {
       row.appendChild(b);
       return b;
     };
-    const keep = mk('Keep the custom MathJax method', 'cancel', true);
+    const keep = mk('Keep MathML (+ MathJax)', 'cancel', true);
     mk('Remove the annotations and switch', 'revert');
     mk('Switch anyway (math will not render)', 'force');
     dlg.appendChild(row);
