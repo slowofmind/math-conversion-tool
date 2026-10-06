@@ -45,8 +45,8 @@ const titles = steps.map((s) => text(s.querySelector('.prep-title')));
 const FOUR = ['Figures drawn in code', 'PDF images', 'Source cleanup', 'Math notation review'];
 ok('its first four steps, in order', FOUR.every((t, i) => titles[i] === t), titles.join(' | '));
 const tabs = [...doc.querySelectorAll('#selOutputView option')].map((o) => o.getAttribute('value'));
-ok('the Output view options are Preview, Source, Preprocess, Log, Intent (revised 2026-10-06)',
-  ['preview', 'source', 'preprocess', 'log', 'intent'].every((t, i) => tabs[i] === t), tabs.join(' | '));
+ok('the Output view options are Output, Code, Preprocess, Log (revised 2026-10-06; Intent moved to the sidebar)',
+  tabs.join(',') === 'preview,source,preprocess,log', tabs.join(' | '));
 const A_IMPORT = "import { initMathCATProof } from './js/mathcat-proof.js';";
 const A_LISTEN = "document.getElementById('btnMathCATProof').addEventListener('click'";
 const A_TABS = '// OUTPUT TABS — js/output-tabs.js';
@@ -89,8 +89,8 @@ const panel = doc.getElementById('tabPreprocess');
 ok('the panel output-tabs.js looks for, tabPreprocess, is there', !!panel);
 ok('a view area (tab-content) without tab roles', !!panel &&
   panel.classList.contains('tab-content') && !panel.hasAttribute('role'));
-ok('it comes directly after the Intent panel',
-  !!panel && panel.previousElementSibling === doc.getElementById('tabIntent'));
+ok('it comes directly after the Code view area (the Intent view moved to the sidebar, 2026-10-06)',
+  !!panel && panel.previousElementSibling === doc.getElementById('tabSource'));
 ok('until the first press it holds a note naming the button',
   text(panel).includes('Preprocess & convert'), text(panel).slice(0, 80));
 

@@ -743,6 +743,8 @@
 
   .intent-nav { display: flex; align-items: center; gap: 3px; margin-right: 2px; }
   .intent-nav[hidden] { display: none; }
+  /* In the sidebar, below the Intent Scan button (2026-10-06). */
+  .prep-step .intent-nav { margin-top: 6px; margin-right: 0; }
   .intent-nav-status {
     font-size: 11px;
     color: var(--text-secondary);
@@ -752,7 +754,7 @@
   }
   .intent-nav-status.stale { color: var(--warning); font-weight: 500; }
 
-  /* Review panel (Intent output tab) */
+  /* Review panel (in the sidebar since 2026-10-06; was the Intent output view) */
   .intent-panel { padding: 12px 14px; overflow: auto; height: 100%;
     font-size: 13px; line-height: 1.5; }
   .intent-panel-empty { color: var(--text-muted); font-size: 12px; max-width: 46em; }
@@ -795,6 +797,24 @@
 
   .intent-panel-actions { display: flex; align-items: center; gap: 6px;
     margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+  /* In the sidebar step, below the findings navigation (2026-10-06). Spacing
+     to be revisited later (Nicholas). */
+  .prep-step .intent-panel { height: auto; overflow: visible; padding: 8px 0 0; font-size: 12px; }
+  .prep-step .intent-panel-actions { flex-wrap: wrap; }
+
+  /* Scan report (2026-10-06; was written to the Log). */
+  .intent-report { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .intent-report[hidden] { display: none; }
+  .intent-report-head { font-size: 12px; font-weight: 600; margin: 0 0 4px; }
+  .intent-report-list { list-style: none; margin: 0; padding: 0; font-size: 11px; line-height: 1.4; }
+  .intent-report-item { margin: 2px 0; color: var(--text-secondary); overflow-wrap: anywhere; }
+  .intent-report-link { display: block; width: 100%; text-align: left; font: inherit; color: inherit;
+    background: none; border: 1px solid transparent; border-radius: 3px; padding: 1px 3px; cursor: pointer; }
+  .intent-report-link:hover { background: var(--bg-elevated); border-color: var(--border); }
+  .intent-report-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .intent-report-line { font-family: 'Roboto Mono', monospace; color: var(--text-muted); }
+  .intent-report-item.warn .intent-report-level { color: var(--warning); font-weight: 600; }
+  .intent-report-item.error .intent-report-level { color: var(--error); font-weight: 600; }
 
   /* Visible to screen readers only. */
   .sr-only {
@@ -2227,10 +2247,48 @@
         <p class="prep-status" id="intentScanHint">Finds math notation whose
           meaning is ambiguous to a screen reader and lets you hear how each
           reading would sound. Findings are highlighted in the editor; the
-          ◀ ▶ controls beside the file name step through them.</p>
+          ◀ ▶ controls below this button step through them (F2 and Shift+F2
+          work from anywhere).</p>
         <button type="button" class="prep-btn" id="btnIntentScan"
                 title="Find math notation whose meaning is ambiguous to a screen reader, and hear what each reading would sound like"
                 aria-describedby="intentScanHint">🔎 Intent Scan</button>
+        <!-- Findings navigation (moved here from the editor's header bar, 2026-10-06).
+             intent/intent-review.js finds these by id and shows the group after a scan. -->
+        <div class="intent-nav" id="intentNav" hidden role="group" aria-label="Intent findings">
+          <button class="toolbar-btn" id="btnIntentPrev" style="font-size:12px; padding:3px 8px;" title="Previous finding (Shift+F2)" aria-label="Previous intent finding">◀</button>
+          <span class="intent-nav-status" id="intentNavStatus" aria-hidden="true"></span>
+          <button class="toolbar-btn" id="btnIntentNext" style="font-size:12px; padding:3px 8px;" title="Next finding (F2)" aria-label="Next intent finding">▶</button>
+          <button class="toolbar-btn" id="btnIntentClear" style="font-size:12px; padding:3px 8px;" title="Clear the highlighted findings" aria-label="Clear intent findings">✕</button>
+        </div>
+        <!-- Review panel (moved here from the Intent output view, 2026-10-06; contents
+             unchanged). intent/intent-review.js fills it by id; number keys 1-9 pick a
+             reading while focus is inside it. -->
+        <div class="intent-panel" id="intentPanel">
+          <div class="intent-panel-empty" id="intentPanelEmpty">
+            Run <strong>🔎 Intent Scan</strong> to find math whose meaning is
+            ambiguous to a screen reader. Each finding offers the readings it
+            could have, and what each one would sound like.
+          </div>
+          <div class="intent-panel-body" id="intentPanelBody" hidden>
+            <div class="intent-progress" id="intentProgress"></div>
+            <h3 class="intent-finding-head" id="intentFindingHead"></h3>
+            <div class="intent-notes" id="intentNotes"></div>
+            <div id="intentChoices" role="radiogroup" aria-labelledby="intentFindingHead"></div>
+            <div class="intent-panel-actions">
+              <button class="toolbar-btn primary" id="btnIntentApply">Apply</button>
+              <button class="toolbar-btn" id="btnIntentSkip" title="Leave this one unannotated">Skip</button>
+              <span style="flex:1;"></span>
+              <button class="toolbar-btn" id="btnIntentUndo" title="Undo the last applied annotation">Undo last</button>
+              <button class="toolbar-btn" id="btnIntentRescan" title="Scan the document again from scratch">Re-scan</button>
+            </div>
+          </div>
+        </div>
+        <!-- Scan report (2026-10-06; it was written to the Log, which is for Pandoc's
+             messages). Hidden until a scan reports something; filled by intent-review.js. -->
+        <div class="intent-report" id="intentReport" hidden>
+          <h3 class="intent-report-head" id="intentReportHead">Scan report</h3>
+          <ul class="intent-report-list" id="intentReportList" aria-labelledby="intentReportHead"></ul>
+        </div>
       </div>
 
       <div class="prep-step">
@@ -2366,12 +2424,10 @@
                 style="font-size:12px; padding:3px 10px;">☰ Project</button>
         <span class="editor-filename"><span class="sr-only">Editing file: </span><span id="tabFilename">untitled.tex</span></span>
         <span style="flex:1;"></span>
-        <div class="intent-nav" id="intentNav" hidden role="group" aria-label="Intent findings">
-          <button class="toolbar-btn" id="btnIntentPrev" style="font-size:12px; padding:3px 8px;" title="Previous finding (Shift+F2)" aria-label="Previous intent finding">◀</button>
-          <span class="intent-nav-status" id="intentNavStatus" aria-hidden="true"></span>
-          <button class="toolbar-btn" id="btnIntentNext" style="font-size:12px; padding:3px 8px;" title="Next finding (F2)" aria-label="Next intent finding">▶</button>
-          <button class="toolbar-btn" id="btnIntentClear" style="font-size:12px; padding:3px 8px;" title="Clear the highlighted findings" aria-label="Clear intent findings">✕</button>
-        </div>
+        <!-- The intent findings navigation (◀ count ▶ ✕) moved to the sidebar, below the
+             Intent Scan button (2026-10-06). The spoken-message area below stays here:
+             this bar is always visible, and a live region inside the collapsible sidebar
+             would go silent whenever the sidebar or its Prepare section is closed. -->
         <div class="sr-only" id="intentLive" role="status" aria-live="polite" aria-atomic="true"></div>
       </div>
       <div class="editor-content">
@@ -2394,8 +2450,8 @@
     <!-- OUTPUT PANEL -->
     <div class="output-panel" id="outputPanel">
       <!-- One "Output view" drop-down instead of five tabs (decided 2026-10-06, to declutter the
-           row above the preview; see output-panel-ui\NOTE-OUTPUT-PANEL-UI.md). Intent is listed
-           until it moves to the left sidebar. js/output-tabs.js switches the views. -->
+           row above the preview; see output-panel-ui\NOTE-OUTPUT-PANEL-UI.md). The Intent view
+           moved to the left sidebar (2026-10-06). js/output-tabs.js switches the views. -->
       <div class="output-tabs">
         <!-- "View" (2026-10-06): a visible label, which is also the drop-down's spoken name; the
              preview option reads "Output" and the source option "Code". Option values are unchanged. -->
@@ -2405,7 +2461,6 @@
           <option value="source">Code</option>
           <option value="preprocess">Preprocess</option>
           <option value="log">Log</option>
-          <option value="intent">Intent</option>
         </select></span>
         <span id="mathSubtitlesBox" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles" aria-disabled="true" aria-describedby="selMathSubtitlesWhy" title="Convert a document to HTML first."><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
         <span class="output-tab-spacer"></span>
@@ -2442,28 +2497,8 @@
           <span id="btnCopySourceWhy" hidden>Nothing to copy yet. Convert a document first.</span>
           <div id="outputSource"></div>
         </div>
-        <div class="tab-content" id="tabIntent">
-          <div class="intent-panel" id="intentPanel">
-            <div class="intent-panel-empty" id="intentPanelEmpty">
-              Run <strong>🔎 Intent Scan</strong> to find math whose meaning is
-              ambiguous to a screen reader. Each finding offers the readings it
-              could have, and what each one would sound like.
-            </div>
-            <div class="intent-panel-body" id="intentPanelBody" hidden>
-              <div class="intent-progress" id="intentProgress"></div>
-              <h3 class="intent-finding-head" id="intentFindingHead"></h3>
-              <div class="intent-notes" id="intentNotes"></div>
-              <div id="intentChoices" role="radiogroup" aria-labelledby="intentFindingHead"></div>
-              <div class="intent-panel-actions">
-                <button class="toolbar-btn primary" id="btnIntentApply">Apply</button>
-                <button class="toolbar-btn" id="btnIntentSkip" title="Leave this one unannotated">Skip</button>
-                <span style="flex:1;"></span>
-                <button class="toolbar-btn" id="btnIntentUndo" title="Undo the last applied annotation">Undo last</button>
-                <button class="toolbar-btn" id="btnIntentRescan" title="Scan the document again from scratch">Re-scan</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- The Intent view's contents moved to the sidebar, below the Intent Scan button
+             and its findings navigation (2026-10-06). -->
         <div class="tab-content" id="tabPreprocess">
           <div id="preprocessNote" style="color: var(--text-muted); padding: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;">
             Press <strong>Preprocess &amp; convert</strong>, step 5 in Prepare,

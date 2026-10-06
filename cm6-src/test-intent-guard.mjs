@@ -30,6 +30,8 @@ const dom = new JSDOM(`<!doctype html><html><body>
     <div id="intentChoices" role="radiogroup"></div>
     <button id="btnIntentApply"></button><button id="btnIntentSkip"></button>
     <button id="btnIntentUndo"></button></div></div>
+  <div id="intentReport" hidden><h3 id="intentReportHead">Scan report</h3>
+    <ul id="intentReportList"></ul></div>
 </body></html>`, { pretendToBeVisual: true, url: 'http://localhost/' });
 
 for (const k of ['window', 'document', 'navigator', 'HTMLElement', 'Element',
@@ -118,6 +120,10 @@ const setSel = (sel, v) => {
 const dlgButtons = () => [...(D.getElementById('intentMethodDialog')
   ?.querySelectorAll('button') || [])];
 const live = () => D.getElementById('intentLive').textContent;
+// Revised 2026-10-06: intent messages go to the sidebar's scan report, not
+// the Pandoc Log (which the `logs` spy still watches, to prove it).
+const report = () => [...D.querySelectorAll('#intentReportList li')]
+  .map(li => ({ level: li.dataset.level, message: li.textContent }));
 const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
 const DOC = 'Distance $|x|$, set $|S|$, and divisibility $3 \\mid 12$ here.\n';
@@ -162,8 +168,10 @@ ok('button stays focusable (aria-disabled, not disabled)',
 editor.setText(DOC);
 logs.length = 0;
 await runIntentScan();
-ok('scanning docx is refused', logs.some(l => /HTML output only/.test(l.message)),
-   JSON.stringify(logs.map(l => l.message).slice(0, 2)));
+ok('scanning docx is refused (said in the sidebar scan report, 2026-10-06)',
+   report().some(l => /HTML output only/.test(l.message)),
+   JSON.stringify(report().map(l => l.message).slice(0, 2)));
+ok('and nothing went to the Pandoc Log', logs.length === 0, String(logs.length));
 
 setSel(to(), 'epub');
 ok('epub is also refused for now',
@@ -190,9 +198,9 @@ await wait(60);
 
 ok('a write switched the math method automatically',
    math().value === 'mathjax-mathml-intent', math().value);
-ok('the switch was logged, not silent',
-   logs.some(l => /switched to/.test(l.message)),
-   JSON.stringify(logs.map(l => l.message)));
+ok('the switch was reported, not silent (scan report)',
+   report().some(l => /switched to/.test(l.message)),
+   JSON.stringify(report().map(l => l.message)));
 ok('the switch was announced to assistive tech',
    /switched to/.test(live()), live());
 
@@ -242,8 +250,8 @@ ok('revert restored the document EXACTLY', editor.getText() === DOC,
    JSON.stringify(editor.getText()));
 ok('reverted findings are pending again',
    IntentReview.findings.every(p => p.status !== 'applied' || !p.appliedText));
-ok('revert was logged', logs.some(l => /removed/.test(l.message)),
-   JSON.stringify(logs.map(l => l.message)));
+ok('revert was reported (scan report)', report().some(l => /removed/.test(l.message)),
+   JSON.stringify(report().map(l => l.message)));
 ok('the requested method took effect', math().value === 'mathml', math().value);
 
 // ── 6. switching away: force keeps annotations, warns loudly ─────────
@@ -262,9 +270,9 @@ dlgButtons()[2].click();          // "Switch anyway"
 await wait(40);
 ok('force applied the requested method', math().value === 'mathjax', math().value);
 ok('force kept the annotations', editor.getText() === annotated2);
-ok('force warned at warn level',
-   logs.some(l => l.level === 'warn' && /will not render/.test(l.message)),
-   JSON.stringify(logs.map(l => l.level + ':' + l.message)));
+ok('force warned at warn level (scan report)',
+   report().some(l => l.level === 'warn' && /will not render/.test(l.message)),
+   JSON.stringify(report().map(l => l.level + ':' + l.message)));
 
 // ── 7. no annotations means no dialog at all ─────────────────────────
 IntentReview.clear();
@@ -275,7 +283,7 @@ setSel(math(), 'mathml');
 ok('a clean document switches methods without interruption',
    math().value === 'mathml' && !openBefore, math().value);
 
-// ── 8. the scan lands on the right output tab ────────────────────────
+// ── 8. where the scan's results go (revised 2026-10-06) ────────────────────────
 // Verified against the REAL tab ids parsed out of index.html, so an id
 // rename cannot leave this passing while the app misbehaves.
 {
@@ -285,7 +293,7 @@ ok('a clean document switches methods without interruption',
   const indexHtml = readFileSync(join(PLAT, 'index.html'), 'utf8');
   const sel = (indexHtml.match(/<select id="selOutputView"[^>]*>([\s\S]*?)<\/select>/) || [])[1] || '';
   const views = [...sel.matchAll(/<option value="([a-z]+)"/g)].map(m => m[1]);
-  ok('index.html has an Intent output view', views.includes('intent'), JSON.stringify(views));
+  ok('index.html has NO Intent output view any more (moved to the sidebar 2026-10-06)', !views.includes('intent'), JSON.stringify(views));
   ok('index.html has a Log output view', views.includes('log'));
 
   let activated = null;
@@ -294,22 +302,31 @@ ok('a clean document switches methods without interruption',
   setSel(to(), 'html5');
   setSel(math(), 'mathjax-mathml-intent');
 
-  // A document WITH findings should land on Intent.
+  // A document WITH findings: the output area is left alone (2026-10-06); the
+  // report is in the sidebar and the Pandoc Log is not touched.
   editor.setText(DOC);
   activated = null;
+  logs.length = 0;
   await runIntentScan();
   await wait(60);
-  ok('a scan with findings activates the Intent view',
-     activated === 'intent', String(activated));
+  ok('a scan with findings leaves the output area alone',
+     activated === null, String(activated));
+  ok('its report is in the sidebar, summary first',
+     /^Intent scan: \d+ finding/.test(report()[0]?.message || ''), JSON.stringify(report()[0]));
+  ok('and nothing went to the Pandoc Log', logs.length === 0, String(logs.length));
 
-  // A document with NOTHING to review should stay on the Log, which is
-  // where the explanation of what was searched lives.
+  // A document with NOTHING to review: the report says so; still no switch.
   editor.setText('No math here at all, just prose.\n');
   activated = null;
+  logs.length = 0;
   await runIntentScan();
   await wait(60);
-  ok('a scan with no findings activates the Log view instead',
-     activated === 'log', String(activated));
+  ok('a scan with no findings also leaves the output area alone',
+     activated === null, String(activated));
+  ok('and its report says nothing was found',
+     report().some(l => /No ambiguous notation found/.test(l.message)),
+     JSON.stringify(report().map(l => l.message)));
+  ok('nothing went to the Pandoc Log', logs.length === 0, String(logs.length));
 }
 
 console.log(`\nintent guard: ${pass} passed, ${fail} failed`);

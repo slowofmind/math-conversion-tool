@@ -12,14 +12,15 @@ export function initOutputTabs(ctx) {
   // SECTION 9: OUTPUT TABS
   // ════════════════════════════════════════════════════════════════════
 
-  // Output views: one drop-down, #selOutputView (Preview, Source, Preprocess,
-  // Log, Intent). activateOutputTab keeps its name so callers barely change;
+  // Output views: one drop-down, #selOutputView (Output, Code, Preprocess,
+  // Log; the Intent view moved to the left sidebar on 2026-10-06).
+  // activateOutputTab keeps its name so callers barely change;
   // it takes a view name ('log'), and for safety an old tab id ('outtab-log')
   // or an element with such an id. Unknown names change nothing. Programmatic
   // switches still move focus to the drop-down, as the tabs did (kept for
   // now, decided 2026-10-06).
   const viewSelect = document.getElementById('selOutputView');
-  const VIEWS = ['preview', 'source', 'preprocess', 'log', 'intent'];
+  const VIEWS = ['preview', 'source', 'preprocess', 'log'];
 
   function viewName(x) {
     const s = typeof x === 'string' ? x : (x && x.id) || '';

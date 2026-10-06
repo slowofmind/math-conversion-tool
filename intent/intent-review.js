@@ -9,6 +9,9 @@
 export function initIntentReview(ctx) {
   const editor = ctx.editor;
   const updateStatus = (...a) => ctx.updateStatus(...a);
+  // Since 2026-10-06 the intent code writes nothing to the Pandoc Log and
+  // never switches the output area (its report is in the sidebar). These two
+  // stay so callers can keep passing the same ctx; they are not called.
   const updateLog = (...a) => ctx.updateLog(...a);
   const activateOutputTab = (...a) => ctx.activateOutputTab(...a);
 
@@ -18,8 +21,9 @@ export function initIntentReview(ctx) {
   //   Finds math notation whose MEANING is ambiguous to a screen reader
   //   (|x| — absolute value? determinant? cardinality?) and reports what
   //   each reading would SOUND like. Read-only at this stage: nothing is
-  //   written to the document; findings are listed in the Log and each
-  //   entry jumps to its line.
+  //   written to the document by the scan itself; findings are listed in
+  //   the scan report in the sidebar (the Log until 2026-10-06), and each
+  //   entry selects its finding or jumps to its line.
   //
   //   Engine: math-conversion/intent-scan.js — a browser bundle built by
   //   the intent-search-harness-v2 project (npm run build:browser), which
@@ -126,6 +130,84 @@ export function initIntentReview(ctx) {
       + (p.confidence ? ' \u00B7 ' + p.confidence + ' confidence' : '');
   }
 
+  // ── Scan report (2026-10-06) ─────────────────────────────────────────
+  //   The report used to go to the output area's Log. The Log is rebuilt
+  //   from scratch on every write, so a scan wiped the last Pandoc
+  //   conversion's messages, and each math-method message below wiped the
+  //   scan report. Decided by Nicholas: all intent information lives in the
+  //   sidebar under the Intent Scan button, and the Log is for Pandoc.
+  //   showReport() replaces the report (a new, refused or failed scan);
+  //   addToReport() appends (math-method messages during review);
+  //   clearReport() empties and hides it (the ✕ button).
+  //   A line about a finding is a button that selects that finding for
+  //   review (as ▶ would); a line with only a line number is a button that
+  //   moves the editor there (as clicking a Log line did). Both work from
+  //   the keyboard, which the Log lines did not.
+  function reportLine(entry) {
+    const level = entry.level || 'info';
+    const li = document.createElement('li');
+    li.className = 'intent-report-item ' + level;
+    li.dataset.level = level;
+    let holder = li;
+    if (entry.findingIndex != null || entry.line) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'intent-report-link';
+      if (entry.findingIndex != null) b.dataset.finding = String(entry.findingIndex);
+      b.addEventListener('click', () => {
+        if (entry.findingIndex != null) {
+          if (entry.findingIndex < IntentReview.count) IntentReview.goTo(entry.findingIndex);
+        } else {
+          editor.gotoLine(entry.line, entry.column || 1);
+          editor.focus();
+        }
+      });
+      li.appendChild(b);
+      holder = b;
+    }
+    if (level === 'warn' || level === 'error') {
+      const lv = document.createElement('span');
+      lv.className = 'intent-report-level';
+      lv.textContent = (level === 'warn' ? 'Warning' : 'Error') + ': ';
+      holder.appendChild(lv);
+    }
+    if (entry.line) {
+      const loc = document.createElement('span');
+      loc.className = 'intent-report-line';
+      loc.textContent = 'Line ' + entry.line + ': ';
+      holder.appendChild(loc);
+    }
+    holder.appendChild(document.createTextNode(entry.message));
+    return li;
+  }
+
+  function reportParts() {
+    return { box: document.getElementById('intentReport'),
+             list: document.getElementById('intentReportList') };
+  }
+
+  function showReport(entries) {
+    const { box, list } = reportParts();
+    if (!box || !list) return;
+    list.textContent = '';
+    for (const e of entries) list.appendChild(reportLine(e));
+    box.hidden = entries.length === 0;
+  }
+
+  function addToReport(entry) {
+    const { box, list } = reportParts();
+    if (!box || !list) return;
+    list.appendChild(reportLine(entry));
+    box.hidden = false;
+  }
+
+  function clearReport() {
+    const { box, list } = reportParts();
+    if (!box || !list) return;
+    list.textContent = '';
+    box.hidden = true;
+  }
+
   async function runIntentScan() {
     const src = editor.getText();
     if (!src || !src.trim()) {
@@ -135,7 +217,7 @@ export function initIntentReview(ctx) {
 
     const blocked = intentBlockedReason();
     if (blocked) {
-      updateLog([{ line: null, column: null, level: 'info', type: 'intent-scan',
+      showReport([{ line: null, column: null, level: 'info', type: 'intent-scan',
         matchedText: null, message: blocked }]);
       updateStatus('ready', 'Intent scan unavailable for this output format');
       announceGuard(blocked);
@@ -149,10 +231,10 @@ export function initIntentReview(ctx) {
       res = await IntentScan.scan(src);
     } catch (err) {
       console.error('[intent-scan]', err);
-      updateLog([{ line: null, column: null, level: 'error', type: 'intent-scan',
+      showReport([{ line: null, column: null, level: 'error', type: 'intent-scan',
         matchedText: null,
         message: 'Intent scan failed: ' + (err && err.message ? err.message : String(err)) }]);
-      updateStatus('error', 'Intent scan failed \u2014 see Log');
+      updateStatus('error', 'Intent scan failed \u2014 see the scan report');
       return;
     }
 
@@ -162,13 +244,16 @@ export function initIntentReview(ctx) {
 
     const logs = [];
     const c = res.counts;
+    // res.regions is the LIST of math regions the scanner read, not a count;
+    // adding it to a string printed "[object Object],…" (fixed 2026-10-06).
+    const regionCount = Array.isArray(res.regions) ? res.regions.length : Number(res.regions) || 0;
 
     logs.push({ line: null, column: null, level: 'info', type: 'intent-scan',
       matchedText: null,
       message: 'Intent scan: ' + res.payloads.length + ' finding'
         + (res.payloads.length === 1 ? '' : 's')
-        + ' across ' + res.regions + ' math region'
-        + (res.regions === 1 ? '' : 's')
+        + ' across ' + regionCount + ' math region'
+        + (regionCount === 1 ? '' : 's')
         + '  \u00B7 raw ' + c.raw
         + ', ruled out ' + c.suppressed
         + ', already annotated ' + c.annotated
@@ -191,10 +276,10 @@ export function initIntentReview(ctx) {
           + (pe.msg || 'unknown parse error') });
     }
 
-    for (const p of res.payloads) {
+    res.payloads.forEach((p, k) => {
       logs.push({ line: p.line, column: p.col, level: 'info', type: 'intent-scan',
-        matchedText: p.text, message: intentFindingMessage(p) });
-    }
+        matchedText: p.text, message: intentFindingMessage(p), findingIndex: k });
+    });
 
     if (res.payloads.length === 0) {
       logs.push({ line: null, column: null, level: 'info', type: 'intent-scan',
@@ -202,14 +287,10 @@ export function initIntentReview(ctx) {
         message: 'No ambiguous notation found \u2014 nothing needs an intent annotation.' });
     }
 
-    updateLog(logs);
-
-    // Land on the tab the author actually needs. When there are findings
-    // that is Intent — the review panel is where the work happens, and the
-    // per-finding detail is all there. With nothing to review, Intent has
-    // only an empty state, so the Log (which explains what was searched)
-    // is more use. (2026-10-06: views are named options of one drop-down.)
-    if (typeof activateOutputTab === 'function') activateOutputTab(res.payloads.length > 0 ? 'intent' : 'log');
+    showReport(logs);
+    // The output area is left alone (2026-10-06): the review, its navigation
+    // and this report are all in the sidebar under the Intent Scan button, so
+    // focus stays there. The status bar (a live region) announces the result.
 
     updateStatus('ready', res.payloads.length > 0
       ? 'Intent scan: ' + res.payloads.length + ' finding'
@@ -221,8 +302,10 @@ export function initIntentReview(ctx) {
 
 
   // ── Review loop ──────────────────────────────────────────────────────
-  //   Step through findings, choose a reading, apply it. The panel lives in
-  //   the Intent output tab; the strip beside the editor drives navigation.
+  //   Step through findings, choose a reading, apply it. The panel, the
+  //   ◀ ▶ navigation and the scan report all live in the sidebar, under the
+  //   Intent Scan button (moved from the Intent output view and the editor's
+  //   header bar, 2026-10-06).
   //
   //   WHAT APPLY WRITES (settled 2026-08-24): the compact macro form when
   //   the concept has one and it fits, the generic \intent wrap otherwise.
@@ -642,7 +725,12 @@ export function initIntentReview(ctx) {
     on('btnIntentRescan', () => runIntentScan());
     on('btnIntentClear',  () => {
       IntentReview.clear();
+      clearReport();   // the report describes the findings just cleared (2026-10-06)
       updateStatus('ready', 'Intent findings cleared');
+      // ✕ hides together with its group, so keyboard focus would drop to the
+      // page. Put it on the Intent Scan button just above the group instead
+      // (2026-10-06). Only ✕ does this; clear() itself never moves focus.
+      document.getElementById('btnIntentScan')?.focus();
     });
 
     // Number keys pick a reading, but ONLY inside the panel — a global
@@ -720,8 +808,8 @@ export function initIntentReview(ctx) {
     lastMathValue = INTENT_MATH_METHOD;
     const msg = 'Math rendering method switched to "MathML (custom MathJax '
       + 'conversion + SRE speech)" \u2014 ' + why;
-    updateLog([{ line: null, column: null, level: 'info', type: 'intent-scan',
-      matchedText: null, message: msg }]);
+    addToReport({ line: null, column: null, level: 'info', type: 'intent-scan',
+      matchedText: null, message: msg });
     // The caller may prefer to fold this into its OWN announcement: the
     // review loop announces the next finding ~30ms later on the same live
     // region, which would replace anything said here before it was read.
@@ -820,16 +908,16 @@ export function initIntentReview(ctx) {
         lastMathValue = now;
         const msg = n + ' annotation' + (n === 1 ? '' : 's')
           + ' removed and the original notation restored.';
-        updateLog([{ line: null, column: null, level: 'info',
-          type: 'intent-scan', matchedText: null, message: msg }]);
+        addToReport({ line: null, column: null, level: 'info',
+          type: 'intent-scan', matchedText: null, message: msg });
         announceGuard(msg);
       } else {
         lastMathValue = now;
         const msg = 'Math method changed while ' + count + ' intent '
           + 'annotation' + (count === 1 ? '' : 's') + ' remain in the source. '
           + 'The annotated math will not render under this method.';
-        updateLog([{ line: null, column: null, level: 'warn',
-          type: 'intent-scan', matchedText: null, message: msg }]);
+        addToReport({ line: null, column: null, level: 'warn',
+          type: 'intent-scan', matchedText: null, message: msg });
         announceGuard(msg);
       }
     });
