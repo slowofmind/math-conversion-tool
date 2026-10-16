@@ -1,0 +1,97 @@
+<!doctype html>
+<!-- mock-platform.html — a stand-in for the platform's Output view, for trying the
+     multipage preview before it is wired into index.html (PLAN-MULTIPAGE-PREVIEW.md).
+     Uses the REAL js/preview-pages.js, js/preview-helper.js, js/mathcat-proof.js and
+     its agent, and the platform's JSZip. Serve the platform folder (it fetches files):
+         cd pandoc-for-math-conversion  &&  python -m http.server 8766
+     then open  http://localhost:8766/js/test-preview/browser/mock-platform.html
+     ?engine=fake uses a stand-in MathCAT engine (the browser tests do); without it the
+     real MathCAT engine loads the first time MathCat is chosen.
+     ?focus=none tries D6's other setting (a link does not move focus). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mock platform: multipage preview</title>
+<style>
+  body { font: 15px system-ui, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+  .bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 8px 12px; border-bottom: 1px solid #ccc; background: #f4f4f4; }
+  #previewFrame { flex: 1; border: 0; background: #fff; }
+  #status { padding: 6px 12px; border-top: 1px solid #ccc; background: #f4f4f4; min-height: 1.4em; }
+  select[aria-disabled="true"] { opacity: .5; }
+</style>
+<script src="../../../epub-thorium/jszip.min.js"></script>
+</head>
+<body>
+<p id="platform-marker" hidden>PLATFORM PAGE</p>
+<div class="bar">
+  <button type="button" id="btnMulti">Convert: HTML (multipage)</button>
+  <button type="button" id="btnSingle">Convert: HTML (single page, separate images)</button>
+  <!-- no Page drop-down: removed 2026-10-10, as in index.html -->
+  <span><label for="selMathSubtitles">Math subtitles</label>
+    <select id="selMathSubtitles"><option value="hide">Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
+</div>
+<iframe id="previewFrame" sandbox="allow-scripts" title="HTML output"></iframe>
+<div id="status" role="status">Choose a conversion above.</div>
+<script type="module">
+import { initPreviewPages } from '../../preview-pages.js';
+import { initMathCATProof } from '../../mathcat-proof.js';
+
+const q = new URLSearchParams(location.search);
+const frame = document.getElementById('previewFrame');
+const statusEl = document.getElementById('status');
+const selSubs = document.getElementById('selMathSubtitles');
+const status = (level, text) => { statusEl.textContent = text; };
+const fakeEngine = { version: 'fake', nvda: 'fake', speak: async (m) => ({ ok: true, text: 'spoken: ' + m.length + ' chars' }) };
+
+const proof = initMathCATProof({ getPreviewFrame: () => frame, choosePauseMs: 100,
+  ...(q.get('engine') === 'fake' ? { loadEngine: async () => fakeEngine } : {}),
+  updateLog: (l, t) => console.info('[MathCAT proofing]', t),
+  onEngineLoad: (p) => { status('loading', 'Loading MathCAT…'); p.then(() => status('ready', 'MathCAT ready.')); } });
+
+// Mirrors index.html's setPreviewHtml (L8168, commit 29852e0) with the new option.
+let previewSeq = 0;
+async function setPreviewHtml(html, opts) {
+  const seq = ++previewSeq;
+  let copy = html;
+  try { copy = await proof.preparePreview(html, opts); }
+  catch (err) { console.info('[MathCAT proofing] helper not added: ' + (err && err.message || err)); }
+  if (seq !== previewSeq) return;
+  frame.srcdoc = copy;
+}
+// Mirrors index.html's readZipFiles (L6767).
+async function readZipFiles(bytes) {
+  const zin = await window.JSZip.loadAsync(bytes);
+  const out = [];
+  for (const entry of Object.values(zin.files)) { if (!entry.dir) out.push({ name: entry.name, data: await entry.async('uint8array') }); }
+  return out;
+}
+
+const pp = initPreviewPages({ getPreviewFrame: () => frame, writePreview: setPreviewHtml, readZip: readZipFiles, status,
+  ...(q.get('focus') ? { focusMode: q.get('focus') } : {}) });
+
+proof.onChoice((info) => {
+  selSubs.value = info.choice;
+  selSubs.querySelector('option[value="mathjax"]').disabled = info.mathjax !== true;
+});
+selSubs.addEventListener('change', () => proof.choose(selSubs.value));
+
+const fixtures = new URL('../fixtures/', import.meta.url);
+async function convertMultipage() {
+  const bytes = new Uint8Array(await (await fetch(new URL('workbook.zip', fixtures))).arrayBuffer());
+  window.lastProblems = await pp.showMultipage({ bytes });
+  status('ready', 'Converted (multipage). ' + window.lastProblems.missing.length + ' missing image(s).');
+}
+async function convertSingle() {
+  const html = await (await fetch(new URL('single.html', fixtures))).text();
+  const files = {};   // as lastOutput.files: what the conversion gave Pandoc
+  for (const f of ['figures/plot.png', 'figures/curve.svg', 'figures/photo.jpg', 'single.tex'])
+    files[f] = await (await fetch(new URL('src/' + f, fixtures))).blob();
+  window.lastProblems = await pp.showSinglePage({ name: 'single.html', html, files });
+  status('ready', 'Converted (single page). Missing: ' + window.lastProblems.missing.map(m => m.path).join(', '));
+}
+document.getElementById('btnMulti').addEventListener('click', convertMultipage);
+document.getElementById('btnSingle').addEventListener('click', convertSingle);
+window.harness = { pp, proof, convertMultipage, convertSingle, ready: true };
+</script>
+</body>
+</html>

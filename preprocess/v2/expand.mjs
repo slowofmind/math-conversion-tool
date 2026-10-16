@@ -26,9 +26,20 @@ import { readArguments } from "./definition.mjs";
 // ---- positions -----------------------------------------------------------
 // The line a token index sits on, counted from the token array itself, so it
 // agrees with the text the author sees. Lifted from marker-rewrite (s18).
+// 1 + the line feeds in the text of every token before it. Counting Newline
+// tokens alone missed the breaks a token holds INSIDE its own text - a
+// Region (verbatim, expl3, a url over lines) and a backslash at a line's end
+// (LF or CRLF) - and every site after one was a line short (HANDOFF 85.2,
+// 86.2; fixed session 107). The same body as v2/transforms/ifthen.mjs's
+// lineOf, kept twice on purpose (85.4, 2A); v2/test/ifthen.mjs C asserts
+// they agree. A bare CR is an Other token, never a line, as in the
+// tokenizer's own count. marker-rewrite takes its sites from here (siteOf).
 export const lineOf = (tokens, k) => {
   let n = 1;
-  for (let i = 0; i < k && i < tokens.length; i++) if (tokens[i].kind === "Newline") n++;
+  for (let i = 0; i < k && i < tokens.length; i++) {
+    const s = tokens[i].text;
+    for (let j = s.indexOf("\n"); j >= 0; j = s.indexOf("\n", j + 1)) n++;
+  }
   return n;
 };
 export const siteOf = (file, tokens, k) => file + ":" + lineOf(tokens, k);
@@ -88,6 +99,50 @@ export const UNMODELLED = new Set([
   "ifthenelse", "ifx", "if", "ifnum", "ifcase", "ifdefined", "ifmmode", "else", "fi", "or",
   "iftoggle", "IfBooleanTF", "IfBooleanT", "IfBooleanF",
 ]);
+
+// ---- 3b-1 (s120; HANDOFF 99.3 parts 1-3 and 5, decided 99.4): \ifthenelse
+// in the queue. One decider, not two: the fold's chooseBranch decides, from
+// an ifThenState built of the expander's `flags` option (absent: every flag
+// unknown). The kept branch's tokens go back on the queue, so a macro inside
+// it still expands. 93.6 A's edge rule at the four joints is 3b-2's, not here.
+// Before deciding, (9): an \ifthenelse written in the body of one of the four
+// definitions 78.4 read as markup is the markup module's, whatever its test
+// (99.3 Q1 A, a list by name; `tf` is an environment, its store key not read).
+// An undecidable test is refused with ONE reason, in 99.3's order: (1) the
+// test reads a counter (by name); (6) it holds a parameter, so it belongs to
+// a definition made inside another; (10) by origin: a command that came
+// through the call's own argument and that the store does not define; (4) a
+// command the store defines; (5) any other command; else (12), undecidable,
+// no listed cause (99.4). Reasons (1)-(8) at 64.5, (9)-(11) at 78.4.
+// "ifthenelse" stays in UNMODELLED: a site whose three arguments cannot be
+// read in the queue keeps today's refusal.
+import { ifThenState, chooseBranch } from "./transforms/ifthen.mjs";
+import { evalTest } from "../lib/ifthen-eval.mjs";   // s146, 3c-3 p2 (HANDOFF 124.4): the queue's decider evaluates its rebuilt text (p4); lib untouched
+const IFTHEN_MARKUP = Object.freeze(["maybecircle", "maybebubble", "tf", "LP@drawbackground"]);
+const COUNTER_READERS = new Set(["value", "arabic", "alph", "Alph", "roman", "Roman", "fnsymbol"]);
+const isCounterReader = (name) => COUNTER_READERS.has(name) ||
+  /^the(enum(i|ii|iii|iv)|page|part|chapter|section|subsection|subsubsection|paragraph|subparagraph|equation|figure|table|footnote|mpfootnote)$/.test(name);
+const isIfthen = (x) => !!x && x.kind === "ControlWord" && x.name === "ifthenelse";
+const IFTHEN_WHY = Object.freeze({
+  1: "its test reads a counter, which needs the counter module",
+  4: "a side of its test needs an author's macro expanded first",
+  5: "a side of its test holds a command the fold does not expand",
+  6: "it belongs to a definition made inside another",
+  9: "it is markup, the markup module's",
+  10: "its test holds a command that came through the call's argument and that the store does not define",
+  12: "its test cannot be decided, and no listed cause fits",
+});
+// s146, 3c-3 p5 (HANDOFF 124.4): `answered`, the tokens of the counter
+// commands the counters option answered in this test, skipped; absent, none.
+function ifthenReason(q, c, lookup, argSet, answered) {
+  const ts = q.slice(c.testAt[0], c.testAt[1] + 1).filter((x) => !(answered && answered.has(x)));
+  const cw = ts.filter((x) => x && x.kind === "ControlWord");
+  if (cw.some((x) => isCounterReader(x.name))) return 1;
+  if (ts.some((x) => x && x.kind === "Parameter")) return 6;
+  if (cw.some((x) => argSet.has(x) && !lookup(x.name))) return 10;
+  if (cw.some((x) => lookup(x.name))) return 4;
+  return cw.length ? 5 : 12;
+}
 
 // A letter token, for the joining rule: the tokenizer emits letters as Other.
 const isLetter = (t) => !!t && t.kind === "Other" && /^[A-Za-z]$/.test(t.text);
@@ -305,6 +360,96 @@ function skippedAfter(tokens, k) {
   return j - 1;
 }
 
+// s122 (HANDOFF 101.3 Q1 A, stop 3b-2a; Q5 A): TeX's reading of a blank line
+// before \ifthenelse's ELSE, in the expander's queue ONLY. readArguments skips
+// a blank line before a mandatory argument (E12) and chooseBranch takes the
+// token after it as ELSE; pdflatex takes the blank line itself - its paragraph
+// break, the second Newline of the pair - as ELSE (S1, S2; _work\_s114-probe.txt).
+// So ELSE is that Newline, the call's span ends there, and what followed the
+// blank line stays on the queue. s126 (Q5 A; HANDOFF 105.4 carried 2; Q1 A,
+// Q2 A; _work\_s126-design.txt): a blank line before the test is TeX's test,
+// so the call is refused, reason 12 (R6); exactly one blank line before THEN
+// is TeX's THEN, the group E12 reads as THEN is its ELSE, the span ends there
+// and E12's ELSE stays on the queue (S9). s136 (HANDOFF 113.2 Q1 A, 114.2,
+// 115.3 A; _work\_s134-probe.txt, _work\_s135-probe.txt): two or more blank
+// lines before THEN are TeX's THEN, the first, and its ELSE, the second; the
+// span ends at the second and what followed it stays on the queue. With three
+// or more, TeX's later paragraph breaks print nothing, and one is served (B3,
+// compiled SAME beside its call at s135). chooseBranch, the -pp fold and the
+// reader's seam are unchanged.
+const IF_THREE = Object.freeze([{ type: "mandatory" }, { type: "mandatory" }, { type: "mandatory" }]);
+function elseAtPar(q, c) {
+  if (!c) return c;
+  const r = readArguments(q, 1, IF_THREE);
+  if (!r || !r.args || !r.args[0] || !r.args[1] || !r.args[2]) return c;
+  const par = (a, b) => { for (let k = a; k < b; k++) if (q[k].kind === "Newline" && q[k].parbreak) return k; return -1; };
+  if (par(1, r.args[0].open) >= 0) return Object.assign({}, c, { parTest: true });   // s126, R6: refused in the queue, reason 12
+  const kT = par(r.args[0].close + 1, r.args[1].open);
+  if (kT >= 0) {                                     // s126, S9: THEN is the blank line, ELSE E12's THEN group
+    const kE = par(kT + 1, r.args[1].open);          // s136 (113.2 Q1 A): THEN the first blank line, ELSE the second
+    if (kE >= 0) return Object.assign({}, c, { close: kE, keep: c.value === "T" ? [kT, kT] : [kE, kE] });
+    const a = r.args[1], e = a.braced ? [a.open + 1, a.close - 1] : [a.open, a.close];
+    return Object.assign({}, c, { close: a.close, keep: c.value === "T" ? [kT, kT] : (e[0] > e[1] ? null : e) });
+  }
+  const k = par(r.args[1].close + 1, r.args[2].open);
+  return k < 0 ? c : Object.assign({}, c, { close: k, keep: c.value === "T" ? c.keep : [k, k] });
+}
+
+// ---- s123, 3b-2b (HANDOFF 99.3 part 4; 93.6 A, decided 93.7): the edge rule ----
+// In the expander only (99.3 Q3 A): the -pp fold, chooseBranch and the seam are
+// unchanged. A JOINT is a run of whitespace between two pieces of content in what
+// the expander writes: a fold's two edges, (a) and (b), and a served text's two,
+// (c) and (d). Its PLACES are its stretches of source-adjacent tokens; each is read
+// as TeX read it in its own place, from the state after its source predecessor
+// (sim, as _work\_s114_probe.mjs), TeX's outcome the largest. Where the joined run
+// reads otherwise it is rewritten in 93.5.2's form, a comment kept where the form
+// has a %; where no such form reads as TeX (a space after a control word) the
+// call is refused. A token the rule writes carries the state it was read from.
+const isWS = (t) => !!t && (t.kind === "Space" || t.kind === "Newline" || t.kind === "Comment");
+const stAfter = (t) => (!t ? "N" : t.kind === "ControlWord" || (t.kind === "ControlSymbol" && t.name === " ") ? "S" : t.kind === "Newline" ? "N" : "M");
+const stFrom = (prev, t) => (!t ? "M" : t.st0 ? t.st0 : prev && !isWS(prev) && prev.end === t.start ? stAfter(prev)
+  : t.kind === "Newline" && t.parbreak ? "N" : "M");
+const synth = (text, st0) => ({ kind: "Space", text, st0 });
+const JOINT_WHY = "a joint of its served text cannot be written to read as TeX reads it (a space after a control word)";
+function simSt(piece, st) {        // -> [0 nothing | 1 space | 2 paragraph | 3 not whitespace, the state after]
+  let out = 0;
+  for (let i = 0; i < piece.length; i++) {
+    const c = piece[i];
+    if (c === "%") { const j = piece.indexOf("\n", i); if (j < 0) return [out, st]; i = j; st = "N"; continue; }
+    if (c === " " || c === "\t") { if (st === "M") { out = Math.max(out, 1); st = "S"; } continue; }
+    if (c === "\r") continue;
+    if (c === "\n") { if (st === "N") out = 2; else if (st === "M") out = Math.max(out, 1); st = "N"; continue; }
+    return [3, st];
+  }
+  return [out, st];
+}
+const sim = (piece, st) => simSt(piece, st)[0];
+function texOf(parts) {            // parts: [[tokens, the state at the first], ...] -> TeX's outcome, the largest
+  let T = 0;
+  for (const [J, st] of parts)
+    for (let k = 0, m; k < J.length; k = m) {
+      for (m = k + 1; m < J.length && !J[m].st0 && J[m - 1].end !== undefined && J[m - 1].end === J[m].start; m++);
+      T = Math.max(T, sim(textOf(J.slice(k, m)), k ? stFrom(null, J[k]) : st));
+    }
+  return T;
+}
+function rewriteJoint(parts) {     // (a), (b), (ab): false - reads as TeX; a token - rewritten; null - refuse
+  const J = parts.flatMap((p) => p[0]);
+  if (!J.length) return false;
+  const s0 = parts.find((p) => p[0].length)[1], jt = textOf(J), T = texOf(parts);
+  if (sim(jt, s0) === T) return false;
+  const nl = jt.lastIndexOf("\n"), ind = nl < 0 ? "" : jt.slice(nl + 1).match(/^[ \t]*/)[0], cm = jt.match(/%[^\r\n]*/g) || [];
+  const f = T === 0 ? (cm.length ? cm : ["%"]).join("\n" + ind) + "\n" + ind : T === 1 ? " \n" + ind : "\n\n" + ind;
+  return sim(f, s0) === T ? synth(f, s0) : null;
+}
+function rewriteEdge(piece, s, doc, sDoc, atEnd) {   // (c), (d): false; [] or [token] for the served side; null
+  const own = texOf([[piece, s]]), T = Math.max(own, sim(doc, sDoc)), pt = textOf(piece);
+  if ((atEnd ? sim(pt + doc, s) : sim(doc + pt, sDoc)) === T) return false;
+  const f = ["", " ", "\n\n"][own];
+  if ((atEnd ? sim(f + doc, s) : sim(doc + f, sDoc)) !== T) return null;
+  return f ? [synth(f, s)] : [];
+}
+
 const MATH_CACHE = new WeakMap();
 const mathSpansOf = (tokens) => {
   let s = MATH_CACHE.get(tokens);
@@ -329,8 +474,10 @@ export const DEFAULT_MATH_HANDLER = Object.freeze({
   inExpansion: ({ stretch }) => ({ action: "emit", tokens: stretch }),
 });
 
-export function createExpander({ store, budget, capability, math } = {}) {
+export function createExpander({ store, budget, capability, math, flags, counters } = {}) {
   const B = Object.assign({}, DEFAULT_BUDGET, budget || {});
+  const IF = ifThenState(flags || {});      // s120, 3b-1 part 1: the fold's three-valued state; absent, every flag unknown
+  const counterOpt = typeof counters === "function" ? counters : null;   // s146, 3c-3 p3 (119.3 Q1 A): counters(written, place); absent (or not a function): nothing asked
   const cap = capability || null;            // absent: nothing is classified as dropped
   const M = math || DEFAULT_MATH_HANDLER;    // session 70: absent -> the default, today's behaviour
   const definedTimes = (name) => (store && store.events ? store.events.filter((e) => e.type === "define" && e.name === name).length : 0);
@@ -344,9 +491,19 @@ export function createExpander({ store, budget, capability, math } = {}) {
     if (!top || top.kind !== "ControlWord" || !lookup(top.name)) return { kind: "leave", span: null };
 
     let span = null, expansions = 0, depth = 0;
+    // s120, 3b-1 part 5, reason (7): any OTHER refusal of a call that holds an
+    // \ifthenelse - met by the decider in this call, still on the queue, or in
+    // its definition's body - carries detail.reason 7 beside the expander's own
+    // rule (64.5: the call refused for another reason, citing the expander's).
+    // Not refused-ifthen, which has its own reason; not today's refusal of an
+    // \ifthenelse whose arguments cannot be read in the queue (token \ifthenelse).
+    let metIf = false, argSet = new Set();
+    const holdsIf = () => metIf || (Array.isArray(q) && q.some(isIfthen)) ||
+      (() => { const d = lookup(top.name); return !!d && Array.isArray(d.body) && d.body.some(isIfthen); })();
     const refuse = (rule, level, what, detail) => ({
       kind: "refused", span, steps,
-      finding: { rule, level, file, span, detail: Object.assign({ site, name: top.name, depth }, detail),
+      finding: { rule, level, file, span, detail: Object.assign({ site, name: top.name, depth },
+          rule !== "expand/refused-ifthen" && !(detail && detail.token === "\\ifthenelse") && holdsIf() ? { reason: 7 } : {}, detail),
         message: site + " — left \\" + top.name + " alone: " + what + " [" + rule + "]" },
     });
 
@@ -393,11 +550,89 @@ export function createExpander({ store, budget, capability, math } = {}) {
       if (notACall(rec)) return keep("expand/kept-not-a-call", "it is a \\" + rec.form + " name, not a command with a body", { form: rec.form });   // B (s78)
       if (!Array.isArray(rec.body)) return refuse("expand/refused-unmodelled", "unsupported", "its definition has no body the expander can expand", { token: "\\" + top.name });
       depth = 1; expansions = 1; r0 = r;
+      argSet = new Set(tokens.slice(i + 1, r.next));   // s120, (10) by origin: the call's own argument tokens, by identity
       const sub = substitute(rec.body, tokens, r.args, rec);
       if (!sub) return refuse("expand/refused-unmodelled", "unsupported",
         "an optional argument is absent and its definition gives no default (xparse's -NoValue- is not modelled)", { token: "\\" + top.name });
       q = sub.concat([END]);
       steps.push({ kind: RESULT.INPUT, name: top.name });
+    }
+
+    // ---- s146, 3c-3 p4 (HANDOFF 124.4; 119.3; 125.2's reading): the queue's
+    // decider, handed to chooseBranch (p5); the fold's decideTest is unchanged.
+    // Per test: (a) a Parameter token, or a token holding # other than the
+    // control symbol \#: unknown, as today (122.5 (i)), nothing asked. (b) each
+    // counter command - \the<counter>, or a reader of 119.2's list with its one
+    // argument by readArguments - as written, asked through `counters` once per
+    // call, the answer kept across the call's tests; a string answer put where
+    // the command stood; any other answer: the test unknown, not evaluated
+    // (119.3 Q3 A), its reason kept for p5; option absent: nothing asked, the
+    // command left as written. (c) the test's text rebuilt from its tokens, a
+    // brace group that is an operand of \AND/\and or follows \NOT/\not written
+    // \(...\), inside such groups too, found by brace depth over BeginGroup and
+    // EndGroup tokens, never by pattern (122.5 (ii)); \OR not included. (d)
+    // lib's evalTest on that text, with the expander's flag state.
+    const asked = new Map();                         // written -> the option's answer, once per call
+    let decided = null;                              // the last test's { counter, answered }, read by p5
+    const ONE_ARG = [{ type: "mandatory" }];
+    const isCW = (x, names) => !!x && x.kind === "ControlWord" && names.includes(x.name);
+    const OPS = ["AND", "and", "OR", "or", "NOT", "not"], AND_NOT = ["AND", "and", "NOT", "not"], AND = ["AND", "and"];
+    const txt = (x) => (x && typeof x.text === "string" ? x.text : "");
+    function decideQ(ts, from, to, state) {
+      decided = { counter: null, answered: new Set() };
+      const test = from > to ? "" : ts.slice(from, to + 1).map(txt).join("");
+      for (let k = from; k <= to; k++)                                   // (a): \# is not a parameter
+        if (ts[k].kind === "Parameter" || (txt(ts[k]).includes("#") && !(ts[k].kind === "ControlSymbol" && ts[k].name === "#")))
+          return { value: "U", why: "parameter", test };
+      const put = new Map();                                             // (b): a command's index -> [its last index, the answer]
+      for (let k = from; k <= to; k++) {
+        const x = ts[k];
+        if (!x || x.kind !== "ControlWord" || !isCounterReader(x.name)) continue;
+        let end = k;
+        if (COUNTER_READERS.has(x.name)) {
+          const r = readArguments(ts, k + 1, ONE_ARG);
+          if (!r || !r.args || r.next - 1 > to) continue;
+          end = r.next - 1;
+        }
+        if (!counterOpt) { k = end; continue; }
+        const written = ts.slice(k, end + 1).map(txt).join("");
+        if (!asked.has(written)) {
+          let a; try { a = counterOpt(written, { file, i, site }); } catch (e) { a = { reason: "the counters option threw: " + String(e && e.message) }; }
+          asked.set(written, a);
+        }
+        const a = asked.get(written);
+        if (typeof a === "string") { put.set(k, [end, a]); for (let j = k; j <= end; j++) decided.answered.add(ts[j]); }
+        else if (!decided.counter) decided.counter = { written, reason: a && typeof a === "object" && "reason" in a ? a.reason : null };
+        k = end;
+      }
+      if (decided.counter) return { value: "U", why: "counter", test };
+      const conv = new Map();                                            // (c): a converted group's brace index -> \( or \)
+      const level = (a, b) => {                                          // one level of the test; a primary may start at a
+        let prev = null;
+        for (let k = a; k <= b; k++) {
+          const x = ts[k];
+          if (isWS(x)) continue;
+          if (x.kind === "BeginGroup") {
+            let e = -1;
+            for (let d = 0, j = k; j <= b; j++) { if (ts[j].kind === "BeginGroup") d++; else if (ts[j].kind === "EndGroup" && --d === 0) { e = j; break; } }
+            if (e < 0) return;
+            let n = e + 1; while (n <= b && isWS(ts[n])) n++;
+            const starts = prev === null || isCW(prev, OPS) || (prev.kind === "ControlSymbol" && prev.name === "(");
+            if (starts && (isCW(prev, AND_NOT) || (n <= b && isCW(ts[n], AND)))) { conv.set(k, "\\("); conv.set(e, "\\)"); level(k + 1, e - 1); }
+            prev = ts[e]; k = e; continue;
+          }
+          prev = x;
+        }
+      };
+      level(from, to);
+      let text = "";                                                     // the rebuilt text
+      for (let k = from; k <= to; k++) {
+        if (put.has(k)) { const [e, s] = put.get(k); text += s; k = e; continue; }
+        text += conv.has(k) ? conv.get(k) : txt(ts[k]);
+      }
+      let v = "U";                                                       // (d)
+      try { v = evalTest(text, state); } catch { v = "U"; }
+      return { value: v, why: v === "U" ? "test" : null, test };
     }
 
     while (q.length) {
@@ -440,6 +675,43 @@ export function createExpander({ store, budget, capability, math } = {}) {
           for (let k = 0; k <= d.close; k++) { if (q[k] === END) { depth--; continue; } emitted.push(q[k]); steps.push({ kind: RESULT.EMIT }); }
         q = q.slice(d.close + 1); continue;
       }
+      if (isIfthen(t)) {                                    // s120, 3b-1 part 2: the fold's decider, in the queue
+        const c = elseAtPar(q, chooseBranch(q, 0, IF, decideQ));     // s122, 3b-2a: a blank line before ELSE read as TeX does; s146, 3c-3 p5: the queue's decider (p4)
+        if (c && !q.slice(0, c.close + 1).includes(END)) {   // else today's refusal, just below
+          metIf = true;
+          if (IFTHEN_MARKUP.some((n) => { const d = lookup(n); return !!d && Array.isArray(d.body) && d.body.includes(t); }))
+            return refuse("expand/refused-ifthen", "unsupported", "an \\ifthenelse in its expansion: " + IFTHEN_WHY[9] + " (reason 9)", { reason: 9 });
+          if (c.parTest)                                     // s126 (Q5 A, Q2 A): TeX's test is the blank line - R6
+            return refuse("expand/refused-ifthen", "undecidable", "an \\ifthenelse in its expansion: " + IFTHEN_WHY[12] + " (reason 12)", { reason: 12 });
+          if (c.value === "U" && c.why === "counter")        // s146, 3c-3 p5 (119.3 Q3 A): an answer unknown - reason 1, the answer's reason in the detail
+            return refuse("expand/refused-ifthen", "undecidable", "an \\ifthenelse in its expansion: " + IFTHEN_WHY[1] + " (reason 1)", { reason: 1, counter: decided.counter });
+          if (c.value === "U") {
+            const n = ifthenReason(q, c, lookup, argSet, decided ? decided.answered : null);
+            return refuse("expand/refused-ifthen", "undecidable", "an \\ifthenelse in its expansion: " + IFTHEN_WHY[n] + " (reason " + n + ")", { reason: n });
+          }
+          // s123, 3b-2b (93.6 A; 99.3 part 4): the fold's two edges - (a) what was written
+          // since the last content with the kept branch's head, (b) its tail with the
+          // queue's whitespace after the span, to the next content or the body's end; a
+          // branch of whitespace only is one joint (ab). Unchanged where it reads as TeX.
+          let kept = c.keep ? q.slice(c.keep[0], c.keep[1] + 1) : [], rest = q.slice(c.close + 1);
+          let e0 = emitted.length, a = 0, fi = 0, la = kept.length;
+          while (e0 > 0 && isWS(emitted[e0 - 1])) e0--;
+          while (a < rest.length && isWS(rest[a])) a++;
+          while (fi < kept.length && isWS(kept[fi])) fi++;
+          while (la > fi && isWS(kept[la - 1])) la--;
+          const ab = fi === kept.length, L = emitted.slice(e0), A = rest.slice(0, a);
+          const pL = [L, stFrom(emitted[e0 - 1], L[0])], pA = [A, stFrom(q[c.close], A[0])];
+          const xa = rewriteJoint(ab ? [pL, [kept, stFrom(null, kept[0])], pA] : [pL, [kept.slice(0, fi), stFrom(null, kept[0])]]);
+          const xb = ab ? false : rewriteJoint([[kept.slice(la), stFrom(kept[la - 1], kept[la])], pA]);
+          if (xa === null || xb === null)
+            return refuse("expand/refused-joint", "unsupported", JOINT_WHY, { joint: xa === null ? (ab ? "ab" : "a") : "b" });
+          if (xb) { kept = kept.slice(0, la).concat([xb]); rest = rest.slice(a); }
+          if (xa) { emitted.length = e0; emitted.push(xa); kept = ab ? [] : kept.slice(fi); if (ab) rest = rest.slice(a); }
+          q = kept.concat(rest);
+          steps.push({ kind: RESULT.INPUT, name: "ifthenelse" });
+          continue;
+        }
+      }
       if (UNMODELLED.has(t.name)) return refuse("expand/refused-unmodelled", "unsupported",
         "\\" + t.name + " appears in its expansion and is not yet modelled", { token: "\\" + t.name });
 
@@ -472,6 +744,25 @@ export function createExpander({ store, budget, capability, math } = {}) {
     let endIdx = r0.next - 1;
     if (r0.next === i + 1) endIdx = skippedAfter(tokens, endIdx);
     span = { start: top.start, end: tokens[endIdx].end };
+    // s123, 3b-2b (93.6 A; 99.3 part 4): the served text's two edges against the
+    // document, (c) after and (d) before; only the served side is rewritten. The
+    // document after is read from the state after the span (after a read argument,
+    // its last token's; with none read, after the skipped run, read from S). A
+    // served text with no content is left as before (carried).
+    let f0 = 0, l0 = emitted.length, p0 = i, d0 = endIdx + 1;
+    while (f0 < emitted.length && isWS(emitted[f0])) f0++;
+    if (f0 < emitted.length) {
+      while (isWS(emitted[l0 - 1])) l0--;
+      while (p0 > 0 && isWS(tokens[p0 - 1])) p0--;
+      while (d0 < tokens.length && isWS(tokens[d0])) d0++;
+      const sD = r0.next === i + 1 ? simSt(textOf(tokens.slice(i + 1, endIdx + 1)), "S")[1] : stAfter(tokens[endIdx]);
+      const xc = rewriteEdge(emitted.slice(l0), stFrom(emitted[l0 - 1], emitted[l0]), textOf(tokens.slice(endIdx + 1, d0)), sD, true);
+      const xd = rewriteEdge(emitted.slice(0, f0), stFrom(null, emitted[0]), textOf(tokens.slice(p0, i)), stAfter(tokens[p0 - 1]), false);
+      if (xc === null || xd === null)
+        return refuse("expand/refused-joint", "unsupported", JOINT_WHY, { joint: xc === null ? "c" : "d" });
+      if (xc) emitted.splice(l0, emitted.length - l0, ...xc);
+      if (xd) emitted.splice(0, f0, ...xd);
+    }
     let text = joinTokens(emitted);
     const last = emitted[emitted.length - 1], after = tokens[endIdx + 1], before = tokens[i - 1];
     if (last && last.kind === "ControlWord" && isLetter(after)) text += " ";            // \emph|beta

@@ -38,6 +38,32 @@ export function evalTest(src, state) {
     return null;
   };
 
+  // Session 157 (HANDOFF 124.2 point 2; 135.3 Q2 A; 137): a jump must not
+  // hide more of the test. atom() jumps to the end at a piece it cannot
+  // read. A piece read whole never holds \AND / \OR outside braces (its
+  // arguments are braced), so when the text atom() consumed holds one, it
+  // jumped past more of the test, and the whole test is unknown (`skipped`,
+  // read at the return). An unreadable LAST piece consumes no operator, and
+  // Kleene's answer stands. The four operators and the letter rule are
+  // peekOp's. Walked by braces and commands, not by pattern: \{ \} \( \)
+  // are stepped over as control symbols.
+  let skipped = false;
+  const opAt = (j) => ["\\AND", "\\and", "\\OR", "\\or"].some((lit) =>
+    s.startsWith(lit, j) && !/[a-zA-Z]/.test(s[j + lit.length] || ""));
+  const holdsOp = (from, to) => {
+    let depth = 0;
+    for (let j = from; j < to; j++) {
+      const c = s[j];
+      if (c === "\\") {
+        if (depth <= 0 && opAt(j)) return true;
+        if (/[a-zA-Z]/.test(s[j + 1] || "")) { while (j + 1 < to && /[a-zA-Z]/.test(s[j + 1])) j++; }
+        else j++;
+      } else if (c === "{") depth++;
+      else if (c === "}") depth--;
+    }
+    return false;
+  };
+
   function primary() {
     ws();
     if (eat("\\NOT") || eat("\\not")) return not(primary());
@@ -46,7 +72,9 @@ export function evalTest(src, state) {
       eat("\\)");
       return v;
     }
-    return atom();
+    const from = i, v = atom();
+    if (holdsOp(from, i)) skipped = true;
+    return v;
   }
 
   function atom() {
@@ -92,6 +120,7 @@ export function evalTest(src, state) {
 
   const result = expr();
   ws();
-  // Anything left over means we did not understand the whole test.
-  return i < s.length ? U : result;
+  // Anything left over means we did not understand the whole test; nor
+  // does a jump that passed more of it (`skipped`, session 157).
+  return (skipped || i < s.length) ? U : result;
 }

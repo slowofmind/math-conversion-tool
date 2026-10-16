@@ -105,7 +105,9 @@
   ----------------------------------------------------------------------
   Pandoc's HTML writer feeds its math <script> into the template's `math`
   variable via a defField pipeline that yields to any value already present,
-  so setting meta.math = false makes the writer emit nothing. The v4 config +
+  so giving meta.math an empty value makes the writer emit nothing (empty, not
+  false: Pandoc's multipage template prints false as the word "false" at the
+  end of every page's <head>; 2026-10-10). The v4 config +
   custom-extension script + library + toggle are appended to header-includes,
   which (since Pandoc 2.17) the default template renders AFTER its own style
   block and BEFORE the math block; within header-includes we control order, so
@@ -2740,8 +2742,9 @@ function Pandoc(doc)
     return doc
   end
 
-  -- 1. Suppress Pandoc's own MathJax head script.
-  doc.meta.math = false
+  -- 1. Suppress Pandoc's own MathJax head script: an empty value, not false
+  --    (Pandoc's multipage template prints false as the word "false"; 2026-10-10).
+  doc.meta.math = pandoc.MetaString('')
 
   -- 2. Head pieces, in order: config, custom extension (if any), library,
   --    then the optional feature blocks (each behind its switch).

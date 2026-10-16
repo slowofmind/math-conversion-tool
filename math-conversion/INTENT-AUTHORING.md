@@ -35,6 +35,14 @@ the author's original tokens — visible, reversible, teaches the mechanism.
 Offer macros as the terse alternative. NEVER auto-apply; faculty choose
 (standing user directive).
 
+POLICY HISTORY [NICHOLAS 2026-10-14]: a 2026-08-24 ruling switched apply
+to macro-first; it is now SUPERSEDED. Current ruling: wrap by default for
+detection findings and manually applied snippets alike, with a user
+"prefer macros" setting that writes the macro when one exists. Pending
+code change: intent/intent-review.js textFor() still returns
+`macroText || wrapText`. Source of truth: intent-search-harness-v2
+docs/INTENT-TOOLCHAIN-STATUS.md, dated section 2026-10-14.
+
 ## intent-vocabulary.json (same folder — the data the tool needs)
 
 COPY of the single source of truth in the mathjax-intent-extension project

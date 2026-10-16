@@ -67,9 +67,20 @@ function mentionsParameter(tokens, from, to) {
   return textOf(tokens, from, to).includes("#");
 }
 
+// The line a token index sits on: 1 + the line feeds in the text of every
+// token before it, so it agrees with the text the author sees. Counting
+// Newline tokens alone missed the breaks a token holds INSIDE its own text -
+// a Region (verbatim, expl3, a url over lines) and a backslash at a line's
+// end (LF or CRLF) - and every site after one was a line short (HANDOFF
+// 85.2, 86.2; fixed session 107). The same body as v2/expand.mjs's lineOf,
+// kept twice on purpose (85.4, 2A); v2/test/ifthen.mjs C asserts they agree.
+// A bare CR is an Other token, never a line, as in the tokenizer's own count.
 const lineOf = (tokens, k) => {
   let n = 1;
-  for (let i = 0; i < k && i < tokens.length; i++) if (tokens[i].kind === "Newline") n++;
+  for (let i = 0; i < k && i < tokens.length; i++) {
+    const s = tokens[i].text;
+    for (let j = s.indexOf("\n"); j >= 0; j = s.indexOf("\n", j + 1)) n++;
+  }
   return n;
 };
 const tidy = (s) => s.replace(/\s+/g, " ").trim();
@@ -118,14 +129,20 @@ function decideTest(tokens, from, to, state) {
 // UNKNOWN keeps the ELSE branch: LaTeX's own behaviour for an unset flag, and
 // the fold's policy (PLAN-6 §4A). `keep` is null when the winning branch is
 // empty. Returns null when the site is malformed — flag, don't fail.
-export function chooseBranch(tokens, i, state) {
+// s146, 3c-3 p1 (HANDOFF 124.4): `decide`, the test's decider - decideTest
+// when absent, so the fold and the seam, which pass nothing, are unchanged;
+// the expander's queue passes its own (v2/expand.mjs, p4).
+export function chooseBranch(tokens, i, state, decide = decideTest) {
   const r = readArguments(tokens, i + 1, THREE);
   if (!r || !r.args || r.args.length < 3 || !r.args[2]) return null;
   const [tf, tt] = innerRange(r.args[0]);
-  const v = decideTest(tokens, tf, tt, state);
+  const v = decide(tokens, tf, tt, state);
   const keep = innerRange(r.args[v.value === "T" ? 1 : 2]);
   return { value: v.value, why: v.why, test: v.test, close: r.args[2].close,
-           keep: keep[0] > keep[1] ? null : keep };
+           keep: keep[0] > keep[1] ? null : keep,
+           // s120 (HANDOFF 99.3 part 1): where the test sits, for the
+           // expander's reason check; an added field, nothing else changes.
+           testAt: [tf, tt] };
 }
 
 export function createIfThen({ flags = {} } = {}) {

@@ -1,0 +1,22 @@
+\documentclass{article}
+\usepackage{graphicx,hyperref}
+\title{Workbook Sample}
+\begin{document}
+\maketitle
+Opening paragraph before any section.
+\section{Limits}\label{sec:limits}
+See Section~\ref{sec:deriv}. A footnote.\footnote{Note text.}
+Web: \url{https://example.org/page}. Mail: \href{mailto:someone@example.org}{write}.
+
+\includegraphics{figures/plot.png}
+
+\includegraphics{figures/photo.jpg}
+\subsection{One-sided limits}\label{sec:one-sided}
+Text $x^2$. Back to \hyperref[sec:limits]{the start of this page}.
+\section{Derivatives}\label{sec:deriv}
+\includegraphics{figures/curve.svg}
+
+\includegraphics{figures/anim.gif}
+
+Back to Section~\ref{sec:one-sided}.
+\end{document}

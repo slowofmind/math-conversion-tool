@@ -1,0 +1,28 @@
+<script>
+(function () {
+  if (window.self === window.top) return;
+  var root = document.documentElement;
+  root.style.height = "auto";
+  var lastSent = 0, timer = null;
+  function contentHeight() { return Math.ceil(root.offsetHeight); }
+  function sendHeight() {
+    var h = contentHeight() + 8;
+    if (h !== lastSent) {
+      lastSent = h;
+      var note = { subject: "lti.frameResize", height: h };
+      [window.parent, window.top].forEach(function (target) {
+        try { target.postMessage(note, "*"); target.postMessage(JSON.stringify(note), "*"); } catch (e) {}
+      });
+    }
+    clearTimeout(timer);
+    timer = setTimeout(checkFit, 600);
+  }
+  function checkFit() {
+    root.style.overflowY = (window.innerHeight >= contentHeight()) ? "hidden" : "";
+  }
+  if ("ResizeObserver" in window) new ResizeObserver(sendHeight).observe(root);
+  window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", checkFit);   // re-check when the frame itself changes height
+  sendHeight();
+})();
+</script>

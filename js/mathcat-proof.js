@@ -35,7 +35,9 @@ async function defaultLoadEngine() {
 }
 async function defaultLoadAgentSource() {
   const url = agentUrl();
-  const r = await fetch(url);
+  // cache 'no-cache' (2026-10-10): the browser checks with the server each time, so an old
+  // cached copy never stands in for an updated helper.
+  const r = await fetch(url, { cache: 'no-cache' });
   if (!r.ok) throw new Error(`${url} not found (HTTP ${r.status})`);
   return r.text();
 }
@@ -134,7 +136,8 @@ export function initMathCATProof(ctx) {
   // chosen in the platform's drop-down (N46). Switch on (`subtitleSettings` at the
   // top of this file; ctx.subtitleSettings overrides it in tests): the helper goes
   // into every HTML preview with one line just ahead of it (N42, N44), each new
-  // preview starts at Hide (N43), and a change is sent to the helper without
+  // OUTPUT starts at the default and a page swap keeps the setting (N43, revised
+  // 2026-10-08, PLAN-MULTIPAGE-PREVIEW.md 5), and a change is sent to the helper without
   // rebuilding the preview. Switch off: today's rule (N44): the helper only while
   // MathCat is chosen, the preview rebuilt on each change, the cycle Hide <-> MathCat,
   // no line. Download and SCORM are never given preparePreview's output. Deleting
@@ -195,8 +198,20 @@ export function initMathCATProof(ctx) {
     if (current === 'mathcat') return mjPresent === true ? 'mathjax' : 'hide';   // N37: skip MathJax without it
     return 'hide';
   }
-  function tell(source) {         // source: 'platform', 'page' or 'new-preview'
-    const info = { choice: current, next: nextChoice(), mathjax: mjPresent, pageButton: pageBtn, source };
+  // The default for each new output, from one place (PLAN-MULTIPAGE-PREVIEW.md 5, G13):
+  // ctx.defaultChoice (a value or a function) is where a future user setting plugs in.
+  function defaultChoice() {
+    const d = typeof ctx.defaultChoice === 'function' ? ctx.defaultChoice() : ctx.defaultChoice;
+    return CHOICES.includes(d) ? d : 'hide';
+  }
+  // What the page in the preview shows: the setting, except on a page without MathJax,
+  // which cannot show the MathJax setting and stays Hidden (the setting is kept).
+  function shown() { return (current === 'mathjax' && mjPresent === false) ? 'hide' : current; }
+  // source: 'platform', 'page', 'new-preview', 'page-swap' or 'refused' (only 'page'
+  // is announced by the platform). info.choice is what the page shows; info.setting
+  // is the setting carried from page to page (they differ only on a page without MathJax).
+  function tell(source) {
+    const info = { choice: shown(), setting: current, next: nextChoice(), mathjax: mjPresent, pageButton: pageBtn, source };
     for (const fn of watchers.slice()) {
       try { fn(info); } catch (e) { console.warn('MathCAT subtitle settings: ' + (e && e.message || e)); }
     }
@@ -206,11 +221,29 @@ export function initMathCATProof(ctx) {
     const w = frame && frame.contentWindow;
     if (w) w.postMessage({ type: MSG_SETMODE, choice: current }, '*');
   }
-  async function preparePreview(html) {
+  // Two kinds of preview (PLAN-MULTIPAGE-PREVIEW.md 5; Nicholas 2026-10-08, D1 (a)):
+  //   a NEW OUTPUT (no options, or { newOutput: true }): the setting goes back to the
+  //     default; a change still in its pause is dropped (N46 C);
+  //   a PAGE SWAP ({ pageSwap: true }: another page of the same output): the setting is
+  //     kept, and so is a change still in its pause; only what belongs to the page is
+  //     reset. The new page's first report is answered with the setting, as before.
+  async function preparePreview(html, opts) {
     if (!settingsOn) { kept = html; return injectForPreview(html); }   // today's rule
-    current = 'hide'; mjPresent = null; pageBtn = null; firstReportSeen = false; enabled = false;   // N43
-    ticket++; dropPending();          // N46 C: anything still waiting belongs to the old preview
-    tell('new-preview');
+    const swap = !!(opts && opts.pageSwap);
+    mjPresent = null; pageBtn = null; firstReportSeen = false;
+    if (swap) {
+      enabled = current === 'mathcat' && !!engine;
+      tell('page-swap');
+    } else {
+      current = defaultChoice();      // N43, revised: was always Hide
+      enabled = false;
+      ticket++; dropPending();        // N46 C: anything still waiting belongs to the old output
+      if (current === 'mathcat') {    // a default of MathCat: the engine loads now (announced)
+        announced(loadEngineOnce()).then(() => { if (current === 'mathcat') enabled = true; },
+          (e) => log('error', 'MathCAT could not be loaded: ' + (e && e.message || e)));
+      }
+      tell('new-preview');
+    }
     const tags = SETTINGS_TAG + '<script data-astem-mathcat-agent>' + (await helperText()) + '</' + 'script>';
     let at = -1;
     for (const m of html.matchAll(BODY_CLOSE)) at = m.index;          // last </body>
@@ -259,6 +292,9 @@ export function initMathCATProof(ctx) {
       return;
     }
     const c = d.choice;               // later reports: the page's own button or menu (N38 a)
+    // A page without MathJax refuses the MathJax setting and reports Hidden: the setting
+    // is kept, to be re-applied on the next page that has MathJax (PLAN-MULTIPAGE-PREVIEW.md 5).
+    if (current === 'mathjax' && mjPresent === false && c === 'hide') { tell('refused'); return; }
     if (!CHOICES.includes(c) || c === current || (c === 'mathjax' && mjPresent !== true)) {
       if (nextChoice() !== nextBefore) tell('page');
       return;

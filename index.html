@@ -2569,6 +2569,8 @@
           <option value="preprocess">Preprocess</option>
           <option value="log">Log</option>
         </select></span>
+        <!-- No Page drop-down (removed 2026-10-10, PLAN-MULTIPAGE-PREVIEW.md D2): the preview
+             frame's name says which page ("page 3 of 12"); the pages' own links move between them. -->
         <span id="mathSubtitlesBox" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles" aria-disabled="true" aria-describedby="selMathSubtitlesWhy" title="Convert a document to HTML first."><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
         <span class="output-tab-spacer"></span>
         <button class="output-tab-action" id="btnDownloadOutput" title="Convert a document first." data-title-available="Download output" aria-label="Download output" aria-disabled="true" aria-describedby="btnDownloadOutputWhy">Download</button>
@@ -2645,6 +2647,7 @@
 </div>
 
 <script src="./epub-thorium/jszip.min.js"></script>
+<script src="./js/canvas-package.js"></script>
 <script src="./epub-thorium/postprocess-epub.js"></script>
 
 <script type="module">
@@ -2667,6 +2670,7 @@ import { initOutputTabs } from './js/output-tabs.js';
 import { initWarningParser } from './js/warning-parser.js';
 import { initProjectModel } from './project/project-model.js';
 import { initFileTree } from './filetree/file-tree.js';
+import { initPreviewPages } from './js/preview-pages.js';   // PLAN-MULTIPAGE-PREVIEW.md (last, so test-preprocess-page F7 keeps preprocess after MathCAT)
 
 // ════════════════════════════════════════════════════════════════════
 // PROJECT MODEL (Stage 0) — project/project-model.js
@@ -2971,11 +2975,17 @@ const MATH_METHODS_NA = [['', 'Not applicable for this output format']];
 // embedImages (decided 2026-10-05): when the chosen style changes to one that
 // sets it, the Embed Images filter is switched to that value; a hand change
 // in the Pandoc options sticks until the style changes again (nextEmbedImages).
+// afterBody (decided 2026-10-11, Nicholas: "all we need is to have the script inserted if a user
+// choses the "canvas" style"): a file in ./styles/ added at the end of every page (Pandoc's
+// include-after-body), after any after-body files the user added. No control of its own.
+// zipSinglePage (decided 2026-10-11): single-page HTML downloads as a zip with the images it links
+// to (js/canvas-package.js; self-contained, uses no SCORM code). The option was renamed "Package
+// for Canvas" the same day; its id stays 'canvas'.
 const STYLES = {
   html: [
     { id: 'standalone', label: 'Standalone', file: 'standalone.css', embedImages: true },
-    { id: 'canvas', label: 'Canvas', file: 'canvas.css', headingShift: 1, embedImages: false,
-      note: 'Canvas style: headings start at level 2, as on a Canvas page, and images stay separate files (Embed Images is off; it can be switched back on in the Pandoc options).' }
+    { id: 'canvas', label: 'Package for Canvas', file: 'canvas.css', headingShift: 1, embedImages: false, afterBody: 'resize-for-iframe.html', zipSinglePage: true,
+      note: 'Package for Canvas: headings start at level 2, as on a Canvas page; images stay separate files (Embed Images is off; it can be switched back on in the Pandoc options); a script lets a Canvas Page fit its frame to the page; and single-page HTML downloads as a zip with its images.' }
   ],
   docx: [
     { id: 'pandoc-default', label: 'Pandoc default' }
@@ -2987,7 +2997,8 @@ const STYLE_FILES_URL = './styles/';
 const STYLING_FILTER_URL = './filters/styling.lua';
 const STYLING_FILTER_NAME = '_atc-styling.lua';
 const STYLE_SHEET_NAME = 'atc-style-sheet.css';   // the file name styling.lua reads
-const stylingAssets = { filter: null, css: {} };   // fetched once, then reused
+const STYLE_AFTER_BODY_NAME = 'atc-resize-for-iframe.html';   // a style's afterBody file, as Pandoc sees it
+const stylingAssets = { filter: null, css: {}, after: {} };   // fetched once, then reused
 let styleShiftSetTo = null;                        // heading shift a style set, if any
 let styleImagesPrevId;                             // style at the last refresh; undefined until the first
 
@@ -3088,18 +3099,28 @@ function refreshStyleOptions() {
 }
 
 // Fetch styling.lua and a style's stylesheet (once each). No style: nothing.
+// cache 'no-cache' (2026-10-10): the browser checks with the server each time
+// (a quick "unchanged" reply when nothing changed), so an old cached copy never
+// stands in for an updated file. The same goes for the intent filter and the
+// MathCAT and preview helpers.
 async function ensureStylingAssets(entry) {
   if (!entry || !entry.file) return;
   if (!stylingAssets.filter) {
-    const r = await fetch(STYLING_FILTER_URL);
+    const r = await fetch(STYLING_FILTER_URL, { cache: 'no-cache' });
     if (!r.ok) throw new Error(STYLING_FILTER_URL + ' not found (HTTP ' + r.status + ')');
     stylingAssets.filter = await r.text();
   }
   if (!stylingAssets.css[entry.file]) {
     const url = STYLE_FILES_URL + entry.file;
-    const r = await fetch(url);
+    const r = await fetch(url, { cache: 'no-cache' });
     if (!r.ok) throw new Error(url + ' not found (HTTP ' + r.status + ')');
     stylingAssets.css[entry.file] = await r.text();
+  }
+  if (entry.afterBody && !stylingAssets.after[entry.afterBody]) {
+    const url = STYLE_FILES_URL + entry.afterBody;
+    const r = await fetch(url, { cache: 'no-cache' });
+    if (!r.ok) throw new Error(url + ' not found (HTTP ' + r.status + ')');
+    stylingAssets.after[entry.afterBody] = await r.text();
   }
 }
 
@@ -6345,7 +6366,7 @@ function needsIntentFilter() {
 
 async function ensureIntentFilter() {
   if (intentFilterSource) return;
-  const r = await fetch(INTENT_FILTER_URL);
+  const r = await fetch(INTENT_FILTER_URL, { cache: 'no-cache' });   // checks with the server each time (2026-10-10)
   if (!r.ok) throw new Error(INTENT_FILTER_URL + ' not found (HTTP ' + r.status + ')');
   intentFilterSource = await r.text();
 }
@@ -6425,11 +6446,12 @@ document.getElementById('btnDownloadOutput').addEventListener('click', (e) => {
   if (isActionUnavailable(e.currentTarget) || !lastOutput) return;
   // Clean up previous URL if any
   if (lastOutput.objectUrl) URL.revokeObjectURL(lastOutput.objectUrl);
-  const url = URL.createObjectURL(lastOutput.blob);
+  const out = lastOutput.download || lastOutput;   // Package for Canvas: the zip (2026-10-11)
+  const url = URL.createObjectURL(out.blob);
   lastOutput.objectUrl = url;
   const a = document.createElement('a');
   a.href = url;
-  a.download = lastOutput.filename;
+  a.download = out.filename;
   a.click();
   maybeExportProfileWithOutput();
 });
@@ -7103,16 +7125,18 @@ function buildOptions() {
       //     untouched as <span class="math">\(...\)</span>. This is NOT
       //     Pandoc's 'plain', which rewrites math into Unicode characters
       //     and loses all mathematical meaning.
-      //   metadata math=false        -> suppresses the script tag the
+      //   metadata math=''           -> suppresses the script tag the
       //     mathjax method would otherwise add. The writer's defField
-      //     yields to a value already present in metadata.
+      //     yields to a value already present in metadata. Empty, not
+      //     false (2026-10-10): Pandoc's multipage template prints false
+      //     as the word "false" at the end of every page's <head>.
       //
       // No Lua filter and no post-processing are involved, which is what
       // lets "was it converted?" and "is a script attached?" become two
       // independent controls. The script-reference checkbox will simply
-      // stop setting math=false.
+      // stop setting math.
       opts['html-math-method'] = 'mathjax';
-      opts.metadata = Object.assign({}, opts.metadata, { math: false });
+      opts.metadata = Object.assign({}, opts.metadata, { math: '' });
     } else if (mathEl.value === 'plain') {
       // 3.11 named this value for the first time. Sending nothing would now
       // mean 'mathml' (the new default), not plain.
@@ -7255,7 +7279,10 @@ function buildOptions() {
   if (thoriumPreset) headerNames.push(THORIUM_HEAD_NAME);
   if (headerNames.length > 0) opts['include-in-header'] = headerNames;
   if (resourceFiles.beforeBodyFiles.length > 0) opts['include-before-body'] = resourceFiles.beforeBodyFiles.map(f => f.name);
-  if (resourceFiles.afterBodyFiles.length > 0) opts['include-after-body'] = resourceFiles.afterBodyFiles.map(f => f.name);
+  const afterNames = resourceFiles.afterBodyFiles.map(f => f.name);
+  const afterStyle = activeStyle();   // the Canvas style adds the iframe resize script (2026-10-11)
+  if (afterStyle && afterStyle.afterBody && stylingAssets.after[afterStyle.afterBody]) afterNames.push(STYLE_AFTER_BODY_NAME);
+  if (afterNames.length > 0) opts['include-after-body'] = afterNames;
 
   // Wrapping (wired later)
   const wrapEl = document.getElementById('opt-wrap');
@@ -7370,6 +7397,9 @@ function buildFiles() {
   if (chosenStyle && stylingAssets.filter && stylingAssets.css[chosenStyle.file]) {
     raw[STYLING_FILTER_NAME] = new Blob([stylingAssets.filter], { type: 'text/plain' });
     raw[STYLE_SHEET_NAME] = new Blob([stylingAssets.css[chosenStyle.file]], { type: 'text/css' });
+  }
+  if (chosenStyle && chosenStyle.afterBody && stylingAssets.after[chosenStyle.afterBody]) {
+    raw[STYLE_AFTER_BODY_NAME] = new Blob([stylingAssets.after[chosenStyle.afterBody]], { type: 'text/html' });
   }
   if (needsIntentFilter() && intentFilterSource) raw[INTENT_FILTER_NAME] = new Blob([intentFilterSource], { type: 'text/plain' });
   // Thorium preset: virtual header carrying the MathJax bootstrap
@@ -7872,6 +7902,7 @@ async function runConversion() {
     const outFileName = options['output-file'];
     const baseToFmt = document.getElementById('selTo').value.split(/[+-]/)[0];
     const isBinaryOutput = BINARY_FORMATS.includes(baseToFmt);
+  const packageStyle = activeStyle();   // Package for Canvas: zips single-page HTML (2026-10-11)
 
     console.log('Pandoc options:', JSON.stringify(options, null, 2));
 
@@ -8000,18 +8031,34 @@ async function runConversion() {
       downloadBtn.dataset.titleAvailable = `Download ${outName} (${sizeKB} KB)`;
       setActionAvailable(downloadBtn, true);
       setActionAvailable(scormBtn, scormAvailableFor(baseToFmt), scormUnavailableReason(baseToFmt));
-      clearPreviewHtml();   // MathCAT proofing: not HTML
+      // HTML (multipage): its pages in the Output view, one at a time (PLAN-MULTIPAGE-PREVIEW.md).
+      // Download still saves Pandoc's zip, untouched. Flag, don't fail: if the pages can't
+      // be shown, the card below is shown as before.
+      let shownAsPages = false;
+      if (baseToFmt === 'chunkedhtml') {
+        try {
+          const problems = await previewPages.showMultipage({ bytes: new Uint8Array(await blob.arrayBuffer()) });
+          addPreviewImageWarnings(warnings, problems, result.stderr);
+          shownAsPages = true;
+        } catch (err) {
+          console.warn('Output pages: the multipage preview failed; showing the card instead:', err);
+        }
+      }
+      if (!shownAsPages) {
+        previewPages.clear();
+        clearPreviewHtml();   // MathCAT proofing: not HTML
 
-      sourceEditor.setText(`[Binary output: ${outName} (${sizeKB} KB)]\nUse the download button to save this file.`);
-      setSourceCopyable(false, 'Binary output has no text to copy. Use Download to save the file.');
+        sourceEditor.setText(`[Binary output: ${outName} (${sizeKB} KB)]\nUse the download button to save this file.`);
+        setSourceCopyable(false, 'Binary output has no text to copy. Use Download to save the file.');
 
-      const previewFrame = document.getElementById('previewFrame');
-      previewFrame.srcdoc = `<body style="background:#f5f5f5;color:#1e2124;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
-        <div style="font-size:48px;margin-bottom:16px;">📄</div>
-        <div style="font-size:16px;">${outName} (${sizeKB} KB)</div>
-        <div style="font-size:12px;color:#666666;margin-top:8px;">Binary file — use the download button above</div>
-        ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#b86e00;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
-      </body>`;
+        const previewFrame = document.getElementById('previewFrame');
+        previewFrame.srcdoc = `<body style="background:#f5f5f5;color:#1e2124;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
+          <div style="font-size:48px;margin-bottom:16px;">📄</div>
+          <div style="font-size:16px;">${outName} (${sizeKB} KB)</div>
+          <div style="font-size:12px;color:#666666;margin-top:8px;">Binary file — use the download button above</div>
+          ${placeholderFiles.length > 0 ? `<div style="font-size:11px;color:#b86e00;margin-top:12px;">⚠ ${placeholderFiles.length} missing image${placeholderFiles.length > 1 ? 's' : ''} replaced with placeholders</div>` : ''}
+        </body>`;
+      }
 
     } else {
       // Text output — display in editor/preview, enable download
@@ -8056,13 +8103,50 @@ async function runConversion() {
       setSourceCopyable(true);
 
       const previewFrame = document.getElementById('previewFrame');
-      setPreviewHtml(outputText, /\.html?$/i.test(outFileName));   // MathCAT proofing: preview copy only
+      // HTML goes through the page shelf, so links and separate images work in the
+      // preview (PLAN-MULTIPAGE-PREVIEW.md); other text formats as before. Flag, don't
+      // fail: if the shelf can't be used, the page is shown as it was before this change.
+      if (/\.html?$/i.test(outFileName)) {
+        try {
+          const problems = await previewPages.showSinglePage({ name: outFileName, html: outputText, files });
+          addPreviewImageWarnings(warnings, problems, result.stderr);
+        } catch (err) {
+          console.warn('Output pages: the single-page preview failed; showing the page as before:', err);
+          previewPages.clear();
+          setPreviewHtml(outputText, true);
+        }
+      } else {
+        previewPages.clear();
+        setPreviewHtml(outputText, false);   // MathCAT proofing: preview copy only
+      }
 
       const blob = new Blob([outputText], { type: 'text/plain' });
       const sizeKB = (blob.size / 1024).toFixed(1);
       lastOutput = { blob, filename: outFileName, files };
       downloadBtn.textContent = 'Download';
       downloadBtn.dataset.titleAvailable = `Download ${outFileName} (${sizeKB} KB)`;
+      // Package for Canvas (2026-10-11): single-page HTML downloads as a zip with the images it
+      // links to (js/canvas-package.js). lastOutput.blob stays the page itself, so everything else
+      // that reads it is unchanged; the Download button uses lastOutput.download when present.
+      if (packageStyle && packageStyle.zipSinglePage && /\.html?$/i.test(outFileName)) {
+        try {
+          if (!window.CanvasPackage) throw new Error('js/canvas-package.js is not loaded');
+          const pkg = await window.CanvasPackage.make({ name: outFileName, html: outputText, files });
+          lastOutput.download = { blob: pkg.blob, filename: pkg.filename };
+          downloadBtn.dataset.titleAvailable = `Download ${pkg.filename} (${(pkg.blob.size / 1024).toFixed(1)} KB)`;
+          if (pkg.missing.length) {
+            const one = pkg.missing.length === 1;
+            warnings.push({ line: null, column: null, level: 'warn', type: 'package', matchedText: null,
+              message: `Package for Canvas: ${one ? '1 image was' : pkg.missing.length + ' images were'} not found, so ${pkg.filename} doesn't include ${one ? 'it' : 'them'}: ${pkg.missing.join(', ')}` });
+            updateLog(warnings, result.stderr);
+          }
+        } catch (err) {
+          console.warn('Package for Canvas: no zip; Download gives the page alone:', err);
+          warnings.push({ line: null, column: null, level: 'warn', type: 'package', matchedText: null,
+            message: 'Package for Canvas: the zip could not be made, so Download gives the page alone (' + ((err && err.message) || err) + ').' });
+          updateLog(warnings, result.stderr);
+        }
+      }
       setActionAvailable(downloadBtn, true);
 
       // SCORM: available for single-page HTML output, any math method (see
@@ -8165,12 +8249,14 @@ let previewSeq = 0;           // of two previews prepared at once, only the newe
 // Until then it was hidden in those cases (sitting 12, point 3).
 const SUBTITLES_NO_PREVIEW = 'Convert a document to HTML first.';
 let subtitlesChoice = mathSubtitlesSel.value;   // the setting, to undo a change made while unavailable
-async function setPreviewHtml(html, isHtml) {
+// opts (PLAN-MULTIPAGE-PREVIEW.md 5): { pageSwap: true } for another page of the same
+// output, passed on so Math subtitles keep their setting (D1 a); none for a new output.
+async function setPreviewHtml(html, isHtml, opts) {
   const seq = ++previewSeq;
   lastPreviewHtml = isHtml ? html : null;
   let copy = html;
   if (isHtml) {
-    try { copy = await mathcatProof.preparePreview(html); setActionAvailable(mathSubtitlesSel, true); }
+    try { copy = await mathcatProof.preparePreview(html, opts); setActionAvailable(mathSubtitlesSel, true); }
     catch (err) {   // sitting 12, point 3: the preview as converted, the control unavailable, one log line
       copy = html;
       setActionAvailable(mathSubtitlesSel, false, 'Math subtitles could not be added to this preview.');
@@ -8186,6 +8272,45 @@ function clearPreviewHtml() {
   ++previewSeq;
   lastPreviewHtml = null;
   setActionAvailable(mathSubtitlesSel, false, SUBTITLES_NO_PREVIEW);
+}
+// ════════════════════════════════════════════════════════════════════
+// OUTPUT PAGES — js/preview-pages.js (PLAN-MULTIPAGE-PREVIEW.md)
+// ════════════════════════════════════════════════════════════════════
+// HTML output, one page or many, is shown one page at a time. A helper in the preview
+// copy handles links and separate images. Download, SCORM and Copy all keep using the
+// untouched output. (lastPreviewHtml, above, now holds the marked page; nothing reads it.)
+// No Page drop-down (removed 2026-10-10, Nicholas: "I agree with removing the "page"
+// dropdown"): the frame's spoken name gives the position (preview-pages.js nameFrame),
+// and the pages' own links move between pages.
+let pageLabelShown = false;   // the Code view's label was set for a page (D3 a)
+const previewPages = initPreviewPages({
+  getPreviewFrame: () => document.getElementById('previewFrame'),
+  writePreview: (html, opts) => setPreviewHtml(html, true, opts),
+  readZip: (bytes) => readZipFiles(bytes),
+  status: (level, text) => updateStatus(level, text),
+});
+previewPages.onPageChange((i) => {
+  if (i.cause === 'landed') return;
+  // Code view (D3 a): for multipage output, the untouched page in the preview.
+  const lbl = document.getElementById('sourceViewerLabel');
+  if (i.kind === 'multipage' && i.name) {
+    sourceEditor.setText(previewPages.pageHtml(i.name));
+    setSourceCopyable(true);
+    if (lbl) { lbl.textContent = `Page ${i.position} of ${i.count}: ${i.name}`; lbl.hidden = false; pageLabelShown = true; }
+  } else if (pageLabelShown && lbl) {
+    lbl.hidden = true; pageLabelShown = false;
+  }
+});
+// D4 (a): images the output points to but doesn't contain, and images the preview doesn't
+// show (not PNG, JPG or SVG), as Log entries like the "Missing image" ones; the Log is redrawn.
+function addPreviewImageWarnings(warnings, problems, stderr) {
+  if (!problems) return;
+  const before = warnings.length;
+  for (const m of problems.missing) warnings.push({ line: null, column: null, level: 'warn', type: 'preview-image', matchedText: null,
+    message: `Image "${m.path}" (on ${m.page}) is not in the output, so it can't be shown. Check that the file was uploaded.` });
+  for (const u of problems.unsupported) warnings.push({ line: null, column: null, level: 'info', type: 'preview-image', matchedText: null,
+    message: `Image "${u.path}" (on ${u.page}) isn't PNG, JPG or SVG, so the preview doesn't show it. Its alt text is still there.` });
+  if (warnings.length > before) updateLog(warnings, stderr);
 }
 // The drop-down follows the setting (N46 C); since 2026-10-06 it is greyed
 // out only while the preview has no HTML (see above).
