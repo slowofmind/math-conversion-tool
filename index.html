@@ -663,6 +663,7 @@
   .image-row { display: contents; }
   .prep-btn.image-btn { font-size: 12px; padding: 3px 10px; }
   .image-auto { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
+  .image-auto.image-option { grid-column: 2; }   /* under PDF to SVG's Autoconvert box */
   .prep-more { font-size: 11px; color: var(--text-muted); font-style: italic;
     text-align: center; padding: 6px 0; }
 
@@ -2316,6 +2317,13 @@
             <button type="button" class="prep-btn image-btn" id="btnConvertPdfs">PDF to SVG</button>
             <label class="image-auto"><input type="checkbox" id="chkAutoPdf" checked> Autoconvert<span class="sr-only"> PDF to SVG after upload</span></label>
           </div>
+          <!-- USE OUTLINES (Nicholas, 2026-10-18): belongs to "PDF to SVG"; sits under its Autoconvert
+               box (column 2). Ticked = MuPDF text=path, so symbols such as the TeX radical render as in the
+               PDF. Read once per batch by convertPdfsBody; affects only the button and the after-upload
+               sequence; never reconverts existing SVGs. -->
+          <div class="image-row">
+            <label class="image-auto image-option"><input type="checkbox" id="chkPdfOutlines" checked> Use outlines<span class="sr-only"> for PDF to SVG</span></label>
+          </div>
         </div>
       </div>
 
@@ -2574,17 +2582,16 @@
         <span id="mathSubtitlesBox" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles" aria-disabled="true" aria-describedby="selMathSubtitlesWhy" title="Convert a document to HTML first."><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
         <span class="output-tab-spacer"></span>
         <button class="output-tab-action" id="btnDownloadOutput" title="Convert a document first." data-title-available="Download output" aria-label="Download output" aria-disabled="true" aria-describedby="btnDownloadOutputWhy">Download</button>
-        <!-- SCORM split button (2026-10-06, Nicholas): 📦 SCORM is unchanged; ▾ opens a menu with
-             "Download as SCORM package" (the same action; greyed with the same reason while it is
-             unavailable) and "Canvas Frame Fix" (install-fix-scorm-frames.html, the bookmarklet
-             instructions, in a new tab). Keys and clicks: setupScormMenu. -->
-        <span class="scorm-split">
+        <!-- SCORM split button (2026-10-06, Nicholas). Hidden 2026-10-18: SCORM is now an Output packaging
+             option, and Download makes the package by clicking the hidden 📦 SCORM button, so the SCORM
+             code runs unchanged until SCORM is removed. Canvas Frame Fix was removed the same day (its
+             page is archived in ..\scorm-bookmarklet). Keys and clicks: setupScormMenu. -->
+        <span class="scorm-split" hidden style="display:none">
           <button class="output-tab-action" id="btnDownloadScorm" title="Convert a document first." data-title-available="Download as SCORM package for Canvas LMS" aria-label="Download as SCORM package" aria-disabled="true" aria-describedby="btnDownloadScormWhy">📦 SCORM</button><button class="output-tab-action scorm-split-toggle" id="btnScormMenu" type="button"
                   aria-haspopup="menu" aria-expanded="false" aria-controls="scormMenu"
                   aria-label="More SCORM options" title="More SCORM options"><span aria-hidden="true">▾</span></button>
           <ul class="upload-menu scorm-menu" id="scormMenu" role="menu" aria-label="SCORM" hidden>
             <li role="menuitem" tabindex="-1" data-action="download">Download as SCORM package</li>
-            <li role="menuitem" tabindex="-1" data-action="framefix" title="How to install and use the bookmarklet that fixes SCORM frames on Canvas pages">Canvas Frame Fix<span class="sr-only"> (opens in a new tab)</span><span aria-hidden="true"> ↗</span></li>
           </ul>
         </span>
         <button class="output-tab-action" id="btnOutputClose" title="Hide panel" aria-label="Close output panel">×</button>
@@ -2647,7 +2654,7 @@
 </div>
 
 <script src="./epub-thorium/jszip.min.js"></script>
-<script src="./js/canvas-package.js"></script>
+<script src="./js/canvas-output.js"></script>
 <script src="./epub-thorium/postprocess-epub.js"></script>
 
 <script type="module">
@@ -2969,29 +2976,34 @@ const MATH_METHODS_NA = [['', 'Not applicable for this output format']];
 // centre the page body with automatic margins plus a maximum width (that is
 // what breaks MathJax's right-click submenus); styling.lua relies on it to
 // switch the intent filter's menu fix off. To add a style: put the file in
-// ./styles/ and add one line here. DOCX shows the same control as
-// "Reference document"; its list is a placeholder until reference documents
-// are added (an entry without `file` applies nothing).
+// ./styles/ and add one line here. DOCX and other non-HTML formats show
+// "Not applicable" (2026-10-18: DOCX's "Reference document" placeholder, which
+// applied nothing, was removed; reference documents will be handled elsewhere).
 // embedImages (decided 2026-10-05): when the chosen style changes to one that
 // sets it, the Embed Images filter is switched to that value; a hand change
 // in the Pandoc options sticks until the style changes again (nextEmbedImages).
 // afterBody (decided 2026-10-11, Nicholas: "all we need is to have the script inserted if a user
 // choses the "canvas" style"): a file in ./styles/ added at the end of every page (Pandoc's
 // include-after-body), after any after-body files the user added. No control of its own.
-// zipSinglePage (decided 2026-10-11): single-page HTML downloads as a zip with the images it links
-// to (js/canvas-package.js; self-contained, uses no SCORM code). The option was renamed "Package
-// for Canvas" the same day; its id stays 'canvas'.
+// zipSinglePage (2026-10-11) was replaced on 2026-10-18 by `packaging` (below), and
+// js/canvas-package.js by js/canvas-output.js. The id 'canvas' now means "Canvas content".
+// Output packaging (decided 2026-10-18, Nicholas; design: canvas-embedding\output-packaging-design.md):
+// the drop-down is chosen BEFORE converting and says what Download gives. packaging: 'loose' = a zip
+// with every file in one top folder; 'scorm' = the SCORM package (made by the SCORM code when Download
+// is clicked); 'canvas' = a Canvas import file with one unpublished Page showing the document in a
+// frame (js/canvas-output.js). lockEmbedImages: Embed Images is off and can't be switched on (Nicholas:
+// "I don't want users to package output for canvas and have images embedded"). No `note` on any option
+// (Nicholas, 2026-10-18: notes removed until he decides how informational messages should appear).
+const CANVAS_RESIZE = 'resize-for-iframe.html';
 const STYLES = {
   html: [
     { id: 'standalone', label: 'Standalone', file: 'standalone.css', embedImages: true },
-    { id: 'canvas', label: 'Package for Canvas', file: 'canvas.css', headingShift: 1, embedImages: false, afterBody: 'resize-for-iframe.html', zipSinglePage: true,
-      note: 'Package for Canvas: headings start at level 2, as on a Canvas page; images stay separate files (Embed Images is off; it can be switched back on in the Pandoc options); a script lets a Canvas Page fit its frame to the page; and single-page HTML downloads as a zip with its images.' }
-  ],
-  docx: [
-    { id: 'pandoc-default', label: 'Pandoc default' }
+    { id: 'loose', label: 'Loose files', file: 'canvas.css', headingShift: 1, embedImages: false, lockEmbedImages: true, afterBody: CANVAS_RESIZE, packaging: 'loose' },
+    { id: 'scorm', label: 'SCORM package', file: 'canvas.css', headingShift: 1, embedImages: false, lockEmbedImages: true, afterBody: CANVAS_RESIZE, packaging: 'scorm' },
+    { id: 'canvas', label: 'Canvas content', file: 'canvas.css', headingShift: 1, embedImages: false, lockEmbedImages: true, afterBody: CANVAS_RESIZE, packaging: 'canvas' }
   ]
 };
-const STYLE_LABELS = { html: 'Styling', docx: 'Reference document' };
+const STYLE_LABELS = { html: 'Output packaging' };
 const STYLES_NA = [{ id: '', label: 'Not applicable for this output format' }];
 const STYLE_FILES_URL = './styles/';
 const STYLING_FILTER_URL = './filters/styling.lua';
@@ -3014,6 +3026,12 @@ function activeStyle() {
   const fmt = document.getElementById('selTo')?.value;
   const e = styleEntryFor(fmt, document.getElementById('opt-style')?.value);
   return (e && e.file && mathFamilyFor(fmt) === 'html') ? e : null;
+}
+
+// The Output packaging option that keeps Embed Images off and locked, or null (2026-10-18).
+function embedImagesLockedBy() {
+  const e = activeStyle();
+  return e && e.lockEmbedImages ? e : null;
 }
 
 // Heading-shift rule (decided 2026-10-05: choosing Canvas shifts headings
@@ -3071,6 +3089,13 @@ function applyStyleSideEffects() {
     }
     styleImagesPrevId = styleId;
   }
+  // Locked options (2026-10-18): Embed Images stays off; redraw so its checkbox shows why.
+  try {
+    if (embedImagesLockedBy() && builtInState['embed-images']) builtInState['embed-images'] = false;
+    renderLuaFiltersList();
+  } catch (err) {
+    console.warn('Output packaging: could not lock Embed Images:', err);
+  }
   const note = document.getElementById('styleNote');
   if (note) note.textContent = (e && e.note) || '';
 }
@@ -3093,7 +3118,7 @@ function refreshStyleOptions() {
   }
   sel.value = list.some(s => s.id === prev) ? prev : list[0].id;
   sel.disabled = !applicable;
-  const text = STYLE_LABELS[fam] || 'Styling';
+  const text = STYLE_LABELS[fam] || 'Output packaging';
   document.querySelectorAll('.style-label-text').forEach(el => { el.textContent = text; });
   applyStyleSideEffects();
 }
@@ -3497,8 +3522,8 @@ async function addSupportFiles(files) {
 // 📦 SCORM is a split button like Upload Files. Its ▾ menu: "Download as SCORM package"
 // does what 📦 SCORM does (it clicks it, so the same checks run) and, while SCORM is
 // unavailable, is greyed with the button's reason (checked each time the menu opens);
-// "Canvas Frame Fix" opens the bookmarklet instructions (install-fix-scorm-frames.html)
-// in a new tab. ▾ is always usable: the instructions help before any conversion.
+// (Canvas Frame Fix, removed 2026-10-18, opened the bookmarklet instructions.) The whole
+// split button is hidden since 2026-10-18: SCORM is an Output packaging option.
 // Keys as in the Upload menu: Down/Up on ▾ open at the first/last item; Up, Down, Home,
 // End move; Enter, or Space on key up, chooses; Escape closes (focus back on ▾); Tab
 // closes. A greyed item can be reached but does nothing.
@@ -3538,7 +3563,6 @@ async function addSupportFiles(files) {
     if (item.getAttribute('aria-disabled') === 'true') return;
     close(true);
     if (item.dataset.action === 'download') scormBtn.click();
-    else if (item.dataset.action === 'framefix') window.open('install-fix-scorm-frames.html', '_blank', 'noopener');
   };
   toggle.addEventListener('pointerdown', () => { pressingToggle = true; });
   toggle.addEventListener('click', () => {
@@ -5105,6 +5129,9 @@ let convertPdfsAutomatically = null, pdfConvertRunning = () => false;
     try { captureEditorIntoModel(); }
     catch (e) { console.warn('[pdf-convert] captureEditorIntoModel failed', e); }
 
+    // Use outlines (Nicholas, 2026-10-18): read ONCE so a mid-run toggle cannot mix modes.
+    const outlines = !!(document.getElementById('chkPdfOutlines') || {}).checked;
+
     // opts.only (auto-pdf-conversion): the PDFs in use, from the after-upload sequence; the button: every PDF.
     const pdfs = opts.only ? opts.only.filter(p => paths(/\.pdf$/i).includes(p)) : paths(/\.pdf$/i);
     if (!pdfs.length) {
@@ -5202,11 +5229,11 @@ let convertPdfsAutomatically = null, pdfConvertRunning = () => false;
     }
 
     let conv = { converted: 0, failed: 0, details: [] };
-    try { if (toConvert.length) conv = await processPdfAuxFiles(toConvert); }
+    try { if (toConvert.length) conv = await processPdfAuxFiles(toConvert, { outlines }); }
     catch (e) {
       setLabel(BASE, false);
       const msg = (e && e.message) ? e.message : String(e);
-      window.__lastPdfConvert = { ok: false, error: msg, threw: true };
+      window.__lastPdfConvert = { ok: false, error: msg, threw: true, outlines: outlines };
       updateStatus('error', 'PDF conversion failed: ' + msg);
       console.error('[pdf-convert]', e);
       return;
@@ -5264,6 +5291,7 @@ let convertPdfsAutomatically = null, pdfConvertRunning = () => false;
       kept: kept, dropped: dropped, rewritten: rewritten,
       alreadyConverted: already.length, skippedPaths: already,
       refusals: totalRefusals, bytesMissing: noBytes, details: conv.details,
+      outlines: outlines,
     };
     window.__lastPdfConvert.message =
       'Converted ' + conv.converted + ' PDF(s) to SVG' +
@@ -6038,11 +6066,16 @@ function renderLuaFiltersList() {
       const def = BUILT_IN_FILTERS.find(f => f.id === entry.id);
       if (!def) return;
       filterName = def.name;
+      // Output packaging (2026-10-18): the Canvas-bound options keep Embed Images off and locked.
+      const lockedBy = entry.id === 'embed-images' ? embedImagesLockedBy() : null;
+      if (lockedBy) builtInState[entry.id] = false;
       isEnabled = builtInState[entry.id];
       tag.className = 'opt-file-tag builtin-filter' + (isEnabled ? ' enabled' : '');
       tag.title = def.description;
       tag.innerHTML = `<span style="color:var(--text-muted);font-size:12px;margin-right:2px;" aria-hidden="true">☰</span>` +
-        `<input type="checkbox" class="builtin-checkbox" ${isEnabled ? 'checked' : ''} aria-label="Enable ${def.name} filter">` +
+        // Locked: disabled, with no reason text for now (Nicholas, 2026-10-18: help messages to be
+        // mapped out together later).
+        `<input type="checkbox" class="builtin-checkbox" ${isEnabled ? 'checked' : ''}${lockedBy ? ' disabled' : ''} aria-label="Enable ${def.name} filter">` +
         `${def.name}<span class="builtin-label">(built-in)</span>`;
       tag.querySelector('.builtin-checkbox').addEventListener('change', (ev) => {
         ev.stopPropagation();
@@ -6442,11 +6475,51 @@ document.getElementById('btnCopySource').addEventListener('click', async (e) => 
 });
 
 // Download button handler
+// Output packaging (2026-10-18; design: canvas-embedding\output-packaging-design.md): after an HTML
+// conversion, build what Download gives for the option chosen before converting. lastOutput.blob stays
+// Pandoc's own output (the preview, Code view and SCORM code read it); Download uses
+// lastOutput.download when present. SCORM package: Download starts the SCORM code instead.
+async function applyOutputPackaging(style, o) {
+  if (!style || !style.packaging || !lastOutput) return;
+  const btn = o.downloadBtn;
+  if (style.packaging === 'scorm') {
+    lastOutput.packaging = 'scorm';
+    btn.dataset.titleAvailable = 'Download as SCORM package';
+    return;
+  }
+  const what = style.packaging === 'canvas' ? 'Canvas content' : 'Loose files';
+  try {
+    if (!window.CanvasOutput) throw new Error('js/canvas-output.js is not loaded');
+    const set = o.zipBlob ? await window.CanvasOutput.collectZip(o.zipBlob)
+                          : await window.CanvasOutput.collectPage(o.name, o.html, o.files);
+    const when = new Date();
+    const inputName = String(o.name || '').replace(/\.[^.]+$/, '');   // the output is named after the input file
+    const pkg = style.packaging === 'canvas' ? await window.CanvasOutput.makeImportFile(set, inputName, when)
+                                             : await window.CanvasOutput.makeLooseZip(set, when);
+    lastOutput.download = { blob: pkg.blob, filename: pkg.filename };
+    lastOutput.packaging = style.packaging;
+    btn.dataset.titleAvailable = `Download ${pkg.filename} (${(pkg.blob.size / 1024).toFixed(1)} KB)`;
+    if (set.missing.length) {
+      const one = set.missing.length === 1;
+      o.warnings.push({ line: null, column: null, level: 'warn', type: 'package', matchedText: null,
+        message: `${what}: ${one ? '1 image was' : set.missing.length + ' images were'} not found, so ${pkg.filename} doesn't include ${one ? 'it' : 'them'}: ${set.missing.join(', ')}` });
+      updateLog(o.warnings, o.stderr);
+    }
+  } catch (err) {
+    console.warn(`${what}: could not be packaged; Download gives the plain output:`, err);
+    o.warnings.push({ line: null, column: null, level: 'warn', type: 'package', matchedText: null,
+      message: `${what}: the package could not be made, so Download gives the plain output (${(err && err.message) || err}).` });
+    updateLog(o.warnings, o.stderr);
+  }
+}
+
 document.getElementById('btnDownloadOutput').addEventListener('click', (e) => {
   if (isActionUnavailable(e.currentTarget) || !lastOutput) return;
+  // Output packaging "SCORM package" (2026-10-18): the SCORM code makes and downloads the package.
+  if (lastOutput.packaging === 'scorm') { document.getElementById('btnDownloadScorm').click(); return; }
   // Clean up previous URL if any
   if (lastOutput.objectUrl) URL.revokeObjectURL(lastOutput.objectUrl);
-  const out = lastOutput.download || lastOutput;   // Package for Canvas: the zip (2026-10-11)
+  const out = lastOutput.download || lastOutput;   // Output packaging: the zip or import file (2026-10-11, 2026-10-18)
   const url = URL.createObjectURL(out.blob);
   lastOutput.objectUrl = url;
   const a = document.createElement('a');
@@ -6969,7 +7042,7 @@ document.getElementById('btnDownloadScorm').addEventListener('click', async (e) 
       updateStatus('ready', 'SCORM package made. Height for Canvas: ' + forCanvas + ' px (a column ' + SCORM_REFERENCE_WIDTH
         + ' px wide or wider' + (tallest.pages > 1 ? '; ' + tallest.measured + ' of ' + tallest.pages + ' pages measured' : '') + ').');
     } else if (isZip) {
-      updateStatus('ready', 'SCORM package made, but its pages could not be measured, so Canvas Frame Fix will suggest a height to adjust.');
+      updateStatus('ready', 'SCORM package made, but its pages could not be measured.');
     }
     if (missingImages.length) {   // flag, don't fail: the package is made without them
       console.warn('SCORM: images not packaged:', missingImages);
@@ -7562,10 +7635,14 @@ async function loadMuPDF() {
 
 /**
  * Convert a single-page PDF to SVG string.
- * Uses MuPDF's DocumentWriter with 'svg' format and 'text=text' option
- * to preserve text as <text> elements rather than path outlines.
+ * Uses MuPDF's DocumentWriter with 'svg' format. outlines=false ('text=text')
+ * keeps live <text> elements naming the PDF's fonts, which can misrender TeX
+ * symbol fonts (e.g. the CMSY10 radical) when the viewer substitutes a font.
+ * outlines=true ('text=path') draws glyph outlines that match the PDF exactly.
+ * Only convertPdfsBody (checkbox #chkPdfOutlines) passes outlines; every
+ * other caller keeps text=text.
  */
-async function convertPdfToSvg(pdfArrayBuffer) {
+async function convertPdfToSvg(pdfArrayBuffer, { outlines = false } = {}) {
   const mupdf = await loadMuPDF();
   let doc, page, displayList, buffer, writer;
   try {
@@ -7575,7 +7652,7 @@ async function convertPdfToSvg(pdfArrayBuffer) {
     displayList = page.toDisplayList();
 
     buffer = new mupdf.Buffer();
-    writer = new mupdf.DocumentWriter(buffer, 'svg', 'text=text');
+    writer = new mupdf.DocumentWriter(buffer, 'svg', outlines ? 'text=path' : 'text=text');
     const device = writer.beginPage(bounds);
     displayList.run(device, mupdf.Matrix.identity);
     writer.endPage();
@@ -7674,7 +7751,7 @@ function showPdfPrompt(pdfNames) {
  * Process PDF files in auxFiles: convert each to SVG (or PNG fallback),
  * replace the .pdf entry with the converted file, and return a summary.
  */
-async function processPdfAuxFiles(pdfNames) {
+async function processPdfAuxFiles(pdfNames, { outlines = false } = {}) {
   const results = { converted: 0, failed: 0, details: [] };
   for (const pdfName of pdfNames) {
     const pdfData = resourceFiles.auxFiles[pdfName];
@@ -7686,7 +7763,7 @@ async function processPdfAuxFiles(pdfNames) {
         pdfData.byteOffset,
         pdfData.byteOffset + pdfData.byteLength
       );
-      const svgString = await convertPdfToSvg(arrayBuffer);
+      const svgString = await convertPdfToSvg(arrayBuffer, { outlines });
       const svgName = baseName + '.svg';
       const encoder = new TextEncoder();
       projectModel.removeFile(pdfName);
@@ -7902,7 +7979,7 @@ async function runConversion() {
     const outFileName = options['output-file'];
     const baseToFmt = document.getElementById('selTo').value.split(/[+-]/)[0];
     const isBinaryOutput = BINARY_FORMATS.includes(baseToFmt);
-  const packageStyle = activeStyle();   // Package for Canvas: zips single-page HTML (2026-10-11)
+  const packageStyle = activeStyle();   // the Output packaging option chosen when this conversion started (2026-10-18)
 
     console.log('Pandoc options:', JSON.stringify(options, null, 2));
 
@@ -8029,6 +8106,10 @@ async function runConversion() {
       lastOutput = { blob, filename: outName, files };
       downloadBtn.textContent = 'Download';
       downloadBtn.dataset.titleAvailable = `Download ${outName} (${sizeKB} KB)`;
+      // Output packaging (2026-10-18): HTML (multipage) as Loose files, Canvas content or SCORM package.
+      if (baseToFmt === 'chunkedhtml') {
+        await applyOutputPackaging(packageStyle, { name: outName, zipBlob: blob, files, warnings, stderr: result.stderr, downloadBtn });
+      }
       setActionAvailable(downloadBtn, true);
       setActionAvailable(scormBtn, scormAvailableFor(baseToFmt), scormUnavailableReason(baseToFmt));
       // HTML (multipage): its pages in the Output view, one at a time (PLAN-MULTIPAGE-PREVIEW.md).
@@ -8125,27 +8206,9 @@ async function runConversion() {
       lastOutput = { blob, filename: outFileName, files };
       downloadBtn.textContent = 'Download';
       downloadBtn.dataset.titleAvailable = `Download ${outFileName} (${sizeKB} KB)`;
-      // Package for Canvas (2026-10-11): single-page HTML downloads as a zip with the images it
-      // links to (js/canvas-package.js). lastOutput.blob stays the page itself, so everything else
-      // that reads it is unchanged; the Download button uses lastOutput.download when present.
-      if (packageStyle && packageStyle.zipSinglePage && /\.html?$/i.test(outFileName)) {
-        try {
-          if (!window.CanvasPackage) throw new Error('js/canvas-package.js is not loaded');
-          const pkg = await window.CanvasPackage.make({ name: outFileName, html: outputText, files });
-          lastOutput.download = { blob: pkg.blob, filename: pkg.filename };
-          downloadBtn.dataset.titleAvailable = `Download ${pkg.filename} (${(pkg.blob.size / 1024).toFixed(1)} KB)`;
-          if (pkg.missing.length) {
-            const one = pkg.missing.length === 1;
-            warnings.push({ line: null, column: null, level: 'warn', type: 'package', matchedText: null,
-              message: `Package for Canvas: ${one ? '1 image was' : pkg.missing.length + ' images were'} not found, so ${pkg.filename} doesn't include ${one ? 'it' : 'them'}: ${pkg.missing.join(', ')}` });
-            updateLog(warnings, result.stderr);
-          }
-        } catch (err) {
-          console.warn('Package for Canvas: no zip; Download gives the page alone:', err);
-          warnings.push({ line: null, column: null, level: 'warn', type: 'package', matchedText: null,
-            message: 'Package for Canvas: the zip could not be made, so Download gives the page alone (' + ((err && err.message) || err) + ').' });
-          updateLog(warnings, result.stderr);
-        }
+      // Output packaging (2026-10-18): single-page HTML as Loose files, Canvas content or SCORM package.
+      if (/\.html?$/i.test(outFileName)) {
+        await applyOutputPackaging(packageStyle, { name: outFileName, html: outputText, files, warnings, stderr: result.stderr, downloadBtn });
       }
       setActionAvailable(downloadBtn, true);
 

@@ -18,6 +18,7 @@ should be confirmed by counsel.
 | MuPDF / MuPDF.js | `image-processing/mupdf.js`, `mupdf-wasm.js`, `mupdf-wasm.wasm` | AGPL-3.0 (dual-licensed; commercial licenses available from Artifex Software) | https://mupdf.com / https://github.com/ArtifexSoftware/mupdf.js |
 | CodeMirror 6 | `codemirror/cm6-editor.js` (bundled build; build inputs in `cm6-src/`) | MIT | https://codemirror.net |
 | MathJax (v4, tex-to-MathML build) | `math-conversion/mathjax-bundle.js` | Apache-2.0 | https://www.mathjax.org |
+| Sa11y 5.1.0 (accessibility checker, run in the preview only) | `sa11y-5.1.0/` (released files, unchanged: `sa11y.umd.min.js`, `lang/en.umd.js`, `sa11y.min.css`; licence in `sa11y-5.1.0/LICENSE.md`) | GPL-2.0-or-later (Toronto Metropolitan University; versions 2.0 and earlier were MIT) | https://sa11y.netlify.app / https://github.com/ryersondmp/sa11y |
 | MML2OMML.XSL | `math-conversion/MML2OMML.XSL` | **Unverified — flagged for legal review; see note below** | Associated with Microsoft Office |
 
 ### MML2OMML.XSL — licensing flag
@@ -61,7 +62,7 @@ their code does not live in this repository.
 
 Original code in this repository is offered under the MIT License (`LICENSE`),
 which is compatible with the GPL and AGPL. Because the repository physically
-includes components under GPL-2.0-or-later (Pandoc) and AGPL-3.0 (MuPDF),
+includes components under GPL-2.0-or-later (Pandoc, Sa11y) and AGPL-3.0 (MuPDF),
 distribution or network hosting of the combined work is governed by those
 copyleft terms — in practice, the AGPL-3.0 as the strongest of them. Our
 understanding, for counsel to confirm: these licenses require that complete

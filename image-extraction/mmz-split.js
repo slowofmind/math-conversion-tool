@@ -51,6 +51,8 @@ export async function extractPage(srcBytes, page1) {
  * Convert a single-page PDF to SVG with text preserved.
  * Copied deliberately from the main tool's convertPdfToSvg (index.html 5C) so
  * that proving it here proves the downstream junction.
+ * The live text/outlines choice is made in index.html (convertPdfsBody →
+ * processPdfAuxFiles → convertPdfToSvg, checkbox #chkPdfOutlines); this harness copy stays text=text.
  */
 export async function pdfToSvg(pdfBytes) {
   const mupdf = await loadMuPDF();

@@ -1,0 +1,47 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\title{Problem Set 4: Linear Transformations}
+\author{Math 21b}
+\begin{document}
+\maketitle
+
+\section*{Instructions}
+Submit your solutions on Gradescope by Friday at 5pm. For the late-work policy, \href{https://example.org/policy}{click here}.
+
+\subsubsection*{Notation}
+We write $\im(T)$ for the image of a linear map $T$ and $\rref(A)$ for the reduced row echelon form of a matrix $A$.
+
+\section*{Problem 1}
+The figure shows what a linear map $T\colon \mathbb{R}^2 \to \mathbb{R}^2$ does to the unit square.
+
+\begin{center}
+\includegraphics[width=0.35\textwidth]{plot.png}
+\end{center}
+
+\textbf{Part (a)}
+
+Find the matrix $A$ of $T$, given the values below.
+
+\begin{center}
+\begin{tabular}{cc}
+$x$ & $T(x)$ \\
+$e_1$ & $(2,1)$ \\
+$e_2$ & $(-1,1)$ \\
+\end{tabular}
+\end{center}
+
+\textbf{Part (b)}
+
+Compute $\det A$ and explain what it says about the area of the image of the unit square:
+\[
+  \det\begin{pmatrix} 2 & -1 \\ 1 & 1 \end{pmatrix} = 2\cdot 1 - (-1)\cdot 1 .
+\]
+
+\textcolor{lightgray}{Hint: compare the area of the parallelogram with the area of the square.}
+
+\section*{Problem 2}
+Let $A = \begin{pmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \end{pmatrix}$. Find $\rref(A)$ and a basis for $\ker A$.
+\end{document}
