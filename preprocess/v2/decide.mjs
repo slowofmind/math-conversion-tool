@@ -50,6 +50,10 @@ export const PREPEND_RANKS = Object.freeze({
   "at-letter": 0,
   "newtheorem": 10,        // stage 6, \newtheorem declarations
   "stub": 20,              // stage 6, harmless stubs for absent packages
+  "flagging": 25,          // session 257, the flag tags' definitions (\ppflag, \ppflagitem): BEFORE
+                           // list-carrier's, or Pandoc stops on them (_work/_s257-defprobe.txt D2, D3)
+  "list-carrier": 30,      // session 252, shortlabels and the list tags' definitions
+  "inline-blocks": 35,     // session 270, \ppwrap's definitions (INLINE-BLOCKS-PLAN-s270, option A)
   "test-probe": 900,       // v2/test only; never in a shipping registry
   "test-probe-2": 910,
 });
@@ -143,7 +147,9 @@ export function prepend({ by, text, rank, rule, note, file } = {}) {
 }
 
 // Translate into an equivalent Pandoc handles.
-export function rewrite({ by, span, replacement, rule, note, kind, file } = {}) {
+// session 270: an optional `detail` joins the finding's detail (only when
+// given, so every action written before it is unchanged).
+export function rewrite({ by, span, replacement, rule, note, kind, file, detail } = {}) {
   checkBy(by);
   const s = checkSpan(by, span);
   need(by, "REWRITE needs a string `replacement`", typeof replacement === "string");
@@ -151,7 +157,8 @@ export function rewrite({ by, span, replacement, rule, note, kind, file } = {}) 
   need(by, "an empty replacement is a deletion — use remove() so it is reported on the " +
            "removed channel, not silently on the changed one", replacement !== "");
   return frozen({ action: "REWRITE", by, span: s, replacement, rule,
-                  note: note || "", kind: checkKind(by, kind, "literal"), file: file ?? null });
+                  note: note || "", kind: checkKind(by, kind, "literal"), file: file ?? null,
+                  ...(detail ? { detail } : {}) });
 }
 
 // Work the result out ourselves (§4.6) and splice it. Same shape as REWRITE;
@@ -225,7 +232,7 @@ export function toFindings(action) {
                       a.note || a.rule, { text: a.text, rank: a.rank })];
     default:
       return [finding(a.rule, "changed", null, a.span, a.file, a.note || a.rule,
-                      { replacement: a.replacement }, a.kind)];
+                      a.detail ? { replacement: a.replacement, ...a.detail } : { replacement: a.replacement }, a.kind)];
   }
 }
 

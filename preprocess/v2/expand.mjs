@@ -474,13 +474,56 @@ export const DEFAULT_MATH_HANDLER = Object.freeze({
   inExpansion: ({ stretch }) => ({ action: "emit", tokens: stretch }),
 });
 
-export function createExpander({ store, budget, capability, math, flags, counters } = {}) {
+// ---- session 262 (EXPANDER-PLAN-s260.md, approved; run.mjs connects this) ----
+// Three options, each absent by default so every earlier fixture is unchanged:
+//   bodyFrom  the store's event index at \begin{document} (reader.body.event).
+//             Decision 2 A: a name whose every definition comes before it
+//             counts as defined once - the store's final meaning is the one in
+//             force in the body; one more definition after it still refuses.
+//             The caller expands calls in the body only.
+//   textMode  the call sits in running text (run.mjs never asks inside maths):
+//             \ifmmode, met outside any maths the expansion opens and outside
+//             an \ensuremath group, is TeX's "not maths" - its \else branch.
+//             An \ifmmode holding another conditional, or with no \fi before
+//             its frame ends, still refuses.
+//   keep      name -> true: met inside an expansion, the call is written as it
+//             stands, its arguments as read, nothing in them expanded
+//             (Decision 3 A: commands flagging tags at the call).
+// And always: a \let copy keeps the meaning it had when it was made (M1,
+// _work/_s261-m1.txt). The store freezes a copy whose target it did not know
+// then (hyperref's \href); when the document defines that target later, the
+// copy's meaning has no name the written-out text could use, so it refuses -
+// and a command whose own body uses such a copy is written as a call, as it
+// stands, rather than expanded into it.
+const CONDITIONAL = (x) => !!x && x.kind === "ControlWord" && x.name.startsWith("if") && x.name !== "ifthenelse";
+
+export function createExpander({ store, budget, capability, math, flags, counters, bodyFrom, textMode, keep } = {}) {
   const B = Object.assign({}, DEFAULT_BUDGET, budget || {});
   const IF = ifThenState(flags || {});      // s120, 3b-1 part 1: the fold's three-valued state; absent, every flag unknown
   const counterOpt = typeof counters === "function" ? counters : null;   // s146, 3c-3 p3 (119.3 Q1 A): counters(written, place); absent (or not a function): nothing asked
   const cap = capability || null;            // absent: nothing is classified as dropped
   const M = math || DEFAULT_MATH_HANDLER;    // session 70: absent -> the default, today's behaviour
-  const definedTimes = (name) => (store && store.events ? store.events.filter((e) => e.type === "define" && e.name === name).length : 0);
+  const keepName = typeof keep === "function" ? keep : () => false;
+  const body0 = Number.isInteger(bodyFrom) ? bodyFrom : null;
+  let times = null;                          // s262: name -> times defined, counted once (the store is final)
+  const definedTimes = (name) => {
+    if (!store || !store.events) return 0;
+    if (!times) {
+      times = new Map();
+      store.events.forEach((e, k) => {
+        if (e.type !== "define") return;
+        const c = times.get(e.name) || { pre: 0, body: 0 };
+        if (body0 !== null && k < body0) c.pre++; else c.body++;
+        times.set(e.name, c);
+      });
+    }
+    const c = times.get(name);
+    return !c ? 0 : (body0 !== null ? (c.pre ? 1 : 0) : c.pre) + c.body;
+  };
+  // s262, (c): a frozen copy whose target the document now defines
+  const lostCopy = (rec) => !!rec && rec.kind === "frozen" && !!rec.aliasOf && !!(store && store.lookup(rec.aliasOf));
+  const usesLostCopy = (rec) => Array.isArray(rec.body) &&
+    rec.body.some((x) => x.kind === "ControlWord" && lostCopy(store && store.lookup(x.name)));
 
   function expandAt(tokens, i, { file = "?" } = {}) {
     const site = siteOf(file, tokens, i);
@@ -498,7 +541,7 @@ export function createExpander({ store, budget, capability, math, flags, counter
     // Not refused-ifthen, which has its own reason; not today's refusal of an
     // \ifthenelse whose arguments cannot be read in the queue (token \ifthenelse).
     let metIf = false, argSet = new Set();
-    const holdsIf = () => metIf || (Array.isArray(q) && q.some(isIfthen)) ||
+    const holdsIf = () => metIf || (Array.isArray(q) && q.slice(h).some(isIfthen)) ||
       (() => { const d = lookup(top.name); return !!d && Array.isArray(d.body) && d.body.some(isIfthen); })();
     const refuse = (rule, level, what, detail) => ({
       kind: "refused", span, steps,
@@ -524,7 +567,7 @@ export function createExpander({ store, budget, capability, math, flags, counter
       : refuse("expand/refused-math-handler", "unsupported",
           "the math handler \"" + M.name + "\" gave an answer the expander cannot use", { handler: M.name, at }));
 
-    let q, r0, inMath = false;
+    let q, r0, inMath = false, h = 0;   // s262: h, the queue's front (below)
     {
       const rec = lookup(top.name);
       const m = mathSpansOf(tokens).find((s) => s.start <= top.start && top.end <= s.end);
@@ -547,6 +590,9 @@ export function createExpander({ store, budget, capability, math, flags, counter
       const r = Array.isArray(rec.params) ? readArguments(tokens, i + 1, rec.params) : { args: [], next: i + 1 };
       if (!r) { span = { start: top.start, end: top.end }; return refuse("expand/refused-unreadable", "author-error", "its arguments cannot be read by its own definition", {}); }
       span = { start: top.start, end: tokens[r.next - 1].end };
+      if (lostCopy(rec))                                     // s262, (c): the call is itself the copy
+        return refuse("expand/refused-let-copy", "unsupported", "it is a \\let copy of \\" + rec.aliasOf + " made before the document defined \\" +
+          rec.aliasOf + "; that old meaning has no name the written-out text could use", { copyOf: "\\" + rec.aliasOf });
       if (notACall(rec)) return keep("expand/kept-not-a-call", "it is a \\" + rec.form + " name, not a command with a body", { form: rec.form });   // B (s78)
       if (!Array.isArray(rec.body)) return refuse("expand/refused-unmodelled", "unsupported", "its definition has no body the expander can expand", { token: "\\" + top.name });
       depth = 1; expansions = 1; r0 = r;
@@ -635,11 +681,43 @@ export function createExpander({ store, budget, capability, math, flags, counter
       return { value: v, why: v === "U" ? "test" : null, test };
     }
 
-    while (q.length) {
-      if (q.length > B.queue) return refuse("expand/refused-budget", "unsupported",
+    // s262: the queue's front is q[h]. Popping one token moves h, not the whole
+    // queue (it was copied at every step, so a long expansion slowed by the
+    // square of its length); norm() re-bases q at 0 before any step that reads
+    // the queue by position, and those happen once per expansion, not per token.
+    const norm = () => { if (h) { q = q.slice(h); h = 0; } };
+    // s262: a call written as it stands - the control word and its arguments,
+    // nothing in them expanded (keep, and a body that uses a lost \let copy)
+    const asWritten = (rec, why) => {
+      norm();
+      const r = Array.isArray(rec.params) ? readArguments(q, 1, rec.params) : { args: [], next: 1 };
+      if (!r) return refuse("expand/refused-unreadable", "author-error", "the arguments of \\" + q[0].name + " in its expansion cannot be read", { token: "\\" + q[0].name });
+      for (let k = 0; k < r.next; k++) { if (q[k] === END) { depth--; continue; } emitted.push(q[k]); steps.push({ kind: RESULT.EMIT, kept: why }); }
+      q = q.slice(r.next);
+      return null;
+    };
+    // s262, (b): is the call inside an \ensuremath group - in what the expansion
+    // has written so far, or around the call in the author's text?
+    const inEnsure = () => {
+      const opened = (ts, k) => { let p = k - 1; while (p >= 0 && ts[p].kind === "Space") p--; return p >= 0 && ts[p].kind === "ControlWord" && ts[p].name === "ensuremath"; };
+      let d = 0;
+      for (let k = emitted.length - 1; k >= 0; k--) {
+        if (emitted[k].kind === "EndGroup") d++;
+        else if (emitted[k].kind === "BeginGroup") { if (d) d--; else if (opened(emitted, k)) return true; }
+      }
+      d = 0;
+      for (let k = i - 1; k >= 0; k--) {
+        if (tokens[k].kind === "EndGroup") d++;
+        else if (tokens[k].kind === "BeginGroup") { if (d) d--; else if (opened(tokens, k)) return true; }
+      }
+      return false;
+    };
+
+    while (h < q.length) {
+      if (q.length - h > B.queue) return refuse("expand/refused-budget", "unsupported",
         "its expansion grew the working queue past " + B.queue + " tokens — deep, not necessarily broken", { budget: "queue", limit: B.queue });
-      const t = q[0];
-      if (t === END) { depth--; q = q.slice(1); continue; }
+      const t = q[h];
+      if (t === END) { depth--; h++; continue; }
       // Answer 1, inside an expansion: math the expansion itself opens is the
       // math pipeline's too — every token in it is emitted as written and
       // nothing in it is expanded (\Rs -> $\R$, not $\mathbb{R}$).
@@ -647,8 +725,9 @@ export function createExpander({ store, budget, capability, math, flags, counter
       // the closing one (or to the queue's end: `closed` false) goes to the
       // math handler, frame ends taken out and counted exactly as before. The
       // default hands it back, so the emitted tokens and steps are unchanged.
-      const mt = inMath ? null : mathTurn(q, 0, false);
+      const mt = inMath ? null : mathTurn(q, h, false);
       if (mt) {
+        norm();
         const stretch = [];
         let j = 0, closed = false;
         while (j < mt.take) stretch.push(q[j++]);
@@ -664,9 +743,10 @@ export function createExpander({ store, budget, capability, math, flags, counter
         for (const x of a.tokens) { emitted.push(x); steps.push({ kind: RESULT.EMIT }); }
         q = q.slice(j); inMath = !closed; continue;
       }
-      if (t.kind !== "ControlWord") { emitted.push(t); steps.push({ kind: RESULT.EMIT }); q = q.slice(1); continue; }
+      if (t.kind !== "ControlWord") { emitted.push(t); steps.push({ kind: RESULT.EMIT }); h++; continue; }
 
       if (isDefinitionForm(t.name)) {                       // E13: executed into scratch, nothing emitted
+        norm();
         const d = readDefinition(q, 0);
         if (!d || !d.def) return refuse("expand/refused-unmodelled", "unsupported", "a definition inside its body could not be read", { token: "\\" + t.name });
         scratch.set(d.def.name, d.def);
@@ -676,6 +756,7 @@ export function createExpander({ store, budget, capability, math, flags, counter
         q = q.slice(d.close + 1); continue;
       }
       if (isIfthen(t)) {                                    // s120, 3b-1 part 2: the fold's decider, in the queue
+        norm();
         const c = elseAtPar(q, chooseBranch(q, 0, IF, decideQ));     // s122, 3b-2a: a blank line before ELSE read as TeX does; s146, 3c-3 p5: the queue's decider (p4)
         if (c && !q.slice(0, c.close + 1).includes(END)) {   // else today's refusal, just below
           metIf = true;
@@ -712,16 +793,44 @@ export function createExpander({ store, budget, capability, math, flags, counter
           continue;
         }
       }
+      // s262, (b): \ifmmode in running text, outside maths the expansion opened
+      // (that is emitted whole above) and outside \ensuremath: "not maths"
+      if (textMode && t.name === "ifmmode" && !inMath && !inEnsure()) {
+        norm();
+        let els = -1, fi = -1, nested = false;
+        for (let k = 1; k < q.length && fi < 0 && !nested; k++) {
+          const x = q[k];
+          if (x === END) break;
+          if (x.kind !== "ControlWord") continue;
+          if (x.name === "fi") fi = k;
+          else if (x.name === "else" && els < 0) els = k;
+          else if (x.name === "or" || CONDITIONAL(x)) nested = true;
+        }
+        if (fi >= 0 && !nested) {
+          q = (els < 0 ? [] : q.slice(els + 1, fi)).concat(q.slice(fi + 1));
+          steps.push({ kind: RESULT.INPUT, name: "ifmmode" });
+          continue;
+        }
+      }
       if (UNMODELLED.has(t.name)) return refuse("expand/refused-unmodelled", "unsupported",
         "\\" + t.name + " appears in its expansion and is not yet modelled", { token: "\\" + t.name });
 
       const rec = lookup(t.name);
-      if (!rec) { emitted.push(t); steps.push({ kind: RESULT.EMIT }); q = q.slice(1); continue; }   // not the document's: Pandoc's business
+      if (!rec) { emitted.push(t); steps.push({ kind: RESULT.EMIT }); h++; continue; }   // not the document's: Pandoc's business
+      if (lostCopy(rec) && !scratch.has(t.name))           // s262, (c)
+        return refuse("expand/refused-let-copy", "unsupported", "\\" + t.name + " in its expansion is a \\let copy of \\" + rec.aliasOf +
+          " made before the document defined \\" + rec.aliasOf + "; that old meaning has no name the written-out text could use", { token: "\\" + t.name, copyOf: "\\" + rec.aliasOf });
       if (definedTimes(t.name) > 1 && !scratch.has(t.name))
         return refuse("expand/refused-redefined", "undecidable", "\\" + t.name + " in its expansion is defined " + definedTimes(t.name) + " times in the chain", { definitions: definedTimes(t.name), token: "\\" + t.name });
-      if (rec.kind === "alias" && Array.isArray(rec.body)) { q = rec.body.concat(q.slice(1)); steps.push({ kind: RESULT.INPUT, name: t.name }); continue; }
-      if (notACall(rec)) { emitted.push(t); steps.push({ kind: RESULT.EMIT }); q = q.slice(1); continue; }   // B (s78): passes through as written
+      if (rec.kind === "alias" && Array.isArray(rec.body)) { norm(); q = rec.body.concat(q.slice(1)); steps.push({ kind: RESULT.INPUT, name: t.name }); continue; }
+      if (notACall(rec)) { emitted.push(t); steps.push({ kind: RESULT.EMIT }); h++; continue; }   // B (s78): passes through as written
       if (!Array.isArray(rec.body)) return refuse("expand/refused-unmodelled", "unsupported", "\\" + t.name + " in its expansion has no body the expander can expand", { token: "\\" + t.name });
+      if (!scratch.has(t.name) && (keepName(t.name) || usesLostCopy(rec))) {   // s262: written as a call, as it stands
+        const no = asWritten(rec, keepName(t.name) ? "keep" : "let-copy");
+        if (no) return no;
+        continue;
+      }
+      norm();
       const r = Array.isArray(rec.params) ? readArguments(q, 1, rec.params) : { args: [], next: 1 };
       if (!r) return refuse("expand/refused-unreadable", "author-error", "the arguments of \\" + t.name + " in its expansion cannot be read", { token: "\\" + t.name });
       if (++expansions > B.expansions) return refuse("expand/refused-budget", "unsupported",
@@ -766,12 +875,33 @@ export function createExpander({ store, budget, capability, math, flags, counter
     let text = joinTokens(emitted);
     const last = emitted[emitted.length - 1], after = tokens[endIdx + 1], before = tokens[i - 1];
     if (last && last.kind === "ControlWord" && isLetter(after)) text += " ";            // \emph|beta
-    if (before && before.kind === "ControlWord" && /^[A-Za-z]/.test(text.length ? text : (after ? after.text : "")))
+    // s262: `starts`, where each emitted token begins in `text` (joinTokens'
+    // own count), so run.mjs can find a definition's pieces in what it writes
+    const starts = [];
+    for (let k = 0, at = 0; k < emitted.length; k++) {
+      starts.push(at);
+      at += emitted[k].text.length + (emitted[k].kind === "ControlWord" && isLetter(emitted[k + 1]) ? 1 : 0);
+    }
+    if (before && before.kind === "ControlWord" && /^[A-Za-z]/.test(text.length ? text : (after ? after.text : ""))) {
       text = " " + text;                                                                 // \relax|X
+      for (let k = 0; k < starts.length; k++) starts[k]++;
+    }
+    // s262, (d) (M4 print, Math Mb ws2-3's \pspace{\vfill}): a call that read an
+    // argument, alone on its line, written as nothing would leave a blank line -
+    // a paragraph TeX never saw. An empty group keeps the line, and what TeX
+    // read around the call: the line end before it and the one after it. Only
+    // between two line ends: at a file's start or end no blank line can form
+    // (expand-ifthen S7, compiled at N4, stays nothing).
+    if (!text.length && r0.next > i + 1) {
+      let p = i - 1, a = endIdx + 1;
+      while (p >= 0 && tokens[p].kind === "Space") p--;
+      while (a < tokens.length && tokens[a].kind === "Space") a++;
+      if (p >= 0 && tokens[p].kind === "Newline" && a < tokens.length && tokens[a].kind === "Newline") text = "{}";
+    }
     const rule = !emitted.length ? "expand/removed-empty"
       : redefines ? "expand/expanded-redefines-dropped"
       : c.dropped.length ? "expand/expanded-pandoc-drops" : "expand/expanded";
-    return { kind: "expanded", span, text, steps, emitted, expansions, rule,
+    return { kind: "expanded", span, text, steps, emitted, starts, expansions, rule,
              detail: { site, name: top.name, dropped: c.dropped, redefines } };
   }
   return { expandAt, budget: B };

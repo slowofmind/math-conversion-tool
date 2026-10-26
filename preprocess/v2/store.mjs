@@ -133,12 +133,24 @@ export function createStore() {
 
   // ---- frames: { and \begin{env} push; } and \end{env} pop and replay -----
   function openGroup(kind, name, at) {
-    frames.push({ kind, name: name ?? null, at: at ?? null, undo: new Map(), flagUndo: new Map() });
+    frames.push({ kind, name: name ?? null, at: at ?? null, undo: new Map(), flagUndo: new Map(), closers: pending });
+    pending = [];
     events.push({ type: "open", kind, name: name ?? null, depth: frames.length });
   }
   function replay(frame) {
     for (const [name, prev] of frame.undo) { if (prev === undefined) definitions.delete(name); else definitions.set(name, prev); }
     for (const [name, prev] of frame.flagUndo) { if (prev === undefined) flags.delete(name); else flags.set(name, prev); }
+    for (let k = frame.closers.length - 1; k >= 0; k--) frame.closers[k]();
+  }
+  // onClose(fn) — session 250, for the list-depth piece: another part of the
+  // tool says "put this back when this group closes", at the store's own
+  // moments (\end, }, \egroup, a mismatched close). { next: true } attaches it
+  // to the frame about to open: a reader hook sees \begin before the walk
+  // opens its frame. With no frame open, a step for the innermost one is dropped.
+  let pending = [];
+  function onClose(fn, opts) {
+    if (opts && opts.next) pending.push(fn);
+    else if (frames.length) frames[frames.length - 1].closers.push(fn);
   }
   // A close with nothing open, or one that does not match the innermost
   // frame, is a finding, never a failure. When a matching frame sits lower
@@ -222,7 +234,7 @@ export function createStore() {
   }
 
   return { define, lookup, resolve, has: (n) => definitions.has(n), names: () => [...definitions.keys()],
-           openGroup, closeGroup, depth, frames: () => frames.map((f) => ({ kind: f.kind, name: f.name, at: f.at })),
+           openGroup, closeGroup, onClose, depth, frames: () => frames.map((f) => ({ kind: f.kind, name: f.name, at: f.at })),
            declareFlag, setFlag, flagSetter, flagValue, flags: () => new Map(flags),
            beginOption, endOption, currentOption, snapshot, diff, hiddenEnvironments, events };
 }
@@ -268,7 +280,7 @@ export function walkDefinitions(tokens, file, store, hooks) {
     if (commands && commands.has(t.name)) {
       const next = commands.get(t.name)({ tokens, i, file, store, findings, skipped, statements });
       if (typeof next === "number") { i = next; continue; }
-    }
+    } else if (hooks && hooks.fallback) hooks.fallback({ tokens, i, file, store });   // s251: sees any other command, consumes nothing
     if (t.name === "bgroup") { store.openGroup("group", "bgroup", i); i++; continue; }
     if (t.name === "egroup") { take(store.closeGroup("group", "bgroup", i, file, spanOf(tokens, i, i))); i++; continue; }
     if (t.name === "begin" || t.name === "end") {

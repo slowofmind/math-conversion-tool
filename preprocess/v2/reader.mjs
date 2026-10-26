@@ -36,6 +36,7 @@ import { tokenize, profileFor } from "./tokenizer.mjs";
 import { readGroup, readBracket, skipSpaces } from "./structure.mjs";
 import { groupText } from "./definition.mjs";
 import { createStore, walkDefinitions, HIDING_ENVS } from "./store.mjs";
+import { createListDepth } from "./list-depth.mjs";
 // THE SEAM decides with the SAME rule the fold decides with — deliberately
 // the same module, not a copy of it, so the text Pandoc receives and the
 // notebook the later rules read can never disagree about which branch won.
@@ -265,11 +266,18 @@ export function readDocument(entry, files, options = {}) {
   if (!entryInfo) throw new Error("no such file in project: " + entry);
 
   const store = options.store || createStore();
+  const listDepth = createListDepth();      // s250: the depth at every \item, counted during the reading
   const record = [], findings = [], statements = [], skipped = [], decided = [];
   const unresolved = [], filesRead = [], stack = [], reading = new Set();
   const requested = new Map();      // package -> Set(option) requested so far
   const loaded = new Set();         // packages already read in this chain
   const tally = { includes: 0, notFollowed: 0, optionHandlersRun: 0 };
+  // Session 262 (EXPANDER-PLAN-s260.md, Decision 2 A): where the body begins -
+  // the store's event count at the entry's \begin{document} - and the files
+  // read after it. run.mjs writes out calls in the body only, and a name all of
+  // whose definitions come before this point has one meaning there.
+  let bodyEvent = null;
+  const inBody = [];
   // \ifSubfilesClassLoaded is decided by OUR conversion mode, never by the
   // author (D6): the subfiles class is loaded exactly when the document being
   // converted is itself the subfile.
@@ -319,6 +327,7 @@ export function readDocument(entry, files, options = {}) {
                  viaOption: null, starHandler: false });
     let toks = info.tokens;
     if (opts.preambleOnly) { const e = preambleEnd(toks); if (e >= 0) toks = toks.slice(0, e); }
+    else if (bodyEvent !== null && !inBody.includes(pathName)) inBody.push(pathName);
     absorb(walkDefinitions(toks, pathName, store, hooks), pathName, toks);
     stack.pop();
     reading.delete(pathName);
@@ -364,6 +373,7 @@ export function readDocument(entry, files, options = {}) {
     const fresh = wanted.filter((w) => !cur.has(w));
     for (const w of wanted) cur.add(w);
     requested.set(name, cur);
+    if (name !== "subfiles") listDepth.noteLoad(t.name === "documentclass", name, wanted);
 
     if (t.name === "documentclass" && name === "subfiles") { loadParent(t, wanted); return; }
 
@@ -412,7 +422,8 @@ export function readDocument(entry, files, options = {}) {
       return;
     }
     if (reading.has(target)) { say(t.start, "load subfiles", "parent " + target + " is already open above; not read again"); return; }
-    say(t.start, "load subfiles", "reading " + target + " (parent preamble)");
+    // `parent` names the file outright, for run.mjs's subfile preamble step (s244).
+    say(t.start, "load subfiles", "reading " + target + " (parent preamble)", "certain", { parent: target });
     readFile(target, { preambleOnly: true });
   }
 
@@ -612,8 +623,31 @@ export function readDocument(entry, files, options = {}) {
   on(["begin", "end"], (ctx) => {
     const { tokens, i } = ctx;
     const g = readGroup(tokens, i + 1);
-    if (!g || groupText(tokens, g).trim() !== "document") return null;
-    return g.close + 1;
+    if (!g) return null;
+    const name = groupText(tokens, g).trim();
+    if (name === "document") {
+      if (tokens[i].name === "begin" && top().file === entry && bodyEvent === null) bodyEvent = store.events.length;
+      return g.close + 1;
+    }
+    // List depth (s250, 179.3): counted here, before the walk opens the frame;
+    // s251: the numbers too, and the \end checked before the walk closes it.
+    if (tokens[i].name === "begin") listDepth.begin(name, ctx, lineOf(top().info.lines, tokens[i].start));
+    else listDepth.end(name, ctx);
+    return null;
+  });
+  on(["item"], (ctx) => { listDepth.item(ctx, lineOf(top().info.lines, ctx.tokens[ctx.i].start)); return null; });
+  // s251: enumitem's \setlist[names,levels]{keys}, \setlist*, and the older \setenumerate[levels]{keys}.
+  on(["setlist"], (ctx) => { listDepth.setlist(ctx, "setlist"); return null; });
+  on(["setenumerate"], (ctx) => { listDepth.setlist(ctx, "setenumerate"); return null; });
+  // s251: an author's command that makes an item (\plainitem, \calcitem) inside a numbered list.
+  hooks.fallback = (ctx) => listDepth.command(ctx, () => lineOf(top().info.lines, ctx.tokens[ctx.i].start));
+  // enumitem's \newlist{name}{type}{max-depth}: a list kind of its own (178.3).
+  on(["newlist", "renewlist"], (ctx) => {
+    const { tokens, i } = ctx;
+    const g1 = readGroup(tokens, i + 1), g2 = g1 && readGroup(tokens, g1.close + 1), g3 = g2 && readGroup(tokens, g2.close + 1);
+    if (g3 && /^\d+$/.test(groupText(tokens, g3).trim()))
+      listDepth.noteNewlist(groupText(tokens, g1).trim(), groupText(tokens, g2).trim(), +groupText(tokens, g3).trim());
+    return null;
   });
 
   // D6. \ifSubfilesClassLoaded{A}{B} is fully decidable by us, always,
@@ -743,6 +777,13 @@ export function readDocument(entry, files, options = {}) {
   const read = [...new Set(filesRead)];
   return {
     entry, mode, record, statements, skipped, decided, store, findings, unresolved,
+    // s250: { items, findings } — each \item's overall and own list depth.
+    // Kept apart from `findings` until the list transform decides what is reported.
+    lists: listDepth.result(),
+    // s262: { event, files } - the store's event index at the entry's
+    // \begin{document} (null when the reader never met it there) and the files
+    // read after it, in the order read.
+    body: { event: bodyEvent, files: inBody.slice() },
     // v1's filesRead is what the chain READ BESIDE the entry; `chain` is the
     // whole set including it, which is what a person means by "the chain".
     filesRead: read.filter((p) => p !== entry),

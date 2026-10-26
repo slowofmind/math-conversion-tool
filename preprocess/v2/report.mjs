@@ -68,6 +68,12 @@ const discardCount = (dropped) =>
 // shape; session 40 re-cut the rest of the page to match (INDEX.md).
 const MARKER_HEAD = "ITEM MARKERS PANDOC DISCARDS";
 
+// Session 257, the first flagging build (v2/flag-calls.mjs): every call of a
+// command that draws what Pandoc cannot carry, tagged in the -pp copy or left
+// as it is. Not findings either: the result carries them as `flagged`, shaped
+// like `dropped`, counted the same way, under the same switch.
+const FLAG_HEAD = "COMMANDS FLAGGED FOR LATER HANDLING";
+
 // Turn an offset into a line and a column, both counted from 1, in the text
 // the offset belongs to. Returns null when there is nothing to count in, so
 // a caller can say "no location" rather than print a confident 1:1.
@@ -122,6 +128,23 @@ function renderMarker(e, sources) {
 // wrote it; nothing here is JSON-escaped.
 function renderDrop(e, sources) {
   return "  " + whereOf(e, sources) + "  \\" + e.name + "  " + e.rule;
+}
+
+// One flagged call, on ONE line: where, the command, the tag - with the place
+// in brackets when no tag was written there. The note stays in the data.
+function renderFlag(e, sources) {
+  const said = e.place === "environment" ? "\\begin{" + e.name + "}" : "\\" + e.name;
+  return "  " + whereOf(e, sources) + "  " + said + "  " + e.rule + (e.tagged ? "" : " [" + e.place + "]");
+}
+
+// One definition site (session 258), on ONE line: where the piece sits in its
+// definition, the piece and the definition, its ID, the tag; then one line
+// with where it is used - the calls that expand it.
+function renderSite(s, sources) {
+  const inDef = s.definition === null ? "a definition whose name is built at run time"
+    : s.env ? "{" + s.definition + "}" : "\\" + s.definition;
+  const used = s.uses.length ? "    used at " + s.uses.map((u) => whereOf(u, sources)).join(", ") : "    not used in this document";
+  return ["  " + whereOf(s, sources) + "  \\" + s.piece + " in " + inDef + "  " + s.id + "  " + s.rule, used];
 }
 
 // One finding, on ONE line (session 40, INDEX.md): where, what the author
@@ -201,6 +224,11 @@ export function renderReport(result, sources, options = {}) {
     ? result.markers : null;
   const dropState = !dropped ? "NOT CHECKED" : dropped.total ? discardCount(dropped) : "none found";
   const markState = !markers ? "NOT CHECKED" : markers.total ? String(markers.total) : "none found";
+  // A result from before session 257 has no `flagged`: no line, no section,
+  // rather than a NOT CHECKED that would read as a pass that failed to run.
+  const flagged = surfacing && result.flagged && Number.isInteger(result.flagged.total)
+    ? result.flagged : null;
+  const flagState = !flagged ? null : flagged.total ? discardCount(flagged) : "none found";
 
   const out = [];
   const title = options.title || "LaTeX preprocessing report";
@@ -211,6 +239,7 @@ export function renderReport(result, sources, options = {}) {
   const countRows = [["needs attention", counts.attention]];
   if (surfacing) countRows.push(["commands Pandoc discards", dropState],
                                 ["item markers Pandoc discards", markState]);
+  if (flagged) countRows.push(["commands flagged", flagState]);
   countRows.push(["changed", counts.changed], ["removed", counts.removed]);
   for (const [label, n] of countRows) out.push((label + ":").padEnd(31) + n);
   if (unchannelled)
@@ -248,6 +277,15 @@ export function renderReport(result, sources, options = {}) {
         : !markers.total ? ["  none."]
         : orderFindings([...markers.entries], paths).map((e) => renderMarker(e, src)));
   }
+  // Session 258: the definition sites (pieces tagged inside definitions),
+  // each with the calls that use it, after the calls.
+  const sites = flagged && Array.isArray(flagged.sites) ? flagged.sites : [];
+  if (flagged)
+    section(FLAG_HEAD, flagState, [...(!flagged.total ? ["  none."]
+      : ["  by command: " + flagged.byName.map((b) => "\\" + b.name + " ×" + b.count).join(", "),
+         ...orderFindings([...flagged.entries], paths).map((e) => renderFlag(e, src))]),
+      ...(sites.length ? ["  definition sites: " + sites.length + " (" + sites.filter((s) => s.tagged).length + " tagged)",
+                          ...orderFindings([...sites], paths).flatMap((s) => renderSite(s, src))] : [])]);
   // Then what the tool did for the author.
   channel("changed");
   channel("removed");

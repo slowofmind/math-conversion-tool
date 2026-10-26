@@ -145,7 +145,12 @@ export function chooseBranch(tokens, i, state, decide = decideTest) {
            testAt: [tf, tt] };
 }
 
-export function createIfThen({ flags = {} } = {}) {
+// wrapToken(file, k, text) (session 258): the text written for token k of a
+// kept branch. The flagging build tags pieces inside definitions, and a piece
+// inside an \ifthenelse sits in a span this fix rewrites whole; two edits
+// there would overlap, so the tag is written into this fix's replacement.
+// Without it every token is written as the author wrote it, as before.
+export function createIfThen({ flags = {}, wrapToken = null } = {}) {
   // The reader's finished answers arrive as a factory option, because the
   // shared caller passes state:null to runWalk and the reader's store does
   // not reach a transform.
@@ -160,7 +165,7 @@ export function createIfThen({ flags = {} } = {}) {
   // can itself hold conditionals, and the outer edit span already covers
   // them, so they must be folded INTO the replacement — two overlapping edits
   // would be refused by the edit list, and rightly.
-  const foldRange = (tokens, from, to, report) => {
+  const foldRange = (tokens, from, to, report, file) => {
     let out = "", k = from;
     while (k <= to && k < tokens.length) {
       const t = tokens[k];
@@ -170,13 +175,13 @@ export function createIfThen({ flags = {} } = {}) {
           const v = verdict(tokens, r);
           report(v, k, r);
           const [bf, bt] = innerRange(v.value === "T" ? r.args[1] : r.args[2]);
-          out += bf > bt ? "" : foldRange(tokens, bf, bt, report);
+          out += bf > bt ? "" : foldRange(tokens, bf, bt, report, file);
           k = r.args[2].close + 1;
           continue;
         }
         report({ value: "X", why: "malformed", test: "" }, k, null);
       }
-      out += t.text;
+      out += wrapToken ? wrapToken(file, k, t.text) : t.text;
       k++;
     }
     return out;
@@ -218,7 +223,7 @@ export function createIfThen({ flags = {} } = {}) {
         const v = verdict(tokens, r);
         report(v, i, r);
         const [bf, bt] = innerRange(v.value === "T" ? r.args[1] : r.args[2]);
-        const replacement = bf > bt ? "" : foldRange(tokens, bf, bt, report);
+        const replacement = bf > bt ? "" : foldRange(tokens, bf, bt, report, file);
         const span = { start: t.start, end: r.args[2].end };
         const kept = v.value === "T" ? "then" : "else";
         const why = v.value === "T" ? "the condition is true"
