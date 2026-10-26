@@ -966,6 +966,8 @@
     margin-right: 4px;
   }
   .output-tab-action:hover { color: var(--text-primary); border-color: var(--text-muted); }
+  /* Accessibility check (2026-10-18): pressed = on, shown as the layout buttons' active state. */
+  .output-tab-action[aria-pressed="true"] { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
   #btnDownloadOutput { color: var(--harvard-blue); border-color: var(--harvard-blue); }
   #mathSubtitlesBox { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-primary); }
   #selMathSubtitles { width: auto; font-size: 12px; }
@@ -2581,6 +2583,10 @@
              frame's name says which page ("page 3 of 12"); the pages' own links move between them. -->
         <span id="mathSubtitlesBox" title="Math subtitles in the preview. MathCat: under each equation, what NVDA's speech viewer shows (MathCAT 0.7.2, NVDA 2026.2 defaults). MathJax: MathJax's own subtitles."><label for="selMathSubtitles">Math subtitles</label><select id="selMathSubtitles" aria-disabled="true" aria-describedby="selMathSubtitlesWhy" title="Convert a document to HTML first."><option value="hide" selected>Hidden</option><option value="mathcat">MathCat</option><option value="mathjax" disabled>MathJax</option></select></span>
         <span class="output-tab-spacer"></span>
+        <!-- Accessibility check (2026-10-18, accessibility-checker\PLAN-ACCESSIBILITY-CHECKER.md): Sa11y in the
+             preview copy only; off by default. Nicholas: "On/off should be as you describe...off by default
+             (for now)". No title text: help messages are to be mapped out together later. -->
+        <button class="output-tab-action" id="btnA11yCheck" type="button" aria-pressed="false">Accessibility check</button>
         <button class="output-tab-action" id="btnDownloadOutput" title="Convert a document first." data-title-available="Download output" aria-label="Download output" aria-disabled="true" aria-describedby="btnDownloadOutputWhy">Download</button>
         <!-- SCORM split button (2026-10-06, Nicholas). Hidden 2026-10-18: SCORM is now an Output packaging
              option, and Download makes the package by clicking the hidden 📦 SCORM button, so the SCORM
@@ -2678,6 +2684,7 @@ import { initWarningParser } from './js/warning-parser.js';
 import { initProjectModel } from './project/project-model.js';
 import { initFileTree } from './filetree/file-tree.js';
 import { initPreviewPages } from './js/preview-pages.js';   // PLAN-MULTIPAGE-PREVIEW.md (last, so test-preprocess-page F7 keeps preprocess after MathCAT)
+import { initA11yCheck } from './js/a11y-check.js';   // accessibility-checker\PLAN-ACCESSIBILITY-CHECKER.md
 
 // ════════════════════════════════════════════════════════════════════
 // PROJECT MODEL (Stage 0) — project/project-model.js
@@ -8302,6 +8309,13 @@ const mathcatProof = initMathCATProof({
       (err) => updateStatus('error', 'MathCAT could not start: ' + (err && err.message ? err.message : err)));
   },
 });
+// ════════════════════════════════════════════════════════════════════
+// ACCESSIBILITY CHECK — js/a11y-check.js (accessibility-checker\PLAN-ACCESSIBILITY-CHECKER.md)
+// ════════════════════════════════════════════════════════════════════
+// Sa11y in the preview copy of each HTML page while the button is pressed; off by default
+// (Nicholas, 2026-10-18: "On/off should be as you describe...off by default (for now)").
+// Download, packaging and the Code view never see it: setPreviewHtml passes it only the copy.
+const a11yCheck = initA11yCheck({ getPreviewFrame: () => document.getElementById('previewFrame') });
 const mathSubtitlesSel = document.getElementById('selMathSubtitles');
 const MATH_SUBTITLE_NAMES = { hide: 'Hidden', mathcat: 'MathCat', mathjax: 'MathJax' };
 let lastPreviewHtml = null;   // last HTML put in the preview, untouched; null when not HTML
@@ -8327,6 +8341,10 @@ async function setPreviewHtml(html, isHtml, opts) {
     }
   } else {
     setActionAvailable(mathSubtitlesSel, false, 'Math subtitles need an HTML preview. ' + SUBTITLES_NO_PREVIEW);
+  }
+  if (isHtml) {   // accessibility check: preview copy only, and only while it is on
+    try { copy = await a11yCheck.preparePreview(copy); }
+    catch (err) { console.info('[Accessibility check]', 'not added to the preview: ' + (err && err.message ? err.message : err)); }
   }
   if (seq !== previewSeq) return;
   document.getElementById('previewFrame').srcdoc = copy;
@@ -8397,6 +8415,16 @@ mathSubtitlesSel.addEventListener('keydown', (e) => {
 });
 mathSubtitlesSel.addEventListener('mousedown', (e) => {
   if (isActionUnavailable(mathSubtitlesSel)) e.preventDefault();
+});
+// Accessibility check button (2026-10-18): pressed = on. The page in the preview is shown again,
+// with or without the check; it is a page swap, so Math subtitles keep their setting.
+const a11yBtn = document.getElementById('btnA11yCheck');
+a11yBtn.addEventListener('click', async () => {
+  const on = a11yBtn.getAttribute('aria-pressed') !== 'true';
+  a11yBtn.setAttribute('aria-pressed', String(on));
+  a11yCheck.setOn(on);
+  const cur = previewPages.current();
+  if (cur && cur.name) await previewPages.showPage(cur.name, cur.fragment || '', { cause: 'picker' });
 });
 // ════════════════════════════════════════════════════════════════════
 // LATEX PREPROCESSING — js/preprocess.js (latex-preprocess PLAN-9, step F)
