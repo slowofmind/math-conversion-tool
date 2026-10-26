@@ -11,7 +11,8 @@
 //   - waits for Sa11y's files, for MathJax to finish and for the preview's images to be drawn
 //     (preview-helper.js draws them after the page loads), then starts Sa11y with the settings
 //     below, with Sa11y's own panel (stage 1 of the plan);
-//   - adds one check of its own: equations that did not convert;
+//   - adds checks of its own: equations that did not convert; alt text that only names the kind
+//     of image; pixel-based (raster) images, as a warning;
 //   - sends a summary of the results to the platform ('astem-a11y:results').
 (function (window) {
   'use strict';
@@ -50,7 +51,6 @@
     imageIgnore: 'mjx-container *',
     // An equation the maths check below reports is shown in red; its letters are not also contrast errors.
     ignoreByTest: { CONTRAST_ERROR: '[data-astem-math-error], [data-astem-math-error] *' },
-    extraPlaceholderStopWords: 'equation, formula, graph, figure, diagram, plot',
     checks: {
       ALT_PLACEHOLDER: {
         content: 'This image has placeholder alt text: <strong>%(ALT_TEXT)</strong>. Pandoc writes this when the LaTeX gives no description. In your LaTeX, describe the image: <code>\\includegraphics[alt={A short description}]{file}</code>.'
@@ -109,6 +109,41 @@
     return out;
   }
 
+  // ---- image checks of our own (2026-10-18) -----------------------------------------------------------
+  // Generic alt: the WHOLE alt only names the kind of image ("Figure 2", "graph", "Equation (4)"), matched
+  // the way Sa11y matches its own placeholder list. Sa11y's extraPlaceholderStopWords is not used: it
+  // matches a word anywhere in the first six characters, so it flagged real descriptions ("Graph of ...",
+  // "Two graphs ...").
+  var GENERIC_ALT = /^(equation|formula|graph|figure|fig|diagram|plot)\.?(\s*\(?\s*\d+(\.\d+)*[a-z]?\s*\)?)?\.?$/i;
+  // Pixel-based images, by the file's own name (the preview keeps it in data-astem-preview-src) or, for an
+  // embedded image, by its file type. SVG, in a file or inline, is vector and passes.
+  var RASTER = { png: 'PNG', jpg: 'JPEG', jpeg: 'JPEG', gif: 'GIF', webp: 'WebP', bmp: 'BMP', 'x-ms-bmp': 'BMP', tif: 'TIFF', tiff: 'TIFF' };
+  function rasterKind(img) {
+    var src = img.getAttribute('data-astem-preview-src') || img.getAttribute('src') || '';
+    var m = /^data:image\/([a-z0-9.+-]+)[;,]/i.exec(src);
+    var ext = m ? m[1] : (/\.([a-z0-9]+)$/i.exec(src.split(/[?#]/)[0]) || [])[1];
+    return (ext && RASTER[ext.toLowerCase()]) || null;
+  }
+  function imageResults() {
+    var out = [], els = document.querySelectorAll('img, [role="img"]');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el.closest('mjx-container, [class*="ASTEM_MathCAT_Region"], [class*="MJX_LiveRegion"]')) continue;
+      var alt = el.tagName === 'IMG' ? el.getAttribute('alt') : el.getAttribute('aria-label');
+      var text = alt == null ? '' : String(alt).replace(/\s+/g, ' ').trim();
+      if (text && GENERIC_ALT.test(text)) {
+        out.push({ test: 'ASTEM_ALT_GENERIC', element: el, type: 'error', inline: true, position: 'beforebegin',
+          content: 'This image\'s alt text only names the kind of image: <strong>' + esc(text) + '</strong>. In your LaTeX, describe what it shows: <code>\\includegraphics[alt={A short description}]{file}</code>.' });
+      }
+      var kind = el.tagName === 'IMG' ? rasterKind(el) : null;
+      if (kind) {
+        out.push({ test: 'ASTEM_RASTER_IMAGE', element: el, type: 'warning', inline: true, position: 'beforebegin',
+          content: 'This is a pixel-based image (' + kind + '). It blurs when enlarged. A vector version (SVG) stays sharp for readers who zoom in.' });
+      }
+    }
+    return out;
+  }
+
   // ---- results to the platform (kept there for stage 2) ---------------------------------------------
   document.addEventListener('sa11y-check-complete', function (e) {
     var res = (e.detail && e.detail.results) || [], items = [], errors = 0, warnings = 0;
@@ -129,6 +164,7 @@
     document.addEventListener('sa11y-custom-checks', function () {
       var found = [];
       try { found = mathResults(); } catch (err) { console.warn('Accessibility check: maths check failed: ' + (err && err.message || err)); }
+      try { found = found.concat(imageResults()); } catch (err) { console.warn('Accessibility check: image checks failed: ' + (err && err.message || err)); }
       for (var i = 0; i < found.length; i++) sa11y.results.push(found[i]);
       document.dispatchEvent(new CustomEvent('sa11y-resume'));
     });

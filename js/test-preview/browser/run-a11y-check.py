@@ -47,6 +47,8 @@ RESULTS = '''(() => (window.sa11yCheckComplete && window.sa11yCheckComplete.resu
     return { test: r.test, type: r.type,
              inMath: !!(el && el.closest && el.closest('mjx-container')),
              where: el ? (el.textContent || '').replace(/\\s+/g, ' ').slice(0, 80) : '',
+             alt: el ? (el.getAttribute('alt') ?? el.getAttribute('aria-label')) : null,
+             src: el ? String(el.getAttribute('data-astem-preview-src') || el.getAttribute('src') || '').slice(0, 40) : '',
              text: (r.content && r.content.textContent || String(r.content || '')).replace(/\\s+/g, ' ') }; }))()'''
 
 async def main():
@@ -84,11 +86,11 @@ async def main():
             return None
         MATH_DRAWN = 'document.querySelectorAll("mjx-container").length > 0'
         SA11Y_DONE = '!!window.sa11yCheckComplete'
-        async def convert(files=None, to='html5', cond=MATH_DRAWN):
+        async def convert(files=None, to='html5', cond=MATH_DRAWN, style='standalone'):
             if files:
                 await pg.set_input_files('#fileInput', files); await pg.wait_for_timeout(2500)
             await pg.select_option('#selTo', to)
-            try: await pg.select_option('#opt-style', 'standalone')
+            try: await pg.select_option('#opt-style', style)
             except Exception: pass
             await mark()
             await pg.click('#btnConvert')
@@ -106,7 +108,7 @@ async def main():
         check('B1 no title text (help messages to be mapped out later)', await pg.get_attribute(btn, 'title') is None)
 
         # ---- B2: off: the preview is exactly as before ----
-        f = await convert([str(FIX / 'a11y-demo.tex'), str(FIX / 'figures' / 'plot.png')])
+        f = await convert([str(FIX / 'a11y-demo.tex'), str(FIX / 'figures' / 'plot.png'), str(FIX / 'figures' / 'curve.svg')])
         check('B2 converted, maths drawn', f is not None)
         if f: check('B2 off: nothing of Sa11y in the preview', not await f.evaluate(HAS_SA11Y))
 
@@ -134,6 +136,22 @@ async def main():
         check('B6 contrast: only the light-grey hint', bool(cc) and all('Hint' in r['where'] for r in cc), cc)
         if f: check('B7 Sa11y\'s own panel is there', await f.evaluate('!!document.querySelector("sa11y-control-panel")'))
 
+        # ---- B13/B14: images (2026-10-18). Placeholder only for real placeholders: a description that
+        # starts "Graph of" or "Two graphs" is not one. Generic alt ("Figure 2") flagged by our own check,
+        # matching the whole alt. Raster warning for the PNGs, none for the SVGs. ----
+        def image_checks(tag, res):
+            ph = [r for r in res if r['test'] == 'ALT_PLACEHOLDER']
+            check(tag + ': one placeholder, Pandoc\'s "image"', len(ph) == 1 and ph[0]['alt'] == 'image', ph)
+            gen = [r for r in res if r['test'] == 'ASTEM_ALT_GENERIC']
+            check(tag + ': one generic alt, "Figure 2"', len(gen) == 1 and gen[0]['type'] == 'error' and 'Figure 2' in gen[0]['text'], gen)
+            desc = [r for r in res if r['test'] in ('ALT_PLACEHOLDER', 'ASTEM_ALT_GENERIC') and re.match(r'\s*(Graph of|Two graphs)', r['alt'] or '')]
+            check(tag + ': "Graph of ..." and "Two graphs ..." not flagged', not desc, desc)
+            ras = [r for r in res if r['test'] == 'ASTEM_RASTER_IMAGE']
+            check(tag + ': two raster warnings (the two PNGs)', len(ras) == 2, ras)
+            check(tag + ': raster wording as approved', bool(ras) and all(r['type'] == 'warning' and r['text'].startswith('This is a pixel-based image (PNG). It blurs when enlarged. A vector version (SVG) stays sharp for readers who zoom in.') for r in ras), ras)
+            check(tag + ': no raster warning on an SVG', not any('svg' in (r['src'] or '').lower() for r in ras), ras)
+        image_checks('B13 Standalone', res)
+
         # ---- B8: the download and the Code view never carry it ----
         async with pg.expect_download() as dl:
             await pg.click('#btnDownloadOutput')
@@ -143,6 +161,11 @@ async def main():
         check('B8 download: nothing of Sa11y', b'sa11y' not in data.lower() and b'astem-a11y' not in data, len(data))
         code = await pg.evaluate('document.querySelector("#outputSource .cm-content")?.textContent || ""')
         check('B8 Code view: nothing of Sa11y', 'sa11y' not in code.lower() and len(code) > 100, len(code))
+
+        # ---- B14: the same images with Canvas content packaging (images as separate files) ----
+        f = await convert(cond=SA11Y_DONE, style='canvas')
+        check('B14 Canvas content: Sa11y finished', f is not None)
+        image_checks('B14 Canvas content', await f.evaluate(RESULTS) if f else [])
 
         # ---- B9: stays on for the next conversion ----
         f = await convert(cond=SA11Y_DONE)
