@@ -29,6 +29,7 @@
 // E1-E4 PLAN-9 E's list; E5 the held name; E6 a second press; E7 call 81;
 // E8 call 82; E9 Nicholas's session-50 decision (the tool's own reading
 // says the target is not a document: refused); E10 a failure; E11 call 79.
+// E19 (latex-preprocess s267): a subfile processed on its own.
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -64,7 +65,11 @@ const dec = (b) => (b == null ? null : new TextDecoder().decode(b));
 // ── Fixture texts, each as a probe ran it ─────────────────────────
 const R = String.raw;
 const DOC = R`\documentclass{article}` + '\n';
-const BODY = R`\begin{document}` + '\nHello \\hello.\n' + R`\end{document}` + '\n';
+// latex-preprocess s268: the body calls no author command. Since the tool
+// writes such calls out (its expander, s262), "Hello \hello." changed the main
+// file in tests written to show only the style file changing (E2, E3, E6, E8,
+// E16); E19 tests a written-out call on purpose.
+const BODY = R`\begin{document}` + '\nHello.\n' + R`\end{document}` + '\n';
 const HEAD = R`\NeedsTeXFormat{LaTeX2e}` + '\n' + R`\ProvidesPackage{handout}` + '\n';
 const USE = R`\usepackage{handout}` + '\n';
 const CLEAN = DOC + R`\begin{document}` + '\nHello.\n' + R`\end{document}` + '\n'; // probe 1 C
@@ -482,6 +487,45 @@ sect('E18 the page\'s own shapes: a stop says error, a press that converts says 
   await press();
   eq('E18c a stop: status error, log error',
      { states: rec.states, levels: rec.levels }, { states: ['error'], levels: ['error'] });
+}
+
+// ── E19 ────────────────────────────────────────────────────────────
+// latex-preprocess session 267 (Nicholas, 2026-10-25: "Approve the subfile glue
+// fix with A (convert as now and say in the log that the workbook file is
+// missing). Test first, then the change, then the page check."). A subfile
+// opened and processed on its own - \documentclass[../main.tex]{subfiles}:
+// since latex-preprocess s244 the tool's own reading reads it as a document
+// (the parent's preamble spliced in), so call 85 lets it run. E9's chapter
+// and commented-out \documentclass stay refused. Expected outputs copied from
+// the real tool (latex-preprocess _work\_s267_subprobe.mjs).
+const SUB_MAIN = DOC + R`\usepackage{subfiles}` + '\n' + R`\newcommand{\hello}{Hello}` + '\n' +
+  R`\begin{document}` + '\n' + R`\subfile{ws/a}` + '\n' + R`\end{document}` + '\n';
+const SUB = R`\documentclass[../main.tex]{subfiles}` + '\n' + R`\begin{document}` + '\n' +
+  R`\hello{} world.` + '\n' + R`\end{document}` + '\n';
+const SUB_OUT = DOC + R`\usepackage{subfiles}` + '\n' + R`\newcommand{\hello}{Hello}` + '\n\n' +
+  R`\begin{document}` + '\nHello{} world.\n' + R`\end{document}` + '\n';
+sect('E19 a subfile processed on its own: the parent\'s preamble spliced in; a missing parent named in the log');
+{
+  const { m, editor, rec, press } = await world([['main.tex', SUB_MAIN], ['ws/a.tex', SUB]], { open: 'ws/a.tex' });
+  await press();
+  eq('E19a one copy, ws/a-pp.tex, with main.tex\'s preamble and the call written out; originals as they were',
+     snap(m), [line('main.tex', 'upload', SUB_MAIN), line('ws/a-pp.tex', 'preprocessed', SUB_OUT),
+               line('ws/a.tex', 'upload', SUB)].sort());
+  eq('E19b converted once: ws/a-pp.tex, its text on stdin; the editor on it',
+     { convs: rec.convs.map((c) => [c.target, c.stdin]), editor: editor.current },
+     { convs: [['ws/a-pp.tex', SUB_OUT]], editor: 'ws/a-pp.tex' });
+  ok('E19c the report shown, once; the log names ws/a-pp.tex',
+     rec.reports.filter((r) => r.includes(REPORT_HEAD)).length === 1 && names(rec.logs, 'ws/a-pp.tex'), JSON.stringify(rec.logs));
+}
+{
+  const { m, rec, press } = await world([['ws/a.tex', SUB]], { open: 'ws/a.tex' });
+  const before = snap(m);
+  await press();
+  eq('E19d the parent missing: nothing changed, no copy, the original converted',
+     { same: same(snap(m), before), convs: rec.convs.map((c) => c.target) }, { same: true, convs: ['ws/a.tex'] });
+  ok('E19e ...and the log says, as a warning, that ../main.tex is not in the project',
+     (rec.levels || []).includes('warn') && rec.logs.some((l) => l.includes('../main.tex') && l.includes('not in the project')),
+     JSON.stringify(rec.logs));
 }
 
 console.log(`\n──────── ${pass} passed, ${fail} failed ────────`);

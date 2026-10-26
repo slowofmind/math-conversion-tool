@@ -150,10 +150,22 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
       return stop(`the preprocessor failed on ${entryPath} (${message(e)}). ` +
         'Nothing was changed or converted.');
     }
-    const documents = (result.project && result.project.documents) || [];
+    // A subfile converted on its own is read as a document by the tool since
+    // latex-preprocess s244 (its parent's preamble spliced in): convertible =
+    // documents + subfiles (latex-preprocess s267; Nicholas 2026-10-25, A).
+    const documents = (result.project && result.project.convertible) || [];
     if (!documents.includes(entryPath))
       return stop(`${entryPath} is not read as a document: the preprocessor finds no ` +
         '\\documentclass in it. Nothing was changed or converted.');
+    // Option A: a subfile whose workbook file is not in the project converts as
+    // it is, its parent's commands undefined - and the log says so.
+    const sp = result.subfileParent;
+    if (sp && !sp.spliced) {
+      const info = result.project.byPath && result.project.byPath.get(entryPath);
+      const named = info && info.parent ? info.parent : 'its workbook file';
+      updateLog([{ level: 'warn', message: `Preprocess: ${entryPath} names ${named} as its workbook file, which is ` +
+        `not in the project (${sp.reason}); the commands defined there are undefined in this conversion.` }]);
+    }
     let report;
     try { report = tool.renderReport(result, files); } catch (e) {
       return stop(`the preprocessor's report could not be made (${message(e)}). ` +
