@@ -44,7 +44,9 @@
 //   (a second short form stops pdflatex, s249 K2). Each is reported.
 // - A tag is not written for an \item inside a braced argument (an
 //   \ifthenelse branch): what LaTeX runs there is the command's choice, and
-//   another fix may rewrite that whole argument.
+//   another fix may rewrite that whole argument. Since session 276 that
+//   includes a whole list inside an \ifthenelse (its \begin too): neither its
+//   items nor its options are written, and each is reported.
 // - The circle: only where the list's own label holds \maybecircle and the
 //   document's \solonly prints its argument (its definition at the end of
 //   the reading), since only then does LaTeX draw it. These three names are
@@ -53,6 +55,8 @@
 //   its reason (finding lists/numbers-unsure).
 import { readGroup, readBracket } from "../structure.mjs";
 import { splitKeys, SHORT_FORMS } from "../list-numbers.mjs";
+import { readArguments } from "../definition.mjs";
+const THREE = Object.freeze([{ type: "mandatory" }, { type: "mandatory" }, { type: "mandatory" }]);
 
 export const HEAD = "% Added by the preprocessor so that Pandoc keeps list numbers and markers:\n";
 export const PASS = "\\PassOptionsToPackage{shortlabels}{enumitem}\n";
@@ -150,6 +154,11 @@ export function createListCarrier({ lists, store, entry, tokensOf, tagText = (x)
       }
       const needs = !(L.level === 1 && L.short === "1." && L.exact && L.first === 1);
       if (!needs) continue;
+      if (inConditional(L.file, tokens[i].start)) {
+        flag(L.file, where, "lists/left-alone", "unsupported",
+          said + ": this list sits inside an \\ifthenelse, which another fix rewrites whole, so its marker style and start number are not written for Pandoc. Pandoc shows its own default there.", { why: "ifthenelse" });
+        continue;
+      }
       const counter = L.first !== 1 ? "\\setcounter{" + L.counter + "}{" + (L.first - 1) + "}" : "";
       const notCarried = (why) => flag(L.file, where, "lists/label-not-carried", "unsupported",
         said + ": its marker (" + (L.short || L.before + "#" + L.after) + ") is not written for Pandoc, because " + why +
@@ -219,6 +228,11 @@ export function createListCarrier({ lists, store, entry, tokensOf, tagText = (x)
           "\\" + tokens[k].name + ": this item sits inside a command's argument, so its marker is not tagged for Pandoc.");
         continue;
       }
+      if (inConditional(it.file, tokens[k].start)) {
+        flag(it.file, at, "lists/item-tag-not-written", "unsupported",
+          "\\" + tokens[k].name + ": this item sits inside an \\ifthenelse, which another fix rewrites whole, so its marker is not tagged for Pandoc.", { why: "ifthenelse" });
+        continue;
+      }
       // Where the tag goes: straight after an author's item command (\calcitem,
       // \circleitem - s257: an insertion, so the flagging transform can wrap
       // the command itself), after \item[..]'s ] (an insertion too, so another
@@ -271,6 +285,25 @@ export function createListCarrier({ lists, store, entry, tokensOf, tagText = (x)
       else return null;
     }
     return last;
+  }
+  // Session 276 (DECISIONS 2026-10-26, option A; IFTHEN-LIST-CLASH-s276.md):
+  // is this position inside an \ifthenelse call? The ifthen fix replaces
+  // every call it can read - from \ifthenelse to the else branch's closing
+  // brace, read the same way (readArguments, three arguments) - so an edit of
+  // ours in there would clash with it. insideArgument above cannot see a list
+  // whose \begin is itself inside the branch (lecture18_MOSFET_Amps).
+  const conditionals = new Map();
+  function inConditional(file, pos) {
+    if (!conditionals.has(file)) {
+      const spans = [], toks = tokensOf(file) || [];
+      for (let j = 0; j < toks.length; j++) {
+        if (toks[j].kind !== "ControlWord" || toks[j].name !== "ifthenelse") continue;
+        const r = readArguments(toks, j + 1, THREE);
+        if (r && r.args[2]) spans.push([toks[j].start, r.args[2].end]);
+      }
+      conditionals.set(file, spans);
+    }
+    return conditionals.get(file).some(([a, b]) => a <= pos && pos < b);
   }
   // Is token k inside a braced group opened after the list's \begin?
   function insideArgument(tokens, L, k) {

@@ -44,11 +44,15 @@ import { createListCarrier } from "./transforms/list-carrier.mjs";
 import { createColumns } from "./transforms/columns.mjs";
 import { createFlagging } from "./transforms/flagging.mjs";
 import { createInlineBlocks } from "./transforms/inline-blocks.mjs";
+import { createTaggedPdf } from "./transforms/tagged-pdf.mjs";
+import { createPartChapter } from "./transforms/part-chapter.mjs";
 import { mergeFlagList, decideDefinitions } from "./flag-list.mjs";
 import { findFlagCalls, findDefinitionSites, flagEntries, flagTracker, placeAt } from "./flag-calls.mjs";
 import { expandBody, mapper } from "./expand-body.mjs";
-import { profileFor } from "./tokenizer.mjs";
+import { profileFor, tokenize } from "./tokenizer.mjs";
 import { spliceParentPreamble } from "./subfile-preamble.mjs";
+import { readGroup, readBracket } from "./structure.mjs";
+import { groupText } from "./definition.mjs";
 
 // The registration order, declared here and nowhere else. It is the order
 // session 29 ran and session 31 re-ran, and the order every recorded number
@@ -68,7 +72,15 @@ export const TRANSFORM_ORDER = Object.freeze(
    "flagging",
    // session 270: an inline command wrapped around a block reaches Pandoc as
    // visible source text around the block (INLINE-BLOCKS-PLAN-s270, option A)
-   "inline-blocks"]);
+   "inline-blocks",
+   // session 270: what a file written for a tagged PDF can carry to Pandoc
+   // (decorative and symbol images as alt text; \DocumentMetadata's leak),
+   // and a report of what it cannot (TAGGED-PDF-PLAN-s264, option B)
+   "tagged-pdf",
+   // session 274: in a class without chapters, each heading \part is written
+   // \chapter, so the web page and Word get no empty level below it
+   // (accessibility-checker/PLAN-PART-CHAPTER-a11y04.md)
+   "part-chapter"]);
 
 // Which package options actually RAN, per file. The reader's \ProcessOptions
 // rows are the only place this is known; package-options cannot work it out
@@ -187,6 +199,26 @@ export function runProject(files, options = {}) {
   return finish(r, expansion, map, firstCalls);
 }
 
+// Session 274: the document class and the file whose \documentclass names it:
+// the entry, or, for a subfile (\documentclass[..]{subfiles}), its parent.
+function classOfDocument(entry, project, reader) {
+  const of = (p) => {
+    const info = project.byPath.get(p);
+    if (!info) return null;
+    const ts = info.tokens;
+    for (let i = 0; i < ts.length; i++) {
+      if (ts[i].kind !== "ControlWord" || ts[i].name !== "documentclass") continue;
+      const o = readBracket(ts, i + 1), g = readGroup(ts, o ? o.close + 1 : i + 1);
+      return g ? groupText(ts, g).trim() : null;
+    }
+    return null;
+  };
+  const c = of(entry);
+  if (c !== "subfiles") return { cls: c, file: entry };
+  const row = reader.record.find((r) => r.file === entry && r.what === "load subfiles" && r.parent);
+  return row ? { cls: of(row.parent), file: row.parent } : { cls: c, file: null };
+}
+
 // The entry first, then every file it pulled in, with its tokens and text.
 function chainOf(entry, reader, project, map) {
   return [entry, ...reader.chain.filter((p) => p !== entry)]
@@ -230,6 +262,15 @@ function runOnce(map, project, reader, entry, options, extra) {
   // the author's files (packages are never edited), with their IDs in order
   const inline = createInlineBlocks({ files: authorFiles, entry, hidden,
     placeAt: (file, tokens, k) => placeAt(tokens, k, { store: reader.store, hidden }) });
+  // session 270: tagged-PDF syntax in the author's files (packages never edited)
+  const tagged = createTaggedPdf({ files: authorFiles, hidden,
+    placeAt: (file, tokens, k) => placeAt(tokens, k, { store: reader.store, hidden }) });
+  // session 274: \part -> \chapter in a class without chapters; the class is
+  // the entry's, or a subfile's parent's (whose preamble gets the line)
+  const docClass = classOfDocument(entry, project, reader);
+  const partChapter = createPartChapter({ files: authorFiles, cls: docClass.cls, classFile: docClass.file,
+    storeHasChapter: !!reader.store.lookup("chapter"), hidden,
+    placeAt: (file, tokens, k) => placeAt(tokens, k, { store: reader.store, hidden }) });
 
   const transforms = [
     createAtLetter(),
@@ -246,6 +287,8 @@ function runOnce(map, project, reader, entry, options, extra) {
     createColumns({ lists: reader.lists }),
     flagging.transform,
     inline.transform,
+    tagged.transform,
+    partChapter.transform,
   ];
 
   // The entry first, then every file it pulled in, in the order it pulled
@@ -283,7 +326,9 @@ function runOnce(map, project, reader, entry, options, extra) {
   // command the course's packages define is lost to it. Done after the walk,
   // so the preamble copied in is the parent's -pp text with its fixes in.
   // A subfile reached through its parent's \subfile is not touched.
-  let subfileParent = null;
+  // session 272: `splice` says where, for v2/source-map.mjs: { file, parent,
+  // cut, take } (spliceParentPreamble), or null when nothing was spliced
+  let subfileParent = null, splice = null;
   if (reader.mode === "subfile-alone") {
     const row = reader.record.find((r) => r.file === entry && r.what === "load subfiles");
     const parent = row && row.parent && output.has(row.parent) ? row.parent : null;
@@ -293,7 +338,7 @@ function runOnce(map, project, reader, entry, options, extra) {
     } else {
       const s = spliceParentPreamble({ path: entry, text: output.get(entry) },
                                      { path: parent, text: output.get(parent) });
-      if (s.spliced) output.set(entry, s.text);
+      if (s.spliced) { splice = spliceAt(entry, output.get(entry), parent, output.get(parent)); output.set(entry, s.text); }
       subfileParent = s.spliced ? { parent, spliced: true } : { parent, spliced: false, reason: s.reason };
     }
   }
@@ -308,13 +353,37 @@ function runOnce(map, project, reader, entry, options, extra) {
     // session 269: list-carrier's tag on each numbered item (lists/item-mark)
     // is left out like flagging's per-call tags: one line per item would bury
     // the report; the list's own line and the preamble line stay
-    findings: walk.findings.filter((f) => f.rule !== "flag/tag" && f.rule !== "lists/item-mark"),
+    findings: walk.findings.filter((f) => f.rule !== "flag/tag" && f.rule !== "lists/item-mark" && f.rule !== "part/heading"),
     dropped,
     markers,
     flagging,
     output,
     subfileParent,
+    splice,
   };
+}
+
+// Session 272: where a splice cut, for v2/source-map.mjs - found by tokens the
+// way spliceParentPreamble finds them (v2/subfile-preamble.mjs, left as it is
+// so that the platform's copy stays in step): `cut`, the span of the first
+// \documentclass statement in the subfile's -pp text; `take`, where \begin{document}
+// starts in the parent's -pp text (how much of it went in).
+function spliceAt(file, subText, parent, parentText) {
+  const st = tokenize(subText, { profile: profileFor(file), file }).tokens;
+  let cut = null;
+  for (let i = 0; i < st.length && !cut; i++) {
+    if (st[i].kind !== "ControlWord" || st[i].name !== "documentclass") continue;
+    const o = readBracket(st, i + 1), g = readGroup(st, o ? o.close + 1 : i + 1);
+    if (g) cut = { start: st[i].start, end: g.end };
+  }
+  const pt = tokenize(parentText, { profile: profileFor(parent), file: parent }).tokens;
+  let take = -1;
+  for (let i = 0; i < pt.length && take < 0; i++) {
+    if (pt[i].kind !== "ControlWord" || pt[i].name !== "begin") continue;
+    const g = readGroup(pt, i + 1);
+    if (g && groupText(pt, g).trim() === "document") take = pt[i].start;
+  }
+  return { file, parent, cut, take };
 }
 
 // Session 262: the result as runProject returns it. Without a written-out call
