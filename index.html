@@ -1520,6 +1520,9 @@
          (applyOptionsView). Each label wraps its slot instead of using for=, as before. -->
     <span id="coreToolbarOptions">
       <label class="toolbar-label core-tool-label">Math conversion: <span id="core-slot-math"></span></label>
+      <!-- INTENT-CONTROL (stage 1, 2026-11-01): #opt-intent sits here in the core view,
+           in its Math-tab slot in the full view (relocateControl, like #opt-math). -->
+      <label class="toolbar-label core-tool-label">Intent handling: <span id="core-slot-intent"></span></label>
       <label class="toolbar-label core-tool-label"><span class="style-label-text">Styling</span>: <span id="core-slot-style"></span></label>
     </span>
   </div>
@@ -1770,6 +1773,20 @@
           <option value="katex">KaTeX</option>
           <option value="plain">Unicode</option>
         </select>
+      </div>
+      <!-- INTENT-CONTROL (stage 1, 2026-11-01; STAGE1-BRIEF.md 5.4). Label, placement
+           and "greyed out when not applicable" signed off by Nicholas 2026-11-01. One
+           element, moved between this slot and #core-slot-intent. aria-label keeps its
+           name "Intent handling" in both places. Greyed out (disabled) unless the math
+           setting uses the custom MathJax conversion: refreshIntentControl(). -->
+      <div class="opt-group" id="pandoc-slot-intent">
+        <label for="opt-intent">Intent handling:</label>
+        <select id="opt-intent" style="width:auto;" aria-label="Intent handling" aria-describedby="optIntentWhy"
+                title="Baseline: \MathMLintent and \MathMLarg (and the \intent / \iarg shorthand) become MathML intent and arg, copied as written. Off: no intent handling. Applies only to the custom MathJax conversion settings.">
+          <option value="baseline" selected>Baseline</option>
+          <option value="off">Off</option>
+        </select>
+        <span id="optIntentWhy" hidden>Baseline turns MathMLintent and MathMLarg into MathML intent. Off adds no intent. Used only by the custom MathJax conversion settings.</span>
       </div>
       <div class="opt-group" id="pandoc-slot-style">
         <label for="opt-style"><span class="style-label-text">Styling</span>:</label>
@@ -3175,6 +3192,7 @@ function applyOptionsView() {
   panel.classList.toggle('view-pandoc', !core);
 
   relocateControl('opt-math', core ? 'core-slot-math' : 'pandoc-slot-math');
+  relocateControl('opt-intent', core ? 'core-slot-intent' : 'pandoc-slot-intent');   // INTENT-CONTROL
   relocateControl('opt-style', core ? 'core-slot-style' : 'pandoc-slot-style');
 
   // Input format: hidden in the core view (LaTeX input only), shown as
@@ -3240,6 +3258,27 @@ function refreshMathOptions() {
   const lbl = document.querySelector('label[for="opt-math"]');
   if (lbl) lbl.style.opacity = applicable ? '' : '0.55';
   refreshStyleOptions();   // the Styling list follows the output format too
+  refreshIntentControl();  // INTENT-CONTROL
+}
+
+// INTENT-CONTROL (stage 1, 2026-11-01): the "Intent handling" select is usable
+// only when the math setting goes through the custom MathJax conversion (the
+// device); otherwise greyed out, like the math menu, keeping its value.
+function refreshIntentControl() {
+  const sel = document.getElementById('opt-intent');
+  if (!sel) return;
+  const on = needsMathjaxDevice();
+  sel.disabled = !on;
+  for (const lbl of [document.querySelector('label[for="opt-intent"]'),
+                     document.getElementById('core-slot-intent')?.parentNode]) {
+    if (lbl) lbl.style.opacity = on ? '' : '0.55';
+  }
+}
+document.getElementById('opt-math')?.addEventListener('change', refreshIntentControl);
+
+// The mode the device passes to tex2mml: 'baseline' or 'off'.
+function currentIntentMode() {
+  return document.getElementById('opt-intent')?.value === 'off' ? 'off' : 'baseline';
 }
 
 function populateFormats(selectId, formats, defaultVal, labels) {
@@ -6386,6 +6425,9 @@ async function ensureThoriumAssets() {
 // NOTE: BOTH custom MathML methods are intent-capable - the intent-aware
 // bundle is imported unconditionally in ensureMathjaxDevice(), so intent=
 // attributes appear whenever the source uses \intent/\iarg/\speakas.
+// [2026-11-01, stage 1: the device now uses the Baseline bundle and the
+// "Intent handling" control; intent comes from \MathMLintent/\MathMLarg and the
+// \intent/\iarg shorthand only, with no ext-* carriers and no \speakas.]
 // This method additionally injects the page-side SRE speech layer.
 // Division of labour: the MathJax *device* bakes intent= and ext-* attributes
 // into the static MathML at conversion time; this *filter* loads MathJax 4.1.3
@@ -7550,7 +7592,13 @@ function ensureMathjaxDevice() {
         // vocabulary shortcut macros; no-intent sources convert IDENTICALLY —
         // byte-parity verified). Built by mathjax-intent-extension
         // build/bundle/. To revert, point back at './math-conversion/mathjax-bundle.js'.
-        import('./math-conversion/mathjax-bundle-intent.js'),
+        // INTENT-CONTROL (stage 1, 2026-11-01): now the stage-1 Baseline bundle,
+        // tex2mml(tex, display, { intent: 'off' | 'baseline' }); kernel
+        // \MathMLintent/\MathMLarg plus the \intent/\iarg shorthand, no macros,
+        // no ext-*, no \speakas, no chemistry marker (STAGE1-BRIEF.md 5.3).
+        // The previous bundle, kept for reference:
+        // import('./math-conversion/mathjax-bundle-intent.js'),
+        import('./math-conversion/mathjax-bundle-baseline.js'),
         import('./math-conversion/mml-condition.js'),
         import('./math-conversion/mml-isotopes-browser.js'),
       ]);
@@ -7564,7 +7612,10 @@ function ensureMathjaxDevice() {
       // to disable without unwiring; delete this block + the destructured
       // chemConditionDocument above to fully remove. Docs:
       // math-conversion/CHEM-WIRE.md
-      const CHEM_CONDITION = true;
+      // 2026-11-01, stage 1 (STAGE1-BRIEF.md 5.3): OFF in both intent modes.
+      // No automatic chemistry intents; parked, not deleted. The Baseline
+      // bundle does not export chemConditionDocument anyway.
+      const CHEM_CONDITION = false;
       const chemCond = (mml) =>
         (CHEM_CONDITION && typeof chemConditionDocument === 'function')
           ? chemConditionDocument(mml) : mml;
@@ -7582,9 +7633,10 @@ function ensureMathjaxDevice() {
       pandocModule.setDeviceTransform((bytes) => {
         const batch = JSON.parse(dec.decode(bytes));
         const items = batch.items || [];
+        const intent = currentIntentMode();   // INTENT-CONTROL: read at each conversion
         const out = items.map((it) => {
           try {
-            const mml = tex2mml(it.tex, it.display);
+            const mml = tex2mml(it.tex, it.display, { intent });
             return batch.target === 'omml'
               ? mmlToOmml(rewriteIsotopes(conditionForOmml(mml)))
               : chemCond(conditionUniversal(mml)); // CHEM-WIRE: HTML path only
