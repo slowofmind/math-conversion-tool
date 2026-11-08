@@ -1,7 +1,8 @@
 // snippets/snippet-panel.js -- the snippet tool in the platform editor (sidebar section "Intent snippets").
 // [CLAUDE 2026-11-08] Build step "integrate into the platform editor" [NICHOLAS 2026-11-08: "Build it this
-// way", Alt+Shift+I]. The author selects math in the editor, presses Alt+Shift+I (or opens the section),
-// finds a concept, presses Enter: the snippet core writes the kernel markup into the editor as ONE undoable
+// way"; shortcut Ctrl+Period, chosen after Alt+Shift+I clashed]. The author selects math in the editor, presses
+// Ctrl+Period (or opens the section), finds a concept, presses Enter: the snippet core writes the kernel markup
+// into the editor as ONE undoable
 // edit. When the core cannot tell the parts, a form asks for them (typed), as on snippets/demo.html.
 //
 // Two layers:
@@ -13,7 +14,11 @@
 import { createSnippetCore } from './src/snippet-core.js';
 
 export const SLIM_URL = './math-conversion/intent-concepts-slim.json';
-export const SHORTCUT = { key: 'I', altKey: true, shiftKey: true, ctrlKey: false, metaKey: false };
+// [CLAUDE 2026-11-08] Ctrl+Period [NICHOLAS 2026-11-08], replacing Alt+Shift+I, which Chrome and Edge use for
+// "Send feedback" (and Left Alt+Shift switches Windows keyboard languages). Checked free in: the editor's
+// CodeMirror keymaps, Chrome, Edge, Windows and macOS shortcut lists, NVDA's key reference, JAWS keystrokes.
+// Same meaning as VS Code's Ctrl+Period: actions for what is selected. Control on a Mac too (not Command).
+export const SHORTCUT = { key: '.', code: 'Period', ctrlKey: true, altKey: false, shiftKey: false, metaKey: false, label: 'Ctrl+Period' };
 
 /** The logic, with no page: { selection, search, apply, applyParts, undo, core }. */
 export function createSnippetController({ core, editor }) {
@@ -32,19 +37,32 @@ export function createSnippetController({ core, editor }) {
     return r;
   }
 
-  /** Apply a concept to the editor's current selection. Returns the core's result
-   *  ({status: 'ready'|'needs-operands'|'refused', ...}); 'ready' has already been written. */
-  function apply(conceptKey) {
-    const sel = selection();
-    if (sel.start === sel.end) return { status: 'refused', reason: { code: 'no-selection', message: 'Select some math in the editor first.' } };
+  // [CLAUDE 2026-11-08] `target` = the selection remembered when the shortcut was pressed. NVDA live check:
+  // opening the sidebar collapsed the editor's selection, so the panel applies to the remembered span, after
+  // checking the text there is still what was selected (else it asks for a new selection).
+  function resolve(target) {
+    if (!target) return selection();
+    if (editor.getRange(target.start, target.end) !== target.text) return { ...target, stale: true };
+    return target;
+  }
+  const stale = { status: 'refused', reason: { code: 'selection-changed', message: 'The document changed since the math was chosen. Select the math again.' } };
+  const empty = { status: 'refused', reason: { code: 'no-selection', message: 'Select some math in the editor first.' } };
+
+  /** Apply a concept to the remembered selection (target) or the editor's current one. Returns the core's
+   *  result ({status: 'ready'|'needs-operands'|'refused', ...}); 'ready' has already been written. */
+  function apply(conceptKey, target = null) {
+    const sel = resolve(target);
+    if (sel.stale) return stale;
+    if (sel.start === sel.end) return empty;
     const r = core.apply(editor.getText(), { start: sel.start, end: sel.end }, conceptKey);
     return r.status === 'ready' ? write(r) : r;
   }
 
   /** The author typed the parts (concept order). */
-  function applyParts(conceptKey, texts) {
-    const sel = selection();
-    if (sel.start === sel.end) return { status: 'refused', reason: { code: 'no-selection', message: 'Select some math in the editor first.' } };
+  function applyParts(conceptKey, texts, target = null) {
+    const sel = resolve(target);
+    if (sel.stale) return stale;
+    if (sel.start === sel.end) return empty;
     const r = core.applyWithOperandTexts(editor.getText(), { start: sel.start, end: sel.end }, conceptKey, texts);
     return r.status === 'ready' ? write(r) : r;
   }
@@ -71,9 +89,10 @@ export function describeResult(r) {
   return `Not applied: ${r.reason.message}`;
 }
 
-/** Is this keydown the snippet shortcut (Alt+Shift+I)? */
-export const isShortcut = e => e.altKey === SHORTCUT.altKey && e.shiftKey === SHORTCUT.shiftKey &&
-  !e.ctrlKey && !e.metaKey && (e.key === 'I' || e.key === 'i' || e.code === 'KeyI');
+/** Is this keydown the snippet shortcut (Ctrl+Period)? The physical key or the "." character, so other
+ *  keyboard layouts work; not with Shift (">"), Alt or Command, and not the number pad's decimal key. */
+export const isShortcut = e => e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey &&
+  (e.code === SHORTCUT.code || (e.key === SHORTCUT.key && e.code !== 'NumpadDecimal'));
 
 /**
  * ctx: { editor, updateStatus(kind, text), openSection() (opens the sidebar on this section), fetchJson? }
@@ -110,9 +129,10 @@ export async function initSnippetPanel(ctx) {
   for (const g of controller.core.groups()) el.group.add(new Option(`${g.id} (${g.count})`, g.id));
   for (const s of controller.core.sources()) el.source.add(new Option(`${s.id} (${s.count})`, s.id));
   let pending = null;   // { key, forms } while the parts form is open
+  let target = null;    // the selection remembered when the panel opened ({ start, end, text })
 
   function showSelection() {
-    const s = controller.selection();
+    const s = target ?? controller.selection();
     el.sel.textContent = s.start === s.end ? 'Nothing is selected in the editor.' : `Selected: ${s.text}`;
   }
   function fill() {
@@ -153,6 +173,7 @@ export async function initSnippetPanel(ctx) {
   }
   function done(r) {
     closeParts();
+    target = null;
     el.undo.disabled = false;
     say(describeResult(r), r.warnings?.length ? 'warning' : 'ready');
     ctx.editor.focus();
@@ -160,24 +181,36 @@ export async function initSnippetPanel(ctx) {
   function apply() {
     const key = el.list.value;
     if (!key) { say('Choose a concept from the list first.', 'warning'); return; }
-    const r = controller.apply(key);
+    const r = controller.apply(key, target);
     if (r.status === 'ready') return done(r);
     if (r.status === 'needs-operands') return partsForm(key, r);
     say(describeResult(r), 'error');
   }
+  // back to the editor with the remembered selection put back, so the author can try again or carry on
+  function back(message) {
+    closeParts();
+    if (target && target.start !== target.end && ctx.editor.getRange(target.start, target.end) === target.text)
+      ctx.editor.selectRange(target.start, target.end, { focusEditor: false });
+    target = null;
+    if (message) say(message);
+    ctx.editor.focus();
+  }
   function open() {
+    target = controller.selection();   // remember it FIRST: opening the sidebar can collapse it
     ctx.openSection?.();
     if (el.toggle && el.toggle.getAttribute('aria-expanded') !== 'true') el.toggle.click();
+    if (target.start !== target.end) ctx.editor.selectRange(target.start, target.end, { focusEditor: false });
     closeParts();
     showSelection();
     if (!el.list.options.length) fill();
     el.filter.focus();
     el.filter.select();
   }
+  const inPanel = () => el.panel.contains(document.activeElement);
 
   for (const k of ['filter']) el[k].addEventListener('input', fill);
   for (const k of ['group', 'source', 'notUsed', 'rwm']) el[k].addEventListener('change', fill);
-  el.filter.addEventListener('focus', showSelection);
+  el.filter.addEventListener('focus', () => { if (!target) target = controller.selection(); showSelection(); });
   el.filter.addEventListener('keydown', e => {
     if (e.key === 'ArrowDown') { e.preventDefault(); el.list.focus(); }
     if (e.key === 'Enter') { e.preventDefault(); apply(); }
@@ -185,7 +218,7 @@ export async function initSnippetPanel(ctx) {
   el.list.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); apply(); } });
   el.list.addEventListener('dblclick', apply);
   el.apply.addEventListener('click', apply);
-  el.back.addEventListener('click', () => { closeParts(); ctx.editor.focus(); });
+  el.back.addEventListener('click', () => back('Back to the editor. Nothing was changed.'));
   el.undo.addEventListener('click', () => {
     if (controller.undo()) { say('The last snippet was undone.'); el.undo.disabled = true; } else say('Nothing to undo.', 'warning');
   });
@@ -193,15 +226,21 @@ export async function initSnippetPanel(ctx) {
     e.preventDefault();
     if (!pending) return;
     const texts = [...el.fields.querySelectorAll('input')].map(i => i.value);
-    const r = controller.applyParts(pending.key, texts);
+    const r = controller.applyParts(pending.key, texts, target);
     if (r.status === 'ready') return done(r);
     say(describeResult(r), 'error');
   });
   el.partsCancel.addEventListener('click', () => { closeParts(); say('Cancelled. Nothing was changed.'); el.filter.focus(); });
   el.panel.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { e.preventDefault(); closeParts(); say('Back to the editor. Nothing was changed.'); ctx.editor.focus(); }
+    if (e.key === 'Escape') { e.preventDefault(); back('Back to the editor. Nothing was changed.'); }
   });
-  document.addEventListener('keydown', e => { if (isShortcut(e)) { e.preventDefault(); e.stopPropagation(); open(); } }, true);
+  // Ctrl+Period: from the editor (or anywhere else) opens the panel; from inside the panel goes back to the
+  // editor [CLAUDE 2026-11-08: NVDA can keep Escape for itself (leaving focus mode), so the shortcut toggles]
+  document.addEventListener('keydown', e => {
+    if (!isShortcut(e)) return;
+    e.preventDefault(); e.stopPropagation();
+    if (inPanel()) back('Back to the editor. Nothing was changed.'); else open();
+  }, true);
   fill();
   return { controller, open };
 }

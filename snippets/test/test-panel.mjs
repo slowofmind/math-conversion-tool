@@ -62,10 +62,32 @@ const core = createSnippetCore(loadExport());
   ok(!c.search('plus').some(d => d.key === 'core:plus') && c.search('plus', { includeReadsWithoutMarkup: true }).some(d => d.key === 'core:plus'),
     'search hides "reads correctly with no markup" concepts unless asked');
 }
-{ // the shortcut
-  ok(isShortcut({ key: 'I', altKey: true, shiftKey: true, ctrlKey: false, metaKey: false }), 'Alt+Shift+I is the shortcut');
-  ok(!isShortcut({ key: 'I', altKey: false, shiftKey: true, ctrlKey: true, metaKey: false }), 'Ctrl+Shift+I (Chrome developer tools) is not');
-  ok(!isShortcut({ key: 'i', altKey: true, shiftKey: false, ctrlKey: false, metaKey: false }), 'Alt+I is not');
+{ // [CLAUDE 2026-11-08] the remembered selection (NVDA live check: opening the sidebar collapsed it)
+  const ed = fakeEditor(R`Change: $\Delta x$ here.`);
+  ed.select(R`\Delta x`);
+  const c = createSnippetController({ core, editor: ed });
+  const target = c.selection();
+  ed.selectRange(0, 0);   // the editor's selection collapses after the shortcut
+  const r = c.apply('change', target);
+  ok(r.status === 'ready' && ed.getText() === R`Change: $\MathMLintent{change:prefix($quantity)}{\Delta \MathMLarg{quantity}{x}}$ here.`,
+    'applies to the remembered selection even after the editor selection collapsed', ed.getText());
+  const ed2 = fakeEditor(R`Change: $\Delta x$ here.`);
+  ed2.select(R`\Delta x`);
+  const c2 = createSnippetController({ core, editor: ed2 });
+  const t2 = c2.selection();
+  ed2.replaceRange(0, 0, 'New text. ');   // the document changes underneath it
+  const r2 = c2.apply('change', t2);
+  ok(r2.status === 'refused' && r2.reason.code === 'selection-changed' && ed2.getText() === R`New text. Change: $\Delta x$ here.`,
+    'a remembered selection whose text moved is refused, document unchanged', `${r2.status} ${r2.reason?.code}`);
+}
+{ // the shortcut: Ctrl+Period [NICHOLAS 2026-11-08] (Alt+Shift+I was Chrome's and Edge's "Send feedback")
+  const k = (o) => ({ key: '.', code: 'Period', ctrlKey: false, altKey: false, shiftKey: false, metaKey: false, ...o });
+  ok(isShortcut(k({ ctrlKey: true })), 'Ctrl+Period is the shortcut');
+  ok(isShortcut(k({ ctrlKey: true, code: 'Unidentified' })), 'Ctrl+"." from another keyboard layout also counts');
+  ok(!isShortcut(k({ ctrlKey: true, shiftKey: true, key: '>' })), 'Ctrl+Shift+Period (">") is not');
+  ok(!isShortcut(k({ metaKey: true })), 'Command+Period on a Mac (stop/cancel) is not');
+  ok(!isShortcut(k({ ctrlKey: true, code: 'NumpadDecimal' })), 'Ctrl + the number pad\'s decimal key is not');
+  ok(!isShortcut({ key: 'I', code: 'KeyI', altKey: true, shiftKey: true, ctrlKey: false, metaKey: false }), 'Alt+Shift+I (the old key) is not');
 }
 console.log(`\ntest-panel: ${pass} passed, ${fail} failed`);
 process.exitCode = fail ? 1 : 0;

@@ -1,0 +1,18 @@
+PASS  apply writes the kernel markup in place
+PASS  the written markup is selected afterwards
+PASS  status line names the intent and the parts
+PASS  undo restores the document
+PASS  no selection: refused, document unchanged
+PASS  needs parts: document unchanged until the author marks them
+PASS  status line asks for the parts
+PASS  typed parts are written
+PASS  a not-used concept is refused with its reason
+PASS  search hides "reads correctly with no markup" concepts unless asked
+PASS  Ctrl+Period is the shortcut
+PASS  Ctrl+"." from another keyboard layout also counts
+PASS  Ctrl+Shift+Period (">") is not
+PASS  Command+Period on a Mac (stop/cancel) is not
+PASS  Ctrl + the number pad's decimal key is not
+PASS  Alt+Shift+I (the old key) is not
+
+test-panel: 16 passed, 0 failed
