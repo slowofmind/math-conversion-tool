@@ -82,12 +82,18 @@ export const MARK_COLOURS = { ppmark: "ppmark", ppmarkown: "ppmark-own", ppmarkc
 // spans, every list would show its marker twice ("c. (c) ..."). So Pandoc's
 // line is an empty definition - Pandoc drops each tag and logs nothing
 // (_work/_s269-drop.txt V2) - and the span definition stays above it as a
-// comment in the -pp copy. To undo: set PANDOC_SEES_MARKS to true here and in
-// v2/test/list-carrier-cases.mjs. TeX's line is the same either way.
-export const PANDOC_SEES_MARKS = false;
+// comment in the -pp copy. TeX's line is the same either way.
+// s295 (LISTS-HTML-FILTER-PLAN-s294 step 1, signed off 2026-11-01): the HTML
+// list filter shows the tags, so the switch is per tag name and Pandoc sees
+// them again - all but \ppmarkcalc, dropped until the \calcitem step. Keep it
+// the same in v2/test/list-carrier-cases.mjs.
+// s299 (DECISIONS 2026-11-03, "B3 HTML, C Word"): the \calcitem step - the
+// filter shows the calc tag too (its \ppflag'd \calculator becomes the icon),
+// so Pandoc sees all four.
+export const PANDOC_SEES_MARKS = { ppmark: true, ppmarkown: true, ppmarkcalc: true, ppmarkcircled: true };
 export const markDefinition = (n) => {
   const span = "\\newcommand{\\" + n + "}[1]{\\textcolor{" + MARK_COLOURS[n] + "}{#1}}\n";
-  return (PANDOC_SEES_MARKS ? span : "% " + span + "\\newcommand{\\" + n + "}[1]{}\n") +
+  return (PANDOC_SEES_MARKS[n] ? span : "% " + span + "\\newcommand{\\" + n + "}[1]{}\n") +
     "\\expandafter\\long\\expandafter\\def\\csname " + n + "\\endcsname#1{}\n";
 };
 const mark = (n, x) => "\\" + n + "{" + x + "}";

@@ -44,9 +44,11 @@ const steps = prep ? [...prep.querySelectorAll('.prep-step')] : [];
 // Since 2026-10-06 (Nicholas) File Preparation is four accordions, in this order, with no numbered
 // steps: Images ("TikZ to PDF", then "PDF to SVG"), LaTeX preprocessing, Math notation review,
 // Source cleanup (temporary; it will go once preprocessing does more).
+// latex-preprocess s299 (lists plan step 6, his "Yes, start step 6", 2026-11-03): Source cleanup, which held only
+// Smart Cleanup, is retired - the List Markers filter replaces it. Three accordions now.
 const accs = prep ? [...prep.querySelectorAll('.sidebar-body > .prep-accordion')] : [];
 const accTitles = accs.map((a) => text(a.querySelector('.prep-accordion-toggle')).replace(/^▸/, ''));
-ok('four accordions, in order', accTitles.join(' | ') === 'Images | LaTeX preprocessing | Math notation review | Source cleanup', accTitles.join(' | '));
+ok('three accordions, in order', accTitles.join(' | ') === 'Images | LaTeX preprocessing | Math notation review', accTitles.join(' | '));
 ok('no numbered steps left', steps.length === 0 && !prep?.querySelector('.prep-num'), String(steps.length));
 const imgPanel = doc.getElementById('prepImagesPanel');
 const imgBtns = imgPanel ? [...imgPanel.querySelectorAll('button')].map((b) => b.id + '=' + text(b)).join(',') : '';
@@ -155,6 +157,37 @@ ok('before openProjectFile', rd >= 0 && po >= 0 && rd < po, rd + ' ' + po);
 ok("its entries are handleFileUpload's formatMap's, line for line",
   rEntries.length > 0 && rEntries.join(' | ') === fEntries.join(' | '),
   rEntries.length + ' lines against ' + fEntries.length);
+
+// ── L6, latex-preprocess s299: lists plan step 6 (LISTS-HTML-FILTER-PLAN-s294) ──
+// His words (2026-11-03): List Markers checked by default; Default Lists unchecked, "only there as a backup in case
+// someone needs to format lists in the output without using the preprocessor"; Smart Cleanup retired. The filter's
+// text is the platform's filters/list-markers.lua, embedded in BUILT_IN_FILTERS as Default Lists is. Written before
+// index.html changes: every check here fails until they go in.
+group('L6 s299: List Markers on, Default Lists off, Smart Cleanup retired');
+const bfAt = js.indexOf('const BUILT_IN_FILTERS = [');
+const bfEnd = bfAt >= 0 ? js.indexOf('\n];', bfAt) : -1;
+let BF = [];
+try { BF = bfAt >= 0 && bfEnd > bfAt ? new Function('return ' + js.slice(bfAt + 'const BUILT_IN_FILTERS = '.length, bfEnd + 2))() : []; }
+catch (e) { ok('BUILT_IN_FILTERS reads as JavaScript', false, e.message); }
+const bf = (id) => BF.find((f) => f.id === id);
+ok('built-in filters in order: default-lists, list-markers, resolve-image-paths, embed-images',
+  BF.map((f) => f.id).join(',') === 'default-lists,list-markers,resolve-image-paths,embed-images', BF.map((f) => f.id).join(','));
+ok('Default Lists is off by default', bf('default-lists')?.defaultEnabled === false, String(bf('default-lists')?.defaultEnabled));
+ok('its tooltip says it is the backup for files not run through the preprocessor',
+  /backup/i.test(bf('default-lists')?.description || '') && /preprocessor/i.test(bf('default-lists')?.description || ''), bf('default-lists')?.description);
+const LM = bf('list-markers');
+ok('List Markers: named "List Markers", file list-markers.lua, on by default',
+  LM?.name === 'List Markers' && LM?.filename === 'list-markers.lua' && LM?.defaultEnabled === true, JSON.stringify(LM && { ...LM, content: undefined }));
+ok('its tooltip is the planned one (unticked, every list marker appears twice)',
+  (LM?.description || '').startsWith('List Markers: shows each list item') && /appears twice/.test(LM?.description || ''), LM?.description);
+let lmFile = '';
+try { lmFile = readFileSync(join(PLAT, 'filters', 'list-markers.lua'), 'utf8'); } catch { /* missing */ }
+ok('filters/list-markers.lua is there', lmFile.length > 0);
+ok('the embedded text is exactly filters/list-markers.lua', !!LM && LM.content === lmFile,
+  LM ? 'embedded ' + LM.content.length + ' chars, file ' + lmFile.length : 'no entry');
+ok('Smart Cleanup is gone from the page: no button, hint or accordion',
+  !doc.getElementById('btnSmartCleanup') && !doc.getElementById('smartCleanupHint') && !doc.getElementById('prepSourceCleanup'));
+ok('and from the script: no import or start-up of smart-cleanup', !/smart-cleanup|initSmartCleanup/.test(js));
 
 console.log('\n──────── ' + pass + ' passed, ' + fail + ' failed ────────');
 process.exitCode = fail ? 1 : 0;
