@@ -20,6 +20,7 @@
 // It reads nothing and changes nothing: the store is handed in.
 import { readGroup } from "./structure.mjs";
 import { groupText } from "./definition.mjs";
+import { tokenize } from "./tokenizer.mjs";
 
 const freeze = (o) => { for (const v of Object.values(o)) if (v && typeof v === "object") freeze(v); return Object.freeze(o); };
 
@@ -184,6 +185,55 @@ export function flaggedCommands({ store, isAuthorFile, list = DEFAULT_FLAG_LIST 
 // runs is the interface's decision, later.
 export const CHOICES = Object.freeze(["call", "inside", "leave"]);
 
+// ---- session 301: handout.sty's fill-in-the-blank (BLANKS-FILTER-PLAN-s300 step 1) --
+// \fitb[words]{width}{answer} and its relatives draw a line holding the words
+// (problems) or the answer in bold (solutions). Their calls get a tag of their
+// own (v2/transforms/flagging.mjs) holding only what the version prints. Which
+// definitions qualify is read from the definition itself: its body, token for
+// token with blanks and comments aside, is one of handout.sty's three versions
+// in the corpus (_work/_s300-count2.txt A: 22 files). A course's own \fitb
+// written another way is flagged as before.
+const FITB_3 = (ans, blank, frame) => String.raw`\ifmmode\renewcommand{\@fitbans}{` + ans + String.raw`$\bm{#3}$}\renewcommand{\@fitbblank}{` +
+  blank + String.raw`$#1$}\else\renewcommand{\@fitbans}{` + ans + String.raw`\textbf{#3}}\renewcommand{\@fitbblank}{` + blank +
+  String.raw`#1}\fi` + frame + String.raw`{\parbox[t]{#2}{\probonly{\@fitbblank}\solonly{\@fitbans}}}`;
+const C = String.raw`\centering`, U = String.raw`\underline`, F = String.raw`\fbox`;
+export const FITB_FORMS = Object.freeze([
+  // \fitb (\mfitb is \let to it): Math Ma, Math Mb, Math 1b, ATC Math Ma
+  { body: FITB_3("", "", U), words: 1, width: 2, answer: 3, blankAlign: "left", answerAlign: "left", box: false },
+  // \cfitb as Math Mb, 1b and ATC Math Ma have it: the words centred too
+  { body: FITB_3(C, C, U), words: 1, width: 2, answer: 3, blankAlign: "center", answerAlign: "center", box: false },
+  // \cfitb as Math Ma has it: only the answer centred
+  { body: FITB_3(C, "", U), words: 1, width: 2, answer: 3, blankAlign: "left", answerAlign: "center", box: false },
+  // Math Ma's \fitbox and \cfitbox: a frame instead of the underline
+  { body: FITB_3("", "", F), words: 1, width: 2, answer: 3, blankAlign: "left", answerAlign: "left", box: true },
+  { body: FITB_3(C, "", F), words: 1, width: 2, answer: 3, blankAlign: "left", answerAlign: "center", box: true },
+  // the older two-part \fitb{width}{answer} (ATC Math Ma's Exam 1 copy)
+  { body: String.raw`\underline{\parbox[t]{#1}{\probonly{\ }\solonly{\textbf{#2}}}}`, words: null, width: 1, answer: 2, blankAlign: "left", answerAlign: "left", box: false },
+].map((f) => Object.freeze(f)));
+const shape = (ts) => ts.filter((t) => t.kind !== "Space" && t.kind !== "Newline" && t.kind !== "Comment").map((t) => t.text).join("\u0001");
+const FORM_SHAPES = FITB_FORMS.map((f) => shape(tokenize(f.body, { profile: "style" }).tokens));
+// Does a one-argument switch print its argument, by its meaning at the end of
+// the reading (as list-carrier's solonlyPrints)? true / false, or null when it
+// is not a macro of one argument (what prints cannot be read).
+function switchPrints(store, name) {
+  const rec = store.resolve(name).record;
+  if (!rec || rec.kind !== "macro" || !Array.isArray(rec.body) || (rec.params || []).length !== 1 || rec.params[0].type !== "mandatory") return null;
+  return rec.body.some((t, j) => t.kind === "Parameter" && rec.body[j + 1] && rec.body[j + 1].text === "1");
+}
+// handout.sty's meaning of a record, with what this version prints: the form's
+// roles plus { slots, probonly, solonly }, or null.
+export function fitbMeaning(store, rec) {
+  if (!rec || rec.kind !== "macro" || !Array.isArray(rec.body)) return null;
+  const k = FORM_SHAPES.indexOf(shape(rec.body));
+  if (k < 0) return null;
+  const f = FITB_FORMS[k], params = rec.params || [];
+  if (params.length !== (f.words ? 3 : 2) || params.some((p, j) => p.type !== (f.words && j === 0 ? "optional" : "mandatory"))) return null;
+  if (f.words && shape((rec.defaultOf || {})[0] || []) !== "\\ ") return null;
+  const probonly = switchPrints(store, "probonly"), solonly = switchPrints(store, "solonly");
+  if (probonly === null || solonly === null) return null;
+  return Object.freeze({ ...f, slots: params, probonly, solonly });
+}
+
 const authorRecord = (store, name, isAuthorFile) => {
   const own = store.lookup(name);
   if (!own || !own.origin || !isAuthorFile(own.origin.file)) return null;
@@ -192,10 +242,12 @@ const authorRecord = (store, name, isAuthorFile) => {
 };
 
 // decideDefinitions({ store, isAuthorFile, list, choices })
-// Returns Map name -> flaggedCommands' fields plus { decision, default, holds }:
+// Returns Map name -> flaggedCommands' fields plus { decision, default, holds, fitb }:
 //   decision  call | inside | leave (the choice when one is given, else the default)
 //   holds     block (its own body draws) | flagged (reaches through another
-//             flagged command) | box (holds only a box) | listed (also-flag)
+//             flagged command) | box (holds only a box) | listed (also-flag) |
+//             fitb (s301: handout.sty's fill-in-the-blank; tagged at the call)
+//   fitb      fitbMeaning's roles and what this version prints, or null
 export function decideDefinitions({ store, isAuthorFile, list = DEFAULT_FLAG_LIST, choices = {} } = {}) {
   const chosen = (name) => (CHOICES.includes(choices["\\" + name]) ? choices["\\" + name] : null);
   const left = Object.keys(choices).filter((k) => k.startsWith("\\") && choices[k] === "leave").map((k) => k.slice(1));
@@ -214,15 +266,18 @@ export function decideDefinitions({ store, isAuthorFile, list = DEFAULT_FLAG_LIS
     const isLeft = chosen(name) === "leave";
     // flagged only through a command left by choice: as if it drew nothing
     const flagged = f && (isLeft || reached.has(name)) ? f : null;
-    if (!flagged && !box) continue;
-    const holds = !flagged ? "box" : !rec ? "listed" : direct ? "block" : "flagged";
-    const dflt = holds === "block" || holds === "listed" ? "call" : "inside";
+    // s301: handout.sty's fill-in-the-blank is tagged at its call, whatever it
+    // draws with (\fitbox's \fbox included); its tag holds what the version prints
+    const fitb = rec ? fitbMeaning(store, rec) : null;
+    if (!flagged && !box && !fitb) continue;
+    const holds = fitb ? "fitb" : !flagged ? "box" : !rec ? "listed" : direct ? "block" : "flagged";
+    const dflt = holds === "block" || holds === "listed" || holds === "fitb" ? "call" : "inside";
     const env = rec ? rec.kind === "environment" : false;
     out.set(name, Object.freeze({
       name, kind: flagged ? flagged.kind : env ? "environment" : "command",
       slots: flagged ? flagged.slots : rec.params || [], item: flagged ? flagged.item : !env && makesItem(ts),
-      reach: flagged ? flagged.reach : "holds \\" + box.name,
-      decision: chosen(name) || dflt, default: dflt, holds }));
+      reach: flagged ? flagged.reach : fitb ? "handout.sty's fill-in-the-blank line" : "holds \\" + box.name,
+      decision: chosen(name) || dflt, default: dflt, holds, fitb }));
   }
   return out;
 }

@@ -34,6 +34,26 @@
 //   space. An item command needs none of this: \item skips them itself.
 // - tagText tags flagged commands in text another fix writes: list-carrier's
 //   marker of \calcitem holds the TikZ \calculator.
+//
+// Session 301 (BLANKS-FILTER-PLAN-s300 step 1; DECISIONS 2026-11-03, "A: tag +
+// filter"): a call of handout.sty's fill-in-the-blank (v2/flag-list.mjs
+// fitbMeaning: \fitb, \cfitb, \mfitb, \fitbox, \cfitbox) gets a tag of its own
+// holding only what this version prints, never the source:
+//     \ppfitb{<the call>}{\textcolor{ppfitb <kind> <width> <align>}{<shown>}}
+// and, inside a formula, where a span cannot go,
+//     \ppfitbm{<the call>}{\class{ppfitb <kind> <width> <align>}{<drawing>}}
+// kind "blank" (the words written on the line, if any) or "answer" (the answer,
+// with the words too where both print, [showprobonly]); an empty answer prints
+// an empty line, so it is a blank. " box" ends the style for a framed line. The
+// drawing is the line as MathJax draws it: \underline{<words>\hspace{<width>}}
+// or \underline{\boldsymbol{<answer>}}, \boxed for a frame; a width MathJax
+// cannot read (0.3\linewidth: the formula would show as raw TeX,
+// _work/_s301-wordprobe.txt T6) is drawn 1in and kept as written in the style.
+// What prints comes from the final meanings of \probonly and \solonly, so a
+// problems version's tag never holds the answer; a call this version does not
+// print (shown "no") gives Pandoc nothing. TeX reads the \csname definitions
+// and runs the call: the print is unchanged (_work/_s300-tagprobe2.txt,
+// _s300-mathprobe.txt; the control _work/_s301_print.mjs).
 import { tokenize } from "../tokenizer.mjs";
 import { readArguments } from "../definition.mjs";
 
@@ -42,6 +62,40 @@ export const FLAG_HEAD = "% Added by the preprocessor: flagged commands reach Pa
   "\\newcommand{\\ppflagitem}[2]{\\item\\textcolor{ppflag}{#2}}\n" +
   "\\expandafter\\long\\expandafter\\def\\csname ppflag\\endcsname#1#2{#1}\n" +
   "\\expandafter\\long\\expandafter\\def\\csname ppflagitem\\endcsname#1#2{#1}\n";
+export const FITB_HEAD = "% Added by the preprocessor: fill-in-the-blank calls reach Pandoc as tags holding only what this version prints; TeX still runs them:\n" +
+  "\\newcommand{\\ppfitb}[2]{#2}\n" +
+  "\\newcommand{\\ppfitbm}[2]{#2}\n" +
+  "\\expandafter\\long\\expandafter\\def\\csname ppfitb\\endcsname#1#2{#1}\n" +
+  "\\expandafter\\long\\expandafter\\def\\csname ppfitbm\\endcsname#1#2{#1}\n";
+
+// A width MathJax's \hspace reads: a number and one of its units.
+const MATHJAX_UNITS = ["pt", "pc", "in", "cm", "mm", "em", "ex", "mu"];
+function mathjaxWidth(w) {
+  const unit = w.slice(-2), num = w.slice(0, -2);
+  return MATHJAX_UNITS.includes(unit) && num !== "" && num !== "." && [...num].every((ch, k) => (ch >= "0" && ch <= "9") || ch === "." || (k === 0 && ch === "-")) ? w : "1in";
+}
+
+// The Pandoc half of a fill-in-the-blank call's tag (s301), or null when its
+// arguments cannot be read. tokens/c: the call as flag-calls found it.
+function fitbHalf(tokens, c) {
+  const f = c.fitb;
+  const r = readArguments(tokens, c.open + 1, f.slots);
+  if (!r) return null;
+  const inside = (a) => (a && a.open !== undefined && a.close > a.open ? textOf(tokens.slice(a.open + 1, a.close)) : "");
+  const words = f.words ? inside(r.args[f.words - 1]) : "";
+  const width = inside(r.args[f.width - 1]).split("").filter((ch) => ch !== " " && ch !== "\t" && ch !== "\n" && ch !== "\r").join("");
+  const answer = inside(r.args[f.answer - 1]);
+  if (!width || [...width].some((ch) => "{}%#".includes(ch))) return null;
+  const shownWords = f.probonly && words.trim() !== "" ? words : "";
+  const answerShown = f.solonly && answer.trim() !== "";
+  const kind = answerShown ? "answer" : "blank";
+  c.fitbKind = c.shown === "no" ? "none" : kind;
+  if (c.shown === "no") return "";
+  const style = "ppfitb " + kind + " " + width + " " + (answerShown ? f.answerAlign : f.blankAlign) + (f.box ? " box" : "");
+  if (c.place !== "maths") return "\\textcolor{" + style + "}{" + shownWords + (answerShown ? answer : "") + "}";
+  const line = shownWords + (answerShown ? "\\boldsymbol{" + answer + "}" : "\\hspace{" + mathjaxWidth(width) + "}");
+  return "\\class{" + style + "}{" + (f.box ? "\\boxed{" : "\\underline{") + line + "}}";
+}
 
 const DELIMS = ["|", "!", "+", "=", "/", ";", ":", "?", "@"];
 // A definition site whose source holds a parameter (#1): Pandoc fills the
@@ -134,7 +188,8 @@ export function createFlagging({ calls = [], commands = new Map(), entry, sites 
   }
   let usedInText = false;
   const atCall = (def) => !def.decision || def.decision === "call";
-  const taggable = (c) => (c.place === "text" || c.place === "item") && !c.inRegion && !c.inDepends && atCall(c) && !c.left;
+  // s301: a fill-in-the-blank call is tagged inside a formula too
+  const taggable = (c) => (c.place === "text" || c.place === "item" || (c.place === "maths" && !!c.fitb)) && !c.inRegion && !c.inDepends && atCall(c) && !c.left;
 
   // Definition sites: written in onFile, or - for a piece inside an
   // \ifthenelse, which the ifthen fix rewrites whole - through wrapToken, which
@@ -198,6 +253,18 @@ export function createFlagging({ calls = [], commands = new Map(), entry, sites 
     const q = quiet.find((s) => s.file === file && s.start <= c.start && c.end <= s.end);
     if (q) { c.why = "left by choice (the call it is written out from, " + q.id + ")"; return null; }
     const w = writtenAt.get(file + "\u0001" + c.start);   // s262: a written-out copy of a definition site
+    if (c.fitb) {                                  // s301: the fill-in-the-blank tag
+      const half = fitbHalf(tokens, c);
+      if (half === null) { c.why = "its width cannot be carried in the tag's style, so it is not tagged"; return null; }
+      const open = c.place === "maths" ? "\\ppfitbm{" : "\\ppfitb{";
+      emit(decide.rewrite({ by: BY, file, rule: "flag/tag", span: { start: tokens[i].start, end: tokens[i].start }, replacement: open,
+        note: "wrapped \\" + c.name + " in a fill-in-the-blank tag: TeX still runs it, Pandoc sees only what this version prints. What a compile prints is unchanged." }));
+      emit(decide.rewrite({ by: BY, file, rule: "flag/tag", span: { start: tokens[c.close].start, end: tokens[c.close].end },
+        replacement: tokens[c.close].text + "}{" + half + "}", note: "the end of \\" + c.name + "'s fill-in-the-blank tag." }));
+      if (w) w.tagged = true;
+      c.tagged = true;
+      return null;
+    }
     const p = pieces(c.source, c.place === "item", w ? w.id : undefined);
     if (w && p) w.tagged = true;
     if (!p) { c.why = "its source holds every delimiter \\verb could use (" + DELIMS.join(" ") + "), so it is not tagged"; return null; }
@@ -254,9 +321,13 @@ export function createFlagging({ calls = [], commands = new Map(), entry, sites 
       }
       boxDone.set(file, done);
       if (file !== entry) return;
-      if (!usedInText && !calls.some(taggable) && !anySite && !written.length) return;
-      emit(decide.prepend({ by: BY, rule: "flag/preamble", text: FLAG_HEAD,
-        note: "added at the top the definitions of the flag tags (\\ppflag, \\ppflagitem): Pandoc reads the plain ones, TeX the ones after them. They print nothing." }));
+      // s301: each set of definitions only where its tags can be written
+      const flags = usedInText || calls.some((c) => taggable(c) && !c.fitb) || anySite || written.length > 0;
+      const fitbs = calls.some((c) => taggable(c) && c.fitb);
+      if (!flags && !fitbs) return;
+      emit(decide.prepend({ by: BY, rule: "flag/preamble", text: (flags ? FLAG_HEAD : "") + (fitbs ? FITB_HEAD : ""),
+        note: "added at the top the definitions of the " + (flags ? "flag tags (\\ppflag, \\ppflagitem)" : "") + (flags && fitbs ? " and the " : "") +
+          (fitbs ? "fill-in-the-blank tags (\\ppfitb, \\ppfitbm)" : "") + ": Pandoc reads the plain ones, TeX the ones after them. They print nothing." }));
     },
   };
   return { transform, tagText, calls, sites, wrapToken, written };

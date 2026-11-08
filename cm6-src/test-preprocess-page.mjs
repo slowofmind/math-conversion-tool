@@ -19,6 +19,7 @@
 // Run from cm6-src, where jsdom resolves:   node test-preprocess-page.mjs
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 import { JSDOM } from 'jsdom';
 
 const PLAT = 'C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion';
@@ -170,8 +171,10 @@ let BF = [];
 try { BF = bfAt >= 0 && bfEnd > bfAt ? new Function('return ' + js.slice(bfAt + 'const BUILT_IN_FILTERS = '.length, bfEnd + 2))() : []; }
 catch (e) { ok('BUILT_IN_FILTERS reads as JavaScript', false, e.message); }
 const bf = (id) => BF.find((f) => f.id === id);
-ok('built-in filters in order: default-lists, list-markers, resolve-image-paths, embed-images',
-  BF.map((f) => f.id).join(',') === 'default-lists,list-markers,resolve-image-paths,embed-images', BF.map((f) => f.id).join(','));
+// latex-preprocess s307: 'blanks' joins the order after list-markers (blanks plan step 7, his "Yes, copy them",
+// 2026-11-04) - the agreed new entry; the rest of the order is unchanged.
+ok('built-in filters in order: default-lists, list-markers, blanks, resolve-image-paths, embed-images',
+  BF.map((f) => f.id).join(',') === 'default-lists,list-markers,blanks,resolve-image-paths,embed-images', BF.map((f) => f.id).join(','));
 ok('Default Lists is off by default', bf('default-lists')?.defaultEnabled === false, String(bf('default-lists')?.defaultEnabled));
 ok('its tooltip says it is the backup for files not run through the preprocessor',
   /backup/i.test(bf('default-lists')?.description || '') && /preprocessor/i.test(bf('default-lists')?.description || ''), bf('default-lists')?.description);
@@ -188,6 +191,31 @@ ok('the embedded text is exactly filters/list-markers.lua', !!LM && LM.content =
 ok('Smart Cleanup is gone from the page: no button, hint or accordion',
   !doc.getElementById('btnSmartCleanup') && !doc.getElementById('smartCleanupHint') && !doc.getElementById('prepSourceCleanup'));
 ok('and from the script: no import or start-up of smart-cleanup', !/smart-cleanup|initSmartCleanup/.test(js));
+
+// ── L7, latex-preprocess s307: blanks plan step 7 (BLANKS-FILTER-PLAN-s300) ──
+// His words (2026-11-04): "Start step 7", then "Yes, copy them". The Blanks filter shows each handout.sty
+// fill-in-the-blank (\fitb, \cfitb, \mfitb, \fitbox, \cfitbox) as a line with a lighter "blank" on it, and a
+// solution's answer bold on its line. On by default, run right after List Markers (L6 checks the order). Its text is
+// the platform's filters/blanks.lua, a copy of the tool folder's _work/blanks.lua, embedded as List Markers is.
+// Written before index.html changes: every check here fails until they go in.
+group('L7 s307: Blanks on, embedded, the same text as the tool folder\'s filter');
+const BL = bf('blanks');
+ok('Blanks: named "Blanks", file blanks.lua, on by default',
+  BL?.name === 'Blanks' && BL?.filename === 'blanks.lua' && BL?.defaultEnabled === true, JSON.stringify(BL && { ...BL, content: undefined }));
+ok('its tooltip is the planned one (names \\fitb, says "[blank]" elsewhere, unticked a blank shows nothing)',
+  (BL?.description || '').startsWith('Blanks: shows each fill-in-the-blank (\\fitb, \\cfitb, \\fitbox ...)')
+  && (BL?.description || '').includes('"[blank]"') && /unticked, a blank shows nothing/.test(BL?.description || ''), BL?.description);
+let blFile = '';
+try { blFile = readFileSync(join(PLAT, 'filters', 'blanks.lua'), 'utf8'); } catch { /* missing */ }
+ok('filters/blanks.lua is there', blFile.length > 0);
+ok('the embedded text is exactly filters/blanks.lua', !!BL && BL.content === blFile,
+  BL ? 'embedded ' + BL.content.length + ' chars, file ' + blFile.length : 'no entry');
+const TOOL_BLANKS = join(PLAT, '..', 'latex-preprocess', '_work', 'blanks.lua');
+let toolBl = '';
+try { toolBl = readFileSync(TOOL_BLANKS, 'utf8'); } catch { /* missing */ }
+const sha12 = (s) => createHash('sha1').update(s).digest('hex').slice(0, 12);
+ok('filters/blanks.lua is the tool folder\'s _work/blanks.lua, byte for byte (s304: 999a244c3083)',
+  blFile.length > 0 && blFile === toolBl, 'platform ' + (blFile ? sha12(blFile) : 'missing') + ', tool ' + (toolBl ? sha12(toolBl) : 'missing'));
 
 console.log('\n──────── ' + pass + ' passed, ' + fail + ' failed ────────');
 process.exitCode = fail ? 1 : 0;

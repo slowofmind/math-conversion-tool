@@ -187,7 +187,7 @@ function callsIn(tokens, file, text, commands, opts, base, hiddenWhy) {
     out.push({ name, file, open: i, close: last, start: base + start, end: base + end, place,
                shown: no ? "no" : dep ? "depends" : "yes", shownWhy: no || dep || "",
                outer: place === "nested" ? outerName : null, inRegion: !!hiddenWhy, inDepends: !!dep,
-               source: text.slice(start, end), reach: def.reach, holds: def.holds || null, decision });
+               source: text.slice(start, end), reach: def.reach, holds: def.holds || null, decision, fitb: def.fitb || null });
     // only a call tagged whole carries the calls inside it (s258: the words of
     // an "inside" command's arguments reach Pandoc, so their calls are tagged)
     if (place !== "nested" && decision === "call" && end > outerEnd) { outerEnd = end; outerName = name; }
@@ -228,8 +228,9 @@ function idMaker(letter) {
 //   choices   { "U<n>": "leave" } leaves one call untagged
 // Returns the calls in file order, each { id, name, file, line, open, close,
 //   start, end, place, shown, shownWhy, outer, inRegion, inDepends, source,
-//   reach, decision, left, sites }; open and close are token indices in that
-//   file's tokens (none inside a comment block: inRegion is true there).
+//   reach, decision, left, sites, fitb }; open and close are token indices in that
+//   file's tokens (none inside a comment block: inRegion is true there). fitb
+//   (s301): handout.sty's fill-in-the-blank meaning, from decideDefinitions, or null.
 export function findFlagCalls({ files = [], commands, store, hidden = [], sites = [], choices = {} } = {}) {
   const out = [];
   if (!commands || !commands.size) return out;
@@ -466,7 +467,10 @@ export function flagEntries(calls, sites = []) {
     return Object.freeze({
       rule: c.tagged ? "flag/tagged" : inside ? "flag/inside" : "flag/left",
       name: c.name, file: c.file, span: Object.freeze({ start: c.start, end: c.end }),
-      note: said + lossOf(c) + ". " + (c.tagged
+      note: said + lossOf(c) + ". " + (c.tagged && c.fitbKind
+        ? "The -pp copy keeps it for TeX and gives Pandoc a fill-in-the-blank tag holding only what this version prints (" +
+          (c.fitbKind === "answer" ? "the answer" : c.fitbKind === "blank" ? "a blank" : "nothing: this version does not print it") + ")."
+        : c.tagged
         ? "The -pp copy keeps it for TeX and gives Pandoc a tag holding its source, for a later step to replace."
         : inside ? "It is left whole: " + why + "."
         : "It is listed here and left as it is: " + why + "."),
