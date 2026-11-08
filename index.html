@@ -656,6 +656,16 @@
   .prep-accordion-toggle:hover { background: var(--bg-elevated); }
   .prep-accordion-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .prep-accordion-toggle[aria-expanded="true"] .rail-chevron { transform: rotate(90deg); }
+/* Intent snippets [CLAUDE 2026-11-08] (snippets/snippet-panel.js) */
+.snip-panel label { display: block; margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
+.snip-panel input[type="search"], .snip-panel input[type="text"], .snip-panel select { width: 100%; box-sizing: border-box; margin-top: 2px; }
+.snip-panel .snip-check { display: flex; align-items: center; gap: 6px; }
+.snip-panel .snip-check input { margin: 0; }
+.snip-selection { font-family: var(--font-mono, monospace); font-size: 12px; word-break: break-all; margin: 6px 0; }
+.snip-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.snip-status { min-height: 1.5em; margin-top: 8px; font-size: 12px; white-space: pre-wrap; }
+#snipParts h4 { margin: 12px 0 4px; font-size: 13px; }
+.snip-panel [aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
   .prep-accordion-panel { padding: 0 10px 8px; }
   .prep-accordion-panel.prep-grid { display: grid; grid-template-columns: max-content max-content;
     gap: 6px 10px; align-items: center; justify-content: start; }
@@ -2451,6 +2461,48 @@
         </div>
       </div>
 
+      <!-- INTENT SNIPPETS [CLAUDE 2026-11-08] (editor integration; Nicholas 2026-11-08: "Build it this way",
+           Ctrl+Period). snippets/snippet-panel.js binds these ids. Select math in the editor, press Ctrl+Period,
+           choose a concept, press Enter: the kernel intent markup is written as one undoable edit. The filters
+           are for this visit only (nothing stored); the open/closed state is the accordion's, like its neighbours. -->
+      <div class="prep-accordion" id="prepSnippets">
+        <h3 class="prep-accordion-heading">
+          <button type="button" class="prep-accordion-toggle" id="prepSnippetsToggle" data-store="atc.prep.snippets"
+                  aria-expanded="true" aria-controls="prepSnippetsPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Intent snippets</button>
+        </h3>
+        <div class="prep-accordion-panel snip-panel" id="prepSnippetsPanel" role="region" aria-labelledby="prepSnippetsToggle">
+          <p class="prep-status" id="snipHint">Select math in the editor, then press Ctrl+Period. Choose a concept
+            and press Enter to write its intent markup. Ctrl+Period or Escape goes back to the editor.</p>
+          <p class="snip-selection" id="snipSelection">Nothing is selected in the editor.</p>
+          <label for="snipFilter">Find a concept</label>
+          <input type="search" id="snipFilter" autocomplete="off" spellcheck="false" aria-describedby="snipSelection snipHint" aria-controls="snipList">
+          <label for="snipGroup">Subject group</label>
+          <select id="snipGroup"><option value="">All groups</option></select>
+          <label for="snipSource">Source</label>
+          <select id="snipSource"><option value="">Any source</option></select>
+          <label class="snip-check"><input type="checkbox" id="snipNotUsed"> Show concepts marked "not used"</label>
+          <label class="snip-check"><input type="checkbox" id="snipRwm"> Show concepts that read correctly with no markup</label>
+          <label for="snipList">Concepts (<span id="snipCount">0</span> shown)</label>
+          <select id="snipList" size="8"></select>
+          <div class="snip-actions">
+            <button type="button" class="prep-btn" id="btnSnipApply">Apply</button>
+            <button type="button" class="toolbar-btn" id="btnSnipBack">Back to editor</button>
+            <button type="button" class="toolbar-btn" id="btnSnipUndo" aria-disabled="true">Undo last snippet</button>
+          </div>
+          <form id="snipParts" hidden aria-labelledby="snipPartsHead">
+            <h4 id="snipPartsHead">Mark the parts</h4>
+            <p id="snipPartsWhy"></p>
+            <div id="snipArityWrap" hidden><label for="snipArity">Number of parts</label><select id="snipArity"></select></div>
+            <div id="snipPartFields"></div>
+            <div class="snip-actions">
+              <button type="submit" class="prep-btn">Apply with these parts</button>
+              <button type="button" class="toolbar-btn" id="btnSnipPartsCancel">Cancel</button>
+            </div>
+          </form>
+          <p class="snip-status" id="snipStatus" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+
       <!-- (SOURCE CLEANUP, the Smart Cleanup button's accordion since 2026-10-06, was retired by latex-preprocess
            s299, lists plan step 6: the preprocessor and the List Markers filter now carry list numbering.) -->
 
@@ -2723,6 +2775,7 @@ import { initProjectModel } from './project/project-model.js';
 import { initFileTree } from './filetree/file-tree.js';
 import { initPreviewPages } from './js/preview-pages.js';   // PLAN-MULTIPAGE-PREVIEW.md (last, so test-preprocess-page F7 keeps preprocess after MathCAT)
 import { initA11yCheck } from './js/a11y-check.js';   // accessibility-checker\PLAN-ACCESSIBILITY-CHECKER.md
+import { initSnippetPanel } from './snippets/snippet-panel.js';   // [CLAUDE 2026-11-08] Intent snippets (Ctrl+Period)
 
 // ════════════════════════════════════════════════════════════════════
 // PROJECT MODEL (Stage 0) — project/project-model.js
@@ -9003,6 +9056,13 @@ const { getSourceForConversion, populateCleanupFromWarnings,
 const { IntentReview, runIntentScan } = initIntentReview({
   editor, updateStatus, updateLog,
   activateOutputTab: (...a) => activateOutputTab(...a),
+});
+// INTENT SNIPPETS - snippets/snippet-panel.js [CLAUDE 2026-11-08]
+// Ctrl+Period opens the "Intent snippets" section in Prepare; the chosen concept's kernel markup is written
+// into the editor as one undoable edit. Reads only math-conversion/intent-concepts-slim.json.
+const snippetPanelReady = initSnippetPanel({
+  editor, updateStatus: (...a) => updateStatus(...a),
+  openSection: () => setSidebarOpen(true, 'prepare'),
 });
 // ════════════════════════════════════════════════════════════════════
 // MATHCAT SPEECH PROOFING — js/mathcat-proof.js

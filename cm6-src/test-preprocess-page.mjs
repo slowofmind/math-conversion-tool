@@ -49,7 +49,9 @@ const steps = prep ? [...prep.querySelectorAll('.prep-step')] : [];
 // Smart Cleanup, is retired - the List Markers filter replaces it. Three accordions now.
 const accs = prep ? [...prep.querySelectorAll('.sidebar-body > .prep-accordion')] : [];
 const accTitles = accs.map((a) => text(a.querySelector('.prep-accordion-toggle')).replace(/^▸/, ''));
-ok('three accordions, in order', accTitles.join(' | ') === 'Images | LaTeX preprocessing | Math notation review', accTitles.join(' | '));
+// [CLAUDE 2026-11-08] Intent snippets added as the fourth (snippet tool in the editor, Alt+Shift+I;
+// Nicholas 2026-11-08 "Build it this way").
+ok('four accordions, in order', accTitles.join(' | ') === 'Images | LaTeX preprocessing | Math notation review | Intent snippets', accTitles.join(' | '));
 ok('no numbered steps left', steps.length === 0 && !prep?.querySelector('.prep-num'), String(steps.length));
 const imgPanel = doc.getElementById('prepImagesPanel');
 const imgBtns = imgPanel ? [...imgPanel.querySelectorAll('button')].map((b) => b.id + '=' + text(b)).join(',') : '';
