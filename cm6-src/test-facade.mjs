@@ -44,7 +44,7 @@ function markedText() {
 const flat = (s) => s.split('\n').join('');
 
 console.log(`\ncm6 facade v${CM6_BUNDLE_VERSION}\n`);
-ok('bundle version is 0.5.0', CM6_BUNDLE_VERSION === '0.5.0', CM6_BUNDLE_VERSION);
+ok('bundle version is 0.5.1', CM6_BUNDLE_VERSION === '0.5.1', CM6_BUNDLE_VERSION);   // [CLAUDE 2026-11-08] was 0.5.0; 0.5.1 adds getSelection()
 
 // ── offsets and conversion ────────────────────────────────────────────
 ok('docLength matches the source string', ed.docLength() === DOC.length,
@@ -182,6 +182,18 @@ ed.setReadOnly(true); ed.setReadOnly(false);
 ed.setLineWrap(false); ed.setLineWrap(true);
 ok('config setters do not throw', true);
 ok('reconfiguration preserved the text', ed.getText() === DOC);
+
+// ── getSelection (v0.5.1) ───────────────────────────────────────────── [CLAUDE 2026-11-08]
+{
+  const at = ed.getText().indexOf('line three');
+  ed.selectRange(at, at + 4, { focusEditor: false });
+  eq('getSelection reports the selected span as offsets', ed.getSelection(), { from: at, to: at + 4 });
+  eq('getSelection text matches getRange', ed.getRange(ed.getSelection().from, ed.getSelection().to), 'line');
+  ed.view.dispatch({ selection: { anchor: at + 4, head: at } });   // a backward drag (selectRange cannot make one)
+  eq('getSelection is ordered (from <= to) after a backward selection', ed.getSelection(), { from: at, to: at + 4 });
+  ed.selectRange(at, at, { focusEditor: false });
+  eq('getSelection with nothing selected gives from === to', ed.getSelection(), { from: at, to: at });
+}
 
 console.log(`\nfacade: ${pass} passed, ${fail} failed`);
 ed.destroy();

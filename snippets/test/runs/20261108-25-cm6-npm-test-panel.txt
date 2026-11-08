@@ -1,0 +1,1073 @@
+
+> cm6-editor-bundle@0.1.0 test
+> node test-asset-urls.mjs && node test-page-load.mjs && node test-facade.mjs && node test-intent-review.mjs && node test-intent-apply.mjs && node test-intent-outoforder.mjs && node test-intent-guard.mjs
+
+   ok   found the extracted modules
+   ok   intent\intent-review.js -> ../math-conversion/intent-scan.js
+   ok   intent\intent-review.js -> ../math-conversion/intent-vocabulary.json
+   ok   js\a11y-check.js -> ./a11y-check-agent.js
+   ok   js\mathcat-proof.js -> ../mathcat-wasm/mathcat.js
+   ok   js\mathcat-proof.js -> ./mathcat-proof-agent.js
+   ok   js\preview-pages.js -> ./preview-shelf.js
+   ok   js\preview-pages.js -> ./preview-helper.js
+   ok   at least one asset URL was checked
+   ok   asset present: math-conversion/intent-scan.js
+   ok   asset non-empty: math-conversion/intent-scan.js
+   ok   asset present: math-conversion/intent-vocabulary.json
+   ok   asset non-empty: math-conversion/intent-vocabulary.json
+
+asset urls: 13 passed, 0 failed
+   ok   exactly one non-empty inline script
+   ok   it is a module script
+node.exe : Failed to load pandoc.wasm: Error [ERR_UNSUPPORTED_ESM_URL_SCHEME]: Only URLs with a scheme in: file and 
+data are supported by the default ESM loader. Received protocol 'https:'
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\nim022\AppData\Roaming ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to load ...otocol 'https:':String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    at getSourceSync (node:internal/modules/esm/load:48:11)
+    at defaultLoadSync (node:internal/modules/esm/load:154:34)
+    at #loadAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:809:12)
+    at #loadSync (node:internal/modules/esm/loader:841:53)
+    at ModuleLoader.load (node:internal/modules/esm/loader:790:26)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:501:31)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:567:36)
+    at afterResolve (node:internal/modules/esm/loader:614:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:620:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:277:33) {
+  code: 'ERR_UNSUPPORTED_ESM_URL_SCHEME'
+}
+   ok   the module script executed without throwing
+(node:33968) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33968) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of 
+file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-editor.js 
+is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\nim022\package.json.
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10182)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout._onTimeout (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src\
+node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10182)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   editor mounted into the page
+   ok   output source editor mounted
+   ok   intent panel present
+   ok   intent scan button present
+   ok   cleanup pattern list rendered
+   ok   format selects populated by init
+
+page load: 9 passed, 0 failed
+
+cm6 facade v0.5.1
+
+   ok   bundle version is 0.5.1
+   ok   docLength matches the source string
+   ok   getText round-trips
+   ok   getRange extracts the right span
+   ok   lineColAt lands on line 2
+   ok   offsetAt inverts lineColAt
+   ok   lineColAt(0) is line 1 col 1
+   ok   offsets clamp instead of throwing
+   ok   replaceRange reports the new span
+   ok   document now contains the macro
+   ok   surrounding text untouched
+   ok   undo() reports it did something
+   ok   undo restores the pre-edit text (history preserved)
+   ok   redo re-applies it
+   ok   setText resets history, so it is wrong for apply
+   ok   replaceRanges applied both
+   ok   both replacements present
+   ok   a single undo reverts BOTH (one transaction)
+   ok   overlapping spans throw
+   ok   document unchanged after the throw
+   ok   the test span really does cross a line boundary
+   ok   markRanges returns a token
+   ok   a MULTI-LINE mark renders over the right text
+   ok   it rendered as more than one span (one per line)
+   ok   mark still covers the same text after an edit before it
+   ok   mark grew with an edit inside it
+   ok   clearMarks removes it
+   ok   mark placed again
+   ok   setText drops stale marks
+   ok   selectRange sets the selection
+   ok   getLine still works
+   ok   lineCount still works
+   ok   getCursor still works
+   ok   setDiagnostics tints the line
+   ok   clearDiagnostics removes the tint
+   ok   highlightRanges still renders
+   ok   clearHighlights still works
+   ok   both decoration systems render together
+   ok   config setters do not throw
+   ok   reconfiguration preserved the text
+   ok   getSelection reports the selected span as offsets
+   ok   getSelection text matches getRange
+   ok   getSelection is ordered (from <= to) after a backward selection
+   ok   getSelection with nothing selected gives from === to
+
+facade: 44 passed, 0 failed
+
+02-raisin-games.tex: 93 findings, 295 lines
+
+(node:30776) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of 
+file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-editor.js 
+is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\nim022\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   nav strip revealed
+   ok   rendered marks never exceed the finding count
+   ok   no current highlight before navigating
+   ok   status shows the total
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   first next() lands on finding 1
+   ok   current mark covers the finding text
+   ok   editor selection moved to the finding
+   ok   all-findings mark renders alongside the current one
+   ok   announcement names the position and a spoken reading
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   second next() advances
+   ok   only ONE current mark at a time
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   prev() goes back
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   prev() from the first wraps to the last
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   next() from the last wraps to the first
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   edited document is reported as stale
+   ok   stale state is announced, not silently mis-navigated
+   ok   clear removes all marks
+   ok   clear removes the current mark
+   ok   clear hides the nav strip
+   ok   clear resets the count
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   short document: a finding was found at all
+   ok   short document: EVERY finding is marked
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   short document: current mark is correct
+   ok   short document: clear works
+   --   no multi-line finding in the sampled files (not a failure)
+
+apply fixture: 3 findings in 52 chars
+
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   panel shows the finding and its readings
+   ok   first reading is preselected
+   ok   progress starts with none applied
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   apply wrote the macro/wrap text into the document
+   ok   apply replaced exactly the finding span
+   ok   the applied finding is marked applied
+   ok   progress counts it
+   ok   later finding offsets shifted by the exact delta
+   ok   later finding offsets still select ITS OWN text
+   ok   review auto-advanced to the next pending finding
+   ok   applying does not make the document stale
+   ok   apply confirmation survives the auto-advance
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   undo restored the original text
+   ok   undo returned the finding to pending
+   ok   undo reversed the offset shift on later findings
+   ok   undo left offsets selecting the right text
+   ok   progress shows nothing applied again
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   skip wrote nothing
+   ok   skip marked the finding skipped
+   ok   progress counts the skip
+   ok   skip announced that nothing was written, AND the next finding
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   stepping never lands on a resolved finding
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   every finding was resolved
+   ok   no finding was invalidated by another apply
+   ok   the document still contains the untouched prose
+   --   after applying all: "Let $\\abs{x}$ be one, $\\abs{S}$ another, and $\\abs{A}$ a third."
+   ok   re-scan does NOT re-offer annotated notation (idempotence)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   apply is refused while the document is stale
+   ok   stale state is reported
+
+review behaviour: 52 passed, 0 failed
+
+synthetic document: 5 findings
+
+   ok   the fixture produces several findings
+(node:4696) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of 
+file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-editor.js 
+is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\nim022\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   panel body shown
+   ok   radios rendered for every candidate
+   ok   radios share one name and are a labelled group
+   ok   macro form is preferred when available
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   document now contains the annotation
+   ok   finding marked applied
+   ok   apply is announced with the concept name
+   ok   offsets of the REMAINING findings survived the apply
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   offsets survived a second apply
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   skip writes nothing
+   ok   offsets survived a skip
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   confirm-only wrote nothing to the document
+   ok   confirm-only still resolves the finding
+   ok   confirm-only says nothing was written
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   undo restores the original text
+   ok   undone finding is pending again
+   ok   offsets correct again after undo
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   undo is announced
+   ok   editing marks the review stale
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   apply refuses while stale
+
+02-raisin-games.tex: applying all 93 findings
+
+   ok   every finding reached a decision
+   ok   applies actually happened
+   ok   no finding was silently invalidated on a non-overlapping corpus
+   ok   every applied annotation is present in the final document
+   ok   re-scanning the annotated document offers fewer findings
+
+intent apply: 26 passed, 0 failed
+
+findings: 4
+
+   ok   later finding applied
+   ok   earlier finding applied
+   ok   already-applied finding still points at its own annotation
+   ok   two undos restore the original document exactly
+   ok   both findings pending again
+   ok   no offsets drifted after the out-of-order undo
+
+out-of-order: 6 passed, 0 failed
+   ok   found CORE_OUTPUT in index.html
+   ok   CORE_OUTPUT lists formats
+   ok   index.html default output format found
+   ok   fixture offers the real format html5
+   ok   fixture offers the real format chunkedhtml
+   ok   fixture offers the real format docx
+   ok   intent is AVAILABLE on the default output format (html5)
+   ok   scan button marked unavailable for docx
+   ok   the reason is in the tooltip, not just the styling
+   ok   button stays focusable (aria-disabled, not disabled)
+   ok   scanning docx is refused (said in the sidebar scan report, 2026-10-06)
+   ok   and nothing went to the Pandoc Log
+   ok   epub is also refused for now
+   ok   chunked html is refused for now (planned, not verified)
+   ok   html is allowed
+   ok   starting from a non-intent method
+(node:14720) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of 
+file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-editor.js 
+is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\nim022\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   a write switched the math method automatically
+   ok   the switch was reported, not silent (scan report)
+   ok   the switch was announced to assistive tech
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   confirm-only wrote nothing
+   ok   confirm-only did NOT change the math method
+   ok   there is an applied annotation to protect
+   ok   a dialog was raised rather than switching silently
+   ok   cancel restored the intent method
+   ok   cancel left the document untouched
+   ok   cancel kept the annotations
+   ok   dialog raised again
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   revert removed every applied annotation
+   ok   revert restored the document EXACTLY
+   ok   reverted findings are pending again
+   ok   revert was reported (scan report)
+   ok   the requested method took effect
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   force applied the requested method
+   ok   force kept the annotations
+   ok   force warned at warn level (scan report)
+   ok   a clean document switches methods without interruption
+   ok   index.html has NO Intent output view any more (moved to the sidebar 2026-10-06)
+   ok   index.html has a Log output view
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   a scan with findings leaves the output area alone
+   ok   its report is in the sidebar, summary first
+   ok   and nothing went to the Pandoc Log
+ReferenceError: Window is not defined
+    at zc (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-e
+ditor.js:7:13090)
+    at Kr.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirr
+or/cm6-editor.js:9:38327)
+    at i.measure (file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirro
+r/cm6-editor.js:10:10338)
+    at file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/codemirror/cm6-edito
+r.js:10:13114
+    at invokeTheCallbackFunction (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\c
+m6-src\node_modules\jsdom\lib\generated\idl\Function.js:19:26)
+    at runAnimationFrameCallbacks (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\
+cm6-src\node_modules\jsdom\lib\jsdom\browser\Window.js:639:13)
+    at Timeout.<anonymous> (C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\cm6-src
+\node_modules\jsdom\lib\jsdom\browser\Window.js:617:11)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+   ok   a scan with no findings also leaves the output area alone
+   ok   and its report says nothing was found
+   ok   nothing went to the Pandoc Log
+
+intent guard: 44 passed, 0 failed
+

@@ -1,0 +1,84 @@
+
+F0 the page as it stands
+   ok   exactly one non-empty inline script
+   ok   it is a module script
+   ok   the Prepare panel is there
+   ok   four accordions, in order
+   ok   no numbered steps left
+   ok   Images: "TikZ to PDF", then "PDF to SVG"
+   ok   the Output view options are Output, Code, Preprocess, Log, Report (revised 2026-10-06; Intent moved to the sidebar; Report s292)
+   ok   the script holds, once: import { initMathCATProof } from './js/mathcat-proof.js';
+   ok   the script holds, once: const mathcatProof = initMathCATProof({
+   ok   the script holds, once: // LATEX PREPROCESSING GÇö js/preprocess.js
+   ok   the script holds, once: // OUTPUT TABS GÇö js/output-tabs.js
+
+F2 call 87: the LaTeX preprocessing accordion and its "Process file" button
+   ok   it comes right after Images
+   ok   it holds exactly one button
+   ok   a prep-btn of type button
+   ok   labelled "Process file"
+   ok   with an id no other element has
+   ok   no hint, description or tooltip
+   ok   the Preprocess view's note mentions Process file
+   ok   the Preprocess view's note mentions copies
+   ok   the Preprocess view's note mentions main-pp.tex
+   ok   the Preprocess view's note mentions original
+
+F3 call 88, revised 2026-10-06: Preprocess in the Output view drop-down, and its panel
+   ok   exactly one Output view option for preprocess
+   ok   it comes directly after Source (order confirmed 2026-10-06)
+   ok   an option labelled "Preprocess"
+   ok   not the default view
+   ok   the panel output-tabs.js looks for, tabPreprocess, is there
+   ok   a view area (tab-content) without tab roles
+   ok   it comes directly after the Code view area (the Intent view moved to the sidebar, 2026-10-06)
+   ok   until the first press it holds a note naming the button
+
+F5 call 90: no live region in the Preprocess panel
+   ok   the panel and all it holds: no aria-live, no status, log or alert role
+
+F6 call 91: the button is not disabled
+   ok   the button carries no disabled attribute
+
+F7 call 92: where the import and the start-up call sit
+   ok   the import, once
+   ok   on the line after MathCAT's import
+   ok   the start-up call, once
+   ok   after MathCAT's block, before the output tabs are made
+   ok   it is handed model
+   ok   it is handed editor
+   ok   it is handed openProjectFile
+   ok   it is handed syncAuxFiles
+   ok   it is handed runConversion
+   ok   it is handed showReport
+   ok   it is handed updateLog
+   ok   it is handed updateStatus
+   ok   it is handed loadTable
+   ok   it is handed loadTool
+   ok   the tool is not imported at start: no import from ./preprocess/
+
+F8 call 101: READER_BY_EXT, the reader for a file opened from the tree
+   ok   declared once
+   ok   before openProjectFile
+   ok   its entries are handleFileUpload's formatMap's, line for line
+
+L6 s299: List Markers on, Default Lists off, Smart Cleanup retired
+   ok   built-in filters in order: default-lists, list-markers, blanks, resolve-image-paths, embed-images
+   ok   Default Lists is off by default
+   ok   its tooltip says it is the backup for files not run through the preprocessor
+   ok   List Markers: named "List Markers", file list-markers.lua, on by default
+   ok   its tooltip is the planned one (unticked, every list marker appears twice)
+   ok   filters/list-markers.lua is there
+   ok   the embedded text is exactly filters/list-markers.lua
+   ok   Smart Cleanup is gone from the page: no button, hint or accordion
+   ok   and from the script: no import or start-up of smart-cleanup
+
+L7 s307: Blanks on, embedded, the same text as the tool folder's filter
+   ok   Blanks: named "Blanks", file blanks.lua, on by default
+   ok   its tooltip is the planned one (names \fitb, says "[blank]" elsewhere, unticked a blank shows nothing)
+   ok   filters/blanks.lua is there
+   ok   the embedded text is exactly filters/blanks.lua
+   ok   filters/blanks.lua is the tool folder's _work/blanks.lua, byte for byte (s304: 999a244c3083)
+
+GöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇ 63 passed, 0 failed GöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇ
+

@@ -36,7 +36,7 @@ const extraTokenClasses = tagHighlighter([
   { tag: lzTags.bracket, class: "tok-bracket" },
 ]);
 
-export const CM6_BUNDLE_VERSION = "0.5.0";
+export const CM6_BUNDLE_VERSION = "0.5.1";   // [CLAUDE 2026-11-08] 0.5.1: getSelection()
 
 // ── Language registry ──────────────────────────────────────────────
 // LaTeX: Overleaf's Lezer grammar via codemirror-lang-latex (TeXlyre),
@@ -530,6 +530,15 @@ export function createEditor(containerEl, opts = {}) {
         effects: EditorView.scrollIntoView(f, { y: o.y || "center" }),
       });
       if (o.focusEditor !== false) view.focus();
+    },
+
+    /** The main selection as 0-based offsets into getText(): {from, to},
+     *  from <= to (from === to when nothing is selected). CM6 keeps the
+     *  selection while focus is elsewhere, so a sidebar tool can read it.
+     *  [CLAUDE 2026-11-08] v0.5.1, for snippets/snippet-panel.js. */
+    getSelection() {
+      const s = view.state.selection.main;
+      return { from: s.from, to: s.to };
     },
 
     /** Undo / redo the last transaction. Exposed so a caller that made an
