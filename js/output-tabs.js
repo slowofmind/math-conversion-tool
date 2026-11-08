@@ -20,7 +20,7 @@ export function initOutputTabs(ctx) {
   // switches still move focus to the drop-down, as the tabs did (kept for
   // now, decided 2026-10-06).
   const viewSelect = document.getElementById('selOutputView');
-  const VIEWS = ['preview', 'source', 'preprocess', 'log'];
+  const VIEWS = ['preview', 'source', 'preprocess', 'log', 'report'];   // 'report': latex-preprocess s292
 
   function viewName(x) {
     const s = typeof x === 'string' ? x : (x && x.id) || '';

@@ -52,8 +52,9 @@ const imgPanel = doc.getElementById('prepImagesPanel');
 const imgBtns = imgPanel ? [...imgPanel.querySelectorAll('button')].map((b) => b.id + '=' + text(b)).join(',') : '';
 ok('Images: "TikZ to PDF", then "PDF to SVG"', imgBtns === 'btnImageHandling=TikZ to PDF,btnConvertPdfs=PDF to SVG', imgBtns);
 const tabs = [...doc.querySelectorAll('#selOutputView option')].map((o) => o.getAttribute('value'));
-ok('the Output view options are Output, Code, Preprocess, Log (revised 2026-10-06; Intent moved to the sidebar)',
-  tabs.join(',') === 'preview,source,preprocess,log', tabs.join(' | '));
+// latex-preprocess s292: Report added (the combined report's platform step 2), Preprocess and Log kept
+ok('the Output view options are Output, Code, Preprocess, Log, Report (revised 2026-10-06; Intent moved to the sidebar; Report s292)',
+  tabs.join(',') === 'preview,source,preprocess,log,report', tabs.join(' | '));
 const A_IMPORT = "import { initMathCATProof } from './js/mathcat-proof.js';";
 // MathCAT's start-up call. The committed page never had a btnMathCATProof button; MathCAT is driven
 // by the "Math subtitles" drop-down (updated 2026-10-06; was a btnMathCATProof click listener).

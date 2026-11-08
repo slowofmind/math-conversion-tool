@@ -44,7 +44,10 @@ const REAL = {
   ...(await import(at('preprocess/v2/run.mjs'))),
   ...(await import(at('preprocess/v2/capability.mjs'))),
   ...(await import(at('preprocess/v2/report.mjs'))),
+  ...(await import(at('preprocess/v2/latex-names.mjs'))),   // latex-preprocess s292 (E20)
 };
+const NAMES = JSON.parse(fs.readFileSync(
+  fileURLToPath(at('preprocess/data/latex-names.json')), 'utf8'));
 const TABLE = JSON.parse(fs.readFileSync(
   fileURLToPath(at('preprocess/data/pandoc-latex-reader-index.json')), 'utf8'));
 const { initPreprocess } = await import(GLUE.href);
@@ -123,14 +126,15 @@ const spy = (rec) => ({
   ...REAL,
   runProject(files, opts) {
     const f = files instanceof Map ? Object.fromEntries(files) : { ...files };
-    rec.handed.push({ entry: opts ? opts.entry : undefined, files: f });
+    rec.handed.push({ entry: opts ? opts.entry : undefined, files: f,
+                      latexNames: opts ? opts.latexNames : undefined });
     return REAL.runProject(files, opts);
   },
 });
 
 // One project, opened the way the page opens it. files: [path, text, tag?].
 async function world(files, { open = 'main.tex', typed, exclude = [],
-                              tool, table } = {}) {
+                              tool, table, names } = {}) {
   const m = initProjectModel();
   for (const [p, t, source] of files) m.addFile(p, enc(t), source ? { source } : {});
   for (const p of exclude) m.setInclude(p, false);
@@ -180,6 +184,9 @@ async function world(files, { open = 'main.tex', typed, exclude = [],
     },
     loadTable: async () => { rec.tableLoads++; return table ? table() : TABLE; },
     loadTool: async () => { rec.toolLoads++; return tool || spy(rec); },
+    // latex-preprocess s292 (platform step 2, E20): optional; the page passes both
+    ...(names ? { loadNames: async () => { rec.nameLoads = (rec.nameLoads || 0) + 1; return names(); },
+                  keepRun: (k) => { (rec.kept ??= []).push(k); } } : {}),
   });
   return { m, editor, rec, press: () => glue.run(), open: openProjectFile };
 }
@@ -526,6 +533,47 @@ sect('E19 a subfile processed on its own: the parent\'s preamble spliced in; a m
   ok('E19e ...and the log says, as a warning, that ../main.tex is not in the project',
      (rec.levels || []).includes('warn') && rec.logs.some((l) => l.includes('../main.tex') && l.includes('not in the project')),
      JSON.stringify(rec.logs));
+}
+
+// ── E20 ────────────────────────────────────────────────────────────
+// latex-preprocess s292, the combined report's platform step 2 (PLAN-COMBINED-PLATFORM-s278; copy approved
+// 2026-11-01): the names list (data/latex-names.json) loads with the tool and is handed to every run as
+// latexNames, built by the tool's own createLatexNames; after a run the page is handed the run, the original
+// files, the entry and the file converted (keepRun), for the Report view. A stop hands nothing. A names list
+// that fails to load does not stop the press: the run goes ahead without it, and the log says so.
+sect('E20 the names list handed to the run; the run and the originals kept for the Report view');
+{
+  const { rec, press } = await world([['main.tex', MAIN_STY], ['handout.sty', STY]], { names: () => NAMES });
+  await press();
+  const h = rec.handed[0] || {};
+  ok('E20a the run is handed latexNames, the tool\'s own lookup (knows \\vfill as LaTeX\'s)',
+     !!h.latexNames && typeof h.latexNames.originOf === 'function' &&
+     JSON.stringify(h.latexNames.originOf('vfill')) === '{"from":"kernel"}', JSON.stringify(Object.keys(h.latexNames || {})));
+  const k = (rec.kept || [])[0] || {};
+  eq('E20b keepRun once: the entry, the file converted, the originals handed to the run',
+     { n: (rec.kept || []).length, entry: k.entry, converted: k.converted, files: k.files },
+     { n: 1, entry: 'main.tex', converted: 'main-pp.tex', files: h.files });
+  ok('E20c ...with the run itself (its -pp texts) and the tool', !!k.run && k.run.output instanceof Map &&
+     k.run.output.get('handout.sty') === STY_OUT && !!k.tool && typeof k.tool.runProject === 'function');
+  ok('E20d the names list loaded once', rec.nameLoads === 1, String(rec.nameLoads));
+}
+{
+  const { rec, press } = await world([['main.tex', CLEAN]], { names: () => NAMES });
+  await press();
+  const k = (rec.kept || [])[0] || {};
+  eq('E20e nothing changed: kept, the original is the file converted', [k.entry, k.converted], ['main.tex', 'main.tex']);
+}
+{
+  const { rec, press } = await world([['main.tex', COMMENTED]], { names: () => NAMES });
+  await press();
+  ok('E20f a stop hands nothing', !(rec.kept || []).length, JSON.stringify(rec.kept));
+}
+{
+  const { rec, press } = await world([['main.tex', CLEAN]], { names: () => { throw new Error('forced names failure'); } });
+  await press();
+  ok('E20g the names list failing: converted anyway, without it; the log warns',
+     rec.convs.length === 1 && rec.handed.length === 1 && rec.handed[0].latexNames === undefined &&
+     (rec.levels || []).includes('warn') && rec.logs.some((l) => l.includes('names list')), JSON.stringify(rec.logs));
 }
 
 console.log(`\n──────── ${pass} passed, ${fail} failed ────────`);

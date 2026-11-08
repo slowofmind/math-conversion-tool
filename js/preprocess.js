@@ -6,6 +6,10 @@
 //   initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
 //     runConversion, showReport, updateLog, updateStatus, loadTable,
 //     loadTool }) -> { run }       run() is one press of the button.
+// latex-preprocess s292 adds two optional ones, for the Report view:
+// loadNames (the names list's JSON, handed to the run as latexNames) and
+// keepRun({ tool, run, files, entry, converted }), called after each run
+// that converts, before the report shows (test E20).
 // Every page function is passed in, and this module never touches
 // `document` (judgement call 79), so it runs unchanged in Node and in the
 // browser. The tool and its table load on the first press and are kept.
@@ -61,8 +65,10 @@ export function originalPathOf(path) {
 }
 
 export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
-  runConversion, showReport, updateLog, updateStatus, loadTable, loadTool } = {}) {
+  runConversion, showReport, updateLog, updateStatus, loadTable, loadTool,
+  loadNames, keepRun } = {}) {
   let loaded = null;       // { tool, capability }, kept only once a load succeeds
+  let names = null;        // the names list, kept only once a load succeeds
   let busy = false;        // a press during a press is ignored
 
   async function load() {
@@ -72,6 +78,20 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
     const capability = tool.createCapability(table);   // the tool wants it built
     loaded = { tool, capability };
     return loaded;
+  }
+
+  // latex-preprocess s292 (the combined report's platform step 2): the list of
+  // LaTeX's, the classes' and the packages' command names (data/latex-names.json),
+  // built by the tool's own createLatexNames. It serves the report only, so a
+  // failed load does not stop the press: the run goes without it, the log warns,
+  // and the next press tries again.
+  async function loadNamesList(tool) {
+    if (names || !loadNames) return names || undefined;
+    try { names = tool.createLatexNames(await loadNames()); return names; } catch (e) {
+      updateLog([{ level: 'warn', message: `Preprocess: the names list did not load (${message(e)}); ` +
+        'the report cannot tell this time which commands nobody understands.' }]);
+      return undefined;
+    }
   }
 
   // A stop: nothing written, nothing converted, the reason in both places.
@@ -145,8 +165,9 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
     }
 
     // 5. The tool. A throw writes nothing. Then call 85, from the run itself.
+    const latexNames = await loadNamesList(tool);
     let result;
-    try { result = tool.runProject(files, { capability, entry: entryPath }); } catch (e) {
+    try { result = tool.runProject(files, { capability, entry: entryPath, ...(latexNames ? { latexNames } : {}) }); } catch (e) {
       return stop(`the preprocessor failed on ${entryPath} (${message(e)}). ` +
         'Nothing was changed or converted.');
     }
@@ -197,6 +218,7 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
           { source: PREPROCESSED });
       syncAuxFiles();
       const mainPp = ppPathOf(entryPath);
+      if (keepRun) keepRun({ tool, run: result, files, entry: entryPath, converted: mainPp });
       showReport(report);
       updateLog([{ level: 'info', message: `Preprocess: ${listed(changed)} changed; saved ` +
         `${listed(wanted.map(([, pp]) => pp))}; converting ${mainPp}.` }]);
@@ -210,6 +232,7 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
     // original of the copy it was on; the target back to the original if it
     // was a copy; the original converted.
     removeEarlier(earlier);
+    if (keepRun) keepRun({ tool, run: result, files, entry: entryPath, converted: entryPath });
     showReport(report);
     updateLog([{ level: 'info', message: `Preprocess: nothing in ${entryPath} needed changing` +
       (earlier.length ? `; removed the earlier copies ${listed(earlier.map((e) => e.path))}` : '') +

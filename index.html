@@ -1002,6 +1002,38 @@
   .tab-content { display: none; height: 100%; }
   .tab-content.active { display: flex; flex-direction: column; }
 
+  /* Report view (latex-preprocess s292, the combined report's platform step 2; js/report-view.js) */
+  #tabReport { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; overflow: auto; }
+  .report-bar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .report-status { margin: 0; flex: 1 1 320px; }
+  .report-spacer { flex: 0 0 0; }
+  .report-copied { color: var(--text-muted); }
+  .report-note { color: var(--text-muted); padding: 16px; margin: 0; }
+  .report-settings { padding: 8px 16px; border-bottom: 1px solid var(--border); }
+  .report-settings fieldset { border: 1px solid var(--border); margin: 0 0 8px; padding: 4px 10px 8px; }
+  .report-settings legend { font-weight: 600; }
+  .report-levels label { margin-right: 14px; }
+  .report-custom { font-style: italic; }
+  .report-tick { margin: 2px 0; }
+  .report-tick-child { margin-left: 22px; }
+  .report-why { display: block; margin-left: 22px; color: var(--text-muted); }
+  .report-list { padding: 4px 16px 16px; }
+  .report-file { font-size: 13px; margin: 12px 0 4px; }
+  .report-entries, .report-inner { list-style: none; margin: 0; padding: 0; }
+  .report-inner { padding-left: 18px; }
+  .report-entry { padding: 2px 0; }
+  .report-place { font-family: 'IBM Plex Mono', monospace; }
+  .report-level { font-weight: 600; }
+  .report-error .report-level { color: var(--error); }
+  .report-warning .report-level { color: var(--warning); }
+  .report-details { list-style: disc; margin: 0 0 0 24px; color: var(--text-muted); }
+  .report-fold { background: none; border: none; padding: 2px 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+  .report-go { background: none; border: none; padding: 2px 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+  .report-go:hover .report-place { text-decoration: underline; }
+  .report-missing { color: var(--text-muted); font-style: italic; }
+  .report-fold::before { content: '▸ '; }
+  .report-fold[aria-expanded="true"]::before { content: '▾ '; }
+
   /* Preview iframe */
   #previewFrame { flex: 1; border: none; background: #fff; }
 
@@ -2595,6 +2627,7 @@
           <option value="source">Code</option>
           <option value="preprocess">Preprocess</option>
           <option value="log">Log</option>
+          <option value="report">Report</option>
         </select></span>
         <!-- No Page drop-down (removed 2026-10-10, PLAN-MULTIPAGE-PREVIEW.md D2): the preview
              frame's name says which page ("page 3 of 12"); the pages' own links move between them. -->
@@ -2657,6 +2690,9 @@
           </div>
           <pre id="preprocessReport" hidden style="margin: 0; padding: 16px; white-space: pre-wrap; font-size: 12px;"></pre>
         </div>
+        <!-- Report (latex-preprocess s292, PLAN-COMBINED-PLATFORM-s278 step 2): the combined report, drawn by
+             js/report-view.js; Preprocess and Log stay until it has been tested. -->
+        <div class="tab-content" id="tabReport"></div>
       </div>
     </div>
 
@@ -2695,6 +2731,7 @@ import { initSmartCleanup } from './cleanup/smart-cleanup.js';
 import { initIntentReview } from './intent/intent-review.js';
 import { initMathCATProof } from './js/mathcat-proof.js';
 import { initPreprocess } from './js/preprocess.js';
+import { initReportView } from './js/report-view.js';
 import { initLogDisplay } from './js/log-display.js';
 import { initOutputTabs } from './js/output-tabs.js';
 import { initWarningParser } from './js/warning-parser.js';
@@ -3936,6 +3973,13 @@ const READER_BY_EXT = Object.freeze({
   'epub': 'epub', 'fb2': 'fb2', 'ipynb': 'ipynb',
 });
 
+// The Report view's marks for its main file (latex-preprocess s293, platform step 3):
+// { file, diags } from its last drawing, put back whenever that file is shown.
+let reportMarks = null;
+function applyReportMarks() {
+  if (reportMarks && editor.currentDocumentId() === reportMarks.file) editor.setDiagnostics(reportMarks.diags);
+}
+
 async function openProjectFile(entry) {
   if (!entry) return;
 
@@ -3970,6 +4014,7 @@ async function openProjectFile(entry) {
                       def: 'latex', clo: 'latex', md: 'markdown',
                       markdown: 'markdown', html: 'html', htm: 'html' };
     editor.setLanguage(langMap[entry.ext] || 'text');
+    applyReportMarks();
 
     syncAuxFiles();
     const lbl = document.getElementById('sourceViewerLabel');
@@ -8024,6 +8069,7 @@ async function runConversion() {
   // openProjectFile). Conversion therefore reads the editor, unchanged
   // from before Stages 3/4.
   const sourceText = inputBinaryFile ? null : getSourceForConversion();
+  const reportTarget = projectModel.project.convertTargetPath;   // the Report view takes Pandoc's log for this file (s292)
 
   try {
     if (isThoriumPreset()) { updateStatus('loading', 'Loading Thorium EPUB assets…'); await ensureThoriumAssets(); }
@@ -8112,6 +8158,9 @@ async function runConversion() {
 
     // Update log panel
     updateLog(warnings, result.stderr);
+    // The Report view: Pandoc's own log, as pandoc-wasm returned it (latex-preprocess s292)
+    try { reportView.pandoc({ target: reportTarget, warnings: result.warnings, stderr: result.stderr }); }
+    catch (e) { console.warn('Report: Pandoc\'s messages could not be added (' + e.message + ')'); }
 
     // Handle output
     const downloadBtn = document.getElementById('btnDownloadOutput');
@@ -8315,6 +8364,8 @@ async function runConversion() {
     }
     updateStatus('error', `Error: ${err.message}`);
     updateLog([{ line: null, column: null, level: 'error', message: userMessage, matchedText: null, type: 'exception' }], '');
+    try { reportView.pandoc({ target: reportTarget, error: err.message }); }
+    catch (e) { console.warn('Report: Pandoc\'s stop could not be added (' + e.message + ')'); }
   } finally {
     btn.disabled = false;
     btn.textContent = 'Convert';
@@ -8500,17 +8551,55 @@ async function loadTable() {
   if (!res.ok) throw new Error('the preprocessor table did not load: HTTP ' + res.status);
   return res.json();
 }
+// latex-preprocess s292 (the combined report's platform step 2): the tool's
+// report modules load with it, and the names list (data/latex-names.json,
+// 2.7 MB) on the first press; the run and the original files are kept for the
+// Report view (js/report-view.js), which Pandoc's log joins after the
+// conversion that press starts.
 async function loadTool() {
-  const [run, capability, report] = await Promise.all([
+  const [run, capability, report, names, findings, check, combined] = await Promise.all([
     import('./preprocess/v2/run.mjs'),
     import('./preprocess/v2/capability.mjs'),
     import('./preprocess/v2/report.mjs'),
+    import('./preprocess/v2/latex-names.mjs'),
+    import('./preprocess/v2/findings.mjs'),
+    import('./preprocess/v2/a11y/check.mjs'),
+    import('./preprocess/v2/combined.mjs'),
   ]);
-  return { ...run, ...capability, ...report };
+  return { ...run, ...capability, ...report, ...names, ...findings, ...check, ...combined };
 }
+async function loadNames() {
+  const res = await fetch('preprocess/data/latex-names.json');
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+// Click to the line (latex-preprocess s293, platform step 3). An entry opens its file
+// through the Files list's own open action, kept from becoming the conversion target
+// (a click reads; it does not change what is converted), then jumps to the line and
+// highlights the entry's place. One highlight per file: the next click replaces it.
+const reportHighlights = new Map();   // file -> highlight token
+function reportTextOf(path) {
+  return editor.currentDocumentId() === path ? editor.getText() : projectModel.getText(path);
+}
+async function reportGoTo(t) {
+  if (editor.currentDocumentId() !== t.file) {
+    const entry = projectModel.getEntry(t.file);
+    if (!entry || !entry.viewable) { updateStatus('ready', `${t.file} is not in the project`); return false; }
+    await openProjectFile({ ...entry, convertible: false });
+    if (editor.currentDocumentId() !== t.file) return false;
+  }
+  if (reportHighlights.has(t.file)) editor.clearHighlights(reportHighlights.get(t.file));
+  reportHighlights.set(t.file, editor.highlightRanges(t.ranges));
+  editor.gotoLine(t.line, t.column || 1);
+  return true;
+}
+const reportView = initReportView({ root: document.getElementById('tabReport'),
+  textOf: reportTextOf, goTo: reportGoTo,
+  mark: (m) => { reportMarks = m; applyReportMarks(); } });
 const { run: runPreprocess } = initPreprocess({
   model: projectModel, editor, openProjectFile, syncAuxFiles, runConversion,
   showReport, updateLog, updateStatus, loadTable, loadTool,
+  loadNames, keepRun: (k) => reportView.keep(k),
 });
 document.getElementById('btnPreprocess').addEventListener('click', () => runPreprocess());
 // ════════════════════════════════════════════════════════════════════
