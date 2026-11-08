@@ -1,0 +1,13 @@
+--- hand fixtures
+--- example fixtures
+--- search
+--- typed operands (the demo page path)
+--- auto-coverage snapshot
+FAIL  prime-subscripted: want ready "\\MathMLintent{prime-notation:postfix($a)}{{\\MathMLarg{a}{f_n}}'}", got needs-operands (ambiguous: The selection can be read in more than one way for "prime-notation": f  or  f_n. Mark the operands.)
+FAIL  tends-to-from-above: want ready "\\MathMLintent{tends-to-from-above:infix($a1,$a2)}{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{+}}}", got needs-operands (example-disagrees: The Reference tool's kernel form for "tends-to-from-above" marks the operands differently from how the tool reads this notation. Mark the operands.)
+FAIL  tends-to-from-below: want ready "\\MathMLintent{tends-to-from-below:infix($a1,$a2)}{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{-}}}", got needs-operands (example-disagrees: The Reference tool's kernel form for "tends-to-from-below" marks the operands differently from how the tool reads this notation. Mark the operands.)
+FAIL  coverage tends-to-from-above--example: was labelled without help in the pinned snapshot, now is not
+FAIL  coverage tends-to-from-below--example: was labelled without help in the pinned snapshot, now is not
+
+example fixtures labelled without help: 146 of 164
+test-core: 664 passed, 5 failed

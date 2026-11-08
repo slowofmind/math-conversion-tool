@@ -39067,8 +39067,8 @@
    "status": "decided",
    "arity": 2,
    "operands": [
-    "sub",
-    "a"
+    "a",
+    "sub"
    ],
    "fixity": "function",
    "fixityFrom": "custom",
@@ -47041,8 +47041,8 @@
     "a1",
     "a2"
    ],
-   "fixity": "function",
-   "fixityFrom": "core",
+   "fixity": "infix",
+   "fixityFrom": "annotation",
    "wording": "$a2 permutation of $a1",
    "groups": [
     "discrete",

@@ -2,7 +2,7 @@
  "meta": {
   "generator": "test/gen-fixtures.mjs",
   "group": "calculus-analysis",
-  "generated": "2026-11-08T21:25:22.695Z",
+  "generated": "2026-11-08T21:50:37.942Z",
   "export": {
    "layout": "slim layout 1",
    "generator": "tools/export-slim.mjs",
@@ -2865,7 +2865,7 @@
    "source": "$x \\to a^{+}$",
    "select": "x \\to a^{+}",
    "expect": {
-    "text": "\\MathMLintent{tends-to-from-above:infix($a1,$a2)}{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{+}}}",
+    "text": "\\MathMLintent{tends-to-from-above:infix($a1,$a2)}{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a}^{+}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2874,7 +2874,7 @@
      "nth": 1
     },
     {
-     "text": "a^{+}",
+     "text": "a",
      "nth": 1
     }
    ]
@@ -2886,7 +2886,7 @@
    "source": "$x \\to a^{-}$",
    "select": "x \\to a^{-}",
    "expect": {
-    "text": "\\MathMLintent{tends-to-from-below:infix($a1,$a2)}{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{-}}}",
+    "text": "\\MathMLintent{tends-to-from-below:infix($a1,$a2)}{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a}^{-}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2895,7 +2895,7 @@
      "nth": 1
     },
     {
-     "text": "a^{-}",
+     "text": "a",
      "nth": 1
     }
    ]

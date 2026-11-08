@@ -38,8 +38,8 @@
    "role": 20,
    "withShape": 1122,
    "multiVariant": 12,
-   "withForms": 1193,
-   "readsWithoutMarkup": 75
+   "withForms": 1196,
+   "readsWithoutMarkup": 92
   }
  },
  "concepts": [
@@ -35677,18 +35677,18 @@
    "arity": 2,
    "variableArity": null,
    "operands": [
-    "sub",
-    "a"
+    "a",
+    "sub"
    ],
    "fixity": "function",
    "variants": [],
    "forms": [
     {
-     "tex": "\\MathMLintent{subscripted-norm:function($sub,$a)}{{\\left\\| \\MathMLarg{a}{\\mathbf{v}} \\right\\|_{\\MathMLarg{sub}{2}}}}",
-     "intent": "subscripted-norm:function($sub,$a)",
+     "tex": "\\MathMLintent{subscripted-norm:function($a,$sub)}{{\\left\\| \\MathMLarg{a}{\\mathbf{v}} \\right\\|_{\\MathMLarg{sub}{2}}}}",
+     "intent": "subscripted-norm:function($a,$sub)",
      "operands": [
-      "sub",
-      "a"
+      "a",
+      "sub"
      ],
      "default": true
     }
@@ -35738,7 +35738,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -35782,7 +35782,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -36136,7 +36136,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -36177,7 +36177,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -36259,7 +36259,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -36324,7 +36324,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -36665,7 +36665,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -40235,7 +40235,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{annotation:infix($a1,$a2)}{{\\underbrace{\\MathMLarg{a1}{H_2O}}_{\\MathMLarg{a2}{\\text{water}}}}}",
+     "intent": "annotation:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -40298,7 +40308,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -40688,7 +40698,7 @@
    ],
    "forms": [],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -40986,7 +40996,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -41136,7 +41146,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -41566,7 +41576,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -41751,7 +41761,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -42032,7 +42042,7 @@
     "a1",
     "a2"
    ],
-   "fixity": "function",
+   "fixity": "infix",
    "variants": [
     {
      "arity": 2,
@@ -42044,7 +42054,53 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{pochhammer:infix($n,$k)}{{P_{\\MathMLarg{k}{k}}^{\\MathMLarg{n}{n}}}}",
+     "intent": "pochhammer:infix($n,$k)",
+     "operands": [
+      "n",
+      "k"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{pochhammer:infix($n,$k)}{{{}^{\\MathMLarg{n}{n}}P_{\\MathMLarg{k}{k}}}}",
+     "intent": "pochhammer:infix($n,$k)",
+     "operands": [
+      "n",
+      "k"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{pochhammer:infix($n,$k)}{{{}_{\\MathMLarg{n}{n}}P_{\\MathMLarg{k}{k}}}}",
+     "intent": "pochhammer:infix($n,$k)",
+     "operands": [
+      "n",
+      "k"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{pochhammer:infix($n,$k)}{{P_{\\MathMLarg{n}{n},\\MathMLarg{k}{k}}}}",
+     "intent": "pochhammer:infix($n,$k)",
+     "operands": [
+      "n",
+      "k"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{pochhammer:infix($n,$k)}{{P(\\MathMLarg{n}{n},\\MathMLarg{k}{k})}}",
+     "intent": "pochhammer:infix($n,$k)",
+     "operands": [
+      "n",
+      "k"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42265,7 +42321,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -42309,7 +42365,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -42386,7 +42442,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -42524,7 +42580,7 @@
    ],
    "forms": [
     {
-     "tex": "\\MathMLintent{tends-to-from-above:infix($a1,$a2)}{{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{+}}}}",
+     "tex": "\\MathMLintent{tends-to-from-above:infix($a1,$a2)}{{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a}^{+}}}",
      "intent": "tends-to-from-above:infix($a1,$a2)",
      "operands": [
       "a1",
@@ -42567,7 +42623,7 @@
    ],
    "forms": [
     {
-     "tex": "\\MathMLintent{tends-to-from-below:infix($a1,$a2)}{{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{-}}}}",
+     "tex": "\\MathMLintent{tends-to-from-below:infix($a1,$a2)}{{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a}^{-}}}",
      "intent": "tends-to-from-below:infix($a1,$a2)",
      "operands": [
       "a1",
@@ -42618,7 +42674,7 @@
     }
    ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -42649,7 +42705,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{translation:function($a1,$a2)}{{T_{(\\MathMLarg{a1}{1},\\MathMLarg{a2}{3})}}}",
+     "intent": "translation:function($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,

@@ -1,0 +1,11 @@
+--- hand fixtures
+--- example fixtures
+--- search
+--- typed operands (the demo page path)
+--- auto-coverage snapshot
+FAIL  prime-subscripted: want ready "\\MathMLintent{prime-notation:postfix($a)}{{\\MathMLarg{a}{f_n}}'}", got needs-operands (ambiguous: The selection can be read in more than one way for "prime-notation": f  or  f_n. Mark the operands.)
+FAIL  coverage tends-to-from-above--example: was labelled without help in the pinned snapshot, now is not
+FAIL  coverage tends-to-from-below--example: was labelled without help in the pinned snapshot, now is not
+
+example fixtures labelled without help: 146 of 164
+test-core: 666 passed, 3 failed

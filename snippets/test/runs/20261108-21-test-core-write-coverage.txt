@@ -1,0 +1,10 @@
+--- hand fixtures
+--- example fixtures
+--- search
+--- typed operands (the demo page path)
+--- auto-coverage snapshot
+wrote C:\Users\nim022\Desktop\mma-code\Accessible-STEM-Project\pandoc-for-math-conversion\snippets\test\fixtures\auto-coverage-calculus-analysis.json (146 ready)
+FAIL  prime-subscripted: want ready "\\MathMLintent{prime-notation:postfix($a)}{{\\MathMLarg{a}{f_n}}'}", got needs-operands (ambiguous: The selection can be read in more than one way for "prime-notation": f  or  f_n. Mark the operands.)
+
+example fixtures labelled without help: 146 of 164
+test-core: 520 passed, 1 failed

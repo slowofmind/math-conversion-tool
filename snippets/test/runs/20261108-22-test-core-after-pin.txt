@@ -1,0 +1,9 @@
+--- hand fixtures
+--- example fixtures
+--- search
+--- typed operands (the demo page path)
+--- auto-coverage snapshot
+FAIL  prime-subscripted: want ready "\\MathMLintent{prime-notation:postfix($a)}{{\\MathMLarg{a}{f_n}}'}", got needs-operands (ambiguous: The selection can be read in more than one way for "prime-notation": f  or  f_n. Mark the operands.)
+
+example fixtures labelled without help: 146 of 164
+test-core: 666 passed, 1 failed

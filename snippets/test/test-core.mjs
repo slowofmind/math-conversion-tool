@@ -86,7 +86,8 @@ ok(s5c.some(d => d.key === 'core:plus' && d.readsWithoutMarkup), 'search: reads-
 let layoutRefused = false;
 try { createSnippetCore({ meta: { layout: 'slim layout 2' }, concepts: [] }); } catch (e) { layoutRefused = /slim layout 1/.test(e.message); }
 ok(layoutRefused, 'a concept list with another layout label is refused, naming the layout the tool reads', '');
-const s6 = core.search('log');
+// [CLAUDE 2026-11-08, later] logarithm is labelled "reads without markup" (hidden by default), so ask for labelled ones
+const s6 = core.search('log', { includeReadsWithoutMarkup: true });
 ok(s6[0]?.concept === 'logarithm' || names(s6).slice(0, 3).includes('logarithm'), 'search: no group filter searches every group', `got ${names(s6).slice(0, 5)}`);
 // [CLAUDE 2026-11-08] hyperbolic-sine is labelled "reads without markup", so it is hidden by default
 const s7 = core.search('hyp sin', { group: GROUP, includeReadsWithoutMarkup: true });

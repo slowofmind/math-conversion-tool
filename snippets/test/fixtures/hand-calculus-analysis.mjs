@@ -158,10 +158,13 @@ export const fixtures = [
     expect: needs(null) },
   { id: 'tends-to', concept: 'tends-to', source: R`$n\to\infty$`, select: R`n\to\infty`,
     expect: ready(R`\MathMLintent{tends-to:infix($a1,$a2)}{\MathMLarg{a1}{n}\to\MathMLarg{a2}{\infty}}`), operands: ops('n', R`\infty`) },
+  // [CLAUDE 2026-11-08, later] the + / - is notation, not part of the second part [NICHOLAS 2026-11-08]
+  // (reading test: "x tends to from above a superscript plus"). The shape finder reads a^{+} as one piece,
+  // so the kernel form disagrees and the core asks; the author marks x and a.
   { id: 'tends-to-from-above', concept: 'tends-to-from-above', source: R`$x \to a^{+}$`, select: R`x \to a^{+}`,
-    expect: ready(R`\MathMLintent{tends-to-from-above:infix($a1,$a2)}{\MathMLarg{a1}{x} \to \MathMLarg{a2}{a^{+}}}`), operands: ops('x', 'a^{+}') },
+    expect: needs('example-disagrees', R`\MathMLintent{tends-to-from-above:infix($a1,$a2)}{\MathMLarg{a1}{x} \to \MathMLarg{a2}{a}^{+}}`), operands: ops('x', 'a') },
   { id: 'tends-to-from-below', concept: 'tends-to-from-below', source: R`$x \to a^{-}$`, select: R`x \to a^{-}`,
-    expect: ready(R`\MathMLintent{tends-to-from-below:infix($a1,$a2)}{\MathMLarg{a1}{x} \to \MathMLarg{a2}{a^{-}}}`), operands: ops('x', 'a^{-}') },
+    expect: needs('example-disagrees', R`\MathMLintent{tends-to-from-below:infix($a1,$a2)}{\MathMLarg{a1}{x} \to \MathMLarg{a2}{a}^{-}}`), operands: ops('x', 'a') },
   { id: 'differential-d', concept: 'differential-d', source: R`$\int f(x)\,dx$`, select: 'd', nth: 1,
     expect: ready(R`\MathMLintent{differential-d:nofix}{d}`), operands: [] },
 
