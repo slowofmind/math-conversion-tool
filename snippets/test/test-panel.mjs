@@ -46,7 +46,8 @@ const core = createSnippetCore(loadExport());
   const c = createSnippetController({ core, editor: ed });
   const r = c.apply('tends-to-from-above');
   ok(r.status === 'needs-operands' && ed.getText() === R`$x \to a^{+}$`, 'needs parts: document unchanged until the author marks them', `${r.status} ${r.reason?.code}`);
-  ok(/^Mark the parts:/.test(describeResult(r)), 'status line asks for the parts');
+  ok(/Mark the parts\.$/.test(describeResult(r)) && !/operand/i.test(describeResult(r)),
+    'status line asks for the parts, in the panel\'s words ("parts", not "operands")', describeResult(r));
   const r2 = c.applyParts('tends-to-from-above', ['x', 'a']);
   ok(r2.status === 'ready' && ed.getText() === R`$\MathMLintent{tends-to-from-above:infix($a1,$a2)}{\MathMLarg{a1}{x} \to \MathMLarg{a2}{a}^{+}}$`,
     'typed parts are written', ed.getText());

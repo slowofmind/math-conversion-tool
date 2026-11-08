@@ -78,15 +78,17 @@ export function createSnippetController({ core, editor }) {
   };
 }
 
-/** A plain-language line for the status region. */
+/** A plain-language line for the status region. [CLAUDE 2026-11-08] The core's messages say "operand"; the
+ *  panel says "part" (live check: "Mark the parts: ... Mark the operands." was read out). */
+const plain = s => String(s).replace(/\boperands\b/g, 'parts').replace(/\boperand\b/g, 'part').replace(/\bOperand\b/g, 'Part');
 export function describeResult(r) {
   if (r.status === 'ready') {
     const parts = r.operands.length ? ` Parts: ${r.operands.map(o => `${o.name} = ${o.text}`).join('; ')}.` : '';
-    const warn = r.warnings?.length ? ` Check: ${r.warnings.map(w => w.message).join(' ')}` : '';
+    const warn = r.warnings?.length ? ` Check: ${r.warnings.map(w => plain(w.message)).join(' ')}` : '';
     return `Applied ${r.value}.${parts}${warn}`;
   }
-  if (r.status === 'needs-operands') return `Mark the parts: ${r.reason.message}`;
-  return `Not applied: ${r.reason.message}`;
+  if (r.status === 'needs-operands') return plain(r.reason.message);
+  return `Not applied: ${plain(r.reason.message)}`;
 }
 
 /** Is this keydown the snippet shortcut (Ctrl+Period)? The physical key or the "." character, so other
@@ -126,7 +128,7 @@ export async function initSnippetPanel(ctx) {
     for (const k of ['filter', 'group', 'source', 'notUsed', 'rwm', 'list', 'apply']) el[k].disabled = true;
     return null;
   }
-  for (const g of controller.core.groups()) el.group.add(new Option(`${g.id} (${g.count})`, g.id));
+  for (const g of controller.core.groups()) el.group.add(new Option(`${g.id.replace(/-/g, ' ')} (${g.count})`, g.id));
   for (const s of controller.core.sources()) el.source.add(new Option(`${s.id} (${s.count})`, s.id));
   let pending = null;   // { key, forms } while the parts form is open
   let target = null;    // the selection remembered when the panel opened ({ start, end, text })
@@ -146,12 +148,13 @@ export async function initSnippetPanel(ctx) {
       el.list.add(new Option(`${d.label} — ${ops}${tags}`, d.key));
     }
     if (el.list.options.length) el.list.selectedIndex = 0;
-    el.count.textContent = String(el.list.options.length);
+    // [CLAUDE 2026-11-08] the list shows at most 300; say so rather than "300 shown" (live check)
+    el.count.textContent = hits.length >= 300 ? `first ${hits.length}` : String(hits.length);
   }
   function closeParts() { pending = null; el.parts.hidden = true; el.fields.textContent = ''; }
   function partsForm(key, r) {
     pending = { key, forms: r.forms.length ? r.forms : [{ arity: 1, operands: ['a1'] }] };
-    el.partsWhy.textContent = r.reason.message;
+    el.partsWhy.textContent = describeResult(r);
     el.arity.textContent = '';
     for (const f of pending.forms) el.arity.add(new Option(`${f.arity} (${f.operands.join(', ')})`, String(f.arity)));
     el.arityWrap.hidden = pending.forms.length < 2;
@@ -174,7 +177,7 @@ export async function initSnippetPanel(ctx) {
   function done(r) {
     closeParts();
     target = null;
-    el.undo.disabled = false;
+    el.undo.setAttribute('aria-disabled', 'false');
     say(describeResult(r), r.warnings?.length ? 'warning' : 'ready');
     ctx.editor.focus();
   }
@@ -208,19 +211,27 @@ export async function initSnippetPanel(ctx) {
   }
   const inPanel = () => el.panel.contains(document.activeElement);
 
-  for (const k of ['filter']) el[k].addEventListener('input', fill);
+  // [CLAUDE 2026-11-08] live check: refilling the list on every keystroke made NVDA say "list item" several
+  // times; refill once typing pauses (the list is read when the author arrows into it).
+  let fillTimer = null;
+  el.filter.addEventListener('input', () => { clearTimeout(fillTimer); fillTimer = setTimeout(fill, 250); });
   for (const k of ['group', 'source', 'notUsed', 'rwm']) el[k].addEventListener('change', fill);
   el.filter.addEventListener('focus', () => { if (!target) target = controller.selection(); showSelection(); });
   el.filter.addEventListener('keydown', e => {
-    if (e.key === 'ArrowDown') { e.preventDefault(); el.list.focus(); }
-    if (e.key === 'Enter') { e.preventDefault(); apply(); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); clearTimeout(fillTimer); fill(); el.list.focus(); }
+    if (e.key === 'Enter') { e.preventDefault(); clearTimeout(fillTimer); fill(); apply(); }
   });
   el.list.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); apply(); } });
   el.list.addEventListener('dblclick', apply);
   el.apply.addEventListener('click', apply);
   el.back.addEventListener('click', () => back('Back to the editor. Nothing was changed.'));
+  // [CLAUDE 2026-11-08] live check: disabling the focused Undo button dropped focus to the page. It is now
+  // marked aria-disabled (stays focusable, announced as unavailable) and does nothing then.
+  const undoOff = () => el.undo.getAttribute('aria-disabled') === 'true';
   el.undo.addEventListener('click', () => {
-    if (controller.undo()) { say('The last snippet was undone.'); el.undo.disabled = true; } else say('Nothing to undo.', 'warning');
+    if (undoOff()) { say('Nothing to undo.', 'warning'); return; }
+    if (controller.undo()) { say('The last snippet was undone.'); el.undo.setAttribute('aria-disabled', 'true'); }
+    else say('Nothing to undo.', 'warning');
   });
   el.parts.addEventListener('submit', e => {
     e.preventDefault();
@@ -239,7 +250,10 @@ export async function initSnippetPanel(ctx) {
   document.addEventListener('keydown', e => {
     if (!isShortcut(e)) return;
     e.preventDefault(); e.stopPropagation();
-    if (inPanel()) back('Back to the editor. Nothing was changed.'); else open();
+    // [CLAUDE 2026-11-08] say any failure out loud instead of failing silently (live check: a press after a
+    // burst of selection changes sometimes did nothing; this tells a page error from a key that never arrived)
+    try { if (inPanel()) back('Back to the editor. Nothing was changed.'); else open(); }
+    catch (err) { console.error('[snippet panel]', err); say(`The snippet panel could not open: ${err.message}`, 'error', { bar: true }); }
   }, true);
   fill();
   return { controller, open };
