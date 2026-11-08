@@ -32,6 +32,8 @@ import { classifyFiles, readDocument } from "./reader.mjs";
 import { createDecide } from "./decide.mjs";
 import { runWalk } from "./walk.mjs";
 import { surfaceDrops } from "./surface.mjs";
+import { findUnknownCalls, reachedCalls, nameRedefinitions } from "./unknown-calls.mjs";
+import { buildSourceMap, mapPosition } from "./source-map.mjs";
 import { surfaceItemMarkers } from "./item-markers.mjs";
 import { createAtLetter } from "./transforms/at-letter.mjs";
 import { createRequirePackage } from "./transforms/require-package.mjs";
@@ -95,15 +97,13 @@ function handlersRanFrom(reader) {
 
 // Which files the reader opened AS PACKAGES, matched exactly against the
 // chain. comment-alias must not edit a package file, and this is how it
-// tells one apart from a subfile.
+// tells one apart from a subfile. s287: from the row's `target` (s285), not its
+// words; a subfile's parent row is a "load" row too, and has `parent`.
 function packageFilesFrom(reader) {
   const set = new Set();
-  for (const row of reader.record) {
-    if (!row.what.startsWith("load ") || !String(row.effect).startsWith("reading ")) continue;
-    for (const p of reader.chain)
-      if (row.effect === "reading " + p || row.effect.startsWith("reading " + p + " with ["))
-        set.add(p);
-  }
+  for (const row of reader.record)
+    if (row.what.startsWith("load ") && row.target != null && row.parent == null && reader.chain.includes(row.target))
+      set.add(row.target);
   return set;
 }
 
@@ -165,7 +165,7 @@ export function runProject(files, options = {}) {
       "so there is no document to read");
 
   const reader = readDocument(entry, map, { project });
-  if (options.expand === false) return finish(runOnce(map, project, reader, entry, options, {}), null, map);
+  if (options.expand === false) return reached(finish(runOnce(map, project, reader, entry, options, {}), null, map), map, capability);
 
   // The first reading decides what is written out: the store, where the body
   // begins, the commands flagged at the call, the definition sites.
@@ -176,7 +176,7 @@ export function runProject(files, options = {}) {
   const flagSites = findDefinitionSites({ files: chainFiles.filter((f) => map.has(f.path)), commands: flagCommands,
                                           list: flagList, choices: flagChoices, flags: reader.summary.flags || {} });
   const expansion = expandBody({ files: map, project, reader, entry, capability, flagCommands, flagSites, packageFiles });
-  if (!expansion.changed) return finish(runOnce(map, project, reader, entry, options, {}), expansion, map);
+  if (!expansion.changed) return reached(finish(runOnce(map, project, reader, entry, options, {}), expansion, map), map, capability);
 
   // The calls of flagged commands in the ORIGINAL text, for their IDs and
   // places: the written-out text has the same calls, moved, and no longer the
@@ -196,7 +196,7 @@ export function runProject(files, options = {}) {
   const project2 = classifyFiles(expansion.files);
   const reader2 = readDocument(entry, expansion.files, { project: project2 });
   const r = runOnce(expansion.files, project2, reader2, entry, options, { written: expansion.written.filter((w) => !w.left), quiet });
-  return finish(r, expansion, map, firstCalls);
+  return reached(finish(r, expansion, map, firstCalls), map, capability);
 }
 
 // Session 274: the document class and the file whose \documentclass names it:
@@ -310,6 +310,20 @@ function runOnce(map, project, reader, entry, options, extra) {
   // report gives it a section of its own under the same switch.
   const markers = surfaceItemMarkers({ files: walkFiles, capability });
 
+  // Session 289 (PLAN-REPORT-ORDER-s284 step 5): the commands and environments
+  // in the author's running text that no file read, nor Pandoc, nor LaTeX or
+  // the class defines, measured in the same text at the same moment. Reports
+  // only, on the attention channel; runs only when options.latexNames (the
+  // built names list, v2/latex-names.mjs) is handed in, as the capability is.
+  const unknown = options.latexNames
+    ? findUnknownCalls({ files: authorFiles, reader, capability, latexNames: options.latexNames, decide, documentclass: docClass.cls })
+    : { findings: [], byName: [], total: 0 };
+  // Session 290 (step 6): "redefined before defined" split by who defines the
+  // name (nameRedefinitions), under the same condition.
+  const renamed = (list) => options.latexNames
+    ? nameRedefinitions(list, { reader, latexNames: options.latexNames, documentclass: docClass.cls,
+                                tokensOf: (p) => project.byPath.get(p) && project.byPath.get(p).tokens }) : list;
+
   const walk = runWalk({
     files: walkFiles,
     state: null,
@@ -353,7 +367,8 @@ function runOnce(map, project, reader, entry, options, extra) {
     // session 269: list-carrier's tag on each numbered item (lists/item-mark)
     // is left out like flagging's per-call tags: one line per item would bury
     // the report; the list's own line and the preamble line stay
-    findings: walk.findings.filter((f) => f.rule !== "flag/tag" && f.rule !== "lists/item-mark" && f.rule !== "part/heading"),
+    findings: renamed(walk.findings.filter((f) => f.rule !== "flag/tag" && f.rule !== "lists/item-mark" && f.rule !== "part/heading"))
+      .concat(unknown.findings),
     dropped,
     markers,
     flagging,
@@ -384,6 +399,32 @@ function spliceAt(file, subText, parent, parentText) {
     if (g && groupText(pt, g).trim() === "document") take = pt[i].start;
   }
   return { file, parent, cut, take };
+}
+
+// Session 289: an unknown-command entry stays only where Pandoc will meet the
+// call. The pass reads the text before the fixes; a fix can take a call out
+// (the columns fix unwraps a multicols, X6) or wrap it in a tag (flagging's
+// \ppflag, X8). So the -pp copy is read by the same rules (reachedCalls) and
+// each call left is placed back with the source map (v2/source-map.mjs), as
+// Pandoc's own lines are; an entry no call places back to is dropped.
+function reached(res, original, capability) {
+  const unk = (f) => String(f.rule).startsWith("unknown/");
+  if (!res.findings.some(unk)) return res;
+  const sm = buildSourceMap(res, original);
+  const keys = new Set(), done = new Set();
+  for (const f of res.findings.filter(unk)) {
+    if (done.has(f.file) || !res.output.has(f.file)) continue;
+    done.add(f.file);
+    const names = new Set(res.findings.filter((x) => unk(x) && x.file === f.file).map((x) => x.detail.name));
+    const tokens = tokenize(res.output.get(f.file), { profile: profileFor(f.file), file: f.file }).tokens;
+    for (const c of reachedCalls({ tokens, reader: res.reader, capability, names })) {
+      const m = mapPosition(sm, f.file, { offset: c.start });
+      if (!m || m.how === "inserted") continue;
+      keys.add(m.file + "\u0001" + c.name + "\u0001" + (m.how === "written-out" ? m.range.start : m.offset));
+    }
+  }
+  return Object.assign({}, res, { findings: res.findings.filter((f) => !unk(f)
+    || keys.has(f.file + "\u0001" + f.detail.name + "\u0001" + f.span.start)) });
 }
 
 // Session 262: the result as runProject returns it. Without a written-out call

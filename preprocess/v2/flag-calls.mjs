@@ -187,7 +187,7 @@ function callsIn(tokens, file, text, commands, opts, base, hiddenWhy) {
     out.push({ name, file, open: i, close: last, start: base + start, end: base + end, place,
                shown: no ? "no" : dep ? "depends" : "yes", shownWhy: no || dep || "",
                outer: place === "nested" ? outerName : null, inRegion: !!hiddenWhy, inDepends: !!dep,
-               source: text.slice(start, end), reach: def.reach, decision });
+               source: text.slice(start, end), reach: def.reach, holds: def.holds || null, decision });
     // only a call tagged whole carries the calls inside it (s258: the words of
     // an "inside" command's arguments reach Pandoc, so their calls are tagged)
     if (place !== "nested" && decision === "call" && end > outerEnd) { outerEnd = end; outerName = name; }
@@ -427,6 +427,13 @@ function whyInside(c, sites) {
     : "its words reach Pandoc; its definition holds no piece a tag could be written around" + (mine.length ? " (" + mine.map((s) => s.id).join(", ") + " listed)" : "");
 }
 
+// What the call loses, after its name. s278: a definition holding only a box
+// (holds "box": \fbox, \framebox ..) frames words; it draws nothing
+// (_work/_s278-boxes.txt: Pandoc keeps no frame).
+const lossOf = (c) => c.holds === "box"
+  ? " puts a box around its words; Pandoc carries no box (" + c.reach + ")"
+  : " draws something Pandoc cannot carry (" + c.reach + ")";
+
 // flagEntries(calls, sites) -> { entries, byName, total, sites }, after the
 // transform has marked each call and site tagged or not. Nothing is written
 // anywhere. Rules: flag/tagged, flag/inside (s258: tagged inside its
@@ -442,8 +449,8 @@ function expandedEntry(c, sites) {
   const said = "\\" + c.name;
   return Object.freeze({
     rule: "flag/expanded", name: c.name, file: c.file, span: Object.freeze({ start: c.start, end: c.end }),
-    note: said + " draws something Pandoc cannot carry (" + c.reach + "). It is " + why.slice(6) + ".",
-    place: c.place, shown: c.shown, why, tagged: false, source: c.source, reach: c.reach,
+    note: said + lossOf(c) + ". It is " + why.slice(6) + ".",
+    place: c.place, shown: c.shown, why, tagged: false, source: c.source, reach: c.reach, holds: c.holds || null,
   });
 }
 
@@ -459,11 +466,11 @@ export function flagEntries(calls, sites = []) {
     return Object.freeze({
       rule: c.tagged ? "flag/tagged" : inside ? "flag/inside" : "flag/left",
       name: c.name, file: c.file, span: Object.freeze({ start: c.start, end: c.end }),
-      note: said + " draws something Pandoc cannot carry (" + c.reach + "). " + (c.tagged
+      note: said + lossOf(c) + ". " + (c.tagged
         ? "The -pp copy keeps it for TeX and gives Pandoc a tag holding its source, for a later step to replace."
         : inside ? "It is left whole: " + why + "."
         : "It is listed here and left as it is: " + why + "."),
-      place: c.place, shown: c.shown, why, tagged: !!c.tagged, source: c.source, reach: c.reach,
+      place: c.place, shown: c.shown, why, tagged: !!c.tagged, source: c.source, reach: c.reach, holds: c.holds || null,
     });
   });
   const counts = new Map();

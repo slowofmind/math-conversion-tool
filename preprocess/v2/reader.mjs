@@ -269,6 +269,7 @@ export function readDocument(entry, files, options = {}) {
   const listDepth = createListDepth();      // s250: the depth at every \item, counted during the reading
   const record = [], findings = [], statements = [], skipped = [], decided = [];
   const unresolved = [], filesRead = [], stack = [], reading = new Set();
+  const openedBy = {};              // s281: file -> the file whose command first opened it (the entry: null)
   const requested = new Map();      // package -> Set(option) requested so far
   const loaded = new Set();         // packages already read in this chain
   const tally = { includes: 0, notFollowed: 0, optionHandlersRun: 0 };
@@ -323,6 +324,7 @@ export function readDocument(entry, files, options = {}) {
     if (!info) return;
     reading.add(pathName);
     filesRead.push(pathName);
+    if (!(pathName in openedBy)) openedBy[pathName] = stack.length ? top().file : null;
     stack.push({ file: pathName, info, pkg: opts.package || null, processed: false,
                  viaOption: null, starHandler: false });
     let toks = info.tokens;
@@ -348,7 +350,10 @@ export function readDocument(entry, files, options = {}) {
           { reason: "circular include" });
       return;
     }
-    say(t.start, what, "reading " + target);
+    // s285: `target` and `at` name the opened file and the command's place as
+    // fields, so nothing has to read them back out of the words (step 1 of
+    // PLAN-REPORT-ORDER-s284). The same on every row that opens a file.
+    say(t.start, what, "reading " + target, "certain", { target, at: t.start });
     readFile(target, {});
   }
 
@@ -394,7 +399,7 @@ export function readDocument(entry, files, options = {}) {
     }
     loaded.add(name);
     say(t.start, "load " + name, "reading " + target +
-        (wanted.length ? " with [" + wanted.join(",") + "]" : ""));
+        (wanted.length ? " with [" + wanted.join(",") + "]" : ""), "certain", { target, at: t.start });
     readFile(target, { package: name });
   }
 
@@ -423,7 +428,7 @@ export function readDocument(entry, files, options = {}) {
     }
     if (reading.has(target)) { say(t.start, "load subfiles", "parent " + target + " is already open above; not read again"); return; }
     // `parent` names the file outright, for run.mjs's subfile preamble step (s244).
-    say(t.start, "load subfiles", "reading " + target + " (parent preamble)", "certain", { parent: target });
+    say(t.start, "load subfiles", "reading " + target + " (parent preamble)", "certain", { parent: target, target, at: t.start });
     readFile(target, { preambleOnly: true });
   }
 
@@ -788,6 +793,10 @@ export function readDocument(entry, files, options = {}) {
     // whole set including it, which is what a person means by "the chain".
     filesRead: read.filter((p) => p !== entry),
     chain: read,
+    // s281 (combined report, call 2): who opened each file of the chain, so a
+    // report can tell the files reached only through a parent the document
+    // does not read (v2/combined.mjs unreadParts)
+    openedBy,
     // The residue: everything the reader could not decide. This is what a
     // report is built from, and the goal is for it to be SHORT.
     needsAttention: opaque.map((r) => ({ file: r.file, line: r.line, what: r.what,

@@ -295,18 +295,22 @@ export function collectAndReport(capability) {
       : { severity: "wrapper-only", rule: "unknown/command-dropped" };
   }
 
-  function decideUnknown({ by, name, shape, hasContent = false, span, file, detail } = {}) {
+  // origin (session 289, v2/unknown-calls.mjs): a sentence saying where the
+  // name comes from, added after the message.
+  function decideUnknown({ by, name, shape, hasContent = false, span, file, detail, origin } = {}) {
     const pandoc = capability.unknownFallback(shape);   // throws on a shape it cannot model
     const c = classify(shape, !!hasContent);
     const bare = String(name ?? "").replace(/^\\/, "");
-    const message = c.severity === "content-loss"
+    // session 289: the environment is named as written, \begin{..}, so the
+    // combined report can pair it with Pandoc's skipped line
+    const message = (c.severity === "content-loss"
       ? "Pandoc's LaTeX reader does not know \\" + bare + ", so it drops the command AND the " +
         "text inside it. Nothing here is safe to substitute, so it is reported instead."
       : shape === "environment"
-        ? "Pandoc's LaTeX reader does not know the " + bare + " environment; the body survives " +
+        ? "Pandoc's LaTeX reader does not know \\begin{" + bare + "}; the body survives " +
           "inside a plain container but the environment's own meaning is lost."
         : "Pandoc's LaTeX reader does not know \\" + bare + "; it is dropped. It carried no " +
-          "content, so nothing the author wrote is lost with it.";
+          "content, so nothing the author wrote is lost with it.") + (origin ? " " + origin : "");
     return flag({ by, rule: c.rule, level: "unsupported", message, span, file,
                   detail: { name: bare, shape, hasContent: !!hasContent,
                             severity: c.severity, pandoc, ...(detail || {}) } });
