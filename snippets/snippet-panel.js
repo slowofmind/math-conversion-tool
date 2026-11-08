@@ -89,17 +89,21 @@ export async function initSnippetPanel(ctx) {
     fields: $('snipPartFields'), partsCancel: $('btnSnipPartsCancel'),
   };
   if (!el.panel) return null;
-  const say = (msg, kind = 'ready') => {
+  // [CLAUDE 2026-11-08] NVDA live check: sending every message to the page's status bar as well made NVDA
+  // say it three times (panel region + status bar twice, with "LaTeX UTF-8 Ln 1, Col 81"). Routine
+  // messages now go to the panel's own status region only; the status bar gets only what happens without
+  // the author acting in the panel (the concept list failing to load).
+  const say = (msg, kind = 'ready', { bar = false } = {}) => {
     el.status.textContent = '';
     setTimeout(() => { el.status.textContent = msg; }, 30);   // re-announce the same text
-    ctx.updateStatus?.(kind === 'warning' ? 'ready' : kind, msg);   // the status dot knows ready / loading / error
+    if (bar) ctx.updateStatus?.(kind === 'warning' ? 'ready' : kind, msg);   // the status dot knows ready / loading / error
   };
   let controller = null;
   try {
     const data = await (ctx.fetchJson ? ctx.fetchJson(SLIM_URL) : fetch(SLIM_URL).then(r => r.json()));
     controller = createSnippetController({ core: createSnippetCore(data), editor: ctx.editor });
   } catch (e) {
-    say(`The snippet tool could not load the concept list (${SLIM_URL}): ${e.message}`, 'error');
+    say(`The snippet tool could not load the concept list (${SLIM_URL}): ${e.message}`, 'error', { bar: true });
     for (const k of ['filter', 'group', 'source', 'notUsed', 'rwm', 'list', 'apply']) el[k].disabled = true;
     return null;
   }
