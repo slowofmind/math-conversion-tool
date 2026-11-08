@@ -67,6 +67,17 @@ export function formsOf(rec) {
   return out;
 }
 
+/** Every kernel form of the concept (a concept may have several notations for one arity, e.g.
+ *  \log_b x and \log_b(x)), in the formsOf entry shape. formsOf keeps one per arity for WRITING
+ *  (the names and head are the same); this list is for EVIDENCE (shapes.js formEvidence).
+ *  [CLAUDE 2026-11-08] */
+export function kernelFormsOf(rec) {
+  return (rec?.forms ?? []).map(k => {
+    const head = headOf(k.intent);
+    return { arity: k.operands.length, operands: k.operands, fixity: fixityIn(head), head, intent: k.intent, kernel: k.tex, from: 'form' };
+  });
+}
+
 /** The order in which a wording template first mentions each operand, or null.
  *  [CLAUDE 2026-11-08] Not used by the core since slim layout 1 (the slim copy carries no wording;
  *  operand order comes from the kernel forms). Kept for snippets/probes/probe-wording-order-20261108.mjs. */

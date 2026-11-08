@@ -1,6 +1,6 @@
 {
  "note": "Example fixtures the core labels without help. Pinned from an observed run of test/test-core.mjs; a fixture leaving this list is a regression.",
- "written": "2026-11-08T21:19:06.013Z",
+ "written": "2026-11-08T21:26:01.277Z",
  "ready": [
   "abelian-integral--example",
   "annulus--example",
@@ -134,7 +134,15 @@
   "weak-convergence--example",
   "wiener-algebra--example",
   "wronskian--example",
+  "open-closed-interval--example",
+  "closed-open-interval--example",
+  "evaluated-at--example",
+  "evaluate--example",
   "differential-d--example",
+  "logarithm--example",
+  "tends-to--example",
+  "tends-to-from-above--example",
+  "tends-to-from-below--example",
   "change--example",
   "arc-hyperbolic-sine--example",
   "arc-hyperbolic-cosine--example",

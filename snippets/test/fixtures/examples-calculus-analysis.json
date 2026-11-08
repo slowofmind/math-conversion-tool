@@ -2,7 +2,7 @@
  "meta": {
   "generator": "test/gen-fixtures.mjs",
   "group": "calculus-analysis",
-  "generated": "2026-11-08T21:13:23.154Z",
+  "generated": "2026-11-08T21:25:22.695Z",
   "export": {
    "layout": "slim layout 1",
    "generator": "tools/export-slim.mjs",
@@ -11,18 +11,10 @@
    "forms": "2026-11-08"
   },
   "recordsInGroup": 193,
-  "fixtures": 156,
-  "skipped": 37
+  "fixtures": 164,
+  "skipped": 29
  },
  "skipped": [
-  {
-   "concept": "open-closed-interval",
-   "why": "no kernel form"
-  },
-  {
-   "concept": "closed-open-interval",
-   "why": "no kernel form"
-  },
   {
    "concept": "prime-notation",
    "why": "no kernel form"
@@ -45,14 +37,6 @@
   },
   {
    "concept": "gradient",
-   "why": "no kernel form"
-  },
-  {
-   "concept": "evaluated-at",
-   "why": "no kernel form"
-  },
-  {
-   "concept": "evaluate",
    "why": "no kernel form"
   },
   {
@@ -100,10 +84,6 @@
    "why": "marked not used"
   },
   {
-   "concept": "logarithm",
-   "why": "no kernel form"
-  },
-  {
    "concept": "logarithm-with-base",
    "why": "marked not used"
   },
@@ -117,18 +97,6 @@
   },
   {
    "concept": "piecewise",
-   "why": "no kernel form"
-  },
-  {
-   "concept": "tends-to",
-   "why": "no kernel form"
-  },
-  {
-   "concept": "tends-to-from-above",
-   "why": "no kernel form"
-  },
-  {
-   "concept": "tends-to-from-below",
    "why": "no kernel form"
   },
   {
@@ -2753,6 +2721,94 @@
    ]
   },
   {
+   "id": "open-closed-interval--example",
+   "concept": "custom:open-closed-interval",
+   "from": "kernel form",
+   "source": "$(a, b]$",
+   "select": "(a, b]",
+   "expect": {
+    "text": "\\MathMLintent{open-closed-interval:function($lower,$upper)}{(\\MathMLarg{lower}{a}, \\MathMLarg{upper}{b}]}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "a",
+     "nth": 1
+    },
+    {
+     "text": "b",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "closed-open-interval--example",
+   "concept": "custom:closed-open-interval",
+   "from": "kernel form",
+   "source": "$[a, b)$",
+   "select": "[a, b)",
+   "expect": {
+    "text": "\\MathMLintent{closed-open-interval:function($lower,$upper)}{[\\MathMLarg{lower}{a}, \\MathMLarg{upper}{b})}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "a",
+     "nth": 1
+    },
+    {
+     "text": "b",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "evaluated-at--example",
+   "concept": "custom:evaluated-at",
+   "from": "kernel form",
+   "source": "$f(x) \\big|_{x=a}$",
+   "select": "f(x) \\big|_{x=a}",
+   "expect": {
+    "text": "\\MathMLintent{evaluated-at:infix($a1,$a2)}{\\MathMLarg{a1}{f(x)} \\big|_{\\MathMLarg{a2}{x=a}}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "f(x)",
+     "nth": 1
+    },
+    {
+     "text": "x=a",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "evaluate--example",
+   "concept": "custom:evaluate",
+   "from": "kernel form",
+   "source": "$\\left. F(x) \\right|_{a}^{b}$",
+   "select": "\\left. F(x) \\right|_{a}^{b}",
+   "expect": {
+    "text": "\\MathMLintent{evaluate:function($expr,$lower,$upper)}{\\left. \\MathMLarg{expr}{F(x)} \\right|_{\\MathMLarg{lower}{a}}^{\\MathMLarg{upper}{b}}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "F(x)",
+     "nth": 1
+    },
+    {
+     "text": "a",
+     "nth": 1
+    },
+    {
+     "text": "b",
+     "nth": 1
+    }
+   ]
+  },
+  {
    "id": "differential-d--example",
    "concept": "custom:differential-d",
    "from": "kernel form",
@@ -2763,6 +2819,86 @@
     "auto": "ready-or-needs-operands"
    },
    "operands": []
+  },
+  {
+   "id": "logarithm--example",
+   "concept": "custom:logarithm",
+   "from": "kernel form",
+   "source": "$\\log x$",
+   "select": "\\log x",
+   "expect": {
+    "text": "\\MathMLintent{logarithm:function($a1)}{\\log \\MathMLarg{a1}{x}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "tends-to--example",
+   "concept": "custom:tends-to",
+   "from": "kernel form",
+   "source": "$x \\to a$",
+   "select": "x \\to a",
+   "expect": {
+    "text": "\\MathMLintent{tends-to:infix($a1,$a2)}{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    },
+    {
+     "text": "a",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "tends-to-from-above--example",
+   "concept": "custom:tends-to-from-above",
+   "from": "kernel form",
+   "source": "$x \\to a^{+}$",
+   "select": "x \\to a^{+}",
+   "expect": {
+    "text": "\\MathMLintent{tends-to-from-above:infix($a1,$a2)}{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{+}}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    },
+    {
+     "text": "a^{+}",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "tends-to-from-below--example",
+   "concept": "custom:tends-to-from-below",
+   "from": "kernel form",
+   "source": "$x \\to a^{-}$",
+   "select": "x \\to a^{-}",
+   "expect": {
+    "text": "\\MathMLintent{tends-to-from-below:infix($a1,$a2)}{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{-}}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    },
+    {
+     "text": "a^{-}",
+     "nth": 1
+    }
+   ]
   },
   {
    "id": "divergence--example",

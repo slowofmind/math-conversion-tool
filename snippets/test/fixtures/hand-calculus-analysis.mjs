@@ -126,16 +126,17 @@ export const fixtures = [
   // Evaluation bars. evaluate has generated operand names (a1..a3) and no
   // wording, so its order is the reading order: expression, lower, upper,
   // with a warning. The upper limit written first must NOT flip (F1).
+  // [CLAUDE 2026-11-08] evaluate now has a kernel form, which confirms the operand order: no order-unconfirmed warning.
   { id: 'evaluate-big-bar', concept: 'evaluate', source: R`$F(x)\Big|_{0}^{1}$`, select: R`F(x)\Big|_{0}^{1}`,
-    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\MathMLarg{expr}{F(x)}\Big|_{\MathMLarg{lower}{0}}^{\MathMLarg{upper}{1}}}`, { warnings: ['order-unconfirmed'] }), operands: ops('F(x)', '0', '1') },
+    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\MathMLarg{expr}{F(x)}\Big|_{\MathMLarg{lower}{0}}^{\MathMLarg{upper}{1}}}`), operands: ops('F(x)', '0', '1') },
   { id: 'evaluate-upper-first', concept: 'evaluate', source: R`$F\Big|^{1}_{0}$`, select: R`F\Big|^{1}_{0}`,
-    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\MathMLarg{expr}{F}\Big|^{\MathMLarg{upper}{1}}_{\MathMLarg{lower}{0}}}`, { warnings: ['order-unconfirmed'] }), operands: ops('F', '0', '1') },
+    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\MathMLarg{expr}{F}\Big|^{\MathMLarg{upper}{1}}_{\MathMLarg{lower}{0}}}`), operands: ops('F', '0', '1') },
   { id: 'evaluate-left-dot', concept: 'evaluate', source: R`$\left.F(x)\right|_a^b$`, select: R`\left.F(x)\right|_a^b`,
-    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\left.\MathMLarg{expr}{F(x)}\right|_{\MathMLarg{lower}{a}}^{\MathMLarg{upper}{b}}}`, { warnings: ['order-unconfirmed'] }), operands: ops('F(x)', 'a', 'b') },
+    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\left.\MathMLarg{expr}{F(x)}\right|_{\MathMLarg{lower}{a}}^{\MathMLarg{upper}{b}}}`), operands: ops('F(x)', 'a', 'b') },
   { id: 'evaluate-brackets', concept: 'evaluate', source: R`$\left[x^2\right]_{0}^{2}$`, select: R`\left[x^2\right]_{0}^{2}`,
-    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\left[\MathMLarg{expr}{x^2}\right]_{\MathMLarg{lower}{0}}^{\MathMLarg{upper}{2}}}`, { warnings: ['order-unconfirmed'] }), operands: ops('x^2', '0', { text: '2', nth: 2 }) },
+    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\left[\MathMLarg{expr}{x^2}\right]_{\MathMLarg{lower}{0}}^{\MathMLarg{upper}{2}}}`), operands: ops('x^2', '0', { text: '2', nth: 2 }) },
   { id: 'evaluate-plain-bar-bare-scripts', concept: 'evaluate', source: R`$F|_0^1$`, select: R`F|_0^1`,
-    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\MathMLarg{expr}{F}|_{\MathMLarg{lower}{0}}^{\MathMLarg{upper}{1}}}`, { warnings: ['order-unconfirmed'] }), operands: ops('F', '0', '1') },
+    expect: ready(R`\MathMLintent{evaluate:function($expr,$lower,$upper)}{\MathMLarg{expr}{F}|_{\MathMLarg{lower}{0}}^{\MathMLarg{upper}{1}}}`), operands: ops('F', '0', '1') },
   { id: 'evaluated-at', concept: 'evaluated-at', source: R`$f(x)\big|_{x=0}$`, select: R`f(x)\big|_{x=0}`,
     expect: ready(R`\MathMLintent{evaluated-at:infix($a1,$a2)}{\MathMLarg{a1}{f(x)}\big|_{\MathMLarg{a2}{x=0}}}`), operands: ops('f(x)', 'x=0') },
 

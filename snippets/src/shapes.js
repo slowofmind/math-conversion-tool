@@ -27,7 +27,7 @@
 // unchanged: a form's \MathMLarg markers play the part the example's \arg
 // markers did.
 import { contentTerms, parseMath } from './latex-parse.js';
-import { formsOf } from './concepts.js';
+import { kernelFormsOf } from './concepts.js';
 import { locateSelection, trimRange } from './checks.js';
 
 // ---- Vocabulary (data, extend as concepts need) ------------------------------
@@ -396,7 +396,7 @@ export function formEvidence(rec) {
   if (evidenceCache.has(rec)) return evidenceCache.get(rec);
   const map = new Map();
   evidenceCache.set(rec, map);
-  for (const form of formsOf(rec).filter(f => f.from === 'form' && f.arity > 0)) {
+  for (const form of kernelFormsOf(rec).filter(f => f.arity > 0)) {   // every notation the Reference gives
     const homes = form.operands;
     const body = kernelBody(form);
     const ex = body ? stripMarkers(body) : null;

@@ -1,0 +1,6 @@
+control caught: operand swallows the superscript (F4) (operand a1: element <msubsup> holds "zkGêù", the operand alone is "zk" (swallowed or split))
+control caught: label swallows a script outside it (label covers "e12", the notation alone is "e1")
+control caught: nested label lost on one element (2 label(s) written, 1 intent attribute(s) in the MathML: a label was lost or merged)
+control caught: operand list not in the expected order (operand list in value [a1,a3,a2] differs from the expected operands [a1,a2,a3])
+
+test-render: 454 passed, 0 failed (51 fixtures not ready in auto mode, so not rendered there); negative controls caught: 4 of 4

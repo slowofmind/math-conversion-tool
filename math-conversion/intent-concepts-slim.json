@@ -38,7 +38,7 @@
    "role": 20,
    "withShape": 1122,
    "multiVariant": 12,
-   "withForms": 1165,
+   "withForms": 1193,
    "readsWithoutMarkup": 75
   }
  },
@@ -35682,7 +35682,17 @@
    ],
    "fixity": "function",
    "variants": [],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{subscripted-norm:function($sub,$a)}{{\\left\\| \\MathMLarg{a}{\\mathbf{v}} \\right\\|_{\\MathMLarg{sub}{2}}}}",
+     "intent": "subscripted-norm:function($sub,$a)",
+     "operands": [
+      "sub",
+      "a"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -35716,7 +35726,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{open-closed-interval:function($lower,$upper)}{{(\\MathMLarg{lower}{a}, \\MathMLarg{upper}{b}]}}",
+     "intent": "open-closed-interval:function($lower,$upper)",
+     "operands": [
+      "lower",
+      "upper"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -35750,7 +35770,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{closed-open-interval:function($lower,$upper)}{{[\\MathMLarg{lower}{a}, \\MathMLarg{upper}{b})}}",
+     "intent": "closed-open-interval:function($lower,$upper)",
+     "operands": [
+      "lower",
+      "upper"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -35784,7 +35814,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{ordered-pair:function($a1,$a2)}{{(\\MathMLarg{a1}{a}, \\MathMLarg{a2}{b})}}",
+     "intent": "ordered-pair:function($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -35882,7 +35922,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{inner-product:infix($a1,$a2)}{{\\langle \\MathMLarg{a1}{u}, \\MathMLarg{a2}{v} \\rangle}}",
+     "intent": "inner-product:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36074,7 +36124,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{cross-product:infix($a1,$a2)}{{\\MathMLarg{a1}{\\mathbf{u}} \\times \\MathMLarg{a2}{\\mathbf{v}}}}",
+     "intent": "cross-product:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36105,7 +36165,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{dot-product:infix($a1,$a2)}{{\\MathMLarg{a1}{\\mathbf{u}} \\cdot \\MathMLarg{a2}{\\mathbf{v}}}}",
+     "intent": "dot-product:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36177,7 +36247,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{power:infix($a1,$a2)}{{\\MathMLarg{a1}{x}^{\\MathMLarg{a2}{n}}}}",
+     "intent": "power:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36232,7 +36312,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{line-segment:prefix($a1,$a2)}{{\\overline{\\MathMLarg{a1}{A}\\MathMLarg{a2}{B}}}}",
+     "intent": "line-segment:prefix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36563,7 +36653,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{evaluated-at:infix($a1,$a2)}{{\\MathMLarg{a1}{f(x)} \\big|_{\\MathMLarg{a2}{x=a}}}}",
+     "intent": "evaluated-at:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36587,7 +36687,18 @@
    ],
    "fixity": "function",
    "variants": [],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{evaluate:function($expr,$lower,$upper)}{{\\left. \\MathMLarg{expr}{F(x)} \\right|_{\\MathMLarg{lower}{a}}^{\\MathMLarg{upper}{b}}}}",
+     "intent": "evaluate:function($expr,$lower,$upper)",
+     "operands": [
+      "expr",
+      "lower",
+      "upper"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -40175,7 +40286,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{arc:prefix($a1,$a2)}{{\\overset{\\frown}{\\MathMLarg{a1}{A}\\MathMLarg{a2}{B}}}}",
+     "intent": "arc:prefix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -40683,7 +40804,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{directed-line-segment:prefix($a1,$a2)}{{\\overrightarrow{\\MathMLarg{a1}{A}\\MathMLarg{a2}{B}}}}",
+     "intent": "directed-line-segment:prefix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -40843,7 +40974,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{fraction:function($a1,$a2)}{{\\frac{\\MathMLarg{a1}{a}}{\\MathMLarg{a2}{b}}}}",
+     "intent": "fraction:function($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -40983,7 +41124,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{indexed-by:infix($a1,$a2)}{{\\MathMLarg{a1}{x}_{\\MathMLarg{a2}{i}}}}",
+     "intent": "indexed-by:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -41287,7 +41438,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{line:prefix($a1,$a2)}{{\\overleftrightarrow{\\MathMLarg{a1}{A}\\MathMLarg{a2}{B}}}}",
+     "intent": "line:prefix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -41376,7 +41537,34 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{logarithm:function($a1)}{{\\log \\MathMLarg{a1}{x}}}",
+     "intent": "logarithm:function($a1)",
+     "operands": [
+      "a1"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{logarithm:function($a1,$a2)}{{\\log_{\\MathMLarg{a2}{b}} \\MathMLarg{a1}{x}}}",
+     "intent": "logarithm:function($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{logarithm:function($a1,$a2)}{{\\log_{\\MathMLarg{a2}{b}}(\\MathMLarg{a1}{x})}}",
+     "intent": "logarithm:function($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -41551,7 +41739,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{mixed-fraction:infix($n,$frac)}{{\\MathMLarg{n}{2}\\MathMLarg{frac}{\\frac{1}{3}}}}",
+     "intent": "mixed-fraction:infix($n,$frac)",
+     "operands": [
+      "n",
+      "frac"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -41879,7 +42077,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{polar-coordinate:function($a1,$a2)}{{(\\MathMLarg{a1}{r}, \\MathMLarg{a2}{\\theta})}}",
+     "intent": "polar-coordinate:function($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -41958,7 +42166,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{quotient:function($a1,$a2)}{{\\left\\lfloor \\frac{\\MathMLarg{a1}{a}}{\\MathMLarg{a2}{b}} \\right\\rfloor}}",
+     "intent": "quotient:function($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -41992,7 +42210,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{rate:infix($a1,$a2)}{{\\MathMLarg{a1}{\\text{km}}/\\MathMLarg{a2}{\\text{h}}}}",
+     "intent": "rate:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42025,7 +42253,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{ray:prefix($a1,$a2)}{{\\overrightarrow{\\MathMLarg{a1}{A}\\MathMLarg{a2}{B}}}}",
+     "intent": "ray:prefix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42059,7 +42297,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{remainder:function($a1,$a2)}{{\\MathMLarg{a1}{a} \\bmod \\MathMLarg{a2}{b}}}",
+     "intent": "remainder:function($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42126,7 +42374,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{set-difference:infix($a1,$a2)}{{\\MathMLarg{a1}{A} \\setminus \\MathMLarg{a2}{B}}}",
+     "intent": "set-difference:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42221,7 +42479,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{tends-to:infix($a1,$a2)}{{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a}}}",
+     "intent": "tends-to:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42254,7 +42522,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{tends-to-from-above:infix($a1,$a2)}{{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{+}}}}",
+     "intent": "tends-to-from-above:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42287,7 +42565,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{tends-to-from-below:infix($a1,$a2)}{{\\MathMLarg{a1}{x} \\to \\MathMLarg{a2}{a^{-}}}}",
+     "intent": "tends-to-from-below:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42318,7 +42606,17 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{time-separator:infix($a1,$a2)}{{\\MathMLarg{a1}{2}{:}\\MathMLarg{a2}{31}}}",
+     "intent": "time-separator:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,

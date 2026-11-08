@@ -1,0 +1,2 @@
+
+verify-fixtures: 237 passed, 0 failed, 31 without an expected text (refusals)
