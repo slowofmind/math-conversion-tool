@@ -1,0 +1,145 @@
+OK   A^T, operand bare
+     \MathMLintent{transpose($a)}{\MathMLarg{a}{A}^T}
+     msup[intent=transpose($a)] mi[arg=a]
+OK   A^T, operand braced
+     \MathMLintent{transpose($a)}{{\MathMLarg{a}{A}}^T}
+     msup[intent=transpose($a)] mi[arg=a]
+FAIL A_i^T, operand bare
+     \MathMLintent{transpose($a)}{\MathMLarg{a}{A_i}^T}
+     msubsup[intent=transpose($a)][arg=a]
+     - operand a: element <msubsup> holds "AiT", the operand alone is "Ai" (swallowed or split)
+OK   A_i^T, operand braced
+     \MathMLintent{transpose($a)}{{\MathMLarg{a}{A_i}}^T}
+     msup[intent=transpose($a)] msub[arg=a]
+OK   f', operand bare
+     \MathMLintent{prime-notation($f)}{\MathMLarg{f}{f}'}
+     msup[intent=prime-notation($f)] mi[arg=f]
+FAIL f_n', operand bare
+     \MathMLintent{prime-notation($f)}{\MathMLarg{f}{f_n}'}
+     msubsup[intent=prime-notation($f)][arg=f]
+     - operand f: element <msubsup> holds "fn′", the operand alone is "fn" (swallowed or split)
+OK   f_n', operand braced
+     \MathMLintent{prime-notation($f)}{{\MathMLarg{f}{f_n}}'}
+     msup[intent=prime-notation($f)] msub[arg=f]
+OK   norm _2, script operand bare
+     \MathMLintent{subscripted-norm($v,$p)}{\|\MathMLarg{v}{v}\|_\MathMLarg{p}{2}}
+     mrow[intent=subscripted-norm($v,$p)] mi[arg=v] mn[arg=p]
+OK   norm _2, script operand braced
+     \MathMLintent{subscripted-norm($v,$p)}{\|\MathMLarg{v}{v}\|_{\MathMLarg{p}{2}}}
+     mrow[intent=subscripted-norm($v,$p)] mi[arg=v] mn[arg=p]
+OK   sqrt x, braced arg
+     \MathMLintent{square-root($a)}{\sqrt{\MathMLarg{a}{x}}}
+     msqrt[intent=square-root($a)] mi[arg=a]
+OK   label inside arg, bare
+     \MathMLintent{absolute-value($a)}{\left|\MathMLarg{a}{\MathMLintent{transpose($b)}{\MathMLarg{b}{A}^T}}\right|}
+     mrow[intent=absolute-value($a)] msup[intent=transpose($b)][arg=a] mi[arg=b]
+OK   label inside arg, braced
+     \MathMLintent{absolute-value($a)}{\left|\MathMLarg{a}{{\MathMLintent{transpose($b)}{\MathMLarg{b}{A}^T}}}\right|}
+     mrow[intent=absolute-value($a)] mrow[arg=a] msup[intent=transpose($b)] mi[arg=b]
+OK   inner label of the braced case
+     \MathMLintent{absolute-value($a)}{\left|\MathMLarg{a}{{\MathMLintent{transpose($b)}{\MathMLarg{b}{A}^T}}}\right|}
+     mrow[intent=absolute-value($a)] mrow[arg=a] msup[intent=transpose($b)] mi[arg=b]
+OK   existing label as operand, bare
+     \MathMLintent{transpose($m)}{\MathMLarg{m}{\MathMLintent{absolute-value($a)}{\left|\MathMLarg{a}{A}\right|}}^T}
+     msup[intent=transpose($m)] mrow[intent=absolute-value($a)][arg=m] mi[arg=a]
+OK   existing label as operand, braced
+     \MathMLintent{transpose($m)}{{\MathMLarg{m}{{\MathMLintent{absolute-value($a)}{\left|\MathMLarg{a}{A}\right|}}}}^T}
+     msup[intent=transpose($m)] mrow[arg=m] mrow[intent=absolute-value($a)] mi[arg=a]
+OK   existing label as operand, braced, inner
+     \MathMLintent{transpose($m)}{{\MathMLarg{m}{{\MathMLintent{absolute-value($a)}{\left|\MathMLarg{a}{A}\right|}}}}^T}
+     msup[intent=transpose($m)] mrow[arg=m] mrow[intent=absolute-value($a)] mi[arg=a]
+OK   existing label as only operand, unbraced arg body
+     \MathMLintent{transpose($m)}{{\MathMLarg{m}{\MathMLintent{absolute-value($a)}{\left|\MathMLarg{a}{A}\right|}}}^T}
+     msup[intent=transpose($m)] mrow[intent=absolute-value($a)][arg=m] mi[arg=a]
+FAIL label then ^T, A_i, bare
+     \MathMLintent{x-sub($a)}{\MathMLarg{a}{x}_i}^T
+     msubsup[intent=x-sub($a)] mi[arg=a]
+     - label covers "xiT", the notation alone is "xi"
+OK   label then ^T, A_i, braced
+     {\MathMLintent{x-sub($a)}{\MathMLarg{a}{x}_i}}^T
+     msub[intent=x-sub($a)] mi[arg=a]
+OK   label then ^2, |x|, bare
+     \MathMLintent{absolute-value($a)}{\left|\MathMLarg{a}{x}\right|}^2
+     mrow[intent=absolute-value($a)] mi[arg=a]
+OK   whole body operand, bare
+     \MathMLintent{blue-box($a)}{\MathMLarg{a}{x+1}}
+     mrow[intent=blue-box($a)][arg=a]
+OK   whole body operand, braced
+     \MathMLintent{blue-box($a)}{{\MathMLarg{a}{x+1}}}
+     mrow[intent=blue-box($a)] mrow[arg=a]
+OK   operand names a1 a2
+     \MathMLintent{open-interval($a1,$a2)}{(\MathMLarg{a1}{a},\MathMLarg{a2}{b})}
+     mrow[intent=open-interval($a1,$a2)] mi[arg=a1] mi[arg=a2]
+OK   operand name with hyphen
+     \MathMLintent{open-interval($lower-end,$upper-end)}{(\MathMLarg{lower-end}{a},\MathMLarg{upper-end}{b})}
+     mrow[intent=open-interval($lower-end,$upper-end)] mi[arg=lower-end] mi[arg=upper-end]
+OK   function application
+     \MathMLintent{real-part($value)}{\operatorname{Re}(\MathMLarg{value}{z})}
+     mrow[intent=real-part($value)] mi[arg=value]
+OK   function, two items
+     \MathMLintent{wronskian($f,$g)}{W(\MathMLarg{f}{f}, \MathMLarg{g}{g})}
+     mrow[intent=wronskian($f,$g)] mi[arg=f] mi[arg=g]
+OK   function, sub head
+     \MathMLintent{dirichlet-kernel($number,$value)}{D_{\MathMLarg{number}{n}}(\MathMLarg{value}{x})}
+     mrow[intent=dirichlet-kernel($number,$value)] mi[arg=number] mi[arg=value]
+OK   sinh x no parens
+     \MathMLintent{hyperbolic-sine($a)}{\sinh \MathMLarg{a}{x}}
+     mrow[intent=hyperbolic-sine($a)] mi[arg=a]
+OK   sinh(x+1)
+     \MathMLintent{hyperbolic-sine($a)}{\sinh(\MathMLarg{a}{x+1})}
+     mrow[intent=hyperbolic-sine($a)] mrow[arg=a]
+OK   prefix L{f}
+     \MathMLintent{laplace-transform($function)}{\mathcal{L}\{\MathMLarg{function}{f}\}}
+     mrow[intent=laplace-transform($function)] mi[arg=function]
+OK   definite integral
+     \MathMLintent{definite-integral($lower,$upper,$integrand,$variable)}{\int_{\MathMLarg{lower}{a}}^{\MathMLarg{upper}{b}}\MathMLarg{integrand}{f(x)}\,d\MathMLarg{variable}{x}}
+     mrow[intent=definite-integral($lower,$upper,$integrand,$variable)] mi[arg=lower] mi[arg=upper] mrow[arg=integrand] mi[arg=variable]
+OK   definite integral, bare scripts
+     \MathMLintent{definite-integral($lower,$upper,$integrand,$variable)}{\int_{\MathMLarg{lower}{0}}^{\MathMLarg{upper}{1}} \MathMLarg{integrand}{x^2} \, d\MathMLarg{variable}{x}}
+     mrow[intent=definite-integral($lower,$upper,$integrand,$variable)] mn[arg=lower] mn[arg=upper] msup[arg=integrand] mi[arg=variable]
+OK   limit
+     \MathMLintent{limit($variable,$point,$expression)}{\lim_{\MathMLarg{variable}{x}\to \MathMLarg{point}{a}} \MathMLarg{expression}{f(x)}}
+     mrow[intent=limit($variable,$point,$expression)] mi[arg=variable] mi[arg=point] mrow[arg=expression]
+OK   sum
+     \MathMLintent{sum($index,$upper,$term)}{\sum_{\MathMLarg{index}{i=1}}^{\MathMLarg{upper}{n}} \MathMLarg{term}{a_i}}
+     mrow[intent=sum($index,$upper,$term)] mrow[arg=index] mi[arg=upper] msub[arg=term]
+OK   derivative frac
+     \MathMLintent{derivative($f,$x)}{\frac{d\MathMLarg{f}{y}}{d\MathMLarg{x}{x}}}
+     mfrac[intent=derivative($f,$x)] mi[arg=f] mi[arg=x]
+OK   partial derivative frac
+     \MathMLintent{partial-derivative($f,$x)}{\frac{\partial \MathMLarg{f}{f}}{\partial \MathMLarg{x}{x}}}
+     mfrac[intent=partial-derivative($f,$x)] mi[arg=f] mi[arg=x]
+OK   evaluate Big bar
+     \MathMLintent{evaluate($f,$lo,$hi)}{\MathMLarg{f}{F(x)}\Big|_{\MathMLarg{lo}{0}}^{\MathMLarg{hi}{1}}}
+     mrow[intent=evaluate($f,$lo,$hi)] mrow[arg=f] mn[arg=lo] mn[arg=hi]
+OK   evaluate Big bar upper first
+     \MathMLintent{evaluate($f,$lo,$hi)}{\MathMLarg{f}{F}\Big|^{\MathMLarg{hi}{1}}_{\MathMLarg{lo}{0}}}
+     mrow[intent=evaluate($f,$lo,$hi)] mi[arg=f] mn[arg=lo] mn[arg=hi]
+OK   evaluate brackets
+     \MathMLintent{evaluate($f,$lo,$hi)}{\left[\MathMLarg{f}{F(x)}\right]_{\MathMLarg{lo}{a}}^{\MathMLarg{hi}{b}}}
+     msubsup[intent=evaluate($f,$lo,$hi)] mrow[arg=f] mi[arg=lo] mi[arg=hi]
+OK   hat accent
+     \MathMLintent{fourier-transform($function)}{\hat{\MathMLarg{function}{f}}}
+     mrow[intent=fourier-transform($function)] mi[arg=function]
+OK   overline accent
+     \MathMLintent{complex-conjugate($value)}{\overline{\MathMLarg{value}{z}}}
+     mover[intent=complex-conjugate($value)] mi[arg=value]
+OK   label mid-row
+     2\MathMLintent{absolute-value($a)}{|\MathMLarg{a}{x}|}+1
+     mrow[intent=absolute-value($a)] mi[arg=a]
+OK   infix
+     \MathMLintent{convolution($x,$y)}{\MathMLarg{x}{f} * \MathMLarg{y}{g}}
+     mrow[intent=convolution($x,$y)] mi[arg=x] mi[arg=y]
+OK   infix inside a sum
+     h + \MathMLintent{convolution($x,$y)}{\MathMLarg{x}{f} * \MathMLarg{y}{g}}
+     mrow[intent=convolution($x,$y)] mi[arg=x] mi[arg=y]
+OK   dot accent time derivative
+     \MathMLintent{time-derivative($a)}{\dot{\MathMLarg{a}{x}}}
+     mrow[intent=time-derivative($a)] mi[arg=a]
+OK   nullary
+     \MathMLintent{euler-constant}{\gamma}
+     mi[intent=euler-constant]
+(node:51816) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/nim022/Desktop/mma-code/Accessible-STEM-Project/pandoc-for-math-conversion/math-conversion/mathjax-bundle-baseline.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\nim022\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)

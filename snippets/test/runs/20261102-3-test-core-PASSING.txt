@@ -1,0 +1,7 @@
+--- hand fixtures
+--- example fixtures
+--- search
+--- auto-coverage snapshot
+
+example fixtures labelled without help: 130 of 145
+test-core: 587 passed, 0 failed

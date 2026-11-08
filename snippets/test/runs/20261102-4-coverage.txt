@@ -1,0 +1,304 @@
+
+=== EXAMPLE FIXTURES (one per concept with a LaTeX example)
+abelian-integral--example                    ready           largeop/scripts+body | order from example
+annulus--example                             ready           apply/args | order from example
+argument--example                            ready           apply/args | order from example
+backward-difference--example                 ready           apply/args | order from example
+berezin-integral--example                    ready           largeop/scripts+integrand | order from example
+bergman-space--example                       ready           apply/scripts+args | order from example
+bigeometric-integral--example                needs-operands  example-disagrees: The Reference tool's example for "bigeometric-integral" marks the operands differently from how the tool reads this notation. Mark the operands.
+bipolar-set--example                         ready           scripted/base | order from example
+blaschke-product--example                    ready           apply/args | order from example
+bloch-constant--example                      ready           whole | order from none
+bounded-variation--example                   ready           apply/args | order from example
+calderon-toeplitz-operator--example          needs-operands  example-disagrees: The Reference tool's example for "calderon-toeplitz-operator" marks the operands differently from how the tool reads this notation. Mark the operands.
+cauchy-principal-value--example              ready           prefix/rest | order from example
+cauchy-product--example                      ready           infix/sides | order from example
+characteristic-function--example             ready           scripted/scripts | order from example
+complex-conjugate--example                   ready           command/args | order from example
+condition-number--example                    ready           apply/args | order from example
+constant-of-integration--example             ready           whole | order from none
+convex-conjugate--example                    ready           scripted/base | order from example
+convolution--example                         ready           infix/sides | order from example
+current--example                             ready           fenced/items | order from example
+dalembert-operator--example                  ready           prefix/rest | order from example
+decrease--example                            ready           postfix/operand | order from example
+decrease-tends-to--example                   ready           infix/sides | order from example
+differential-operator--example               ready           scripted/scripts | order from example
+dirac-delta-function--example                ready           apply/args | order from example
+dirac-matrix--example                        ready           scripted/scripts | order from example
+dirac-measure--example                       ready           scripted/scripts | order from example
+directional-derivative--example              ready           prefix/scripts+rest | order from example
+dirichlet-eta-function--example              ready           apply/args | order from example
+dirichlet-kernel--example                    ready           apply/scripts+args | order from example
+dirichlet-l-function--example                ready           apply/args | order from example
+divided-difference--example                  ready           fenced/items | order from example
+effective-domain--example                    ready           apply/args | order from example
+epigraph--example                            ready           apply/args | order from example
+essential-infimum--example                   ready           prefix/rest | order from example
+essential-supremum--example                  ready           prefix/rest | order from example
+euler-constant--example                      ready           whole | order from none
+fatou-set--example                           ready           apply/args | order from example
+feigenbaum-constant--example                 ready           whole | order from none
+forward-difference--example                  needs-operands  example-disagrees: The Reference tool's example for "forward-difference" marks the operands differently from how the tool reads this notation. Mark the operands.
+fourier-cosine-transform--example            ready           prefix/rest | order from example
+fourier-sine-transform--example              ready           prefix/rest | order from example
+fourier-transform--example                   ready           command/args | order from example
+fractional-derivative--example               ready           prefix/rest | order from example
+fractional-integral--example                 ready           prefix/rest | order from example
+frechet-derivative--example                  ready           prefix/rest | order from example
+fredholm-determinant--example                ready           apply/args | order from example
+gabor-transform--example                     ready           apply/args | order from example
+gateaux-derivative--example                  needs-operands  arity-mismatch: "gateaux-derivative" takes 3 operand(s); the selection shows 1. Mark the operands.
+gelfand-triple--example                      ready           fenced/items | order from example
+geometric-integral--example                  ready           largeop/scripts | order from example
+green-function--example                      ready           apply/args | order from example
+hardy-littlewood-maximal-operator--example   ready           prefix/rest | order from example
+hardy-space--example                         ready           scripted/scripts | order from example
+hausdorff-measure--example                   ready           scripted/scripts | order from example
+hermitian-adjoint--example                   ready           scripted/base | order from example
+hessian--example                             ready           apply/args | order from example
+hilbert-schmidt-norm--example                ready           fenced/items | order from example
+hilbert-transform--example                   ready           apply/args | order from example
+increase--example                            ready           postfix/operand | order from example
+increase-tends-to--example                   ready           infix/sides | order from example
+infimum-limit--example                       ready           largeop/scripts+body | order from example
+infinite-product--example                    ready           largeop/body | order from example
+inner-jordan-measure--example                ready           apply/args | order from example
+jacobi-matrix--example                       ready           apply/args | order from example
+join--example                                ready           largeop/body | order from example
+jordan-measure--example                      ready           apply/args | order from example
+julia-set--example                           ready           apply/args | order from example
+kloosterman-sum--example                     ready           apply/args | order from example
+lagrange-multiplier--example                 ready           whole | order from none
+landau-constant--example                     ready           whole | order from none
+laplace-operator--example                    ready           prefix/rest | order from example
+laplace-transform--example                   ready           apply/args | order from example
+lebesgue-constant--example                   ready           scripted/scripts | order from example
+lebesgue-integral--example                   ready           largeop/scripts+integrand | order from example
+lefschetz-zeta-function--example             ready           apply/args | order from example
+left-derivative--example                     ready           prefix/rest | order from example
+levy-prokhorov-metric--example               ready           apply/args | order from example
+line-integral--example                       ready           largeop/scripts+integrand | order from example
+logistic-function--example                   ready           apply/args | order from example
+lower-darboux-integral--example              ready           prefix/rest | order from example
+lower-dini-derivative--example               needs-operands  example-disagrees: The Reference tool's example for "lower-dini-derivative" marks the operands differently from how the tool reads this notation. Mark the operands.
+lyapunov-candidate-function--example         ready           apply/args | order from example
+mellin-transform--example                    needs-operands  example-disagrees: The Reference tool's example for "mellin-transform" marks the operands differently from how the tool reads this notation. Mark the operands.
+minakshisundaram-pleijel-zeta-function--example ready           apply/args | order from example
+multiple-integral--example                   needs-operands  example-disagrees: The Reference tool's example for "multiple-integral" marks the operands differently from how the tool reads this notation. Mark the operands.
+multiplier-algebra--example                  ready           apply/args | order from example
+napiers-constant--example                    ready           whole | order from none
+narrow-denjoy-integral--example              ready           largeop/scripts+body | order from example
+numerical-radius--example                    ready           apply/args | order from example
+numerical-range--example                     ready           apply/args | order from example
+onsager-machlup-function--example            ready           apply/args | order from example
+open-real-interval--example                  ready           fenced/items | order from example
+outer-jordan-measure--example                ready           apply/args | order from example
+pade-approximant--example                    needs-operands  arity-mismatch: "pade-approximant" takes 3 operand(s); the selection shows 1 or 2. Mark the operands.
+paraproduct--example                         ready           apply/args | order from example
+pauli-matrix--example                        ready           scripted/scripts | order from example
+pointwise-convergent--example                needs-operands  arity-mismatch: "pointwise-convergent" takes 1 operand(s); the selection shows 2. Mark the operands.
+polar-set--example                           ready           scripted/base | order from example
+pontrjagin-dual--example                     ready           command/args | order from example
+principal-value--example                     ready           apply/args | order from example
+product-integral--example                    needs-operands  example-disagrees: The Reference tool's example for "product-integral" marks the operands differently from how the tool reads this notation. Mark the operands.
+product-measure--example                     ready           infix/sides | order from example
+pseudovector--example                        ready           command/args | order from example
+quadratic-differential--example              needs-operands  example-disagrees: The Reference tool's example for "quadratic-differential" marks the operands differently from how the tool reads this notation. Mark the operands.
+ramp-function--example                       ready           apply/args | order from example
+real-bipolar--example                        ready           scripted/base | order from example
+real-part--example                           ready           apply/args | order from example
+real-polar--example                          ready           scripted/base | order from example
+real-prepolar--example                       needs-operands  example-disagrees: The Reference tool's example for "real-prepolar" marks the operands differently from how the tool reads this notation. Mark the operands.
+recession-cone--example                      ready           apply/args | order from example
+residue--example                             ready           apply/args | order from example
+resolvent-set--example                       ready           apply/args | order from example
+riemann-integral--example                    ready           largeop/scripts+body | order from example
+riemann-sphere--example                      ready           whole | order from none
+riemann-stieltjes-integral--example          ready           largeop/scripts+integrand+var | order from example
+right-derivative--example                    ready           prefix/rest | order from example
+ruelle-zeta-function--example                ready           apply/args | order from example
+schwartz-space--example                      ready           whole | order from none
+schwarzian-derivative--example               needs-operands  arity-mismatch: "schwarzian-derivative" takes 2 operand(s); the selection shows 1. Mark the operands.
+shift-operator--example                      ready           apply/args | order from example
+small-o--example                             ready           apply/args | order from example
+sobolev-space--example                       needs-operands  example-disagrees: The Reference tool's example for "sobolev-space" marks the operands differently from how the tool reads this notation. Mark the operands.
+spectral-radius--example                     ready           apply/args | order from example
+spectrum--example                            ready           apply/args | order from example
+support--example                             ready           apply/args | order from example
+supremum-limit--example                      ready           largeop/scripts+body | order from example
+surface-integral--example                    ready           largeop/integrand | order from example
+taylor-polynomial--example                   ready           apply/args | order from example
+topological-entropy--example                 ready           apply/args | order from example
+total-derivative--example                    ready           prefix/scripts+rest | order from example
+total-variation--example                     ready           apply/args | order from example
+truncation--example                          ready           apply/args | order from example
+tube-domain--example                         ready           scripted/scripts | order from example
+uniformly-convergent--example                ready           infix/sides | order from example
+upper-darboux-integral--example              ready           prefix/rest | order from example
+upper-dini-derivative--example               needs-operands  example-disagrees: The Reference tool's example for "upper-dini-derivative" marks the operands differently from how the tool reads this notation. Mark the operands.
+upper-half-plane--example                    ready           whole | order from none
+volterra-integral--example                   ready           largeop/scripts+body | order from example
+volume-element--example                      ready           whole | order from none
+wavelet-transform--example                   ready           prefix/scripts+rest | order from example
+weak-convergence--example                    ready           infix/sides | order from example
+wiener-algebra--example                      ready           whole | order from none
+wronskian--example                           ready           apply/args | order from example
+counts: {"ready":130,"needs-operands":15}
+
+=== HAND FIXTURES
+closed-interval                              ready           fenced/items | order from wording
+open-interval                                ready           fenced/items | order from wording
+open-interval-european                       ready           fenced/items | order from wording
+open-closed-interval                         ready           fenced/items | order from wording
+closed-open-interval                         ready           fenced/items | order from wording
+closed-open-interval-sized                   ready           fenced/items | order from wording
+open-interval-longer-operands                ready           fenced/items | order from wording
+open-interval-nested-comma                   ready           fenced/items | order from wording
+sinh-prefix                                  ready           prefix/rest | order from wording
+cosh-parens                                  ready           apply/args | order from wording
+tanh-left-right                              ready           apply/args | order from wording
+sech-operatorname                            ready           prefix/rest | order from wording
+coth-prefix                                  ready           prefix/rest | order from wording
+arsinh-operatorname                          ready           apply/args | order from wording
+csch-operatorname                            ready           prefix/rest | order from wording
+arcosh-operatorname                          ready           prefix/rest | order from wording
+artanh-parens                                ready           apply/args | order from wording
+arsech-operatorname                          ready           prefix/rest | order from wording
+arcsch-parens                                ready           apply/args | order from wording
+arcoth-operatorname                          ready           prefix/rest | order from wording
+sinh-inverse-script                          needs-operands  lossy: Taking only x as the operand would leave other letters or numbers unread. Mark the operands.
+log-prefix                                   ready           prefix/rest | order from wording
+log-base                                     ready           prefix/scripts+rest | order from wording
+log-base-parens                              ready           apply/scripts+args | order from wording
+ln-parens                                    ready           apply/args | order from wording
+ln-prefix                                    ready           prefix/rest | order from wording
+exp-parens                                   ready           apply/args | order from wording
+exp-e-power                                  needs-operands  ambiguous: The tool cannot tell which part is the operand of "exponential" here (x  or  e). Mark the operands.
+exponential-e-base                           ready           whole | order from none
+real-part-prefix                             ready           prefix/rest | order from wording
+imaginary-part-parens                        ready           apply/args | order from wording
+complex-arg-prefix                           ready           prefix/rest | order from wording
+conjugate-overline                           ready           command/args | order from example
+conjugate-bar-unbraced                       ready           command/args | order from example
+conjugate-star                               ready           scripted/base | order from wording
+conjugate-star-subscripted                   ready           scripted/base+sub | order from wording
+prime                                        ready           scripted/base | order from reading
+prime-double                                 ready           scripted/base | order from reading
+prime-subscripted                            ready           scripted/base+sub | order from reading
+time-derivative-dot                          ready           command/args | order from reading
+gradient-nabla                               ready           prefix/rest | order from reading
+evaluate-big-bar                             ready           evalbar/body+limits | order from reading | order-unconfirmed
+evaluate-upper-first                         ready           evalbar/body+limits | order from reading | order-unconfirmed
+evaluate-left-dot                            ready           evalbar/body+limits | order from reading | order-unconfirmed
+evaluate-brackets                            ready           fenced/items+sub+sup | order from reading | order-unconfirmed
+evaluate-plain-bar-bare-scripts              ready           evalbar/body+limits | order from reading | order-unconfirmed
+evaluated-at                                 ready           evalbar/body+limits | order from wording
+sum-from-to                                  ready           largeop/scripts+body | order from wording
+sum-upper-first                              ready           largeop/scripts+body | order from wording
+sum-over                                     ready           largeop/scripts+body | order from wording
+sum-plain                                    ready           largeop/scripts+body | order from wording
+product-from-to                              ready           largeop/scripts+body | order from wording
+limit-operator                               ready           largeop/scripts | order from wording
+limit-with-body                              needs-operands  lossy: Taking only \frac{\sin x}{x} or x\to 0 as the operand would leave other letters or numbers unread. Mark the operands.
+tends-to                                     ready           infix/sides | order from wording
+tends-to-from-above                          ready           infix/sides | order from wording
+tends-to-from-below                          ready           infix/sides | order from wording
+differential-d                               ready           whole | order from none
+definite-integral                            needs-operands  lossy: Taking only x^2 or x^2 | x as the operand would leave other letters or numbers unread. Mark the operands.
+derivative-leibniz                           needs-operands  arity-mismatch: "derivative" takes 3 operand(s); the selection shows 2. Mark the operands.
+partial-derivative                           needs-operands  arity-unknown: The Reference tool does not record a fixed number of operands for "partial-derivative" (the Reference tool says ">=3"). Mark the operands.
+divergence                                   needs-operands  arity-unknown: The Reference tool does not record a fixed number of operands for "divergence". Mark the operands.
+curl                                         needs-operands  arity-unknown: The Reference tool does not record a fixed number of operands for "curl". Mark the operands.
+laplacian                                    needs-operands  arity-unknown: The Reference tool does not record a fixed number of operands for "laplacian". Mark the operands.
+change                                       needs-operands  arity-unknown: The Reference tool does not record a fixed number of operands for "change". Mark the operands.
+piecewise                                    needs-operands  arity-unknown: The Reference tool does not record a fixed number of operands for "piecewise". Mark the operands.
+not-used-large-op                            refused         not-used: "large-op" is marked "not used" in the Reference tool. Reason: MathCAT's internal name for large operators (∑, ∏, ∫); we use `sum`, `product` and `definite-integral` (only `definite-integral` is in our vocabulary yet). [NICHOLAS 2026-10-30]
+not-used-limit-sup                           refused         not-used: "limit-sup" is marked "not used" in the Reference tool; use "supremum-limit" instead. Reason: MathCAT's internal name for the limit superior; we use the open list's `supremum-limit`. [NICHOLAS 2026-10-30]
+not-used-limit-inf                           refused         not-used: "limit-inf" is marked "not used" in the Reference tool; use "infimum-limit" instead. Reason: MathCAT's internal name for the limit inferior; we use the open list's `infimum-limit`. [NICHOLAS 2026-10-30]
+not-used-log-base                            refused         not-used: "logarithm-with-base" is marked "not used" in the Reference tool. Reason: MathCAT's internal name for a logarithm with a base; we use the W3C core concept `logarithm`, which is not in our vocabulary yet. [NICHOLAS 2026-10-30]
+bergman-space-other-letters                  ready           apply/scripts+args | order from example
+dirichlet-kernel-other-letters               ready           apply/scripts+args | order from example
+wronskian-subscripts                         ready           apply/args | order from example
+hardy-space-number                           ready           scripted/scripts | order from example
+fourier-hat-g                                ready           command/args | order from example
+laplace-transform-y                          ready           apply/args | order from example
+convolution-other-letters                    ready           infix/sides | order from example
+uniformly-convergent                         ready           infix/sides | order from example
+forward-difference-other-letters             needs-operands  example-disagrees: The Reference tool's example for "forward-difference" marks the operands differently from how the tool reads this notation. Mark the operands.
+check-empty                                  refused         empty-selection: Nothing is selected (or only spaces).
+check-spaces-only                            refused         empty-selection: Nothing is selected (or only spaces).
+check-unknown-concept                        refused         unknown-concept: "no-such-concept" is not in the concept list.
+check-outside-math                           refused         not-in-math: The selection must sit inside one piece of math ($...$, \(...\), \[...\] or a math environment).
+check-two-regions                            refused         not-in-math: The selection must sit inside one piece of math ($...$, \(...\), \[...\] or a math environment).
+check-in-text                                refused         in-text: The selection is inside text (\text{...}), not math.
+check-cuts-braces                            refused         cuts-structure: The selection cuts through a brace group, a \left...\right pair or a command. Select whole pieces.
+check-cuts-left-right                        refused         cuts-structure: The selection cuts through a brace group, a \left...\right pair or a command. Select whole pieces.
+check-cuts-command                           refused         cuts-command: The selection cuts a command from its arguments. Select the whole command.
+check-cuts-script                            refused         cuts-script: The selection separates a superscript or subscript from what it belongs to. Select the whole piece, scripts included.
+check-table-cells                            refused         table-cells: The selection spans more than one table cell or row (& or \\). Select inside one cell, or the whole table.
+check-in-operator-name                       refused         in-name: The selection is inside an operator name (\operatorname{...}). Select the whole command.
+check-cuts-font-word                         refused         cuts-name: The selection is part of a word in one font command (\mathrm{...}). Select the whole command.
+check-math-does-not-parse                    refused         math-does-not-parse: The math around the selection does not parse (an unbalanced brace or \left/\right?). Fix it first.
+check-labelled-whole-command                 refused         already-labelled: This is an existing label ("absolute-value($a1)"). Change or remove it instead of labelling it again.
+check-labelled-notation                      refused         already-labelled: This notation is already labelled "absolute-value($a1)".
+check-labelled-operand-command               refused         already-labelled: This is an existing operand mark (\MathMLarg). Select what is inside it to label that.
+check-labelled-shorthand                     refused         already-labelled: This notation is already labelled "absolute-value".
+check-in-label-name                          refused         in-label: The selection is inside the name of an existing label or operand.
+nest-inside-operand                          ready           prefix/rest | order from wording
+nest-label-as-operand                        ready           prefix/rest | order from wording
+brace-label-as-bare-script                   ready           whole | order from none
+brace-label-as-bare-argument                 ready           whole | order from none
+brace-label-before-script                    ready           whole | order from none
+selection-trimmed                            ready           prefix/rest | order from wording
+counts: {"ready":69,"needs-operands":12,"refused":23}
+
+=== CONCEPTS IN THE GROUP WITH NO EXAMPLE FIXTURE
+closed-interval                example has MathML only, no LaTeX    hand fixture(s)
+open-interval                  example has MathML only, no LaTeX    hand fixture(s)
+open-closed-interval           example has MathML only, no LaTeX    hand fixture(s)
+closed-open-interval           example has MathML only, no LaTeX    hand fixture(s)
+prime-notation                 no example                           hand fixture(s)
+derivative                     no example                           hand fixture(s)
+definite-integral              no example                           hand fixture(s)
+time-derivative                no example                           hand fixture(s)
+fixed-point                    no example                           NO FIXTURE
+gradient                       no example                           hand fixture(s)
+evaluated-at                   no example                           hand fixture(s)
+evaluate                       no example                           hand fixture(s)
+differential-d                 no example                           hand fixture(s)
+sum                            no example                           hand fixture(s)
+complex-arg                    no example                           hand fixture(s)
+curl                           no example                           hand fixture(s)
+exponential                    no example                           hand fixture(s)
+imaginary-part                 no example                           hand fixture(s)
+laplacian                      no example                           hand fixture(s)
+large-op                       marked not used                      hand fixture(s)
+limit                          no example                           hand fixture(s)
+limit-inf                      marked not used                      hand fixture(s)
+limit-sup                      marked not used                      hand fixture(s)
+logarithm                      no example                           hand fixture(s)
+logarithm-with-base            marked not used                      hand fixture(s)
+natural-logarithm              no example                           hand fixture(s)
+partial-derivative             no example                           hand fixture(s)
+piecewise                      no example                           hand fixture(s)
+tends-to                       no example                           hand fixture(s)
+tends-to-from-above            no example                           hand fixture(s)
+tends-to-from-below            no example                           hand fixture(s)
+divergence                     no example                           hand fixture(s)
+change                         no example                           hand fixture(s)
+product                        no example                           hand fixture(s)
+hyperbolic-sine                no example                           hand fixture(s)
+hyperbolic-cosine              no example                           hand fixture(s)
+hyperbolic-tangent             no example                           hand fixture(s)
+hyperbolic-secant              no example                           hand fixture(s)
+hyperbolic-cosecant            no example                           hand fixture(s)
+hyperbolic-cotangent           no example                           hand fixture(s)
+arc-hyperbolic-sine            no example                           hand fixture(s)
+arc-hyperbolic-cosine          no example                           hand fixture(s)
+arc-hyperbolic-tangent         no example                           hand fixture(s)
+arc-hyperbolic-secant          no example                           hand fixture(s)
+arc-hyperbolic-cosecant        no example                           hand fixture(s)
+arc-hyperbolic-cotangent       no example                           hand fixture(s)
+exponential-e                  no example                           hand fixture(s)

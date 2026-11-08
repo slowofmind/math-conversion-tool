@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snippet core test page</title>
+<!-- [CLAUDE 2026-11-02] Track C, overnight plan section 5 step 5. Standalone
+     test page for the new snippet core (src/snippet-core.js). Not wired into
+     the platform editor. Keyboard-operable with visible labels; NOT YET
+     CHECKED WITH NVDA OR JAWS. Serve the platform folder over http, e.g.
+     python -m http.server 8765 --bind 127.0.0.1, then open
+     http://127.0.0.1:8765/snippets/demo.html -->
+<style>
+  :root { --bg: #ffffff; --fg: #1a1a1a; --muted: #555; --line: #8a8a8a; --panel: #f3f5f8;
+          --accent: #0b57d0; --ok: #116329; --warn: #8a4b00; --bad: #b3261e; --focus: #c25e00; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #15181d; --fg: #e8eaed; --muted: #b0b6bf; --line: #6b7280; --panel: #1f242c;
+    --accent: #8ab4f8; --ok: #6dd58c; --warn: #f2b45c; --bad: #ff8f86; --focus: #f2b45c; color-scheme: dark; } }
+  body { background: var(--bg); color: var(--fg); font: 1.05rem/1.55 "Segoe UI", system-ui, sans-serif; margin: 0; }
+  main { max-width: 52rem; margin: 0 auto; padding: 1.5rem 16px 4rem; }
+  h1 { font-size: 1.6rem; margin: 0 0 .5rem; }
+  h2 { font-size: 1.2rem; margin: 1.8rem 0 .5rem; }
+  p { max-width: 65ch; }
+  label, legend { font-weight: 600; display: block; margin: .9rem 0 .3rem; }
+  textarea, input[type="search"], input[type="text"], select { font: inherit; color: var(--fg); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 4px; padding: .4rem .5rem; width: 100%; box-sizing: border-box; }
+  textarea { font-family: Consolas, "Courier New", monospace; min-height: 9rem; }
+  select[size] { font-family: Consolas, "Courier New", monospace; font-size: .95rem; }
+  button { font: inherit; padding: .45rem .9rem; border-radius: 4px; border: 1px solid var(--accent);
+    background: var(--accent); color: var(--bg); cursor: pointer; margin: .8rem .5rem 0 0; }
+  button.secondary { background: transparent; color: var(--accent); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: .2rem 1rem 1rem; margin-top: 1rem; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 0 1rem; }
+  .check { display: flex; gap: .5rem; align-items: center; margin-top: .9rem; font-weight: 600; }
+  .check input { width: auto; }
+  .hint { color: var(--muted); font-size: .92rem; margin: .2rem 0; }
+  #status { border-left: 4px solid var(--accent); padding: .4rem .8rem; margin-top: 1rem; min-height: 1.5em; white-space: pre-wrap; }
+  #status.ok { border-color: var(--ok); } #status.warn { border-color: var(--warn); } #status.bad { border-color: var(--bad); }
+  pre { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: .6rem; overflow-x: auto; font-size: .88rem; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Snippet core test page</h1>
+  <p>Select some math in the LaTeX source, press <strong>Label the selection</strong>, choose a concept, then press
+    <strong>Apply</strong>. The selection gets kernel intent markup (<code>\MathMLintent</code> and <code>\MathMLarg</code>)
+    with the formal concept name from the Intent Concept Reference.</p>
+  <p class="hint">Test page for the overnight snippet core. Not part of the platform editor. Not yet checked with NVDA or JAWS.</p>
+
+  <label for="src">LaTeX source</label>
+  <textarea id="src" spellcheck="false" aria-describedby="src-hint"></textarea>
+  <p class="hint" id="src-hint">Select with Shift and the arrow keys. The tool keeps your selection while you choose a concept.</p>
+  <button type="button" id="open">Label the selection</button>
+  <button type="button" id="undo" class="secondary" disabled>Undo last change</button>
+
+  <div id="status" role="status" aria-live="polite"></div>
+
+  <section id="picker" class="panel" hidden aria-labelledby="picker-h">
+    <h2 id="picker-h">Choose a concept</h2>
+    <p class="hint" id="picker-sel"></p>
+    <div class="row">
+      <div>
+        <label for="filter">Filter concepts</label>
+        <input type="search" id="filter" autocomplete="off" aria-describedby="filter-hint">
+        <p class="hint" id="filter-hint">Type part of a name, for example "log" or "interval". Press Down arrow to move to the list.</p>
+      </div>
+      <div>
+        <label for="group">Subject group</label>
+        <select id="group"></select>
+        <label for="level">Level</label>
+        <select id="level"><option value="">Any level</option></select>
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" id="notused"> Show concepts marked "not used"</label>
+    <label for="list" id="list-label">Concepts (<span id="count">0</span> shown)</label>
+    <select id="list" size="10" aria-describedby="list-hint"></select>
+    <p class="hint" id="list-hint">Each entry: name, number of operands, and how it is worded. Press Enter to apply.</p>
+    <button type="button" id="apply">Apply</button>
+    <button type="button" id="cancel" class="secondary">Cancel</button>
+
+    <form id="operands" hidden aria-labelledby="operands-h">
+      <h2 id="operands-h">Mark the operands</h2>
+      <p id="operands-why"></p>
+      <div id="arity-wrap" hidden>
+        <label for="arity">Number of operands</label>
+        <select id="arity"></select>
+      </div>
+      <div id="operand-fields"></div>
+      <p class="hint">Type each operand exactly as it appears in the selection. If the same text appears more than once, the first one not used by an earlier operand is taken.</p>
+      <button type="submit">Apply with these operands</button>
+    </form>
+  </section>
+
+  <section aria-labelledby="mml-h">
+    <h2 id="mml-h">Converted MathML of the last change</h2>
+    <p class="hint">From the platform's Baseline converter. Look for the <code>intent</code> and <code>arg</code> attributes.</p>
+    <pre id="mml">(nothing applied yet)</pre>
+  </section>
+</main>
+
+<script type="module">
+import { createSnippetCore, applyEdit } from './src/snippet-core.js';
+import { findMathRegions } from './src/latex-parse.js';
+
+const $ = id => document.getElementById(id);
+const src = $('src'), statusEl = $('status');
+const SAMPLE = String.raw`The real part is $\operatorname{Re}(z)$ and the interval is $x \in [0, 1)$.
+Hyperbolic: $\sinh x + \cosh(2t)$. Logs: $\log_b x = \ln(1+x)$.
+A sum $\sum_{i=1}^{n} a_i$, a limit $\lim_{x\to 0} \frac{\sin x}{x}$,
+an evaluation $F(x)\Big|_{0}^{1}$ and a conjugate $z_k^*$.
+Already labelled: $\MathMLintent{absolute-value($a1)}{\left|\MathMLarg{a1}{x}\right|}$.`;
+src.value = SAMPLE;
+
+let core = null, sel = null, lastConcept = null, history = [];
+const say = (msg, kind = '') => { statusEl.className = kind; statusEl.textContent = ''; setTimeout(() => { statusEl.textContent = msg; }, 30); };
+
+try {
+  const data = await (await fetch('../math-conversion/intent-concepts.json')).json();
+  core = createSnippetCore(data);
+  for (const g of core.groups()) $('group').add(new Option(`${g.id} (${g.count})`, g.id));
+  $('group').add(new Option('All groups', ''), 0);
+  $('group').value = 'calculus-analysis';
+  const levels = new Set(core.index.records.flatMap(r => r.levels ?? []));
+  for (const l of levels) $('level').add(new Option(l, l));
+} catch (e) {
+  say(`Could not load the concept list (math-conversion/intent-concepts.json): ${e.message}. Open this page through a local web server, not as a file.`, 'bad');
+}
+
+function fill() {
+  const list = $('list');
+  list.textContent = '';
+  const hits = core.search($('filter').value, { group: $('group').value || null, level: $('level').value || null, includeNotUsed: $('notused').checked });
+  for (const d of hits) {
+    const ops = d.forms.length ? `${d.arityText} operand${d.arityText === '1' ? '' : 's'}` : `operands: ${d.arityText}`;
+    const words = d.wording ? ` — "${d.wording}"` : '';
+    const nu = d.notUsed ? ' — NOT USED' : '';
+    list.add(new Option(`${d.label} — ${ops}${words}${nu}`, d.key));
+  }
+  if (list.options.length) list.selectedIndex = 0;
+  $('count').textContent = String(list.options.length);
+}
+
+function openPicker() {
+  if (!core) return;
+  sel = { start: src.selectionStart, end: src.selectionEnd };
+  if (sel.start === sel.end) { say('Select some math in the LaTeX source first.', 'warn'); src.focus(); return; }
+  $('picker-sel').textContent = `Selected: ${src.value.slice(sel.start, sel.end)}`;
+  $('picker').hidden = false; $('operands').hidden = true;
+  fill();
+  $('filter').focus();
+  $('filter').select();           // the last filter stays, but typing replaces it
+}
+
+function closePicker() {
+  $('picker').hidden = true;
+  src.focus();
+  if (sel) src.setSelectionRange(sel.start, sel.end);
+}
+
+async function showMathML(doc, edit) {
+  const reg = findMathRegions(doc).find(g => g.contentStart <= edit.start && edit.start <= g.contentEnd);
+  if (!reg) return;
+  try {
+    const { tex2mml } = await import('../math-conversion/mathjax-bundle-baseline.js');
+    const mml = await tex2mml(doc.slice(reg.contentStart, reg.contentEnd), false);
+    $('mml').textContent = mml.replace(/ data-[a-z-]+="[^"]*"/g, '');
+  } catch (e) { $('mml').textContent = `(the converter could not be loaded: ${e.message})`; }
+}
+
+function done(r) {
+  history.push(src.value);
+  $('undo').disabled = false;
+  const doc = applyEdit(src.value, r.edit);
+  src.value = doc;
+  $('picker').hidden = true;
+  src.focus();
+  src.setSelectionRange(r.edit.start, r.edit.start + r.edit.text.length);
+  const ops = r.operands.length ? ` Operands: ${r.operands.map(o => `${o.name} = ${o.text}`).join('; ')}.` : '';
+  const warn = r.warnings.length ? `\nCheck: ${r.warnings.map(w => w.message).join(' ')}` : '';
+  say(`Applied ${r.value}.${ops}${warn}`, r.warnings.length ? 'warn' : 'ok');
+  showMathML(doc, r.edit);
+}
+
+function operandForm(r) {
+  const f = $('operands'), wrap = $('operand-fields'), ar = $('arity');
+  $('operands-why').textContent = r.reason.message;
+  const forms = r.forms.length ? r.forms : [{ arity: 1, operands: ['a1'], wording: null }];
+  ar.textContent = '';
+  for (const fm of forms) ar.add(new Option(`${fm.arity}${fm.wording ? ` — "${fm.wording}"` : ''}`, String(fm.arity)));
+  $('arity-wrap').hidden = forms.length < 2;
+  const build = () => {
+    const fm = forms.find(x => String(x.arity) === ar.value) ?? forms[0];
+    wrap.textContent = '';
+    fm.operands.forEach((name, i) => {
+      const id = `op-${i}`;
+      const lab = document.createElement('label');
+      lab.htmlFor = id; lab.textContent = `Operand ${i + 1} of ${fm.operands.length} ($${name})`;
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.id = id; inp.spellcheck = false; inp.autocomplete = 'off';
+      wrap.append(lab, inp);
+    });
+    if (!fm.operands.length) wrap.textContent = 'This form has no operands.';
+  };
+  ar.onchange = build;
+  build();
+  f.hidden = false;
+  (wrap.querySelector('input') ?? ar).focus();
+}
+
+function apply() {
+  const key = $('list').value;
+  if (!key) { say('No concept is chosen. Change the filter or pick one from the list.', 'warn'); return; }
+  lastConcept = key;
+  const r = core.apply(src.value, sel, key);
+  if (r.status === 'ready') return done(r);
+  if (r.status === 'refused') { say(`Not applied: ${r.reason.message}`, 'bad'); return; }
+  say(`Needs your help: ${r.reason.message}`, 'warn');
+  operandForm(r);
+}
+
+$('open').addEventListener('click', openPicker);
+$('cancel').addEventListener('click', () => { closePicker(); say('Cancelled. Nothing was changed.'); });
+$('apply').addEventListener('click', apply);
+$('undo').addEventListener('click', () => {
+  if (!history.length) return;
+  src.value = history.pop();
+  $('undo').disabled = !history.length;
+  src.focus();
+  say('The last change was undone.');
+});
+for (const id of ['filter', 'group', 'level', 'notused']) $(id).addEventListener(id === 'filter' ? 'input' : 'change', fill);
+$('filter').addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') { e.preventDefault(); $('list').focus(); }
+  if (e.key === 'Enter') { e.preventDefault(); apply(); }
+});
+$('list').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); apply(); } });
+$('list').addEventListener('dblclick', apply);
+$('picker').addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); closePicker(); say('Cancelled. Nothing was changed.'); } });
+$('operands').addEventListener('submit', e => {
+  e.preventDefault();
+  const texts = [...$('operand-fields').querySelectorAll('input')].map(i => i.value);
+  const r = core.applyWithOperandTexts(src.value, sel, lastConcept, texts);
+  if (r.status === 'ready') return done(r);
+  say(`Not applied: ${r.reason.message}`, 'bad');
+});
+</script>
+</body>
+</html>
