@@ -20,23 +20,23 @@
   },
   "annotations": {
    "updated": "2026-11-07T19:23:21.832Z",
-   "customConcepts": 283
+   "customConcepts": 285
   },
   "subjectGroups": {
    "updated": "2026-10-30",
    "status": "provisional"
   },
   "counts": {
-   "records": 1516,
+   "records": 1518,
    "rowsOpen": 1126,
-   "rowsCustom": 283,
+   "rowsCustom": 285,
    "rowsCoreOnly": 107,
    "sourceCore": 215,
    "sourceOpen": 1104,
-   "sourceCustom": 197,
-   "notUsed": 18,
+   "sourceCustom": 199,
+   "notUsed": 20,
    "withExample": 1127,
-   "withWording": 1251,
+   "withWording": 1253,
    "held": 3,
    "roleProperty": 7,
    "roleInternal": 13
@@ -7706,7 +7706,10 @@
    "levels": [
     "2nd year"
    ],
-   "notUsed": null,
+   "notUsed": {
+    "reason": "Ginev's example labels two different inputs with one name, giving one part where the notation needs two (the random variable X and the value x). Use the Harvard two-part version of the same name (custom:cumulative-distribution-function). [NICHOLAS 2026-11-08]",
+    "useInstead": "cumulative-distribution-function"
+   },
    "role": null,
    "held": null,
    "example": {
@@ -17687,7 +17690,10 @@
    "levels": [
     "upper division"
    ],
-   "notUsed": null,
+   "notUsed": {
+    "reason": "Ginev's example labels two different inputs with one name, giving one part where the notation needs two (a and x). Use the Harvard two-part version of the same name (custom:incomplete-gamma-function). [NICHOLAS 2026-11-08]",
+    "useInstead": "incomplete-gamma-function"
+   },
    "role": null,
    "held": null,
    "example": {
@@ -44425,8 +44431,11 @@
    "key": "custom:outer-product",
    "source": "core",
    "status": "settled",
-   "arity": null,
-   "operands": [],
+   "arity": 2,
+   "operands": [
+    "u",
+    "v"
+   ],
    "fixity": "infix",
    "fixityFrom": "core",
    "wording": null,
@@ -44440,9 +44449,12 @@
    "example": null,
    "property": "infix",
    "variableArity": null,
-   "operandsFrom": null,
+   "operandsFrom": "custom",
    "wordingFrom": null,
-   "homeOperands": null,
+   "homeOperands": [
+    "u",
+    "v"
+   ],
    "forms": [
     {
      "section": "defaultfixity",
@@ -44545,8 +44557,10 @@
    "key": "custom:measured-angle",
    "source": "core",
    "status": "settled",
-   "arity": null,
-   "operands": [],
+   "arity": 1,
+   "operands": [
+    "angle"
+   ],
    "fixity": "prefix",
    "fixityFrom": "core",
    "wording": null,
@@ -44560,9 +44574,11 @@
    "example": null,
    "property": "prefix",
    "variableArity": null,
-   "operandsFrom": null,
+   "operandsFrom": "custom",
    "wordingFrom": null,
-   "homeOperands": null,
+   "homeOperands": [
+    "angle"
+   ],
    "forms": [
     {
      "section": "defaultfixity",
@@ -44579,8 +44595,10 @@
    "key": "custom:square-root-of",
    "source": "core",
    "status": "settled",
-   "arity": null,
-   "operands": [],
+   "arity": 1,
+   "operands": [
+    "radicand"
+   ],
    "fixity": "prefix",
    "fixityFrom": "core",
    "wording": null,
@@ -44594,9 +44612,11 @@
    "example": null,
    "property": "prefix",
    "variableArity": null,
-   "operandsFrom": null,
+   "operandsFrom": "custom",
    "wordingFrom": null,
-   "homeOperands": null,
+   "homeOperands": [
+    "radicand"
+   ],
    "forms": [
     {
      "section": "defaultfixity",
@@ -44842,8 +44862,11 @@
    "key": "custom:times",
    "source": "core",
    "status": "settled",
-   "arity": null,
-   "operands": [],
+   "arity": 2,
+   "operands": [
+    "a",
+    "b"
+   ],
    "fixity": "infix",
    "fixityFrom": "core",
    "wording": null,
@@ -44857,9 +44880,12 @@
    "example": null,
    "property": "infix",
    "variableArity": null,
-   "operandsFrom": null,
+   "operandsFrom": "custom",
    "wordingFrom": null,
-   "homeOperands": null,
+   "homeOperands": [
+    "a",
+    "b"
+   ],
    "forms": [
     {
      "section": "defaultfixity",
@@ -47835,6 +47861,66 @@
      "default": true
     }
    ]
+  },
+  {
+   "concept": "incomplete-gamma-function",
+   "key": "custom:incomplete-gamma-function",
+   "source": "custom",
+   "status": "decided",
+   "arity": 2,
+   "operands": [
+    "a",
+    "x"
+   ],
+   "fixity": "function",
+   "fixityFrom": "annotation",
+   "wording": "incomplete gamma function of $a and $x",
+   "groups": [
+    "special-functions"
+   ],
+   "levels": [
+    "upper division"
+   ],
+   "notUsed": null,
+   "role": null,
+   "held": null,
+   "example": null,
+   "property": "function",
+   "variableArity": null,
+   "operandsFrom": "custom",
+   "wordingFrom": "custom",
+   "homeOperands": null,
+   "forms": null
+  },
+  {
+   "concept": "cumulative-distribution-function",
+   "key": "custom:cumulative-distribution-function",
+   "source": "custom",
+   "status": "decided",
+   "arity": 2,
+   "operands": [
+    "variable",
+    "value"
+   ],
+   "fixity": "function",
+   "fixityFrom": "annotation",
+   "wording": "cumulative distribution function of $variable at $value",
+   "groups": [
+    "probability-statistics"
+   ],
+   "levels": [
+    "2nd year"
+   ],
+   "notUsed": null,
+   "role": null,
+   "held": null,
+   "example": null,
+   "property": "function",
+   "variableArity": null,
+   "operandsFrom": "custom",
+   "wordingFrom": "custom",
+   "homeOperands": null,
+   "forms": null
   },
   {
    "concept": "divergence",
