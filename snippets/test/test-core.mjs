@@ -65,8 +65,9 @@ const s1 = core.search('real part', { group: GROUP });
 ok(s1[0]?.concept === 'real-part', 'search: "real part" finds real-part first', `got ${names(s1).slice(0, 5)}`);
 const all = core.search('', { group: GROUP });
 const inGroup = loadExport().concepts.filter(r => (r.groups ?? []).includes(GROUP));
-ok(all.length === inGroup.filter(r => !r.notUsed).length, 'search: empty query lists the whole group minus not-used',
-   `got ${all.length}, group has ${inGroup.length} (${inGroup.filter(r => r.notUsed).length} not used)`);
+const listed = inGroup.filter(r => !r.notUsed && !r.readsWithoutMarkup);
+ok(all.length === listed.length, 'search: empty query lists the whole group minus not-used and reads-without-markup',
+   `got ${all.length}, group has ${inGroup.length} (${inGroup.filter(r => r.notUsed).length} not used, ${inGroup.filter(r => r.readsWithoutMarkup).length} reads without markup)`);
 const s2 = core.search('integral', { group: GROUP });
 ok(names(s2).includes('definite-integral') && names(s2).includes('riemann-integral') && s2.every(d => d.groups.includes(GROUP)),
    'search: "integral" within the group', `got ${names(s2)}`);
@@ -75,23 +76,35 @@ ok(!names(s3).includes('limit-sup'), 'search: not-used concepts hidden by defaul
 const s4 = core.search('limit', { group: GROUP, includeNotUsed: true });
 ok(names(s4).includes('limit-sup') && s4.find(d => d.concept === 'limit-sup').notUsed?.useInstead === 'supremum-limit',
    'search: not-used concepts shown on request, with what to use instead', `got ${names(s4)}`);
-const s5 = core.search('', { group: GROUP, level: '1st year' });
-ok(s5.length > 0 && s5.every(d => d.levels.includes('1st year')), 'search: level filter', `got ${s5.length}`);
+// [CLAUDE 2026-11-08] slim layout 1: no levels; source filter instead; reads-without-markup hidden
+const s5 = core.search('', { group: GROUP, source: 'open' });
+ok(s5.length > 0 && s5.every(d => d.source === 'open'), 'search: source filter', `got ${s5.length}`);
+const s5b = core.search('plus');
+ok(!s5b.some(d => d.key === 'core:plus'), 'search: reads-without-markup concepts hidden by default', `got ${s5b.map(d => d.key).slice(0, 5)}`);
+const s5c = core.search('plus', { includeReadsWithoutMarkup: true });
+ok(s5c.some(d => d.key === 'core:plus' && d.readsWithoutMarkup), 'search: reads-without-markup concepts shown on request, marked', `got ${s5c.map(d => d.key).slice(0, 5)}`);
+let layoutRefused = false;
+try { createSnippetCore({ meta: { layout: 'slim layout 2' }, concepts: [] }); } catch (e) { layoutRefused = /slim layout 1/.test(e.message); }
+ok(layoutRefused, 'a concept list with another layout label is refused, naming the layout the tool reads', '');
 const s6 = core.search('log');
 ok(s6[0]?.concept === 'logarithm' || names(s6).slice(0, 3).includes('logarithm'), 'search: no group filter searches every group', `got ${names(s6).slice(0, 5)}`);
-const s7 = core.search('hyp sin', { group: GROUP });
-ok(s7[0]?.concept === 'hyperbolic-sine', 'search: word starts ("hyp sin")', `got ${names(s7).slice(0, 3)}`);
+// [CLAUDE 2026-11-08] hyperbolic-sine is labelled "reads without markup", so it is hidden by default
+const s7 = core.search('hyp sin', { group: GROUP, includeReadsWithoutMarkup: true });
+ok(s7[0]?.concept === 'hyperbolic-sine', 'search: word starts ("hyp sin", labelled concepts shown)', `got ${names(s7).slice(0, 3)}`);
+const s7b = core.search('hyp sin', { group: GROUP });
+ok(s7b[0]?.concept === 'arc-hyperbolic-sine' && !names(s7b).includes('hyperbolic-sine'), 'search: "hyp sin" by default skips the labelled hyperbolic-sine', `got ${names(s7b).slice(0, 3)}`);
 
 console.log('--- typed operands (the demo page path)');
 {
   const R = String.raw;
   const doc = R`$\operatorname{arcoth} t$`, s = doc.indexOf('\\'), sel = { start: s, end: doc.length - 1 };
   const r = core.applyWithOperandTexts(doc, sel, 'arc-hyperbolic-cotangent', ['t']);
-  ok(r.status === 'ready' && r.edit.text === R`\MathMLintent{arc-hyperbolic-cotangent($a1)}{\operatorname{arcoth} \MathMLarg{a1}{t}}`,
+  // [CLAUDE 2026-11-08] values now carry fixity; arc-hyperbolic-cotangent's kernel form names its part "value"
+  ok(r.status === 'ready' && r.edit.text === R`\MathMLintent{arc-hyperbolic-cotangent:function($value)}{\operatorname{arcoth} \MathMLarg{value}{t}}`,
      'typed operand skips the t inside \\operatorname', `got ${show(r)}`);
   const doc2 = R`$\sum_{k} b_k$`, s2 = doc2.indexOf('\\'), sel2 = { start: s2, end: doc2.length - 1 };
   const r2 = core.applyWithOperandTexts(doc2, sel2, 'sum', ['k', 'b_k']);
-  ok(r2.status === 'ready' && r2.edit.text === R`\MathMLintent{sum($a1,$a2)}{\sum_{\MathMLarg{a1}{k}} \MathMLarg{a2}{b_k}}`,
+  ok(r2.status === 'ready' && r2.edit.text === R`\MathMLintent{sum:function($a1,$a2)}{\sum_{\MathMLarg{a1}{k}} \MathMLarg{a2}{b_k}}`,
      'typed operands: a repeated letter takes the first whole, unused piece', `got ${show(r2)}`);
   const r3 = core.applyWithOperandTexts(doc2, sel2, 'sum', ['q']);
   ok(r3.status === 'refused' && r3.reason.code === 'operand-not-found', 'typed operand not in the selection is refused', `got ${show(r3)}`);

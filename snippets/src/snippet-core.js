@@ -2,16 +2,18 @@
 // kernel intent markup out.
 // [CLAUDE 2026-11-02] Track C of the overnight plan (section 5). Headless: no
 // editor, no page, no converter. Writes only the kernel notation
-//   \MathMLintent{concept($a,$b)}{...\MathMLarg{a}{...}...\MathMLarg{b}{...}...}
+//   \MathMLintent{concept:fixity($a,$b)}{...\MathMLarg{a}{...}...\MathMLarg{b}{...}...}
 // with the FORMAL concept name from the Reference tool. No macros, no
-// shorthand, no literals (the converter swaps literals in later), no spoken
-// preview.
+// shorthand, no spoken preview.
+// [CLAUDE 2026-11-08] Reads the slim copy (math-conversion/intent-concepts-slim.json,
+// "slim layout 1") through concepts.js; writes fixity [NICHOLAS 2026-11-08]; operand
+// names, positions and order come from the concept's kernel form when it has one.
 //
-//   const core = createSnippetCore(exportJson);
+//   const core = createSnippetCore(slimJson);
 //   core.apply(doc, { start, end }, 'logarithm')
 //   core.applyWithOperands(doc, sel, concept, [{ start, end }, ...])   // author-marked, concept order
 //   core.applyWithOperandTexts(doc, sel, concept, ['x', { text: 'b', occurrence: 2 }])
-//   core.search('log', { group: 'calculus-analysis' })
+//   core.search('log', { group: 'calculus-analysis', source: 'open' })
 //
 // Every call returns one of
 //   { status: 'ready', edit: { start, end, text }, value, operands:[{ name, text, start, end }],
@@ -19,7 +21,7 @@
 //   { status: 'needs-operands', reason: { code, message }, forms, candidates?, warnings }
 //   { status: 'refused', reason: { code, message } }
 // `edit` replaces document[start, end) with text; applyEdit() does that.
-import { loadConceptIndex, formsOf, searchConcepts, describe, groupsIn } from './concepts.js';
+import { loadConceptIndex, formsOf, searchConcepts, describe, groupsIn, sourcesIn } from './concepts.js';
 import { trimRange, runChecks, locateSelection, namesInScope, regionFor } from './checks.js';
 import { chooseInterpretation } from './shapes.js';
 import { writeKernel } from './writer.js';
@@ -63,7 +65,7 @@ export function createSnippetCore(exportJson) {
     if (choice.problem) return needs(ctx, choice.problem, choice.candidates ? { candidates: choice.candidates } : {});
     if (choice.orderFrom === 'reading' && choice.operands.length > 1)
       ctx.warnings.push({ code: 'order-unconfirmed', message:
-        `The Reference tool gives no wording or example that fixes the operand order of "${ctx.concept.concept}"; ` +
+        `The Reference tool has no kernel form for "${ctx.concept.concept}" that fixes the operand order here; ` +
         'the reading order was used. Check that the operands are in the right order.' });
     const written = writeKernel(ctx, { form: choice.form, operands: choice.operands, names: namesInScope(ctx) });
     return ready(ctx, written, { orderFrom: choice.orderFrom, shape: choice.shape });
@@ -79,7 +81,8 @@ export function createSnippetCore(exportJson) {
     if (!form) {
       if (forms.length) return refused({ code: 'arity-mismatch', message:
         `"${ctx.concept.concept}" takes ${forms.map(f => f.arity).join(' or ')} operand(s); ${n} were marked.` });
-      form = { arity: n, operands: Array.from({ length: n }, (_, i) => `a${i + 1}`), wording: null };
+      const fx = ctx.concept.fixity;
+      form = { arity: n, operands: Array.from({ length: n }, (_, i) => `a${i + 1}`), head: fx ? `${ctx.concept.concept}:${fx}` : ctx.concept.concept, from: 'author' };
       ctx.warnings.push({ code: 'arity-unknown', message: `The Reference tool records no fixed number of operands for "${ctx.concept.concept}"; the operands are named a1..a${n}.` });
     }
     const ops = [];
@@ -134,5 +137,6 @@ export function createSnippetCore(exportJson) {
     search: (query, opts) => searchConcepts(index, query, opts),
     concept: key => { const r = index.get(key); return r ? describe(r) : null; },
     groups: () => groupsIn(index),
+    sources: () => sourcesIn(index),
   };
 }

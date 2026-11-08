@@ -11,20 +11,23 @@
 //   3. A reading that would leave letters or numbers out of every operand
 //      (a "lossy" reading: they would not be read aloud) is kept only with
 //      evidence. So is a reading where the base and the script could each be
-//      the operand (e^x). Evidence is the concept's own example in the
+//      the operand (e^x). Evidence is the concept's own kernel form in the
 //      Reference tool (the same shape, with the operands marked) or, for
 //      scripts, the concept's fixity (postfix: the base; indexed: the script).
-//   4. When the Reference example has the same shape but marks other pieces,
-//      that reading is dropped: the example disagrees.
+//   4. When the kernel form has the same shape but marks other pieces,
+//      that reading is dropped: the form disagrees.
 //   5. One reading left: use it. None, or several that differ: the author
 //      marks the operands ("needs-operands"). The tool never guesses.
-// Operand ORDER: from the example when it confirmed the reading; otherwise
-// from the order the concept's wording mentions its operands ("log base $a2
-// of $a1"); otherwise the reading order (with a warning when there are two or
-// more operands). Scripts are always in TeX's order, subscript then
-// superscript, however they are typed, so ^{1}_{0} cannot flip a range.
+// Operand ORDER: from the kernel form when it confirmed the reading; otherwise
+// the reading order (with a warning when there are two or more operands).
+// Scripts are always in TeX's order, subscript then superscript, however they
+// are typed, so ^{1}_{0} cannot flip a range.
+// [CLAUDE 2026-11-08] Evidence and order now come from the kernel forms in the
+// slim copy (Ginev's example and the wording are not in it); the matching is
+// unchanged: a form's \MathMLarg markers play the part the example's \arg
+// markers did.
 import { contentTerms, parseMath } from './latex-parse.js';
-import { mentionOrder } from './concepts.js';
+import { formsOf } from './concepts.js';
 import { locateSelection, trimRange } from './checks.js';
 
 // ---- Vocabulary (data, extend as concepts need) ------------------------------
@@ -338,12 +341,13 @@ export function selectionTerms(loc) {
   return [{ kind: 'term', base: t.base, sub: t.sub, sup: null, primes: 0, start: t.start, end: t.sub.groupEnd ?? t.sub.end, row: t.row }];
 }
 
-// ---- Evidence from the Reference tool's example ----------------------------------
-/** Take the \arg{name}{x} markers out of an example: { plain, markers:[{ home, start, end }] }. */
+// ---- Evidence from the Reference tool's kernel forms -------------------------------
+/** Take the operand markers out of LaTeX: { plain, markers:[{ home, start, end }] }.
+ *  Reads Ginev's \arg{name}{x} / \intent{..}{..} and the kernel's \MathMLarg / \MathMLintent. */
 export function stripMarkers(tex) {
   let plain = '', i = 0;
   const markers = [];
-  const re = /\\(arg|intent)(?![A-Za-z])\s*\{/g;
+  const re = /\\(arg|intent|MathMLarg|MathMLintent)(?![A-Za-z])\s*\{/g;
   const groupEnd = (s, k) => { for (let d = 0; k < s.length; k++) { if (s[k] === '\\') { k++; continue; } if (s[k] === '{') d++; else if (s[k] === '}' && --d === 0) return k + 1; } return -1; };
   for (;;) {
     re.lastIndex = i;
@@ -361,7 +365,7 @@ export function stripMarkers(tex) {
     if (/\\[A-Za-z]+$/.test(plain) && /^[A-Za-z]/.test(inner.plain)) plain += ' ';
     const at = plain.length;
     for (const im of inner.markers) markers.push({ ...im, start: im.start + at, end: im.end + at });
-    if (m[1] === 'arg') {
+    if (m[1] === 'arg' || m[1] === 'MathMLarg') {
       const lead = inner.plain.length - inner.plain.trimStart().length;
       markers.push({ home: tex.slice(nOpen + 1, nEnd - 1).trim(), start: at + lead, end: at + inner.plain.trimEnd().length });
     }
@@ -376,34 +380,48 @@ const intentNames = v => {
   return o < 0 ? [] : v.slice(o + 1, v.lastIndexOf(')')).split(',').map(s => s.trim().replace(/^\$/, '')).filter(Boolean);
 };
 
+/** The notation inside a kernel form: \MathMLintent{<intent>}{{<body>}} -> <body>, or null. */
+export function kernelBody(form) {
+  if (!form?.kernel || !form.intent) return null;
+  const pre = `\\MathMLintent{${form.intent}}{{`;
+  return form.kernel.startsWith(pre) && form.kernel.endsWith('}}') ? form.kernel.slice(pre.length, -2) : null;
+}
+
 const evidenceCache = new WeakMap();
-/** For a concept: Map "shape/variant/count" -> { status: 'confirmed', perm } | { status: 'contradicted' }.
- *  perm[i] = the concept position of the reading's i-th operand. */
-export function exampleEvidence(rec) {
+/** For a concept: Map "shape/variant/count" -> { status: 'confirmed', perm, form } | { status: 'contradicted' }.
+ *  perm[i] = the concept position of the reading's i-th operand. Built from each kernel form: its
+ *  notation is read like a selection, and each reading is checked against the form's \MathMLarg marks.
+ *  [CLAUDE 2026-11-08] Was exampleEvidence (Ginev's example + its intent value). */
+export function formEvidence(rec) {
   if (evidenceCache.has(rec)) return evidenceCache.get(rec);
   const map = new Map();
   evidenceCache.set(rec, map);
-  const homes = intentNames(rec.example?.intent);
-  const ex = rec.example?.tex && homes.length ? stripMarkers(rec.example.tex) : null;
-  if (!ex) return map;
-  const top = ex.markers.filter(m => homes.includes(m.home));
-  if (top.length !== homes.length) return map;
-  const doc = `$${ex.plain}$`;
-  const tree = parseMath(doc, 1, doc.length - 1);
-  if (!tree) return map;
-  const sel = trimRange(doc, 1, doc.length - 1);
-  const loc = locateSelection(tree, sel.start, sel.end);
-  if (loc.code) return map;
-  for (const r of readingsOf(doc, selectionTerms(loc))) {
-    if (r.ops.length !== homes.length) continue;
-    const key = `${r.shape}/${r.variant}/${r.ops.length}`;
-    const perm = r.ops.map(op => {
-      const m = top.find(mk => mk.start + 1 === op.start && mk.end + 1 === op.end);
-      return m ? homes.indexOf(m.home) : -1;
-    });
-    const ok = perm.every(p => p >= 0) && new Set(perm).size === perm.length;
-    if (ok) map.set(key, { status: 'confirmed', perm });
-    else if (!map.has(key)) map.set(key, { status: 'contradicted' });
+  for (const form of formsOf(rec).filter(f => f.from === 'form' && f.arity > 0)) {
+    const homes = form.operands;
+    const body = kernelBody(form);
+    const ex = body ? stripMarkers(body) : null;
+    if (!ex) continue;
+    const top = ex.markers.filter(m => homes.includes(m.home));
+    if (top.length !== homes.length) continue;
+    const doc = `$${ex.plain}$`;
+    const tree = parseMath(doc, 1, doc.length - 1);
+    if (!tree) continue;
+    const sel = trimRange(doc, 1, doc.length - 1);
+    const loc = locateSelection(tree, sel.start, sel.end);
+    if (loc.code) continue;
+    for (const r of readingsOf(doc, selectionTerms(loc))) {
+      if (r.ops.length !== homes.length) continue;
+      const key = `${r.shape}/${r.variant}/${r.ops.length}`;
+      const perm = r.ops.map(op => {
+        const m = top.find(mk => mk.start + 1 === op.start && mk.end + 1 === op.end);
+        return m ? homes.indexOf(m.home) : -1;
+      });
+      const ok = perm.every(p => p >= 0) && new Set(perm).size === perm.length;
+      // lossy: the form's own notation leaves pieces unread (kept so a form without that cannot
+      // vouch for a selection that would leave pieces unread: \sin x is no evidence for \sin^2 x)
+      if (ok) { if (map.get(key)?.status !== 'confirmed') map.set(key, { status: 'confirmed', perm, form, lossy: !!r.lossy }); }
+      else if (!map.has(key)) map.set(key, { status: 'contradicted' });
+    }
   }
   return map;
 }
@@ -426,13 +444,13 @@ export function chooseInterpretation(ctx, forms) {
   }
   const all = readingsOf(src, selectionTerms(ctx.loc));
   const fits = all.filter(r => arities.includes(r.ops.length));
-  const evidence = exampleEvidence(concept);
+  const evidence = formEvidence(concept);
   const fixities = new Set([concept.fixity, ...forms.map(f => f.fixity)].filter(Boolean));
   const kept = [], dropped = { contradicted: [], lossy: [], evidence: [] };
   for (const r of fits) {
     const e = evidence.get(`${r.shape}/${r.variant}/${r.ops.length}`);
     if (e?.status === 'contradicted') { dropped.contradicted.push(r); continue; }
-    if (e?.status === 'confirmed') { kept.push({ ...r, rank: 0, perm: e.perm }); continue; }
+    if (e?.status === 'confirmed' && (!r.lossy || e.lossy)) { kept.push({ ...r, rank: 0, perm: e.perm }); continue; }
     const byFixity = (r.fixityOk ?? []).some(f => fixities.has(f));
     if ((r.lossy || r.needs) && !byFixity) { (r.lossy ? dropped.lossy : dropped.evidence).push(r); continue; }
     kept.push({ ...r, rank: 1 });
@@ -447,7 +465,7 @@ export function chooseInterpretation(ctx, forms) {
       `The selection can be read in more than one way for "${name}": ${uniq.map(r => describeOps(src, r)).join('  or  ')}. Mark the operands.` },
       candidates: uniq.map(r => r.ops.map(o => src.slice(o.start, o.end))) };
     if (dropped.contradicted.length && !dropped.lossy.length && !dropped.evidence.length) return { problem: { code: 'example-disagrees', message:
-      `The Reference tool's example for "${name}" marks the operands differently from how the tool reads this notation. Mark the operands.` } };
+      `The Reference tool's kernel form for "${name}" marks the operands differently from how the tool reads this notation. Mark the operands.` } };
     if (dropped.lossy.length && !dropped.evidence.length) return { problem: { code: 'lossy', message:
       `Taking only ${dropped.lossy.map(r => describeOps(src, r)).join(' or ')} as the operand would leave other letters or numbers unread. Mark the operands.` } };
     if (dropped.evidence.length || dropped.lossy.length) return { problem: { code: 'ambiguous', message:
@@ -460,11 +478,7 @@ export function chooseInterpretation(ctx, forms) {
   const n = best.ops.length, form = forms.find(f => f.arity === n);
   const operands = new Array(n);
   let orderFrom;
-  if (best.perm) { best.ops.forEach((o, i) => { operands[best.perm[i]] = o; }); orderFrom = 'example'; }
-  else {
-    const mention = mentionOrder(form.wording, form.operands);
-    if (mention) { best.ops.forEach((o, i) => { operands[form.operands.indexOf(mention[i])] = o; }); orderFrom = 'wording'; }
-    else { best.ops.forEach((o, i) => { operands[i] = o; }); orderFrom = 'reading'; }
-  }
+  if (best.perm) { best.ops.forEach((o, i) => { operands[best.perm[i]] = o; }); orderFrom = 'form'; }
+  else { best.ops.forEach((o, i) => { operands[i] = o; }); orderFrom = 'reading'; }
   return { form, operands, orderFrom, shape: `${best.shape}/${best.variant}` };
 }

@@ -7,7 +7,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const FIXTURES = join(HERE, '../fixtures');
-export const EXPORT = join(HERE, '../../../math-conversion/intent-concepts.json');
+// [CLAUDE 2026-11-08] The core reads the slim copy ("slim layout 1"); FULL_EXPORT is kept only for
+// test/migrate-hand-fixtures-20261108.mjs (old operand names).
+export const EXPORT = join(HERE, '../../../math-conversion/intent-concepts-slim.json');
+export const FULL_EXPORT = join(HERE, '../../../math-conversion/intent-concepts.json');
 
 /** Hand-written fixtures (an .mjs module, for String.raw) plus the generated
  *  example fixtures (JSON). */

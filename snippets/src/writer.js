@@ -90,8 +90,11 @@ export function writeKernel(ctx, { form, operands, names = new Set() }) {
     at = op.end;
   }
   body += src.slice(at, ctx.end);
-  const name = ctx.concept.concept;
-  const value = ns.length ? `${name}(${ns.map(n => '$' + n).join(',')})` : name;
+  // [CLAUDE 2026-11-08] the head carries the fixity ("implies:infix"): the snippet tool writes
+  // fixity into the markup [NICHOLAS 2026-11-08]. From the kernel form when there is one, else the
+  // concept's fixity (concepts.js formsOf); a form without a head falls back to the bare name.
+  const head = form.head ?? ctx.concept.concept;
+  const value = ns.length ? `${head}(${ns.map(n => '$' + n).join(',')})` : head;
   let text = `\\MathMLintent{${value}}{${body}}`;
   const loc = ctx.loc;
   if (loc.row.braced === false || endsInSubBeforeScript(loc) || isWholeOperandMark(loc, ctx.start, ctx.end)) text = `{${text}}`;

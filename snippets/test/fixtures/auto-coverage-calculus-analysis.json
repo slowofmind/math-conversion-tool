@@ -1,6 +1,6 @@
 {
  "note": "Example fixtures the core labels without help. Pinned from an observed run of test/test-core.mjs; a fixture leaving this list is a regression.",
- "written": "2026-11-03T03:31:11.744Z",
+ "written": "2026-11-08T21:19:06.013Z",
  "ready": [
   "abelian-integral--example",
   "annulus--example",
@@ -15,6 +15,7 @@
   "cauchy-principal-value--example",
   "cauchy-product--example",
   "characteristic-function--example",
+  "closed-interval--example",
   "complex-conjugate--example",
   "condition-number--example",
   "constant-of-integration--example",
@@ -88,6 +89,7 @@
   "numerical-radius--example",
   "numerical-range--example",
   "onsager-machlup-function--example",
+  "open-interval--example",
   "open-real-interval--example",
   "outer-jordan-measure--example",
   "paraproduct--example",
@@ -131,6 +133,14 @@
   "wavelet-transform--example",
   "weak-convergence--example",
   "wiener-algebra--example",
-  "wronskian--example"
+  "wronskian--example",
+  "differential-d--example",
+  "change--example",
+  "arc-hyperbolic-sine--example",
+  "arc-hyperbolic-cosine--example",
+  "arc-hyperbolic-tangent--example",
+  "arc-hyperbolic-secant--example",
+  "arc-hyperbolic-cosecant--example",
+  "arc-hyperbolic-cotangent--example"
  ]
 }

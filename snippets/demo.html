@@ -69,14 +69,15 @@
       <div>
         <label for="group">Subject group</label>
         <select id="group"></select>
-        <label for="level">Level</label>
-        <select id="level"><option value="">Any level</option></select>
+        <label for="source">Source</label>
+        <select id="source"><option value="">Any source</option></select>
       </div>
     </div>
     <label class="check"><input type="checkbox" id="notused"> Show concepts marked "not used"</label>
+    <label class="check"><input type="checkbox" id="rwm"> Show concepts that read correctly with no markup</label>
     <label for="list" id="list-label">Concepts (<span id="count">0</span> shown)</label>
     <select id="list" size="10" aria-describedby="list-hint"></select>
-    <p class="hint" id="list-hint">Each entry: name, number of operands, and how it is worded. Press Enter to apply.</p>
+    <p class="hint" id="list-hint">Each entry: name, number of operands, and whether the Reference has a ready-made form. Press Enter to apply.</p>
     <button type="button" id="apply">Apply</button>
     <button type="button" id="cancel" class="secondary">Cancel</button>
 
@@ -117,26 +118,27 @@ let core = null, sel = null, lastConcept = null, history = [];
 const say = (msg, kind = '') => { statusEl.className = kind; statusEl.textContent = ''; setTimeout(() => { statusEl.textContent = msg; }, 30); };
 
 try {
-  const data = await (await fetch('../math-conversion/intent-concepts.json')).json();
+  const data = await (await fetch('../math-conversion/intent-concepts-slim.json')).json();
   core = createSnippetCore(data);
   for (const g of core.groups()) $('group').add(new Option(`${g.id} (${g.count})`, g.id));
   $('group').add(new Option('All groups', ''), 0);
   $('group').value = 'calculus-analysis';
-  const levels = new Set(core.index.records.flatMap(r => r.levels ?? []));
-  for (const l of levels) $('level').add(new Option(l, l));
+  for (const s of core.sources()) $('source').add(new Option(`${s.id} (${s.count})`, s.id));
 } catch (e) {
-  say(`Could not load the concept list (math-conversion/intent-concepts.json): ${e.message}. Open this page through a local web server, not as a file.`, 'bad');
+  say(`Could not load the concept list (math-conversion/intent-concepts-slim.json): ${e.message}. Open this page through a local web server, not as a file.`, 'bad');
 }
 
 function fill() {
   const list = $('list');
   list.textContent = '';
-  const hits = core.search($('filter').value, { group: $('group').value || null, level: $('level').value || null, includeNotUsed: $('notused').checked });
+  const hits = core.search($('filter').value, { group: $('group').value || null, source: $('source').value || null,
+    includeNotUsed: $('notused').checked, includeReadsWithoutMarkup: $('rwm').checked });
   for (const d of hits) {
     const ops = d.forms.length ? `${d.arityText} operand${d.arityText === '1' ? '' : 's'}` : `operands: ${d.arityText}`;
-    const words = d.wording ? ` — "${d.wording}"` : '';
+    const words = d.hasKernelForm ? ' — ready-made form' : '';
+    const rwm = d.readsWithoutMarkup ? ' — reads correctly with no markup' : '';
     const nu = d.notUsed ? ' — NOT USED' : '';
-    list.add(new Option(`${d.label} — ${ops}${words}${nu}`, d.key));
+    list.add(new Option(`${d.label} — ${ops}${words}${rwm}${nu}`, d.key));
   }
   if (list.options.length) list.selectedIndex = 0;
   $('count').textContent = String(list.options.length);
@@ -186,9 +188,9 @@ function done(r) {
 function operandForm(r) {
   const f = $('operands'), wrap = $('operand-fields'), ar = $('arity');
   $('operands-why').textContent = r.reason.message;
-  const forms = r.forms.length ? r.forms : [{ arity: 1, operands: ['a1'], wording: null }];
+  const forms = r.forms.length ? r.forms : [{ arity: 1, operands: ['a1'] }];
   ar.textContent = '';
-  for (const fm of forms) ar.add(new Option(`${fm.arity}${fm.wording ? ` — "${fm.wording}"` : ''}`, String(fm.arity)));
+  for (const fm of forms) ar.add(new Option(`${fm.arity}${fm.operands?.length ? ` (${fm.operands.join(', ')})` : ''}`, String(fm.arity)));
   $('arity-wrap').hidden = forms.length < 2;
   const build = () => {
     const fm = forms.find(x => String(x.arity) === ar.value) ?? forms[0];
@@ -230,7 +232,7 @@ $('undo').addEventListener('click', () => {
   src.focus();
   say('The last change was undone.');
 });
-for (const id of ['filter', 'group', 'level', 'notused']) $(id).addEventListener(id === 'filter' ? 'input' : 'change', fill);
+for (const id of ['filter', 'group', 'source', 'notused', 'rwm']) $(id).addEventListener(id === 'filter' ? 'input' : 'change', fill);
 $('filter').addEventListener('keydown', e => {
   if (e.key === 'ArrowDown') { e.preventDefault(); $('list').focus(); }
   if (e.key === 'Enter') { e.preventDefault(); apply(); }

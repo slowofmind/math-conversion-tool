@@ -19,12 +19,17 @@
 //            selection each one is (for the "author marks the operands" path).
 // Expected texts that the converter shows to be wrong are corrected in
 // OVERRIDES below, each with the measurement that showed it.
+// [CLAUDE 2026-11-08] Now built from the slim copy's kernel forms (each concept's default form),
+// not Ginev's examples: the forms were made from those examples and converter-checked, and they
+// carry the names, fixity and operand positions the core now uses. The form's notation, markers
+// taken out, is the source; the expected text is \MathMLintent{<form's intent>}{<notation with
+// \MathMLarg marks>}. Concepts without a kernel form are skipped (listed with the reason).
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const EXPORT = join(HERE, '../../math-conversion/intent-concepts.json');
+const EXPORT = join(HERE, '../../math-conversion/intent-concepts-slim.json');
 const GROUP = process.argv[2] ?? 'calculus-analysis';
 
 // concept -> { text, note } : expected text corrected after test/verify-fixtures.mjs
@@ -41,7 +46,7 @@ function groupEnd(s, i) {
 
 /** Strip markers. Returns { plain, kernelBody, markers:[{home, content, plainStart}] }. */
 export function readExample(tex, nameFor) {
-  const re = /\\(arg|intent)(?![A-Za-z])\s*\{/g;
+  const re = /\\(arg|intent|MathMLarg|MathMLintent)(?![A-Za-z])\s*\{/g;
   let plain = '', body = '', i = 0;
   const markers = [];
   for (;;) {
@@ -63,7 +68,7 @@ export function readExample(tex, nameFor) {
     // taking the marker out must not glue a command to a letter: \cdot\arg{y}{Y} -> \cdot Y.
     // The space goes in the expected text too: it is the author's source, kept as written.
     if (/\\[A-Za-z]+$/.test(plain) && /^[A-Za-z]/.test(inner.plain)) { plain += ' '; body += ' '; }
-    if (m[1] === 'arg') {
+    if (m[1] === 'arg' || m[1] === 'MathMLarg') {
       // unbraced script / command argument: x^\arg{a}{2}  ->  x^{\MathMLarg{a}{2}}
       const prev = body.replace(/\s+$/, '');
       const bare = /[\^_]$/.test(prev) || /\\(?:hat|bar|vec|dot|ddot|tilde|sqrt|overline|widehat|widetilde)$/.test(prev);
@@ -110,30 +115,27 @@ function main() {
   const fixtures = [], skipped = [];
   for (const r of recs) {
     if (r.notUsed) { skipped.push({ concept: r.concept, why: 'marked not used' }); continue; }
-    const tex = r.example?.tex;
-    if (!tex) { skipped.push({ concept: r.concept, why: r.example ? 'example has MathML only, no LaTeX' : 'no example' }); continue; }
-    const homes = intentOperands(r.example.intent);
-    const form = formFor(r, homes.length);
-    if (!form) { skipped.push({ concept: r.concept, why: `example has ${homes.length} operand(s); the export's arity is ${r.arity ?? 'not recorded'}` }); continue; }
-    const names = homes.length ? form.operands : [];
-    const nameFor = h => names[homes.indexOf(h)] ?? `?${h}`;
-    const ex = readExample(tex, nameFor);
-    if (!ex) { skipped.push({ concept: r.concept, why: 'example LaTeX does not parse' }); continue; }
+    const kf = (r.forms ?? []).find(f => f.default) ?? (r.forms ?? [])[0];
+    if (!kf) { skipped.push({ concept: r.concept, why: r.readsWithoutMarkup ? 'reads without markup' : 'no kernel form' }); continue; }
+    const pre = `\\MathMLintent{${kf.intent}}{{`;
+    if (!kf.tex.startsWith(pre) || !kf.tex.endsWith('}}')) { skipped.push({ concept: r.concept, why: 'kernel form not in the \\MathMLintent{..}{{..}} shape' }); continue; }
+    const homes = kf.operands;
+    const ex = readExample(kf.tex.slice(pre.length, -2), h => h);
+    if (!ex) { skipped.push({ concept: r.concept, why: 'kernel form LaTeX does not parse' }); continue; }
     const top = ex.markers.filter(m => homes.includes(m.home));
     if (top.length !== homes.length || new Set(top.map(m => m.home)).size !== homes.length) {
-      skipped.push({ concept: r.concept, why: `example marks ${top.length} operand(s) for ${homes.length} in its intent value` }); continue;
+      skipped.push({ concept: r.concept, why: `kernel form marks ${top.length} operand(s) for ${homes.length} in its intent value` }); continue;
     }
     const select = ex.plain.trim();
     const lead = ex.plain.length - ex.plain.trimStart().length;
-    const value = names.length ? `${r.concept}(${names.map(n => '$' + n).join(',')})` : r.concept;
     const ordered = homes.map(h => top.find(m => m.home === h));
     const fx = {
       id: `${r.concept}--example`,
       concept: r.key ?? r.concept,
-      from: 'export example',
+      from: 'kernel form',
       source: `$${select}$`,
       select,
-      expect: { text: `\\MathMLintent{${value}}{${ex.kernelBody.trim()}}`, auto: 'ready-or-needs-operands' },
+      expect: { text: `\\MathMLintent{${kf.intent}}{${ex.kernelBody.trim()}}`, auto: 'ready-or-needs-operands' },
       operands: ordered.map(m => ({ text: m.content, nth: occurrence(select, m.content, m.plainStart - lead) })),
     };
     if (OVERRIDES[r.concept]) Object.assign(fx.expect, OVERRIDES[r.concept]);
@@ -142,7 +144,8 @@ function main() {
   const out = {
     meta: {
       generator: 'test/gen-fixtures.mjs', group: GROUP, generated: new Date().toISOString(),
-      export: { generator: data.meta.generator, core: data.meta.core?.commit, annotations: data.meta.annotations?.updated },
+      export: { layout: data.meta.layout, generator: data.meta.generator, core: data.meta.builtFrom?.coreCommit,
+        annotations: data.meta.builtFrom?.annotationsUpdated, forms: data.meta.builtFrom?.formsUpdated },
       recordsInGroup: recs.length, fixtures: fixtures.length, skipped: skipped.length,
     },
     skipped, fixtures,

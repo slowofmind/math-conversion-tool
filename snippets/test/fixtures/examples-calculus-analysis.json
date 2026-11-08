@@ -2,92 +2,86 @@
  "meta": {
   "generator": "test/gen-fixtures.mjs",
   "group": "calculus-analysis",
-  "generated": "2026-11-03T03:30:11.670Z",
+  "generated": "2026-11-08T21:13:23.154Z",
   "export": {
-   "generator": "tools/export-concepts.mjs",
+   "layout": "slim layout 1",
+   "generator": "tools/export-slim.mjs",
    "core": "045d8798ba335c64f45bc9726fcb282fba2c0d88",
-   "annotations": "2026-10-30T20:43:26.703Z"
+   "annotations": "2026-11-07T19:23:21.832Z",
+   "forms": "2026-11-08"
   },
-  "recordsInGroup": 192,
-  "fixtures": 145,
-  "skipped": 47
+  "recordsInGroup": 193,
+  "fixtures": 156,
+  "skipped": 37
  },
  "skipped": [
   {
-   "concept": "closed-interval",
-   "why": "example has MathML only, no LaTeX"
-  },
-  {
-   "concept": "open-interval",
-   "why": "example has MathML only, no LaTeX"
-  },
-  {
    "concept": "open-closed-interval",
-   "why": "example has MathML only, no LaTeX"
+   "why": "no kernel form"
   },
   {
    "concept": "closed-open-interval",
-   "why": "example has MathML only, no LaTeX"
+   "why": "no kernel form"
   },
   {
    "concept": "prime-notation",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "derivative",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "definite-integral",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "time-derivative",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "fixed-point",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "gradient",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "evaluated-at",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "evaluate",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
-   "concept": "differential-d",
-   "why": "no example"
+   "concept": "functional-derivative",
+   "why": "no kernel form"
   },
   {
    "concept": "sum",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "complex-arg",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "curl",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "exponential",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "imaginary-part",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "laplacian",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "large-op",
@@ -95,7 +89,7 @@
   },
   {
    "concept": "limit",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "limit-inf",
@@ -107,7 +101,7 @@
   },
   {
    "concept": "logarithm",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "logarithm-with-base",
@@ -115,102 +109,70 @@
   },
   {
    "concept": "natural-logarithm",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "partial-derivative",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "piecewise",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "tends-to",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "tends-to-from-above",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "tends-to-from-below",
-   "why": "no example"
-  },
-  {
-   "concept": "divergence",
-   "why": "no example"
-  },
-  {
-   "concept": "change",
-   "why": "no example"
+   "why": "no kernel form"
   },
   {
    "concept": "product",
-   "why": "no example"
+   "why": "reads without markup"
   },
   {
    "concept": "hyperbolic-sine",
-   "why": "no example"
+   "why": "reads without markup"
   },
   {
    "concept": "hyperbolic-cosine",
-   "why": "no example"
+   "why": "reads without markup"
   },
   {
    "concept": "hyperbolic-tangent",
-   "why": "no example"
+   "why": "reads without markup"
   },
   {
    "concept": "hyperbolic-secant",
-   "why": "no example"
+   "why": "reads without markup"
   },
   {
    "concept": "hyperbolic-cosecant",
-   "why": "no example"
+   "why": "reads without markup"
   },
   {
    "concept": "hyperbolic-cotangent",
-   "why": "no example"
-  },
-  {
-   "concept": "arc-hyperbolic-sine",
-   "why": "no example"
-  },
-  {
-   "concept": "arc-hyperbolic-cosine",
-   "why": "no example"
-  },
-  {
-   "concept": "arc-hyperbolic-tangent",
-   "why": "no example"
-  },
-  {
-   "concept": "arc-hyperbolic-secant",
-   "why": "no example"
-  },
-  {
-   "concept": "arc-hyperbolic-cosecant",
-   "why": "no example"
-  },
-  {
-   "concept": "arc-hyperbolic-cotangent",
-   "why": "no example"
+   "why": "reads without markup"
   },
   {
    "concept": "exponential-e",
-   "why": "no example"
+   "why": "reads without markup"
   }
  ],
  "fixtures": [
   {
    "id": "abelian-integral--example",
    "concept": "abelian-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\int f$",
    "select": "\\int f",
    "expect": {
-    "text": "\\MathMLintent{abelian-integral($function)}{\\int \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{abelian-integral:function($function)}{\\int \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -223,11 +185,11 @@
   {
    "id": "annulus--example",
    "concept": "annulus",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathrm{ann}(x)$",
    "select": "\\mathrm{ann}(x)",
    "expect": {
-    "text": "\\MathMLintent{annulus($point)}{\\mathrm{ann}(\\MathMLarg{point}{x})}",
+    "text": "\\MathMLintent{annulus:function($point)}{\\mathrm{ann}(\\MathMLarg{point}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -240,11 +202,11 @@
   {
    "id": "argument--example",
    "concept": "argument",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\operatorname{arg}(z)$",
    "select": "\\operatorname{arg}(z)",
    "expect": {
-    "text": "\\MathMLintent{argument($value)}{\\operatorname{arg}(\\MathMLarg{value}{z})}",
+    "text": "\\MathMLintent{argument:function($value)}{\\operatorname{arg}(\\MathMLarg{value}{z})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -257,11 +219,11 @@
   {
    "id": "backward-difference--example",
    "concept": "backward-difference",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\nabla(x)$",
    "select": "\\nabla(x)",
    "expect": {
-    "text": "\\MathMLintent{backward-difference($value)}{\\nabla(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{backward-difference:prefix($value)}{\\nabla(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -274,11 +236,11 @@
   {
    "id": "berezin-integral--example",
    "concept": "berezin-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\int f\\,d\\theta$",
    "select": "\\int f\\,d\\theta",
    "expect": {
-    "text": "\\MathMLintent{berezin-integral($function)}{\\int \\MathMLarg{function}{f}\\,d\\theta}",
+    "text": "\\MathMLintent{berezin-integral:prefix($function)}{\\int \\MathMLarg{function}{f}\\,d\\theta}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -291,11 +253,11 @@
   {
    "id": "bergman-space--example",
    "concept": "bergman-space",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$A^{n}(X)$",
    "select": "A^{n}(X)",
    "expect": {
-    "text": "\\MathMLintent{bergman-space($power,$space)}{A^{\\MathMLarg{power}{n}}(\\MathMLarg{space}{X})}",
+    "text": "\\MathMLintent{bergman-space:infix($power,$space)}{A^{\\MathMLarg{power}{n}}(\\MathMLarg{space}{X})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -312,11 +274,11 @@
   {
    "id": "bigeometric-integral--example",
    "concept": "bigeometric-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\int (f)$",
    "select": "\\int (f)",
    "expect": {
-    "text": "\\MathMLintent{bigeometric-integral($function)}{\\int (\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{bigeometric-integral:prefix($function)}{\\int (\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -329,11 +291,11 @@
   {
    "id": "bipolar-set--example",
    "concept": "bipolar-set",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$X^{\\circ\\circ}$",
    "select": "X^{\\circ\\circ}",
    "expect": {
-    "text": "\\MathMLintent{bipolar-set($set)}{\\MathMLarg{set}{X}^{\\circ\\circ}}",
+    "text": "\\MathMLintent{bipolar-set:postfix($set)}{\\MathMLarg{set}{X}^{\\circ\\circ}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -346,11 +308,11 @@
   {
    "id": "blaschke-product--example",
    "concept": "blaschke-product",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$B(z)$",
    "select": "B(z)",
    "expect": {
-    "text": "\\MathMLintent{blaschke-product($value)}{B(\\MathMLarg{value}{z})}",
+    "text": "\\MathMLintent{blaschke-product:function($value)}{B(\\MathMLarg{value}{z})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -363,11 +325,11 @@
   {
    "id": "bloch-constant--example",
    "concept": "bloch-constant",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$B$",
    "select": "B",
    "expect": {
-    "text": "\\MathMLintent{bloch-constant}{B}",
+    "text": "\\MathMLintent{bloch-constant:nofix}{B}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -375,11 +337,11 @@
   {
    "id": "bounded-variation--example",
    "concept": "bounded-variation",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathrm{BV}(f)$",
    "select": "\\mathrm{BV}(f)",
    "expect": {
-    "text": "\\MathMLintent{bounded-variation($function)}{\\mathrm{BV}(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{bounded-variation:function($function)}{\\mathrm{BV}(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -392,11 +354,11 @@
   {
    "id": "calderon-toeplitz-operator--example",
    "concept": "calderon-toeplitz-operator",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$T_{b\\psi}$",
    "select": "T_{b\\psi}",
    "expect": {
-    "text": "\\MathMLintent{calderon-toeplitz-operator($b,$psi)}{T_{\\MathMLarg{b}{b}\\MathMLarg{psi}{\\psi}}}",
+    "text": "\\MathMLintent{calderon-toeplitz-operator:function($b,$psi)}{T_{\\MathMLarg{b}{b}\\MathMLarg{psi}{\\psi}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -413,11 +375,11 @@
   {
    "id": "cauchy-principal-value--example",
    "concept": "cauchy-principal-value",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\operatorname{p.v.}X$",
    "select": "\\operatorname{p.v.}X",
    "expect": {
-    "text": "\\MathMLintent{cauchy-principal-value($value)}{\\operatorname{p.v.}\\MathMLarg{value}{X}}",
+    "text": "\\MathMLintent{cauchy-principal-value:prefix($value)}{\\operatorname{p.v.}\\MathMLarg{value}{X}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -430,11 +392,11 @@
   {
    "id": "cauchy-product--example",
    "concept": "cauchy-product",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$X\\cdot Y$",
    "select": "X\\cdot Y",
    "expect": {
-    "text": "\\MathMLintent{cauchy-product($x,$y)}{\\MathMLarg{x}{X}\\cdot \\MathMLarg{y}{Y}}",
+    "text": "\\MathMLintent{cauchy-product:infix($x,$y)}{\\MathMLarg{x}{X}\\cdot \\MathMLarg{y}{Y}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -451,11 +413,11 @@
   {
    "id": "characteristic-function--example",
    "concept": "characteristic-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathbf{1}_{A}$",
    "select": "\\mathbf{1}_{A}",
    "expect": {
-    "text": "\\MathMLintent{characteristic-function($set)}{\\mathbf{1}_{\\MathMLarg{set}{A}}}",
+    "text": "\\MathMLintent{characteristic-function:function($set)}{\\mathbf{1}_{\\MathMLarg{set}{A}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -466,13 +428,34 @@
    ]
   },
   {
+   "id": "closed-interval--example",
+   "concept": "closed-interval",
+   "from": "kernel form",
+   "source": "$[a, b]$",
+   "select": "[a, b]",
+   "expect": {
+    "text": "\\MathMLintent{closed-interval:function($lower,$upper)}{[\\MathMLarg{lower}{a}, \\MathMLarg{upper}{b}]}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "a",
+     "nth": 1
+    },
+    {
+     "text": "b",
+     "nth": 1
+    }
+   ]
+  },
+  {
    "id": "complex-conjugate--example",
    "concept": "complex-conjugate",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\overline{z}$",
    "select": "\\overline{z}",
    "expect": {
-    "text": "\\MathMLintent{complex-conjugate($a1)}{\\overline{\\MathMLarg{a1}{z}}}",
+    "text": "\\MathMLintent{complex-conjugate:function($value)}{\\overline{\\MathMLarg{value}{z}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -485,11 +468,11 @@
   {
    "id": "condition-number--example",
    "concept": "condition-number",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\kappa(A)$",
    "select": "\\kappa(A)",
    "expect": {
-    "text": "\\MathMLintent{condition-number($value)}{\\kappa(\\MathMLarg{value}{A})}",
+    "text": "\\MathMLintent{condition-number:function($value)}{\\kappa(\\MathMLarg{value}{A})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -502,11 +485,11 @@
   {
    "id": "constant-of-integration--example",
    "concept": "constant-of-integration",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$C$",
    "select": "C",
    "expect": {
-    "text": "\\MathMLintent{constant-of-integration}{C}",
+    "text": "\\MathMLintent{constant-of-integration:nofix}{C}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -514,11 +497,11 @@
   {
    "id": "convex-conjugate--example",
    "concept": "convex-conjugate",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$f^{*}$",
    "select": "f^{*}",
    "expect": {
-    "text": "\\MathMLintent{convex-conjugate($function)}{\\MathMLarg{function}{f}^{*}}",
+    "text": "\\MathMLintent{convex-conjugate:postfix($function)}{\\MathMLarg{function}{f}^{*}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -531,11 +514,11 @@
   {
    "id": "convolution--example",
    "concept": "convolution",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$f * g$",
    "select": "f * g",
    "expect": {
-    "text": "\\MathMLintent{convolution($x,$y)}{\\MathMLarg{x}{f} * \\MathMLarg{y}{g}}",
+    "text": "\\MathMLintent{convolution:infix($x,$y)}{\\MathMLarg{x}{f} * \\MathMLarg{y}{g}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -552,11 +535,11 @@
   {
    "id": "current--example",
    "concept": "current",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$[M]$",
    "select": "[M]",
    "expect": {
-    "text": "\\MathMLintent{current($manifold)}{[\\MathMLarg{manifold}{M}]}",
+    "text": "\\MathMLintent{current:function($manifold)}{[\\MathMLarg{manifold}{M}]}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -569,11 +552,11 @@
   {
    "id": "dalembert-operator--example",
    "concept": "dalembert-operator",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\Box\\,u$",
    "select": "\\Box\\,u",
    "expect": {
-    "text": "\\MathMLintent{dalembert-operator($function)}{\\Box\\,\\MathMLarg{function}{u}}",
+    "text": "\\MathMLintent{dalembert-operator:prefix($function)}{\\Box\\,\\MathMLarg{function}{u}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -586,11 +569,11 @@
   {
    "id": "decrease--example",
    "concept": "decrease",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$x\\downarrow$",
    "select": "x\\downarrow",
    "expect": {
-    "text": "\\MathMLintent{decrease($value)}{\\MathMLarg{value}{x}\\downarrow}",
+    "text": "\\MathMLintent{decrease:postfix($value)}{\\MathMLarg{value}{x}\\downarrow}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -603,11 +586,11 @@
   {
    "id": "decrease-tends-to--example",
    "concept": "decrease-tends-to",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$x\\searrow a$",
    "select": "x\\searrow a",
    "expect": {
-    "text": "\\MathMLintent{decrease-tends-to($value,$limit)}{\\MathMLarg{value}{x}\\searrow \\MathMLarg{limit}{a}}",
+    "text": "\\MathMLintent{decrease-tends-to:infix($value,$limit)}{\\MathMLarg{value}{x}\\searrow \\MathMLarg{limit}{a}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -624,11 +607,11 @@
   {
    "id": "differential-operator--example",
    "concept": "differential-operator",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$D_{x}$",
    "select": "D_{x}",
    "expect": {
-    "text": "\\MathMLintent{differential-operator($variable)}{D_{\\MathMLarg{variable}{x}}}",
+    "text": "\\MathMLintent{differential-operator:prefix($variable)}{D_{\\MathMLarg{variable}{x}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -641,11 +624,11 @@
   {
    "id": "dirac-delta-function--example",
    "concept": "dirac-delta-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\delta(x)$",
    "select": "\\delta(x)",
    "expect": {
-    "text": "\\MathMLintent{dirac-delta-function($value)}{\\delta(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{dirac-delta-function:function($value)}{\\delta(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -658,11 +641,11 @@
   {
    "id": "dirac-matrix--example",
    "concept": "dirac-matrix",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\gamma^{\\mu}$",
    "select": "\\gamma^{\\mu}",
    "expect": {
-    "text": "\\MathMLintent{dirac-matrix($index)}{\\gamma^{\\MathMLarg{index}{\\mu}}}",
+    "text": "\\MathMLintent{dirac-matrix:prefix($index)}{\\gamma^{\\MathMLarg{index}{\\mu}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -675,11 +658,11 @@
   {
    "id": "dirac-measure--example",
    "concept": "dirac-measure",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\delta_{x}$",
    "select": "\\delta_{x}",
    "expect": {
-    "text": "\\MathMLintent{dirac-measure($point)}{\\delta_{\\MathMLarg{point}{x}}}",
+    "text": "\\MathMLintent{dirac-measure:function($point)}{\\delta_{\\MathMLarg{point}{x}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -692,11 +675,11 @@
   {
    "id": "directional-derivative--example",
    "concept": "directional-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\nabla_{v} f$",
    "select": "\\nabla_{v} f",
    "expect": {
-    "text": "\\MathMLintent{directional-derivative($vector,$function)}{\\nabla_{\\MathMLarg{vector}{v}} \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{directional-derivative:function($vector,$function)}{\\nabla_{\\MathMLarg{vector}{v}} \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -713,11 +696,11 @@
   {
    "id": "dirichlet-eta-function--example",
    "concept": "dirichlet-eta-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\eta(s)$",
    "select": "\\eta(s)",
    "expect": {
-    "text": "\\MathMLintent{dirichlet-eta-function($value)}{\\eta(\\MathMLarg{value}{s})}",
+    "text": "\\MathMLintent{dirichlet-eta-function:function($value)}{\\eta(\\MathMLarg{value}{s})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -730,11 +713,11 @@
   {
    "id": "dirichlet-kernel--example",
    "concept": "dirichlet-kernel",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$D_{n}(x)$",
    "select": "D_{n}(x)",
    "expect": {
-    "text": "\\MathMLintent{dirichlet-kernel($number,$value)}{D_{\\MathMLarg{number}{n}}(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{dirichlet-kernel:function($number,$value)}{D_{\\MathMLarg{number}{n}}(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -751,11 +734,11 @@
   {
    "id": "dirichlet-l-function--example",
    "concept": "dirichlet-l-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$L(s, \\chi)$",
    "select": "L(s, \\chi)",
    "expect": {
-    "text": "\\MathMLintent{dirichlet-l-function($value,$character)}{L(\\MathMLarg{value}{s}, \\MathMLarg{character}{\\chi})}",
+    "text": "\\MathMLintent{dirichlet-l-function:function($value,$character)}{L(\\MathMLarg{value}{s}, \\MathMLarg{character}{\\chi})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -772,11 +755,11 @@
   {
    "id": "divided-difference--example",
    "concept": "divided-difference",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$[x, y, z]$",
    "select": "[x, y, z]",
    "expect": {
-    "text": "\\MathMLintent{divided-difference($x,$y,$z)}{[\\MathMLarg{x}{x}, \\MathMLarg{y}{y}, \\MathMLarg{z}{z}]}",
+    "text": "\\MathMLintent{divided-difference:function($x,$y,$z)}{[\\MathMLarg{x}{x}, \\MathMLarg{y}{y}, \\MathMLarg{z}{z}]}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -797,11 +780,11 @@
   {
    "id": "effective-domain--example",
    "concept": "effective-domain",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathrm{dom}(f)$",
    "select": "\\mathrm{dom}(f)",
    "expect": {
-    "text": "\\MathMLintent{effective-domain($function)}{\\mathrm{dom}(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{effective-domain:function($function)}{\\mathrm{dom}(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -814,11 +797,11 @@
   {
    "id": "epigraph--example",
    "concept": "epigraph",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathrm{epi}(f)$",
    "select": "\\mathrm{epi}(f)",
    "expect": {
-    "text": "\\MathMLintent{epigraph($function)}{\\mathrm{epi}(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{epigraph:function($function)}{\\mathrm{epi}(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -831,11 +814,11 @@
   {
    "id": "essential-infimum--example",
    "concept": "essential-infimum",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\operatorname{ess\\,inf} f$",
    "select": "\\operatorname{ess\\,inf} f",
    "expect": {
-    "text": "\\MathMLintent{essential-infimum($function)}{\\operatorname{ess\\,inf} \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{essential-infimum:function($function)}{\\operatorname{ess\\,inf} \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -848,11 +831,11 @@
   {
    "id": "essential-supremum--example",
    "concept": "essential-supremum",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\operatorname{ess\\,sup} f$",
    "select": "\\operatorname{ess\\,sup} f",
    "expect": {
-    "text": "\\MathMLintent{essential-supremum($function)}{\\operatorname{ess\\,sup} \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{essential-supremum:function($function)}{\\operatorname{ess\\,sup} \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -865,11 +848,11 @@
   {
    "id": "euler-constant--example",
    "concept": "euler-constant",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\gamma$",
    "select": "\\gamma",
    "expect": {
-    "text": "\\MathMLintent{euler-constant}{\\gamma}",
+    "text": "\\MathMLintent{euler-constant:nofix}{\\gamma}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -877,11 +860,11 @@
   {
    "id": "fatou-set--example",
    "concept": "fatou-set",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$F(f)$",
    "select": "F(f)",
    "expect": {
-    "text": "\\MathMLintent{fatou-set($function)}{F(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{fatou-set:function($function)}{F(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -894,11 +877,11 @@
   {
    "id": "feigenbaum-constant--example",
    "concept": "feigenbaum-constant",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\delta$",
    "select": "\\delta",
    "expect": {
-    "text": "\\MathMLintent{feigenbaum-constant}{\\delta}",
+    "text": "\\MathMLintent{feigenbaum-constant:nofix}{\\delta}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -906,11 +889,11 @@
   {
    "id": "forward-difference--example",
    "concept": "forward-difference",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\Delta_{h}^{n} f(x)$",
    "select": "\\Delta_{h}^{n} f(x)",
    "expect": {
-    "text": "\\MathMLintent{forward-difference($step,$order,$function)}{\\Delta_{\\MathMLarg{step}{h}}^{\\MathMLarg{order}{n}} \\MathMLarg{function}{f}(x)}",
+    "text": "\\MathMLintent{forward-difference:function($step,$order,$function)}{\\Delta_{\\MathMLarg{step}{h}}^{\\MathMLarg{order}{n}} \\MathMLarg{function}{f}(x)}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -931,11 +914,11 @@
   {
    "id": "fourier-cosine-transform--example",
    "concept": "fourier-cosine-transform",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathcal{F}_c f$",
    "select": "\\mathcal{F}_c f",
    "expect": {
-    "text": "\\MathMLintent{fourier-cosine-transform($function)}{\\mathcal{F}_c \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{fourier-cosine-transform:function($function)}{\\mathcal{F}_c \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -948,11 +931,11 @@
   {
    "id": "fourier-sine-transform--example",
    "concept": "fourier-sine-transform",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathcal{F}_s f$",
    "select": "\\mathcal{F}_s f",
    "expect": {
-    "text": "\\MathMLintent{fourier-sine-transform($function)}{\\mathcal{F}_s \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{fourier-sine-transform:function($function)}{\\mathcal{F}_s \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -965,11 +948,11 @@
   {
    "id": "fourier-transform--example",
    "concept": "fourier-transform",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\hat{f}$",
    "select": "\\hat{f}",
    "expect": {
-    "text": "\\MathMLintent{fourier-transform($function)}{\\hat{\\MathMLarg{function}{f}}}",
+    "text": "\\MathMLintent{fourier-transform:function($function)}{\\hat{\\MathMLarg{function}{f}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -982,11 +965,11 @@
   {
    "id": "fractional-derivative--example",
    "concept": "fractional-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$D^{\\alpha} f$",
    "select": "D^{\\alpha} f",
    "expect": {
-    "text": "\\MathMLintent{fractional-derivative($function)}{D^{\\alpha} \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{fractional-derivative:function($function)}{D^{\\alpha} \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -999,11 +982,11 @@
   {
    "id": "fractional-integral--example",
    "concept": "fractional-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$I^{\\alpha} f$",
    "select": "I^{\\alpha} f",
    "expect": {
-    "text": "\\MathMLintent{fractional-integral($function)}{I^{\\alpha} \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{fractional-integral:function($function)}{I^{\\alpha} \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1016,11 +999,11 @@
   {
    "id": "frechet-derivative--example",
    "concept": "frechet-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$Df$",
    "select": "Df",
    "expect": {
-    "text": "\\MathMLintent{frechet-derivative($function)}{D\\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{frechet-derivative:function($function)}{D\\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1033,11 +1016,11 @@
   {
    "id": "fredholm-determinant--example",
    "concept": "fredholm-determinant",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\det(A)$",
    "select": "\\det(A)",
    "expect": {
-    "text": "\\MathMLintent{fredholm-determinant($operator)}{\\det(\\MathMLarg{operator}{A})}",
+    "text": "\\MathMLintent{fredholm-determinant:function($operator)}{\\det(\\MathMLarg{operator}{A})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1050,11 +1033,11 @@
   {
    "id": "gabor-transform--example",
    "concept": "gabor-transform",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathcal{G}\\left(f\\right)$",
    "select": "\\mathcal{G}\\left(f\\right)",
    "expect": {
-    "text": "\\MathMLintent{gabor-transform($function)}{\\mathcal{G}\\left(\\MathMLarg{function}{f}\\right)}",
+    "text": "\\MathMLintent{gabor-transform:function($function)}{\\mathcal{G}\\left(\\MathMLarg{function}{f}\\right)}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1067,11 +1050,11 @@
   {
    "id": "gateaux-derivative--example",
    "concept": "gateaux-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$dF\\left(u;\\psi\\right)$",
    "select": "dF\\left(u;\\psi\\right)",
    "expect": {
-    "text": "\\MathMLintent{gateaux-derivative($function,$point,$direction)}{d\\MathMLarg{function}{F}\\left(\\MathMLarg{point}{u};\\MathMLarg{direction}{\\psi}\\right)}",
+    "text": "\\MathMLintent{gateaux-derivative:function($function,$point,$direction)}{d\\MathMLarg{function}{F}\\left(\\MathMLarg{point}{u};\\MathMLarg{direction}{\\psi}\\right)}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1092,11 +1075,11 @@
   {
    "id": "gelfand-triple--example",
    "concept": "gelfand-triple",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\left(\\Phi,H,\\Phi'\\right)$",
    "select": "\\left(\\Phi,H,\\Phi'\\right)",
    "expect": {
-    "text": "\\MathMLintent{gelfand-triple($first,$second,$third)}{\\left(\\MathMLarg{first}{\\Phi},\\MathMLarg{second}{H},\\MathMLarg{third}{\\Phi'}\\right)}",
+    "text": "\\MathMLintent{gelfand-triple:function($first,$second,$third)}{\\left(\\MathMLarg{first}{\\Phi},\\MathMLarg{second}{H},\\MathMLarg{third}{\\Phi'}\\right)}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1117,11 +1100,11 @@
   {
    "id": "geometric-integral--example",
    "concept": "geometric-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\prod_{a}^{b}$",
    "select": "\\prod_{a}^{b}",
    "expect": {
-    "text": "\\MathMLintent{geometric-integral($lower,$upper)}{\\prod_{\\MathMLarg{lower}{a}}^{\\MathMLarg{upper}{b}}}",
+    "text": "\\MathMLintent{geometric-integral:function($lower,$upper)}{\\prod_{\\MathMLarg{lower}{a}}^{\\MathMLarg{upper}{b}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1138,11 +1121,11 @@
   {
    "id": "green-function--example",
    "concept": "green-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$G(x)$",
    "select": "G(x)",
    "expect": {
-    "text": "\\MathMLintent{green-function($value)}{G(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{green-function:function($value)}{G(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1155,11 +1138,11 @@
   {
    "id": "hardy-littlewood-maximal-operator--example",
    "concept": "hardy-littlewood-maximal-operator",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$Mf$",
    "select": "Mf",
    "expect": {
-    "text": "\\MathMLintent{hardy-littlewood-maximal-operator($function)}{M\\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{hardy-littlewood-maximal-operator:function($function)}{M\\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1172,11 +1155,11 @@
   {
    "id": "hardy-space--example",
    "concept": "hardy-space",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$H^{p}$",
    "select": "H^{p}",
    "expect": {
-    "text": "\\MathMLintent{hardy-space($exponent)}{H^{\\MathMLarg{exponent}{p}}}",
+    "text": "\\MathMLintent{hardy-space:function($exponent)}{H^{\\MathMLarg{exponent}{p}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1189,11 +1172,11 @@
   {
    "id": "hausdorff-measure--example",
    "concept": "hausdorff-measure",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathcal{H}^{d}$",
    "select": "\\mathcal{H}^{d}",
    "expect": {
-    "text": "\\MathMLintent{hausdorff-measure($dimension)}{\\mathcal{H}^{\\MathMLarg{dimension}{d}}}",
+    "text": "\\MathMLintent{hausdorff-measure:postfix($dimension)}{\\mathcal{H}^{\\MathMLarg{dimension}{d}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1206,11 +1189,11 @@
   {
    "id": "hermitian-adjoint--example",
    "concept": "hermitian-adjoint",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$A^{\\dagger}$",
    "select": "A^{\\dagger}",
    "expect": {
-    "text": "\\MathMLintent{hermitian-adjoint($operator)}{\\MathMLarg{operator}{A}^{\\dagger}}",
+    "text": "\\MathMLintent{hermitian-adjoint:postfix($operator)}{\\MathMLarg{operator}{A}^{\\dagger}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1223,11 +1206,11 @@
   {
    "id": "hessian--example",
    "concept": "hessian",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$H(f)$",
    "select": "H(f)",
    "expect": {
-    "text": "\\MathMLintent{hessian($function)}{H(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{hessian:function($function)}{H(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1240,11 +1223,11 @@
   {
    "id": "hilbert-schmidt-norm--example",
    "concept": "hilbert-schmidt-norm",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\lVert A \\rVert_{\\mathrm{HS}}$",
    "select": "\\lVert A \\rVert_{\\mathrm{HS}}",
    "expect": {
-    "text": "\\MathMLintent{hilbert-schmidt-norm($matrix)}{\\lVert \\MathMLarg{matrix}{A} \\rVert_{\\mathrm{HS}}}",
+    "text": "\\MathMLintent{hilbert-schmidt-norm:function($matrix)}{\\lVert \\MathMLarg{matrix}{A} \\rVert_{\\mathrm{HS}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1257,11 +1240,11 @@
   {
    "id": "hilbert-transform--example",
    "concept": "hilbert-transform",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathcal{H}\\{f\\}$",
    "select": "\\mathcal{H}\\{f\\}",
    "expect": {
-    "text": "\\MathMLintent{hilbert-transform($function)}{\\mathcal{H}\\{\\MathMLarg{function}{f}\\}}",
+    "text": "\\MathMLintent{hilbert-transform:function($function)}{\\mathcal{H}\\{\\MathMLarg{function}{f}\\}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1274,11 +1257,11 @@
   {
    "id": "increase--example",
    "concept": "increase",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$x \\uparrow$",
    "select": "x \\uparrow",
    "expect": {
-    "text": "\\MathMLintent{increase($value)}{\\MathMLarg{value}{x} \\uparrow}",
+    "text": "\\MathMLintent{increase:postfix($value)}{\\MathMLarg{value}{x} \\uparrow}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1291,11 +1274,11 @@
   {
    "id": "increase-tends-to--example",
    "concept": "increase-tends-to",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$x \\nearrow a$",
    "select": "x \\nearrow a",
    "expect": {
-    "text": "\\MathMLintent{increase-tends-to($value,$limit)}{\\MathMLarg{value}{x} \\nearrow \\MathMLarg{limit}{a}}",
+    "text": "\\MathMLintent{increase-tends-to:infix($value,$limit)}{\\MathMLarg{value}{x} \\nearrow \\MathMLarg{limit}{a}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1312,11 +1295,11 @@
   {
    "id": "infimum-limit--example",
    "concept": "infimum-limit",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\liminf x_n$",
    "select": "\\liminf x_n",
    "expect": {
-    "text": "\\MathMLintent{infimum-limit($sequence)}{\\liminf \\MathMLarg{sequence}{x_n}}",
+    "text": "\\MathMLintent{infimum-limit:function($sequence)}{\\liminf \\MathMLarg{sequence}{x_n}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1329,11 +1312,11 @@
   {
    "id": "infinite-product--example",
    "concept": "infinite-product",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\prod_{n=1}^{\\infty} a_n$",
    "select": "\\prod_{n=1}^{\\infty} a_n",
    "expect": {
-    "text": "\\MathMLintent{infinite-product($term)}{\\prod_{n=1}^{\\infty} \\MathMLarg{term}{a_n}}",
+    "text": "\\MathMLintent{infinite-product:function($term)}{\\prod_{n=1}^{\\infty} \\MathMLarg{term}{a_n}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1346,11 +1329,11 @@
   {
    "id": "inner-jordan-measure--example",
    "concept": "inner-jordan-measure",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$m_{*}(N)$",
    "select": "m_{*}(N)",
    "expect": {
-    "text": "\\MathMLintent{inner-jordan-measure($set)}{m_{*}(\\MathMLarg{set}{N})}",
+    "text": "\\MathMLintent{inner-jordan-measure:function($set)}{m_{*}(\\MathMLarg{set}{N})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1363,11 +1346,11 @@
   {
    "id": "jacobi-matrix--example",
    "concept": "jacobi-matrix",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$J(x)$",
    "select": "J(x)",
    "expect": {
-    "text": "\\MathMLintent{jacobi-matrix($value)}{J(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{jacobi-matrix:function($value)}{J(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1380,11 +1363,11 @@
   {
    "id": "join--example",
    "concept": "join",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\bigvee_{\\alpha \\in \\mathcal{A}} \\Sigma_{\\alpha}$",
    "select": "\\bigvee_{\\alpha \\in \\mathcal{A}} \\Sigma_{\\alpha}",
    "expect": {
-    "text": "\\MathMLintent{join($value)}{\\bigvee_{\\alpha \\in \\mathcal{A}} \\MathMLarg{value}{\\Sigma_{\\alpha}}}",
+    "text": "\\MathMLintent{join:function($value)}{\\bigvee_{\\alpha \\in \\mathcal{A}} \\MathMLarg{value}{\\Sigma_{\\alpha}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1397,11 +1380,11 @@
   {
    "id": "jordan-measure--example",
    "concept": "jordan-measure",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$m(S)$",
    "select": "m(S)",
    "expect": {
-    "text": "\\MathMLintent{jordan-measure($set)}{m(\\MathMLarg{set}{S})}",
+    "text": "\\MathMLintent{jordan-measure:function($set)}{m(\\MathMLarg{set}{S})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1414,11 +1397,11 @@
   {
    "id": "julia-set--example",
    "concept": "julia-set",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$J(f)$",
    "select": "J(f)",
    "expect": {
-    "text": "\\MathMLintent{julia-set($function)}{J(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{julia-set:function($function)}{J(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1431,11 +1414,11 @@
   {
    "id": "kloosterman-sum--example",
    "concept": "kloosterman-sum",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$K(a,b;m)$",
    "select": "K(a,b;m)",
    "expect": {
-    "text": "\\MathMLintent{kloosterman-sum($a,$b,$modulus)}{K(\\MathMLarg{a}{a},\\MathMLarg{b}{b};\\MathMLarg{modulus}{m})}",
+    "text": "\\MathMLintent{kloosterman-sum:function($a,$b,$modulus)}{K(\\MathMLarg{a}{a},\\MathMLarg{b}{b};\\MathMLarg{modulus}{m})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1456,11 +1439,11 @@
   {
    "id": "lagrange-multiplier--example",
    "concept": "lagrange-multiplier",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\lambda$",
    "select": "\\lambda",
    "expect": {
-    "text": "\\MathMLintent{lagrange-multiplier}{\\lambda}",
+    "text": "\\MathMLintent{lagrange-multiplier:nofix}{\\lambda}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -1468,11 +1451,11 @@
   {
    "id": "landau-constant--example",
    "concept": "landau-constant",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$L$",
    "select": "L",
    "expect": {
-    "text": "\\MathMLintent{landau-constant}{L}",
+    "text": "\\MathMLintent{landau-constant:nofix}{L}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -1480,11 +1463,11 @@
   {
    "id": "laplace-operator--example",
    "concept": "laplace-operator",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\nabla^2 f$",
    "select": "\\nabla^2 f",
    "expect": {
-    "text": "\\MathMLintent{laplace-operator($function)}{\\nabla^2 \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{laplace-operator:function($function)}{\\nabla^2 \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1497,11 +1480,11 @@
   {
    "id": "laplace-transform--example",
    "concept": "laplace-transform",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathcal{L}\\{f\\}$",
    "select": "\\mathcal{L}\\{f\\}",
    "expect": {
-    "text": "\\MathMLintent{laplace-transform($function)}{\\mathcal{L}\\{\\MathMLarg{function}{f}\\}}",
+    "text": "\\MathMLintent{laplace-transform:function($function)}{\\mathcal{L}\\{\\MathMLarg{function}{f}\\}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1514,11 +1497,11 @@
   {
    "id": "lebesgue-constant--example",
    "concept": "lebesgue-constant",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$L_{n}$",
    "select": "L_{n}",
    "expect": {
-    "text": "\\MathMLintent{lebesgue-constant($number)}{L_{\\MathMLarg{number}{n}}}",
+    "text": "\\MathMLintent{lebesgue-constant:function($number)}{L_{\\MathMLarg{number}{n}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1531,11 +1514,11 @@
   {
    "id": "lebesgue-integral--example",
    "concept": "lebesgue-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\int f\\, d\\mu$",
    "select": "\\int f\\, d\\mu",
    "expect": {
-    "text": "\\MathMLintent{lebesgue-integral($function)}{\\int \\MathMLarg{function}{f}\\, d\\mu}",
+    "text": "\\MathMLintent{lebesgue-integral:function($function)}{\\int \\MathMLarg{function}{f}\\, d\\mu}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1548,11 +1531,11 @@
   {
    "id": "lefschetz-zeta-function--example",
    "concept": "lefschetz-zeta-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\zeta(t)$",
    "select": "\\zeta(t)",
    "expect": {
-    "text": "\\MathMLintent{lefschetz-zeta-function($value)}{\\zeta(\\MathMLarg{value}{t})}",
+    "text": "\\MathMLintent{lefschetz-zeta-function:function($value)}{\\zeta(\\MathMLarg{value}{t})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1565,11 +1548,11 @@
   {
    "id": "left-derivative--example",
    "concept": "left-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\partial_{-} f$",
    "select": "\\partial_{-} f",
    "expect": {
-    "text": "\\MathMLintent{left-derivative($function)}{\\partial_{-} \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{left-derivative:function($function)}{\\partial_{-} \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1582,11 +1565,11 @@
   {
    "id": "levy-prokhorov-metric--example",
    "concept": "levy-prokhorov-metric",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\pi(\\mu,\\nu)$",
    "select": "\\pi(\\mu,\\nu)",
    "expect": {
-    "text": "\\MathMLintent{levy-prokhorov-metric($mu,$nu)}{\\pi(\\MathMLarg{mu}{\\mu},\\MathMLarg{nu}{\\nu})}",
+    "text": "\\MathMLintent{levy-prokhorov-metric:function($mu,$nu)}{\\pi(\\MathMLarg{mu}{\\mu},\\MathMLarg{nu}{\\nu})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1603,11 +1586,11 @@
   {
    "id": "line-integral--example",
    "concept": "line-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\int_{C}f\\,ds$",
    "select": "\\int_{C}f\\,ds",
    "expect": {
-    "text": "\\MathMLintent{line-integral($curve,$function)}{\\int_{\\MathMLarg{curve}{C}}\\MathMLarg{function}{f}\\,ds}",
+    "text": "\\MathMLintent{line-integral:function($curve,$function)}{\\int_{\\MathMLarg{curve}{C}}\\MathMLarg{function}{f}\\,ds}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1624,11 +1607,11 @@
   {
    "id": "logistic-function--example",
    "concept": "logistic-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\sigma(x)$",
    "select": "\\sigma(x)",
    "expect": {
-    "text": "\\MathMLintent{logistic-function($value)}{\\sigma(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{logistic-function:function($value)}{\\sigma(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1641,11 +1624,11 @@
   {
    "id": "lower-darboux-integral--example",
    "concept": "lower-darboux-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\underline{\\int_a^b}f$",
    "select": "\\underline{\\int_a^b}f",
    "expect": {
-    "text": "\\MathMLintent{lower-darboux-integral($function)}{\\underline{\\int_a^b}\\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{lower-darboux-integral:prefix($function)}{\\underline{\\int_a^b}\\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1658,11 +1641,11 @@
   {
    "id": "lower-dini-derivative--example",
    "concept": "lower-dini-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "${f'_{-}}(t)$",
    "select": "{f'_{-}}(t)",
    "expect": {
-    "text": "\\MathMLintent{lower-dini-derivative($function)}{{\\MathMLarg{function}{f}'_{-}}(t)}",
+    "text": "\\MathMLintent{lower-dini-derivative:function($function)}{{\\MathMLarg{function}{f}'_{-}}(t)}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1675,11 +1658,11 @@
   {
    "id": "lyapunov-candidate-function--example",
    "concept": "lyapunov-candidate-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$V(x)$",
    "select": "V(x)",
    "expect": {
-    "text": "\\MathMLintent{lyapunov-candidate-function($value)}{V(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{lyapunov-candidate-function:function($value)}{V(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1692,11 +1675,11 @@
   {
    "id": "mellin-transform--example",
    "concept": "mellin-transform",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathcal{M}\\{f\\}(s)$",
    "select": "\\mathcal{M}\\{f\\}(s)",
    "expect": {
-    "text": "\\MathMLintent{mellin-transform($function)}{\\mathcal{M}\\{\\MathMLarg{function}{f}\\}(s)}",
+    "text": "\\MathMLintent{mellin-transform:function($function)}{\\mathcal{M}\\{\\MathMLarg{function}{f}\\}(s)}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1709,11 +1692,11 @@
   {
    "id": "minakshisundaram-pleijel-zeta-function--example",
    "concept": "minakshisundaram-pleijel-zeta-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\zeta(s)$",
    "select": "\\zeta(s)",
    "expect": {
-    "text": "\\MathMLintent{minakshisundaram-pleijel-zeta-function($value)}{\\zeta(\\MathMLarg{value}{s})}",
+    "text": "\\MathMLintent{minakshisundaram-pleijel-zeta-function:function($value)}{\\zeta(\\MathMLarg{value}{s})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1726,11 +1709,11 @@
   {
    "id": "multiple-integral--example",
    "concept": "multiple-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\int \\cdots \\int f$",
    "select": "\\int \\cdots \\int f",
    "expect": {
-    "text": "\\MathMLintent{multiple-integral($function)}{\\int \\cdots \\int \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{multiple-integral:prefix($function)}{\\int \\cdots \\int \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1743,11 +1726,11 @@
   {
    "id": "multiplier-algebra--example",
    "concept": "multiplier-algebra",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$M(A)$",
    "select": "M(A)",
    "expect": {
-    "text": "\\MathMLintent{multiplier-algebra($algebra)}{M(\\MathMLarg{algebra}{A})}",
+    "text": "\\MathMLintent{multiplier-algebra:function($algebra)}{M(\\MathMLarg{algebra}{A})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1760,11 +1743,11 @@
   {
    "id": "napiers-constant--example",
    "concept": "napiers-constant",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$e$",
    "select": "e",
    "expect": {
-    "text": "\\MathMLintent{napiers-constant}{e}",
+    "text": "\\MathMLintent{napiers-constant:nofix}{e}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -1772,11 +1755,11 @@
   {
    "id": "narrow-denjoy-integral--example",
    "concept": "narrow-denjoy-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\int f$",
    "select": "\\int f",
    "expect": {
-    "text": "\\MathMLintent{narrow-denjoy-integral($function)}{\\int \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{narrow-denjoy-integral:prefix($function)}{\\int \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1789,11 +1772,11 @@
   {
    "id": "numerical-radius--example",
    "concept": "numerical-radius",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$w(A)$",
    "select": "w(A)",
    "expect": {
-    "text": "\\MathMLintent{numerical-radius($operator)}{w(\\MathMLarg{operator}{A})}",
+    "text": "\\MathMLintent{numerical-radius:function($operator)}{w(\\MathMLarg{operator}{A})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1806,11 +1789,11 @@
   {
    "id": "numerical-range--example",
    "concept": "numerical-range",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$W(A)$",
    "select": "W(A)",
    "expect": {
-    "text": "\\MathMLintent{numerical-range($operator)}{W(\\MathMLarg{operator}{A})}",
+    "text": "\\MathMLintent{numerical-range:function($operator)}{W(\\MathMLarg{operator}{A})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1823,11 +1806,11 @@
   {
    "id": "onsager-machlup-function--example",
    "concept": "onsager-machlup-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$L(x)$",
    "select": "L(x)",
    "expect": {
-    "text": "\\MathMLintent{onsager-machlup-function($value)}{L(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{onsager-machlup-function:function($value)}{L(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1838,13 +1821,34 @@
    ]
   },
   {
-   "id": "open-real-interval--example",
-   "concept": "open-real-interval",
-   "from": "export example",
+   "id": "open-interval--example",
+   "concept": "open-interval",
+   "from": "kernel form",
    "source": "$(a, b)$",
    "select": "(a, b)",
    "expect": {
-    "text": "\\MathMLintent{open-real-interval($lower,$upper)}{(\\MathMLarg{lower}{a}, \\MathMLarg{upper}{b})}",
+    "text": "\\MathMLintent{open-interval:function($lower,$upper)}{(\\MathMLarg{lower}{a}, \\MathMLarg{upper}{b})}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "a",
+     "nth": 1
+    },
+    {
+     "text": "b",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "open-real-interval--example",
+   "concept": "open-real-interval",
+   "from": "kernel form",
+   "source": "$(a, b)$",
+   "select": "(a, b)",
+   "expect": {
+    "text": "\\MathMLintent{open-real-interval:function($lower,$upper)}{(\\MathMLarg{lower}{a}, \\MathMLarg{upper}{b})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1861,11 +1865,11 @@
   {
    "id": "outer-jordan-measure--example",
    "concept": "outer-jordan-measure",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$m^{*}(E)$",
    "select": "m^{*}(E)",
    "expect": {
-    "text": "\\MathMLintent{outer-jordan-measure($set)}{m^{*}(\\MathMLarg{set}{E})}",
+    "text": "\\MathMLintent{outer-jordan-measure:function($set)}{m^{*}(\\MathMLarg{set}{E})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1878,11 +1882,11 @@
   {
    "id": "pade-approximant--example",
    "concept": "pade-approximant",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$[m/n]_{f}$",
    "select": "[m/n]_{f}",
    "expect": {
-    "text": "\\MathMLintent{pade-approximant($m,$n,$function)}{[\\MathMLarg{m}{m}/\\MathMLarg{n}{n}]_{\\MathMLarg{function}{f}}}",
+    "text": "\\MathMLintent{pade-approximant:function($m,$n,$function)}{[\\MathMLarg{m}{m}/\\MathMLarg{n}{n}]_{\\MathMLarg{function}{f}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1903,11 +1907,11 @@
   {
    "id": "paraproduct--example",
    "concept": "paraproduct",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\pi(f, g)$",
    "select": "\\pi(f, g)",
    "expect": {
-    "text": "\\MathMLintent{paraproduct($a,$b)}{\\pi(\\MathMLarg{a}{f}, \\MathMLarg{b}{g})}",
+    "text": "\\MathMLintent{paraproduct:function($a,$b)}{\\pi(\\MathMLarg{a}{f}, \\MathMLarg{b}{g})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1924,11 +1928,11 @@
   {
    "id": "pauli-matrix--example",
    "concept": "pauli-matrix",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\sigma_{i}$",
    "select": "\\sigma_{i}",
    "expect": {
-    "text": "\\MathMLintent{pauli-matrix($number)}{\\sigma_{\\MathMLarg{number}{i}}}",
+    "text": "\\MathMLintent{pauli-matrix:prefix($number)}{\\sigma_{\\MathMLarg{number}{i}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1941,11 +1945,11 @@
   {
    "id": "pointwise-convergent--example",
    "concept": "pointwise-convergent",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$f_n\\to f \\text{ pointwise}$",
    "select": "f_n\\to f \\text{ pointwise}",
    "expect": {
-    "text": "\\MathMLintent{pointwise-convergent($function)}{\\MathMLarg{function}{f_n}\\to f \\text{ pointwise}}",
+    "text": "\\MathMLintent{pointwise-convergent:postfix($function)}{\\MathMLarg{function}{f_n}\\to f \\text{ pointwise}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1958,11 +1962,11 @@
   {
    "id": "polar-set--example",
    "concept": "polar-set",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$A^{\\circ}$",
    "select": "A^{\\circ}",
    "expect": {
-    "text": "\\MathMLintent{polar-set($set)}{\\MathMLarg{set}{A}^{\\circ}}",
+    "text": "\\MathMLintent{polar-set:postfix($set)}{\\MathMLarg{set}{A}^{\\circ}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1975,11 +1979,11 @@
   {
    "id": "pontrjagin-dual--example",
    "concept": "pontrjagin-dual",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\widehat{G}$",
    "select": "\\widehat{G}",
    "expect": {
-    "text": "\\MathMLintent{pontrjagin-dual($group)}{\\widehat{\\MathMLarg{group}{G}}}",
+    "text": "\\MathMLintent{pontrjagin-dual:postfix($group)}{\\widehat{\\MathMLarg{group}{G}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -1992,11 +1996,11 @@
   {
    "id": "principal-value--example",
    "concept": "principal-value",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathrm{Log}(z)$",
    "select": "\\mathrm{Log}(z)",
    "expect": {
-    "text": "\\MathMLintent{principal-value($value)}{\\mathrm{Log}(\\MathMLarg{value}{z})}",
+    "text": "\\MathMLintent{principal-value:function($value)}{\\mathrm{Log}(\\MathMLarg{value}{z})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2009,11 +2013,11 @@
   {
    "id": "product-integral--example",
    "concept": "product-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\prod f(x)^{dx}$",
    "select": "\\prod f(x)^{dx}",
    "expect": {
-    "text": "\\MathMLintent{product-integral($function)}{\\prod \\MathMLarg{function}{f}(x)^{dx}}",
+    "text": "\\MathMLintent{product-integral:function($function)}{\\prod \\MathMLarg{function}{f}(x)^{dx}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2026,11 +2030,11 @@
   {
    "id": "product-measure--example",
    "concept": "product-measure",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mu \\times \\nu$",
    "select": "\\mu \\times \\nu",
    "expect": {
-    "text": "\\MathMLintent{product-measure($mu,$nu)}{\\MathMLarg{mu}{\\mu} \\times \\MathMLarg{nu}{\\nu}}",
+    "text": "\\MathMLintent{product-measure:infix($mu,$nu)}{\\MathMLarg{mu}{\\mu} \\times \\MathMLarg{nu}{\\nu}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2047,11 +2051,11 @@
   {
    "id": "pseudovector--example",
    "concept": "pseudovector",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\vec{v}$",
    "select": "\\vec{v}",
    "expect": {
-    "text": "\\MathMLintent{pseudovector($vector)}{\\vec{\\MathMLarg{vector}{v}}}",
+    "text": "\\MathMLintent{pseudovector:prefix($vector)}{\\vec{\\MathMLarg{vector}{v}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2064,11 +2068,11 @@
   {
    "id": "quadratic-differential--example",
    "concept": "quadratic-differential",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$f(z)\\,dz \\otimes dz$",
    "select": "f(z)\\,dz \\otimes dz",
    "expect": {
-    "text": "\\MathMLintent{quadratic-differential($function)}{\\MathMLarg{function}{f}(z)\\,dz \\otimes dz}",
+    "text": "\\MathMLintent{quadratic-differential:function($function)}{\\MathMLarg{function}{f}(z)\\,dz \\otimes dz}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2081,11 +2085,11 @@
   {
    "id": "ramp-function--example",
    "concept": "ramp-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$R(x)$",
    "select": "R(x)",
    "expect": {
-    "text": "\\MathMLintent{ramp-function($value)}{R(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{ramp-function:function($value)}{R(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2098,11 +2102,11 @@
   {
    "id": "real-bipolar--example",
    "concept": "real-bipolar",
-   "from": "export example",
+   "from": "kernel form",
    "source": "${A}^{\\circ\\circ}$",
    "select": "{A}^{\\circ\\circ}",
    "expect": {
-    "text": "\\MathMLintent{real-bipolar($set)}{{\\MathMLarg{set}{A}}^{\\circ\\circ}}",
+    "text": "\\MathMLintent{real-bipolar:postfix($set)}{{\\MathMLarg{set}{A}}^{\\circ\\circ}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2115,11 +2119,11 @@
   {
    "id": "real-part--example",
    "concept": "real-part",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\operatorname{Re}(z)$",
    "select": "\\operatorname{Re}(z)",
    "expect": {
-    "text": "\\MathMLintent{real-part($a1)}{\\operatorname{Re}(\\MathMLarg{a1}{z})}",
+    "text": "\\MathMLintent{real-part:function($value)}{\\operatorname{Re}(\\MathMLarg{value}{z})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2132,11 +2136,11 @@
   {
    "id": "real-polar--example",
    "concept": "real-polar",
-   "from": "export example",
+   "from": "kernel form",
    "source": "${A}^{r}$",
    "select": "{A}^{r}",
    "expect": {
-    "text": "\\MathMLintent{real-polar($set)}{{\\MathMLarg{set}{A}}^{r}}",
+    "text": "\\MathMLintent{real-polar:postfix($set)}{{\\MathMLarg{set}{A}}^{r}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2149,11 +2153,11 @@
   {
    "id": "real-prepolar--example",
    "concept": "real-prepolar",
-   "from": "export example",
+   "from": "kernel form",
    "source": "${}^{\\circ}{B}$",
    "select": "{}^{\\circ}{B}",
    "expect": {
-    "text": "\\MathMLintent{real-prepolar($set)}{{}^{\\circ}{\\MathMLarg{set}{B}}}",
+    "text": "\\MathMLintent{real-prepolar:prefix($set)}{{}^{\\circ}{\\MathMLarg{set}{B}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2166,11 +2170,11 @@
   {
    "id": "recession-cone--example",
    "concept": "recession-cone",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathrm{recc}(C)$",
    "select": "\\mathrm{recc}(C)",
    "expect": {
-    "text": "\\MathMLintent{recession-cone($set)}{\\mathrm{recc}(\\MathMLarg{set}{C})}",
+    "text": "\\MathMLintent{recession-cone:function($set)}{\\mathrm{recc}(\\MathMLarg{set}{C})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2183,11 +2187,11 @@
   {
    "id": "residue--example",
    "concept": "residue",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\operatorname{Res}(f)$",
    "select": "\\operatorname{Res}(f)",
    "expect": {
-    "text": "\\MathMLintent{residue($function)}{\\operatorname{Res}(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{residue:function($function)}{\\operatorname{Res}(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2200,11 +2204,11 @@
   {
    "id": "resolvent-set--example",
    "concept": "resolvent-set",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\rho(A)$",
    "select": "\\rho(A)",
    "expect": {
-    "text": "\\MathMLintent{resolvent-set($operator)}{\\rho(\\MathMLarg{operator}{A})}",
+    "text": "\\MathMLintent{resolvent-set:function($operator)}{\\rho(\\MathMLarg{operator}{A})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2217,11 +2221,11 @@
   {
    "id": "riemann-integral--example",
    "concept": "riemann-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\int f$",
    "select": "\\int f",
    "expect": {
-    "text": "\\MathMLintent{riemann-integral($function)}{\\int \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{riemann-integral:function($function)}{\\int \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2234,11 +2238,11 @@
   {
    "id": "riemann-sphere--example",
    "concept": "riemann-sphere",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\hat{\\mathbb{C}}$",
    "select": "\\hat{\\mathbb{C}}",
    "expect": {
-    "text": "\\MathMLintent{riemann-sphere}{\\hat{\\mathbb{C}}}",
+    "text": "\\MathMLintent{riemann-sphere:nofix}{\\hat{\\mathbb{C}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -2246,11 +2250,11 @@
   {
    "id": "riemann-stieltjes-integral--example",
    "concept": "riemann-stieltjes-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\int f\\,d\\alpha$",
    "select": "\\int f\\,d\\alpha",
    "expect": {
-    "text": "\\MathMLintent{riemann-stieltjes-integral($integrand,$integrator)}{\\int \\MathMLarg{integrand}{f}\\,d\\MathMLarg{integrator}{\\alpha}}",
+    "text": "\\MathMLintent{riemann-stieltjes-integral:function($integrand,$integrator)}{\\int \\MathMLarg{integrand}{f}\\,d\\MathMLarg{integrator}{\\alpha}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2267,11 +2271,11 @@
   {
    "id": "right-derivative--example",
    "concept": "right-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\partial_{+}f$",
    "select": "\\partial_{+}f",
    "expect": {
-    "text": "\\MathMLintent{right-derivative($function)}{\\partial_{+}\\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{right-derivative:function($function)}{\\partial_{+}\\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2284,11 +2288,11 @@
   {
    "id": "ruelle-zeta-function--example",
    "concept": "ruelle-zeta-function",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\zeta(s)$",
    "select": "\\zeta(s)",
    "expect": {
-    "text": "\\MathMLintent{ruelle-zeta-function($value)}{\\zeta(\\MathMLarg{value}{s})}",
+    "text": "\\MathMLintent{ruelle-zeta-function:function($value)}{\\zeta(\\MathMLarg{value}{s})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2301,11 +2305,11 @@
   {
    "id": "schwartz-space--example",
    "concept": "schwartz-space",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathcal{S}$",
    "select": "\\mathcal{S}",
    "expect": {
-    "text": "\\MathMLintent{schwartz-space}{\\mathcal{S}}",
+    "text": "\\MathMLintent{schwartz-space:nofix}{\\mathcal{S}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -2313,11 +2317,11 @@
   {
    "id": "schwarzian-derivative--example",
    "concept": "schwarzian-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$S(f)(x)$",
    "select": "S(f)(x)",
    "expect": {
-    "text": "\\MathMLintent{schwarzian-derivative($function,$value)}{S(\\MathMLarg{function}{f})(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{schwarzian-derivative:function($function,$value)}{S(\\MathMLarg{function}{f})(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2334,11 +2338,11 @@
   {
    "id": "shift-operator--example",
    "concept": "shift-operator",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$T(f)$",
    "select": "T(f)",
    "expect": {
-    "text": "\\MathMLintent{shift-operator($function)}{T(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{shift-operator:function($function)}{T(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2351,11 +2355,11 @@
   {
    "id": "small-o--example",
    "concept": "small-o",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$o(x)$",
    "select": "o(x)",
    "expect": {
-    "text": "\\MathMLintent{small-o($value)}{o(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{small-o:function($value)}{o(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2368,11 +2372,11 @@
   {
    "id": "sobolev-space--example",
    "concept": "sobolev-space",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$W^{k,p}$",
    "select": "W^{k,p}",
    "expect": {
-    "text": "\\MathMLintent{sobolev-space($k,$p)}{W^{\\MathMLarg{k}{k},\\MathMLarg{p}{p}}}",
+    "text": "\\MathMLintent{sobolev-space:function($k,$p)}{W^{\\MathMLarg{k}{k},\\MathMLarg{p}{p}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2389,11 +2393,11 @@
   {
    "id": "spectral-radius--example",
    "concept": "spectral-radius",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\rho(A)$",
    "select": "\\rho(A)",
    "expect": {
-    "text": "\\MathMLintent{spectral-radius($matrix)}{\\rho(\\MathMLarg{matrix}{A})}",
+    "text": "\\MathMLintent{spectral-radius:function($matrix)}{\\rho(\\MathMLarg{matrix}{A})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2406,11 +2410,11 @@
   {
    "id": "spectrum--example",
    "concept": "spectrum",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\sigma(T)$",
    "select": "\\sigma(T)",
    "expect": {
-    "text": "\\MathMLintent{spectrum($operator)}{\\sigma(\\MathMLarg{operator}{T})}",
+    "text": "\\MathMLintent{spectrum:function($operator)}{\\sigma(\\MathMLarg{operator}{T})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2423,11 +2427,11 @@
   {
    "id": "support--example",
    "concept": "support",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\operatorname{supp}(f)$",
    "select": "\\operatorname{supp}(f)",
    "expect": {
-    "text": "\\MathMLintent{support($function)}{\\operatorname{supp}(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{support:function($function)}{\\operatorname{supp}(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2440,11 +2444,11 @@
   {
    "id": "supremum-limit--example",
    "concept": "supremum-limit",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\limsup x$",
    "select": "\\limsup x",
    "expect": {
-    "text": "\\MathMLintent{supremum-limit($sequence)}{\\limsup \\MathMLarg{sequence}{x}}",
+    "text": "\\MathMLintent{supremum-limit:function($sequence)}{\\limsup \\MathMLarg{sequence}{x}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2457,11 +2461,11 @@
   {
    "id": "surface-integral--example",
    "concept": "surface-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\iint_{S}f\\,dS$",
    "select": "\\iint_{S}f\\,dS",
    "expect": {
-    "text": "\\MathMLintent{surface-integral($function)}{\\iint_{S}\\MathMLarg{function}{f}\\,dS}",
+    "text": "\\MathMLintent{surface-integral:function($function)}{\\iint_{S}\\MathMLarg{function}{f}\\,dS}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2474,11 +2478,11 @@
   {
    "id": "taylor-polynomial--example",
    "concept": "taylor-polynomial",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$P_n(x)$",
    "select": "P_n(x)",
    "expect": {
-    "text": "\\MathMLintent{taylor-polynomial($value)}{P_n(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{taylor-polynomial:function($value)}{P_n(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2491,11 +2495,11 @@
   {
    "id": "topological-entropy--example",
    "concept": "topological-entropy",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$h(f)$",
    "select": "h(f)",
    "expect": {
-    "text": "\\MathMLintent{topological-entropy($map)}{h(\\MathMLarg{map}{f})}",
+    "text": "\\MathMLintent{topological-entropy:function($map)}{h(\\MathMLarg{map}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2508,11 +2512,11 @@
   {
    "id": "total-derivative--example",
    "concept": "total-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$D_{a}f$",
    "select": "D_{a}f",
    "expect": {
-    "text": "\\MathMLintent{total-derivative($point,$function)}{D_{\\MathMLarg{point}{a}}\\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{total-derivative:function($point,$function)}{D_{\\MathMLarg{point}{a}}\\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2529,11 +2533,11 @@
   {
    "id": "total-variation--example",
    "concept": "total-variation",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$V(f)$",
    "select": "V(f)",
    "expect": {
-    "text": "\\MathMLintent{total-variation($function)}{V(\\MathMLarg{function}{f})}",
+    "text": "\\MathMLintent{total-variation:function($function)}{V(\\MathMLarg{function}{f})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2546,11 +2550,11 @@
   {
    "id": "truncation--example",
    "concept": "truncation",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathrm{trunc}(x)$",
    "select": "\\mathrm{trunc}(x)",
    "expect": {
-    "text": "\\MathMLintent{truncation($value)}{\\mathrm{trunc}(\\MathMLarg{value}{x})}",
+    "text": "\\MathMLintent{truncation:function($value)}{\\mathrm{trunc}(\\MathMLarg{value}{x})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2563,11 +2567,11 @@
   {
    "id": "tube-domain--example",
    "concept": "tube-domain",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$T_{B}$",
    "select": "T_{B}",
    "expect": {
-    "text": "\\MathMLintent{tube-domain($base)}{T_{\\MathMLarg{base}{B}}}",
+    "text": "\\MathMLintent{tube-domain:function($base)}{T_{\\MathMLarg{base}{B}}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2580,11 +2584,11 @@
   {
    "id": "uniformly-convergent--example",
    "concept": "uniformly-convergent",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$f \\rightrightarrows g$",
    "select": "f \\rightrightarrows g",
    "expect": {
-    "text": "\\MathMLintent{uniformly-convergent($function,$limit)}{\\MathMLarg{function}{f} \\rightrightarrows \\MathMLarg{limit}{g}}",
+    "text": "\\MathMLintent{uniformly-convergent:infix($function,$limit)}{\\MathMLarg{function}{f} \\rightrightarrows \\MathMLarg{limit}{g}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2601,11 +2605,11 @@
   {
    "id": "upper-darboux-integral--example",
    "concept": "upper-darboux-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\overline{\\int_a^b} f$",
    "select": "\\overline{\\int_a^b} f",
    "expect": {
-    "text": "\\MathMLintent{upper-darboux-integral($function)}{\\overline{\\int_a^b} \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{upper-darboux-integral:prefix($function)}{\\overline{\\int_a^b} \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2618,11 +2622,11 @@
   {
    "id": "upper-dini-derivative--example",
    "concept": "upper-dini-derivative",
-   "from": "export example",
+   "from": "kernel form",
    "source": "${f'}_{+}$",
    "select": "{f'}_{+}",
    "expect": {
-    "text": "\\MathMLintent{upper-dini-derivative($function)}{{\\MathMLarg{function}{f}'}_{+}}",
+    "text": "\\MathMLintent{upper-dini-derivative:prefix($function)}{{\\MathMLarg{function}{f}'}_{+}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2635,11 +2639,11 @@
   {
    "id": "upper-half-plane--example",
    "concept": "upper-half-plane",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathbb{H}$",
    "select": "\\mathbb{H}",
    "expect": {
-    "text": "\\MathMLintent{upper-half-plane}{\\mathbb{H}}",
+    "text": "\\MathMLintent{upper-half-plane:nofix}{\\mathbb{H}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -2647,11 +2651,11 @@
   {
    "id": "volterra-integral--example",
    "concept": "volterra-integral",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\prod f$",
    "select": "\\prod f",
    "expect": {
-    "text": "\\MathMLintent{volterra-integral($function)}{\\prod \\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{volterra-integral:prefix($function)}{\\prod \\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2664,11 +2668,11 @@
   {
    "id": "volume-element--example",
    "concept": "volume-element",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$dV$",
    "select": "dV",
    "expect": {
-    "text": "\\MathMLintent{volume-element}{dV}",
+    "text": "\\MathMLintent{volume-element:nofix}{dV}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -2676,11 +2680,11 @@
   {
    "id": "wavelet-transform--example",
    "concept": "wavelet-transform",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$W_{\\psi}\\,f$",
    "select": "W_{\\psi}\\,f",
    "expect": {
-    "text": "\\MathMLintent{wavelet-transform($wavelet,$function)}{W_{\\MathMLarg{wavelet}{\\psi}}\\,\\MathMLarg{function}{f}}",
+    "text": "\\MathMLintent{wavelet-transform:function($wavelet,$function)}{W_{\\MathMLarg{wavelet}{\\psi}}\\,\\MathMLarg{function}{f}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2697,11 +2701,11 @@
   {
    "id": "weak-convergence--example",
    "concept": "weak-convergence",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$x \\rightharpoonup y$",
    "select": "x \\rightharpoonup y",
    "expect": {
-    "text": "\\MathMLintent{weak-convergence($x,$y)}{\\MathMLarg{x}{x} \\rightharpoonup \\MathMLarg{y}{y}}",
+    "text": "\\MathMLintent{weak-convergence:infix($x,$y)}{\\MathMLarg{x}{x} \\rightharpoonup \\MathMLarg{y}{y}}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2718,11 +2722,11 @@
   {
    "id": "wiener-algebra--example",
    "concept": "wiener-algebra",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$A(\\mathbb{T})$",
    "select": "A(\\mathbb{T})",
    "expect": {
-    "text": "\\MathMLintent{wiener-algebra}{A(\\mathbb{T})}",
+    "text": "\\MathMLintent{wiener-algebra:nofix}{A(\\mathbb{T})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": []
@@ -2730,11 +2734,11 @@
   {
    "id": "wronskian--example",
    "concept": "wronskian",
-   "from": "export example",
+   "from": "kernel form",
    "source": "$\\mathcal{W}(f, g)$",
    "select": "\\mathcal{W}(f, g)",
    "expect": {
-    "text": "\\MathMLintent{wronskian($f,$g)}{\\mathcal{W}(\\MathMLarg{f}{f}, \\MathMLarg{g}{g})}",
+    "text": "\\MathMLintent{wronskian:function($f,$g)}{\\mathcal{W}(\\MathMLarg{f}{f}, \\MathMLarg{g}{g})}",
     "auto": "ready-or-needs-operands"
    },
    "operands": [
@@ -2744,6 +2748,154 @@
     },
     {
      "text": "g",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "differential-d--example",
+   "concept": "custom:differential-d",
+   "from": "kernel form",
+   "source": "$d$",
+   "select": "d",
+   "expect": {
+    "text": "\\MathMLintent{differential-d:nofix}{d}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": []
+  },
+  {
+   "id": "divergence--example",
+   "concept": "core:divergence",
+   "from": "kernel form",
+   "source": "$\\nabla \\cdot \\mathbf{F}$",
+   "select": "\\nabla \\cdot \\mathbf{F}",
+   "expect": {
+    "text": "\\MathMLintent{divergence:function($field)}{\\nabla \\cdot \\MathMLarg{field}{\\mathbf{F}}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "\\mathbf{F}",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "change--example",
+   "concept": "core:change",
+   "from": "kernel form",
+   "source": "$\\Delta x$",
+   "select": "\\Delta x",
+   "expect": {
+    "text": "\\MathMLintent{change:prefix($quantity)}{\\Delta \\MathMLarg{quantity}{x}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "arc-hyperbolic-sine--example",
+   "concept": "core:arc-hyperbolic-sine",
+   "from": "kernel form",
+   "source": "$\\operatorname{arsinh} x$",
+   "select": "\\operatorname{arsinh} x",
+   "expect": {
+    "text": "\\MathMLintent{arc-hyperbolic-sine:function($value)}{\\operatorname{arsinh} \\MathMLarg{value}{x}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "arc-hyperbolic-cosine--example",
+   "concept": "core:arc-hyperbolic-cosine",
+   "from": "kernel form",
+   "source": "$\\operatorname{arcosh} x$",
+   "select": "\\operatorname{arcosh} x",
+   "expect": {
+    "text": "\\MathMLintent{arc-hyperbolic-cosine:function($value)}{\\operatorname{arcosh} \\MathMLarg{value}{x}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "arc-hyperbolic-tangent--example",
+   "concept": "core:arc-hyperbolic-tangent",
+   "from": "kernel form",
+   "source": "$\\operatorname{artanh} x$",
+   "select": "\\operatorname{artanh} x",
+   "expect": {
+    "text": "\\MathMLintent{arc-hyperbolic-tangent:function($value)}{\\operatorname{artanh} \\MathMLarg{value}{x}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "arc-hyperbolic-secant--example",
+   "concept": "core:arc-hyperbolic-secant",
+   "from": "kernel form",
+   "source": "$\\operatorname{arsech} x$",
+   "select": "\\operatorname{arsech} x",
+   "expect": {
+    "text": "\\MathMLintent{arc-hyperbolic-secant:function($value)}{\\operatorname{arsech} \\MathMLarg{value}{x}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "arc-hyperbolic-cosecant--example",
+   "concept": "core:arc-hyperbolic-cosecant",
+   "from": "kernel form",
+   "source": "$\\operatorname{arcsch} x$",
+   "select": "\\operatorname{arcsch} x",
+   "expect": {
+    "text": "\\MathMLintent{arc-hyperbolic-cosecant:function($value)}{\\operatorname{arcsch} \\MathMLarg{value}{x}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
+     "nth": 1
+    }
+   ]
+  },
+  {
+   "id": "arc-hyperbolic-cotangent--example",
+   "concept": "core:arc-hyperbolic-cotangent",
+   "from": "kernel form",
+   "source": "$\\operatorname{arcoth} x$",
+   "select": "\\operatorname{arcoth} x",
+   "expect": {
+    "text": "\\MathMLintent{arc-hyperbolic-cotangent:function($value)}{\\operatorname{arcoth} \\MathMLarg{value}{x}}",
+    "auto": "ready-or-needs-operands"
+   },
+   "operands": [
+    {
+     "text": "x",
      "nth": 1
     }
    ]
