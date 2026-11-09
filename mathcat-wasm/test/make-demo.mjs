@@ -60,7 +60,7 @@ as in the platform.</p>
 <pre id="t7out" aria-live="polite">Not run.</pre>
 
 <h2>Expected text (golden)</h2>
-<details><summary>NVDA 2026.2 speech-viewer text, OneCore voice, per fixture</summary>
+<details><summary>NVDA speech-viewer text (MathCAT add-on 0.7.7, Verbose), OneCore voice, per fixture</summary>
 <table><thead><tr><th>Fixture</th><th>Expected popup text</th></tr></thead><tbody id="goldenRows"></tbody></table>
 </details>
 

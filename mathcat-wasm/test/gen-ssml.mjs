@@ -1,10 +1,14 @@
 // gen-ssml.mjs — step 1 of golden generation (plan T1).
 // Drives the built MathCAT wasm DIRECTLY (not through mathcat.js) in the call
-// order NVDA release-2026.2 uses, and records MathCAT's SSML per fixture:
-//   startup  MathCAT.py L313-329: SetRulesDir, TTS=SSML, applyUserPreferences()
-//   per math MathCAT.py L331-380: Language, SetMathML, CapitalLetters_*, GetSpokenText
-// applyUserPreferences values = NVDA configSpec defaults (preferences.py
-// defaults() L299-327; configSpec.py [math] L394+), BrailleCode skipped as NVDA does.
+// order the MathCAT NVDA add-on 0.7.7 uses (globalPlugins/MathCAT/MathCAT.py),
+// and records MathCAT's SSML per fixture:
+//   startup  MathCAT.__init__: SetRulesDir, TTS=SSML; every other setting comes
+//            from MathCAT's prefs.yaml, plus the modelled user's one change,
+//            Verbosity = Verbose (Nicholas, 2026-11-09: "I want "verbose" as the default, but I will want to add some controls at a later time to adjust that.")
+//   per math getSpeechForMathMl: Language, SetMathML, IgnoreBold,
+//            CapitalLetters_*, GetSpokenText
+// Before 2026-11-09: NVDA release-2026.2's built-in order and configSpec defaults
+// (mathcat-proofing-v2/NOTE-MATHCAT-UPGRADE-0.7.7.md).
 import init, * as mc from '../mathcat_wasm.js';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
@@ -12,14 +16,7 @@ import { gunzipSync } from 'node:zlib';
 await init({ module_or_path: gunzipSync(readFileSync(new URL('../mathcat-wasm.bin', import.meta.url))) });
 mc.init();
 mc.setPreference('TTS', 'SSML');
-const userPrefs = [
-  ['Impairment', 'Blindness'], ['Language', 'en'], ['Verbosity', 'Medium'],
-  ['MathRate', '100'], ['PauseFactor', '100'], ['SpeechSound', 'None'],
-  ['SpeechStyle', 'ClearSpeak'], ['SubjectArea', 'General'], ['Chemistry', 'SpellOut'],
-  ['NavMode', 'Enhanced'], ['ResetNavMode', 'false'], ['Overview', 'false'],
-  ['ResetOverview', 'true'], ['NavVerbosity', 'Medium'], ['AutoZoomOut', 'true'],
-  ['CopyAs', 'MathML'], ['BrailleNavHighlight', 'EndPoints'],
-];
+const userPrefs = [['Verbosity', 'Verbose']];
 for (const [k, v] of userPrefs) mc.setPreference(k, v);
 
 const fixtures = JSON.parse(readFileSync(new URL('./fixtures.json', import.meta.url), 'utf8'));
@@ -35,6 +32,8 @@ function speakNvdaOrder(mathml) {
   try {
     mc.setPreference('Language', 'en');
     mc.setMathML(mathml);
+    // The add-on: IgnoreBold from NVDA's "Report highlighting" (default on).
+    mc.setPreference('IgnoreBold', 'false');
     // OneCore synth defaults: beepForCapitals=false, sayCapForCapitals=false,
     // capPitchChange=30 (configSpec L54-56); OneCore supports PitchCommand.
     mc.setPreference('CapitalLetters_Beep', 'false');

@@ -1,6 +1,7 @@
-// T1 (plan section 5): engine text == NVDA reference for every fixture.
-// Golden = MathCAT SSML (gen-ssml.mjs, NVDA call order) passed through NVDA's
-// own convertSSMLTextForNVDA + speech-viewer join (nvda_reference.py).
+// T1 (plan section 5): engine text == the reference for every fixture.
+// Golden = MathCAT SSML (gen-ssml.mjs, the NVDA add-on's call order) passed
+// through the add-on's own convertSSMLTextForNVDA + speech-viewer join
+// (nvda_reference.py). Until 2026-11-09 the reference was NVDA 2026.2's built-in copy.
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { check, eq, done, collapse } from './lib.mjs';
@@ -9,7 +10,7 @@ import { createMathCATEngine } from '../mathcat.js';
 const golden = JSON.parse(readFileSync(new URL('./golden.json', import.meta.url), 'utf8'));
 const bytes = gunzipSync(readFileSync(new URL('../mathcat-wasm.bin', import.meta.url)));
 const engine = await createMathCATEngine({ bytes });
-eq('version', engine.version, '0.7.2');
+eq('version', engine.version, '0.7.7');
 for (const row of golden.rows) {
   const r = await engine.speak(row.mathml);
   if (row.error) {

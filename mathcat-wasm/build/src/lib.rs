@@ -1,4 +1,4 @@
-//! JS-facing wrapper over libmathcat::interface (MathCAT 0.7.2).
+//! JS-facing wrapper over libmathcat::interface (MathCAT 0.7.7; pin in Cargo.toml).
 //! Speech: PLAN-MATHCAT-SPEECH-PROOFING.md (M9).
 //! Navigation + braille: PLAN-MATHCAT-NAVIGATION.md (N9 revises M9); the
 //! braille functions are built now but unused until the comparison view.

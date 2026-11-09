@@ -1,6 +1,7 @@
-// T1b (plan section 5): the JS port of NVDA's text conversion reproduces NVDA's
-// real Python function on hand-written SSML covering every branch, and on the
-// SSML of every fixture.
+// T1b (plan section 5): the JS port of the speech-viewer text conversion
+// reproduces the real Python function (the MathCAT NVDA add-on's
+// convertSSMLTextForNVDA since 2026-11-09; NVDA 2026.2's before) on
+// hand-written SSML covering every branch, and on the SSML of every fixture.
 import { readFileSync } from 'node:fs';
 import { eq, done } from './lib.mjs';
 import { toSpeechViewerRaw } from '../mathcat.js';

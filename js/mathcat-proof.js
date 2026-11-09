@@ -108,7 +108,7 @@ export function initMathCATProof(ctx) {
   const MSG_NAV = 'mathcat-proof:nav';
   const MSG_GOTO = 'mathcat-proof:goto';          // reserved: no sender in this build (N13)
   const MSG_NAVSPEECH = 'mathcat-proof:navspeech';
-  const NAV_FAILED = 'Error in navigating math';   // NVDA's message (N6)
+  const NAV_FAILED = 'Error in navigating math: see NVDA error log for details';   // the add-on's message (N6)
   function isNavigationMessage(d) { return d.type === MSG_NAV || d.type === MSG_GOTO; }
   async function relayNavigation(event, d) {
     if (!enabled || !engine) return;

@@ -1,50 +1,51 @@
 {
  "meta": {
   "generatedBy": "nvda_reference.py",
-  "nvda": "release-2026.2",
+  "reference": "MathCAT NVDA add-on 0.7.7",
   "synth": "oneCore",
-  "source": "https://raw.githubusercontent.com/nvaccess/nvda/release-2026.2/source/mathPres/MathCAT/speech.py"
+  "source": "https://github.com/daisy/MathCATForPython/releases/download/V0.7.7/MathCAT-0.7.7.nvda-addon :: globalPlugins/MathCAT/MathCAT.py",
+  "addonSha256": "1022780d030052a2799d55fb3d76402fda593ac5250f55730f33af021b13678b"
  },
  "rows": [
   {
    "name": "quadratic",
    "mathml": "<math display=\"block\"><mi>x</mi><mo>=</mo><mfrac><mrow><mo>&#x2212;</mo><mi>b</mi><mo>&#xB1;</mo><msqrt><msup><mi>b</mi><mn>2</mn></msup><mo>&#x2212;</mo><mn>4</mn><mi>a</mi><mi>c</mi></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>",
-   "ssml": "<say-as interpret-as='characters'>x</say-as>  is equal to <break time='384ms'/> the fraction with numerator <break time='400ms'/> negative <say-as interpret-as='characters'>b</say-as>  plus or minus <break time='128ms'/> the square root of <say-as interpret-as='characters'>b</say-as> squared  minus  4   <say-as interpret-as='characters'>a</say-as>   <say-as interpret-as='characters'>c</say-as> <break time='800ms'/>and denominator 2   <say-as interpret-as='characters'>a</say-as> <break time='800ms'/>",
+   "ssml": "<say-as interpret-as='characters'>x</say-as>  is equal to <break time='384ms'/> the fraction with numerator <break time='400ms'/> negative <say-as interpret-as='characters'>b</say-as>  plus or minus <break time='128ms'/> the square root of <say-as interpret-as='characters'>b</say-as> squared  minus  4   <say-as interpret-as='characters'>a</say-as>   <say-as interpret-as='characters'>c</say-as> <break time='200ms'/> end root <break time='400ms'/>and denominator 2   <say-as interpret-as='characters'>a</say-as> <break time='800ms'/>end fraction <break time='200ms'/>",
    "error": null,
-   "viewerRaw": "   x         is equal to         the fraction with numerator         negative         b         plus or minus         the square root of         b        squared  minus  4           eigh                  c        and denominator 2           eigh      ",
+   "viewerRaw": "   x         is equal to         the fraction with numerator         negative         b         plus or minus         the square root of         b        squared  minus  4           eigh                  c        end root         and denominator 2           eigh        end fraction       ",
    "nvdaMathml": "<math xml:lang=\"en\"><mi>x</mi><mo>=</mo><mfrac><mrow><mo>&#x2212;</mo><mi>b</mi><mo>&#xB1;</mo><msqrt><msup><mi>b</mi><mn>2</mn></msup><mo>&#x2212;</mo><mn>4</mn><mi>a</mi><mi>c</mi></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>",
    "nvdaError": null,
-   "nvdaViewerRaw": "   x         is equal to         the fraction with numerator         negative         b         plus or minus         the square root of         b        squared  minus  4           eigh                  c        and denominator 2           eigh      "
+   "nvdaViewerRaw": "   x         is equal to         the fraction with numerator         negative         b         plus or minus         the square root of         b        squared  minus  4           eigh                  c        end root         and denominator 2           eigh        end fraction       "
   },
   {
    "name": "integral-mspace",
    "mathml": "<math><msubsup><mo>&#x222B;</mo><mn>0</mn><mn>1</mn></msubsup><msup><mi>x</mi><mn>2</mn></msup><mspace width=\"0.2em\"></mspace><mi>d</mi><mi>x</mi><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></math>",
-   "ssml": "the integral from 0 to 1 of <break time='128ms'/> <say-as interpret-as='characters'>x</say-as> squared   <say-as interpret-as='characters'>d</say-as>   <say-as interpret-as='characters'>x</say-as> <break time='256ms'/> is equal to  1 third",
+   "ssml": "the integral from 0 <break time='200ms'/> to 1 of <break time='128ms'/> <say-as interpret-as='characters'>x</say-as> squared   <say-as interpret-as='characters'>d</say-as>   <say-as interpret-as='characters'>x</say-as> <break time='256ms'/> is equal to  1 third",
    "error": null,
-   "viewerRaw": "   the integral from 0 to 1 of         x        squared           d                  x        is equal to  1 third      ",
+   "viewerRaw": "   the integral from 0         to 1 of         x        squared           d                  x        is equal to  1 third      ",
    "nvdaMathml": "<math xml:lang=\"en\"><msubsup><mo>&#x222B;</mo><mn>0</mn><mn>1</mn></msubsup><msup><mi>x</mi><mn>2</mn></msup><mspace width=\"0.2em\"></mspace><mi>d</mi><mi>x</mi><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></math>",
    "nvdaError": null,
-   "nvdaViewerRaw": "   the integral from 0 to 1 of         x        squared           d                  x        is equal to  1 third      "
+   "nvdaViewerRaw": "   the integral from 0         to 1 of         x        squared           d                  x        is equal to  1 third      "
   },
   {
    "name": "sum-limits",
    "mathml": "<math display=\"block\"><munderover><mo>&#x2211;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>k</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mo stretchy=\"false\">(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy=\"false\">)</mo></mrow><mn>2</mn></mfrac></math>",
-   "ssml": "the sum from <say-as interpret-as='characters'>k</say-as>  is equal to  1 to <say-as interpret-as='characters'>n</say-as> of  <say-as interpret-as='characters'>k</say-as> <break time='128ms'/> is equal to <break time='256ms'/> the fraction with numerator <break time='400ms'/> <say-as interpret-as='characters'>n</say-as>  times  open paren  <say-as interpret-as='characters'>n</say-as>  plus  1  close paren <break time='400ms'/> and denominator 2 <break time='800ms'/>",
+   "ssml": "the sum from <say-as interpret-as='characters'>k</say-as>  is equal to  1 <break time='200ms'/> to <say-as interpret-as='characters'>n</say-as> of  <say-as interpret-as='characters'>k</say-as> <break time='256ms'/> is equal to <break time='256ms'/> the fraction with numerator <break time='400ms'/> <say-as interpret-as='characters'>n</say-as>  times  open paren  <say-as interpret-as='characters'>n</say-as>  plus  1  close paren <break time='400ms'/> and denominator 2 <break time='800ms'/>end fraction <break time='200ms'/>",
    "error": null,
-   "viewerRaw": "   the sum from         k         is equal to  1 to         n        of          k        is equal to         the fraction with numerator         n         times  open paren          n         plus  1  close paren         and denominator 2       ",
+   "viewerRaw": "   the sum from         k         is equal to  1         to         n        of          k        is equal to         the fraction with numerator         n         times  open paren          n         plus  1  close paren         and denominator 2         end fraction       ",
    "nvdaMathml": "<math xml:lang=\"en\"><munderover><mo>&#x2211;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>k</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mo stretchy=\"false\">(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy=\"false\">)</mo></mrow><mn>2</mn></mfrac></math>",
    "nvdaError": null,
-   "nvdaViewerRaw": "   the sum from         k         is equal to  1 to         n        of          k        is equal to         the fraction with numerator         n         times  open paren          n         plus  1  close paren         and denominator 2       "
+   "nvdaViewerRaw": "   the sum from         k         is equal to  1         to         n        of          k        is equal to         the fraction with numerator         n         times  open paren          n         plus  1  close paren         and denominator 2         end fraction       "
   },
   {
    "name": "derivative",
    "mathml": "<math><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup></math>",
-   "ssml": "<say-as interpret-as='characters'>d</say-as>   <say-as interpret-as='characters'>y</say-as> over <say-as interpret-as='characters'>d</say-as>   <say-as interpret-as='characters'>x</say-as>  is equal to  3   <say-as interpret-as='characters'>x</say-as> squared",
+   "ssml": "<say-as interpret-as='characters'>d</say-as>   <say-as interpret-as='characters'>y</say-as> over <say-as interpret-as='characters'>d</say-as>   <say-as interpret-as='characters'>x</say-as> <break time='200ms'/> end fraction <break time='200ms'/>is equal to  3   <say-as interpret-as='characters'>x</say-as> squared",
    "error": null,
-   "viewerRaw": "   d                  y        over         d                  x         is equal to  3           x        squared      ",
+   "viewerRaw": "   d                  y        over         d                  x        end fraction         is equal to  3           x        squared      ",
    "nvdaMathml": "<math xml:lang=\"en\"><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup></math>",
    "nvdaError": null,
-   "nvdaViewerRaw": "   d                  y        over         d                  x         is equal to  3           x        squared      "
+   "nvdaViewerRaw": "   d                  y        over         d                  x        end fraction         is equal to  3           x        squared      "
   },
   {
    "name": "pair-no-intent",
@@ -89,22 +90,22 @@
   {
    "name": "matrix-2x2",
    "mathml": "<math><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>",
-   "ssml": "the 2 by 2 matrix <break time='800ms'/>row 1 <break time='400ms'/> 1 <break time='200ms'/> 2 <break time='400ms'/>row 2 <break time='400ms'/> 3 <break time='200ms'/> 4 <break time='800ms'/>",
+   "ssml": "the 2 by 2 matrix <break time='800ms'/>row 1 <break time='400ms'/> 1 <break time='200ms'/> 2 <break time='400ms'/>row 2 <break time='400ms'/> 3 <break time='200ms'/> 4 <break time='800ms'/> end matrix",
    "error": null,
-   "viewerRaw": "   the 2 by 2 matrix         row 1         1         2         row 2         3         4       ",
+   "viewerRaw": "   the 2 by 2 matrix         row 1         1         2         row 2         3         4         end matrix      ",
    "nvdaMathml": "<math xml:lang=\"en\"><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>",
    "nvdaError": null,
-   "nvdaViewerRaw": "   the 2 by 2 matrix         row 1         1         2         row 2         3         4       "
+   "nvdaViewerRaw": "   the 2 by 2 matrix         row 1         1         2         row 2         3         4         end matrix      "
   },
   {
    "name": "chem-h2o-plain",
    "mathml": "<math><msub><mi mathvariant=\"normal\">H</mi><mn>2</mn></msub><mi mathvariant=\"normal\">O</mi></math>",
-   "ssml": "<prosody pitch='30%'><say-as interpret-as='characters'>h</say-as></prosody> <break time='200ms'/> sub 2     <prosody pitch='30%'><say-as interpret-as='characters'>o</say-as></prosody> <break time='200ms'/>",
+   "ssml": "<prosody pitch='30%'><say-as interpret-as='characters'>h</say-as></prosody> <break time='200ms'/> subscript 2     <prosody pitch='30%'><say-as interpret-as='characters'>o</say-as></prosody> <break time='200ms'/>",
    "error": null,
-   "viewerRaw": "   h        sub 2             o      ",
+   "viewerRaw": "   h        subscript 2             o      ",
    "nvdaMathml": "<math xml:lang=\"en\"><msub><mi mathvariant=\"normal\">H</mi><mn>2</mn></msub><mi mathvariant=\"normal\">O</mi></math>",
    "nvdaError": null,
-   "nvdaViewerRaw": "   h        sub 2             o      "
+   "nvdaViewerRaw": "   h        subscript 2             o      "
   },
   {
    "name": "malformed",
@@ -199,12 +200,12 @@
   {
    "name": "intent-ce-h2o",
    "mathml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" data-latex=\"\\ce{H2O}\">\n  <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\intentCeMark{{\\mathrm{H}{\\vphantom{A}}_{\\smash[t]{2}}\\mathrm{O}}}\" data-chem=\"ce\">\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathrm{H}\">\n      <mi mathvariant=\"normal\" data-latex=\"H\">H</mi>\n    </mrow>\n    <msub data-latex=\"{\\vphantom{A}}_{\\smash[t]{2}}\">\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\vphantom{A}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\vphantom{A}\">\n          <mpadded width=\"0\">\n            <mphantom>\n              <mi data-latex=\"A\">A</mi>\n            </mphantom>\n          </mpadded>\n        </mrow>\n      </mrow>\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\smash[t]{2}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\smash[t]{2}\">\n          <mpadded height=\"0\">\n            <mn data-latex=\"2\">2</mn>\n          </mpadded>\n        </mrow>\n      </mrow>\n    </msub>\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathrm{O}\">\n      <mi mathvariant=\"normal\" data-latex=\"O\">O</mi>\n    </mrow>\n  </mrow>\n</math>",
-   "ssml": "<prosody pitch='30%'><say-as interpret-as='characters'>h</say-as></prosody> <break time='200ms'/> sub 2 <break time='200ms'/>     <prosody pitch='30%'><say-as interpret-as='characters'>o</say-as></prosody> <break time='200ms'/>",
+   "ssml": "<prosody pitch='30%'><say-as interpret-as='characters'>h</say-as></prosody> <break time='200ms'/> subscript 2 <break time='200ms'/>     <prosody pitch='30%'><say-as interpret-as='characters'>o</say-as></prosody> <break time='200ms'/>",
    "error": null,
-   "viewerRaw": "   h        sub 2                     o      ",
+   "viewerRaw": "   h        subscript 2                     o      ",
    "nvdaMathml": "<math xml:lang=\"en\">\n  <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\intentCeMark{{\\mathrm{H}{\\vphantom{A}}_{\\smash[t]{2}}\\mathrm{O}}}\" data-chem=\"ce\">\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathrm{H}\">\n      <mi mathvariant=\"normal\" data-latex=\"H\">H</mi>\n    </mrow>\n    <msub data-latex=\"{\\vphantom{A}}_{\\smash[t]{2}}\">\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\vphantom{A}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\vphantom{A}\">\n          <mpadded width=\"0\">\n            <mphantom>\n              <mi data-latex=\"A\">A</mi>\n            </mphantom>\n          </mpadded>\n        </mrow>\n      </mrow>\n      <mrow data-mjx-texclass=\"ORD\" data-latex=\"{\\smash[t]{2}}\">\n        <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\smash[t]{2}\">\n          <mpadded height=\"0\">\n            <mn data-latex=\"2\">2</mn>\n          </mpadded>\n        </mrow>\n      </mrow>\n    </msub>\n    <mrow data-mjx-texclass=\"ORD\" data-latex=\"\\mathrm{O}\">\n      <mi mathvariant=\"normal\" data-latex=\"O\">O</mi>\n    </mrow>\n  </mrow>\n</math>",
    "nvdaError": null,
-   "nvdaViewerRaw": "   h        sub 2                     o      "
+   "nvdaViewerRaw": "   h        subscript 2                     o      "
   }
  ]
 }

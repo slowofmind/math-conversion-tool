@@ -1,9 +1,10 @@
 {
  "meta": {
   "generatedBy": "nvda_reference.py",
-  "nvda": "release-2026.2",
+  "reference": "MathCAT NVDA add-on 0.7.7",
   "synth": "oneCore",
-  "source": "https://raw.githubusercontent.com/nvaccess/nvda/release-2026.2/source/mathPres/MathCAT/speech.py"
+  "source": "https://github.com/daisy/MathCATForPython/releases/download/V0.7.7/MathCAT-0.7.7.nvda-addon :: globalPlugins/MathCAT/MathCAT.py",
+  "addonSha256": "1022780d030052a2799d55fb3d76402fda593ac5250f55730f33af021b13678b"
  },
  "rows": [
   {

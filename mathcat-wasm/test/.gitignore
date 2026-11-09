@@ -1,3 +1,10 @@
 # Dev-only test dependencies (npm install here). Kept local to this folder
 # because the repo-root .gitignore has mixed line endings and was left untouched.
 node_modules/
+
+# In-between files from regenerating the expected answers (VERSIONS.md step 5):
+# gen-ssml.mjs writes ssml.json and gen-nav-ssml.mjs writes nav-ssml.json; the
+# reference scripts read them and write the goldens, which contain all of it.
+ssml.json
+nav-ssml.json
+__pycache__/

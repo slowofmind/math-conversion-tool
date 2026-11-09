@@ -1,14 +1,16 @@
 // gen-nav-ssml.mjs — navigation goldens, step 1 (PLAN-MATHCAT-NAVIGATION.md
 // N-T1; its output also feeds N-T3 and N-T4). Drives the built MathCAT wasm
-// DIRECTLY (not through mathcat.js) in NVDA release-2026.2's call order, read
-// from source/mathPres/MathCAT/MathCAT.py in sitting 2:
-//   arriving   getSpeechForMathMl L331-374: Language, SetMathML (on failure
-//              SetMathML("<math></math>"), L353), CapitalLetters_*, GetSpokenText
-//   entering   MathCATInteraction.reportFocus L96-105: DoNavigateCommand("ZoomIn");
-//              no SetMathML (interactWithMathMl L414-421 only focuses).
-//              NVDA's message on failure: "Error in starting navigation of math."
-//   each key   _doNavigateCommand L125-138: DoNavigateCommand(name);
-//              NVDA's message on failure: "Error in navigating math"
+// DIRECTLY (not through mathcat.js) in the MathCAT NVDA add-on 0.7.7's call
+// order (globalPlugins/MathCAT/MathCAT.py; before 2026-11-09, NVDA
+// release-2026.2's built-in copy, which differs only by not setting IgnoreBold):
+//   arriving   getSpeechForMathMl: Language, SetMathML (on failure
+//              SetMathML("<math></math>")), IgnoreBold, CapitalLetters_*, GetSpokenText
+//   entering   MathCATInteraction.reportFocus: DoNavigateCommand("ZoomIn");
+//              no SetMathML (interactWithMathMl only focuses).
+//              The add-on's message on failure: "Error in starting navigation of math: see NVDA error log for details"
+//   each key   script_navigate: DoNavigateKeyPress(key); MathCAT's own key table
+//              gives the same command names used here for all 69 NVDA keys.
+//              The add-on's message on failure: "Error in navigating math: see NVDA error log for details"
 // So the reset to the whole expression comes from the SetMathML on arriving.
 // After every step the node is read with getNavigationMathMLId() and
 // getNavigationMathML(), as the engine will do.
@@ -33,15 +35,9 @@ export const SEQUENCE = ['ZoomIn', 'MoveNext', 'MoveNext', 'ZoomIn', 'ZoomOut', 
 await init({ module_or_path: gunzipSync(readFileSync(new URL('../mathcat-wasm.bin', import.meta.url))) });
 mc.init();
 mc.setPreference('TTS', 'SSML');
-// NVDA configSpec defaults, identical to gen-ssml.mjs (which cannot be imported: it runs on load)
-for (const [k, v] of [
-  ['Impairment', 'Blindness'], ['Language', 'en'], ['Verbosity', 'Medium'],
-  ['MathRate', '100'], ['PauseFactor', '100'], ['SpeechSound', 'None'],
-  ['SpeechStyle', 'ClearSpeak'], ['SubjectArea', 'General'], ['Chemistry', 'SpellOut'],
-  ['NavMode', 'Enhanced'], ['ResetNavMode', 'false'], ['Overview', 'false'],
-  ['ResetOverview', 'true'], ['NavVerbosity', 'Medium'], ['AutoZoomOut', 'true'],
-  ['CopyAs', 'MathML'], ['BrailleNavHighlight', 'EndPoints'],
-]) mc.setPreference(k, v);
+// The modelled user's settings on top of prefs.yaml, identical to gen-ssml.mjs
+// (which cannot be imported: it runs on load)
+for (const [k, v] of [['Verbosity', 'Verbose']]) mc.setPreference(k, v);
 
 const OPEN = /^\s*<math\b[^>]*>/;
 // NVDA's rebuild (ia2Web.py Math._get_mathMl): inner markup, comments removed, new <math xml:lang>
@@ -100,6 +96,7 @@ function arrive(mathml) {               // MathCAT.py getSpeechForMathMl
     mc.setMathML('<math></math>');
     return { ssml: null, error: String(e) };
   }
+  mc.setPreference('IgnoreBold', 'false');            // the add-on, as gen-ssml.mjs
   mc.setPreference('CapitalLetters_Beep', 'false');   // OneCore defaults, as gen-ssml.mjs
   mc.setPreference('CapitalLetters_UseWord', 'false');
   mc.setPreference('CapitalLetters_Pitch', '30');

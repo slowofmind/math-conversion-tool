@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # build-container.sh — builds mathcat-wasm/ from pinned sources.
 # Plan: PLAN-MATHCAT-SPEECH-PROOFING.md, section 2.2 and Appendix A (M10).
+# Pin: the MathCAT inside the NVDA add-on (since 2026-11-09; before that,
+# the MathCAT built into NVDA). See mathcat-proofing-v2/NOTE-MATHCAT-UPGRADE-0.7.7.md.
 #
 # Written for the Claude.ai container (Ubuntu 24.04, apt + crates.io + GitHub
 # reachable). Ubuntu's Rust ships no wasm32 standard library, so this script
@@ -14,14 +16,18 @@
 #   BUILD-INFO.json     provenance + gate results
 #
 # Gates (the script exits non-zero if any fails):
-#   G1 rules  — crate rules == NVDA's bundled rules at NVDA_MATHCAT_COMMIT
+#   G1 rules  — crate rules == the rules inside the Add-on Store's package
+#               (download checked against the Store's sha256 first)
 #   G2 version — the built wasm reports MATHCAT_VERSION
 #   G3 bin    — gunzip(mathcat-wasm.bin) is byte-identical to the raw wasm
 set -euo pipefail
 
-MATHCAT_VERSION="0.7.2"                  # plan F1
-NVDA_RELEASE="release-2026.2"            # plan F1
-NVDA_MATHCAT_COMMIT="808cbe3e7dc407dba927e38e171c85a1348f2c8e"
+MATHCAT_VERSION="0.7.7"
+# The NVDA Add-on Store's record for the add-on: github.com/nvaccess/addon-datastore,
+# addons/MathCAT/0.7.7.json (fields URL and sha256).
+ADDON_VERSION="0.7.7"
+ADDON_URL="https://github.com/daisy/MathCATForPython/releases/download/V0.7.7/MathCAT-0.7.7.nvda-addon"
+ADDON_SHA256="1022780d030052a2799d55fb3d76402fda593ac5250f55730f33af021b13678b"
 WASM_BINDGEN_VERSION="0.2.128"           # must equal Cargo.toml's pin
 RUST_V="1.91"
 LLD_V="20"
@@ -104,22 +110,28 @@ SHA1_RAW="$(sha1sum "$BG" | cut -d' ' -f1)"
 echo "G3 ok  sha1(raw)=$SHA1_RAW"
 
 # ---- 7. G1 rules gate -----------------------------------------------------
-log "7. G1 rules gate vs nvda-mathcat@${NVDA_MATHCAT_COMMIT:0:7}"
+# The add-on package keeps each language's rules zipped (Languages/en/en.zip);
+# MathCAT unzips it on first use, so the gate unzips it the same way.
+log "7. G1 rules gate vs the Add-on Store's MathCAT $ADDON_VERSION package"
 CRATE_DIR="$(ls -d "$HOME"/.cargo/registry/src/*/mathcat-"$MATHCAT_VERSION" | head -1)"
-NVMC="$WORK/nvda-mathcat"
-if [ ! -d "$NVMC/.git" ]; then
-  git clone -q --filter=blob:none https://github.com/nvaccess/nvda-mathcat.git "$NVMC"
+PKG="$WORK/MathCAT-$ADDON_VERSION.nvda-addon"
+if [ ! -f "$PKG" ] || [ "$(sha256sum "$PKG" | cut -d' ' -f1)" != "$ADDON_SHA256" ]; then
+  curl -sSL -o "$PKG" "$ADDON_URL"
 fi
-rm -rf "$WORK/nvrules"; mkdir -p "$WORK/nvrules"
-git -C "$NVMC" archive "$NVDA_MATHCAT_COMMIT" assets/Rules | tar -x -C "$WORK/nvrules"
+[ "$(sha256sum "$PKG" | cut -d' ' -f1)" = "$ADDON_SHA256" ] \
+  || { echo "G1 FAIL: add-on package sha256 differs from the Store's record"; exit 1; }
+AR="$WORK/addon-rules"
+rm -rf "$AR"; mkdir -p "$AR/pkg" "$AR/en"
+( cd "$AR/pkg" && unzip -q "$PKG" 'globalPlugins/MathCAT/Rules/*' )
+ADDON_RULES="$AR/pkg/globalPlugins/MathCAT/Rules"
+unzip -q "$ADDON_RULES/Languages/en/en.zip" -d "$AR/en"
 G1=pass
-for sub in Languages/en Intent; do
-  if ! diff -r -q --strip-trailing-cr "$CRATE_DIR/Rules/$sub" "$WORK/nvrules/assets/Rules/$sub"; then G1=fail; fi
-done
+if ! diff -r -q --strip-trailing-cr "$CRATE_DIR/Rules/Languages/en" "$AR/en"; then G1=fail; fi
+if ! diff -r -q --strip-trailing-cr "$CRATE_DIR/Rules/Intent" "$ADDON_RULES/Intent"; then G1=fail; fi
 for f in definitions.yaml intent.yaml prefs.yaml; do
-  if ! diff -q --strip-trailing-cr "$CRATE_DIR/Rules/$f" "$WORK/nvrules/assets/Rules/$f"; then G1=fail; fi
+  if ! diff -q --strip-trailing-cr "$CRATE_DIR/Rules/$f" "$ADDON_RULES/$f"; then G1=fail; fi
 done
-[ "$G1" = pass ] || { echo "G1 FAIL: rules differ from NVDA's bundle"; exit 1; }
+[ "$G1" = pass ] || { echo "G1 FAIL: rules differ from the add-on package"; exit 1; }
 echo "G1 ok"
 
 # ---- 8. G2 version gate ---------------------------------------------------
@@ -145,11 +157,12 @@ PY
 python3 - "$OUT/BUILD-INFO.json" <<PY
 import json, sys, datetime
 info = {
-  "schema": "mathcat-wasm/build-info/1",
+  "schema": "mathcat-wasm/build-info/2",
   "mathcatVersion": "$MATHCAT_VERSION",
   "mathcatCrateChecksum": "$CRATE_SUM",
-  "matchesNVDA": "$NVDA_RELEASE",
-  "nvdaMathcatCommit": "$NVDA_MATHCAT_COMMIT",
+  "matchesAddon": "MathCAT NVDA add-on $ADDON_VERSION",
+  "addonUrl": "$ADDON_URL",
+  "addonSha256": "$ADDON_SHA256",
   "gates": {"G1_rules": "pass", "G2_version": "pass", "G3_bin_roundtrip": "pass"},
   "wasm": {"sha1": "$SHA1_RAW", "sha256": "$SHA256_RAW",
            "bytes": $(stat -c %s "$BG"), "binBytes": $(stat -c %s "$OUT/mathcat-wasm.bin")},

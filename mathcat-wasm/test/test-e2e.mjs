@@ -38,6 +38,6 @@ for (let i = 0; i < 100 && !text; i++) {
   if (r && r.textContent !== '\u00a0') text = r.textContent;
 }
 eq('popup text == NVDA speech-viewer golden', text, collapse(quad.nvdaViewerRaw));
-eq('meta line', (fdoc.querySelector('.ASTEM_MathCAT_Region_meta') || {}).textContent, 'MathCAT 0.7.2 \u00b7 NVDA 2026.2');
+eq('meta line', (fdoc.querySelector('.ASTEM_MathCAT_Region_meta') || {}).textContent, 'MathCAT 0.7.7 \u00b7 NVDA add-on, Verbose');
 check('export string untouched', !page.includes('data-astem-mathcat-agent'));
 done('E2E');

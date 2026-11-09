@@ -7,7 +7,9 @@
 //   N-T6   (engine side) unknown commands refused without touching MathCAT (N14),
 //          reload when another expression was loaded, goTo (N13).
 // Failure messages: entering (first ZoomIn after arriving) -> "Error in starting
-// navigation of math."; any other key -> "Error in navigating math" (N6, N22).
+// navigation of math: see NVDA error log for details"; any other key -> "Error in
+// navigating math: see NVDA error log for details" (the add-on's messages since
+// 2026-11-09; N6, N22).
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { check, eq, done, collapse } from './lib.mjs';
@@ -74,7 +76,7 @@ await engine.navigate(A.mathml, 'ZoomIn', { fresh: true, entering: true });
 for (const bad of ['EraseEverything', 'toString', '__proto__', 'zoomin', '']) {
   const r = await engine.navigate(A.mathml, bad);
   eq(`refused ${JSON.stringify(bad)}: ok`, r.ok, false);
-  eq(`refused ${JSON.stringify(bad)}: NVDA's message`, r.text, 'Error in navigating math');
+  eq(`refused ${JSON.stringify(bad)}: NVDA's message`, r.text, 'Error in navigating math: see NVDA error log for details');
   check(`refused ${JSON.stringify(bad)}: says why`, /not an NVDA navigation command/.test(r.error || ''), r.error);
 }
 eq('after refusals, navigation continues where it was', (await engine.navigate(A.mathml, 'MoveNext')).text, step(A, 1));
@@ -103,5 +105,5 @@ eq('goTo: text == ReadCurrent there', g.text, step(A, rc));
 eq('goTo: highlight', JSON.stringify(g.highlightTags), JSON.stringify([tag]));
 const gBad = await engine.goTo(A.mathml, 'no-such-id');
 eq('goTo unknown tag: ok', gBad.ok, false);
-eq('goTo unknown tag: message', gBad.text, 'Error in navigating math');
+eq('goTo unknown tag: message', gBad.text, 'Error in navigating math: see NVDA error log for details');
 done('N-T1 nav engine');

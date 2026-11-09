@@ -5,48 +5,54 @@
 //        It knows nothing about the DOM, the preview, or messaging, so it can
 //        run in the platform page (v1, M2), inside a sandboxed preview, or in
 //        an exported page, unchanged.
-//   M4   speak() returns what NVDA 2026.2's speech viewer shows with the
-//        default Windows OneCore voice ("eigh", no pause punctuation).
+//   M4   speak() returns what NVDA's speech viewer shows with the MathCAT NVDA
+//        add-on and the default Windows OneCore voice ("eigh", no pause
+//        punctuation).
 //   M14  ...with whitespace collapsed to single spaces.
-//   M8   Settings are fixed to NVDA 2026.2 defaults (plan F2).
+//   M8   Settings are fixed: the add-on's defaults with Verbosity = Verbose
+//        (Nicholas, 2026-11-09: "I want "verbose" as the default, but I will want to add some controls at a later time to adjust that.").
 //   M11  MathCAT errors come back as { ok: false, error }.
 //
-// Pinned build: MathCAT 0.7.2 = the MathCAT inside NVDA 2026.1 - 2026.3b2
-// (plan F1). See VERSIONS.md before changing anything below the line
-// "PINNED BUILD".
+// Pinned build: MathCAT 0.7.7 = the MathCAT inside the NVDA add-on 0.7.7, as the
+// NVDA Add-on Store serves it (since 2026-11-09; until then the MathCAT built
+// into NVDA 2026.2, plan F1; mathcat-proofing-v2/NOTE-MATHCAT-UPGRADE-0.7.7.md).
+// See VERSIONS.md before changing anything below the line "PINNED BUILD".
 
 import init, * as mc from './mathcat_wasm.js';
 
 // ---- PINNED BUILD (update together with mathcat-wasm.bin; VERSIONS.md) ----
-export const PINNED_MATHCAT = '0.7.2';
-export const NVDA_RELEASE = '2026.2';
+export const PINNED_MATHCAT = '0.7.7';
+// What the popup models; shown after "NVDA" in its info line and the console.
+export const NVDA_SETUP = 'add-on, Verbose';
 // sha1 of the raw (uncompressed) wasm. It is the cache-buster in the .bin
 // URL, exactly as WASM_SHA1 is for pandoc-wasm: if it is not changed on an
 // upgrade, browsers keep serving the previously cached payload.
-export const WASM_SHA1 = '2c450eaa6adcc7b9a44f55ff2a2cfdbbee02025a';   // Phase A rebuild, PLAN-MATHCAT-NAVIGATION.md 3.2
+export const WASM_SHA1 = 'cd71ab27120dcdfac84b1830c106b88f88d3ce19';   // MathCAT 0.7.7 build, 2026-11-09
 // ---------------------------------------------------------------------------
 
 export function defaultBinUrl() {
   return new URL(`./mathcat-wasm.bin?sha1=${WASM_SHA1}`, import.meta.url).href;
 }
 
-// Settings NVDA applies at startup: MathCAT.py L313-329 sets TTS=SSML, then
-// applyUserPreferences() writes every key of preferences.py defaults()
-// (L299-327) from configSpec.py [math] (L394+). BrailleCode is skipped, as
-// NVDA skips it. Values below are NVDA's defaults, unchanged by a user.
+// Settings at startup, as the MathCAT NVDA add-on 0.7.7 sets them
+// (globalPlugins/MathCAT/MathCAT.py, MathCAT.__init__): SetRulesDir, then
+// TTS=SSML only. Every other setting comes from MathCAT's own prefs.yaml
+// (embedded; build gate G1 checks it equals the add-on's) and the user's
+// %APPDATA%\MathCAT\prefs.yaml. The modelled user changed one setting:
+// Verbosity = Verbose (Nicholas, 2026-11-09). The add-on's defaults equal the
+// values this list set explicitly for NVDA 2026.2, except Language (Auto),
+// which speak() sets for every expression anyway (checked 2026-11-09).
 const NVDA_STARTUP_PREFS = [
   ['TTS', 'SSML'],
-  ['Impairment', 'Blindness'], ['Language', 'en'], ['Verbosity', 'Medium'],
-  ['MathRate', '100'], ['PauseFactor', '100'], ['SpeechSound', 'None'],
-  ['SpeechStyle', 'ClearSpeak'], ['SubjectArea', 'General'], ['Chemistry', 'SpellOut'],
-  ['NavMode', 'Enhanced'], ['ResetNavMode', 'false'], ['Overview', 'false'],
-  ['ResetOverview', 'true'], ['NavVerbosity', 'Medium'], ['AutoZoomOut', 'true'],
-  ['CopyAs', 'MathML'], ['BrailleNavHighlight', 'EndPoints'],
+  ['Verbosity', 'Verbose'],
 ];
-// Set by getSpeechForMathMl (MathCAT.py L331-380) around every expression,
-// from the OneCore voice's defaults (configSpec.py L54-56; OneCore supports
-// PitchCommand, so the pitch preference is sent too).
+// Set by the add-on's getSpeechForMathMl around every expression, after
+// Language and SetMathML: IgnoreBold from NVDA's "Report highlighting"
+// (default on, so "false"), then the capital-letter settings from the OneCore
+// voice's defaults (configSpec.py; OneCore supports PitchCommand, so the pitch
+// preference is sent too).
 const NVDA_PER_EXPRESSION_PREFS = [
+  ['IgnoreBold', 'false'],
   ['CapitalLetters_Beep', 'false'],
   ['CapitalLetters_UseWord', 'false'],
   ['CapitalLetters_Pitch', '30'],
@@ -55,12 +61,15 @@ const NVDA_PER_EXPRESSION_PREFS = [
 // ---------------------------------------------------------------------------
 // NVDA speech-viewer text, OneCore voice, English (plan F11, 2.3 step 5).
 //
-// Reproduces what NVDA's convertSSMLTextForNVDA (mathPres/MathCAT/speech.py,
-// release-2026.2, L32-118) leaves as PLAIN STRINGS, joined the way
-// speechViewer.appendSpeechSequence does (speechViewer.py L183-203: strings
-// only, two-space separator). Independent reimplementation of that behavior
-// (NVDA is GPL-2.0; no NVDA code is copied here); test T1b checks it against
-// NVDA's own function, downloaded and run unmodified by nvda_reference.py.
+// Reproduces what convertSSMLTextForNVDA leaves as PLAIN STRINGS, joined the way
+// speechViewer.appendSpeechSequence does (speechViewer.py: strings only,
+// two-space separator). The function exists in the MathCAT NVDA add-on
+// (globalPlugins/MathCAT/MathCAT.py, 0.7.7), modelled since 2026-11-09, and in
+// NVDA (mathPres/MathCAT/speech.py, release-2026.2), modelled before; the parts
+// that produce text are identical in both. Independent reimplementation of that
+// behavior (NVDA is GPL-2.0, the add-on GPL v2 per the Add-on Store; no code is
+// copied here); test T1b checks it against the add-on's own function,
+// downloaded from the Store's package and run unmodified by nvda_reference.py.
 //
 // Token grammar, tried in this order at each position:
 //   <break .../> ?                        -> timing command  (no text)
@@ -98,6 +107,9 @@ export function collapseWhitespace(s) {
 // the plan's Appendix A): 29 fixed commands plus 4 placemarker commands x 10
 // digits. navigate() refuses any other name without touching MathCAT (N14).
 // Test N-T2 compares this list with NVDA's file, downloaded at test time.
+// The add-on sends key presses instead (DoNavigateKeyPress); MathCAT 0.7.7's own
+// key table gives the same command for all 69 of NVDA's keys (checked
+// 2026-11-09; mathcat-proofing-v2/NOTE-MATHCAT-UPGRADE-0.7.7.md).
 // Deleting both navigation blocks restores the first plan's engine.
 export const NAV_COMMANDS = Object.freeze([
   'MovePrevious', 'MoveNext', 'ZoomOut', 'ZoomIn',
@@ -109,10 +121,12 @@ export const NAV_COMMANDS = Object.freeze([
   'MoveLastLocation',
   ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].flatMap((n) => [`MoveTo${n}`, `SetPlacemarker${n}`, `Read${n}`, `Describe${n}`]),
 ]);
-// NVDA's two messages (MathCAT.py, release-2026.2): entering math fails (L105);
-// a later key fails (L136). N6, N22.
-export const NAV_ENTER_FAILED = 'Error in starting navigation of math.';
-export const NAV_FAILED = 'Error in navigating math';
+// The add-on's two messages (MathCAT.py 0.7.7): entering math fails
+// (MathCATInteraction.reportFocus); a later key fails (script_navigate). N6,
+// N22. (NVDA 2026.2's built-in copy said "Error in starting navigation of
+// math." and "Error in navigating math".)
+export const NAV_ENTER_FAILED = 'Error in starting navigation of math: see NVDA error log for details';
+export const NAV_FAILED = 'Error in navigating math: see NVDA error log for details';
 // Ids in a MathML string (either quote style), and the top-most elements of a
 // MathCAT subtree whose id is one of them. A string scan, not a DOM (M15);
 // test N-T1 compares it with an XML-parser walk (gen-nav-ssml.mjs).
@@ -292,7 +306,7 @@ async function start(src) {
    *   command   one of NAV_COMMANDS; anything else is refused (N14)
    *   fresh     reload first, back to the whole expression (N19)
    *   entering  the entering step: a failure shows NVDA's entering message (N22)
-   *   text      NVDA 2026.2's speech-viewer text, or NVDA's message on failure (N6)
+   *   text      the speech-viewer text, or the add-on's message on failure (N6)
    *   error     MathCAT's own text on failure, for the console
    */
   async function navigate(mathml, command, opts = {}) {
@@ -313,7 +327,7 @@ async function start(src) {
       return mc.doNavigateCommand('ReadCurrent');
     }, NAV_FAILED);
   }
-  return Object.freeze({ version, nvda: NVDA_RELEASE, speak: speakTracked, navigate, goTo });
+  return Object.freeze({ version, nvda: NVDA_SETUP, speak: speakTracked, navigate, goTo });
   // ==== END navigation, part 2 of 2 ====
-  return Object.freeze({ version, nvda: NVDA_RELEASE, speak });
+  return Object.freeze({ version, nvda: NVDA_SETUP, speak });
 }

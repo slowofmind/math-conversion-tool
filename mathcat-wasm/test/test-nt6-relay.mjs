@@ -65,7 +65,7 @@ const fake = { version: '0.7.2', nvda: '2026.2', speak: async () => ({ ok: true,
   await send(fw, { type: 'mathcat-proof:nav', id: 1, nav: 1, command: 'ZoomIn', mathml: 'M' });
   const r = fw.got[0];
   eq('engine without navigate(): ok false', r && r.m.ok, false);
-  eq("engine without navigate(): NVDA's message", r && r.m.text, 'Error in navigating math');
+  eq("engine without navigate(): NVDA's message", r && r.m.text, 'Error in navigating math: see NVDA error log for details');
 }
 {
   const engine = await createMathCATEngine({ bytes: gunzipSync(readFileSync(new URL('../mathcat-wasm.bin', import.meta.url))) });
@@ -74,7 +74,7 @@ const fake = { version: '0.7.2', nvda: '2026.2', speak: async () => ({ ok: true,
   await send(fw, { type: 'mathcat-proof:nav', id: 1, nav: 1, command: 'DeleteEverything', mathml, fresh: true });
   const r = fw.got[0];
   eq('real engine: unknown command refused (N14)', r && r.m.ok, false);
-  eq("real engine: refusal shows NVDA's message", r && r.m.text, 'Error in navigating math');
+  eq("real engine: refusal shows NVDA's message", r && r.m.text, 'Error in navigating math: see NVDA error log for details');
   await send(fw, { type: 'mathcat-proof:nav', id: 1, nav: 2, command: 'ZoomIn', mathml, fresh: true, entering: true });
   eq('real engine: a real command works', fw.got[1] && fw.got[1].m.ok, true);
 }
