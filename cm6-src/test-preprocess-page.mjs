@@ -254,6 +254,80 @@ ok('nothing remembered: Images and LaTeX preprocessing open; Math notation revie
 ok('a remembered choice still wins (Math notation review remembered open, Images remembered closed)',
   !!chosen && chosen('prepReviewToggle') && !chosen('prepImagesToggle') && !chosen('prepSnippetsToggle'));
 
+// ── P5, 2026-11-09 (Nicholas): Project Files opens when files are loaded; File Preparation starts open ──────────────
+// "I need for the "File Prep" accordion to start open. I need for the "Project Files" accordion to start closed, but to
+// open when files are loaded into the platform ... if somehow only loads 1 file, it only opens a bit, but if someone
+// uploads a whole project, then it opens wide enough to display all the files. If additional files are uploaded after
+// the fact, then it does not need to open wider." Limit: "probably a one-third limit might be sufficient" (the divider
+// still resizes it). Proposed and kept: Project Files always starts closed (files never survive a reload); File
+// Preparation starts open unless the reader closed it; closed by hand and files loaded again, it opens again.
+group('P5 2026-11-09: Project Files opens on load, sized to its files; File Preparation starts open');
+const rt = (id) => doc.getElementById(id);
+ok('markup: Project Files starts closed, File Preparation open',
+  rt('railtab-files').getAttribute('aria-expanded') === 'false' && rt('railPanelFiles').hidden &&
+  !rt('railPanelFiles').closest('.rail-section').classList.contains('open') &&
+  rt('railtab-prepare').getAttribute('aria-expanded') === 'true' && !rt('railPanelPrepare').hidden &&
+  rt('railPanelPrepare').closest('.rail-section').classList.contains('open'));
+// The page's own start-up rule (RAIL_STATE_KEY through railOpen), run with a stand-in storage.
+const stAt = js.indexOf('const RAIL_STATE_KEY'), roAt = stAt >= 0 ? js.indexOf('const railOpen = (() => {', stAt) : -1;
+const roEnd = roAt >= 0 ? js.indexOf('})();', roAt) + 5 : -1;
+const startSrc = stAt >= 0 && roAt > stAt && roEnd > roAt ? js.slice(stAt, roEnd) : '';
+const startOpen = (stored) => {
+  try { return [...new Function('localStorage', startSrc + '\nreturn railOpen;')({ getItem: (k) => (k in stored ? stored[k] : null) })].sort().join(','); }
+  catch (e) { return 'error: ' + e.message; }
+};
+const st = (o) => ({ 'atc.rail.state': JSON.stringify(o) });
+ok('start-up, nothing remembered: File Preparation open, Project Files closed', startOpen({}) === 'prepare', startOpen({}));
+ok('start-up, File Preparation closed by the reader last time: it stays closed',
+  startOpen(st({ prepare: 'closed' })) === '', startOpen(st({ prepare: 'closed' })));
+ok('start-up, Project Files open last time: it still starts closed (it would be empty)',
+  startOpen(st({ files: 'open', prepare: 'open' })) === 'prepare', startOpen(st({ files: 'open', prepare: 'open' })));
+const fnBody = (head) => { const a = js.indexOf(head); return a < 0 ? '' : js.slice(a, js.indexOf('\n}\n', a)); };
+ok('only a reader\'s own open or close (a header click) is remembered; opens made by the platform are not; the old key is cleared',
+  !/localStorage/.test(fnBody('function setRailSection(')) && /localStorage\.setItem\(RAIL_STATE_KEY/.test(js) &&
+  /localStorage\.removeItem\('atc\.rail\.open'\)/.test(js) && !/RAIL_OPEN_KEY/.test(js));
+ok('every way a user loads files opens Project Files: single file, support files, folder, project zip',
+  ['async function handleFileUpload(', 'async function addSupportFiles(', 'async function adoptProjectFiles(', 'async function importProjectZip(']
+    .every((f) => fnBody(f).includes('revealProjectFiles();')));
+ok('files the platform makes itself (converted images, preprocessing copies) do not: called from those four only',
+  count(js, 'revealProjectFiles();') === 4, String(count(js, 'revealProjectFiles();')));
+const rev = fnBody('function revealProjectFiles('), sz = fnBody('function sizeProjectFiles(');
+ok('already open when files arrive: left as it is (no resizing)', /if \(railOpen\.has\('files'\)\) return;/.test(rev));
+ok('sized to its file list, at least the sections\' minimum, at most a third of the height; not saved (the divider stays the reader\'s)',
+  /fileTreeHost/.test(sz) && /RAIL_MIN_PX/.test(sz) && /total \/ 3/.test(sz) && /layoutRailSections\(\)/.test(sz) && !/saveRailSizes/.test(sz));
+ok('measured on the next frame after the load, or once the Tools panel has opened if it was closed',
+  /requestAnimationFrame\(sizeProjectFiles\)/.test(rev) && /filesSizePending/.test(fnBody('function setSidebarOpen(')) &&
+  /transitionend/.test(fnBody('function sizeProjectFilesWhenShown(')) &&
+  js.indexOf('let filesSizePending') >= 0 && js.indexOf('let filesSizePending') < js.indexOf('function setSidebarOpen('));
+
+// ── P6, 2026-11-09 (Nicholas): the divider between Project Files and File Preparation, at rest ─────────────────────
+// "I want to make the baseline divider a little bit thicker/darker to differentiate it from the lines above it" so
+// "users have a better intuition that they can grab and drag". At rest: a 3 px #8a8a8a bar (3:1 for a control on the
+// sidebar's background, WCAG 1.4.11; the 1 px #cccccc lines above are 1.47:1). Hover, drag and focus unchanged: the
+// whole 5 px strip in --accent-dim, the bar stepping aside.
+group('P6 2026-11-09: the sections\' divider at rest is a thicker, darker bar');
+ok('at rest: a 3 px #8a8a8a bar across the divider',
+  css.includes('.rail-sash::before { content: \'\'; position: absolute; left: 0; right: 0; top: 1px; height: 3px; background: #8a8a8a; }'));
+ok('hover, drag and keyboard focus look as before: the bar steps aside for the --accent-dim strip',
+  css.includes('.rail-sash:hover::before, .rail-sash.dragging::before, .rail-sash:focus-visible::before { background: transparent; }') &&
+  css.includes('.rail-sash:hover, .rail-sash.dragging { background: var(--accent-dim); }'));
+const bg2 = cssVar('bg-secondary');
+ok('the bar meets 3:1 against the sidebar\'s background (a control\'s boundary, WCAG 1.4.11)',
+  !!bg2 && ratio('#8a8a8a', bg2) >= 3, `${bg2} ${bg2 ? ratio('#8a8a8a', bg2).toFixed(2) : ''}`);
+
+// ── P7, 2026-11-09: Project Files' size leaves room for the file details line filled in ──────────────────────────────
+// Found while answering Nicholas's question about the details line ("it can stay as it is"): sized to fit exactly,
+// selecting the only file grew the line 15 -> 39 px and hid part of the file's own row. Nicholas: "yes" (fix it). The
+// sizing measures the longest details any file here gets (the tree's own detailText, cm6-src/test-file-tree-detail.mjs)
+// on a hidden copy: never on the live region itself, which would announce.
+group('P7 2026-11-09: Project Files\' size leaves room for the filled-in details line');
+const szDetail = fnBody('function sizeProjectFiles(');
+ok('the sizing measures the filled-in details line with the tree\'s own detailText',
+  /fileTreeDetail/.test(szDetail) && /fileTree\.detailText\(/.test(szDetail));
+ok('on a hidden copy (aria-hidden, no live region, removed afterwards); the real details line is never written to',
+  /aria-hidden/.test(szDetail) && /removeAttribute\('aria-live'\)/.test(szDetail) && /\.remove\(\)/.test(szDetail) &&
+  !/detailEl\.textContent\s*=/.test(szDetail));
+
 // ── F3, call 88: the Preprocess tab, after Intent, and its panel ──────
 group('F3 call 88, revised 2026-10-06: Preprocess in the Output view drop-down, and its panel');
 const vsel = doc.getElementById('selOutputView');

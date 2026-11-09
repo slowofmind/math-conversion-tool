@@ -290,6 +290,12 @@
   .rail-sash:hover, .rail-sash.dragging { background: var(--accent-dim); }
   .rail-sash:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px;
     background: var(--accent-dim); }
+  /* At rest (2026-11-09, Nicholas): "make the baseline divider a little bit thicker/darker to differentiate it from
+     the lines above it", so it reads as something to grab. A 3 px bar over the 1 px border it sits on; #8a8a8a is
+     3.17:1 on --bg-secondary (WCAG 1.4.11; the #cccccc lines are 1.47:1). Hover, drag and focus as before: the bar
+     steps aside for the 5 px --accent-dim strip. Shown only while it can be dragged (two open sections). */
+  .rail-sash::before { content: ''; position: absolute; left: 0; right: 0; top: 1px; height: 3px; background: #8a8a8a; }
+  .rail-sash:hover::before, .rail-sash.dragging::before, .rail-sash:focus-visible::before { background: transparent; }
   @media (prefers-reduced-motion: reduce) { .rail-chevron { transition: none; } }
 
   /* ─── FILE TREE ─── */
@@ -2318,12 +2324,12 @@
 
     <div class="rail-sections">
     <!-- PROJECT FILES ------------------------------------------------>
-    <div class="rail-section open">
+    <div class="rail-section">
       <h2 class="rail-section-heading">
         <button type="button" class="rail-section-toggle" id="railtab-files"
-                aria-expanded="true" aria-controls="railPanelFiles"><span class="rail-chevron" aria-hidden="true">▸</span>Project Files</button>
+                aria-expanded="false" aria-controls="railPanelFiles"><span class="rail-chevron" aria-hidden="true">▸</span>Project Files</button>
       </h2>
-    <div class="rail-panel" id="railPanelFiles" role="region"
+    <div class="rail-panel" id="railPanelFiles" role="region" hidden
          aria-labelledby="railtab-files">
       <div class="ft-toolbar">
         <label class="sr-only" for="fileTreeFilter">Filter project files</label>
@@ -2355,12 +2361,12 @@
          state. *** ORDER IS LOAD-BEARING: extraction CREATES the PDFs that
          "PDF to SVG" converts, so "TikZ to PDF" must come first (both now in Images, 2026-10-06). *** Each button keeps its
          id, so every handler that binds by getElementById still binds. -->
-    <div class="rail-section">
+    <div class="rail-section open">
       <h2 class="rail-section-heading">
         <button type="button" class="rail-section-toggle" id="railtab-prepare"
-                aria-expanded="false" aria-controls="railPanelPrepare"><span class="rail-chevron" aria-hidden="true">▸</span>File Preparation</button>
+                aria-expanded="true" aria-controls="railPanelPrepare"><span class="rail-chevron" aria-hidden="true">▸</span>File Preparation</button>
       </h2>
-    <div class="rail-panel" id="railPanelPrepare" role="region" hidden
+    <div class="rail-panel" id="railPanelPrepare" role="region"
          aria-labelledby="railtab-prepare">
       <div class="sidebar-body">
       <!-- IMAGES (Nicholas, 2026-10-06): its own accordion inside File Preparation, first. Each
@@ -3618,6 +3624,7 @@ async function handleFileUpload(file, pathHint, opts = {}) {
       updateExtensions();
     }
   }
+  revealProjectFiles();   // 2026-11-09: Project Files opens when files are loaded
 }
 
 document.getElementById('btnUpload').addEventListener('click', () => {
@@ -3673,6 +3680,7 @@ async function addSupportFiles(files) {
   }
   syncAuxFiles();
   renderAuxFileList();
+  revealProjectFiles();
   const what = files.length === 1 ? files[0].name : `${files.length} files`;
   updateStatus('ready', `Added ${what} to the project` +
     (replaced ? ` · ${replaced} replaced an existing file` : ''));
@@ -4607,6 +4615,7 @@ async function adoptProjectFiles(rawItems, source, label) {
     }
   }
   renderAuxFileList();
+  revealProjectFiles();
 
   let msg = `Imported ${res.added} file${res.added === 1 ? '' : 's'} from ${label}`;
   if (wrapper) msg += ` · unwrapped "${wrapper}/"`;
@@ -4821,6 +4830,7 @@ async function importProjectZip(arrayBuffer, sourceLabel) {
     }
   }
   renderAuxFileList();
+  revealProjectFiles();
   const total = auxEntries.length + (mainEntry ? 1 : 0);
   let msg = `Imported ${total} file${total === 1 ? '' : 's'} from ${sourceLabel}`;
   if (wrapper) msg += ` · unwrapped "${wrapper}/"`;
@@ -9473,27 +9483,32 @@ const sidebar = document.getElementById('sidebar');
 const btnProject = document.getElementById('btnProject');
 const sidebarClose = document.getElementById('sidebarClose');
 
-// ─── Left rail sections (Project Files / File Preparation / Cleanup) ───
+// ─── Left rail sections (Project Files / File Preparation) ───
 // Collapsible sections in the manner of VS Code's Explorer, built as the
 // ARIA accordion pattern: each header is a button inside a heading, with
 // aria-expanded; its panel is a region labelled by it. Several can be open
-// at once, and open sections share the height. Which are open is remembered.
+// at once, and open sections share the height. Which start open: below (2026-11-09).
 // These replaced the Files / Prepare / Cleanup tabs on 2026-09-29 (the
 // file-tree worklog's parked "tabs vs. vertical accordion" question). The
 // panels keep their ids: other code, and the preprocessor's page test, find
 // them by id.
-const RAIL_OPEN_KEY = 'atc.rail.open';
+// Which start open (2026-11-09, Nicholas): File Preparation, unless the reader closed it last time; Project Files
+// never (files never survive a reload, so it would be empty): it opens when files are loaded (revealProjectFiles).
+// Only a reader's own open or close, a click on a header, is remembered; opens made by the platform are not.
+const RAIL_STATE_KEY = 'atc.rail.state';   // { files|prepare: 'open'|'closed' }; replaced 'atc.rail.open'
 const railSections = [
   ['files',   'railtab-files',   'railPanelFiles'],
   ['prepare', 'railtab-prepare', 'railPanelPrepare'],
 ];
 const railOpen = (() => {
+  const open = new Set(['prepare']);
   try {
-    const v = JSON.parse(localStorage.getItem(RAIL_OPEN_KEY));
-    if (Array.isArray(v)) return new Set(v.filter(k => railSections.some(s => s[0] === k)));
+    const v = JSON.parse(localStorage.getItem(RAIL_STATE_KEY));
+    if (v && v.prepare === 'closed') open.delete('prepare');
   } catch {}
-  return new Set(['files']);
+  return open;
 })();
+let filesSizePending = false;   // Project Files opened by a load and not yet sized (revealProjectFiles)
 
 
 // ─── Prepare panel: the two statuses that can be computed HONESTLY ───
@@ -9569,7 +9584,6 @@ function setRailSection(key, open, focusHeader) {
   const head = document.getElementById(s[1]);
   const panel = document.getElementById(s[2]);
   if (open) railOpen.add(key); else railOpen.delete(key);
-  try { localStorage.setItem(RAIL_OPEN_KEY, JSON.stringify([...railOpen])); } catch {}
   if (head) head.setAttribute('aria-expanded', String(open));
   if (panel) {
     panel.hidden = !open;
@@ -9588,7 +9602,15 @@ function refreshRailSection(key) {
 }
 
 for (const [key, headId] of railSections) {
-  document.getElementById(headId)?.addEventListener('click', () => setRailSection(key, !railOpen.has(key)));
+  document.getElementById(headId)?.addEventListener('click', () => {
+    const open = !railOpen.has(key);
+    setRailSection(key, open);
+    try {   // the reader's own choice (start-up uses File Preparation's)
+      const v = JSON.parse(localStorage.getItem(RAIL_STATE_KEY) || '{}') || {};
+      v[key] = open ? 'open' : 'closed';
+      localStorage.setItem(RAIL_STATE_KEY, JSON.stringify(v));
+    } catch {}
+  });
 }
 // Up/Down/Home/End move between the section headers (the accordion pattern's
 // optional keys), only while a header has focus: the tree and the fields
@@ -9689,6 +9711,7 @@ function setSidebarOpen(open, section) {
   }
   if (open && section) setRailSection(section, true);
   else if (open && railOpen.has('prepare')) refreshPrepareStatus();
+  if (open && filesSizePending) sizeProjectFilesWhenShown();   // files were loaded while the panel was closed
   if (btnProject) {
     btnProject.classList.toggle('active', open);
     btnProject.setAttribute('aria-expanded', String(open));
@@ -9824,6 +9847,66 @@ btnProject?.addEventListener('click', () => toggleSidebar());
 sidebarClose.addEventListener('click', () => { setSidebarOpen(false); btnProject?.focus(); });
 for (const [key] of railSections) setRailSection(key, railOpen.has(key));
 try { localStorage.removeItem('atc.rail.tab'); } catch {}   // the old tabs' key
+try { localStorage.removeItem('atc.rail.open'); } catch {}   // replaced by atc.rail.state (2026-11-09)
+
+// Project Files opens when files are loaded (2026-11-09, Nicholas): "start closed, but ... open when files are loaded
+// into the platform", tall enough to show all the files, at most a third of the sidebar's height ("a one-third limit
+// might be sufficient"); the divider still resizes it, and any split stays the reader's to change (not saved here).
+// Already open: left as it is ("If additional files are uploaded after the fact, then it does not need to open
+// wider"). Closed by hand and files loaded again: it opens again, sized again. Called by the four ways a user loads
+// files (handleFileUpload, addSupportFiles, adoptProjectFiles, importProjectZip), never for files the platform makes.
+// Measured on the next frame, once the whole load is drawn into the list (folders first expanded, the Checkpoint row
+// shown) and before it is painted; while the Tools panel is closed, once it has opened (setSidebarOpen).
+function revealProjectFiles() {
+  if (railOpen.has('files')) return;
+  setRailSection('files', true);
+  filesSizePending = true;
+  if (!sidebar.classList.contains('collapsed')) requestAnimationFrame(sizeProjectFiles);
+}
+function sizeProjectFiles() {
+  if (!filesSizePending) return;
+  filesSizePending = false;
+  const others = railSections.map(([k]) => k).filter((k) => k !== 'files' && railOpen.has(k));
+  const sec = railSectionEl('files'), host = document.getElementById('fileTreeHost');
+  if (!railOpen.has('files') || !others.length || !sec || !host) return;   // alone, it has the whole height anyway
+  // Its natural height: the section as it is now, less the list's box, plus what the list holds.
+  const hs = getComputedStyle(host);
+  const listH = [...host.children].reduce((s, c) => s + c.getBoundingClientRect().height, 0) +
+    parseFloat(hs.paddingTop) + parseFloat(hs.paddingBottom);
+  let natural = sec.getBoundingClientRect().height - host.clientHeight + listH;
+  // Room for the details line filled in (2026-11-09): selecting a file fills it (path · role · size ...), often on two
+  // lines in a narrow sidebar; sized only for the empty line, selecting the only file hid part of its own row. The
+  // longest details any file here gets, measured on a hidden copy: never on the live region, which would announce.
+  const detailEl = document.getElementById('fileTreeDetail');
+  if (detailEl && fileTree.detailText) {
+    const texts = [...host.querySelectorAll('li[data-kind="file"]')].map((li) => fileTree.detailText(li.dataset.path))
+      .sort((a, b) => b.length - a.length).slice(0, 5);
+    const probe = detailEl.cloneNode(false);
+    probe.removeAttribute('id'); probe.removeAttribute('aria-live'); probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = `position: absolute; visibility: hidden; left: 0; top: 0; width: ${detailEl.offsetWidth}px;`;
+    detailEl.after(probe);
+    let most = 0;
+    for (const t of texts) { probe.textContent = t; most = Math.max(most, probe.getBoundingClientRect().height); }
+    probe.remove();
+    natural += Math.max(0, most - detailEl.getBoundingClientRect().height);
+  }
+  // Share out the height the open sections have now: Project Files gets what it needs, within the limits; the others
+  // keep their proportions among themselves.
+  const total = ['files', ...others].reduce((s, k) => s + railSectionEl(k).getBoundingClientRect().height, 0);
+  const h = Math.min(Math.max(natural, RAIL_MIN_PX), total / 3);
+  const rest = others.reduce((s, k) => s + railWeight(k), 0);
+  for (const k of others) railSizes[k] = (total - h) * railWeight(k) / rest;
+  railSizes.files = h;
+  layoutRailSections();
+}
+// The Tools panel opens with a width transition (none with reduced motion): measure once it has its width.
+function sizeProjectFilesWhenShown() {
+  let done = false;
+  const go = () => { if (done) return; done = true; sidebar.removeEventListener('transitionend', onEnd); sizeProjectFiles(); };
+  const onEnd = (e) => { if (e.target === sidebar && e.propertyName === 'width') go(); };
+  sidebar.addEventListener('transitionend', onEnd);
+  setTimeout(go, 400);
+}
 
 // ─── Layout switching ───
 const outputPanel = document.getElementById('outputPanel');

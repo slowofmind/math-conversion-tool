@@ -49,7 +49,7 @@ export function initFileTree({ getEntries, getSummaryText, getTargetPath,
   const filterSel = document.getElementById('fileTreeFilter');
   const detailEl  = document.getElementById('fileTreeDetail');
   const emptyEl   = document.getElementById('fileTreeEmpty');
-  if (!host) return { render() {}, focus() {} };
+  if (!host) return { render() {}, focus() {}, detailText: () => '' };
 
   let expanded = loadExpanded();
   let selectedPath = null;
@@ -213,17 +213,22 @@ export function initFileTree({ getEntries, getSummaryText, getTargetPath,
     return ((getEntries ? getEntries() : []) || []).find(e => e.path === path);
   }
 
-  function updateDetail(path) {
-    if (!detailEl) return;
+  // The details line's words for a file ('' for a folder or an unknown path). One source: the page also uses it to
+  // leave room for the filled-in line when it sizes Project Files (2026-11-09; cm6-src/test-file-tree-detail.mjs).
+  function detailText(path) {
     const e = path ? entryFor(path) : null;
-    if (!e) { detailEl.textContent = ''; return; }
+    if (!e) return '';
     const size = e.bytes ? `${(e.bytes.length / 1024).toFixed(1)} KB`
                : (e.text ? `${(e.text.length / 1024).toFixed(1)} KB` : '');
     const bits = [e.path, e.role];
     if (size) bits.push(size);
     if (getTargetPath && e.path === getTargetPath()) bits.push('conversion target');
     else if (e.isMain) bits.push('in editor');
-    detailEl.textContent = bits.join(' · ');
+    return bits.join(' · ');
+  }
+  function updateDetail(path) {
+    if (!detailEl) return;
+    detailEl.textContent = detailText(path);
   }
 
   function select(li) {
@@ -380,5 +385,6 @@ export function initFileTree({ getEntries, getSummaryText, getTargetPath,
       if (t) focusItem(t);
     },
     get selectedPath() { return selectedPath; },
+    detailText,   // 2026-11-09: the details line's words for a path
   };
 }
