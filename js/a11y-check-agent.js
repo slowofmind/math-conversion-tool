@@ -1,6 +1,7 @@
 // js/a11y-check-agent.js — the accessibility check's helper. Placed, as text, in each PREVIEW COPY
 // of an HTML page, just before </body>, by js/a11y-check.js, followed by Sa11y's own files
-// (sa11y-5.1.0/, loaded by address). Never in a download.
+// (sa11y-5.1.0/, carried inside data: addresses since 2026-11-09; by address only as a fallback).
+// Never in a download.
 //
 // Plan: accessibility-checker\PLAN-ACCESSIBILITY-CHECKER.md. Written in the same plain style as
 // preview-helper.js and mathcat-proof-agent.js (no modules, no newer syntax), and it must never

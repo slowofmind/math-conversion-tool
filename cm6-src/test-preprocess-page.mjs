@@ -51,7 +51,8 @@ const accs = prep ? [...prep.querySelectorAll('.sidebar-body > .prep-accordion')
 const accTitles = accs.map((a) => text(a.querySelector('.prep-accordion-toggle')).replace(/^▸/, ''));
 // [CLAUDE 2026-11-08] Intent snippets added as the fourth (snippet tool in the editor, Alt+Shift+I;
 // Nicholas 2026-11-08 "Build it this way").
-ok('four accordions, in order', accTitles.join(' | ') === 'Images | LaTeX preprocessing | Math notation review | Intent snippets', accTitles.join(' | '));
+// 2026-11-09 (Nicholas): LaTeX Find/Replace, the sidebar section once called Cleanup, moved here as the fifth.
+ok('five accordions, in order', accTitles.join(' | ') === 'Images | LaTeX preprocessing | Math notation review | Intent snippets | LaTeX Find/Replace', accTitles.join(' | '));
 ok('no numbered steps left', steps.length === 0 && !prep?.querySelector('.prep-num'), String(steps.length));
 const imgPanel = doc.getElementById('prepImagesPanel');
 const imgBtns = imgPanel ? [...imgPanel.querySelectorAll('button')].map((b) => b.id + '=' + text(b)).join(',') : '';
@@ -76,9 +77,13 @@ for (const a of [A_IMPORT, A_MATHCAT, A_PP_SECTION, A_TABS])
 group('F2 call 87: the LaTeX preprocessing accordion and its "Process file" button');
 const s5 = doc.getElementById('prepPreprocessPanel');
 ok('it comes right after Images', accs[0]?.id === 'prepImages' && !!s5 && !!accs[1]?.contains(s5), accs.map((a) => a.id).join(','));
+// 2026-11-09 (Nicholas): an "Autoprocess" box beside the button, and an Options accordion under it with "Hide temp
+// files" ("I am thinking of adding an accordion under the "Process file" button, and having the checkbox live in that
+// accordion"). Was: it holds exactly one button.
 const btns = s5 ? [...s5.querySelectorAll('button')] : [];
 const btn = btns[0] || null;
-ok('it holds exactly one button', btns.length === 1, String(btns.length));
+ok('it holds two buttons: Process file, then the Options accordion\'s toggle',
+  btns.length === 2 && btns[1].classList.contains('prep-accordion-toggle'), btns.map((b) => b.id).join(','));
 ok('a prep-btn of type button', !!btn && btn.classList.contains('prep-btn') && btn.getAttribute('type') === 'button');
 ok('labelled "Process file"', text(btn) === 'Process file', text(btn));
 const bid = btn?.id || '';
@@ -88,6 +93,166 @@ ok('no hint, description or tooltip', !!btn && !btn.hasAttribute('aria-described
 const h = text(doc.getElementById('preprocessNote'));
 for (const w of ['Process file', 'copies', 'main-pp.tex', 'original'])
   ok('the Preprocess view\'s note mentions ' + w, h.includes(w), h.slice(0, 80));
+
+// ── P1, 2026-11-09 (Nicholas, preprocess-autoconvert\NOTE-PREPROCESS-AUTOCONVERT-ANALYSIS.md) ──────────────────
+// "the "preprocess" button should [have] an "autoconvert" checkbox similar to the "image handling buttons" ... have
+// preprocessing run when the "convert" button is pushed"; "-pp" copies hidden by default ("hide temp files"), the box
+// in an accordion under "Process file". Settings are not remembered between visits (as the image boxes).
+group('P1 2026-11-09: Autoprocess beside Process file; Options with Hide temp files; Convert through preprocessing');
+ok('the panel is a two-column grid, as Images is', !!s5 && s5.classList.contains('prep-grid'));
+const autoBox = doc.getElementById('chkAutoPreprocess');
+const autoLbl = autoBox && autoBox.closest('label');
+ok('an "Autoprocess" checkbox, ticked, beside the button in the same row, styled as the image boxes',
+  !!autoBox && autoBox.type === 'checkbox' && autoBox.hasAttribute('checked') && !!autoLbl &&
+  autoLbl.classList.contains('image-auto') && !!btn && autoLbl.parentElement === btn.parentElement &&
+  btn.parentElement.classList.contains('image-row') && text(autoLbl).startsWith('Autoprocess'), autoLbl ? text(autoLbl) : '');
+ok('its name adds screen-reader-only words, as the image boxes\' do', !!autoLbl && !!autoLbl.querySelector('.sr-only'));
+const optAcc = doc.getElementById('prepPreprocessOptions');
+const optToggle = doc.getElementById('prepPreprocessOptionsToggle');
+const optPanel = doc.getElementById('prepPreprocessOptionsPanel');
+ok('an Options accordion inside the panel, right after the row', !!optAcc && !!s5 && s5.contains(optAcc) &&
+  optAcc.classList.contains('prep-accordion') && !!btn && optAcc.previousElementSibling === btn.parentElement);
+ok('its heading is an h4 holding the toggle "Options"', !!optToggle && optToggle.parentElement?.tagName === 'H4' &&
+  optToggle.classList.contains('prep-accordion-toggle') && text(optToggle).endsWith('Options'), optToggle ? text(optToggle) : '');
+ok('the toggle controls its panel, starts open, and remembers under its own key, as the other accordions do',
+  !!optToggle && !!optPanel && optToggle.getAttribute('aria-controls') === optPanel.id &&
+  optToggle.getAttribute('aria-expanded') === 'true' && optToggle.dataset.store === 'atc.prep.preprocess.options' &&
+  optPanel.getAttribute('role') === 'region' && optPanel.getAttribute('aria-labelledby') === optToggle.id);
+const hideBox = doc.getElementById('chkHideTempFiles');
+ok('"Hide temp files", ticked, in the Options panel', !!hideBox && hideBox.type === 'checkbox' &&
+  hideBox.hasAttribute('checked') && !!optPanel && optPanel.contains(hideBox) &&
+  text(hideBox.closest('label')).startsWith('Hide temp files'), hideBox ? text(hideBox.closest('label')) : '');
+const convAt = js.indexOf("document.getElementById('btnConvert').addEventListener('click'");
+const conv = convAt >= 0 ? js.slice(convAt, convAt + 900) : '';
+ok('Convert goes through preprocessing (auto) when Autoprocess applies, else converts as before',
+  /if \(autoPreprocessApplies\(\)\) runPreprocess\(\{ auto: true \}\);\s*else runConversion\(\);/.test(conv), conv.slice(0, 160));
+const appAt = js.indexOf('function autoPreprocessApplies(');
+const applies = appAt >= 0 ? js.slice(appAt, appAt + 500) : '';
+ok('...which needs Autoprocess ticked, no binary input file, and LaTeX input',
+  /chkAutoPreprocess/.test(applies) && /inputBinaryFile/.test(applies) && /'latex'/.test(applies), applies.slice(0, 160));
+ok('runConversion takes the preprocessed text (pre)', /async function runConversion\(pre = null\)/.test(js));
+ok('the file tree and its summary leave out tagged copies while Hide temp files is ticked, and redraw on a change',
+  /const hideTempFile = \(e\) => e\.source === 'preprocessed' && !!document\.getElementById\('chkHideTempFiles'\)\?\.checked;/.test(js) &&
+  /hideEntry: hideTempFile/.test(js) && /projectModel\.summaryText\(\{ skip: hideTempFile \}\)/.test(js) &&
+  /getElementById\('chkHideTempFiles'\)\?\.addEventListener\('change', \(\) => fileTree\.render\(\)\)/.test(js));
+
+// ── P2, 2026-11-09: preprocessing's log lines survive the conversion they start ──────────────────────
+// Found in the browser: every conversion redraws the whole Log, so a press's own lines (what was saved; with
+// Autoprocess, why preprocessing did not run) vanished once its conversion logged. They are collected while a press
+// runs and put at the top of that conversion's Log; a press that converts nothing leaves nothing behind.
+group('P2 2026-11-09: a press\'s log lines kept at the top of its conversion\'s Log');
+ok('the glue logs through logPreprocess: shown at once, and collected while a press runs',
+  /let preprocessLines = null;/.test(js) &&
+  /function logPreprocess\(w\) \{ if \(preprocessLines\) preprocessLines\.push\(\.\.\.w\); updateLog\(w\); \}/.test(js) &&
+  /updateLog: logPreprocess/.test(js));
+ok('every press goes through runPreprocess: collecting for that press only; a press during a press ignored',
+  /const \{ run: runPreprocessPress \} = initPreprocess\(\{/.test(js) &&
+  /async function runPreprocess\(opts\) \{\s*if \(preprocessLines\) return false;\s*preprocessLines = \[\];\s*try \{ return await runPreprocessPress\(opts\); \} finally \{ preprocessLines = null; \}\s*\}/.test(js));
+ok('the conversion puts them first in its Log',
+  /const warnings = parseWarnings\(result\.warnings, result\.stderr, sourceText \|\| ''\);\s*\n\s*\/\/[^\n]*\n\s*if \(preprocessLines && preprocessLines\.length\) warnings\.unshift\(\.\.\.preprocessLines\.splice\(0\)\);/.test(js));
+
+// ── P3, 2026-11-09 (Nicholas): experimental sections ─────────────────────────────────────────────────────────────
+// Math notation review and Intent snippets: "I want the accordion for each to appear greyed out and have a hover
+// message that reads "Experimental, under construction". users can still click on them and try them ... When either
+// is expanded, I want the message "Under construction" to appear directly under the expanded accordion label. When
+// expanded, the labels do not need to appear greyed out." Tooltip option (b) ("I agree with you about option "(b)""):
+// on hover AND keyboard focus, with the same words as the label's description for screen readers; greys pass 4.5:1.
+// Then: "do the same thing for the "Cleanup" accordion, but also change the name from "Cleanup" to "LaTeX
+// Find/Replace"" - a sidebar section, so its tooltip opens upward (a collapsed section can sit at the sidebar's bottom
+// edge). One shared rule: a section marked "experimental" gets all of this.
+group('P3 2026-11-09: experimental sections (Math notation review, Intent snippets, LaTeX Find/Replace)');
+const css = [...doc.querySelectorAll('style')].map((s) => s.textContent).join('\n');
+const lum = (hex) => { const c = hex.replace('#', '').match(/../g).map((x) => parseInt(x, 16) / 255)
+  .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+const cssVar = (n) => (new RegExp('--' + n + ':\\s*(#[0-9a-fA-F]{6})').exec(css) || [])[1];
+const EXP = [
+  { name: 'Math notation review', tog: 'prepReviewToggle', tip: 'prepReviewTip', note: '#prepReviewPanel', grey: '#5f5f5f',
+    bgs: ['bg-primary', 'bg-elevated'], rule: '.prep-accordion.experimental .prep-accordion-toggle[aria-expanded="false"] { color: #5f5f5f; }' },
+  { name: 'Intent snippets', tog: 'prepSnippetsToggle', tip: 'prepSnippetsTip', note: '#prepSnippetsPanel', grey: '#5f5f5f',
+    bgs: ['bg-primary', 'bg-elevated'], rule: '.prep-accordion.experimental .prep-accordion-toggle[aria-expanded="false"] { color: #5f5f5f; }' },
+  { name: 'LaTeX Find/Replace', tog: 'prepFindReplaceToggle', tip: 'prepFindReplaceTip', note: '#prepFindReplacePanel', grey: '#5f5f5f',
+    bgs: ['bg-primary', 'bg-elevated'], rule: '.prep-accordion.experimental .prep-accordion-toggle[aria-expanded="false"] { color: #5f5f5f; }' },
+];
+for (const s of EXP) {
+  const t = doc.getElementById(s.tog), tp = doc.getElementById(s.tip), box = t && t.parentElement && t.parentElement.parentElement;
+  ok(`${s.name}: its section marked experimental`, !!box && box.classList.contains('experimental'));
+  ok(`${s.name}: its label described by a tooltip "Experimental, under construction", right after the label in the heading`,
+    !!t && !!tp && t.getAttribute('aria-describedby') === s.tip && tp.getAttribute('role') === 'tooltip' &&
+    tp.classList.contains('exp-tip') && text(tp) === 'Experimental, under construction' &&
+    tp.parentElement === t.parentElement && tp.previousElementSibling === t, tp ? text(tp) : '(none)');
+  ok(`${s.name}: the label still a plain, clickable toggle (not disabled)`, !!t && !t.disabled && !t.hasAttribute('aria-disabled'));
+  const holder = doc.querySelector(s.note), first = holder && holder.firstElementChild;
+  ok(`${s.name}: "Under construction" is the first line under the label when expanded`, !!first &&
+    first.classList.contains('exp-note') && text(first) === 'Under construction', first ? first.outerHTML.slice(0, 90) : '(none)');
+  const rs = s.bgs.map((b) => [b, cssVar(b)]).map(([b, h]) => `${b} ${h} ${h ? ratio(s.grey, h).toFixed(2) : '?'}`);
+  ok(`${s.name}: collapsed label grey ${s.grey}, passing 4.5:1 on ${s.bgs.join(' and ')}`, css.includes(s.rule) &&
+    s.bgs.every((b) => cssVar(b) && ratio(s.grey, cssVar(b)) >= 4.5), rs.join(' / '));
+}
+// Then: "I want to change "LaTeX Find/Replace" so that it is a subcategory of "File Preparation" rather than it's own
+// top-level feature." Last of File Preparation's accordions (F0); its controls keep their ids.
+const fr = doc.getElementById('prepFindReplaceToggle'), frPanel = doc.getElementById('prepFindReplacePanel');
+ok('LaTeX Find/Replace is an accordion inside File Preparation (an h3 under its h2), its region named by its label',
+  !!fr && text(fr).replace(/^▸\s*/, '') === 'LaTeX Find/Replace' && fr.parentElement.tagName === 'H3' &&
+  !!fr.closest('#railPanelPrepare') && !!frPanel && frPanel.getAttribute('aria-labelledby') === 'prepFindReplaceToggle',
+  fr ? text(fr) : '(none)');
+ok('its controls moved with it, ids unchanged (profile, scope, conversion box, run button)',
+  ['cleanupProfile', 'profileScopeHeader', 'chkCleanupOnConvert', 'btnRunCleanup'].every((id) => !!frPanel && frPanel.contains(doc.getElementById(id))));
+const railLabels = [...doc.querySelectorAll('.rail-section-toggle')].map((b) => text(b).replace(/^▸\s*/, '')).join(' | ');
+ok('the sidebar has two top-level sections now: Project Files and File Preparation',
+  railLabels === 'Project Files | File Preparation' && !doc.getElementById('railtab-cleanup') && !doc.getElementById('railPanelCleanup') &&
+  !/railtab-cleanup|railPanelCleanup/.test(js), railLabels);
+ok('no sidebar section or File Preparation accordion is labelled "Cleanup"',
+  ![...doc.querySelectorAll('.rail-section-toggle, .prep-accordion-toggle')].some((b) => /\bCleanup\b/.test(text(b))));
+const HEADS = '.experimental > :is(.prep-accordion-heading, .rail-section-heading)';
+ok('CSS, one shared rule: tooltip hidden; shown on hover and on keyboard focus while collapsed, not once dismissed; upward when flipped',
+  /\.exp-tip \{ display: none;/.test(css) &&
+  css.includes(HEADS + ':not(.tip-dismissed):hover > [aria-expanded="false"] + .exp-tip') &&
+  css.includes(HEADS + ':not(.tip-dismissed) > [aria-expanded="false"]:focus-visible + .exp-tip') &&
+  css.includes('.exp-tip.tip-up { top: auto; bottom: 100%; }') && !css.includes('.rail-section.experimental .exp-tip {'));
+ok('the old one-off names are gone (prep-experimental, prep-tip, prep-under-construction)',
+  !/prep-experimental|prep-tip|prep-under-construction/.test(html));
+const tipsAt = js.indexOf('function initExperimentalTips(');
+const tipsJs = tipsAt >= 0 ? js.slice(tipsAt, tipsAt + 4000) : '';
+ok('Escape hides a showing tooltip in any experimental section; it can show again once the pointer or focus leaves; started once',
+  tipsJs.includes(`'${HEADS}'`) && /'Escape'/.test(tipsJs) && /tip-dismissed/.test(tipsJs) && /mouseleave/.test(tipsJs) &&
+  /focusout/.test(tipsJs) && count(js, 'initExperimentalTips();') === 1);
+// 2026-11-09, found in the browser: under LaTeX Find/Replace, File Preparation's last accordion, the tooltip was
+// clipped by 6 px at the bottom of File Preparation's scrolling area. Each time a tooltip shows, it opens upward if
+// that area has no room below the label (and has room above).
+ok('a tooltip opens upward when the area it scrolls in has no room below its label (decided each time it shows)',
+  /'mouseenter'/.test(tipsJs) && /'focusin'/.test(tipsJs) && /tip-up/.test(tipsJs) && /overflowY/.test(tipsJs) &&
+  /getBoundingClientRect/.test(tipsJs));
+
+// ── P4, 2026-11-09 (Nicholas): which File Preparation accordions start open ──────────────────────────────────────
+// "I want for "Images" and "LaTeX preprocessing" to start open, but the other three (math notation, intent snippets,
+// and now latex find/replace) to all start closed." Each starts as its markup says; a reader's own choice, remembered
+// under its data-store key, still wins. (LaTeX preprocessing's nested Options accordion is unchanged: open.)
+group('P4 2026-11-09: File Preparation accordions start open or closed as their markup says');
+const START = { prepImagesToggle: true, prepPreprocessToggle: true, prepPreprocessOptionsToggle: true,
+  prepReviewToggle: false, prepSnippetsToggle: false, prepFindReplaceToggle: false };
+for (const [id, open] of Object.entries(START)) {
+  const t = doc.getElementById(id), p = t && doc.getElementById(t.getAttribute('aria-controls'));
+  ok(`${id}: its markup starts it ${open ? 'open' : 'closed'}`, !!t && !!p && t.getAttribute('aria-expanded') === String(open) && p.hidden === !open,
+    t ? `aria-expanded=${t.getAttribute('aria-expanded')} hidden=${p && p.hidden}` : '(none)');
+}
+const initAt = js.indexOf('function initPrepAccordions()'), initEnd = js.indexOf('\ninitPrepAccordions();', initAt);
+const initSrc = initAt >= 0 && initEnd > initAt ? js.slice(initAt, initEnd) : '';
+const runInit = (stored) => {   // the page's own initPrepAccordions, on a fresh copy of the page, with a stand-in storage
+  const d = new JSDOM(html).window.document;
+  const store = { getItem: (k) => (k in stored ? stored[k] : null), setItem: (k, v) => { stored[k] = v; } };
+  new Function('document', 'localStorage', initSrc + '\ninitPrepAccordions();')(d, store);
+  return (id) => { const t = d.getElementById(id), p = t && d.getElementById(t.getAttribute('aria-controls'));
+    return !!t && !!p && t.getAttribute('aria-expanded') === 'true' && !p.hidden; };
+};
+let fresh = null, chosen = null;
+try { fresh = runInit({}); chosen = runInit({ 'atc.prep.review': 'open', 'atc.prep.images': 'closed' }); }
+catch (e) { console.log('   (initPrepAccordions did not run: ' + e.message + ')'); }
+ok('nothing remembered: Images and LaTeX preprocessing open; Math notation review, Intent snippets, LaTeX Find/Replace closed',
+  !!fresh && fresh('prepImagesToggle') && fresh('prepPreprocessToggle') && !fresh('prepReviewToggle') &&
+  !fresh('prepSnippetsToggle') && !!doc.getElementById('prepFindReplaceToggle') && !fresh('prepFindReplaceToggle'));
+ok('a remembered choice still wins (Math notation review remembered open, Images remembered closed)',
+  !!chosen && chosen('prepReviewToggle') && !chosen('prepImagesToggle') && !chosen('prepSnippetsToggle'));
 
 // ── F3, call 88: the Preprocess tab, after Intent, and its panel ──────
 group('F3 call 88, revised 2026-10-06: Preprocess in the Output view drop-down, and its panel');

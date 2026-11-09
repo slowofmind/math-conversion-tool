@@ -30,6 +30,11 @@
 // E8 call 82; E9 Nicholas's session-50 decision (the tool's own reading
 // says the target is not a document: refused); E10 a failure; E11 call 79.
 // E19 (latex-preprocess s267): a subfile processed on its own.
+// 2026-11-09 (Nicholas, preprocess-autoconvert\NOTE-PREPROCESS-AUTOCONVERT-ANALYSIS.md): "If users click on the
+// manual "Process file" button, it should stay on the original" - a press no longer opens the -pp copy; the copy's
+// text is converted through runConversion(pre) while the editor and the target stay on the original. Revised for
+// it: E2b, E2c, E3b, E6 (and E6e-f, a press from the copy), E7c's set-up, E8b, E16b, E19b. E21: Autoprocess, a
+// press from Convert ({ auto: true }) that converts the original wherever a press would stop.
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -153,9 +158,15 @@ async function world(files, { open = 'main.tex', typed, exclude = [],
     rec.opens.push(entry.path);
     syncAuxFiles();
   }
-  const runConversion = async () => {
-    rec.convs.push({ target: m.project.convertTargetPath, stdin: editor.getText(),
-                     aux: view(m.toAuxFiles()) });
+  // As the page's runConversion (index.html SECTION 6). No argument: the editor's text, the projection as the
+  // page holds it. pre = { text, master, converted } (2026-11-09): pre.text, the preprocessed copy of pre.master,
+  // with every tagged copy served under its original's name (toAuxFiles({ preprocessed, stdin })); the Report
+  // view is told pre.converted. `converted` records whose text was converted; `target` stays the model's target.
+  const runConversion = async (pre) => {
+    rec.convs.push(pre
+      ? { target: m.project.convertTargetPath, converted: pre.converted, master: pre.master, stdin: pre.text,
+          aux: view(m.toAuxFiles({ preprocessed: true, stdin: pre.master })) }
+      : { target: m.project.convertTargetPath, stdin: editor.getText(), aux: view(m.toAuxFiles()) });
   };
   await openProjectFile(m.getEntry(open));
   rec.opens.length = 0; rec.syncs.length = 0;
@@ -188,7 +199,7 @@ async function world(files, { open = 'main.tex', typed, exclude = [],
     ...(names ? { loadNames: async () => { rec.nameLoads = (rec.nameLoads || 0) + 1; return names(); },
                   keepRun: (k) => { (rec.kept ??= []).push(k); } } : {}),
   });
-  return { m, editor, rec, press: () => glue.run(), open: openProjectFile };
+  return { m, editor, rec, press: () => glue.run(), auto: () => glue.run({ auto: true }), open: openProjectFile };
 }
 // Reports and log lines written since a mark, so a second press is judged
 // on what IT said, not on what the first press said.
@@ -216,12 +227,13 @@ sect('E2 a style file changed: its -pp copy and main-pp.tex, converted through t
   eq('E2a copies of the changed file and of the target, tagged; originals as they were', snap(m), [
     line('handout-pp.sty', 'preprocessed', STY_OUT), line('handout.sty', 'upload', STY),
     line('main-pp.tex', 'preprocessed', MAIN_STY), line('main.tex', 'upload', MAIN_STY)].sort());
-  eq('E2b the editor on main-pp.tex, and main-pp.tex the target',
+  // 2026-11-09: "it should stay on the original". Was: the editor on main-pp.tex, and main-pp.tex the target.
+  eq('E2b the editor stays on main.tex, and main.tex stays the target',
      [m.project.mainPath, m.project.convertTargetPath, editor.getText()],
-     ['main-pp.tex', 'main-pp.tex', MAIN_STY]);
-  eq('E2c converted once, handout-pp.sty served as handout.sty', rec.convs,
-     [{ target: 'main-pp.tex', stdin: MAIN_STY,
-        aux: { 'handout.sty': STY_OUT, 'main.tex': MAIN_STY } }]);
+     ['main.tex', 'main.tex', MAIN_STY]);
+  eq('E2c converted once: main-pp.tex\'s text, handout-pp.sty served as handout.sty', rec.convs,
+     [{ target: 'main.tex', converted: 'main-pp.tex', master: 'main.tex', stdin: MAIN_STY,
+        aux: { 'handout.sty': STY_OUT } }]);
   ok('E2d the page resynced after the last change to the model',
      rec.syncs.length > 0 && same(rec.syncs[rec.syncs.length - 1], snap(m)));
   ok('E2e the tool\'s report shown, once',
@@ -236,8 +248,8 @@ sect('E3 the main file itself changed');
   await press();
   eq('E3a main-pp.tex carries the change; no other copy', snap(m),
      [line('main-pp.tex', 'preprocessed', MAIN_LONG_OUT), line('main.tex', 'upload', MAIN_LONG)].sort());
-  eq('E3b main-pp.tex converted as the tool wrote it',
-     rec.convs.map((c) => [c.target, c.stdin]), [['main-pp.tex', MAIN_LONG_OUT]]);
+  eq('E3b main-pp.tex converted as the tool wrote it; main.tex still the target (2026-11-09)',
+     rec.convs.map((c) => [c.target, c.converted, c.stdin]), [['main.tex', 'main-pp.tex', MAIN_LONG_OUT]]);
 }
 
 // ── E4 ─────────────────────────────────────────────────────────────
@@ -275,26 +287,44 @@ for (const held of ['handout-pp.sty', 'main-pp.tex']) {
 }
 
 // ── E6 ─────────────────────────────────────────────────────────────
-sect('E6 a second press, from main-pp.tex, replaces only the tool\'s own earlier files');
+sect('E6 a second press replaces only the tool\'s own earlier files');
 {
+  // 2026-11-09: the editor stays on main.tex, so the author edits the main file on screen (was: in the model, the
+  // editor being on main-pp.tex). The press hands the tool the editor's text and, having run, puts it in the model.
   const { m, editor, rec, press } = await world([['main.tex', MAIN_STY], ['handout.sty', STY],
     ['my-pp.tex', MINE], ['figs/plot.svg', SVG, 'derived']]);
-  await press();                                     // as E2: two copies
+  await press();                                     // as E2: two copies; the editor stays on main.tex
   m.updateText('handout.sty', STY_OUT);              // the author fixes the style
-  m.updateText('main.tex', P2C_IN);                  // and edits the main file
+  editor.type(P2C_IN);                               // and edits the main file, on screen
   await press();                                     // probe 3 P2C
-  eq('E6a the stale copy gone, main-pp.tex rewritten, everything else untouched', snap(m), [
+  eq('E6a the stale copy gone, main-pp.tex rewritten, everything else untouched; main.tex holds the edit', snap(m), [
     line('figs/plot.svg', 'derived', SVG), line('handout.sty', 'upload', STY_OUT),
     line('main-pp.tex', 'preprocessed', P2C_OUT), line('main.tex', 'upload', P2C_IN),
     line('my-pp.tex', 'upload', MINE)].sort());
   const h = rec.handed[1] || { files: {} };
-  eq('E6b pressed from main-pp.tex, the tool is handed its original',
-     { entry: h.entry, pp: 'main-pp.tex' in h.files }, { entry: 'main.tex', pp: false });
-  eq('E6c the editor shows the NEW main-pp.tex, and the model agrees, unedited',
-     [editor.getText(), m.getText('main-pp.tex'), m.isDirty('main-pp.tex')], [P2C_OUT, P2C_OUT, false]);
-  eq('E6d the second conversion is of the new text', rec.convs[1],
-     { target: 'main-pp.tex', stdin: P2C_OUT, aux: { 'figs/plot.svg': SVG,
-       'handout.sty': STY_OUT, 'main.tex': P2C_IN, 'my-pp.tex': MINE } });
+  eq('E6b the tool is handed the original as typed, never a copy',
+     { entry: h.entry, pp: 'main-pp.tex' in h.files, main: h.files['main.tex'] },
+     { entry: 'main.tex', pp: false, main: P2C_IN });
+  eq('E6c the editor still on main.tex with the author\'s text; main-pp.tex the new output, unedited',
+     [editor.current, editor.getText(), m.getText('main-pp.tex'), m.isDirty('main-pp.tex')],
+     ['main.tex', P2C_IN, P2C_OUT, false]);
+  eq('E6d the second conversion is of the new copy\'s text', rec.convs[1],
+     { target: 'main.tex', converted: 'main-pp.tex', master: 'main.tex', stdin: P2C_OUT,
+       aux: { 'figs/plot.svg': SVG, 'handout.sty': STY_OUT, 'my-pp.tex': MINE } });
+}
+{
+  // Temp files shown and main-pp.tex opened from the tree (it becomes the target, as any document does); then a
+  // press: the tool is handed the original, and the editor and the target return to main.tex.
+  const { m, editor, rec, press, open } = await world([['main.tex', MAIN_STY], ['handout.sty', STY]]);
+  await press();
+  await open(m.getEntry('main-pp.tex'));
+  eq('E6e set-up: the editor and the target on main-pp.tex',
+     [m.project.mainPath, m.project.convertTargetPath], ['main-pp.tex', 'main-pp.tex']);
+  await press();
+  eq('E6f pressed from main-pp.tex: handed main.tex; the editor and the target back on main.tex; the copy converted',
+     { entry: (rec.handed[1] || {}).entry, where: [m.project.mainPath, m.project.convertTargetPath, editor.current],
+       conv: rec.convs[1] && [rec.convs[1].target, rec.convs[1].converted] },
+     { entry: 'main.tex', where: ['main.tex', 'main.tex', 'main.tex'], conv: ['main.tex', 'main-pp.tex'] });
 }
 
 // ── E7 ─────────────────────────────────────────────────────────────
@@ -312,8 +342,9 @@ sect('E7 call 81: an earlier copy edited since the tool wrote it stops the run')
   ok('E7b the log names handout-pp.sty', names(since(rec.logs, l), 'handout-pp.sty'));
 }
 {
-  const { m, editor, rec, press } = await world([['main.tex', MAIN_STY], ['handout.sty', STY]]);
-  await press();                                     // the editor now on main-pp.tex
+  const { m, editor, rec, press, open } = await world([['main.tex', MAIN_STY], ['handout.sty', STY]]);
+  await press();
+  await open(m.getEntry('main-pp.tex'));   // 2026-11-09: a press no longer opens the copy; temp files shown, opened from the tree
   const typedPp = MAIN_STY + '% typed in main-pp.tex, not yet captured\n';
   editor.type(typedPp);
   const before = snap(m), r = rec.reports.length;
@@ -336,9 +367,9 @@ sect('E8 call 82: nothing changed now, so the earlier copies go and the original
      { files: snap(m), convs: rec.convs.length },
      { files: [line('handout.sty', 'upload', STY_OUT), line('main.tex', 'upload', MAIN_STY),
                line('my-pp.tex', 'upload', MINE)].sort(), convs: 2 });
-  eq('E8b the editor back on main.tex, main.tex the target, opened by the page',
+  eq('E8b the editor never left main.tex, main.tex the target, nothing opened (2026-11-09; was: main-pp.tex, then main.tex)',
      { where: [m.project.mainPath, m.project.convertTargetPath, editor.getText()], opens: rec.opens },
-     { where: ['main.tex', 'main.tex', MAIN_STY], opens: ['main-pp.tex', 'main.tex'] });
+     { where: ['main.tex', 'main.tex', MAIN_STY], opens: [] });
   eq('E8c the second conversion is of main.tex, nothing swapped', rec.convs[1],
      { target: 'main.tex', stdin: MAIN_STY, aux: { 'handout.sty': STY_OUT, 'my-pp.tex': MINE } });
   ok('E8d the page resynced after the last change to the model',
@@ -443,7 +474,7 @@ sect('E15 with no document to convert, a press is refused');
 sect('E16 nothing changed, the editor on a style file: the target returns, the editor stays');
 {
   const { m, editor, rec, press, open } = await world([['main.tex', MAIN_STY], ['handout.sty', STY]]);
-  await press();                                     // as E2: main-pp.tex the target
+  await press();                                     // as E2 (2026-11-09: the editor and the target stay on main.tex)
   await open(m.getEntry('handout.sty'));             // the page's own open keeps the target
   editor.type(STY_OUT);                              // the author fixes the style on screen
   await press();                                     // probe 3 P2N: nothing left to change
@@ -452,8 +483,8 @@ sect('E16 nothing changed, the editor on a style file: the target returns, the e
        editor.current, editor.getText()] },
      { files: [line('handout.sty', 'upload', STY), line('main.tex', 'upload', MAIN_STY)],
        where: ['handout.sty', 'main.tex', 'handout.sty', STY_OUT] });
-  eq('E16b converted twice, the second time main.tex',
-     rec.convs.map((c) => c.target), ['main-pp.tex', 'main.tex']);
+  eq('E16b converted twice: main-pp.tex\'s text, then main.tex; main.tex the target both times (2026-11-09)',
+     rec.convs.map((c) => [c.target, c.converted || c.target]), [['main.tex', 'main-pp.tex'], ['main.tex', 'main.tex']]);
 }
 
 // ── E17 ────────────────────────────────────────────────────────────
@@ -518,9 +549,9 @@ sect('E19 a subfile processed on its own: the parent\'s preamble spliced in; a m
   eq('E19a one copy, ws/a-pp.tex, with main.tex\'s preamble and the call written out; originals as they were',
      snap(m), [line('main.tex', 'upload', SUB_MAIN), line('ws/a-pp.tex', 'preprocessed', SUB_OUT),
                line('ws/a.tex', 'upload', SUB)].sort());
-  eq('E19b converted once: ws/a-pp.tex, its text on stdin; the editor on it',
-     { convs: rec.convs.map((c) => [c.target, c.stdin]), editor: editor.current },
-     { convs: [['ws/a-pp.tex', SUB_OUT]], editor: 'ws/a-pp.tex' });
+  eq('E19b converted once: ws/a-pp.tex\'s text on stdin; the editor and the target stay on ws/a.tex (2026-11-09)',
+     { convs: rec.convs.map((c) => [c.target, c.converted, c.stdin]), editor: editor.current },
+     { convs: [['ws/a.tex', 'ws/a-pp.tex', SUB_OUT]], editor: 'ws/a.tex' });
   ok('E19c the report shown, once; the log names ws/a-pp.tex',
      rec.reports.filter((r) => r.includes(REPORT_HEAD)).length === 1 && names(rec.logs, 'ws/a-pp.tex'), JSON.stringify(rec.logs));
 }
@@ -574,6 +605,69 @@ sect('E20 the names list handed to the run; the run and the originals kept for t
   ok('E20g the names list failing: converted anyway, without it; the log warns',
      rec.convs.length === 1 && rec.handed.length === 1 && rec.handed[0].latexNames === undefined &&
      (rec.levels || []).includes('warn') && rec.logs.some((l) => l.includes('names list')), JSON.stringify(rec.logs));
+}
+
+// ── E21 ────────────────────────────────────────────────────────────
+// 2026-11-09 (Nicholas): Autoprocess. Convert, with "Autoprocess" ticked and LaTeX input, presses with { auto: true }:
+// the same press, but wherever a manual press stops, it converts the original instead, as Convert would ("For today
+// though, we can fall back to converting the original"), saying why in the log only ("Don't worry yet about adding
+// messaging to the report related to preprocessing refusing or failing"): nothing written, no report, the log a
+// warning, the status loading, never error.
+sect('E21 Autoprocess: a press from Convert; where a press would stop, the original converted instead');
+{
+  const { m, editor, rec, auto } = await world([['main.tex', MAIN_STY], ['handout.sty', STY]]);
+  const r = await auto();
+  eq('E21a something changed: as a press - two copies, the editor on main.tex, main-pp.tex\'s text converted',
+     { r, files: snap(m).length, where: [m.project.mainPath, m.project.convertTargetPath, editor.current],
+       convs: rec.convs.map((c) => [c.target, c.converted]), reports: rec.reports.length },
+     { r: true, files: 4, where: ['main.tex', 'main.tex', 'main.tex'], convs: [['main.tex', 'main-pp.tex']], reports: 1 });
+}
+{
+  const { rec, auto } = await world([['main.tex', CLEAN]]);
+  await auto();
+  eq('E21b nothing changed: as a press - main.tex converted as it is',
+     rec.convs.map((c) => [c.target, c.converted, c.stdin]), [['main.tex', undefined, CLEAN]]);
+}
+for (const [label, files, opts, named] of [
+  ['the table does not load', [['main.tex', MAIN_STY], ['handout.sty', STY]],
+   { table: () => { throw new Error('forced table failure'); } }, 'forced table failure'],
+  ['the tool throws', [['main.tex', MAIN_STY], ['handout.sty', STY]],
+   { tool: { ...REAL, runProject() { throw new Error('forced tool failure'); } } }, 'forced tool failure'],
+  ['not a document (a chapter)', [['main.tex', CHAP_MAIN], ['chap1.tex', CHAP]], { open: 'chap1.tex' }, 'chap1.tex'],
+  ['a -pp name held by the author\'s own file', [['main.tex', MAIN_STY], ['handout.sty', STY],
+    ['handout-pp.sty', 'The author\'s own file.\n']], {}, 'handout-pp.sty'],
+  ['no document to convert', [['handout.sty', STY]], { open: 'handout.sty' }, 'no document']]) {
+  const { m, editor, rec, auto } = await world(files, opts);
+  const before = snap(m), shown = editor.getText(), target = m.project.convertTargetPath;
+  const r = await auto();
+  eq(`E21 ${label}: nothing written, no report; the original converted once, as Convert would`,
+     { r, same: same(snap(m), before), reports: rec.reports.length,
+       convs: rec.convs.map((c) => [c.target, c.converted, c.stdin]) },
+     { r: false, same: true, reports: 0, convs: [[target, undefined, shown]] });
+  ok(`E21 ${label}: the log warns, naming the reason and that the original is converted`,
+     (rec.levels || []).includes('warn') && !(rec.levels || []).includes('error') &&
+     rec.logs.some((l) => l.includes(named) && l.includes('converting the original') && l.includes('(Autoprocess)')), JSON.stringify(rec.logs));
+  ok(`E21 ${label}: the status says loading, never error`,
+     (rec.states || []).includes('loading') && !(rec.states || []).includes('error'), JSON.stringify(rec.states));
+}
+{
+  const { m, rec, press, auto } = await world([['main.tex', MAIN_STY], ['handout.sty', STY]]);
+  await press();
+  m.updateText('handout-pp.sty', STY_OUT + '% my edit\n');   // call 81: a copy edited by hand
+  const before = snap(m), r0 = rec.reports.length;
+  await auto();
+  eq('E21 a copy edited by hand: kept as it is, no report; main.tex converted as Convert would',
+     { same: same(snap(m), before), reports: rec.reports.length - r0,
+       last: rec.convs[1] && [rec.convs[1].target, rec.convs[1].converted] },
+     { same: true, reports: 0, last: ['main.tex', undefined] });
+}
+{
+  const { rec, auto } = await world([['main.tex', MAIN_STY], ['handout.sty', STY]]);
+  const settled = await Promise.allSettled([auto(), auto()]);   // Convert pressed again before the first ends
+  eq('E21 Convert during an Autoprocess: ignored - one run of the tool, one conversion',
+     { results: settled.map((s) => (s.status === 'fulfilled' ? s.value : 'threw')),
+       handed: rec.handed.length, convs: rec.convs.length },
+     { results: [true, false], handed: 1, convs: 1 });
 }
 
 console.log(`\n──────── ${pass} passed, ${fail} failed ────────`);

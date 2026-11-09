@@ -43,7 +43,7 @@ const FILTERS = [
 ];
 
 export function initFileTree({ getEntries, getSummaryText, getTargetPath,
-                               getFolderState, onOpen, onToggleInclude } = {}) {
+                               getFolderState, onOpen, onToggleInclude, hideEntry } = {}) {
   const host      = document.getElementById('fileTreeHost');
   const summaryEl = document.getElementById('fileTreeSummary');
   const filterSel = document.getElementById('fileTreeFilter');
@@ -177,7 +177,8 @@ export function initFileTree({ getEntries, getSummaryText, getTargetPath,
   }
 
   function render() {
-    const all = (getEntries ? getEntries() : []) || [];
+    // hideEntry (2026-11-09, Hide temp files): entries left out of the tree altogether, before any filter.
+    const all = ((getEntries ? getEntries() : []) || []).filter((e) => !(hideEntry && hideEntry(e)));
     const pred = (FILTERS.find(f => f[0] === activeFilter) || FILTERS[0])[2];
     const entries = all.filter(pred);
 

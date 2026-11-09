@@ -168,5 +168,62 @@ sect('D7 call 76: the editor on main-pp.tex, converting main.tex');
   eq('D7 same as the projection before step D', view(aux), view(today(m)));
 }
 
+// ── 2026-11-09 (Nicholas): preprocessing stays on the original; Autoprocess ──────────────
+// "If users click on the manual "Process file" button, it should stay on the original", and Convert with Autoprocess
+// converts the -pp result behind the scenes. So the copy is converted while the editor and the target stay on the
+// original: toAuxFiles({ preprocessed: true, stdin }) serves every tagged -pp copy under its original's name
+// whatever the target (calls 73-75 otherwise as before), and leaves out `stdin` - the file whose copy is the text
+// converted - instead of the editor's file, which is then served like any other.
+sect('D8 2026-11-09: the forced swap, the editor and the target on the original');
+{
+  const { m, b } = fixture();
+  m.setMainDocument('main.tex', 'MAIN original');
+  eq('D8a editor and target on main.tex', [m.project.mainPath, m.project.convertTargetPath], ['main.tex', 'main.tex']);
+  eq('D8b not forced: the projection as before step D', view(m.toAuxFiles()), view(today(m)));
+  const aux = m.toAuxFiles({ preprocessed: true, stdin: 'main.tex' });
+  eq('D8c forced: handout.sty carries the copy; main.tex (stdin) and both copies not served',
+     view(aux), { 'handout.sty': 'STY preprocessed' });
+  ok('D8d the copy\'s bytes themselves', aux['handout.sty'] === b.stypp);
+}
+{
+  const { m } = fixture();
+  m.setMainDocument('main.tex', 'MAIN original');
+  m.setMainDocument('handout.sty', 'STY original', { keepTarget: true });   // the editor on the style file
+  eq('D8e the editor on handout.sty, the target main.tex',
+     [m.project.mainPath, m.project.convertTargetPath], ['handout.sty', 'main.tex']);
+  eq('D8f forced with stdin main.tex: the editor\'s file is served (as its copy); main.tex is the one left out',
+     view(m.toAuxFiles({ preprocessed: true, stdin: 'main.tex' })), { 'handout.sty': 'STY preprocessed' });
+}
+{
+  const { m } = fixture();
+  m.setMainDocument('main.tex', 'MAIN original');
+  m.setInclude('handout-pp.sty', false);
+  eq('D8g call 75, forced: the copy excluded, the original\'s own bytes',
+     view(m.toAuxFiles({ preprocessed: true, stdin: 'main.tex' })), { 'handout.sty': 'STY original' });
+  m.setInclude('handout-pp.sty', true);
+  m.setInclude('handout.sty', false);
+  eq('D8h call 75, forced: the original excluded, nothing, no copy either',
+     view(m.toAuxFiles({ preprocessed: true, stdin: 'main.tex' })), {});
+}
+{
+  const { m } = fixture({ ppTag: 'upload' });
+  m.setMainDocument('main.tex', 'MAIN original');
+  eq('D8i forced: an untagged -pp file is never swapped (served as itself)',
+     view(m.toAuxFiles({ preprocessed: true, stdin: 'main.tex' })),
+     { 'handout-pp.sty': 'STY preprocessed', 'handout.sty': 'STY original' });
+}
+
+// "I want for the "-pp" file created during preprocessing to be hidden in the file tree by default": the tree leaves
+// them out, and its one-line summary (spoken on entering the tree) counts what it shows: summaryText({ skip }).
+sect('D9 2026-11-09: the summary can leave hidden files out');
+{
+  const { m } = fixture();
+  m.setMainDocument('main.tex', 'MAIN original');
+  const all = m.summaryText();
+  const shown = m.summaryText({ skip: (e) => e.source === 'preprocessed' });
+  ok('D9a every file counted: 4 files', all === '4 files. Converting main.tex.', all);
+  ok('D9b the copies skipped: 2 files, still converting main.tex', shown === '2 files. Converting main.tex.', shown);
+}
+
 console.log(`\n──────── ${pass} passed, ${fail} failed ────────`);
 process.exit(fail ? 1 : 0);

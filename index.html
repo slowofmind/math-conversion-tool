@@ -656,6 +656,28 @@
   .prep-accordion-toggle:hover { background: var(--bg-elevated); }
   .prep-accordion-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .prep-accordion-toggle[aria-expanded="true"] .rail-chevron { transform: rotate(90deg); }
+  /* Experimental sections (2026-11-09, Nicholas): Math notation review and Intent snippets (File Preparation
+     accordions) and LaTeX Find/Replace (once the sidebar section "Cleanup"). Mark a section's box (.prep-accordion
+     or .rail-section) with class "experimental", give its label aria-describedby pointing at an .exp-tip right after
+     it, and make <p class="exp-note">Under construction</p> the first line under the label.
+     Collapsed, the label is a lighter grey that still passes 4.5:1: accordions #5f5f5f (6.4:1 on white, 4.8:1 on the
+     hover background), sidebar sections #6e6e6e (4.7:1 on #f5f5f5; the other section labels are #4a4a4a). Expanded,
+     it is as the others. Collapsed, the tooltip "Experimental, under construction" shows on hover and on keyboard
+     focus (option (b)): the pointer can move onto it, it stays until the pointer or focus leaves, Escape hides it
+     (WCAG 1.4.13; initExperimentalTips); it wraps in a narrow sidebar. A tooltip opens upward when
+     the area it scrolls in has no room below its label (the last accordion at the bottom of File Preparation). Screen readers get the same words as the label's
+     description. The labels stay ordinary, clickable toggles. */
+  .experimental > :is(.prep-accordion-heading, .rail-section-heading) { position: relative; }
+  .prep-accordion.experimental .prep-accordion-toggle[aria-expanded="false"] { color: #5f5f5f; }
+  .rail-section.experimental .rail-section-toggle[aria-expanded="false"] { color: #6e6e6e; }
+  .exp-tip { display: none; position: absolute; left: 24px; top: 100%; z-index: 20; padding: 4px 8px;
+    width: max-content; max-width: calc(100% - 32px); border: 1px solid var(--border); border-radius: 4px;
+    background: var(--bg-primary); color: var(--text-primary); font-size: 12px; font-weight: 400;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+  .exp-tip.tip-up { top: auto; bottom: 100%; }
+  .experimental > :is(.prep-accordion-heading, .rail-section-heading):not(.tip-dismissed):hover > [aria-expanded="false"] + .exp-tip,
+  .experimental > :is(.prep-accordion-heading, .rail-section-heading):not(.tip-dismissed) > [aria-expanded="false"]:focus-visible + .exp-tip { display: block; }
+  .exp-note { margin: 0 0 6px; font-size: 12px; font-style: italic; color: var(--text-secondary); }
 /* Intent snippets [CLAUDE 2026-11-08] (snippets/snippet-panel.js) */
 .snip-panel label { display: block; margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
 .snip-panel input[type="search"], .snip-panel input[type="text"], .snip-panel select { width: 100%; box-sizing: border-box; margin-top: 2px; }
@@ -674,6 +696,8 @@
   .prep-btn.image-btn { font-size: 12px; padding: 3px 10px; }
   .image-auto { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
   .image-auto.image-option { grid-column: 2; }   /* under PDF to SVG's Autoconvert box */
+  /* An accordion inside a grid panel (LaTeX preprocessing > Options, 2026-11-09) spans both columns. */
+  .prep-accordion-panel.prep-grid > .prep-accordion { grid-column: 1 / -1; margin: 6px 0 0; }
   .prep-more { font-size: 11px; color: var(--text-muted); font-style: italic;
     text-align: center; padding: 6px 0; }
 
@@ -1174,8 +1198,10 @@
     gap: 6px;
   }
   .core-note { font-size: 12px; color: var(--text-muted); font-style: italic; }
-  /* Math conversion + Styling in the toolbar (2026-10-06), core view only; the selects
-     look like the toolbar's own while they are there. */
+  /* Math conversion, Intent handling and Output packaging in the toolbar: core view
+     2026-10-06, both views since 2026-11-09. The selects look like the toolbar's own.
+     Nothing hides the box now; the [hidden] rule just keeps hidden working with
+     display: contents. */
   #coreToolbarOptions { display: contents; }
   #coreToolbarOptions[hidden] { display: none; }
   .core-tool-label { display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; white-space: nowrap; }
@@ -1556,16 +1582,43 @@
       <option value="epub">epub</option>
       <option value="typst">typst</option>
     </select>
-    <!-- Math conversion and Styling (moved up from the core options row, 2026-10-06,
-         Nicholas): between Output and Convert. Core view only: in the full Pandoc view
-         the two controls move to their tabs (relocateControl) and this span is hidden
-         (applyOptionsView). Each label wraps its slot instead of using for=, as before. -->
+    <!-- Math conversion, Intent handling and Output packaging, between Output and Convert.
+         Moved up from the core options row 2026-10-06 (Nicholas), core view only at first.
+         2026-11-09 (Nicholas): they stay here in BOTH views, so the full Pandoc options
+         view shows the same row as the core view, with Input to the left of Output; the
+         full view's Math tab was removed. The three selects now live in this markup and
+         nothing moves them between views. Each label wraps its slot instead of using for=.
+         (The "core" in these ids is left over from when the row was core-view only.) -->
     <span id="coreToolbarOptions">
-      <label class="toolbar-label core-tool-label">Math conversion: <span id="core-slot-math"></span></label>
-      <!-- INTENT-CONTROL (stage 1, 2026-11-01): #opt-intent sits here in the core view,
-           in its Math-tab slot in the full view (relocateControl, like #opt-math). -->
-      <label class="toolbar-label core-tool-label">Intent handling: <span id="core-slot-intent"></span></label>
-      <label class="toolbar-label core-tool-label"><span class="style-label-text">Styling</span>: <span id="core-slot-style"></span></label>
+      <label class="toolbar-label core-tool-label">Math conversion: <span id="core-slot-math"><select id="opt-math" style="width:auto;">
+          <!-- Rebuilt at runtime by refreshMathOptions() to match the
+               selected output format. These initial entries are the
+               HTML-family list, matching the default output (html5); the
+               selected one, MathML (+ MathJax), is the default (2026-10-06). -->
+          <option value="mathjax-mathml">MathML</option>
+          <option value="mathjax-mathml-intent" selected>MathML (+ MathJax)</option>
+          <option value="mathml">MathML (texmath)</option>
+          <option value="mathjax4">MathJax (script tag)</option>
+          <option value="katex">KaTeX</option>
+          <option value="plain">Unicode</option>
+        </select></span></label>
+      <!-- INTENT-CONTROL (stage 1, 2026-11-01; STAGE1-BRIEF.md 5.4). Label and "greyed out
+           when not applicable" signed off by Nicholas 2026-11-01; aria-label keeps the name
+           "Intent handling". Greyed out (disabled) unless the math setting uses the custom
+           MathJax conversion: refreshIntentControl(). Here in both views since 2026-11-09;
+           #optIntentWhy, its hidden description, moved here from the removed Math tab. -->
+      <label class="toolbar-label core-tool-label">Intent handling: <span id="core-slot-intent"><select id="opt-intent" style="width:auto;" aria-label="Intent handling" aria-describedby="optIntentWhy"
+                title="Baseline: \MathMLintent and \MathMLarg (and the \intent / \iarg shorthand) become MathML intent and arg, copied as written. Off: no intent handling. Applies only to the custom MathJax conversion settings.">
+          <option value="baseline" selected>Baseline</option>
+          <option value="off">Off</option>
+        </select></span></label>
+      <span id="optIntentWhy" hidden>Baseline turns MathMLintent and MathMLarg into MathML intent. Off adds no intent. Used only by the custom MathJax conversion settings.</span>
+      <label class="toolbar-label core-tool-label"><span class="style-label-text">Styling</span>: <span id="core-slot-style"><select id="opt-style" style="width:auto;" aria-describedby="styleNote">
+          <!-- Rebuilt at runtime by refreshStyleOptions() to match the
+               selected output format. Initial entries: the HTML list. -->
+          <option value="standalone" selected>Standalone</option>
+          <option value="canvas">Canvas</option>
+        </select></span></label>
     </span>
   </div>
 
@@ -1626,17 +1679,11 @@
 <div class="options-panel view-core" id="optionsPanel" role="region" aria-label="Conversion options">
 
   <!-- ═══ CORE OPTIONS ROW ═══
-       One line. The math control is not duplicated here: the single
-       #opt-math element is MOVED between this slot and its Math-tab slot
-       when the view changes, so there is never a second copy of the
-       selection and every existing getElementById('opt-math') call site
-       keeps working. The From/To selects live in the toolbar and are
-       visible in both views, so they are repopulated but never moved.
-       The label wraps its slot instead of using for=, which avoids a
-       second label pointing at the same id once the control moves in. -->
-  <!-- Since 2026-10-06 the Math conversion and Styling slots are in the toolbar
-       (#coreToolbarOptions); this row keeps the two notes, and takes no space while
-       both are empty. -->
+       Holds only the two notes (#styleNote, #coreViewNote) and takes no space while
+       both are empty; hidden in the full Pandoc options view (CSS). The Math
+       conversion, Intent handling and Output packaging drop-downs are in the toolbar
+       (#coreToolbarOptions): in the core view since 2026-10-06, and in both views
+       since 2026-11-09 (Nicholas), so nothing moves between views any more. -->
   <div id="coreOptions">
     <span class="core-note" id="styleNote" role="status"></span>
     <span class="core-note" id="coreViewNote" role="status" aria-live="polite"></span>
@@ -1648,7 +1695,6 @@
     <button class="options-tab" data-tab="headings" role="tab" id="opttab-headings" aria-selected="false" aria-controls="panel-headings" tabindex="-1">Headings</button>
     <button class="options-tab" data-tab="media" role="tab" id="opttab-media" aria-selected="false" aria-controls="panel-media" tabindex="-1">Media</button>
     <button class="options-tab" data-tab="citations" role="tab" id="opttab-citations" aria-selected="false" aria-controls="panel-citations" tabindex="-1">Citations</button>
-    <button class="options-tab" data-tab="math" role="tab" id="opttab-math" aria-selected="false" aria-controls="panel-math" tabindex="-1">Math</button>
     <button class="options-tab" data-tab="code" role="tab" id="opttab-code" aria-selected="false" aria-controls="panel-code" tabindex="-1">Code</button>
     <button class="options-tab" data-tab="format" role="tab" id="opttab-format" aria-selected="false" aria-controls="panel-format" tabindex="-1">Format-Specific</button>
     <button class="options-tab" data-tab="template" role="tab" id="opttab-template" aria-selected="false" aria-controls="panel-template" tabindex="-1">Template</button>
@@ -1661,6 +1707,10 @@
   <!-- General -->
   <div class="options-tab-panel active" id="panel-general" role="tabpanel" aria-labelledby="opttab-general">
     <div class="options-grid">
+      <!-- Standalone document (2026-11-09, Nicholas): what Pandoc is told. For HTML it follows Output
+           packaging (greyed out and ticked; available and unticked for HTML fragment); greyed out and
+           ticked where Pandoc writes the same file either way; otherwise the user's own.
+           refreshStandaloneControl(), onStandaloneBoxChange(). -->
       <div class="opt-group">
         <input type="checkbox" id="opt-standalone" checked>
         <label for="opt-standalone">Standalone document</label>
@@ -1794,50 +1844,6 @@
         <input type="file" id="abbrevFileInput" accept=".json" style="display:none;" aria-label="Upload citation abbreviations file">
         <span class="file-name" id="abbrevFileName"></span>
         <button class="file-remove" id="abbrevFileRemove" style="display:none;">×</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Math -->
-  <div class="options-tab-panel" id="panel-math" role="tabpanel" aria-labelledby="opttab-math">
-    <div class="options-grid">
-      <div class="opt-group" id="pandoc-slot-math">
-        <label for="opt-math">Math rendering method:</label>
-        <select id="opt-math" style="width:auto;">
-          <!-- Rebuilt at runtime by refreshMathOptions() to match the
-               selected output format. These initial entries are the
-               HTML-family list, matching the default output (html5); the
-               selected one, MathML (+ MathJax), is the default (2026-10-06). -->
-          <option value="mathjax-mathml">MathML</option>
-          <option value="mathjax-mathml-intent" selected>MathML (+ MathJax)</option>
-          <option value="mathml">MathML (texmath)</option>
-          <option value="mathjax4">MathJax (script tag)</option>
-          <option value="katex">KaTeX</option>
-          <option value="plain">Unicode</option>
-        </select>
-      </div>
-      <!-- INTENT-CONTROL (stage 1, 2026-11-01; STAGE1-BRIEF.md 5.4). Label, placement
-           and "greyed out when not applicable" signed off by Nicholas 2026-11-01. One
-           element, moved between this slot and #core-slot-intent. aria-label keeps its
-           name "Intent handling" in both places. Greyed out (disabled) unless the math
-           setting uses the custom MathJax conversion: refreshIntentControl(). -->
-      <div class="opt-group" id="pandoc-slot-intent">
-        <label for="opt-intent">Intent handling:</label>
-        <select id="opt-intent" style="width:auto;" aria-label="Intent handling" aria-describedby="optIntentWhy"
-                title="Baseline: \MathMLintent and \MathMLarg (and the \intent / \iarg shorthand) become MathML intent and arg, copied as written. Off: no intent handling. Applies only to the custom MathJax conversion settings.">
-          <option value="baseline" selected>Baseline</option>
-          <option value="off">Off</option>
-        </select>
-        <span id="optIntentWhy" hidden>Baseline turns MathMLintent and MathMLarg into MathML intent. Off adds no intent. Used only by the custom MathJax conversion settings.</span>
-      </div>
-      <div class="opt-group" id="pandoc-slot-style">
-        <label for="opt-style"><span class="style-label-text">Styling</span>:</label>
-        <select id="opt-style" style="width:auto;" aria-describedby="styleNote">
-          <!-- Rebuilt at runtime by refreshStyleOptions() to match the
-               selected output format. Initial entries: the HTML list. -->
-          <option value="standalone" selected>Standalone</option>
-          <option value="canvas">Canvas</option>
-        </select>
       </div>
     </div>
   </div>
@@ -2390,29 +2396,45 @@
 
       <!-- (The "PDF images" step moved into Images, above, 2026-10-06.) -->
 
-      <!-- LATEX PREPROCESSING (Nicholas, 2026-10-06): an accordion, right after Images; for now the
-           button alone, no hint or tooltip ("It only needs to have the button right now"). Options
-           and checkboxes for related features come later, beside or below it. What it does (-pp
-           copies; originals never changed) is said in the Preprocess view's note. Id kept:
-           js/preprocess.js binds it. -->
+      <!-- LATEX PREPROCESSING (Nicholas, 2026-10-06): an accordion, right after Images. What it does (-pp
+           copies; originals never changed) is said in the Preprocess view's note. Id kept: js/preprocess.js
+           binds it. 2026-11-09 (Nicholas): "Process file" gets an "Autoprocess" box beside it, as the image rows
+           do (ticked: Convert preprocesses first and converts the -pp result, with no "-pp" in the output's
+           name: autoPreprocessApplies, SECTION 6), and an Options accordion under it holding "Hide temp files"
+           (ticked: the -pp copies are left out of the file tree), with room for more preprocessing options.
+           Neither box is remembered between visits. Record: preprocess-autoconvert\NOTE-PREPROCESS-AUTOCONVERT-ANALYSIS.md. -->
       <div class="prep-accordion" id="prepPreprocess">
         <h3 class="prep-accordion-heading">
           <button type="button" class="prep-accordion-toggle" id="prepPreprocessToggle" data-store="atc.prep.preprocess"
                   aria-expanded="true" aria-controls="prepPreprocessPanel"><span class="rail-chevron" aria-hidden="true">▸</span>LaTeX preprocessing</button>
         </h3>
-        <div class="prep-accordion-panel" id="prepPreprocessPanel" role="region" aria-labelledby="prepPreprocessToggle">
-          <button type="button" class="prep-btn" id="btnPreprocess">Process file</button>
+        <div class="prep-accordion-panel prep-grid" id="prepPreprocessPanel" role="region" aria-labelledby="prepPreprocessToggle">
+          <div class="image-row">
+            <button type="button" class="prep-btn image-btn" id="btnPreprocess">Process file</button>
+            <label class="image-auto"><input type="checkbox" id="chkAutoPreprocess" checked> Autoprocess<span class="sr-only"> LaTeX files when Convert is pressed</span></label>
+          </div>
+          <div class="prep-accordion" id="prepPreprocessOptions">
+            <h4 class="prep-accordion-heading">
+              <button type="button" class="prep-accordion-toggle" id="prepPreprocessOptionsToggle" data-store="atc.prep.preprocess.options"
+                      aria-expanded="true" aria-controls="prepPreprocessOptionsPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Options</button>
+            </h4>
+            <div class="prep-accordion-panel" id="prepPreprocessOptionsPanel" role="region" aria-labelledby="prepPreprocessOptionsToggle">
+              <label class="image-auto"><input type="checkbox" id="chkHideTempFiles" checked> Hide temp files<span class="sr-only"> (the -pp copies preprocessing makes)</span></label>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- MATH NOTATION REVIEW (Nicholas, 2026-10-06): an accordion; contents unchanged. Closing it
            releases F2 / Shift+F2 (intent-review.js: #intentNav inside anything [hidden]). -->
-      <div class="prep-accordion" id="prepReview">
+      <div class="prep-accordion experimental" id="prepReview">
         <h3 class="prep-accordion-heading">
-          <button type="button" class="prep-accordion-toggle" id="prepReviewToggle" data-store="atc.prep.review"
-                  aria-expanded="true" aria-controls="prepReviewPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Math notation review</button>
+          <button type="button" class="prep-accordion-toggle" id="prepReviewToggle" aria-describedby="prepReviewTip" data-store="atc.prep.review"
+                  aria-expanded="false" aria-controls="prepReviewPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Math notation review</button>
+          <span class="exp-tip" id="prepReviewTip" role="tooltip">Experimental, under construction</span>
         </h3>
-        <div class="prep-accordion-panel" id="prepReviewPanel" role="region" aria-labelledby="prepReviewToggle">
+        <div class="prep-accordion-panel" id="prepReviewPanel" role="region" aria-labelledby="prepReviewToggle" hidden>
+        <p class="exp-note">Under construction</p>
         <p class="prep-status" id="intentScanHint">Finds math notation whose
           meaning is ambiguous to a screen reader and lets you hear how each
           reading would sound. Findings are highlighted in the editor; the
@@ -2465,12 +2487,14 @@
            Ctrl+Period). snippets/snippet-panel.js binds these ids. Select math in the editor, press Ctrl+Period,
            choose a concept, press Enter: the kernel intent markup is written as one undoable edit. The filters
            are for this visit only (nothing stored); the open/closed state is the accordion's, like its neighbours. -->
-      <div class="prep-accordion" id="prepSnippets">
+      <div class="prep-accordion experimental" id="prepSnippets">
         <h3 class="prep-accordion-heading">
-          <button type="button" class="prep-accordion-toggle" id="prepSnippetsToggle" data-store="atc.prep.snippets"
-                  aria-expanded="true" aria-controls="prepSnippetsPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Intent snippets</button>
+          <button type="button" class="prep-accordion-toggle" id="prepSnippetsToggle" aria-describedby="prepSnippetsTip" data-store="atc.prep.snippets"
+                  aria-expanded="false" aria-controls="prepSnippetsPanel"><span class="rail-chevron" aria-hidden="true">▸</span>Intent snippets</button>
+          <span class="exp-tip" id="prepSnippetsTip" role="tooltip">Experimental, under construction</span>
         </h3>
-        <div class="prep-accordion-panel snip-panel" id="prepSnippetsPanel" role="region" aria-labelledby="prepSnippetsToggle">
+        <div class="prep-accordion-panel snip-panel" id="prepSnippetsPanel" role="region" aria-labelledby="prepSnippetsToggle" hidden>
+          <p class="exp-note">Under construction</p>
           <p class="prep-status" id="snipHint">Select math in the editor, then press Ctrl+Period. Choose a concept
             and press Enter to write its intent markup. Ctrl+Period or Escape goes back to the editor.</p>
           <p class="snip-selection" id="snipSelection">Nothing is selected in the editor.</p>
@@ -2503,107 +2527,109 @@
         </div>
       </div>
 
+      <!-- LATEX FIND/REPLACE (2026-11-09, Nicholas): the sidebar section once called Cleanup, moved into File
+           Preparation as its last accordion: "a subcategory of "File Preparation" rather than it's own top-level
+           feature." Starts closed; marked experimental. Its controls belong to cleanup/cleanup-engine.js and keep
+           their ids. -->
+      <div class="prep-accordion experimental" id="prepFindReplace">
+        <h3 class="prep-accordion-heading">
+          <button type="button" class="prep-accordion-toggle" id="prepFindReplaceToggle" aria-describedby="prepFindReplaceTip" data-store="atc.prep.findreplace"
+                  aria-expanded="false" aria-controls="prepFindReplacePanel"><span class="rail-chevron" aria-hidden="true">▸</span>LaTeX Find/Replace</button>
+          <span class="exp-tip" id="prepFindReplaceTip" role="tooltip">Experimental, under construction</span>
+        </h3>
+        <div class="prep-accordion-panel" id="prepFindReplacePanel" role="region" aria-labelledby="prepFindReplaceToggle" hidden>
+          <p class="exp-note">Under construction</p>
+          <!-- Profile selector -->
+          <div class="cleanup-section">
+            <div class="cleanup-section-label">Profile</div>
+            <div style="display:flex; gap:4px;">
+              <select class="cleanup-select" id="cleanupProfile" style="flex:1;" aria-label="Cleanup profile"></select>
+              <button class="toolbar-btn" id="btnDuplicateProfile" style="font-size:10px; padding:3px 6px;" title="Duplicate profile" aria-label="Duplicate profile">⧉</button>
+              <button class="toolbar-btn" id="btnDeleteProfile" style="font-size:10px; padding:3px 6px; color:var(--error);" title="Delete profile" aria-label="Delete profile">✕</button>
+            </div>
+            <div style="margin-top:4px;">
+              <select class="cleanup-select" id="presetAdder" style="width:100%;" aria-label="Add preset patterns to the active profile"></select>
+            </div>
+            <div style="display:flex; gap:4px; margin-top:4px;">
+              <button class="toolbar-btn" id="btnExportProfile" style="font-size:10px; padding:3px 6px; flex:1;" title="Download the active profile as a JSON file" aria-label="Export profile to JSON file">⭳ Export</button>
+              <button class="toolbar-btn" id="btnImportProfile" style="font-size:10px; padding:3px 6px; flex:1;" title="Load a profile from a JSON file" aria-label="Import profile from JSON file">⭱ Import</button>
+              <input type="file" id="profileImportFile" accept=".json,application/json" style="display:none;" aria-hidden="true" tabindex="-1">
+            </div>
+          </div>
+
+          <!-- Profile scope -->
+          <div class="cleanup-section">
+            <div class="scope-section" id="profileScopeSection">
+              <div class="scope-header" id="profileScopeHeader" role="button" tabindex="0" aria-expanded="false" aria-controls="profileScopeFields">
+                <span>Scope (entire file)</span>
+                <span id="profileScopeToggle" aria-hidden="true">›</span>
+              </div>
+              <div class="scope-fields" id="profileScopeFields" style="display:none;">
+                <div class="pf-row">
+                  <span class="pf-label">O:</span>
+                  <input class="pf-input pf-input-flex" id="scopeOpenPrefix" placeholder="Prefix" aria-label="Opening scope prefix">
+                  <input class="pf-input pf-input-anchor" id="scopeOpenAnchor" placeholder="Anchor" aria-label="Opening scope anchor">
+                  <input class="pf-input pf-input-flex" id="scopeOpenSuffix" placeholder="Suffix" aria-label="Opening scope suffix">
+                </div>
+                <div class="pf-row">
+                  <span class="pf-label">C:</span>
+                  <input class="pf-input pf-input-flex" id="scopeClosePrefix" placeholder="Prefix" aria-label="Closing scope prefix">
+                  <input class="pf-input pf-input-anchor" id="scopeCloseAnchor" placeholder="Anchor" aria-label="Closing scope anchor">
+                  <input class="pf-input pf-input-flex" id="scopeCloseSuffix" placeholder="Suffix" aria-label="Closing scope suffix">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pattern list -->
+          <div class="cleanup-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div class="cleanup-section-label" style="margin-bottom:0;">Patterns <span id="patternCount">(0)</span></div>
+              <div style="display:flex; gap:4px;">
+                <button class="toolbar-btn" id="btnClearPatterns" style="font-size:10px; padding:2px 6px; color:var(--error);" title="Remove all patterns from this profile" aria-label="Clear all patterns">🗑</button>
+                <button class="toolbar-btn" id="btnExpandAll" style="font-size:10px; padding:2px 6px;" aria-label="Expand all patterns">⊞</button>
+                <button class="toolbar-btn" id="btnCollapseAll" style="font-size:10px; padding:2px 6px;" aria-label="Collapse all patterns">⊟</button>
+              </div>
+            </div>
+            <div id="patternList" style="max-height: calc(100vh - 480px); overflow-y: auto;"></div>
+          </div>
+
+          <!-- Add pattern -->
+          <div class="cleanup-section">
+            <div style="display:flex; gap:4px;">
+              <select class="cleanup-select" id="addPatternType" style="flex:1;" aria-label="New pattern type">
+                <option value="matched_pair">Matched Pair</option>
+                <option value="single_string">Single String</option>
+              </select>
+              <button class="toolbar-btn" id="btnAddPattern" style="font-size:11px; padding:4px 10px;">+ Add</button>
+            </div>
+          </div>
+
+          <!-- Conversion integration -->
+          <div class="cleanup-section">
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" id="chkCleanupOnConvert">
+              Apply cleanup during conversion
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:4px;">
+              <input type="checkbox" id="chkAutoPopulate">
+              Add patterns from conversion warnings
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:4px;" title="Failsafe: whenever you download a converted file, the active profile is saved alongside it as JSON">
+              <input type="checkbox" id="chkExportProfileWithOutput">
+              Download profile JSON with output
+            </label>
+          </div>
+
+          <button class="cleanup-run-btn" id="btnRunCleanup">▶ Run Cleanup</button>
+        </div>
+      </div>
+
       <!-- (SOURCE CLEANUP, the Smart Cleanup button's accordion since 2026-10-06, was retired by latex-preprocess
            s299, lists plan step 6: the preprocessor and the List Markers filter now carry list numbering.) -->
 
       <!-- (The "further preparation steps land here" line was removed 2026-10-06.) -->
       </div>
-    </div>
-    </div>
-
-    <!-- CLEANUP ----------------------------------------------------->
-    <div class="rail-section">
-      <h2 class="rail-section-heading">
-        <button type="button" class="rail-section-toggle" id="railtab-cleanup"
-                aria-expanded="false" aria-controls="railPanelCleanup"><span class="rail-chevron" aria-hidden="true">▸</span>Cleanup</button>
-      </h2>
-    <div class="rail-panel" id="railPanelCleanup" role="region" hidden
-         aria-labelledby="railtab-cleanup">
-    <div class="sidebar-body">
-      <!-- Profile selector -->
-      <div class="cleanup-section">
-        <div class="cleanup-section-label">Profile</div>
-        <div style="display:flex; gap:4px;">
-          <select class="cleanup-select" id="cleanupProfile" style="flex:1;" aria-label="Cleanup profile"></select>
-          <button class="toolbar-btn" id="btnDuplicateProfile" style="font-size:10px; padding:3px 6px;" title="Duplicate profile" aria-label="Duplicate profile">⧉</button>
-          <button class="toolbar-btn" id="btnDeleteProfile" style="font-size:10px; padding:3px 6px; color:var(--error);" title="Delete profile" aria-label="Delete profile">✕</button>
-        </div>
-        <div style="margin-top:4px;">
-          <select class="cleanup-select" id="presetAdder" style="width:100%;" aria-label="Add preset patterns to the active profile"></select>
-        </div>
-        <div style="display:flex; gap:4px; margin-top:4px;">
-          <button class="toolbar-btn" id="btnExportProfile" style="font-size:10px; padding:3px 6px; flex:1;" title="Download the active profile as a JSON file" aria-label="Export profile to JSON file">⭳ Export</button>
-          <button class="toolbar-btn" id="btnImportProfile" style="font-size:10px; padding:3px 6px; flex:1;" title="Load a profile from a JSON file" aria-label="Import profile from JSON file">⭱ Import</button>
-          <input type="file" id="profileImportFile" accept=".json,application/json" style="display:none;" aria-hidden="true" tabindex="-1">
-        </div>
-      </div>
-
-      <!-- Profile scope -->
-      <div class="cleanup-section">
-        <div class="scope-section" id="profileScopeSection">
-          <div class="scope-header" id="profileScopeHeader" role="button" tabindex="0" aria-expanded="false" aria-controls="profileScopeFields">
-            <span>Scope (entire file)</span>
-            <span id="profileScopeToggle" aria-hidden="true">›</span>
-          </div>
-          <div class="scope-fields" id="profileScopeFields" style="display:none;">
-            <div class="pf-row">
-              <span class="pf-label">O:</span>
-              <input class="pf-input pf-input-flex" id="scopeOpenPrefix" placeholder="Prefix" aria-label="Opening scope prefix">
-              <input class="pf-input pf-input-anchor" id="scopeOpenAnchor" placeholder="Anchor" aria-label="Opening scope anchor">
-              <input class="pf-input pf-input-flex" id="scopeOpenSuffix" placeholder="Suffix" aria-label="Opening scope suffix">
-            </div>
-            <div class="pf-row">
-              <span class="pf-label">C:</span>
-              <input class="pf-input pf-input-flex" id="scopeClosePrefix" placeholder="Prefix" aria-label="Closing scope prefix">
-              <input class="pf-input pf-input-anchor" id="scopeCloseAnchor" placeholder="Anchor" aria-label="Closing scope anchor">
-              <input class="pf-input pf-input-flex" id="scopeCloseSuffix" placeholder="Suffix" aria-label="Closing scope suffix">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pattern list -->
-      <div class="cleanup-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <div class="cleanup-section-label" style="margin-bottom:0;">Patterns <span id="patternCount">(0)</span></div>
-          <div style="display:flex; gap:4px;">
-            <button class="toolbar-btn" id="btnClearPatterns" style="font-size:10px; padding:2px 6px; color:var(--error);" title="Remove all patterns from this profile" aria-label="Clear all patterns">🗑</button>
-            <button class="toolbar-btn" id="btnExpandAll" style="font-size:10px; padding:2px 6px;" aria-label="Expand all patterns">⊞</button>
-            <button class="toolbar-btn" id="btnCollapseAll" style="font-size:10px; padding:2px 6px;" aria-label="Collapse all patterns">⊟</button>
-          </div>
-        </div>
-        <div id="patternList" style="max-height: calc(100vh - 480px); overflow-y: auto;"></div>
-      </div>
-
-      <!-- Add pattern -->
-      <div class="cleanup-section">
-        <div style="display:flex; gap:4px;">
-          <select class="cleanup-select" id="addPatternType" style="flex:1;" aria-label="New pattern type">
-            <option value="matched_pair">Matched Pair</option>
-            <option value="single_string">Single String</option>
-          </select>
-          <button class="toolbar-btn" id="btnAddPattern" style="font-size:11px; padding:4px 10px;">+ Add</button>
-        </div>
-      </div>
-
-      <!-- Conversion integration -->
-      <div class="cleanup-section">
-        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
-          <input type="checkbox" id="chkCleanupOnConvert">
-          Apply cleanup during conversion
-        </label>
-        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:4px;">
-          <input type="checkbox" id="chkAutoPopulate">
-          Add patterns from conversion warnings
-        </label>
-        <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-top:4px;" title="Failsafe: whenever you download a converted file, the active profile is saved alongside it as JSON">
-          <input type="checkbox" id="chkExportProfileWithOutput">
-          Download profile JSON with output
-        </label>
-      </div>
-
-      <button class="cleanup-run-btn" id="btnRunCleanup">▶ Run Cleanup</button>
-    </div>
     </div>
     </div>
     </div>
@@ -2801,9 +2827,15 @@ function syncAuxFiles() {
 // Read-only view of the project model. Re-rendered by syncAuxFiles(),
 // so every intake path refreshes it with no extra call sites.
 // ════════════════════════════════════════════════════════════════════
+// Hide temp files (2026-11-09, Nicholas): the -pp copies preprocessing makes (tagged 'preprocessed', js/preprocess.js
+// PREPROCESSED) are left out of the tree and out of its summary's counts while the box in File Preparation > LaTeX
+// preprocessing > Options is ticked (the default; not remembered between visits).
+const hideTempFile = (e) => e.source === 'preprocessed' && !!document.getElementById('chkHideTempFiles')?.checked;
+document.getElementById('chkHideTempFiles')?.addEventListener('change', () => fileTree.render());
 const fileTree = initFileTree({
   getEntries: () => projectModel.listEntries(),
-  getSummaryText: () => projectModel.summaryText(),
+  getSummaryText: () => projectModel.summaryText({ skip: hideTempFile }),
+  hideEntry: hideTempFile,
   getTargetPath: () => projectModel.project.convertTargetPath,
   getFolderState: (dir) => projectModel.folderIncludeState(dir),
   onOpen: (entry) => openProjectFile(entry),
@@ -3092,10 +3124,16 @@ const MATH_METHODS_NA = [['', 'Not applicable for this output format']];
 // frame (js/canvas-output.js). lockEmbedImages: Embed Images is off and can't be switched on (Nicholas:
 // "I don't want users to package output for canvas and have images embedded"). No `note` on any option
 // (Nicholas, 2026-10-18: notes removed until he decides how informational messages should appear).
+// Optional fields (added 2026-11-09 for HTML fragment; open to any entry): default = the entry chosen
+// when the current choice can't be kept (it need not be listed first); fullViewOnly = left out of the
+// core view; unavailable() = a reason string while the entry can't be chosen (it is greyed out), ''
+// when it can; standalone: false = Pandoc's standalone is off for it. See "HTML fragment and the
+// Standalone document checkbox" below.
 const CANVAS_RESIZE = 'resize-for-iframe.html';
 const STYLES = {
   html: [
-    { id: 'standalone', label: 'Standalone', file: 'standalone.css', embedImages: true },
+    { id: 'fragment', label: 'HTML fragment', standalone: false, fullViewOnly: true, unavailable: () => fragmentBlocker(currentFragmentState()) },
+    { id: 'standalone', label: 'Standalone', file: 'standalone.css', embedImages: true, default: true },
     { id: 'loose', label: 'Loose files', file: 'canvas.css', headingShift: 1, embedImages: false, lockEmbedImages: true, afterBody: CANVAS_RESIZE, packaging: 'loose' },
     { id: 'scorm', label: 'SCORM package', file: 'canvas.css', headingShift: 1, embedImages: false, lockEmbedImages: true, afterBody: CANVAS_RESIZE, packaging: 'scorm' },
     { id: 'canvas', label: 'Canvas content', file: 'canvas.css', headingShift: 1, embedImages: false, lockEmbedImages: true, afterBody: CANVAS_RESIZE, packaging: 'canvas' }
@@ -3111,6 +3149,121 @@ const STYLE_AFTER_BODY_NAME = 'atc-resize-for-iframe.html';   // a style's after
 const stylingAssets = { filter: null, css: {}, after: {} };   // fetched once, then reused
 let styleShiftSetTo = null;                        // heading shift a style set, if any
 let styleImagesPrevId;                             // style at the last refresh; undefined until the first
+
+// ── HTML fragment and the "Standalone document" checkbox (decided 2026-11-09, Nicholas) ─────────
+// Output packaging's "HTML fragment" has Pandoc's standalone off: the page content only, with no
+// <head>, browser-tab title or title block, for pasting or placing into another page or tool. Listed
+// first but not the default (Standalone is), full Pandoc options view only. A fragment has no page
+// head, so it is greyed out unless everything the output needs sits in the content itself:
+// single-page HTML (Pandoc always writes whole pages for HTML (multipage)); a math setting that puts
+// the math in the content (MathJax, KaTeX and the MathJax speech layer load from the head); Embed
+// Images off (Nicholas: keeps a fragment simple); no Template-tab header, before-body or after-body
+// files (Pandoc then writes a whole page anyway). A chosen fragment that stops being possible goes
+// back to Standalone.
+// The General tab's "Standalone document" checkbox stays, and it is what Pandoc is told
+// (buildOptions). For HTML it follows Output packaging: greyed out and ticked, or, for HTML fragment,
+// available and unticked, and ticking it switches Output packaging back to Standalone. Where Pandoc
+// 3.11 writes the same file either way it is greyed out and ticked. Everywhere else it is the user's
+// own, and a hand change is remembered for when it is theirs again (as with Embed Images and heading
+// shift). Measured: output-panel-ui\_work\2026-11-09-fragment-analysis\ (re-run those probes after a
+// Pandoc upgrade).
+const FRAGMENT_MATH = ['mathjax-mathml', 'mathml', 'plain'];   // MathML, MathML (texmath), Unicode
+const STANDALONE_IGNORED_FORMATS = ['docx', 'odt', 'pptx', 'epub', 'epub2', 'epub3', 'chunkedhtml',
+  'ipynb', 'csljson', 'fb2', 'haddock', 'jira', 'textile',
+  'bbcode', 'bbcode_fluxbb', 'bbcode_hubzilla', 'bbcode_phpbb', 'bbcode_steam', 'bbcode_xenforo'];
+let standaloneHandChoice = true;   // the checkbox as the user last set it where it is theirs
+
+// Why HTML fragment can't be chosen now, or '' when it can. s = { fmt, math, embedImages, includeFiles }.
+function fragmentBlocker(s) {
+  const b = (s.fmt || '').split(/[+-]/)[0];
+  if (!/^html/.test(b)) return 'not single-page HTML';
+  if (!FRAGMENT_MATH.includes(s.math)) return 'the math setting needs the page head';
+  if (s.embedImages) return 'Embed Images is on';
+  if (s.includeFiles) return 'header or body files are attached';
+  return '';
+}
+
+// What fragmentBlocker reads, from the page. Early in loading, before the filter list or the file
+// lists exist, a fragment counts as not possible.
+function currentFragmentState() {
+  const s = { fmt: document.getElementById('selTo')?.value, math: document.getElementById('opt-math')?.value,
+              embedImages: true, includeFiles: true };
+  try { s.embedImages = !!builtInState['embed-images']; } catch (err) { /* not set up yet */ }
+  try {
+    s.includeFiles = resourceFiles.headerFiles.length + resourceFiles.beforeBodyFiles.length
+                     + resourceFiles.afterBodyFiles.length > 0;
+  } catch (err) { /* not set up yet */ }
+  return s;
+}
+
+// The Output packaging entry used when the current choice can't be kept: the one marked default.
+function defaultStyleId() {
+  const fam = mathFamilyFor(document.getElementById('selTo')?.value);
+  const list = (fam && STYLES[fam]) || [];
+  return (list.find(s => s.default) || list[0] || { id: '' }).id;
+}
+
+// After a setting an entry depends on changes: grey entries in or out, and move a chosen entry that
+// can no longer be chosen to the default (HTML fragment -> Standalone).
+function refreshStyleAvailability() {
+  const sel = document.getElementById('opt-style');
+  if (!sel) return;
+  const fam = mathFamilyFor(document.getElementById('selTo')?.value);
+  const list = (fam && STYLES[fam]) || [];
+  let lost = false;
+  for (const opt of sel.options) {
+    const s = list.find(x => x.id === opt.value);
+    if (!s || !s.unavailable) continue;
+    opt.disabled = !!s.unavailable();
+    if (opt.disabled && opt.selected) lost = true;
+  }
+  if (lost) {
+    sel.value = defaultStyleId();
+    applyStyleSideEffects();
+  }
+}
+
+// The checkbox for an output format and Output packaging entry: { disabled, checked }.
+function standaloneBoxState(fmt, entry, handChoice) {
+  const b = (fmt || '').split(/[+-]/)[0];
+  if (isHtmlFamily(b)) {
+    return entry && entry.standalone === false ? { disabled: false, checked: false } : { disabled: true, checked: true };
+  }
+  if (STANDALONE_IGNORED_FORMATS.includes(b)) return { disabled: true, checked: true };
+  return { disabled: false, checked: !!handChoice };
+}
+
+// Set the checkbox, and grey its label like the toolbar's, for the current output and packaging.
+function refreshStandaloneControl() {
+  const box = document.getElementById('opt-standalone');
+  if (!box) return;
+  const fmt = document.getElementById('selTo')?.value;
+  const st = standaloneBoxState(fmt, styleEntryFor(fmt, document.getElementById('opt-style')?.value), standaloneHandChoice);
+  box.disabled = st.disabled;
+  box.checked = st.checked;
+  const lbl = document.querySelector('label[for="opt-standalone"]');
+  if (lbl) lbl.style.opacity = st.disabled ? '0.55' : '';
+}
+
+// The user ticked or unticked it. HTML (only possible with HTML fragment chosen): ticking switches
+// Output packaging back to the default (Standalone). Other formats: remember the choice.
+function onStandaloneBoxChange() {
+  const box = document.getElementById('opt-standalone');
+  if (!box) return;
+  const fmt = document.getElementById('selTo')?.value;
+  if (isHtmlFamily((fmt || '').split(/[+-]/)[0])) {
+    const sel = document.getElementById('opt-style');
+    if (box.checked && sel) {
+      sel.value = defaultStyleId();
+      applyStyleSideEffects();
+    } else {
+      refreshStandaloneControl();
+    }
+    return;
+  }
+  standaloneHandChoice = box.checked;
+}
+document.getElementById('opt-standalone')?.addEventListener('change', onStandaloneBoxChange);
 
 // The style entry an id means for an output format, or null.
 function styleEntryFor(fmt, id) {
@@ -3196,6 +3349,10 @@ function applyStyleSideEffects() {
   }
   const note = document.getElementById('styleNote');
   if (note) note.textContent = (e && e.note) || '';
+  // HTML fragment (2026-11-09): what it depends on may just have changed (Embed Images, above), and
+  // the Standalone document checkbox follows Output packaging.
+  refreshStyleAvailability();
+  refreshStandaloneControl();
 }
 
 // Rebuild the Styling drop-down for the current output format, as
@@ -3205,16 +3362,21 @@ function refreshStyleOptions() {
   if (!sel) return;
   const fam = mathFamilyFor(document.getElementById('selTo')?.value);
   const applicable = !!(fam && STYLES[fam]);
-  const list = applicable ? STYLES[fam] : STYLES_NA;
+  // fullViewOnly entries (HTML fragment, 2026-11-09) are left out of the core view.
+  const list = applicable ? STYLES[fam].filter(s => !s.fullViewOnly || optionsView !== 'core') : STYLES_NA;
   const prev = sel.value;
   sel.innerHTML = '';
   for (const s of list) {
     const opt = document.createElement('option');
     opt.value = s.id;
     opt.textContent = s.label;
+    opt.disabled = !!(s.unavailable && s.unavailable());   // greyed out: can't be chosen now (2026-11-09)
     sel.appendChild(opt);
   }
-  sel.value = list.some(s => s.id === prev) ? prev : list[0].id;
+  // Keep the choice when it is still offered and can be chosen; otherwise the entry marked default
+  // (2026-11-09: it need not be listed first), else the first.
+  const keep = [...sel.options].some(o => o.value === prev && !o.disabled);
+  sel.value = keep ? prev : (list.find(s => s.default) || list[0]).id;
   sel.disabled = !applicable;
   const text = STYLE_LABELS[fam] || 'Output packaging';
   document.querySelectorAll('.style-label-text').forEach(el => { el.textContent = text; });
@@ -3249,15 +3411,7 @@ async function ensureStylingAssets(entry) {
 
 document.getElementById('opt-style')?.addEventListener('change', applyStyleSideEffects);
 
-// Move a control into a container without cloning it, so there is never a
-// second copy of the selection.
-function relocateControl(id, targetId) {
-  const el = document.getElementById(id);
-  const target = document.getElementById(targetId);
-  if (el && target && el.parentNode !== target) target.appendChild(el);
-}
-
-// Apply the current view: put the math control where it belongs, then
+// Apply the current view: show Input in the full view only, then
 // repopulate From / To / Math from that view's descriptor.
 function applyOptionsView() {
   const panel = document.getElementById('optionsPanel');
@@ -3265,23 +3419,21 @@ function applyOptionsView() {
   panel.classList.toggle('view-core', core);
   panel.classList.toggle('view-pandoc', !core);
 
-  relocateControl('opt-math', core ? 'core-slot-math' : 'pandoc-slot-math');
-  relocateControl('opt-intent', core ? 'core-slot-intent' : 'pandoc-slot-intent');   // INTENT-CONTROL
-  relocateControl('opt-style', core ? 'core-slot-style' : 'pandoc-slot-style');
+  // Math conversion, Intent handling and Output packaging stay in the toolbar in
+  // both views (2026-11-09, Nicholas): nothing to move, and the full view has no Math tab.
 
   // Input format: hidden in the core view (LaTeX input only), shown as
   // "Input:" in the full Pandoc options view (2026-10-06, Nicholas). While
   // hidden it still works: conversions read it, and it follows opened files.
   const fromBox = document.getElementById('fromBox');
   if (fromBox) fromBox.hidden = core;
-  // Math conversion + Styling sit in the toolbar in the core view only (2026-10-06).
-  const coreTools = document.getElementById('coreToolbarOptions');
-  if (coreTools) coreTools.hidden = !core;
 
   const selTo = document.getElementById('selTo');
   const selMath = document.getElementById('opt-math');
   const beforeTo = selTo.value;
   const beforeMath = selMath.value;
+  const selStyle = document.getElementById('opt-style');
+  const beforeStyle = selStyle ? selStyle.value : '';
 
   if (core) {
     populateFormats('selFrom', keepAvailable(CORE_INPUT, ALL_INPUT_FORMATS), 'latex', CORE_LABELS);
@@ -3297,10 +3449,11 @@ function applyOptionsView() {
   const lost = [];
   if (beforeTo && selTo.value !== beforeTo) lost.push('output format');
   if (beforeMath && selMath.value !== beforeMath) lost.push('math method');
+  if (beforeStyle && selStyle.value !== beforeStyle) lost.push('output packaging');   // e.g. HTML fragment (2026-11-09)
   const note = document.getElementById('coreViewNote');
   if (note) {
     note.textContent = lost.length
-      ? 'Reset ' + lost.join(' and ') + ' \u2014 not offered in this view.'
+      ? 'Reset ' + (lost.length > 2 ? lost.slice(0, -1).join(', ') + ' and ' + lost[lost.length - 1] : lost.join(' and ')) + ' \u2014 not offered in this view.'
       : '';
   }
   updateExtensions();
@@ -3329,7 +3482,8 @@ function refreshMathOptions() {
   // Disable rather than hide, so the control keeps its place in the layout
   // and screen readers can still report why it is unavailable.
   sel.disabled = !applicable;
-  const lbl = document.querySelector('label[for="opt-math"]');
+  // Grey the toolbar label (the Math tab and its own label were removed 2026-11-09).
+  const lbl = document.getElementById('core-slot-math')?.parentNode;
   if (lbl) lbl.style.opacity = applicable ? '' : '0.55';
   refreshStyleOptions();   // the Styling list follows the output format too
   refreshIntentControl();  // INTENT-CONTROL
@@ -3343,12 +3497,12 @@ function refreshIntentControl() {
   if (!sel) return;
   const on = needsMathjaxDevice();
   sel.disabled = !on;
-  for (const lbl of [document.querySelector('label[for="opt-intent"]'),
-                     document.getElementById('core-slot-intent')?.parentNode]) {
-    if (lbl) lbl.style.opacity = on ? '' : '0.55';
-  }
+  // Grey the toolbar label (the Math tab's own label went with the tab, 2026-11-09).
+  const lbl = document.getElementById('core-slot-intent')?.parentNode;
+  if (lbl) lbl.style.opacity = on ? '' : '0.55';
 }
 document.getElementById('opt-math')?.addEventListener('change', refreshIntentControl);
+document.getElementById('opt-math')?.addEventListener('change', refreshStyleAvailability);   // HTML fragment (2026-11-09)
 
 // The mode the device passes to tex2mml: 'baseline' or 'off'.
 function currentIntentMode() {
@@ -6698,6 +6852,7 @@ function setupMultiFileUpload(btnId, inputId, listId, resourceKey) {
   if (!btn || !input) return;
 
   function renderList() {
+    refreshStyleAvailability();   // HTML fragment: these files make Pandoc write a whole page (2026-11-09)
     const list = document.getElementById(listId);
     if (!list) return;
     const files = resourceFiles[resourceKey];
@@ -6838,6 +6993,7 @@ function renderLuaFiltersList() {
         ev.stopPropagation();
         builtInState[entry.id] = ev.target.checked;
         renderLuaFiltersList();
+        refreshStyleAvailability();   // HTML fragment depends on Embed Images (2026-11-09)
       });
     } else {
       const f = resourceFiles.luaFilters[entry.idx];
@@ -8195,10 +8351,11 @@ function buildOptions() {
 }
 
 // --- Build files object for pandoc.convert() ---
-function buildFiles() {
+// aux (2026-11-09): the projection to serve; a preprocessed conversion passes its own.
+function buildFiles(aux = resourceFiles.auxFiles) {
   const raw = {};
   // Collect all resource files
-  Object.entries(resourceFiles.auxFiles).forEach(([name, data]) => { raw[name] = data; });
+  Object.entries(aux).forEach(([name, data]) => { raw[name] = data; });
   if (resourceFiles.bibFile) raw[resourceFiles.bibFile.name] = resourceFiles.bibFile;
   if (resourceFiles.cslFile) raw[resourceFiles.cslFile.name] = resourceFiles.cslFile;
   if (resourceFiles.abbrevFile) raw[resourceFiles.abbrevFile.name] = resourceFiles.abbrevFile;
@@ -8604,9 +8761,22 @@ async function handlePdfAuxFiles() {
 
 document.getElementById('btnConvert').addEventListener('click', () => {
   if (activeEngine === 'pandoc') {
-    runConversion();
+    // Autoprocess (2026-11-09, Nicholas): with its box ticked (File Preparation > LaTeX preprocessing) and LaTeX
+    // input, Convert preprocesses first and converts the -pp result, the editor and the output's name on the
+    // original; if preprocessing cannot run, the original is converted and the log says why (js/preprocess.js,
+    // run({ auto: true })). Unticked, or other input: as before.
+    if (autoPreprocessApplies()) runPreprocess({ auto: true });
+    else runConversion();
   }
 });
+
+// Autoprocess applies: its box ticked, no binary input file, LaTeX input (2026-11-09: "All is only for latex
+// source files").
+function autoPreprocessApplies() {
+  if (!document.getElementById('chkAutoPreprocess')?.checked) return false;
+  if (inputBinaryFile) return false;
+  return document.getElementById('selFrom').value.split(/[+-]/)[0] === 'latex';
+}
 
 // ── Project paths: conversion copies (project/project-paths.js) ─────────
 // Pandoc's LaTeX reader resolves \input-family targets, and the Lua filters image paths,
@@ -8618,14 +8788,14 @@ document.getElementById('btnConvert').addEventListener('click', () => {
 // conversion only: the editor, the project and warning line numbers are unchanged. LaTeX input
 // only. Result left in window.__lastPaths (null when it did not run). Flag, don't fail: on any
 // error the conversion goes ahead exactly as before.
-async function conversionPathCopies(sourceText, files) {
+async function conversionPathCopies(sourceText, files, auxIn, masterIn) {   // auxIn, masterIn: a preprocessed conversion's (2026-11-09)
   window.__lastPaths = null;
-  const master = projectModel.project.mainPath;
+  const master = masterIn || projectModel.project.mainPath;
   const from = document.getElementById('selFrom').value.split(/[+-]/)[0];
   if (typeof sourceText !== 'string' || !master || from !== 'latex') return sourceText;
   try {
     const { conversionCopies } = await import('./project/project-paths.js');
-    const aux = resourceFiles.auxFiles || {};
+    const aux = auxIn || resourceFiles.auxFiles || {};
     const TEXT_EXT = /\.(tex|ltx|sty|cls|tikz|pgf)$/i;
     const decoder = new TextDecoder('utf-8', { fatal: true });
     const blobTexts = new Map();       // a Blob cannot be read synchronously: read those first
@@ -8722,7 +8892,14 @@ function conversionPathWarnings(warnings, files, placeholderFiles) {
   return added.filter(w => w.level === 'warn').length;
 }
 
-async function runConversion() {
+// A press's own log lines (2026-11-09, found in the browser): every conversion redraws the whole Log, so the lines
+// a preprocessing press writes (what changed and was saved; with Autoprocess, why preprocessing did not run) are
+// collected while the press runs and put at the top of the Log of the conversion it starts. Collected only during a
+// press (runPreprocess, SECTION 9), so a press that converts nothing leaves nothing for a later conversion.
+let preprocessLines = null;
+function logPreprocess(w) { if (preprocessLines) preprocessLines.push(...w); updateLog(w); }
+
+async function runConversion(pre = null) {
   if (!pandocModule) return;
 
   const btn = document.getElementById('btnConvert');
@@ -8731,11 +8908,14 @@ async function runConversion() {
   updateStatus('loading', 'Converting…');
   clearDecorations();
 
-  // The editor ALWAYS holds the document being converted (see
-  // openProjectFile). Conversion therefore reads the editor, unchanged
-  // from before Stages 3/4.
-  const sourceText = inputBinaryFile ? null : getSourceForConversion();
-  const reportTarget = projectModel.project.convertTargetPath;   // the Report view takes Pandoc's log for this file (s292)
+  // The editor holds the document being converted (see openProjectFile), so a conversion reads the editor -
+  // except a preprocessed one (2026-11-09, js/preprocess.js): pre = { text, master, converted } converts TEXT, the
+  // -pp copy of MASTER, with every tagged copy served under its original's name (project-model.js
+  // toAuxFiles({ preprocessed, stdin })), and tells the Report view CONVERTED; the editor, the target and the
+  // output's name stay on the original.
+  const sourceText = pre ? pre.text : (inputBinaryFile ? null : getSourceForConversion());
+  const reportTarget = pre ? pre.converted : projectModel.project.convertTargetPath;   // the Report view takes Pandoc's log for this file (s292)
+  const aux = pre ? projectModel.toAuxFiles({ preprocessed: true, stdin: pre.master }) : resourceFiles.auxFiles;
 
   try {
     if (isThoriumPreset()) { updateStatus('loading', 'Loading Thorium EPUB assets…'); await ensureThoriumAssets(); }
@@ -8744,9 +8924,9 @@ async function runConversion() {
     // Styling drop-down: fetch styling.lua and the chosen stylesheet (no style: nothing)
     await ensureStylingAssets(activeStyle());
     const options = buildOptions();
-    const files = buildFiles();
+    const files = buildFiles(aux);
     // Project paths: the text Pandoc reads, and copies of what it reaches (see conversionPathCopies).
-    const pandocText = await conversionPathCopies(sourceText, files);
+    const pandocText = await conversionPathCopies(sourceText, files, aux, pre ? pre.master : undefined);
     const outFileName = options['output-file'];
     const baseToFmt = document.getElementById('selTo').value.split(/[+-]/)[0];
     const isBinaryOutput = BINARY_FORMATS.includes(baseToFmt);
@@ -8793,6 +8973,8 @@ async function runConversion() {
 
     // Parse warnings
     const warnings = parseWarnings(result.warnings, result.stderr, sourceText || '');
+    // A press's own lines first (2026-11-09; preprocessLines, before runConversion).
+    if (preprocessLines && preprocessLines.length) warnings.unshift(...preprocessLines.splice(0));
 
     // Cleanup-on-convert ran over a copy of the source, so warning line
     // numbers refer to the cleaned text, not the editor content.
@@ -9263,11 +9445,18 @@ async function reportGoTo(t) {
 const reportView = initReportView({ root: document.getElementById('tabReport'),
   textOf: reportTextOf, goTo: reportGoTo,
   mark: (m) => { reportMarks = m; applyReportMarks(); } });
-const { run: runPreprocess } = initPreprocess({
+const { run: runPreprocessPress } = initPreprocess({
   model: projectModel, editor, openProjectFile, syncAuxFiles, runConversion,
-  showReport, updateLog, updateStatus, loadTable, loadTool,
+  showReport, updateLog: logPreprocess, updateStatus, loadTable, loadTool,
   loadNames, keepRun: (k) => reportView.keep(k),
 });
+// One press - from Process file, or from Convert with Autoprocess - with its log lines collected for the conversion
+// it starts (logPreprocess, 2026-11-09). A press during a press is ignored, as the glue ignores it.
+async function runPreprocess(opts) {
+  if (preprocessLines) return false;
+  preprocessLines = [];
+  try { return await runPreprocessPress(opts); } finally { preprocessLines = null; }
+}
 document.getElementById('btnPreprocess').addEventListener('click', () => runPreprocess());
 // ════════════════════════════════════════════════════════════════════
 // OUTPUT TABS — js/output-tabs.js
@@ -9297,7 +9486,6 @@ const RAIL_OPEN_KEY = 'atc.rail.open';
 const railSections = [
   ['files',   'railtab-files',   'railPanelFiles'],
   ['prepare', 'railtab-prepare', 'railPanelPrepare'],
-  ['cleanup', 'railtab-cleanup', 'railPanelCleanup'],
 ];
 const railOpen = (() => {
   try {
@@ -9418,7 +9606,8 @@ document.querySelector('.rail-sections')?.addEventListener('keydown', (ev) => {
 
 // ─── File Preparation's accordions (2026-10-06, Nicholas): Images, LaTeX preprocessing,
 // Math notation review, Source cleanup ───
-// Each starts open and remembers the reader's choice under its toggle's data-store key
+// Each starts as its markup says (2026-11-09, Nicholas: Images and LaTeX preprocessing open; Math notation review,
+// Intent snippets and LaTeX Find/Replace closed) and remembers the reader's choice under its toggle's data-store key
 // (Images keeps 'atc.prep.images', which it used first), as the sidebar's sections do.
 function initPrepAccordions() {
   for (const toggle of document.querySelectorAll('.prep-accordion-toggle')) {
@@ -9426,8 +9615,8 @@ function initPrepAccordions() {
     const key = toggle.dataset.store;
     if (!panel) continue;
     const show = (open) => { toggle.setAttribute('aria-expanded', String(open)); panel.hidden = !open; };
-    let open = true;
-    try { if (key) open = localStorage.getItem(key) !== 'closed'; } catch {}
+    let open = toggle.getAttribute('aria-expanded') !== 'false';   // as the markup says (2026-11-09)
+    try { const v = key ? localStorage.getItem(key) : null; if (v === 'open' || v === 'closed') open = v === 'open'; } catch {}
     show(open);
     toggle.addEventListener('click', () => {
       const next = toggle.getAttribute('aria-expanded') !== 'true';
@@ -9437,6 +9626,43 @@ function initPrepAccordions() {
   }
 }
 initPrepAccordions();
+
+// Experimental sections' tooltips (2026-11-09, Nicholas; CSS .exp-tip): Escape hides a tooltip that is showing
+// (WCAG 1.4.13: dismissible without moving the pointer or focus); it can show again once the pointer leaves the label
+// or focus moves on. Every other Escape handler runs as before (nothing is stopped or prevented here).
+function initExperimentalTips() {
+  const heads = [...document.querySelectorAll('.experimental > :is(.prep-accordion-heading, .rail-section-heading)')];
+  // Which way a tooltip opens (2026-11-09): below its label, unless the area it scrolls in has no room there and has
+  // room above (found clipped by 6 px under LaTeX Find/Replace, the last accordion in File Preparation). Measured each
+  // time it shows, before it is drawn, so it never flickers.
+  const scrollBox = (el) => {
+    for (let p = el.parentElement; p; p = p.parentElement) if (getComputedStyle(p).overflowY !== 'visible') return p;
+    return document.documentElement;
+  };
+  const place = (head) => {
+    const tip = head.querySelector('.exp-tip');
+    if (!tip) return;
+    tip.classList.remove('tip-up');
+    tip.style.visibility = 'hidden'; tip.style.display = 'block';
+    const h = tip.getBoundingClientRect().height;
+    tip.style.display = ''; tip.style.visibility = '';
+    const box = scrollBox(head).getBoundingClientRect(), r = head.getBoundingClientRect();
+    if (r.bottom + h > box.bottom && r.top - h >= box.top) tip.classList.add('tip-up');
+  };
+  for (const head of heads) {
+    head.addEventListener('mouseenter', () => place(head));
+    head.addEventListener('focusin', () => place(head));
+    head.addEventListener('mouseleave', () => head.classList.remove('tip-dismissed'));
+    head.addEventListener('focusout', () => head.classList.remove('tip-dismissed'));
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    for (const head of heads) {
+      if (head.matches(':hover') || head.contains(document.activeElement)) head.classList.add('tip-dismissed');
+    }
+  });
+}
+initExperimentalTips();
 
 function setSidebarOpen(open, section) {
   // The Tools button moves into the sidebar header while the panel is open, and back to

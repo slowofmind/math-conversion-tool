@@ -37,6 +37,12 @@
 // conversion starts; a press during a press is ignored; with no target a
 // press is refused; nothing changed with the editor off a copy returns
 // only the target to the original; a failed load is not kept.
+//
+// 2026-11-09 (Nicholas, preprocess-autoconvert\NOTE-PREPROCESS-AUTOCONVERT-ANALYSIS.md): a press "should stay on the
+// original": the -pp copy is never opened; its text is converted with runConversion(pre), pre = { text, master,
+// converted }, the editor and the target on the original (so the output keeps the original's name). run({ auto:
+// true }) is Convert with "Autoprocess" ticked: wherever a press would stop, it converts the original instead, and
+// only the log says why (no report: "Don't worry yet about adding messaging to the report").
 
 export const PREPROCESSED = 'preprocessed';   // the tag, PLAN-9 2.1
 const HANDED_EXTS = ['tex', 'sty', 'cls'];
@@ -99,7 +105,20 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
   // latex-preprocess s55): updateLog([{ level, message }]),
   // js/log-display.js; updateStatus(state, text), index.html L2825.
   // E's stand-ins enforce both.
-  function stop(reason) {
+  // Autoprocess (2026-11-09, Nicholas): where a press from Convert would stop, the original is converted instead,
+  // as Convert would ("For today though, we can fall back to converting the original"); only the log says why
+  // ("Don't worry yet about adding messaging to the report related to preprocessing refusing or failing").
+  // Nothing is written; the status stays loading for the conversion.
+  async function fallback(reason) {
+    const why = String(reason).replace(/\.?\s*Nothing was changed( or converted)?\.\s*$/, '');
+    updateLog([{ level: 'warn', message: `Preprocess (Autoprocess) did not run: ${why}; converting the original instead.` }]);
+    updateStatus('loading', 'Preprocessing did not run. Converting the original.');
+    await runConversion();
+    return false;
+  }
+
+  // A manual press's stop (was named stop; 2026-11-09 a press picks refuse or fallback as its `stop`).
+  function refuse(reason) {
     showReport('Preprocess stopped: ' + reason);
     updateLog([{ level: 'error', message: 'Preprocess stopped: ' + reason }]);
     updateStatus('error', 'Preprocess stopped. See the Preprocess view.');
@@ -124,8 +143,9 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
     }
   }
 
-  async function press() {
+  async function press({ auto = false } = {}) {
     const p = model.project;
+    const stop = auto ? fallback : refuse;   // 2026-11-09: Autoprocess converts the original where a press would stop
 
     // 1. The tool and its table (79). A failed load is not kept.
     let tool, capability;
@@ -216,15 +236,25 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
       for (const [path, pp] of wanted)
         model.addFile(pp, new TextEncoder().encode(result.output.get(path)),
           { source: PREPROCESSED });
+      // 2026-11-09 (Nicholas: "it should stay on the original"): the copy is not opened. The editor's text goes into
+      // the model, as opening a file did; a copy the editor was on (temp files shown) is gone, so the editor returns
+      // to that copy's original; the target stays (or returns to) the original; and the copy's text is converted
+      // through runConversion(pre), every copy served under its original's name.
+      if (onCopy) {
+        const back = originalPathOf(onCopy.path);
+        await openProjectFile((back !== null && model.getEntry(back)) || model.getEntry(entryPath));
+      } else if (p.mainPath && model.getEntry(p.mainPath)) {
+        model.updateText(p.mainPath, editor.getText());
+      }
+      if (model.project.convertTargetPath !== entryPath) model.setConvertTarget(entryPath);
       syncAuxFiles();
       const mainPp = ppPathOf(entryPath);
       if (keepRun) keepRun({ tool, run: result, files, entry: entryPath, converted: mainPp });
       showReport(report);
       updateLog([{ level: 'info', message: `Preprocess: ${listed(changed)} changed; saved ` +
-        `${listed(wanted.map(([, pp]) => pp))}; converting ${mainPp}.` }]);
-      updateStatus('loading', `Preprocessed. Converting ${mainPp}.`);
-      await openProjectFile(model.getEntry(mainPp));
-      await runConversion();
+        `${listed(wanted.map(([, pp]) => pp))}; converting ${mainPp} as ${entryPath}.` }]);
+      updateStatus('loading', `Preprocessed. Converting ${entryPath}.`);
+      await runConversion({ text: model.getText(mainPp), master: entryPath, converted: mainPp });
       return true;
     }
 
@@ -248,10 +278,10 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
     return true;
   }
 
-  async function run() {
+  async function run(opts) {         // opts: { auto: true } from Convert (2026-11-09)
     if (busy) return false;
     busy = true;
-    try { return await press(); } finally { busy = false; }
+    try { return await press(opts); } finally { busy = false; }
   }
 
   return { run };

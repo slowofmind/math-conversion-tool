@@ -379,14 +379,19 @@ export function initProjectModel({ updateStatus } = {}) {
   // THE PROJECTION. resourceFiles.auxFiles is rebuilt from this after
   // every mutation. `include` is deliberately NOT consulted in Stage 0 —
   // wiring it in is the whole of Stage 2.
-  function toAuxFiles() {
+  // opts (2026-11-09, preprocessing stays on the original): { preprocessed: true, stdin } serves every tagged -pp
+  // copy under its original's name whatever the target, and leaves out `stdin` (the file whose copy is converted,
+  // given as text) instead of the editor's file. No opts: exactly as before.
+  function toAuxFiles(opts = {}) {
     const out = {};
+    const forced = !!opts.preprocessed;
+    const isStdin = (e) => (forced && typeof opts.stdin === 'string' ? e.path === opts.stdin : e.isMain);
     // PLAN-9 step D, the preprocess swap. With no stand-ins this loop does
     // exactly what it did before step D (judgement call 76).
-    const standIns = preprocessStandIns();
+    const standIns = preprocessStandIns(forced);
     const standing = new Set(standIns.values());
     for (const e of project.entries.values()) {
-      if (e.isMain) continue;          // stdin, never a file
+      if (isStdin(e)) continue;        // stdin, never a file
       const pp = standIns.get(e.path);
       if (pp) {                        // an original with a stand-in (call 75)
         if (e.include === false) continue;   // excluded: nothing, no -pp either
@@ -409,13 +414,16 @@ export function initProjectModel({ updateStatus } = {}) {
   // is tagged, is NOT the editor file (77), and an original of the same
   // name without -pp, extension kept, sits in the SAME folder and is NOT
   // itself tagged (74).
-  function preprocessStandIns() {
+  // forced (2026-11-09): whatever the target; the editor's file may stand in too (it is not stdin then).
+  function preprocessStandIns(forced = false) {
     const map = new Map();
-    const target = project.entries.get(project.convertTargetPath);
-    if (!target || target.source !== 'preprocessed') return map;
-    if (ppOriginalName(target.name) === null) return map;
+    if (!forced) {
+      const target = project.entries.get(project.convertTargetPath);
+      if (!target || target.source !== 'preprocessed') return map;
+      if (ppOriginalName(target.name) === null) return map;
+    }
     for (const e of project.entries.values()) {
-      if (e.source !== 'preprocessed' || e.isMain) continue;
+      if (e.source !== 'preprocessed' || (!forced && e.isMain)) continue;
       const orig = ppOriginalName(e.name);
       if (orig === null) continue;
       const o = project.entries.get(e.dir ? e.dir + '/' + orig : orig);
@@ -488,10 +496,12 @@ export function initProjectModel({ updateStatus } = {}) {
   // Must stay ONE short sentence — it is spoken on every entry to the
   // panel. Must be rebuilt whenever the model changes. Must NOT be a
   // live region. (nvda-test/RESULTS-tree-patterns.md §follow-up)
-  function summarise() {
+  // skip (2026-11-09): entries the file tree is not showing (Hide temp files) are not counted.
+  function summarise(skip) {
     const dirs = new Set();
     let fileCount = 0, excludedCount = 0;
     for (const e of project.entries.values()) {
+      if (skip && skip(e)) continue;
       fileCount++;
       if (e.include === false) excludedCount++;
       let d = e.dir;
@@ -502,8 +512,8 @@ export function initProjectModel({ updateStatus } = {}) {
     return { fileCount, folderCount: dirs.size, excludedCount, targetName: target };
   }
 
-  function summaryText() {
-    const s = summarise();
+  function summaryText(opts = {}) {
+    const s = summarise(opts.skip);
     let head = `${s.fileCount} file${s.fileCount === 1 ? '' : 's'}`;
     if (s.folderCount) head += ` in ${s.folderCount} folder${s.folderCount === 1 ? '' : 's'}`;
     if (s.excludedCount) head += `, ${s.excludedCount} excluded`;
