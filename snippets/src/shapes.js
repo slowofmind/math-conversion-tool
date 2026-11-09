@@ -13,7 +13,8 @@
 //      evidence. So is a reading where the base and the script could each be
 //      the operand (e^x). Evidence is the concept's own kernel form in the
 //      Reference tool (the same shape, with the operands marked) or, for
-//      scripts, the concept's fixity (postfix: the base; indexed: the script).
+//      scripts, the concept's fixity (postfix: the base, or the base with its
+//      subscript when the term has one, as in f_n'; indexed: the script).
 //   4. When the kernel form has the same shape but marks other pieces,
 //      that reading is dropped: the form disagrees.
 //   5. One reading left: use it. None, or several that differ: the author
@@ -300,8 +301,16 @@ function scripted(src, T) {
   if (!baseR) return [];
   const sub = rowRange(t.sub), sup = rowRange(t.sup);
   const subC = hasContent(src, sub), supC = hasContent(src, sup);
-  const out = [reading('scripted', 'base', [baseR], { lossy: subC || supC, fixityOk: ['postfix'] })];
-  if (t.sub && (t.sup || t.primes) && b.kind !== 'group') {
+  // [CLAUDE 2026-11-08, later] [NICHOLAS 2026-11-08] A postfix mark (a superscript or prime) applies to
+  // everything before it. When the term also has a subscript (f_n', A_n^T), postfix fixity is evidence for
+  // "base+sub", not for the base alone (which would leave the subscript unread); with no subscript (f', z^*)
+  // it is evidence for the base. (Before: postfix vouched for the base in both cases, so f_n' was ambiguous.)
+  const subAndMark = subC && !!(t.sup || t.primes);
+  const out = [reading('scripted', 'base', [baseR], { lossy: subC || supC, fixityOk: subAndMark ? [] : ['postfix'] })];
+  // "base+sub" only when the subscript is typed straight after the base (f_n'): then base and subscript are one
+  // piece of the source. Typed after the mark (f'_n: perhaps "the n-th part of f prime") they are not, and the
+  // range would swallow the mark, so the reading is not offered and the author is asked.
+  if (t.sub && (t.sup || t.primes) && b.kind !== 'group' && !src.slice(b.end, t.sub.marker).trim()) {
     const subEnd = t.sub.groupEnd ?? t.sub.end;
     out.push(reading('scripted', 'base+sub', [{ start: b.start, end: subEnd }], { lossy: supC, fixityOk: ['postfix'] }));
   }

@@ -118,6 +118,14 @@ export const fixtures = [
     expect: ready(R`\MathMLintent{prime-notation:postfix($a)}{\MathMLarg{a}{y}''}`), operands: ops('y') },
   { id: 'prime-subscripted', concept: 'prime-notation', source: R`$f_n'$`, select: R`f_n'`,
     expect: ready(R`\MathMLintent{prime-notation:postfix($a)}{{\MathMLarg{a}{f_n}}'}`), operands: ops('f_n') },
+  // [CLAUDE 2026-11-08, later] [NICHOLAS 2026-11-08] A postfix mark applies to everything before it: with a
+  // subscript typed straight after the base, postfix fixity points to base+subscript (transpose is postfix and
+  // has no kernel form, like prime-notation). With the mark typed BEFORE the subscript, base and subscript are
+  // not one piece of the source ("the n-th part of f prime"?), so the tool asks.
+  { id: 'transpose-subscripted', concept: 'transpose', source: R`$A_n^{T}$`, select: R`A_n^{T}`,
+    expect: ready(R`\MathMLintent{transpose:postfix($a1)}{{\MathMLarg{a1}{A_n}}^{T}}`), operands: ops('A_n') },
+  { id: 'prime-typed-before-subscript', concept: 'prime-notation', source: R`$f'_n$`, select: R`f'_n`, expect: needs('lossy') },
+  { id: 'transpose-typed-before-subscript', concept: 'transpose', source: R`$A^{T}_n$`, select: R`A^{T}_n`, expect: needs('lossy') },
   { id: 'time-derivative-dot', concept: 'time-derivative', source: R`$\dot{x}=v$`, select: R`\dot{x}`,
     expect: ready(R`\MathMLintent{time-derivative:function($a)}{\dot{\MathMLarg{a}{x}}}`), operands: ops('x') },
   { id: 'gradient-nabla', concept: 'gradient', source: R`$\nabla f$`, select: R`\nabla f`,
