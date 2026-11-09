@@ -65,9 +65,9 @@ const s1 = core.search('real part', { group: GROUP });
 ok(s1[0]?.concept === 'real-part', 'search: "real part" finds real-part first', `got ${names(s1).slice(0, 5)}`);
 const all = core.search('', { group: GROUP });
 const inGroup = loadExport().concepts.filter(r => (r.groups ?? []).includes(GROUP));
-const listed = inGroup.filter(r => !r.notUsed && !r.readsWithoutMarkup);
-ok(all.length === listed.length, 'search: empty query lists the whole group minus not-used and reads-without-markup',
-   `got ${all.length}, group has ${inGroup.length} (${inGroup.filter(r => r.notUsed).length} not used, ${inGroup.filter(r => r.readsWithoutMarkup).length} reads without markup)`);
+const listed = inGroup.filter(r => !r.notUsed && !r.readsWithoutMarkup && !r.role);
+ok(all.length === listed.length, 'search: empty query lists the whole group minus not-used, reads-without-markup and role records',
+   `got ${all.length}, group has ${inGroup.length} (${inGroup.filter(r => r.notUsed).length} not used, ${inGroup.filter(r => r.readsWithoutMarkup).length} reads without markup, ${inGroup.filter(r => r.role).length} with a role)`);
 const s2 = core.search('integral', { group: GROUP });
 ok(names(s2).includes('definite-integral') && names(s2).includes('riemann-integral') && s2.every(d => d.groups.includes(GROUP)),
    'search: "integral" within the group', `got ${names(s2)}`);
@@ -94,6 +94,34 @@ const s7 = core.search('hyp sin', { group: GROUP, includeReadsWithoutMarkup: tru
 ok(s7[0]?.concept === 'hyperbolic-sine', 'search: word starts ("hyp sin", labelled concepts shown)', `got ${names(s7).slice(0, 3)}`);
 const s7b = core.search('hyp sin', { group: GROUP });
 ok(s7b[0]?.concept === 'arc-hyperbolic-sine' && !names(s7b).includes('hyperbolic-sine'), 'search: "hyp sin" by default skips the labelled hyperbolic-sine', `got ${names(s7b).slice(0, 3)}`);
+// [CLAUDE 2026-11-08, later] [NICHOLAS 2026-11-08] Records with a role (Reference ruling 11: MathCAT
+// internal names, intent properties) are never listed or counted, whatever is asked for, and are
+// refused when asked for by name or key.
+{
+  const R = String.raw;
+  const recs = loadExport().concepts, roleRecs = recs.filter(r => r.role);
+  const everything = core.search('', { includeNotUsed: true, includeReadsWithoutMarkup: true });
+  ok(roleRecs.length > 0 && !everything.some(d => d.role),
+     'search: records with a role are never listed, even with every option on', `${roleRecs.length} role records; listed: ${everything.filter(d => d.role).map(d => d.concept)}`);
+  ok(!core.search('pause', { includeNotUsed: true, includeReadsWithoutMarkup: true }).some(d => d.concept === 'pause')
+     && !core.search('say super').some(d => d.concept === 'say-super'),
+     'search: a role record is not found by its own name ("pause", "say super")', '');
+  const chem = core.groups().find(g => g.id === 'chemistry');
+  const chemWant = recs.filter(r => (r.groups ?? []).includes('chemistry') && !r.role).length;
+  ok(chem?.count === chemWant, 'group counts leave out role records', `chemistry: got ${chem?.count}, want ${chemWant}`);
+  const srcTotal = core.sources().reduce((n, s) => n + s.count, 0);
+  ok(srcTotal === recs.length - roleRecs.length, 'source counts leave out role records', `got ${srcTotal}, want ${recs.length - roleRecs.length}`);
+  const doc = R`$x \to a$`, sel = { start: 1, end: doc.length - 1 };
+  const r1 = core.apply(doc, sel, 'none');
+  ok(r1.status === 'refused' && r1.reason.code === 'not-a-concept' && /MathCAT's own rules/.test(r1.reason.message),
+     'an internal name asked for by name is refused', `got ${show(r1)}`);
+  const r2 = core.apply(doc, sel, 'custom:pause');
+  ok(r2.status === 'refused' && r2.reason.code === 'not-a-concept' && r2.reason.message.includes('":pause"'),
+     'a property asked for by key is refused, saying how a property is written', `got ${show(r2)}`);
+  const r3 = core.applyWithOperandTexts(doc, sel, 'system-of-equations', ['x']);
+  ok(r3.status === 'refused' && r3.reason.code === 'not-a-concept', 'typed parts do not get round the refusal', `got ${show(r3)}`);
+  ok(core.concept('pause')?.role === 'property', 'a role record is still described (so a message can explain it)', JSON.stringify(core.concept('pause')?.role));
+}
 
 console.log('--- typed operands (the demo page path)');
 {

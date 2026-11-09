@@ -181,8 +181,11 @@ export const fixtures = [
   // confirms the reading: the core labels it without help.
   { id: 'change', concept: 'change', source: R`$\Delta x$`, select: R`\Delta x`,
     expect: ready(R`\MathMLintent{change:prefix($quantity)}{\Delta \MathMLarg{quantity}{x}}`), operands: ops('x') },
+  // [CLAUDE 2026-11-08, later] piecewise has role "property" (Reference ruling 11, 2026-11-07): written
+  // ":piecewise" on an element, not a concept with parts, so the snippet tool refuses it [NICHOLAS 2026-11-08].
+  // (Was needs('arity-unknown') before the ruling.)
   { id: 'piecewise', concept: 'piecewise', source: R`$f(x)=\begin{cases} 1 & x>0 \\ 0 & x\le 0 \end{cases}$`,
-    select: R`\begin{cases} 1 & x>0 \\ 0 & x\le 0 \end{cases}`, expect: needs('arity-unknown') },
+    select: R`\begin{cases} 1 & x>0 \\ 0 & x\le 0 \end{cases}`, expect: refused('not-a-concept') },
 
   // "Not used" concepts are refused, naming the replacement.
   { id: 'not-used-large-op', concept: 'large-op', source: R`$\sum_i a_i$`, select: R`\sum_i a_i`, expect: refused('not-used') },

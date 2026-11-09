@@ -6,6 +6,10 @@
 // snippet tool writes fixity into the markup; each concept's kernel forms (Reference
 // data/concept-forms.js) give the intent value, the operand names and where each operand sits;
 // concepts labelled "reads without markup" are hidden from search unless asked for.
+// [CLAUDE 2026-11-08, later] [NICHOLAS 2026-11-08] Records with a `role` (Reference ruling 11,
+// 2026-11-07: "internal" = names MathCAT's own rules produce; "property" = written `:name` on an
+// element) are not concepts an author writes: never listed, never counted, and refused by
+// checks.js checkConcept if asked for by name or key.
 // Nothing about any concept is written here: names, operands, their order, arity, fixity, groups
 // and source all come from the slim copy. The slim copy has no wording, levels or status.
 
@@ -115,6 +119,7 @@ export function describe(rec) {
 /**
  * Filter the list: query (name, key), subject group, source ('core' | 'open' | 'custom').
  * Left out unless asked for: not-used concepts, and concepts labelled "reads without markup".
+ * Never listed: records with a role (MathCAT internal names, intent properties).
  * Best matches first: exact name, name starts with the query, every query word starts a name
  * word, name contains it, key contains it.
  */
@@ -123,6 +128,7 @@ export function searchConcepts(index, query = '', { group = null, source = null,
   const q = norm(query), qWords = q ? q.split(' ') : [];
   const hits = [];
   for (const r of index.records) {
+    if (r.role) continue;
     if (group && !(r.groups ?? []).includes(group)) continue;
     if (source && r.source !== source) continue;
     if (r.notUsed && !includeNotUsed) continue;
@@ -142,16 +148,17 @@ export function searchConcepts(index, query = '', { group = null, source = null,
   return hits.slice(0, limit).map(h => describe(h.r));
 }
 
-/** The subject groups that occur in the list, with counts. */
+/** The subject groups that occur in the list, with counts (records with a role are not counted:
+ *  search never lists them). */
 export function groupsIn(index) {
   const counts = new Map();
-  for (const r of index.records) for (const g of r.groups ?? []) counts.set(g, (counts.get(g) ?? 0) + 1);
+  for (const r of index.records) if (!r.role) for (const g of r.groups ?? []) counts.set(g, (counts.get(g) ?? 0) + 1);
   return [...counts].map(([id, count]) => ({ id, count })).sort((a, b) => a.id.localeCompare(b.id));
 }
 
-/** The sources that occur in the list, with counts. */
+/** The sources that occur in the list, with counts (records with a role are not counted). */
 export function sourcesIn(index) {
   const counts = new Map();
-  for (const r of index.records) counts.set(r.source, (counts.get(r.source) ?? 0) + 1);
+  for (const r of index.records) if (!r.role) counts.set(r.source, (counts.get(r.source) ?? 0) + 1);
   return [...counts].map(([id, count]) => ({ id, count })).sort((a, b) => String(a.id).localeCompare(String(b.id)));
 }

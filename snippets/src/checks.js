@@ -76,6 +76,14 @@ export function checkConcept(ctx) {
   const nu = ctx.concept.notUsed;
   if (nu) return problem('not-used', `"${ctx.concept.concept}" is marked "not used" in the Reference tool` +
     (nu.useInstead ? `; use "${nu.useInstead}" instead.` : '.') + (nu.reason ? ` Reason: ${nu.reason}` : ''));
+  // [CLAUDE 2026-11-08, later] [NICHOLAS 2026-11-08] A record with a role is not a concept an author
+  // writes (Reference ruling 11, 2026-11-07). Search never lists one; this refuses it by name or key.
+  const role = ctx.concept.role, name = ctx.concept.concept;
+  if (role === 'internal') return problem('not-a-concept',
+    `"${name}" is a name MathCAT's own rules produce when reading math; authors do not write it.`);
+  if (role === 'property') return problem('not-a-concept',
+    `"${name}" is a property, not a concept: it is written ":${name}" on an element. The snippet tool does not write properties.`);
+  if (role) return problem('not-a-concept', `"${name}" is not a concept an author writes (the Reference tool gives it the role "${role}").`);
   return null;
 }
 

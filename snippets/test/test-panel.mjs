@@ -58,6 +58,16 @@ const core = createSnippetCore(loadExport());
   const r = createSnippetController({ core, editor: ed }).apply('limit-sup');
   ok(r.status === 'refused' && r.reason.code === 'not-used' && /^Not applied:/.test(describeResult(r)), 'a not-used concept is refused with its reason');
 }
+{ // [CLAUDE 2026-11-08, later] refused: a record with a role (MathCAT internal name), document unchanged
+  const ed = fakeEditor(R`$x^2$`);
+  ed.select(R`x^2`);
+  const c = createSnippetController({ core, editor: ed });
+  const r = c.apply('say-super');
+  ok(r.status === 'refused' && r.reason.code === 'not-a-concept' && /^Not applied:/.test(describeResult(r)) && ed.getText() === R`$x^2$`,
+    'a MathCAT internal name is refused, document unchanged', describeResult(r));
+  ok(!c.search('say super', { includeNotUsed: true, includeReadsWithoutMarkup: true }).some(d => d.concept === 'say-super'),
+    'the panel\'s search never lists it, whatever the checkboxes say');
+}
 { // search: labelled concepts hidden unless asked
   const c = createSnippetController({ core, editor: fakeEditor('') });
   ok(!c.search('plus').some(d => d.key === 'core:plus') && c.search('plus', { includeReadsWithoutMarkup: true }).some(d => d.key === 'core:plus'),
