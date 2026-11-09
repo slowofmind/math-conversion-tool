@@ -11,6 +11,9 @@
 //   3. The selection checks, nesting, and brace cases.
 // Every expected kernel text is checked by test/verify-fixtures.mjs with the
 // Baseline converter before it is used.
+// [CLAUDE 2026-11-08, late] ln-parens, ln-prefix, exp-parens, exp-e-power, imaginary-part-parens, complex-arg-prefix
+// and transpose-subscripted take the part names of the new kernel forms ($a1 -> $value / $matrix): Reference
+// tools/apply-core-22-20261108.mjs [NICHOLAS 2026-11-08: "I approve the groups"].
 //
 // Fields: id, concept (name or export key), source, select (+ nth) or range,
 //   expect: { status: 'ready'|'needs-operands'|'refused', code?, text?, warnings? }
@@ -83,14 +86,14 @@ export const fixtures = [
   { id: 'log-base-parens', concept: 'logarithm', source: R`$\log_{2}(n+1)$`, select: R`\log_{2}(n+1)`,
     expect: ready(R`\MathMLintent{logarithm:function($a1,$a2)}{\log_{\MathMLarg{a2}{2}}(\MathMLarg{a1}{n+1})}`), operands: ops('n+1', '2') },
   { id: 'ln-parens', concept: 'natural-logarithm', source: R`$\ln(1+x)$`, select: R`\ln(1+x)`,
-    expect: ready(R`\MathMLintent{natural-logarithm:function($a1)}{\ln(\MathMLarg{a1}{1+x})}`), operands: ops('1+x') },
+    expect: ready(R`\MathMLintent{natural-logarithm:function($value)}{\ln(\MathMLarg{value}{1+x})}`), operands: ops('1+x') },
   { id: 'ln-prefix', concept: 'natural-logarithm', source: R`$\ln x$`, select: R`\ln x`,
-    expect: ready(R`\MathMLintent{natural-logarithm:function($a1)}{\ln \MathMLarg{a1}{x}}`), operands: ops('x') },
+    expect: ready(R`\MathMLintent{natural-logarithm:function($value)}{\ln \MathMLarg{value}{x}}`), operands: ops('x') },
   { id: 'exp-parens', concept: 'exponential', source: R`$\exp(-x^2)$`, select: R`\exp(-x^2)`,
-    expect: ready(R`\MathMLintent{exponential:function($a1)}{\exp(\MathMLarg{a1}{-x^2})}`), operands: ops('-x^2') },
+    expect: ready(R`\MathMLintent{exponential:function($value)}{\exp(\MathMLarg{value}{-x^2})}`), operands: ops('-x^2') },
   // e^x: base or exponent? The tool cannot know, so it asks.
   { id: 'exp-e-power', concept: 'exponential', source: R`$e^{x}$`, select: R`e^{x}`,
-    expect: needs(null, R`\MathMLintent{exponential:function($a1)}{e^{\MathMLarg{a1}{x}}}`), operands: ops('x') },
+    expect: needs(null, R`\MathMLintent{exponential:function($value)}{e^{\MathMLarg{value}{x}}}`), operands: ops('x') },
   { id: 'exponential-e-base', concept: 'exponential-e', source: R`$e^{x}$`, select: 'e',
     expect: ready(R`\MathMLintent{exponential-e:nofix}{e}`), operands: [] },
 
@@ -98,9 +101,9 @@ export const fixtures = [
   { id: 'real-part-prefix', concept: 'real-part', source: R`$\Re z$`, select: R`\Re z`,
     expect: ready(R`\MathMLintent{real-part:function($value)}{\Re \MathMLarg{value}{z}}`), operands: ops('z') },
   { id: 'imaginary-part-parens', concept: 'imaginary-part', source: R`$\operatorname{Im}(z+w)$`, select: R`\operatorname{Im}(z+w)`,
-    expect: ready(R`\MathMLintent{imaginary-part:function($a1)}{\operatorname{Im}(\MathMLarg{a1}{z+w})}`), operands: ops('z+w') },
+    expect: ready(R`\MathMLintent{imaginary-part:function($value)}{\operatorname{Im}(\MathMLarg{value}{z+w})}`), operands: ops('z+w') },
   { id: 'complex-arg-prefix', concept: 'complex-arg', source: R`$\arg z$`, select: R`\arg z`,
-    expect: ready(R`\MathMLintent{complex-arg:function($a1)}{\arg \MathMLarg{a1}{z}}`), operands: ops('z') },
+    expect: ready(R`\MathMLintent{complex-arg:function($value)}{\arg \MathMLarg{value}{z}}`), operands: ops('z') },
   { id: 'conjugate-overline', concept: 'complex-conjugate', source: R`$\overline{z}$`, select: R`\overline{z}`,
     expect: ready(R`\MathMLintent{complex-conjugate:function($value)}{\overline{\MathMLarg{value}{z}}}`), operands: ops('z') },
   { id: 'conjugate-bar-unbraced', concept: 'complex-conjugate', source: R`$\bar z$`, select: R`\bar z`,
@@ -123,7 +126,7 @@ export const fixtures = [
   // has no kernel form, like prime-notation). With the mark typed BEFORE the subscript, base and subscript are
   // not one piece of the source ("the n-th part of f prime"?), so the tool asks.
   { id: 'transpose-subscripted', concept: 'transpose', source: R`$A_n^{T}$`, select: R`A_n^{T}`,
-    expect: ready(R`\MathMLintent{transpose:postfix($a1)}{{\MathMLarg{a1}{A_n}}^{T}}`), operands: ops('A_n') },
+    expect: ready(R`\MathMLintent{transpose:postfix($matrix)}{{\MathMLarg{matrix}{A_n}}^{T}}`), operands: ops('A_n') },
   { id: 'prime-typed-before-subscript', concept: 'prime-notation', source: R`$f'_n$`, select: R`f'_n`, expect: needs('lossy') },
   { id: 'transpose-typed-before-subscript', concept: 'transpose', source: R`$A^{T}_n$`, select: R`A^{T}_n`, expect: needs('lossy') },
   { id: 'time-derivative-dot', concept: 'time-derivative', source: R`$\dot{x}=v$`, select: R`\dot{x}`,

@@ -164,8 +164,10 @@ function isHead(src, t) {
 const scriptRanges = t => [t.sub, t.sup].filter(Boolean).map(rowRange);
 
 // A reading.  needs: null | 'evidence' (only with the example or fixityOk)
-const reading = (shape, variant, ops, { lossy = false, needs = null, fixityOk = null } = {}) =>
-  ({ shape, variant, ops, lossy, needs, fixityOk });
+// [CLAUDE 2026-11-08, late] unread: which pieces a lossy reading leaves unread ('sub', 'sup'), where a shape
+// knows; null elsewhere. Used so a kernel form only vouches for readings that leave no more unread than it does.
+const reading = (shape, variant, ops, { lossy = false, needs = null, fixityOk = null, unread = null } = {}) =>
+  ({ shape, variant, ops, lossy, needs, fixityOk, unread });
 
 // ---- Shapes --------------------------------------------------------------------
 // Each: (src, T, conceptArity) => [reading]. T = the selection's terms, no spacing.
@@ -306,13 +308,13 @@ function scripted(src, T) {
   // "base+sub", not for the base alone (which would leave the subscript unread); with no subscript (f', z^*)
   // it is evidence for the base. (Before: postfix vouched for the base in both cases, so f_n' was ambiguous.)
   const subAndMark = subC && !!(t.sup || t.primes);
-  const out = [reading('scripted', 'base', [baseR], { lossy: subC || supC, fixityOk: subAndMark ? [] : ['postfix'] })];
+  const out = [reading('scripted', 'base', [baseR], { lossy: subC || supC, fixityOk: subAndMark ? [] : ['postfix'], unread: [subC && 'sub', supC && 'sup'].filter(Boolean) })];
   // "base+sub" only when the subscript is typed straight after the base (f_n'): then base and subscript are one
   // piece of the source. Typed after the mark (f'_n: perhaps "the n-th part of f prime") they are not, and the
   // range would swallow the mark, so the reading is not offered and the author is asked.
   if (t.sub && (t.sup || t.primes) && b.kind !== 'group' && !src.slice(b.end, t.sub.marker).trim()) {
     const subEnd = t.sub.groupEnd ?? t.sub.end;
-    out.push(reading('scripted', 'base+sub', [{ start: b.start, end: subEnd }], { lossy: supC, fixityOk: ['postfix'] }));
+    out.push(reading('scripted', 'base+sub', [{ start: b.start, end: subEnd }], { lossy: supC, fixityOk: ['postfix'], unread: supC ? ['sup'] : [] }));
   }
   const scripts = [t.sub && sub, t.sup && sup].filter(Boolean);
   if (scripts.length && (!t.sub || subC) && (!t.sup || supC) && !t.primes)
@@ -428,7 +430,7 @@ export function formEvidence(rec) {
       const ok = perm.every(p => p >= 0) && new Set(perm).size === perm.length;
       // lossy: the form's own notation leaves pieces unread (kept so a form without that cannot
       // vouch for a selection that would leave pieces unread: \sin x is no evidence for \sin^2 x)
-      if (ok) { if (map.get(key)?.status !== 'confirmed') map.set(key, { status: 'confirmed', perm, form, lossy: !!r.lossy }); }
+      if (ok) { if (map.get(key)?.status !== 'confirmed') map.set(key, { status: 'confirmed', perm, form, lossy: !!r.lossy, unread: r.unread ?? null }); }
       else if (!map.has(key)) map.set(key, { status: 'contradicted' });
     }
   }
@@ -459,7 +461,10 @@ export function chooseInterpretation(ctx, forms) {
   for (const r of fits) {
     const e = evidence.get(`${r.shape}/${r.variant}/${r.ops.length}`);
     if (e?.status === 'contradicted') { dropped.contradicted.push(r); continue; }
-    if (e?.status === 'confirmed' && (!r.lossy || e.lossy)) { kept.push({ ...r, rank: 0, perm: e.perm }); continue; }
+    // [CLAUDE 2026-11-08, late] a lossy form vouches only if it also left each piece this reading leaves unread
+    // (A^{T} leaves the superscript: no evidence for the base alone in A_n^T, which also leaves the subscript)
+    const covers = !r.unread || !e?.unread || r.unread.every(p => e.unread.includes(p));
+    if (e?.status === 'confirmed' && (!r.lossy || (e.lossy && covers))) { kept.push({ ...r, rank: 0, perm: e.perm }); continue; }
     const byFixity = (r.fixityOk ?? []).some(f => fixities.has(f));
     if ((r.lossy || r.needs) && !byFixity) { (r.lossy ? dropped.lossy : dropped.evidence).push(r); continue; }
     kept.push({ ...r, rank: 1 });

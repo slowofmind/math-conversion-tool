@@ -38,8 +38,8 @@
    "role": 20,
    "withShape": 1122,
    "multiVariant": 12,
-   "withForms": 1197,
-   "readsWithoutMarkup": 93
+   "withForms": 1215,
+   "readsWithoutMarkup": 103
   }
  },
  "concepts": [
@@ -35574,9 +35574,26 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{absolute-value:function($value)}{{\\lvert \\MathMLarg{value}{x} \\rvert}}",
+     "intent": "absolute-value:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{absolute-value:function($value)}{{|\\MathMLarg{value}{x}|}}",
+     "intent": "absolute-value:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -35605,7 +35622,24 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{determinant:function($matrix)}{{\\det \\MathMLarg{matrix}{A}}}",
+     "intent": "determinant:function($matrix)",
+     "operands": [
+      "matrix"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{determinant:function($matrix)}{{\\lvert \\MathMLarg{matrix}{A} \\rvert}}",
+     "intent": "determinant:function($matrix)",
+     "operands": [
+      "matrix"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -35637,7 +35671,24 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{magnitude:function($vector)}{{\\lvert \\MathMLarg{vector}{\\vec{v}} \\rvert}}",
+     "intent": "magnitude:function($vector)",
+     "operands": [
+      "vector"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{magnitude:function($vector)}{{\\lVert \\MathMLarg{vector}{\\vec{v}} \\rVert}}",
+     "intent": "magnitude:function($vector)",
+     "operands": [
+      "vector"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36214,7 +36265,40 @@
      "default": false
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{transpose:postfix($matrix)}{{\\MathMLarg{matrix}{A}^{T}}}",
+     "intent": "transpose:postfix($matrix)",
+     "operands": [
+      "matrix"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{transpose:postfix($matrix)}{{\\MathMLarg{matrix}{A}^{\\top}}}",
+     "intent": "transpose:postfix($matrix)",
+     "operands": [
+      "matrix"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{transpose:postfix($matrix)}{{\\MathMLarg{matrix}{A}^{\\mathsf{T}}}}",
+     "intent": "transpose:postfix($matrix)",
+     "operands": [
+      "matrix"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{transpose:postfix($matrix)}{{\\MathMLarg{matrix}{A}^{\\intercal}}}",
+     "intent": "transpose:postfix($matrix)",
+     "operands": [
+      "matrix"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36354,7 +36438,48 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{complement:function($set)}{{\\MathMLarg{set}{A}^{c}}}",
+     "intent": "complement:function($set)",
+     "operands": [
+      "set"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{complement:function($set)}{{\\MathMLarg{set}{A}^{C}}}",
+     "intent": "complement:function($set)",
+     "operands": [
+      "set"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{complement:function($set)}{{\\MathMLarg{set}{A}^{\\complement}}}",
+     "intent": "complement:function($set)",
+     "operands": [
+      "set"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{complement:function($set)}{{\\MathMLarg{set}{A}'}}",
+     "intent": "complement:function($set)",
+     "operands": [
+      "set"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{complement:function($set)}{{\\overline{\\MathMLarg{set}{A}}}}",
+     "intent": "complement:function($set)",
+     "operands": [
+      "set"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36386,7 +36511,16 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{vector:function($name)}{{\\MathMLarg{name}{\\mathbf{v}}}}",
+     "intent": "vector:function($name)",
+     "operands": [
+      "name"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -36498,9 +36632,18 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{set:function($members)}{{\\{\\MathMLarg{members}{2, 4, 6, 8}\\}}}",
+     "intent": "set:function($members)",
+     "operands": [
+      "members"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -36754,7 +36897,7 @@
    ],
    "forms": [],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -40166,7 +40309,7 @@
    ],
    "forms": [],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -40356,7 +40499,26 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{blank:nofix}{{\\square}}",
+     "intent": "blank:nofix",
+     "operands": [],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{blank:nofix}{{\\underline{\\hspace{2em}}}}",
+     "intent": "blank:nofix",
+     "operands": [],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{blank:nofix}{{\\boxed{\\hspace{2em}}}}",
+     "intent": "blank:nofix",
+     "operands": [],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -40633,7 +40795,16 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{codomain:function($function)}{{\\mathrm{codom}(\\MathMLarg{function}{f})}}",
+     "intent": "codomain:function($function)",
+     "operands": [
+      "function"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -40665,9 +40836,18 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{complex-arg:function($value)}{{\\arg \\MathMLarg{value}{z}}}",
+     "intent": "complex-arg:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -40910,9 +41090,28 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{empty-set:nofix}{{\\emptyset}}",
+     "intent": "empty-set:nofix",
+     "operands": [],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{empty-set:nofix}{{\\varnothing}}",
+     "intent": "empty-set:nofix",
+     "operands": [],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{empty-set:nofix}{{\\{\\}}}",
+     "intent": "empty-set:nofix",
+     "operands": [],
+     "default": false
+    }
+   ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -40942,9 +41141,18 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{exponential:function($value)}{{\\exp \\MathMLarg{value}{x}}}",
+     "intent": "exponential:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -41131,9 +41339,26 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{imaginary-part:function($value)}{{\\operatorname{Im}(\\MathMLarg{value}{z})}}",
+     "intent": "imaginary-part:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{imaginary-part:function($value)}{{\\Im \\MathMLarg{value}{z}}}",
+     "intent": "imaginary-part:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -41399,7 +41624,7 @@
    ],
    "forms": [],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -41712,7 +41937,24 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{median:function($value)}{{\\mathrm{median}(\\MathMLarg{value}{X})}}",
+     "intent": "median:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{median:function($value)}{{\\tilde{\\MathMLarg{value}{x}}}}",
+     "intent": "median:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -41836,9 +42078,18 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{mode:function($value)}{{\\mathrm{mode}(\\MathMLarg{value}{X})}}",
+     "intent": "mode:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
@@ -41886,7 +42137,16 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{natural-logarithm:function($value)}{{\\ln \\MathMLarg{value}{x}}}",
+     "intent": "natural-logarithm:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": true
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42813,7 +43073,24 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{volume:function($region)}{{V(\\MathMLarg{region}{R})}}",
+     "intent": "volume:function($region)",
+     "operands": [
+      "region"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{volume:function($region)}{{\\operatorname{vol}(\\MathMLarg{region}{R})}}",
+     "intent": "volume:function($region)",
+     "operands": [
+      "region"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
@@ -42844,7 +43121,24 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{mean:function($value)}{{\\bar{\\MathMLarg{value}{x}}}}",
+     "intent": "mean:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{mean:function($value)}{{\\overline{\\MathMLarg{value}{x}}}}",
+     "intent": "mean:function($value)",
+     "operands": [
+      "value"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
    "readsWithoutMarkup": false,
    "shape": null,
