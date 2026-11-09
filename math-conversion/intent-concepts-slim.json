@@ -38,8 +38,8 @@
    "role": 20,
    "withShape": 1122,
    "multiVariant": 12,
-   "withForms": 1196,
-   "readsWithoutMarkup": 92
+   "withForms": 1197,
+   "readsWithoutMarkup": 93
   }
  },
  "concepts": [
@@ -40855,9 +40855,37 @@
      "default": true
     }
    ],
-   "forms": [],
+   "forms": [
+    {
+     "tex": "\\MathMLintent{embellished-name:infix($a1,$a2)}{{\\overset{\\MathMLarg{a2}{\\text{def}}}{\\MathMLarg{a1}{=}}}}",
+     "intent": "embellished-name:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": true
+    },
+    {
+     "tex": "\\MathMLintent{embellished-name:infix($a1,$a2)}{{\\stackrel{\\MathMLarg{a2}{\\text{L'H}}}{\\MathMLarg{a1}{=}}}}",
+     "intent": "embellished-name:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": false
+    },
+    {
+     "tex": "\\MathMLintent{embellished-name:infix($a1,$a2)}{{\\underset{\\MathMLarg{a2}{\\text{a.e.}}}{\\MathMLarg{a1}{=}}}}",
+     "intent": "embellished-name:infix($a1,$a2)",
+     "operands": [
+      "a1",
+      "a2"
+     ],
+     "default": false
+    }
+   ],
    "macros": [],
-   "readsWithoutMarkup": false,
+   "readsWithoutMarkup": true,
    "shape": null,
    "notUsed": null,
    "held": null,
