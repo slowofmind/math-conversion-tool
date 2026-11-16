@@ -52,6 +52,46 @@ export function clickTarget(entry, textOf) {
   return { ...at, ranges: lineRanges(w, text) };
 }
 
+// The page's own Log rows -> the tool's platform messages (latex-preprocess s309; report-sidebar\PLAN-REPORT-SIDEBAR.md
+// step A2; "Other messages", his call 1 "A"). Only the platform's own kinds, told by the row's type; Pandoc's rows come
+// through pandocRows. The tool decides what each is (platformEntries); this only carries the row's fields across.
+// A row's `at` ({ file, line, ref }, index.html conversionPathWarnings) is a place in the converted text.
+const PLATFORM_KINDS = Object.freeze({ preprocess: ['preprocess', 'preprocessing'], 'project-paths': ['paths', 'project paths'],
+  placeholder: ['placeholder', 'image placeholder'], package: ['packaging', 'packaging'], 'preview-image': ['preview', 'preview'],
+  exception: ['conversion', 'conversion'] });
+export function platformMessages(rows) {
+  return (rows || []).filter((r) => r && Object.prototype.hasOwnProperty.call(PLATFORM_KINDS, r.type)).map((r) => {
+    const [said, label] = PLATFORM_KINDS[r.type], a = r.at || null;
+    return { level: r.level, message: String(r.message ?? ''), said, label, file: a ? a.file ?? null : null,
+             line: a ? a.line ?? null : null, in: a ? 'converted' : null, ref: a ? a.ref ?? null : null };
+  });
+}
+
+// Pandoc's stop as the page gets it (latex-preprocess s310; report-sidebar step A2b; seen in report-sidebar\a0\S6.json):
+// pandoc-wasm gives `ERROR: Error at "/stdin" (line 16, column 23):` and the lines after it. The tool reads desktop
+// Pandoc's form, `Error at (line 16, column 23):` for unnamed input (pandocRows), so the prefix goes from each line,
+// "/stdin" is read as the unnamed input (as for the JSON log, R12), and lines before the stop are left out of it.
+// Text with no stop gives null: a line such as "File 'x' not found in resource path" is not one (the page tells it
+// with its "Missing image ... placeholder" message).
+export function pandocStopText(text) {
+  const t = String(text || '').replace(/^ERROR: /gm, '').replace(/^Error at "\/stdin" \(/m, 'Error at (');
+  const at = t.search(/^Error at /m);
+  return at < 0 ? null : t.slice(at);
+}
+
+// Which of the output panel's views to leave out (latex-preprocess s312; report-sidebar step A3). His words
+// (2026-11-16): "No preprocessing or combined report should appear in the preview window for non latex input"; LaTeX
+// converted without a preprocessing run: "Option A (the log file, like non-latex input)". So the Report view is offered
+// only while it holds the latest conversion (a run's, joined, not stale), and input that is not LaTeX gets neither it
+// nor the Preprocess view. status: the report state's status(); from: the input format ("latex", "latex+raw_tex" ...).
+// s313 (step A4; his call 3, "Option A is good for now"): the Preprocess view is left out always and the Log while the
+// report holds the latest conversion, unless "Show old views" is ticked (showOld; LaTeX only).
+export function hiddenViews(status, from, { showOld = false } = {}) {
+  const latex = String(from || '').split(/[+-]/)[0] === 'latex';
+  const current = !!(status && status.kept && status.pandoc === 'joined' && !status.stale);
+  return { report: !(latex && current), preprocess: !(latex && showOld), log: latex && current && !showOld };
+}
+
 const SEVERITY = { error: 'error', warning: 'warn', note: 'info' };
 const oneLine = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
 // "label: message", unless the message already starts with its label
@@ -63,6 +103,7 @@ export function createReportState() {
   let pandoc = [];       // Pandoc's entries, from the conversion the press started
   let pandocState = 'none';   // 'none' | 'waiting' | 'joined'
   let stale = false;     // a later conversion happened that this report does not hold
+  let other = [];        // s309: the platform's own messages for the joined conversion (platformMessages)
 
   // After Process file: everything from the run and the ORIGINAL files.
   function keep({ tool, run, files, entry, converted }) {
@@ -73,28 +114,41 @@ export function createReportState() {
           order: checked.files || (run.reader && run.reader.chain) || [entry],
           unread: tool.unreadParts(run, files), opens: tool.openingsOf(run, files),
           packages: tool.packageUsesOf(run, files) };
-    pandoc = []; pandocState = 'waiting'; stale = false;
+    pandoc = []; other = []; pandocState = 'waiting'; stale = false;
   }
 
   // After a conversion: { target, warnings, stderr, error }. Taken only for the
   // conversion the press started (the file it converted, once); any other means
   // this report is from the last run, and it says so.
-  function takePandoc({ target, warnings, stderr, error } = {}) {
+  // s309: `rows`, the page's Log rows for that conversion; its own among them become "Other messages".
+  function takePandoc({ target, warnings, stderr, error, rows: pageRows } = {}) {
     if (!k) return false;
     if (pandocState !== 'waiting' || target !== k.converted) { stale = true; return false; }
     // pandoc-wasm names the file given on stdin "/stdin" (desktop Pandoc: ""); the tool's stdin option reads ""
     // (s293, test R12)
     const log = (warnings || []).map((w) => (w && w.source === '/stdin' ? { ...w, source: '' } : w));
     const rows = k.tool.pandocRows(log, { output: k.run.output, stdin: k.entry,
-      error: error || (stderr && /^Error at /m.test(stderr) ? stderr : null) });
+      // s310: pandocStopText reads pandoc-wasm's form; an error the page caught that is not in it stays as given
+      error: error ? (pandocStopText(error) || error) : pandocStopText(stderr) });
     pandoc = k.tool.pandocEntries(rows, k.run, k.files);
     pandocState = 'joined';
+    if (pageRows) other = platformMessages(pageRows);
+    return true;
+  }
+
+  // s309: later rows of the joined conversion (packaging, preview images). The page hands its whole list for that
+  // conversion, so the list replaces the one held (a row is never told twice). Nothing is taken before a conversion
+  // joins or once a later conversion has made the report stale.
+  function takeOther({ rows } = {}) {
+    if (!k || pandocState !== 'joined' || stale) return false;
+    other = platformMessages(rows);
     return true;
   }
 
   function combined(show) {
     if (!k) return null;
-    return k.tool.combineEntries({ preprocessor: k.pre, checker: k.checker, pandoc },
+    return k.tool.combineEntries({ preprocessor: k.pre, checker: k.checker, pandoc,
+        platform: k.tool.platformEntries ? k.tool.platformEntries(other, k.run, k.files) : [] },
       { main: k.entry, order: k.order, unread: k.unread, opens: k.opens, packages: k.packages,
         ...(show ? { show } : {}) });
   }
@@ -119,7 +173,9 @@ export function createReportState() {
   }
 
   return {
-    keep, pandoc: takePandoc, combined, levelLine, diagnostics,
+    keep, pandoc: takePandoc, other: takeOther, combined, levelLine, diagnostics,
+    // s313: a press that stopped (nothing converted) leaves a report that no longer holds the latest
+    outdate: () => { if (k) stale = true; },
     lines: (c, show) => k.tool.positionLines(c, show),
     status: () => ({ kept: !!k, entry: k && k.entry, converted: k && k.converted, pandoc: pandocState, stale }),
     tool: () => k && k.tool,
@@ -133,9 +189,10 @@ const SHOW_KEY = 'atc.report.show';
 // the project; goTo(target) opens target.file if another is shown, jumps and highlights; mark({ file, diags })
 // hands the main file's marks to the editor.
 export function initReportView({ root, storage = globalThis.localStorage, clipboard = globalThis.navigator && globalThis.navigator.clipboard,
-  textOf = () => null, goTo = null, mark = null } = {}) {
+  textOf = () => null, goTo = null, mark = null, oldViews = null } = {}) {
+  // s313: oldViews { get(), set(v) }, the page's "Show old views" (his call 3 A), drawn as a tick box in Settings
   const state = createReportState();
-  if (!root) return { keep: state.keep, pandoc: state.pandoc, state };
+  if (!root) return { keep: state.keep, pandoc: state.pandoc, other: state.other, state };
   const doc = root.ownerDocument;
   const el = (tag, props = {}, ...kids) => {
     const n = doc.createElement(tag);
@@ -214,7 +271,13 @@ export function initReportView({ root, storage = globalThis.localStorage, clipbo
       }
       return fs;
     });
-    settings.replaceChildren(levels, ...boxes);
+    // s313: "Show old views" (off by default, not remembered): the Preprocess and Log views back in the View drop-down
+    const old = !oldViews ? null : el('fieldset', { class: 'report-ticks' }, el('legend', { text: 'While testing' }),
+      el('div', { class: 'report-tick' },
+        el('input', { type: 'checkbox', id: 'reportShowOld', checked: !!oldViews.get(),
+          onchange: (ev) => oldViews.set(ev.target.checked) }),
+        el('label', { for: 'reportShowOld', text: ' Show old views (Preprocess and Log)' })));
+    settings.replaceChildren(levels, ...boxes, ...(old ? [old] : []));
   }
 
   // ---- the list, by position
@@ -306,6 +369,7 @@ export function initReportView({ root, storage = globalThis.localStorage, clipbo
   return {
     keep(k) { state.keep(k); draw(); },
     pandoc(p) { const took = state.pandoc(p); draw(); return took; },
+    other(o) { const took = state.other(o); if (took) draw(); return took; },
     state,
   };
 }

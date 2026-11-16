@@ -2799,7 +2799,7 @@ import { initCleanupEngine } from './cleanup/cleanup-engine.js';
 import { initIntentReview } from './intent/intent-review.js';
 import { initMathCATProof } from './js/mathcat-proof.js';
 import { initPreprocess } from './js/preprocess.js';
-import { initReportView } from './js/report-view.js';
+import { initReportView, hiddenViews } from './js/report-view.js';
 import { initLogDisplay } from './js/log-display.js';
 import { initOutputTabs } from './js/output-tabs.js';
 import { initWarningParser } from './js/warning-parser.js';
@@ -7449,12 +7449,14 @@ async function applyOutputPackaging(style, o) {
       o.warnings.push({ line: null, column: null, level: 'warn', type: 'package', matchedText: null,
         message: `${what}: ${one ? '1 image was' : set.missing.length + ' images were'} not found, so ${pkg.filename} doesn't include ${one ? 'it' : 'them'}: ${set.missing.join(', ')}` });
       updateLog(o.warnings, o.stderr);
+      reportOther(o.warnings);
     }
   } catch (err) {
     console.warn(`${what}: could not be packaged; Download gives the plain output:`, err);
     o.warnings.push({ line: null, column: null, level: 'warn', type: 'package', matchedText: null,
       message: `${what}: the package could not be made, so Download gives the plain output (${(err && err.message) || err}).` });
     updateLog(o.warnings, o.stderr);
+    reportOther(o.warnings);
   }
 }
 
@@ -8910,7 +8912,8 @@ function conversionPathWarnings(warnings, files, placeholderFiles) {
       dropInclude.add(u.ref);
       if (!/\.[A-Za-z0-9]+$/.test(u.ref.split('/').pop())) dropInclude.add(u.ref + '.tex');
     }
-    added.push({ line: inEditor ? u.line : null, column: null, level, message,
+    // s309: `at`, the place in the text Pandoc read, for the Report view (moved back to the author's file there)
+    added.push({ line: inEditor ? u.line : null, column: null, level, message, at: { file: u.file, line: u.line, ref: u.ref },
       matchedText: inEditor ? u.ref : null, type: 'project-paths' });
   }
   for (let i = warnings.length - 1; i >= 0; i--) {     // Pandoc's own entry for the same include
@@ -8926,7 +8929,18 @@ function conversionPathWarnings(warnings, files, placeholderFiles) {
 // collected while the press runs and put at the top of the Log of the conversion it starts. Collected only during a
 // press (runPreprocess, SECTION 9), so a press that converts nothing leaves nothing for a later conversion.
 let preprocessLines = null;
-function logPreprocess(w) { if (preprocessLines) preprocessLines.push(...w); updateLog(w); }
+// latex-preprocess s309 (report-sidebar\PLAN-REPORT-SIDEBAR.md step A2): a press's own lines carry the type
+// 'preprocess', so the Report view can tell them from Pandoc's (js/report-view.js platformMessages); the Log is unchanged.
+function logPreprocess(w) {
+  w = w.map((r) => (r && !r.type ? { ...r, type: 'preprocess' } : r));
+  if (preprocessLines) preprocessLines.push(...w);
+  updateLog(w);
+}
+// s309: after a row is added late to a conversion's Log list (packaging, read-aloud, preview images), the Report view
+// takes the page's own kinds among the whole list ("Other messages"), only for the conversion the press started.
+function reportOther(rows) {
+  try { reportView.other({ rows }); } catch (e) { console.warn('Report: the page\'s own messages could not be added (' + e.message + ')'); }
+}
 
 async function runConversion(pre = null) {
   if (!pandocModule) return;
@@ -9005,18 +9019,8 @@ async function runConversion(pre = null) {
     // A press's own lines first (2026-11-09; preprocessLines, before runConversion).
     if (preprocessLines && preprocessLines.length) warnings.unshift(...preprocessLines.splice(0));
 
-    // Cleanup-on-convert ran over a copy of the source, so warning line
-    // numbers refer to the cleaned text, not the editor content.
-    const cleanupCount = lastCleanupReplacements();
-    if (cleanupCount > 0) {
-      warnings.unshift({
-        line: null, column: null, level: 'warn',
-        message: 'Cleanup was applied before conversion (' + cleanupCount +
-          ' replacement' + (cleanupCount === 1 ? '' : 's') +
-          ') — line numbers listed may not match line numbers in the original.',
-        matchedText: null, type: 'cleanup'
-      });
-    }
+    // The Find/Replace (cleanup) note added here on convert was removed 2026-11-16 (latex-preprocess s309, Nicholas:
+    // "we are not using the "latex cleanup tool" that way anymore").
 
     // Add placeholder warnings
     for (const pf of placeholderFiles) {
@@ -9036,8 +9040,10 @@ async function runConversion(pre = null) {
     // Update log panel
     updateLog(warnings, result.stderr);
     // The Report view: Pandoc's own log, as pandoc-wasm returned it (latex-preprocess s292)
-    try { reportView.pandoc({ target: reportTarget, warnings: result.warnings, stderr: result.stderr }); }
+    // s309: rows, the page's whole list; its own kinds among them become the report's "Other messages"
+    try { reportView.pandoc({ target: reportTarget, warnings: result.warnings, stderr: result.stderr, rows: warnings }); }
     catch (e) { console.warn('Report: Pandoc\'s messages could not be added (' + e.message + ')'); }
+    syncOutputViews();   // s312: the Report view offered only while it holds this conversion
 
     // Handle output
     const downloadBtn = document.getElementById('btnDownloadOutput');
@@ -9184,6 +9190,7 @@ async function runConversion(pre = null) {
             message: `${packageStyle.label}: the read-aloud page could not be made, so Download gives the plain output (${(err && err.message) || err}).` });
         }
         updateLog(warnings, result.stderr);
+        reportOther(warnings);
       }
 
       sourceEditor.setText(outputText);
@@ -9250,8 +9257,11 @@ async function runConversion(pre = null) {
     const statusMsg = placeholderFiles.length > 0
       ? `Converted ${options.from} → ${options.to} (${placeholderFiles.length} placeholder${placeholderFiles.length > 1 ? 's' : ''}) (${pandocVersion})`
       : `Converted ${options.from} → ${options.to} (${pandocVersion})`;
+    // s313 (step A4): the place that holds the messages, the Report view or the Log (hiddenViews' own rule)
+    const whereTold = hiddenViews(reportView.state.status(), document.getElementById('selFrom').value).report
+      ? 'the Log' : 'the Report view';
     updateStatus('ready', statusMsg + (pathWarnCount
-      ? ` — ${pathWarnCount} reference${pathWarnCount > 1 ? 's' : ''} could not be followed; see the warnings list` : ''));
+      ? ` — ${pathWarnCount} reference${pathWarnCount > 1 ? 's' : ''} could not be followed; see ${whereTold}` : ''));
 
   } catch (err) {
     console.error('Conversion error:', err);
@@ -9262,8 +9272,11 @@ async function runConversion(pre = null) {
     }
     updateStatus('error', `Error: ${err.message}`);
     updateLog([{ line: null, column: null, level: 'error', message: userMessage, matchedText: null, type: 'exception' }], '');
-    try { reportView.pandoc({ target: reportTarget, error: err.message }); }
+    // s309: the error itself is the report's "Pandoc stopped" entry; the tip, when there is one, is the page's own message
+    try { reportView.pandoc({ target: reportTarget, error: err.message, rows: missingFile ? [{ level: 'warn', type: 'exception',
+      message: `Tip: Upload "${missingFile}" via the Media tab's "Upload Files" button, or remove the reference from your source.` }] : [] }); }
     catch (e) { console.warn('Report: Pandoc\'s stop could not be added (' + e.message + ')'); }
+    syncOutputViews();   // s312
   } finally {
     btn.disabled = false;
     btn.textContent = 'Convert';
@@ -9398,7 +9411,7 @@ function addPreviewImageWarnings(warnings, problems, stderr) {
     message: `Image "${m.path}" (on ${m.page}) is not in the output, so it can't be shown. Check that the file was uploaded.` });
   for (const u of problems.unsupported) warnings.push({ line: null, column: null, level: 'info', type: 'preview-image', matchedText: null,
     message: `Image "${u.path}" (on ${u.page}) isn't PNG, JPG or SVG, so the preview doesn't show it. Its alt text is still there.` });
-  if (warnings.length > before) updateLog(warnings, stderr);
+  if (warnings.length > before) { updateLog(warnings, stderr); reportOther(warnings); }
 }
 // The drop-down follows the setting (N46 C); since 2026-10-06 it is greyed
 // out only while the preview has no HTML (see above).
@@ -9448,7 +9461,8 @@ function showReport(text) {
   report.textContent = text;
   report.hidden = false;
   document.getElementById('preprocessNote').hidden = true;
-  activateOutputTab('preprocess');
+  // s313 (step A4): the panel is no longer switched to the Preprocess view (his word, 2026-11-16: the panel
+  // "defaults to showing conversion output")
 }
 async function loadTable() {
   const res = await fetch('preprocess/data/pandoc-latex-reader-index.json');
@@ -9497,9 +9511,29 @@ async function reportGoTo(t) {
   editor.gotoLine(t.line, t.column || 1);
   return true;
 }
+// latex-preprocess s313 (report-sidebar step A4; his call 3: "Option A is good for now"): "Show old views", off by
+// default and not remembered, brings the Preprocess and Log views back while testing (its tick box is in Settings).
+let showOldViews = false;
 const reportView = initReportView({ root: document.getElementById('tabReport'),
   textOf: reportTextOf, goTo: reportGoTo,
-  mark: (m) => { reportMarks = m; applyReportMarks(); } });
+  mark: (m) => { reportMarks = m; applyReportMarks(); },
+  oldViews: { get: () => showOldViews, set: (v) => { showOldViews = !!v; syncOutputViews(); } } });
+// latex-preprocess s312 (report-sidebar\PLAN-REPORT-SIDEBAR.md step A3): one place to look per conversion. The View
+// drop-down offers the Report view only while it holds the latest conversion, and no Preprocess or Report view for
+// input that is not LaTeX (js/report-view.js hiddenViews). A hidden view that is showing gives way to Output; keyboard
+// focus stays where it is (a change event, not activateOutputTab, which focuses the drop-down).
+function syncOutputViews() {
+  const sel = document.getElementById('selOutputView');
+  if (!sel) return;
+  const hide = hiddenViews(reportView.state.status(), document.getElementById('selFrom').value, { showOld: showOldViews });
+  for (const [view, hidden] of Object.entries(hide)) {
+    const option = sel.querySelector(`option[value="${view}"]`);
+    if (option) option.hidden = hidden;
+  }
+  if (hide[sel.value]) { sel.value = 'preview'; sel.dispatchEvent(new Event('change')); }
+}
+document.getElementById('selFrom').addEventListener('change', syncOutputViews);
+syncOutputViews();
 const { run: runPreprocessPress } = initPreprocess({
   model: projectModel, editor, openProjectFile, syncAuxFiles, runConversion,
   showReport, updateLog: logPreprocess, updateStatus, loadTable, loadTool,
@@ -9510,7 +9544,12 @@ const { run: runPreprocessPress } = initPreprocess({
 async function runPreprocess(opts) {
   if (preprocessLines) return false;
   preprocessLines = [];
-  try { return await runPreprocessPress(opts); } finally { preprocessLines = null; }
+  let ran = false;
+  try { ran = await runPreprocessPress(opts); return ran; } finally {
+    preprocessLines = null;
+    // s313: a press that stopped holds no report of its own; the report is out of date and the Log is the place
+    if (ran === false) { reportView.state.outdate(); syncOutputViews(); }
+  }
 }
 document.getElementById('btnPreprocess').addEventListener('click', () => runPreprocess());
 // ════════════════════════════════════════════════════════════════════

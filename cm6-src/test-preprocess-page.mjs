@@ -143,11 +143,13 @@ ok('the file tree and its summary leave out tagged copies while Hide temp files 
 group('P2 2026-11-09: a press\'s log lines kept at the top of its conversion\'s Log');
 ok('the glue logs through logPreprocess: shown at once, and collected while a press runs',
   /let preprocessLines = null;/.test(js) &&
-  /function logPreprocess\(w\) \{ if \(preprocessLines\) preprocessLines\.push\(\.\.\.w\); updateLog\(w\); \}/.test(js) &&
+  // s309: logPreprocess first types the lines 'preprocess' (L8), then collects and shows them as before
+  /function logPreprocess\(w\) \{[\s\S]*?if \(preprocessLines\) preprocessLines\.push\(\.\.\.w\);\s*updateLog\(w\);\s*\}/.test(js) &&
   /updateLog: logPreprocess/.test(js));
 ok('every press goes through runPreprocess: collecting for that press only; a press during a press ignored',
   /const \{ run: runPreprocessPress \} = initPreprocess\(\{/.test(js) &&
-  /async function runPreprocess\(opts\) \{\s*if \(preprocessLines\) return false;\s*preprocessLines = \[\];\s*try \{ return await runPreprocessPress\(opts\); \} finally \{ preprocessLines = null; \}\s*\}/.test(js));
+  // s313: the press's result is kept so a press that stopped outdates the report (L10); collecting as before
+  /async function runPreprocess\(opts\) \{\s*if \(preprocessLines\) return false;\s*preprocessLines = \[\];\s*let ran = false;\s*try \{ ran = await runPreprocessPress\(opts\); return ran; \} finally \{\s*preprocessLines = null;/.test(js));
 ok('the conversion puts them first in its Log',
   /const warnings = parseWarnings\(result\.warnings, result\.stderr, sourceText \|\| ''\);\s*\n\s*\/\/[^\n]*\n\s*if \(preprocessLines && preprocessLines\.length\) warnings\.unshift\(\.\.\.preprocessLines\.splice\(0\)\);/.test(js));
 
@@ -457,6 +459,55 @@ try { toolBl = readFileSync(TOOL_BLANKS, 'utf8'); } catch { /* missing */ }
 const sha12 = (s) => createHash('sha1').update(s).digest('hex').slice(0, 12);
 ok('filters/blanks.lua is the tool folder\'s _work/blanks.lua, byte for byte (s304: 999a244c3083)',
   blFile.length > 0 && blFile === toolBl, 'platform ' + (blFile ? sha12(blFile) : 'missing') + ', tool ' + (toolBl ? sha12(toolBl) : 'missing'));
+
+// ── L8, latex-preprocess s309 (report-sidebar\PLAN-REPORT-SIDEBAR.md step A2) ────────────────────────────────────
+// The page's own Log rows reach the Report view as "Other messages" (his call 1 "A", 2026-11-16); the "Cleanup was
+// applied" line is gone ("we are not using the "latex cleanup tool" that way anymore"). The Log itself is unchanged.
+group('L8 2026-11-16: the page\'s own messages go to the Report view too; the Cleanup line is gone');
+const htmlLF = html.replace(/\r\n/g, '\n');
+const inPage = (s) => htmlLF.split(s).length - 1;
+ok('no "Cleanup was applied" line, and no row of type cleanup', inPage('Cleanup was applied') === 0 && inPage("type: 'cleanup'") === 0);
+ok('a press\'s own lines are typed "preprocess" before the Log and the conversion list get them',
+  /function logPreprocess\(w\) \{\s*w = w\.map\(\(r\) => \(r && !r\.type \? \{ \.\.\.r, type: 'preprocess' \} : r\)\);/.test(htmlLF));
+ok('the conversion hands the Report view the page\'s whole list with Pandoc\'s log',
+  inPage('reportView.pandoc({ target: reportTarget, warnings: result.warnings, stderr: result.stderr, rows: warnings })') === 1);
+ok('a path row carries its place in the text Pandoc read', inPage('at: { file: u.file, line: u.line, ref: u.ref }') === 1);
+ok('every late Log redraw of a conversion\'s list is followed by the Report view\'s (packaging twice, read-aloud, preview images)',
+  inPage('updateLog(o.warnings, o.stderr);\n      reportOther(o.warnings);') + inPage('updateLog(o.warnings, o.stderr);\n    reportOther(o.warnings);') === 2
+  && inPage('updateLog(warnings, result.stderr);\n        reportOther(warnings);') === 1
+  && inPage('{ updateLog(warnings, stderr); reportOther(warnings); }') === 1, String(inPage('reportOther(')));
+ok('a failed conversion\'s tip goes to the Report view as the page\'s own message', inPage("rows: missingFile ? [{ level: 'warn', type: 'exception',") === 1);
+
+// ── L9, latex-preprocess s312 (report-sidebar step A3) ──────────────────────────────────────────────────────────
+// One place to look per conversion: the View drop-down offers the Report view only while it holds the latest
+// conversion, and no Preprocess or Report view for input that is not LaTeX (js/report-view.js hiddenViews). A hidden
+// view that is showing gives way to Output, without moving keyboard focus.
+group('L9 2026-11-16: the View drop-down offers the Report and Preprocess views only where they apply');
+ok('the page imports hiddenViews with initReportView', /import \{ initReportView, hiddenViews \} from '\.\/js\/report-view\.js';/.test(htmlLF));
+const syncAt = htmlLF.indexOf('function syncOutputViews()');
+const syncFn = syncAt < 0 ? '' : htmlLF.slice(syncAt, htmlLF.indexOf('\n}\n', syncAt) + 2);
+ok('syncOutputViews asks hiddenViews with the report\'s status and the input format, and hides the options',
+  /hiddenViews\(reportView\.state\.status\(\), document\.getElementById\('selFrom'\)\.value[,)]/.test(syncFn) && /\.hidden = /.test(syncFn), syncFn.slice(0, 120));
+ok('a hidden view that is showing gives way to Output by a change event, not activateOutputTab (no focus move)',
+  /value = 'preview'/.test(syncFn) && /dispatchEvent\(new Event\('change'/.test(syncFn) && !/activateOutputTab|focus\(/.test(syncFn));
+ok('it runs after each conversion\'s report (success and failure), when the input format changes, and at the start',
+  inPage('syncOutputViews();') >= 3 && /selFrom'\)\.addEventListener\('change', syncOutputViews\)/.test(htmlLF), String(inPage('syncOutputViews();')));
+
+// ── L10, latex-preprocess s313 (report-sidebar step A4; his call 3: "Option A is good for now") ──────────────────────
+// The Log is left out where the report holds the conversion, the Preprocess view always; a "Show old views" tick box
+// (off by default, in the report's Settings) brings them back. No view is switched to by a run; the status bar names
+// the place that holds the messages.
+group('L10 2026-11-16: the old views hidden, "Show old views", the panel stays on Output');
+ok('"Show old views" starts off, is declared before the Report view, and is handed to it',
+  /let showOldViews = false;\s*\n(?:\/\/[^\n]*\n)*const reportView = initReportView\(/.test(htmlLF) &&
+  /oldViews: \{ get: \(\) => showOldViews, set: \(v\) => \{ showOldViews = !!v; syncOutputViews\(\); \} \}/.test(htmlLF));
+ok('syncOutputViews passes it to hiddenViews', /hiddenViews\(reportView\.state\.status\(\), document\.getElementById\('selFrom'\)\.value, \{ showOld: showOldViews \}\)/.test(htmlLF));
+const showRep = htmlLF.slice(htmlLF.indexOf('function showReport('), htmlLF.indexOf('\n}\n', htmlLF.indexOf('function showReport(')) + 2);
+ok('a run fills the Preprocess view but no longer switches to it', showRep.includes('report.textContent = text;') && !showRep.includes('activateOutputTab'), showRep);
+ok('a press that stopped outdates the report and re-sorts the views', /if \(ran === false\) \{ reportView\.state\.outdate\(\); syncOutputViews\(\); \}/.test(htmlLF));
+ok('the status bar no longer sends the reader to "the warnings list"', inPage('see the warnings list') === 0 && inPage('could not be followed; see ${whereTold}') === 1);
+const ppSrc = readFileSync(join(PLAT, 'js', 'preprocess.js'), 'utf8');
+ok('a stopped press\'s status names the Log, not the Preprocess view', !ppSrc.includes('See the Preprocess view') && ppSrc.includes("'Preprocess stopped. See the Log.'"));
 
 console.log('\n──────── ' + pass + ' passed, ' + fail + ' failed ────────');
 process.exitCode = fail ? 1 : 0;

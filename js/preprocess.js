@@ -121,7 +121,8 @@ export function initPreprocess({ model, editor, openProjectFile, syncAuxFiles,
   function refuse(reason) {
     showReport('Preprocess stopped: ' + reason);
     updateLog([{ level: 'error', message: 'Preprocess stopped: ' + reason }]);
-    updateStatus('error', 'Preprocess stopped. See the Preprocess view.');
+    // s313 (report-sidebar step A4): the Preprocess view is hidden; a stopped press has no report, so the Log holds why
+    updateStatus('error', 'Preprocess stopped. See the Log.');
     return false;
   }
 
