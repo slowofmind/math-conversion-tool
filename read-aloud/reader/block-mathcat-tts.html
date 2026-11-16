@@ -1,0 +1,30 @@
+<!-- #region Read-aloud reader: MathCat TTS =========================================
+     Accessible STEM Project, Harvard ATC. Added at the end of the page by the platform's
+     "MathCat TTS" output packaging. Works with no internet. The math was drawn in advance
+     by MathJax during conversion (HTML drawing with MathJax's fonts cut to the characters
+     used), with the labelled MathML kept in each formula's hidden copy; no MathJax runs in
+     the page. On pages with plain MathML the browser draws the math instead.
+     Contains MathCAT @@MATHCAT_VERSION@@ (MIT licence, (c) Neil Soiffer and contributors),
+     English speech rules only, compiled to WebAssembly, and its wasm-bindgen loader
+     (MIT/Apache-2.0). The subtitle styles marked below are adapted from MathJax 4.1.3
+     (Apache-2.0, (c) The MathJax Consortium).
+     Made of: the interface (@@INTERFACE@@), the shared machinery (reader-core.js) and the
+     speech source (speech-source-mathcat-live.js), from the platform's read-aloud/reader/.
+     The last block, "MathCAT engine data", can be folded away in an editor.
+     ========================================================================= -->
+<style id="atc-rd-style">
+@@STYLE@@</style>
+<script type="module" id="atc-rd-script">
+@@SCRIPT@@
+</script>
+<!-- #region MathCAT engine data (@@DATA_KB@@ KB) =================================
+     MathCAT compiled to WebAssembly, gzip-compressed, written as base64 text.
+     Browsers don't run this block; the reader script above unpacks it when
+     someone first presses "Read aloud" or explores a formula. Nothing in it
+     needs reading or editing. Fold it away in your editor.
+     ========================================================================= -->
+<script type="application/octet-stream" id="atc-rd-mathcat-wasm">
+@@WASM_B64@@
+</script>
+<!-- #endregion MathCAT engine data -->
+<!-- #endregion Read-aloud reader -->

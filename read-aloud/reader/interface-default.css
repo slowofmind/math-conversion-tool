@@ -1,0 +1,83 @@
+/* interface-default.css: how the read-aloud interface looks (interface-default.js).
+   The toolbar, the sentence and word highlights (CSS Custom Highlight API), the formula
+   outline, the formula-part box, the subtitle box and the testing log. Replace this file,
+   with interface-default.js, to try another design. */
+.atc-rd-bar {
+  position: sticky; top: 0; z-index: 1000;
+  margin: 0 0 1.5em; padding: 0.5em 0.75em 0.4em;
+  background: #e8eef4; color: #1c2530;
+  border: 1px solid #c3cfdb; border-top: 0; border-radius: 0 0 8px 8px;
+  font: inherit; font-size: 0.95rem; line-height: 1.45;
+}
+.atc-rd-bar .atc-rd-row { display: flex; flex-wrap: wrap; gap: 0.4em 0.9em; align-items: center; margin: 0.15em 0; }
+.atc-rd-bar button {
+  font: inherit; border: 1px solid #2d5ba8; border-radius: 6px;
+  background: #fff; color: #1c2530; padding: 0.25em 0.7em; cursor: pointer;
+}
+.atc-rd-bar button.atc-rd-primary { background: #2d5ba8; color: #fff; font-weight: 700; min-width: 7.5em; }
+.atc-rd-bar button:disabled { opacity: 0.45; cursor: default; }
+.atc-rd-bar label { display: inline-flex; gap: 0.35em; align-items: center; color: #3d4a58; }
+.atc-rd-bar select, .atc-rd-bar input[type="range"] { font: inherit; max-width: 16em; }
+.atc-rd-bar summary { cursor: pointer; color: #3d4a58; margin: 0.2em 0; }
+.atc-rd-bar .atc-rd-help { color: #3d4a58; font-size: 0.9em; margin: 0.3em 0; }
+.atc-rd-bar .atc-rd-status { color: #3d4a58; margin-top: 0.2em; }
+.atc-rd-bar .atc-rd-status.atc-rd-warn { color: #1c2530; font-weight: 700; }
+.atc-rd-bar .atc-rd-caption { min-height: 1.45em; }
+.atc-rd-bar .atc-rd-caption mark { background: #ffd54a; color: #000; border-radius: 3px; padding: 0 0.1em; }
+.atc-rd-bar :focus-visible { outline: 3px solid #2d5ba8; outline-offset: 2px; }
+::highlight(atc-rd-sentence) { background-color: #d6e6ff; }
+::highlight(atc-rd-word) { background-color: #ffd54a; color: #000; }
+/* Formula being read or explored: ONE outline around the whole formula. MathJax may draw an
+   inline formula as several pieces so it can wrap between lines, so inline formulas are outlined
+   on their container (one box, or one per line if the formula wraps). A display formula's
+   container spans the whole line, so there the outline goes on the drawing itself. */
+mjx-container.atc-rd-active:not([display]) { outline: 2px solid #2d5ba8; outline-offset: 3px; border-radius: 4px; }
+mjx-container[display].atc-rd-active > mjx-math,
+mjx-container[display].atc-rd-active > svg { outline: 2px solid #2d5ba8; outline-offset: 3px; border-radius: 4px; }
+mjx-container[data-atc-rd-tab]:focus-visible { outline: none; }
+mjx-container[data-atc-rd-tab]:not([display]):focus-visible { outline: 3px dashed #2d5ba8; outline-offset: 3px; }
+mjx-container[display][data-atc-rd-tab]:focus-visible > mjx-math,
+mjx-container[display][data-atc-rd-tab]:focus-visible > svg { outline: 3px dashed #2d5ba8; outline-offset: 3px; }
+/* The formula part being spoken: a box over it, tinting like a highlighter (multiply keeps the
+   symbols dark). Below the toolbar (z-index 1000) so it never covers the controls. */
+.atc-rd-partbox { position: absolute; z-index: 900; pointer-events: none; background: #ffd54a; mix-blend-mode: multiply; border-radius: 3px; }
+/* Fallback when the page has plain MathML: the browser's own drawing. */
+math.atc-rd-active { outline: 2px solid #2d5ba8; outline-offset: 3px; border-radius: 4px; }
+math.atc-rd-active[display="block"] { width: fit-content; margin-inline: auto; }
+math[data-atc-rd-tab]:focus-visible { outline: 3px dashed #2d5ba8; outline-offset: 3px; }
+
+/* ---- Adapted from MathJax 4.1.3 (ts/a11y/explorer/Region.ts, Apache-2.0) ----
+   Same colour variables as MathJax's explorer. :where() keeps these defaults at the
+   lowest priority, so values MathJax sets itself take over. */
+:where(:root) {
+  --mjx-fg-black: 0, 0, 0;
+  --mjx-bg-blue: 0, 0, 255;
+  --mjx-bg1-alpha: 0.2;
+  --mjx-bg1-color: rgba(var(--mjx-bg-blue), var(--mjx-bg1-alpha));
+  --mjx-fg1-color: rgba(var(--mjx-fg-black), 1);
+  --mjx-live-bg-color: white;
+  --mjx-live-shadow-color: #888;
+  --mjx-live-border-color: #CCCCCC;
+}
+mjx-container [data-sre-highlight-1]:not([data-mjx-collapsed], rect) {
+  color: var(--mjx-fg1-color) !important;
+  fill: var(--mjx-fg1-color) !important;
+}
+mjx-container:not([data-mjx-clone-container]) [data-sre-highlight-1]:not([data-sre-enclosed], rect) {
+  background-color: var(--mjx-bg1-color) !important;
+}
+mjx-container rect[data-sre-highlight-1]:not([data-sre-enclosed]) { fill: var(--mjx-bg1-color) !important; }
+.atc-rd-subtitle {
+  position: absolute; top: 0; left: 0; display: none; z-index: 202;
+  width: auto; max-width: min(40em, calc(100vw - 16px)); margin: 0; padding: 0;
+  background-color: var(--mjx-live-bg-color);
+  box-shadow: 0px 5px 20px var(--mjx-live-shadow-color);
+  border: 2px solid var(--mjx-live-border-color);
+  font: inherit; font-size: 1rem; line-height: 1.45;
+}
+.atc-rd-subtitle.atc-rd-subtitle-show { display: block; }
+.atc-rd-subtitle > div { color: var(--mjx-fg1-color); background-color: var(--mjx-bg1-color); padding: 0.25em 0.5em; }
+/* ---- end of adapted MathJax styles ---- */
+.atc-rd-subtitle mark { background: #ffd54a; color: #000; border-radius: 3px; padding: 0 0.1em; }
+.atc-rd-log { margin-top: 2em; font-size: 0.9rem; color: #3d4a58; }
+.atc-rd-log textarea { width: 100%; height: 14em; font: 0.85rem/1.4 Consolas, "Cascadia Mono", monospace; }

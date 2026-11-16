@@ -1,0 +1,28 @@
+{
+  "schema": "mathcat-wasm/build-info/2",
+  "mathcatVersion": "0.7.7",
+  "mathcatCrateChecksum": "unknown",
+  "matchesAddon": "MathCAT NVDA add-on 0.7.7",
+  "addonUrl": "https://github.com/daisy/MathCATForPython/releases/download/V0.7.7/MathCAT-0.7.7.nvda-addon",
+  "addonSha256": "1022780d030052a2799d55fb3d76402fda593ac5250f55730f33af021b13678b",
+  "gates": {
+    "G1_rules": "pass",
+    "G2_version": "pass",
+    "G3_bin_roundtrip": "pass"
+  },
+  "wasm": {
+    "sha1": "808f71e8bdc7325456d6b336f4b25bf12869be2d",
+    "sha256": "983fc5213703ae45473ec2f0ca2c35d615a7f64f3c993615328edec5044a5a8d",
+    "bytes": 2429122,
+    "binBytes": 923061
+  },
+  "toolchain": {
+    "rustc": "rustc 1.91.1 (ed61e7d7e 2025-11-07) (built from a source tarball)",
+    "wasmBindgen": "0.2.128",
+    "linker": "wasm-ld-20",
+    "buildStd": true
+  },
+  "builtAt": "2026-11-10T00:44:21Z",
+  "rulesSubset": "Languages/en, Intent, top-level rule files, Braille/definitions.yaml, Braille/Nemeth (MathCAT needs one braille code); everything else removed",
+  "purpose": "MathCat TTS reader block (read-aloud/), English only, no braille output"
+}

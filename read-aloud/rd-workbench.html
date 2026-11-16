@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!-- read-aloud/rd-workbench.html: a hidden helper page the platform opens (rd-packager.js) to build
+     "MathCat TTS" and "MathCat Pregen TTS" pages. Being its own page keeps MathJax and a second
+     MathCAT apart from the platform and from the MathCAT proofing tool (MathCAT's WebAssembly allows
+     one copy per page). It draws the math with MathJax 4.1.3 (HTML output, liteDOM: no layout
+     needed), cuts MathJax's fonts to the characters used (HarfBuzz) and, for Pregen, runs MathCAT. -->
+<html lang="en"><head><meta charset="utf-8"><title>Read-aloud workbench</title>
+<script>
+  // MathJax: MathML in, HTML (CHTML) out, built as strings (liteDOM) exactly as in Node.
+  // Fonts: only their data (sizes, which file holds which character) is loaded; the font files
+  // themselves are never needed here, so their links are left as "FONTFILE:" for rd-fonts to fill.
+  window.MathJax = {
+    loader: {
+      paths: { mathjax: new URL('./vendor/mathjax', location.href).href, fonts: new URL('./vendor/fonts', location.href).href },
+      load: ['input/mml', 'output/chtml', 'adaptors/liteDOM', 'a11y/assistive-mml']
+    },
+    startup: { typeset: false, adaptor: 'liteAdaptor', document: '' },
+    options: { enableAssistiveMml: true },
+    chtml: { fontURL: 'FONTFILE:' }
+  };
+</script>
+<script src="./vendor/mathjax/startup.js"></script>
+<script src="./structure-marks.js"></script>
+<script type="module" src="./rd-workbench.js"></script>
+</head><body></body></html>

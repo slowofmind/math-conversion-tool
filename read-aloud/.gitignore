@@ -1,0 +1,7 @@
+# read-aloud/: only what the platform needs at run time is committed (Nicholas, 2026-11-09: minimise
+# unneeded files in the repo). Tests, tools and session notes stay local; a copy lives in the TTS
+# project folder (Accessible-STEM-Project/html-files-with-embedded-TTS-solutions).
+tests/
+tools/
+SESSION-*.md
+INTEGRATION.md
