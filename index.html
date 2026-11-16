@@ -3140,6 +3140,13 @@ const STYLES = {
   html: [
     { id: 'fragment', label: 'HTML fragment', standalone: false, fullViewOnly: true, unavailable: () => fragmentBlocker(currentFragmentState()) },
     { id: 'standalone', label: 'Standalone', file: 'standalone.css', embedImages: true, default: true },
+    // Read-aloud (2026-10-31; 2026-11-10: full Pandoc options view only): Standalone plus MathJax-drawn
+    // math with its fonts cut to the characters used, and a read-aloud reader (read-aloud/rd-packager.js,
+    // run after Pandoc). readAloud = the packager's mode. Greyed out unless readAloudBlocker() is ''.
+    { id: 'mathcat-tts', label: 'MathCat TTS', file: 'standalone.css', embedImages: true, readAloud: 'tts',
+      fullViewOnly: true, unavailable: () => readAloudBlocker(currentReadAloudState()) },
+    { id: 'mathcat-pregen', label: 'MathCat Pregen TTS', file: 'standalone.css', embedImages: true, readAloud: 'pregen',
+      fullViewOnly: true, unavailable: () => readAloudBlocker(currentReadAloudState()) },
     { id: 'loose', label: 'Loose files', file: 'canvas.css', headingShift: 1, embedImages: false, lockEmbedImages: true, afterBody: CANVAS_RESIZE, packaging: 'loose' },
     { id: 'scorm', label: 'SCORM package', file: 'canvas.css', headingShift: 1, embedImages: false, lockEmbedImages: true, afterBody: CANVAS_RESIZE, packaging: 'scorm' },
     { id: 'canvas', label: 'Canvas content', file: 'canvas.css', headingShift: 1, embedImages: false, lockEmbedImages: true, afterBody: CANVAS_RESIZE, packaging: 'canvas' }
@@ -3187,6 +3194,18 @@ function fragmentBlocker(s) {
   if (s.embedImages) return 'Embed Images is on';
   if (s.includeFiles) return 'header or body files are attached';
   return '';
+}
+
+// Why MathCat TTS / MathCat Pregen TTS can't be chosen now, or '' when they can (2026-11-10).
+// s = { fmt, math }. "MathML (+ MathJax)" would run MathJax live in the page and clash with the reader.
+function readAloudBlocker(s) {
+  const b = (s.fmt || '').split(/[+-]/)[0];
+  if (!/^html/.test(b)) return 'not single-page HTML';
+  if (s.math !== 'mathjax-mathml') return 'needs the "MathML" math setting';
+  return '';
+}
+function currentReadAloudState() {
+  return { fmt: document.getElementById('selTo')?.value, math: document.getElementById('opt-math')?.value };
 }
 
 // What fragmentBlocker reads, from the page. Early in loading, before the filter list or the file
@@ -9146,6 +9165,27 @@ async function runConversion(pre = null) {
         outputText = outputText.replace('</head>', () => mathScripts + '</head>');
       }
 
+      // Read-aloud packaging (2026-10-31; read-aloud/INTEGRATION.md): "MathCat TTS" / "MathCat Pregen TTS".
+      // The page that comes back is what the Code view, the preview and Download all use.
+      if (packageStyle && packageStyle.readAloud && /\.html?$/i.test(outFileName)) {
+        try {
+          const { makeReadAloudPage } = await import('./read-aloud/rd-packager.js');
+          const r = await makeReadAloudPage(outputText, packageStyle.readAloud,
+            { onStatus: (t) => updateStatus('loading', t) });
+          outputText = r.html;
+          console.log('Read-aloud packaging:', r.report);
+          warnings.push({ line: null, column: null, level: 'info', type: 'package', matchedText: null,
+            message: `${packageStyle.label}: ${r.report.formulas} formulas drawn with MathJax (fonts ${r.report.fontKB} KB)`
+              + (r.report.speechKB ? `, speech and exploring pre-generated (${r.report.speechKB} KB)` : '')
+              + `; MathCAT ${r.report.mathcat}; page ${r.report.pageKB} KB.` });
+        } catch (err) {
+          console.warn(`${packageStyle.label}: could not be made; Download gives the plain output:`, err);
+          warnings.push({ line: null, column: null, level: 'warn', type: 'package', matchedText: null,
+            message: `${packageStyle.label}: the read-aloud page could not be made, so Download gives the plain output (${(err && err.message) || err}).` });
+        }
+        updateLog(warnings, result.stderr);
+      }
+
       sourceEditor.setText(outputText);
       setSourceCopyable(true);
 
@@ -9294,13 +9334,18 @@ async function setPreviewHtml(html, isHtml, opts) {
   const seq = ++previewSeq;
   lastPreviewHtml = isHtml ? html : null;
   let copy = html;
-  if (isHtml) {
+  // Read-aloud pages (2026-10-31, Nicholas): no MathCAT proofing helper; the page's own reader and
+  // its "Subtitles under formulas" switch do the job.
+  const isReadAloud = isHtml && html.includes('id="atc-rd-script"');
+  if (isHtml && !isReadAloud) {
     try { copy = await mathcatProof.preparePreview(html, opts); setActionAvailable(mathSubtitlesSel, true); }
     catch (err) {   // sitting 12, point 3: the preview as converted, the control unavailable, one log line
       copy = html;
       setActionAvailable(mathSubtitlesSel, false, 'Math subtitles could not be added to this preview.');
       console.info('[MathCAT proofing]', 'helper not added to the preview: ' + (err && err.message ? err.message : err));
     }
+  } else if (isReadAloud) {
+    setActionAvailable(mathSubtitlesSel, false, 'Math subtitles are off for MathCat TTS pages: use the page\'s own "Subtitles under formulas".');
   } else {
     setActionAvailable(mathSubtitlesSel, false, 'Math subtitles need an HTML preview. ' + SUBTITLES_NO_PREVIEW);
   }

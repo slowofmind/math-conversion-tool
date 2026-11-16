@@ -19,6 +19,10 @@ should be confirmed by counsel.
 | CodeMirror 6 | `codemirror/cm6-editor.js` (bundled build; build inputs in `cm6-src/`) | MIT | https://codemirror.net |
 | MathJax (v4, tex-to-MathML build) | `math-conversion/mathjax-bundle.js` | Apache-2.0 | https://www.mathjax.org |
 | Sa11y 5.1.0 (accessibility checker, run in the preview only) | `sa11y-5.1.0/` (released files, unchanged: `sa11y.umd.min.js`, `lang/en.umd.js`, `sa11y.min.css`; licence in `sa11y-5.1.0/LICENSE.md`) | GPL-2.0-or-later (Toronto Metropolitan University; versions 2.0 and earlier were MIT) | https://sa11y.netlify.app / https://github.com/ryersondmp/sa11y |
+| MathJax 4.1.3 parts for drawing math in advance (MathCat TTS / MathCat Pregen TTS) | `read-aloud/vendor/mathjax/` (startup, core, MathML input, HTML output, liteDOM, hidden MathML; licence in `read-aloud/vendor/mathjax/LICENSE`) | Apache-2.0 | https://www.mathjax.org |
+| MathJax New Computer Modern font (data and fonts) | `read-aloud/vendor/fonts/mathjax-newcm-font/` (font data), `read-aloud/fonts-otf/` (the CHTML fonts converted to OpenType, gzipped) | npm package `@mathjax/mathjax-newcm-font` 4.1.3: Apache-2.0. **The fonts derive from New Computer Modern: confirm the font licence (likely the GUST Font License) before release.** | https://github.com/mathjax/MathJax-fonts |
+| HarfBuzz font subsetter (WebAssembly) | `read-aloud/vendor/harfbuzz/harfbuzz-subset.wasm` (from `harfbuzzjs` 1.6.4; licence in `read-aloud/vendor/harfbuzz/LICENSE`) | MIT | https://github.com/harfbuzz/harfbuzzjs |
+| MathCAT 0.7.7, English rules only (WebAssembly), for MathCat TTS pages | `read-aloud/engine/mathcat-wasm-en/` (built from the same pin as `mathcat-wasm/`; see its `BUILD-INFO.json`) | MIT (Neil Soiffer and contributors); wasm-bindgen loader MIT/Apache-2.0 | https://github.com/NSoiffer/MathCAT |
 | MML2OMML.XSL | `math-conversion/MML2OMML.XSL` | **Unverified — flagged for legal review; see note below** | Associated with Microsoft Office |
 
 ### MML2OMML.XSL — licensing flag

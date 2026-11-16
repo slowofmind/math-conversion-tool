@@ -95,6 +95,8 @@ export const CATEGORIES = Object.freeze([
   // (sessions/PANDOC-KINDS-s280.md); a kind is shown only while "pandoc-info", its parent, is on too
   ["pandoc-stop", "Pandoc: stopped", FIX, "Pandoc gave up on the document; nothing after this place was converted"],
   ["pandoc-missing", "Pandoc: a needed file not found", FIX, "a file the document reads (\\input, \\include ...) Pandoc could not find: its text is missing"],   // *
+  // s309 (report-sidebar plan, step A1; his call 2026-11-16, "option A"): the platform's own messages, by seriousness
+  ["other-problem", "Other messages: problems", FIX, "the platform's own errors and warnings: a file or image not found, a package not made, preprocessing that did not run"],
   ["unplaced", "Not recognised", FIX, "an entry of a kind the report does not know (never hidden by a level)"],
   // ---- Check ----
   ["unsettled", "Versions the tool could not settle", CHECK, "a conditional the tool could not decide: the output may show the other version than the print"],
@@ -127,6 +129,8 @@ export const CATEGORIES = Object.freeze([
   ["unread", "Parts of other files this document does not read", ALL, "a worksheet converted on its own reads the book's preamble, not the rest of the book's main file"],
   // s287: DECISIONS 2026-10-31 ("Yes, same shape"): a command the document never uses brings no line; kept, hidden
   ["unused", "Commands of package files this document never uses", ALL, "messages inside the definition of a package command this document never calls"],
+  // s309: the platform's own notes (see "other-problem" above)
+  ["other-info", "Other messages: information", ALL, "the platform's own notes on a conversion: what preprocessing saved, a path it did not check ..."],
   // ---- the checker's (outside the levels) ----
   ["a11y", "Accessibility problems", null, "the checker: what will hurt a reader of the web page or Word file", null, true],
   ["encourage", "Encouragement (tagged PDF)", null, "good for the web page and Word; a note on what would also reach the PDF", null, false],
@@ -155,6 +159,7 @@ export const SECTIONS = Object.freeze([
   ["package", "In package files", true],
   ["conversion", "Changed so Pandoc can read it", false],
   ["unread", "Parts of other files this document does not read", false],
+  ["other", "Other messages from the platform", false],
   ["unplaced", "Not recognised", false],
 ].map(([key, title, folded]) => Object.freeze({ key, title, folded })));
 
@@ -219,6 +224,9 @@ const N = "not-reaching-reader";
 const rule = (...rules) => (e) => rules.includes(e.rule);
 const pandocLevel = (lv) => (e) => e.source === "pandoc" && e.level === lv;
 const SORTING = Object.freeze([
+  // s309: the platform's own messages ("Other messages"): problems, then information
+  ["other-problem", (e) => e.source === "platform" && e.level !== "note"],
+  ["other-info", (e) => e.source === "platform"],
   // Pandoc's messages: by level, and its INFO lines by kind (the six groups)
   ["pandoc-stop", pandocLevel("error")],
   ["pandoc-missing", (e) => pandocLevel("warning")(e) && (e.pandoc || {}).type === "CouldNotLoadIncludeFile" && !isPackage((e.pandoc || {}).path)],
@@ -262,7 +270,7 @@ const SECTION_OF = { a11y: "accessibility", "a11y-fix": "accessibility", drawing
   lists: "not-reaching", "left-alone": "not-reaching", definitions: "not-reaching",
   latex: "latex", rejected: "latex", "renew-known": "latex", "pandoc-stop": "latex", "pandoc-missing": "latex", "pandoc-warning": "latex", "pandoc-info": "latex",
   "pandoc-packages": "latex", "pandoc-spacing": "latex", "pandoc-fonts": "latex", "pandoc-programming": "latex", "pandoc-drawings": "latex",
-  "pandoc-other": "latex", "package-setup": "package", unused: "package", conversion: "conversion", unread: "unread", unplaced: "unplaced" };
+  "pandoc-other": "latex", "other-problem": "other", "other-info": "other", "package-setup": "package", unused: "package", conversion: "conversion", unread: "unread", unplaced: "unplaced" };
 // a note stays in its own kind's section (plan 3.3), after the warnings
 const NOTE_SECTION = { "accessibility-fix": "accessibility", "not-reaching-reader": "not-reaching", "fix-by-hand": "latex" };
 function sectionOf(e, category) {
@@ -304,6 +312,12 @@ export const PAIRS = Object.freeze([
   { name: "defined-twice", keep: "store/already-defined", other: "pandoc/MacroAlreadyDefined",
     match: (k, o) => k.where.file === o.where.file && k.where.line === o.where.line && !!(o.pandoc && o.pandoc.name)
       && k.message.startsWith(o.pandoc.name + " ") },
+  // s309: a path the platform could not follow and Pandoc's "file not loaded" for the same file. The platform's is
+  // kept (its words say where it looked); the page's Log told it once the same way (index.html conversionPathWarnings):
+  // the file the command names, or that name with .tex when it has no extension
+  { name: "path-not-loaded", keep: "platform/paths", other: "pandoc/CouldNotLoadIncludeFile",
+    match: (k, o) => { const ref = k.platform && k.platform.ref, p = String((o.pandoc && o.pandoc.path) || "").trim();
+      return !!ref && !!p && (p === ref || (!/\.[A-Za-z0-9]+$/.test(String(ref).split("/").pop()) && p === ref + ".tex")); } },
 ].map(Object.freeze));
 
 // ---- Pandoc's log ----
@@ -386,6 +400,36 @@ export function pandocEntries(rows, run, originals) {
     e.label = PANDOC_LABELS[r.type] || e.label;
     e.pandoc = { type: r.type, name: r.name, contents: r.contents, path: r.path, line: r.pandocLine, column: r.pandocColumn };
     return e;
+  });
+}
+
+// ---- the platform's own messages: "Other messages" (s309; report-sidebar\PLAN-REPORT-SIDEBAR.md step A1) ----
+// platformEntries(messages, run, originals) -> entries in the shared shape, source "platform", rule "platform/<said>";
+// combineEntries takes them as lists.platform. A message: { level, message, said, label, file, line, column, in, ref }
+//   level   "error" | "warning" (or "warn") | anything else: information (a note)
+//   said    which part of the platform says it ("paths", "packaging", "preview", "preprocess" ...);
+//           label: its short name in the list (default: said)
+//   file, line, column, in   its place, when it has one. in "converted": a place in a file the run wrote (the -pp copy
+//           Pandoc read), moved back to the author's file as Pandoc's places are; otherwise the place is in the
+//           author's file and is kept as given. No file or no line: no place ("Not tied to a place").
+//   ref     for said "paths": the file the command names (told once with Pandoc's "file not loaded", PAIRS)
+const NO_PLACE = Object.freeze({ file: null, line: null, column: null, start: null, end: null, endLine: null, endColumn: null });
+export function platformEntries(messages, run = null, originals = null) {
+  const orig = originals instanceof Map ? originals : new Map(Object.entries(originals || {}));
+  let sm = null;
+  return (messages || []).map((m) => {
+    const said = String(m.said || "platform"), lv = String(m.level || "").toLowerCase();
+    const level = lv === "error" ? "error" : lv === "warning" || lv === "warn" ? "warning" : "note";
+    let where = { ...NO_PLACE };
+    if (m.file && Number.isInteger(m.line)) {
+      if (m.in === "converted" && run) {
+        sm = sm || buildSourceMap(run, orig);
+        where = pandocEntry({ level, file: m.file, line: m.line, column: m.column || 1, message: "", type: "platform/" + said }, sm).where;
+      } else where = { ...NO_PLACE, file: m.file, line: m.line, column: Number.isInteger(m.column) ? m.column : null };
+    }
+    return { source: "platform", kind: "platform-message", visible: true, level, rule: "platform/" + said, where,
+             label: String(m.label || said), message: String(m.message ?? ""), fixes: [], ways: null, rank: null,
+             from: { list: "platform", channel: said, level: m.level ?? null }, link: null, platform: { said, ref: m.ref ?? null } };
   });
 }
 
@@ -537,10 +581,11 @@ function definitionOf(e, definitions) {
 //   arrange "nested" (default, s286) or "flat" (by file in `order`, package files last, then line and column)
 //   level  s291: "Fix this" (default), "Check" or "Everything": the ticks it sets (showFor), when `show` is not given
 export function combineEntries(lists = {}, options = {}) {
-  const given = { preprocessor: lists.preprocessor || [], checker: lists.checker || [], pandoc: lists.pandoc || [] };
+  // s309: lists.platform, the platform's own messages (platformEntries), ids "o0", "o1" ...
+  const given = { preprocessor: lists.preprocessor || [], checker: lists.checker || [], pandoc: lists.pandoc || [], platform: lists.platform || [] };
   const show = new Set(options.show || (options.level ? showFor(options.level) : DEFAULT_SHOW));
   const all = [];
-  for (const [src, p] of [["preprocessor", "p"], ["checker", "c"], ["pandoc", "d"]])
+  for (const [src, p] of [["preprocessor", "p"], ["checker", "c"], ["pandoc", "d"], ["platform", "o"]])
     given[src].forEach((e, n) => all.push(Object.assign({}, e, { id: p + n, also: [], calls: null, definition: null, need: null, inDefinition: null })));
   const firstFile = all.map((e) => e.where && e.where.file).find((f) => f && !isPackage(f)) ?? null;
   const main = options.main ?? (options.order && options.order[0]) ?? firstFile;
@@ -613,7 +658,7 @@ export function combineEntries(lists = {}, options = {}) {
   }).filter((s) => s.count);
   const byCategory = {}, bySection = {};
   for (const e of entries) { byCategory[e.category] = (byCategory[e.category] || 0) + 1; bySection[e.section] = (bySection[e.section] || 0) + 1; }
-  const counts = { total: entries.length, preprocessor: given.preprocessor.length, checker: given.checker.length, pandoc: given.pandoc.length,
+  const counts = { total: entries.length, preprocessor: given.preprocessor.length, checker: given.checker.length, pandoc: given.pandoc.length, platform: given.platform.length,
                    told: told.length, shown: entries.filter((e) => e.shown).length, byCategory, bySection,
                    // s291: the count line per level (the checker's entries are outside the levels)
                    levels: Object.fromEntries(LEVELS.map((lv) => [lv, entries.filter((e) => e.reportLevel === lv).length])) };
@@ -744,7 +789,7 @@ export function renderCombined(combined, options = {}) {
   const byId = new Map(combined.entries.map((e) => [e.id, e]));
   const c = combined.counts, L = [];
   L.push("COMBINED REPORT: " + (combined.options.main ?? "(no main file)"));
-  L.push("In all: " + c.total + " entries (preprocessor " + c.preprocessor + ", checker " + c.checker + ", Pandoc " + c.pandoc + ")"
+  L.push("In all: " + c.total + " entries (preprocessor " + c.preprocessor + ", checker " + c.checker + ", Pandoc " + c.pandoc + (c.platform ? ", platform " + c.platform : "") + ")"
     + (c.told ? "; " + c.told + (c.told === 1 ? " problem" : " problems") + " told by two steps, kept once" : "") + ".");
   // s291: the count line per level ("Fix this: 9. Check would add 31, Everything 540.")
   if (c.levels) L.push(FIX + ": " + c.levels[FIX] + ". " + CHECK + " would add " + c.levels[CHECK] + ", " + ALL + " " + c.levels[ALL] + ".");
