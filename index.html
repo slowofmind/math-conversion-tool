@@ -1073,6 +1073,57 @@
   .report-missing { color: var(--text-muted); font-style: italic; }
   .report-fold::before { content: '▸ '; }
   .report-fold[aria-expanded="true"]::before { content: '▾ '; }
+  /* ─── REPORT in the Tools panel (report-sidebar step B1, latex-preprocess s314; js/report-sidebar.js) ─── its own
+     classes (rsb-), drawn like File Preparation's accordions (initPrepAccordions binds only .prep-accordion-toggle).
+     The warning mark #8a5200 is 6.6:1 on white (the --warning text colour is near 4:1, plan section 7). */
+  .report-sidebar { font-size: 12.5px; color: var(--text-primary); }
+  .rsb-note { margin: 0; color: var(--text-secondary); line-height: 1.5; }
+  .rsb-levels { border: none; margin: 0; padding: 0; min-width: 0; }
+  .rsb-levels legend { padding: 0; margin-bottom: 2px; font-weight: 600; }
+  .rsb-level-row { display: flex; flex-wrap: wrap; gap: 2px 12px; }
+  .rsb-level-row label { display: inline-flex; align-items: center; gap: 2px; cursor: pointer; }
+  .rsb-custom { display: block; font-style: italic; color: var(--text-secondary); }
+  .rsb-custom:empty { display: none; }
+  .rsb-status { margin: 4px 0 8px; color: var(--text-secondary); line-height: 1.4; }
+  .rsb-acc { border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: 4px;
+    background: var(--bg-primary); margin-bottom: 8px; }
+  .rsb-acc .rsb-acc { margin: 0 0 6px; }
+  .rsb-acc-heading { margin: 0; font: inherit; }
+  .rsb-acc-toggle { display: flex; align-items: center; gap: 6px; width: 100%; padding: 6px 10px; border: none;
+    border-radius: 4px; background: none; color: var(--text-primary); font-family: 'Roboto', sans-serif;
+    font-size: 12.5px; font-weight: 500; text-align: left; cursor: pointer; }
+  .rsb-acc-toggle:hover { background: var(--bg-elevated); }
+  .rsb-acc-toggle:focus-visible, .rsb-row:focus-visible, .rsb-fold:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .rsb-acc-toggle[aria-expanded="true"] .rail-chevron, .rsb-fold[aria-expanded="true"] .rail-chevron { transform: rotate(90deg); }
+  .rsb-acc-panel { padding: 0 10px 8px; }
+  .rsb-acc-panel[hidden], .rsb-detail[hidden], .rsb-inner[hidden], .rsb-body[hidden] { display: none; }
+  .rsb-tick { display: flex; align-items: flex-start; gap: 6px; margin: 3px 0; }
+  .rsb-tick input { margin: 2px 0 0; flex: 0 0 auto; }
+  .rsb-tick label { cursor: pointer; }
+  .rsb-tick-child { margin-left: 20px; }
+  .rsb-heading { margin: 10px 0 2px; font-size: 12.5px; font-weight: 600; }
+  .rsb-file { margin: 8px 0 2px; font-size: 12px; font-weight: 600; color: var(--text-secondary); overflow-wrap: anywhere; }
+  .rsb-rows, .rsb-inner { list-style: none; margin: 0; padding: 0; }
+  .rsb-inner { padding-left: 14px; }
+  .rsb-row, .rsb-fold { display: flex; align-items: flex-start; gap: 6px; width: 100%; min-height: 24px; padding: 3px 4px;
+    border: 0; border-radius: 3px; background: none; font: inherit; color: var(--text-primary); text-align: left; cursor: pointer; }
+  .rsb-row:hover, .rsb-fold:hover { background: var(--bg-elevated); }
+  .rsb-row[aria-current="true"] { background: rgba(43, 66, 110, 0.12); }
+  .rsb-line { flex: 0 0 auto; min-width: 2.4em; text-align: right; font-family: 'IBM Plex Mono', monospace; color: var(--text-secondary); }
+  .rsb-icon { flex: 0 0 12px; margin-top: 2px; }
+  .rsb-icon-error { color: var(--error); }
+  .rsb-icon-warning { color: #8a5200; }
+  .rsb-icon-note { color: var(--text-muted); }
+  /* a row's words: two lines until the row is opened (the whole text is always in its name) */
+  .rsb-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; overflow: hidden; display: -webkit-box;
+    -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+  .rsb-row[aria-expanded="true"] .rsb-text, .rsb-fold .rsb-text { display: block; -webkit-line-clamp: none; line-clamp: none; overflow: visible; }
+  .rsb-detail { margin: 2px 0 6px calc(2.4em + 10px); padding: 2px 0 4px 8px; border-left: 2px solid var(--border); color: var(--text-secondary); }
+  .rsb-detail p { margin: 2px 0; }
+  .rsb-detail ul { margin: 2px 0; padding-left: 16px; }
+  .rsb-detail-head { margin: 4px 0 2px; font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .rsb-place { font-family: 'IBM Plex Mono', monospace; }
+  .rsb-empty { margin: 4px 0; color: var(--text-secondary); }
 
   /* Preview iframe */
   #previewFrame { flex: 1; border: none; background: #fff; }
@@ -2638,6 +2689,21 @@
       </div>
     </div>
     </div>
+
+    <!-- REPORT (report-sidebar step B1, latex-preprocess s314; report-sidebar\PLAN-REPORT-SIDEBAR.md): the combined
+         report of the preprocessor, the accessibility checker, Pandoc and the page's own messages, drawn by
+         js/report-sidebar.js from the Report view's state. Starts closed unless the reader left it open; opens by itself
+         after a run with something to show (his call 4 "A"). No live region in it: the status bar speaks. -->
+    <div class="rail-section">
+      <h2 class="rail-section-heading">
+        <button type="button" class="rail-section-toggle" id="railtab-report"
+                aria-expanded="false" aria-controls="railPanelReport"><span class="rail-chevron" aria-hidden="true">▸</span>Report</button>
+      </h2>
+    <div class="rail-panel" id="railPanelReport" role="region" hidden
+         aria-labelledby="railtab-report">
+      <div class="sidebar-body report-sidebar" id="reportSidebar"></div>
+    </div>
+    </div>
     </div>
   </aside>
 
@@ -2800,6 +2866,8 @@ import { initIntentReview } from './intent/intent-review.js';
 import { initMathCATProof } from './js/mathcat-proof.js';
 import { initPreprocess } from './js/preprocess.js';
 import { initReportView, hiddenViews } from './js/report-view.js';
+import { initReportSidebar } from './js/report-sidebar.js';
+import { clickTarget, said, oneLine } from './js/report-view.js';   // s314: handed to the Report section as its words
 import { initLogDisplay } from './js/log-display.js';
 import { initOutputTabs } from './js/output-tabs.js';
 import { initWarningParser } from './js/warning-parser.js';
@@ -9041,7 +9109,8 @@ async function runConversion(pre = null) {
     updateLog(warnings, result.stderr);
     // The Report view: Pandoc's own log, as pandoc-wasm returned it (latex-preprocess s292)
     // s309: rows, the page's whole list; its own kinds among them become the report's "Other messages"
-    try { reportView.pandoc({ target: reportTarget, warnings: result.warnings, stderr: result.stderr, rows: warnings }); }
+    // s314 (B1, his call 4 "A"): the Report section may open by itself (openReportAfterRun)
+    try { openReportAfterRun(reportView.pandoc({ target: reportTarget, warnings: result.warnings, stderr: result.stderr, rows: warnings })); }
     catch (e) { console.warn('Report: Pandoc\'s messages could not be added (' + e.message + ')'); }
     syncOutputViews();   // s312: the Report view offered only while it holds this conversion
 
@@ -9253,6 +9322,7 @@ async function runConversion(pre = null) {
     } else {
       warningsEl.style.display = 'none';
     }
+    showReportCount();   // s314 (B1, call 4): the report's count instead, while the report holds this conversion
 
     const statusMsg = placeholderFiles.length > 0
       ? `Converted ${options.from} → ${options.to} (${placeholderFiles.length} placeholder${placeholderFiles.length > 1 ? 's' : ''}) (${pandocVersion})`
@@ -9273,8 +9343,9 @@ async function runConversion(pre = null) {
     updateStatus('error', `Error: ${err.message}`);
     updateLog([{ line: null, column: null, level: 'error', message: userMessage, matchedText: null, type: 'exception' }], '');
     // s309: the error itself is the report's "Pandoc stopped" entry; the tip, when there is one, is the page's own message
-    try { reportView.pandoc({ target: reportTarget, error: err.message, rows: missingFile ? [{ level: 'warn', type: 'exception',
-      message: `Tip: Upload "${missingFile}" via the Media tab's "Upload Files" button, or remove the reference from your source.` }] : [] }); }
+    // s314 (B1): Pandoc's stop is at Fix this, so the Report section may open by itself here too
+    try { openReportAfterRun(reportView.pandoc({ target: reportTarget, error: err.message, rows: missingFile ? [{ level: 'warn', type: 'exception',
+      message: `Tip: Upload "${missingFile}" via the Media tab's "Upload Files" button, or remove the reference from your source.` }] : [] })); }
     catch (e) { console.warn('Report: Pandoc\'s stop could not be added (' + e.message + ')'); }
     syncOutputViews();   // s312
   } finally {
@@ -9514,10 +9585,35 @@ async function reportGoTo(t) {
 // latex-preprocess s313 (report-sidebar step A4; his call 3: "Option A is good for now"): "Show old views", off by
 // default and not remembered, brings the Preprocess and Log views back while testing (its tick box is in Settings).
 let showOldViews = false;
+const oldViews = { get: () => showOldViews, set: (v) => { showOldViews = !!v; syncOutputViews(); reportView.state.refresh(); } };
 const reportView = initReportView({ root: document.getElementById('tabReport'),
   textOf: reportTextOf, goTo: reportGoTo,
   mark: (m) => { reportMarks = m; applyReportMarks(); },
-  oldViews: { get: () => showOldViews, set: (v) => { showOldViews = !!v; syncOutputViews(); } } });
+  oldViews });
+// latex-preprocess s314 (report-sidebar step B1): the report in the Tools panel's Report section, drawn from the Report
+// view's own state - one copy, so the ticks, the counts and the two drawings cannot disagree. Its rows go to their place
+// with the same click to the line (reportGoTo); "Show old views" is the one flag above, shared by both drawings.
+const reportSidebar = initReportSidebar({ root: document.getElementById('reportSidebar'), state: reportView.state,
+  words: { clickTarget, said, oneLine }, textOf: reportTextOf, goTo: reportGoTo, oldViews });
+// His call 4 "A" (2026-11-16): after a run's conversion joins the report with something to show at the current level,
+// the Report section opens by itself; a closed Tools panel stays closed (the status bar gives the count). An open made
+// here is not remembered: only a reader's own open or close is (as Project Files' open on upload). `took`: the state's
+// answer to the conversion (true only for the conversion the run started).
+function openReportAfterRun(took) {
+  const s = took ? reportSidebar.summary() : null;
+  if (s && s.shown > 0 && !railOpen.has('report')) setRailSection('report', true);
+}
+// The status bar's count (call 4): while the report holds the latest conversion, the report's lines at the current
+// level, kept up to date as the ticks change; otherwise runConversion's counts of the Log's rows stay.
+function showReportCount() {
+  if (hiddenViews(reportView.state.status(), document.getElementById('selFrom').value).report) return;
+  const s = reportSidebar.summary(), el = document.getElementById('statusWarnings');
+  if (!s || !el) return;
+  el.style.display = '';
+  el.style.color = s.worst === 'error' ? 'var(--error)' : s.worst === 'warning' ? 'var(--warning)' : 'var(--accent)';
+  el.textContent = 'Report: ' + s.shown + (s.shown === 1 ? ' line' : ' lines') + ' at ' + s.level;
+}
+reportView.state.subscribe(showReportCount);
 // latex-preprocess s312 (report-sidebar\PLAN-REPORT-SIDEBAR.md step A3): one place to look per conversion. The View
 // drop-down offers the Report view only while it holds the latest conversion, and no Preprocess or Report view for
 // input that is not LaTeX (js/report-view.js hiddenViews). A hidden view that is showing gives way to Output; keyboard
@@ -9579,16 +9675,21 @@ const sidebarClose = document.getElementById('sidebarClose');
 // Which start open (2026-11-09, Nicholas): File Preparation, unless the reader closed it last time; Project Files
 // never (files never survive a reload, so it would be empty): it opens when files are loaded (revealProjectFiles).
 // Only a reader's own open or close, a click on a header, is remembered; opens made by the platform are not.
-const RAIL_STATE_KEY = 'atc.rail.state';   // { files|prepare: 'open'|'closed' }; replaced 'atc.rail.open'
+// latex-preprocess s314 (report-sidebar step B1): Report, the third, after File Preparation. At start it opens only if
+// the reader left it open (before a run it holds only its note); after a run it may open by itself (openReportAfterRun,
+// not remembered).
+const RAIL_STATE_KEY = 'atc.rail.state';   // { files|prepare|report: 'open'|'closed' }; replaced 'atc.rail.open'
 const railSections = [
   ['files',   'railtab-files',   'railPanelFiles'],
   ['prepare', 'railtab-prepare', 'railPanelPrepare'],
+  ['report',  'railtab-report',  'railPanelReport'],
 ];
 const railOpen = (() => {
   const open = new Set(['prepare']);
   try {
     const v = JSON.parse(localStorage.getItem(RAIL_STATE_KEY));
     if (v && v.prepare === 'closed') open.delete('prepare');
+    if (v && v.report === 'open') open.add('report');
   } catch {}
   return open;
 })();

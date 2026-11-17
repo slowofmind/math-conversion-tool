@@ -367,5 +367,39 @@ sect('R16 "Show old views" (his call 3 A): the Preprocess and Log views come bac
   ok('R16e outdate() with nothing kept does nothing', (() => { const t = createReportState(); t.outdate(); return t.status().stale === false; })());
 }
 
+// R17 (latex-preprocess s314; report-sidebar step B1, HANDOFF-B1.md "One shared state"): one copy of the report for every
+// drawing. The ticks live in the state (remembered under 'atc.report.show' when a storage is given), and every change
+// to the state is told to each drawing that subscribed, so the Report view and the sidebar cannot disagree.
+sect('R17 the ticks in the state, remembered; every change told to the drawings');
+try {
+  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)) }; };
+  const store = mem();
+  const s = createReportState({ storage: store });
+  eq('R17a nothing kept, nothing remembered: no ticks', s.ticks(), null);
+  let told = 0;
+  const off = s.subscribe(() => { told++; });
+  s.keep(kept);
+  eq('R17b after a run: the default level\'s ticks, not yet remembered', [s.ticks(), store.getItem('atc.report.show')], [TOOL.showFor('Fix this'), null]);
+  eq('R17c a run is told', told, 1);
+  const mine = TOOL.showFor('Check');
+  s.setTicks(mine);
+  eq('R17d setTicks: the ticks, remembered, told', [s.ticks(), JSON.parse(store.getItem('atc.report.show')), told], [mine, mine, 2]);
+  eq('R17e a new state with the same storage reads them back (before a run too)', createReportState({ storage: store }).ticks(), mine);
+  s.pandoc({ target: 'main-pp.tex', warnings: LOG, stderr: '' });
+  eq('R17f the conversion joining is told', told, 3);
+  s.other({ rows: [] });
+  s.pandoc({ target: 'other.tex', warnings: [], stderr: '' });
+  eq('R17g later rows, then a later conversion (stale): each told', told, 5);
+  s.outdate(); s.refresh();
+  eq('R17h outdate() and refresh() told', told, 7);
+  off();
+  s.setTicks(TOOL.showFor('Everything'));
+  eq('R17i after unsubscribing: not told', told, 7);
+  eq('R17j no storage: setTicks works', (() => { const t = createReportState(); t.keep(kept); t.setTicks(mine); return t.ticks(); })(), mine);
+  const fresh = createReportState({ storage: mem() });
+  ok('R17k a drawing that throws does not stop the others', (() => { let n = 0; fresh.subscribe(() => { throw new Error('drawn badly'); });
+    fresh.subscribe(() => { n++; }); fresh.keep(kept); return n === 1; })());
+} catch (e) { fail++; console.log('  FAIL R17 threw: ' + (e && e.message)); }
+
 console.log(`\n──────── ${pass} passed, ${fail} failed ────────`);
 process.exit(fail ? 1 : 0);

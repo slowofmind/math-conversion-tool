@@ -93,12 +93,24 @@ export function hiddenViews(status, from, { showOld = false } = {}) {
 }
 
 const SEVERITY = { error: 'error', warning: 'warn', note: 'info' };
-const oneLine = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
+// s314 (report-sidebar step B1): oneLine and said exported, so the Tools panel's Report section words entries as this view does
+export const oneLine = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
 // "label: message", unless the message already starts with its label
-const said = (e) => { const m = oneLine(e.message); return m.toLowerCase().startsWith(String(e.label).toLowerCase()) ? m : e.label + ': ' + m; };
+export const said = (e) => { const m = oneLine(e.message); return m.toLowerCase().startsWith(String(e.label).toLowerCase()) ? m : e.label + ': ' + m; };
 
 // ---------------------------------------------------------------- the data
-export function createReportState() {
+// s314 (report-sidebar step B1, HANDOFF-B1.md "One shared state"): the ticks are the state's, one copy for every drawing
+// (the Report view and the Tools panel's Report section), remembered in `storage` under this key (it was the Report
+// view's own). Every change to the state is told to each drawing that subscribed, so the drawings cannot disagree.
+const SHOW_KEY = 'atc.report.show';
+export function createReportState({ storage = null } = {}) {
+  let show = null;       // s314: the ticks; null until chosen (then the default level's once a run is kept)
+  try { const v = storage ? JSON.parse(storage.getItem(SHOW_KEY)) : null; if (Array.isArray(v)) show = v; } catch {}
+  const listeners = new Set();
+  // s314: tell every drawing; one that fails does not stop the others
+  const changed = () => {
+    for (const fn of [...listeners]) { try { fn(); } catch (e) { console.warn('Report: a drawing failed (' + (e && e.message) + ')'); } }
+  };
   let k = null;          // { tool, run, files, entry, converted, pre, checker, order, unread, opens, packages }
   let pandoc = [];       // Pandoc's entries, from the conversion the press started
   let pandocState = 'none';   // 'none' | 'waiting' | 'joined'
@@ -115,6 +127,7 @@ export function createReportState() {
           unread: tool.unreadParts(run, files), opens: tool.openingsOf(run, files),
           packages: tool.packageUsesOf(run, files) };
     pandoc = []; other = []; pandocState = 'waiting'; stale = false;
+    changed();
   }
 
   // After a conversion: { target, warnings, stderr, error }. Taken only for the
@@ -123,7 +136,7 @@ export function createReportState() {
   // s309: `rows`, the page's Log rows for that conversion; its own among them become "Other messages".
   function takePandoc({ target, warnings, stderr, error, rows: pageRows } = {}) {
     if (!k) return false;
-    if (pandocState !== 'waiting' || target !== k.converted) { stale = true; return false; }
+    if (pandocState !== 'waiting' || target !== k.converted) { stale = true; changed(); return false; }
     // pandoc-wasm names the file given on stdin "/stdin" (desktop Pandoc: ""); the tool's stdin option reads ""
     // (s293, test R12)
     const log = (warnings || []).map((w) => (w && w.source === '/stdin' ? { ...w, source: '' } : w));
@@ -133,6 +146,7 @@ export function createReportState() {
     pandoc = k.tool.pandocEntries(rows, k.run, k.files);
     pandocState = 'joined';
     if (pageRows) other = platformMessages(pageRows);
+    changed();
     return true;
   }
 
@@ -142,6 +156,7 @@ export function createReportState() {
   function takeOther({ rows } = {}) {
     if (!k || pandocState !== 'joined' || stale) return false;
     other = platformMessages(rows);
+    changed();
     return true;
   }
 
@@ -172,10 +187,22 @@ export function createReportState() {
     return { file: k.entry, diags };
   }
 
+  // s314: the ticks: the chosen ones (remembered), else, once a run is kept, the first level's (not remembered until
+  // chosen, as before); setTicks remembers them and tells every drawing; subscribe(fn) -> a function that unsubscribes
+  function ticks() { return show ?? (k ? k.tool.showFor(k.tool.LEVELS[0]) : null); }
+  function setTicks(v) {
+    show = [...new Set(v || [])];
+    try { if (storage) storage.setItem(SHOW_KEY, JSON.stringify(show)); } catch {}
+    changed();
+  }
+  function subscribe(fn) { listeners.add(fn); return () => { listeners.delete(fn); }; }
+
   return {
     keep, pandoc: takePandoc, other: takeOther, combined, levelLine, diagnostics,
-    // s313: a press that stopped (nothing converted) leaves a report that no longer holds the latest
-    outdate: () => { if (k) stale = true; },
+    // s314: the ticks, and the drawings told of every change; refresh() redraws them all (the page's "Show old views")
+    ticks, setTicks, subscribe, refresh: changed,
+    // s313: a press that stopped (nothing converted) leaves a report that no longer holds the latest; s314: told
+    outdate: () => { if (k) { stale = true; changed(); } },
     lines: (c, show) => k.tool.positionLines(c, show),
     status: () => ({ kept: !!k, entry: k && k.entry, converted: k && k.converted, pandoc: pandocState, stale }),
     tool: () => k && k.tool,
@@ -183,15 +210,17 @@ export function createReportState() {
 }
 
 // ---------------------------------------------------------------- the drawing
-const SHOW_KEY = 'atc.report.show';
+// (s314: the ticks and their key 'atc.report.show' moved to the state, above)
 
 // The editor hooks (step 3), from index.html: textOf(path) the project's text of a file or null when it is not in
 // the project; goTo(target) opens target.file if another is shown, jumps and highlights; mark({ file, diags })
 // hands the main file's marks to the editor.
 export function initReportView({ root, storage = globalThis.localStorage, clipboard = globalThis.navigator && globalThis.navigator.clipboard,
-  textOf = () => null, goTo = null, mark = null, oldViews = null } = {}) {
+  textOf = () => null, goTo = null, mark = null, oldViews = null, state = null } = {}) {
   // s313: oldViews { get(), set(v) }, the page's "Show old views" (his call 3 A), drawn as a tick box in Settings
-  const state = createReportState();
+  // s314 (report-sidebar step B1): the state may be handed in; by default its own, remembering the ticks in `storage`.
+  // The page hands this view's state to the Tools panel's Report section, so both draw the one copy.
+  state = state || createReportState({ storage });
   if (!root) return { keep: state.keep, pandoc: state.pandoc, other: state.other, state };
   const doc = root.ownerDocument;
   const el = (tag, props = {}, ...kids) => {
@@ -207,10 +236,7 @@ export function initReportView({ root, storage = globalThis.localStorage, clipbo
     return n;
   };
 
-  // The ticks: remembered, else the default level's (set once the tool is known).
-  let show = null;
-  try { const v = JSON.parse(storage.getItem(SHOW_KEY)); if (Array.isArray(v)) show = v; } catch {}
-  const remember = () => { try { storage.setItem(SHOW_KEY, JSON.stringify(show)); } catch {} };
+  // The ticks: the state's (s314; were this view's own): state.ticks(), changed by state.setTicks, which redraws.
 
   root.replaceChildren();
   const status = el('p', { class: 'report-status', role: 'status', 'aria-live': 'polite' });
@@ -234,13 +260,13 @@ export function initReportView({ root, storage = globalThis.localStorage, clipbo
   copyBtn.addEventListener('click', async () => {
     const tool = state.tool();
     if (!tool || !clipboard) return;
-    const c = state.combined(show);
+    const show = state.ticks(), c = state.combined(show);
     try { await clipboard.writeText(tool.renderCombined(c, { show })); copied.textContent = 'Report copied.'; }
     catch { copied.textContent = 'Could not copy.'; }
   });
 
   // ---- the settings panel: the levels, then the ticks under each level
-  function drawSettings(c) {
+  function drawSettings(c, show) {
     const tool = state.tool();
     const by = c.counts.byCategory || {};
     const current = tool.levelOf(show);
@@ -250,7 +276,7 @@ export function initReportView({ root, storage = globalThis.localStorage, clipbo
       const id = 'reportLevel-' + lv.replace(/\W+/g, '');
       levels.append(el('label', { for: id },
         el('input', { type: 'radio', name: 'reportLevel', id, value: lv, checked: current === lv,
-          onchange: () => { show = tool.showFor(lv); remember(); draw(); } }),
+          onchange: () => state.setTicks(tool.showFor(lv)) }),
         ' ' + lv + ' (' + c.counts.levels[lv] + ')'));
     }
     levels.append(el('span', { class: 'report-custom', text: current === 'Custom' ? 'Custom: ticks changed by hand' : '' }));
@@ -263,8 +289,8 @@ export function initReportView({ root, storage = globalThis.localStorage, clipbo
         fs.append(el('div', { class: 'report-tick' + (cat.parent ? ' report-tick-child' : '') },
           el('input', { type: 'checkbox', id, checked: show.includes(cat.key), 'aria-describedby': id + '-why',
             onchange: (ev) => {
-              show = ev.target.checked ? [...new Set([...show, cat.key])] : show.filter((x) => x !== cat.key);
-              remember(); draw();
+              const now = state.ticks() || [];
+              state.setTicks(ev.target.checked ? [...now, cat.key] : now.filter((x) => x !== cat.key));
             } }),
           el('label', { for: id, text: ' ' + name + ' (' + (by[cat.key] || 0) + ')' }),
           el('span', { id: id + '-why', class: 'report-why', text: cat.why })));
@@ -312,7 +338,7 @@ export function initReportView({ root, storage = globalThis.localStorage, clipbo
     });
     return el('li', { class: 'report-closed' }, btn, inner);
   }
-  function drawList(c) {
+  function drawList(c, show) {
     const byId = new Map(c.entries.map((e) => [e.id, e]));
     const out = [];
     let file, ul = null;
@@ -346,7 +372,7 @@ export function initReportView({ root, storage = globalThis.localStorage, clipbo
   function draw() {
     const tool = state.tool();
     if (!tool) return;
-    if (!show) show = tool.showFor(tool.LEVELS[0]);
+    const show = state.ticks();
     const c = state.combined(show);
     const st = state.status();
     const shown = state.lines(c, show).length;
@@ -360,16 +386,20 @@ export function initReportView({ root, storage = globalThis.localStorage, clipbo
     copyBtn.removeAttribute('aria-disabled');
     // the panel is drawn afresh: the tick or level the keyboard was on keeps the focus
     const focused = doc.activeElement && settings.contains(doc.activeElement) ? doc.activeElement.id : null;
-    drawSettings(c);
-    drawList(c);
+    drawSettings(c, show);
+    drawList(c, show);
     if (mark) mark(state.diagnostics(c, show, textOf));
     if (focused && doc.getElementById(focused)) doc.getElementById(focused).focus();
   }
 
+  // s314 (report-sidebar step B1): drawn whenever the state changes - a run kept, Pandoc joining, later messages, the
+  // ticks (from this view or the Tools panel's Report section), outdate, refresh
+  state.subscribe(draw);
+  draw();
   return {
-    keep(k) { state.keep(k); draw(); },
-    pandoc(p) { const took = state.pandoc(p); draw(); return took; },
-    other(o) { const took = state.other(o); if (took) draw(); return took; },
+    keep: (k) => state.keep(k),
+    pandoc: (p) => state.pandoc(p),
+    other: (o) => state.other(o),
     state,
   };
 }

@@ -201,8 +201,9 @@ ok('LaTeX Find/Replace is an accordion inside File Preparation (an h3 under its 
 ok('its controls moved with it, ids unchanged (profile, scope, conversion box, run button)',
   ['cleanupProfile', 'profileScopeHeader', 'chkCleanupOnConvert', 'btnRunCleanup'].every((id) => !!frPanel && frPanel.contains(doc.getElementById(id))));
 const railLabels = [...doc.querySelectorAll('.rail-section-toggle')].map((b) => text(b).replace(/^▸\s*/, '')).join(' | ');
-ok('the sidebar has two top-level sections now: Project Files and File Preparation',
-  railLabels === 'Project Files | File Preparation' && !doc.getElementById('railtab-cleanup') && !doc.getElementById('railPanelCleanup') &&
+// latex-preprocess s314 (report-sidebar step B1): updated on purpose - Report is the third section (L11); Cleanup stays gone
+ok('the sidebar\'s top-level sections: Project Files, File Preparation and (since s314) Report; no Cleanup',
+  railLabels === 'Project Files | File Preparation | Report' && !doc.getElementById('railtab-cleanup') && !doc.getElementById('railPanelCleanup') &&
   !/railtab-cleanup|railPanelCleanup/.test(js), railLabels);
 ok('no sidebar section or File Preparation accordion is labelled "Cleanup"',
   ![...doc.querySelectorAll('.rail-section-toggle, .prep-accordion-toggle')].some((b) => /\bCleanup\b/.test(text(b))));
@@ -498,9 +499,11 @@ ok('it runs after each conversion\'s report (success and failure), when the inpu
 // (off by default, in the report's Settings) brings them back. No view is switched to by a run; the status bar names
 // the place that holds the messages.
 group('L10 2026-11-16: the old views hidden, "Show old views", the panel stays on Output');
+// s314 (report-sidebar step B1): updated on purpose - the flag is one object handed to both drawings (the Report view
+// and the sidebar), and a change redraws both (state.refresh).
 ok('"Show old views" starts off, is declared before the Report view, and is handed to it',
-  /let showOldViews = false;\s*\n(?:\/\/[^\n]*\n)*const reportView = initReportView\(/.test(htmlLF) &&
-  /oldViews: \{ get: \(\) => showOldViews, set: \(v\) => \{ showOldViews = !!v; syncOutputViews\(\); \} \}/.test(htmlLF));
+  /let showOldViews = false;\s*\n(?:\/\/[^\n]*\n)*const oldViews = \{ get: \(\) => showOldViews, set: \(v\) => \{ showOldViews = !!v; syncOutputViews\(\); reportView\.state\.refresh\(\); \} \};\nconst reportView = initReportView\(/.test(htmlLF) &&
+  /const reportView = initReportView\(\{[^]*?\boldViews \}\);/.test(htmlLF));
 ok('syncOutputViews passes it to hiddenViews', /hiddenViews\(reportView\.state\.status\(\), document\.getElementById\('selFrom'\)\.value, \{ showOld: showOldViews \}\)/.test(htmlLF));
 const showRep = htmlLF.slice(htmlLF.indexOf('function showReport('), htmlLF.indexOf('\n}\n', htmlLF.indexOf('function showReport(')) + 2);
 ok('a run fills the Preprocess view but no longer switches to it', showRep.includes('report.textContent = text;') && !showRep.includes('activateOutputTab'), showRep);
@@ -508,6 +511,51 @@ ok('a press that stopped outdates the report and re-sorts the views', /if \(ran 
 ok('the status bar no longer sends the reader to "the warnings list"', inPage('see the warnings list') === 0 && inPage('could not be followed; see ${whereTold}') === 1);
 const ppSrc = readFileSync(join(PLAT, 'js', 'preprocess.js'), 'utf8');
 ok('a stopped press\'s status names the Log, not the Preprocess view', !ppSrc.includes('See the Preprocess view') && ppSrc.includes("'Preprocess stopped. See the Log.'"));
+
+// ── L11, latex-preprocess s314 (report-sidebar step B1; report-sidebar\HANDOFF-B1.md "B1 as agreed") ────────────────
+// A third section "Report" in the Tools panel, after File Preparation, remembered like the others; js/report-sidebar.js
+// draws it from the Report view's own state (one copy). His call 4 "A": after a run's conversion with something to show
+// at the current level the section opens by itself (not remembered); a closed Tools panel stays closed; the status bar
+// gives the report's count while the report holds the latest conversion. Written before index.html changes.
+group('L11 2026-11-16: the Report section in the Tools panel');
+const railHeads = [...doc.querySelectorAll('.rail-sections > .rail-section > h2.rail-section-heading > button.rail-section-toggle')];
+ok('three sections, in order: Project Files, File Preparation, Report',
+  railHeads.map((b) => text(b).replace(/^▸/, '')).join(' | ') === 'Project Files | File Preparation | Report', railHeads.map((b) => text(b)).join(' | '));
+const repHead = doc.getElementById('railtab-report');
+const repPanel = doc.getElementById('railPanelReport');
+ok('Report\'s header: closed, controlling its panel',
+  !!repHead && repHead.getAttribute('aria-expanded') === 'false' && repHead.getAttribute('aria-controls') === 'railPanelReport');
+ok('its panel: a hidden region it labels, holding the drawing area', !!repPanel && repPanel.hidden && repPanel.getAttribute('role') === 'region' &&
+  repPanel.getAttribute('aria-labelledby') === 'railtab-report' && !!repPanel.querySelector('#reportSidebar.sidebar-body'));
+ok('no live region in it', !!repPanel && ![repPanel, ...repPanel.querySelectorAll('*')].some((el) => el.hasAttribute('aria-live') ||
+  ['status', 'log', 'alert'].includes(el.getAttribute('role'))));
+ok('railSections lists it third', /const railSections = \[\s*\['files',\s+'railtab-files',\s+'railPanelFiles'\],\s*\['prepare', 'railtab-prepare', 'railPanelPrepare'\],\s*\['report',\s+'railtab-report',\s+'railPanelReport'\],\s*\];/.test(htmlLF));
+ok('it opens at start only when the reader left it open', /if \(v && v\.report === 'open'\) open\.add\('report'\);/.test(htmlLF));
+ok('the page imports initReportSidebar, on the line after the Report view\'s import',
+  htmlLF.includes("import { initReportView, hiddenViews } from './js/report-view.js';\nimport { initReportSidebar } from './js/report-sidebar.js';"));
+// the module never imports report-view.js itself (test-asset-urls: no relative paths inside js/); the page hands it the
+// Report view's own wording and click target
+ok('the page imports clickTarget, said and oneLine for it, on the next line',
+  htmlLF.includes("import { initReportSidebar } from './js/report-sidebar.js';\nimport { clickTarget, said, oneLine } from './js/report-view.js';"));
+ok('and hands them to it as its words', /const reportSidebar = initReportSidebar\(\{[^]*?words: \{ clickTarget, said, oneLine \}[^]*?\}\);/.test(htmlLF));
+const sbAt = htmlLF.indexOf('const reportSidebar = initReportSidebar(');
+const sbCall = sbAt < 0 ? '' : htmlLF.slice(sbAt, htmlLF.indexOf('});', sbAt) + 3);
+ok('drawn once, from the Report view\'s state, with today\'s click to the line and the shared "Show old views"',
+  inPage('initReportSidebar(') === 1 && /state: reportView\.state/.test(sbCall) && /textOf: reportTextOf/.test(sbCall) &&
+  /goTo: reportGoTo/.test(sbCall) && /\boldViews\b/.test(sbCall) && /getElementById\('reportSidebar'\)/.test(sbCall), sbCall.slice(0, 200));
+const autoAt = htmlLF.indexOf('function openReportAfterRun(');
+const autoFn = autoAt < 0 ? '' : htmlLF.slice(autoAt, htmlLF.indexOf('\n}\n', autoAt) + 2);
+ok('call 4: openReportAfterRun opens the section, not remembered, when the run\'s conversion joined with lines to show',
+  /setRailSection\('report', true\)/.test(autoFn) && /reportSidebar\.summary\(\)/.test(autoFn) && /railOpen\.has\('report'\)/.test(autoFn) &&
+  !/localStorage|setSidebarOpen|focus\(/.test(autoFn), autoFn);
+ok('both joins go through it (a conversion, and a conversion Pandoc stopped)', inPage('openReportAfterRun(reportView.pandoc({') === 2,
+  String(inPage('openReportAfterRun(reportView.pandoc({')));
+const cntAt = htmlLF.indexOf('function showReportCount(');
+const cntFn = cntAt < 0 ? '' : htmlLF.slice(cntAt, htmlLF.indexOf('\n}\n', cntAt) + 2);
+ok('the status bar: the report\'s count while the report holds the latest conversion, kept up to date',
+  /hiddenViews\(reportView\.state\.status\(\)/.test(cntFn) && /statusWarnings/.test(cntFn) && /reportSidebar\.summary\(\)/.test(cntFn) &&
+  /reportView\.state\.subscribe\(showReportCount\);/.test(htmlLF), cntFn);
+ok('runConversion gives the report\'s count after the Log\'s counts', /warningsEl\.style\.display = 'none';\n    \}\n    showReportCount\(\);/.test(htmlLF));
 
 console.log('\n──────── ' + pass + ' passed, ' + fail + ' failed ────────');
 process.exitCode = fail ? 1 : 0;
